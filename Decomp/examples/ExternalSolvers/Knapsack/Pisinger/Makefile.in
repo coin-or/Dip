@@ -1,0 +1,57 @@
+# $Id: $
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+#===========================================================================#
+# library name
+LIBKNAP = libKnapPisinger.@LIBEXT@
+
+# source files
+OBJS_SRC += mcknap.c
+OBJS_SRC += combo.c
+
+OBJS     += mcknap.o
+OBJS     += combo.o
+
+# include flags
+ADDINCFLAGS += 
+
+#===========================================================================#
+# directory to the source files
+SRCDIR = @srcdir@
+VPATH  = @srcdir@
+
+#===========================================================================#
+# C compiler, linker
+CC = @CC@
+AR = @AR@
+
+# C compiler options
+CCFLAGS = @CFLAGS@
+
+#===========================================================================#
+# includes
+INCL =  -I. $(ADDINCFLAGS)
+
+#===========================================================================#
+.SUFFIXES: .c .o
+
+$(LIBKNAP): $(OBJS)
+	$(AR) -q -s $@ ${OBJS}
+
+clean:
+	rm -rf *.o $(LIBKNAP)
+
+.c.o:
+	$(CC) $(CCFLAGS) $(INCL) -c $<
+
+

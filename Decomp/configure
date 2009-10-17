@@ -21659,7 +21659,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/SSR/Makefile examples/SSR/ssr.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile test/Makefile decomp_addlibs.txt"
+                                                                                                                                                                                                                                                                                                            ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile test/Makefile decomp_addlibs.txt"
 
 
 # Here put the location and name of the configuration header file
@@ -22454,8 +22454,6 @@ do
   "examples/VRP/boost_extract.sh" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/boost_extract.sh" ;;
   "examples/ATM/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/ATM/Makefile" ;;
   "examples/ATM/atm.parm" ) CONFIG_FILES="$CONFIG_FILES examples/ATM/atm.parm" ;;
-  "examples/SSR/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/SSR/Makefile" ;;
-  "examples/SSR/ssr.parm" ) CONFIG_FILES="$CONFIG_FILES examples/SSR/ssr.parm" ;;
   "examples/ExternalSolvers/Knapsack/Pisinger/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Knapsack/Pisinger/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "decomp_addlibs.txt" ) CONFIG_FILES="$CONFIG_FILES decomp_addlibs.txt" ;;

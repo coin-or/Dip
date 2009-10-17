@@ -102,6 +102,7 @@ Decomp/examples/ATM/ATM_Param.h -text
 Decomp/examples/ATM/Makefile.in -text
 Decomp/examples/ATM/atm.parm.in -text
 Decomp/examples/ATM/notes.txt -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in -text
 Decomp/examples/GAP/GAP_Debug.h -text
 Decomp/examples/GAP/GAP_DecompApp.cpp -text
 Decomp/examples/GAP/GAP_DecompApp.h -text

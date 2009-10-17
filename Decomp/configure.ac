@@ -244,8 +244,6 @@ AC_CONFIG_FILES([Makefile
 		 examples/VRP/boost_extract.sh
                  examples/ATM/Makefile
                  examples/ATM/atm.parm
-		 examples/SSR/Makefile
-		 examples/SSR/ssr.parm
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
                  test/Makefile
                  decomp_addlibs.txt])
