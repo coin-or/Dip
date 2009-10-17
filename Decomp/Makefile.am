@@ -1,0 +1,74 @@
+#============================================================================#
+# This file is part of the DECOMP Solver Framework.                          #
+#                                                                            #
+# DECOMP is distributed under the Common Public License as part of the       #
+# COIN-OR repository (http://www.coin-or.org).                               #
+#                                                                            #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)        #
+#                                                                            #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs.#
+# All Rights Reserved.                                                       #
+#============================================================================#
+
+AUTOMAKE_OPTIONS = foreign
+
+########################################################################
+#                          Subdirectories                              #
+########################################################################
+
+SUBDIRS = src
+
+# We don't want to compile the test subdirectory, unless the test target is
+# specified.  But we need to list it as subdirectory to make sure that it is
+# included in the tarball
+
+if ALWAYS_FALSE
+  SUBDIRS += test
+endif
+
+########################################################################
+#             Additional files to be included in tarball               #
+########################################################################
+
+# Here we need include all files that are not mentioned in other Makefiles
+EXTRA_DIST = 
+
+########################################################################
+#                           Extra Targets                              #
+########################################################################
+
+test: all
+	cd test; $(MAKE) test
+
+unitTest: test
+
+clean-local:
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
+
+distclean-local:
+	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
+
+.PHONY: test unitTest 
+
+########################################################################
+#                  Installation of the addlibs file                    #
+########################################################################
+
+addlibsfile = decomp_addlibs.txt
+addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
+
+install-exec-local: install-doc
+	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
+
+uninstall-local: uninstall-doc
+	rm -f $(addlibsdir)/$(addlibsfile)
+
+
+########################################################################
+#                         Maintainer Stuff                             #
+########################################################################
+
+# Files that are generated and should be cleaned with make distclean
+DISTCLEANFILES =
+
+include ../BuildTools/Makemain.inc

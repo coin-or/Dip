@@ -1,0 +1,74 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+#===========================================================================#
+EXEDECOMP = decomp_milpblock@EXEEXT@
+
+#source files
+OBJS        = MILPBlock_Main.@OBJEXT@
+OBJS       += MILPBlock_DecompApp.@OBJEXT@
+
+#===========================================================================#
+# directory to the source files
+SRCDIR = @srcdir@
+VPATH = @srcdir@
+
+#===========================================================================#
+# C++ Compiler command
+CXX = @CXX@
+# C++ Compiler options
+CXXFLAGS = @CXXFLAGS@
+# C++ compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+#===========================================================================#
+# directory with COIN header files
+COININCDIR = @abs_include_dir@
+# directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# includes, use the CYGPATH_W variables to allow compilation with win
+INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+
+#===========================================================================#
+# include COIN flags and library options
+include ../Makefile.Examples
+
+#===========================================================================#
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+#===========================================================================#
+all: $(EXEDECOMP)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXEDECOMP): $(OBJS)
+	bla=;\
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+data:
+	cd @srcdir@/../../data/MILP/block; \
+	tar -zxvf retail.tgz; \
+	tar -zxvf atm.tgz;
+
+
+clean:
+	rm -rf $(EXE) $(OBJS)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

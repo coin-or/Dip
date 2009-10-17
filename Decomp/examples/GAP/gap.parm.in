@@ -1,0 +1,40 @@
+doCut           = 1
+doPriceCut      = 0
+
+doModelKPOne    = 1
+doModelKPBlock  = 0
+
+[DECOMP]
+LogLevel      = 10
+LogAppLevel   = 10
+LogLpLevel    = 10
+LogDebugLevel = 10
+
+CutCGL        = 1
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+
+[CUT]
+CutCGL        = 1
+
+[PRICE_AND_CUT]
+LimitRoundCutIters      = 1
+LimitRoundPriceIters    = 1
+LimitInitVars           = 2
+
+[RELAX_AND_CUT]
+LimitRoundCutIters      = 0
+LimitRoundPriceIters    = 50
+LimitInitVars           = 2
+
+[ALPS]
+nodeLogInterval = 1
+msgLevel        = 10
+
+[GAP]
+DataDir    = @srcdir@/../../data/GAP
+Instance   = a05100
+
+#

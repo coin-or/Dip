@@ -1,0 +1,126 @@
+//===========================================================================//
+// This file is part of the Decomp Solver Framework.                         //
+//                                                                           //
+// Decomp is distributed under the Common Public License as part of the      //
+// COIN-OR repository (http://www.coin-or.org).                              //
+//                                                                           //
+// Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       //
+//                                                                           //
+// Copyright (C) 2002-2007, Lehigh University, Matthew Galati, and Ted Ralphs//
+// All Rights Reserved.                                                      //
+//===========================================================================//
+
+#ifndef UTIL_PORTABLE_INCLUDED
+#define UTIL_PORTABLE_INCLUDED
+
+
+//------------------------------------------------------------------------------
+//     ----- Shared Defines   
+//------------------------------------------------------------------------------
+
+#ifndef strncpyz
+#define strncpyz(t,f,n) {strncpy(t,f,n); t[n-1] = '\0';}
+#endif
+
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//     ----- Windows defines
+//------------------------------------------------------------------------------
+#ifdef WIN32
+
+#include <direct.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <memory.h>
+#include <winbase.h>
+#include <io.h>
+
+//
+//      -- standard functions
+//
+
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#define MKDIR(x) _mkdir(x)
+
+//
+//      -- file modes
+//
+
+#include <fcntl.h>
+#define O_RDONLY        _O_RDONLY
+
+#if 0
+#define PROT_READ       1
+#define PROT_WRITE      2
+#define MAP_SHARED      1
+#define MAP_PRIVATE     2
+#endif
+
+typedef char* caddr_t;
+#define STAT    _stat
+
+//
+//      -- path length
+//
+#define PATH_MAX        _MAX_PATH
+
+//------------------------------------------------------------------------------
+
+#else
+
+//------------------------------------------------------------------------------
+//      -----   Unix defines
+//------------------------------------------------------------------------------
+
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <fcntl.h>
+#include <strings.h>
+#include <unistd.h>     // linux
+
+#ifdef Linux
+typedef unsigned int u_int64;
+#endif
+//
+//      -- standard functions
+//
+
+#define MKDIR(x) mkdir(x,0775)
+#ifndef STAT
+#define STAT    stat
+#endif
+//#ifndef max
+//#define max(a,b) (((a)>(b))?(a):(b))
+//#endif
+//#ifndef min
+//#define min(a,b) (((a)<(b))?(a):(b))
+//#endif
+#define MKDIR(x)        mkdir(x,0775)
+
+//------------------------------------------------------------------------------
+#endif
+
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+#define STL_SET         std::set
+#define STL_VECTOR      std::vector
+#define STL_MAP         std::map
+#define STL_PAIR        std::pair
+#define STL_LESS        std::less
+#define STL_SORT        std::sort
+
+#ifdef Linux
+#define PROT_READ       1
+#define PROT_WRITE      2
+#define MAP_SHARED      1
+#define MAP_PRIVATE     2
+#endif
+
+#endif

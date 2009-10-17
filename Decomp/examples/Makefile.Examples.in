@@ -1,0 +1,79 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# define DECOMP libs
+###########################################################################
+LIBS = -L$(COINLIBDIR) \
+	-lDecomp       \
+	@ADDLIBS@
+
+ADDINCFLAGS += -DCOIN_ASSERT
+
+###########################################################################
+#define vars for ALPS
+###########################################################################
+LIBS += -lAlps `cat @ALPSOBJDIR@/alps_addlibs.txt`
+
+###########################################################################
+# define the directory for LP/IP solver determined at configure
+###########################################################################
+CPXINCDIR  = @CPXINCDIR@
+
+###########################################################################
+# define vars for which IP solver was chosen in configure
+###########################################################################
+CBC_IP_SOLVER    = @CBC_IP_SOLVER_TRUE@TRUE
+CPLEX_IP_SOLVER  = @CPLEX_IP_SOLVER_TRUE@TRUE
+
+ifeq ($(CBC_IP_SOLVER),TRUE)
+LIBS += -lOsiCbc -lCbcSolver -lCbc `cat @CBCOBJDIR@/cbc_addlibs.txt`
+ADDINCFLAGS += -D__DECOMP_IP_CBC__
+endif
+
+ifeq ($(CPLEX_IP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lOsiCpx -lcplex
+ADDINCFLAGS += -D__DECOMP_IP_CPX__
+endif
+
+###########################################################################
+# define vars for which LP solver was chosen in configure
+###########################################################################
+CLP_LP_SOLVER    = @CLP_LP_SOLVER_TRUE@TRUE
+CPLEX_LP_SOLVER  = @CPLEX_LP_SOLVER_TRUE@TRUE
+
+ifeq ($(CLP_LP_SOLVER),TRUE)
+LIBS += -lOsiClp -lClp `cat @CLPOBJDIR@/clp_addlibs.txt`
+ADDINCFLAGS += -D__DECOMP_LP_CLP__
+endif
+
+ifeq ($(CPLEX_LP_SOLVER),TRUE)
+INCL += -I`$(CYGPATH_W) $(CPXINCDIR)`
+LIBS += -lOsiCpx -lcplex
+ADDINCFLAGS += -D__DECOMP_LP_CPX__
+endif
+
+###########################################################################
+# define COIN libs
+###########################################################################
+LIBS += -L$(COINLIBDIR) -lCgl -lOsi -lCoinUtils \
+	`cat @CGLOBJDIR@/cgl_addlibs.txt` \
+	`cat @OSIOBJDIR@/osi_addlibs.txt` \
+	`cat @COINUTILSOBJDIR@/coinutils_addlibs.txt`
+#NOTE: CGL depends on CLP
+LIBS += -lOsiClp -lClp -lCoinUtils `cat @CLPOBJDIR@/clp_addlibs.txt`
+INCL += -I@abs_include_dir@
+
+# Directory with COIN header files
+COININCDIR = @abs_include_dir@/coin
+

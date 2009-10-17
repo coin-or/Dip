@@ -1,0 +1,118 @@
+===================================================================
+10_50_1:
+CPX10.2 let run for a while... no UB... let it run overnight, also try CPX11
+
+P:
+881 nodes, opt=575,990.73, 1295s, 1265 in solve relax - lots of potential for threaded.
+
+D-ALGO   : 15.05694100  <--- processNode() -----------
+Process Node 1 (algo = PRICE_AND_CUT, phaseLast = PHASE_PRICE2) gLB = 572817 gUB = INF
+
+
+D-ALGO   : 606.17388    <--- processNode() -----------
+Process Node 144 (algo = PRICE_AND_CUT, phaseLast = PHASE_PRICE2) gLB = 575819 gUB = 575991
+
+PC:
+cuts not getting applied - stopping on gap and not doing... we should probably adjust gap settings
+
+
+
+
+
+
+
+
+===================================================================
+would it help at all to put partial budget constraint in subproblem?
+
+===================================================================
+try branching on least fractional insted of most fractional... 
+  for e.g., branch on 0.993?
+
+tighten K too easy for cplex
+
+try not compressing columns then use solAsIp - better chance to find combo... 
+surprising it is not finding - is it a tolerance issue? or did SAS just get lucky?
+
+10_30_1: 335961.4248542148
+ brute: 64.4s, 16300 nodes, root LB= 326,535, UB 1590 nodes, ~10s, 4.5% gap
+ CPM: 
+
+===================================================================
+5_10_1: 59704.2
+
+CPM:
+0.09s, solved in root node - flow, implied, gomory cuts
+
+P: 
+174s, 851 nodes, rootLB=59159.8, 0.07s
+first UB 60250.7 @ 35s, node 41, LB=59472
+
+P+kfc: no cuts, 176s, 879 nodes (changes state of lp solver??) during CGL process?
+  or do we have some randomness - should rerun each to check
+
++kfcm - cplex error, no solution (not setting row-act, etc) and later, Error
+  var in LP had negrc. --> switch to OsiClp for cglSI
+still get LP var with negrc - so must be bug... 
+need OsiClp setRowAct - but that would not cause this bug since
+SI's are unrelated - that will only effect cuts - perhaps causing to miss some
+found 1 new cut after price call 15.... in node 0. The error comes much later
+in Node 20 in price2 phase... more cuts found in node 20... ?
+
+
+fixed cuts..... but now:
+  364s, 1033 nodes, rootLB=59583.3, 
+  38th node processed
+    LB=59583 UB=60501, 38s -> better gap than w/o cuts
+    but many more nodes - just bad luck?
+
+with compress cols
+ 1245s, 857 nodes
+
+
+
+
+
+
+
+
+===================================================================
+10_50 - negative B so probably disregard
+
+Elapsed time = 31878.22 sec. (tree size = 2508.12 MB, solutions = 0)
+Nodefile size = 2381.03 MB (747.56 MB after compression)
+^C
+GUB cover cuts applied:  14
+Clique cuts applied:  1
+Cover cuts applied:  391
+Implied bound cuts applied:  184
+Flow cuts applied:  608
+Mixed integer rounding cuts applied:  77
+Gomory fractional cuts applied:  41
+
+
+MIP - Aborted, no integer solution.
+Current MIP best bound =  6.0673459464e+05 (gap is infinite)
+Solution time = 31878.43 sec.  Iterations = 201360740  Nodes = 3659030 (3046011)
+
+
+DECOMP also gave up on... after
+Processing Node 412 (algo = PRICE_AND_CUT, phase = PHASE_PRICE1) thisLB = 625680 globalUB = INF
+Processing Node 412 (algo = PRICE_AND_CUT, phase = PHASE_PRICE1) thisLB = 625680 globalUB = INF
+Processing Node 412 (algo = PRICE_AND_CUT, phase = PHASE_PRICE1) thisLB = 625680 globalUB = INF
+^C
+
+many cases of rc=a < 0 in master - so, still think bug - check logic of when that check is made
+
+
+* try cpx11 direct solve
+* try bonmin minlp solve
+* DW
+** try cutup
+** try round robin on blocks
+** threading on blocks
+** try gap and/or time except last iter
+** try cpx11 multiple solutions from milp
+* try different decompos on formulation
+* try BCP
+* try vol+cut - forget generic subgradient?

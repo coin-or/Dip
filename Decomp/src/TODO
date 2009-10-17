@@ -1,0 +1,71 @@
+
+
+=== ToDo Next ===
+- Relax and Cut ---> what to do if no UB!?
+  -- for now, force user to give some idea
+- Decomp and Cut - first just do normal CPM + DC idea with farkas working
+  --> from multi-poly.... 
+  --> even during PC, x* --> decomp from other poly, then farks
+  --> THIS could be interesting
+- Volume -> DecompAlgoVC? or direct DecompVol?
+- DecompInterface Idea
+
+
+- parameters need to be stored in algo, if doing multi-poly... 
+- really need multiple DecompModels? stored as a DecompApp?
+- if depend on COIN or Alps
+- UtilCoin, UtilAlps, ... others should be completely independent of COIN
+
+
+=== Code CleanUp ===
+AlpsDecompTreeNode.cpp  / .h
+XXX AlpsDecompModel.cpp  / .h
+AlpsDecompSolution.h
+AlpsDecompNodeDesc.h    
+
+
+DecompCutPool.cpp / .h
+DecompVarPool.cpp / .h
+DecompBranch.cpp        
+
+DecompConfig.h
+DecompTypes.h      
+DecompConstants.h
+DecompMemPool.h          
+
+DecompConstraintSet.cpp / .h
+DecompWaitingCol.h
+DecompWaitingRow.h
+
+DecompVar.cpp / .h           
+DecompCut.cpp / .h
+DecompCutOsi.h           
+
+DecompAlgo.cpp   / .h      
+DecompAlgoC.cpp  / .h
+DecompAlgoPC.cpp / .h
+DecompAlgoRC.cpp / .h       
+DecompAlgoD.cpp  / .h       
+
+DecompApp.cpp    / .h
+
+
+DecompDebug.cpp         
+DecompStats.cpp / .h
+
+DecompModel.h            
+DecompParam.h            
+DecompPortable.h         
+DecompSolution.h         
+
+UtilParameters.cpp / .h
+UtilMacrosAlps.cpp / .h
+UtilMacros.cpp     / .h
+UtilHash.cpp       / .h
+UtilGraphLib.cpp   / .h
+
+OsiNullSolverInterface.hpp
+OsiData.hpp
+
+
+

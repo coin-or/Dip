@@ -1,0 +1,118 @@
+
+universe     = vanilla
+notification = Error
+log          = /users/magala/running/decomp/milpblock/milpblockpcondor.log
+notify_user  = matthew.galati@sas.com
+executable   = /users/magala/bin/decomp/decomp_milpblock-g
+initialdir   = /users/magala/running/decomp/milpblock/milpblockp
+MAX_SECONDS  = 1000
+periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > 1000)
+requirements = (Arch == "X86_64") && (OpSys == "LINUX")
+# executable: -rwxr-xr-x 1 magala users 33805399 Oct  5 21:49 /users/magala/bin/decomp/decomp_milpblock-g
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
+
+     output      = 3.condor.out
+     error       = 3.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail3 --MILPBlock:BlockFile retail3.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail3.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail3.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 4.condor.out
+     error       = 4.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail4 --MILPBlock:BlockFile retail4.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail4.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail4.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 6.condor.out
+     error       = 6.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail6 --MILPBlock:BlockFile retail6.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail6.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail6.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 20.condor.out
+     error       = 20.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail20 --MILPBlock:BlockFile retail20.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail20.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail20.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 22.condor.out
+     error       = 22.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail22 --MILPBlock:BlockFile retail22.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail22.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail22.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 27.condor.out
+     error       = 27.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail27 --MILPBlock:BlockFile retail27.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail27.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail27.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 31.condor.out
+     error       = 31.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail31 --MILPBlock:BlockFile retail31.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail31.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail31.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   
+
+     output      = 33.condor.out
+     error       = 33.condor.err.$(Process)
+     arguments   = --param milpblockp.parm --MILPBlock:Instance retail33 --MILPBlock:BlockFile retail33.block
+     should_transfer_files = YES
+     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail33.mps, /users/magala/COIN/coin-Decomp/Decomp/data/MILP/block/retail/retail33.block, /users/magala/bin/decomp/milpblockp.parm
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = False
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   

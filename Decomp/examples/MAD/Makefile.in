@@ -1,0 +1,108 @@
+#TODO copyright
+# $Id: $
+
+##########################################################################
+#    You can modify this example makefile to fit for your own program.   #
+#    Usually, you only need to change the five CHANGEME entries below.   #
+##########################################################################
+
+# CHANGEME: This should be the name of your executable
+EXEDECOMP = decomp_mad@EXEEXT@
+EXEALPS   = alps_mad@EXEEXT@
+
+# CHANGEME: Here is the name of all object files corresponding to the source
+#           code that you wrote in order to define the problem statement
+OBJS         = MAD_DecompApp.@OBJEXT@
+OBJS        += MAD_Heuristic.@OBJEXT@
+OBJS        += MAD_DecompDebug.@OBJEXT@
+OBJS_DECOMP  = $(OBJS) MAD_DecompMain.@OBJEXT@
+OBJS_ALPS    = $(OBJS) MAD_Main.@OBJEXT@
+
+# CLIQUER 
+CLIQUER_LIB  = cliquer.a
+CLIQUER_DIR  = @srcdir@/cliquer_msvs
+CLIQUER_OBJ  = $(CLIQUER_DIR)/cliquer.o 
+CLIQUER_OBJ += $(CLIQUER_DIR)/graph.o 
+CLIQUER_OBJ += $(CLIQUER_DIR)/reorder.o
+
+# QUALEX (for now, assume its been built)
+QUALEX_LIB  = Qualex
+QUALEX_DIR  = @srcdir@/../ExternalSolvers/MaxClique/Qualex
+
+# CHANGEME: Additional libraries
+ADDLIBS  = $(CLIQUER_LIB) 
+ADDLIBS += -L$(QUALEX_DIR) -l$(QUALEX_LIB)
+ADDLIBS += ../../../../Decomp/examples/ExternalSolvers/lapack-3.1.1/lapack_LINUX.a
+ADDLIBS += ../../../../Decomp/examples/ExternalSolvers/lapack-3.1.1/blas_LINUX.a
+ADDLIBS += -lg2c
+
+
+# CHANGEME: Additional flags for compilation (e.g., include flags)
+ADDINCFLAGS =-I$(CLIQUER_DIR) -I$(QUALEX_DIR)
+
+# CHANGEME: Directory to the sources for the (example) problem definition
+# files
+SRCDIR = @srcdir@
+VPATH = @srcdir@
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+
+# C++ Compiler command
+CXX = @CXX@
+
+# C++ Compiler options
+CXXFLAGS = @CXXFLAGS@
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+# Directory with COIN header files
+COININCDIR = @abs_include_dir@
+
+# Directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# Necessary Include dirs (we use the CYGPATH_W variables to allow
+# compilation with Windows compilers)
+INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+
+#TODO
+include ../Makefile.Examples
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+#TODO: needs to be conditional on alps or not
+#all: $(EXEDECOMP) $(EXEALPS)
+all: $(EXEALPS)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXEDECOMP): $(OBJS_DECOMP)
+	bla=;\
+	for file in $(OBJS_DECOMP); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+$(EXEALPS): $(OBJS_ALPS) $(CLIQUER_LIB)
+	bla=;\
+	for file in $(OBJS_ALPS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+$(CLIQUER_LIB):
+	bla=;\
+	for file in $(CLIQUER_OBJ); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+   $(AR) -q $@ $$bla
+
+clean:
+	rm -rf $(EXE) $(OBJS_DECOMP) $(OBJS_ALPS) $(CLIQUER_LIB)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

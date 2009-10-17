@@ -1,0 +1,43 @@
+doCut         = 0
+doPriceCut    = 1
+doRelaxCut    = 0
+doDirect      = 0
+
+[DECOMP]
+LogLevel      = 3
+LogAppLevel   = 0
+LogLpLevel    = 1
+LogDebugLevel = 3
+LogDumpModel  = 0
+CutCGL        = 0
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+
+[CUT]
+CutGomory = 1
+
+[PRICE_AND_CUT]
+SolveMasterAsIp         = 1
+CutCGL                  = 1
+LimitRoundCutIters      = 10
+LimitRoundPriceIters    = 10
+LimitInitVars           = 2
+
+[ALPS]
+nodeLogInterval = 1
+msgLevel        = 10
+
+[MILPBlock]
+LogLevel        = 3
+DataDir         = ..\..\..\..\Decomp\data\MILP\block
+
+#BlockFileFormat = List
+#BlockFile       = atm_5_10_1.block
+#Instance        = atm_5_10_1
+
+BlockFileFormat = Pair
+BlockFile       = kohls31_ld1.block
+Instance        = kohls31_ld1
+ColumnUB        = 100

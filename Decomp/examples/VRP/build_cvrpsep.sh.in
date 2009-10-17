@@ -1,0 +1,2 @@
+cd @srcdir@/../ExternalSolvers/VRP/CVRPSEP
+make

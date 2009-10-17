@@ -1,0 +1,89 @@
+# $Id: $
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+#===========================================================================#
+EXEDECOMP = decomp_gap@EXEEXT@
+
+# source files
+OBJS          = GAP_Main.@OBJEXT@
+OBJS         += GAP_Instance.@OBJEXT@
+OBJS         += GAP_DecompApp.@OBJEXT@
+
+#===========================================================================#
+# additional libraries needed (libKnapPisinger)
+KNAP_DIR = ../ExternalSolvers/Knapsack/Pisinger
+KNAP_LIB  = KnapPisinger
+KNAP_INC  = @srcdir@/$(KNAP_DIR)
+
+#===========================================================================#
+# additional include and linnk flags
+ADDLIBS      += -L$(KNAP_DIR) -l$(KNAP_LIB)
+ADDINCFLAGS  += -I$(KNAP_INC)
+ADDINCFLAGS  += -DCOIN_ASSERT #??
+
+#===========================================================================#
+# directory to the source files
+SRCDIR = @srcdir@
+VPATH  = @srcdir@
+
+#===========================================================================#
+# C++ compiler command
+CXX = @CXX@
+# C++ compiler options
+CXXFLAGS = @CXXFLAGS@
+# C++ compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+#===========================================================================#
+# directory with COIN header files
+COININCDIR = @abs_include_dir@
+# directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# includes, use the CYGPATH_W variables to allow compilation with win
+INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+
+#===========================================================================#
+# include COIN flags and library options
+include ../Makefile.Examples
+
+#===========================================================================#
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+#===========================================================================#
+all: $(EXEDECOMP)
+
+.SUFFIXES: .cpp .c .o .obj
+
+#TODO: why does this target not work?
+#what opt flag?
+#$(EXEDECOMP): $(OBJS) $(KNAP_DIR)/libKnapPisinger.a
+
+$(EXEDECOMP): $(OBJS)
+	(cd ${KNAP_DIR} && ${MAKE})
+	bla=;\
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+clean:
+	rm -rf $(EXE) $(OBJS)
+
+$(KNAP_DIR)/libKnapPisinger.a:
+	(cd ${KNAP_DIR} && ${MAKE})
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

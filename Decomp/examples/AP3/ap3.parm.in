@@ -1,0 +1,53 @@
+doCut         = 1
+doPrice       = 0
+doPriceCut    = 0
+doRelaxCut    = 0
+doModelI      = 1
+doModelJ      = 0
+doModelK      = 0
+
+[DECOMP]
+LogLevel      = 3
+LogAppLevel   = 0
+LogLpLevel    = 0
+LogDebugLevel = 3
+CutCGL        = 1
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+
+
+[CUT]
+#TODO: should be able to turn on gomory, etc
+CutCGL        = 1
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+#LimitRoundCutIters      = 100
+LogDebugLevel = 5
+
+[PRICE]
+LimitTotalCutIters      = 0
+LimitRoundPriceIters    = 100
+LimitInitVars           = 2
+
+[PRICE_AND_CUT]
+LimitRoundCutIters      = 1
+LimitRoundPriceIters    = 1
+LimitInitVars           = 2
+
+[RELAX_AND_CUT]
+LimitRoundCutIters      = 0
+LimitRoundPriceIters    = 50
+LimitInitVars           = 2
+
+#what if i want to run price and then price and cut?
+[ALPS]
+nodeLogInterval = 1
+msgLevel        = 10
+
+[AP3]
+DataDir  = ../../../../Decomp/data/AP3/Grundel
+Instance = ap3.10.1

@@ -1,0 +1,2 @@
+cd @srcdir@/../ExternalSolvers/Graph/
+tar -zxvf boost_*.tar.gz

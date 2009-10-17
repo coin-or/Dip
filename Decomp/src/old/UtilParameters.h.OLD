@@ -1,0 +1,76 @@
+//===========================================================================//
+// This file is part of the Decomp Solver Framework.                         //
+//                                                                           //
+// Decomp is distributed under the Common Public License as part of the      //
+// COIN-OR repository (http://www.coin-or.org).                              //
+//                                                                           //
+// Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       //
+//                                                                           //
+// Copyright (C) 2002-2007, Lehigh University, Matthew Galati, and Ted Ralphs//
+// All Rights Reserved.                                                      //
+//===========================================================================//
+
+#ifndef UTIL_PARAMETERS_INCLUDED
+#define UTIL_PARAMETERS_INCLUDED
+
+#include <string>
+#include <map>
+
+typedef bool CBFUNC(void* pArgs,std::ostream& os, 
+                    const std::string& section, 
+                    const std::string& name, 
+                    const std::string& value);
+typedef std::map<std::string, std::pair<int,std::string>, 
+                 std::less<std::string> >   NV_MAP;
+typedef std::map<std::string, NV_MAP, std::less<std::string> > SECTION_MAP;
+
+//TODO:
+//change to one map
+//  string -> class parameter (string, need anything else?)
+//  string = section_name (concatenate to get one key)
+//  
+
+
+class UtilParameters 
+{
+private:
+  UtilParameters(const UtilParameters& copy);
+  UtilParameters& operator=(const UtilParameters& rhs);
+public:
+  UtilParameters();
+  ~UtilParameters();
+
+  void Load(std::istream& is);
+  void Save(std::ostream& os, CBFUNC* cb=NULL, void* pArgs=NULL);
+  void Dump(std::ostream& os) const; // dump with defined parm are/aren't unsed
+
+  void        Add(const char* section, const char* name, const char* value);
+  bool        GetSetting(const char* name,
+			 bool defaultValue=true,
+			 const char* section = NULL) const;
+  std::string GetSetting(const char* name,
+			 const char* defaultValue,
+			 const char* section = NULL) const;
+  short       GetSetting(const char* name,
+			 short defaultValue,
+			 const char* section = NULL) const;
+  int         GetSetting(const char* name,
+			 int defaultValue,
+			 const char* section = NULL) const;
+  long        GetSetting(const char* name,
+			 long defaultValue,
+			 const char* section = NULL) const;
+  //float       GetSetting(const char* name,
+  //			 float defaultValue,
+  //		 const char* section = NULL) const;
+  double       GetSetting(const char* name,
+			  double defaultValue,
+			  const char* section = NULL) const;
+private:
+  std::string* Find(const char* section, const char* name) const;
+  std::string  Expand(const char* name);
+  std::pair<int,std::string>* FindEntry(const char* section, const char* name);
+  SECTION_MAP m_sectionMap;
+};
+
+#endif

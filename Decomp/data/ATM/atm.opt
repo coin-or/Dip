@@ -1,0 +1,7 @@
+next try:
+  sol as IP
+  decomp cut / init cols
+  thread subprobs
+
+5_10_1   59704.02
+10_30_1 

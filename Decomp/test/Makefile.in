@@ -1,0 +1,30 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+all: test
+
+test:
+	cd ../examples/MILP; make clean; make;
+
+#Data/Sample/pack1 optimal=2 (solve with cutting plane method)
+	../examples/MILP/decomp_milp --doPriceCut 0 --doCut 1 --MILP:DataDir ../../../Data/Sample --MILP:Instance pack1 --MILP:BestKnownLB 2 --MILP:BestKnownUB 2
+#Data/Sample/pack1 optimal=2 (solve with price and cut method)
+	../examples/MILP/decomp_milp --doPriceCut 1 --doCut 0 --MILP:DataDir ../../../Data/Sample --MILP:Instance pack1 --MILP:BestKnownLB 2 --MILP:BestKnownUB 2
+
+#Data/Sample/tp3 optimal=2 (solve with cutting plane method)
+	../examples/MILP/decomp_milp --doPriceCut 0 --doCut 1 --MILP:DataDir ../../../Data/Sample --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+#Data/Sample/tp3 optimal=2 (solve with price and cut method)
+	../examples/MILP/decomp_milp --doPriceCut 1 --doCut 0 --MILP:DataDir ../../../Data/Sample --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+
+clean:
+	cd ../examples/MILP; make clean;
+
+

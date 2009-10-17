@@ -1,0 +1,8 @@
+retail20.direct.txt:DIRECT SOLVE RealTime= 303.35666 CpuTime= 300.01000 Nodes=     448980 LB=        79.77 UB=        80.18
+retail22.direct.txt:DIRECT SOLVE RealTime= 305.58257 CpuTime= 300.01000 Nodes=     185034 LB=       151.26 UB=       151.31
+retail27.direct.txt:DIRECT SOLVE RealTime= 301.86700 CpuTime= 300.03000 Nodes=     189521 LB=       855.85 UB=       878.90
+retail31.direct.txt:DIRECT SOLVE RealTime= 301.63062 CpuTime= 300.05000 Nodes=      98999 LB=      2382.03 UB=      2402.70
+retail33.direct.txt:DIRECT SOLVE RealTime= 301.57274 CpuTime= 300.04000 Nodes=      71236 LB=       491.88 UB=       645.99
+retail3.direct.txt:DIRECT SOLVE RealTime= 314.87581 CpuTime= 300.01000 Nodes=    1649322 LB=       503.76 UB=       508.30
+retail4.direct.txt:DIRECT SOLVE RealTime= 302.81279 CpuTime= 300.10000 Nodes=     125005 LB=      5671.27 UB=      5782.36
+retail6.direct.txt:DIRECT SOLVE RealTime=  1.16589 CpuTime=  1.11000 Nodes=        803 LB=       443.58 UB=       443.62
