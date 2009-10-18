@@ -120,6 +120,15 @@ public:
       //is utilParam used in base class?
       DecompAlgo(PRICE_AND_CUT, app, utilParam),
       m_classTag("D-ALGOPC") {
+
+      //---
+      //--- by default turn off gomory cuts for PC
+      //---
+      m_param.CutCglGomory = 0;
+
+      //---
+      //--- run init setup
+      //---
       if(doSetup)
          initSetup(utilParam, paramSection);
    }

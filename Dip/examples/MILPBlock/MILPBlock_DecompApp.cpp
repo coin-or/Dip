@@ -40,6 +40,9 @@ void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
       cerr << "Error: Filename = " << fileName << " failed to open." << endl;
       throw UtilException("I/O Error.", "initalizeApp", "MILPBlock_DecompApp");
    }
+   if(m_appParam.LogLevel >= 2)
+      (*m_osLog) << "Objective Offset = " 
+                 << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
 
    //---
    //--- read block file

@@ -39,12 +39,16 @@ void MILP_DecompApp::initializeApp(UtilParameters & utilParam)  {
       cerr << "Error: Filename = " << fileName << " failed to open." << endl;
       throw UtilException("I/O Error.", "initalizeApp", "MILP_DecompApp");
    }
+   if(m_appParam.LogLevel >= 2)
+      (*m_osLog) << "Objective Offset = " 
+                 << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
 
    //---
    //--- set best known lb/ub
    //---
-   setBestKnownLB(m_appParam.BestKnownLB);
-   setBestKnownUB(m_appParam.BestKnownUB);
+   double offset = m_mpsIO.objectiveOffset();
+   setBestKnownLB(m_appParam.BestKnownLB + offset);
+   setBestKnownUB(m_appParam.BestKnownUB + offset);
 
    //---
    //--- create models

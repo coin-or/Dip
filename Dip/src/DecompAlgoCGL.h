@@ -123,8 +123,8 @@ public:
       m_genFlowCover  (0),
       m_genKnapCover  (0),
       m_genMixIntRound(0),
-     m_genGomory     (0),
-     m_algo          (algo)
+      m_genGomory     (0),
+      m_algo          (algo)
    {
    }
    
