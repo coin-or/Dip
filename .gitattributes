@@ -31,6 +31,7 @@ Decomp/data/ATM/results/parameters.txt -text
 Decomp/data/GAP/ReadMe.txt -text
 Decomp/data/GAP/ReadMe2.txt -text
 Decomp/data/GAP/gap.opt -text
+Decomp/data/GAP/get.data -text
 Decomp/data/MAD/equipart/NN.tar.gz -text
 Decomp/data/MAD/equipart/madlib.equipart.list -text
 Decomp/data/MAD/equipart/madlib.equipart.opt -text
