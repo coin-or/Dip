@@ -56,7 +56,7 @@ Dip/data/MAD/steiner/madlib.steiner.list -text
 Dip/data/MAD/steiner/madlib.steiner.opt -text
 Dip/data/MAD/unzip.sh -text
 Dip/data/MEWCP/maxclique_data.txt -text
-Dip/data/MILP/block/atm.tgz -text
+Dip/data/MILP/block/get.data -text
 Dip/data/MILP/block/results/parameters.txt -text
 Dip/data/MILP/block/results/retail_cpx11.300.txt -text
 Dip/data/MILP/block/results/retail_cpx11.3600.txt -text
@@ -67,7 +67,6 @@ Dip/data/MILP/block/retail.direct.parm -text
 Dip/data/MILP/block/retail.direct.sh -text
 Dip/data/MILP/block/retail.pc.parm -text
 Dip/data/MILP/block/retail.pc.sh -text
-Dip/data/MILP/block/retail.tgz -text
 Dip/data/MILP/miplib/cbcpre.sh -text
 Dip/data/MILP/miplib/get.data -text
 Dip/data/MILP/miplib/miplib3.list -text
@@ -75,10 +74,10 @@ Dip/data/MMKP/MMKP.html -text
 Dip/data/MMKP/README.txt -text
 Dip/data/MMKP/data.tgz -text
 Dip/data/MMKP/mmkp.opt -text
-Dip/data/TSP/TSPLIB/ALL_tsp.tar.gz -text
-Dip/data/TSP/TSPLIB/TSPLIB_opt -text
-Dip/data/TSP/TSPLIB/tsplib.list -text
-Dip/data/TSP/TSPLIB/tsplib2.list -text
+Dip/data/TSP/TSPLIB_opt -text
+Dip/data/TSP/get.data -text
+Dip/data/TSP/tsplib.list -text
+Dip/data/TSP/tsplib2.list -text
 Dip/data/VRP/vrplib.tgz -text
 Dip/dip_addlibs.txt.in -text
 Dip/examples/AP3/AP3_DecompApp.cpp -text
@@ -149,6 +148,7 @@ Dip/examples/MILPBlock/MILPBlock_Main.cpp -text
 Dip/examples/MILPBlock/MILPBlock_Param.h -text
 Dip/examples/MILPBlock/Makefile.in -text
 Dip/examples/MILPBlock/README.txt.in -text
+Dip/examples/MILPBlock/data_extract.sh.in -text
 Dip/examples/MILPBlock/milpblock.parm.in -text
 Dip/examples/MILPBlock/milpblock.parm2.in -text
 Dip/examples/MMKP/MMKP_DecompApp.cpp -text

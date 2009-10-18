@@ -21658,7 +21658,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h test/Makefile dip_addlibs.txt"
+                                                                                                                                                                                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h test/Makefile dip_addlibs.txt"
 
 
 # Here put the location and name of the configuration header file
@@ -22435,9 +22435,12 @@ do
   "examples/SmallIP/smallip.parm" ) CONFIG_FILES="$CONFIG_FILES examples/SmallIP/smallip.parm" ;;
   "examples/MILP/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/MILP/Makefile" ;;
   "examples/MILP/milp.parm" ) CONFIG_FILES="$CONFIG_FILES examples/MILP/milp.parm" ;;
+  "examples/MILP/data_extract.sh" ) CONFIG_FILES="$CONFIG_FILES examples/MILP/data_extract.sh" ;;
+  "examples/MILP/README.txt" ) CONFIG_FILES="$CONFIG_FILES examples/MILP/README.txt" ;;
   "examples/MILPBlock/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/MILPBlock/Makefile" ;;
   "examples/MILPBlock/milpblock.parm" ) CONFIG_FILES="$CONFIG_FILES examples/MILPBlock/milpblock.parm" ;;
   "examples/MILPBlock/milpblock.parm2" ) CONFIG_FILES="$CONFIG_FILES examples/MILPBlock/milpblock.parm2" ;;
+  "examples/MILPBlock/data_extract.sh" ) CONFIG_FILES="$CONFIG_FILES examples/MILPBlock/data_extract.sh" ;;
   "examples/MILPBlock/README.txt" ) CONFIG_FILES="$CONFIG_FILES examples/MILPBlock/README.txt" ;;
   "examples/AP3/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/AP3/Makefile" ;;
   "examples/AP3/ap3.parm" ) CONFIG_FILES="$CONFIG_FILES examples/AP3/ap3.parm" ;;

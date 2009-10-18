@@ -226,9 +226,12 @@ AC_CONFIG_FILES([Makefile
                  examples/SmallIP/smallip.parm
                  examples/MILP/Makefile
                  examples/MILP/milp.parm
+                 examples/MILP/data_extract.sh
+                 examples/MILP/README.txt
                  examples/MILPBlock/Makefile
                  examples/MILPBlock/milpblock.parm
                  examples/MILPBlock/milpblock.parm2
+                 examples/MILPBlock/data_extract.sh
                  examples/MILPBlock/README.txt
                  examples/AP3/Makefile
                  examples/AP3/ap3.parm

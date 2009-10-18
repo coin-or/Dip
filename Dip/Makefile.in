@@ -83,9 +83,12 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/MAD/Makefile.in \
 	$(top_srcdir)/examples/MAD/mad.parm.in \
 	$(top_srcdir)/examples/MILP/Makefile.in \
+	$(top_srcdir)/examples/MILP/README.txt.in \
+	$(top_srcdir)/examples/MILP/data_extract.sh.in \
 	$(top_srcdir)/examples/MILP/milp.parm.in \
 	$(top_srcdir)/examples/MILPBlock/Makefile.in \
 	$(top_srcdir)/examples/MILPBlock/README.txt.in \
+	$(top_srcdir)/examples/MILPBlock/data_extract.sh.in \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm.in \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm2.in \
 	$(top_srcdir)/examples/MMKP/Makefile.in \
@@ -115,9 +118,11 @@ CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
 CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/SmallIP/Makefile \
 	examples/SmallIP/smallip.parm examples/MILP/Makefile \
-	examples/MILP/milp.parm examples/MILPBlock/Makefile \
+	examples/MILP/milp.parm examples/MILP/data_extract.sh \
+	examples/MILP/README.txt examples/MILPBlock/Makefile \
 	examples/MILPBlock/milpblock.parm \
 	examples/MILPBlock/milpblock.parm2 \
+	examples/MILPBlock/data_extract.sh \
 	examples/MILPBlock/README.txt examples/AP3/Makefile \
 	examples/AP3/ap3.parm examples/GAP/Makefile \
 	examples/GAP/gap.parm examples/GAP/data_extract.sh \
@@ -437,11 +442,17 @@ examples/MILP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MIL
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILP/milp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MILP/milp.parm.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MILP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MILP/data_extract.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MILP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MILP/README.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILPBlock/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILPBlock/milpblock.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/milpblock.parm.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILPBlock/milpblock.parm2: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/milpblock.parm2.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MILPBlock/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILPBlock/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/README.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
