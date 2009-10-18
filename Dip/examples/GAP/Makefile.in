@@ -23,13 +23,12 @@ OBJS         += GAP_DecompApp.@OBJEXT@
 # additional libraries needed (libKnapPisinger)
 KNAP_DIR = ../ExternalSolvers/Knapsack/Pisinger
 KNAP_LIB  = KnapPisinger
-KNAP_INC  = @srcdir@/$(KNAP_DIR)
+KNAP_INC  = $(KNAP_DIR)
 
 #===========================================================================#
 # additional include and linnk flags
 ADDLIBS      += -L$(KNAP_DIR) -l$(KNAP_LIB)
 ADDINCFLAGS  += -I$(KNAP_INC)
-ADDINCFLAGS  += -DCOIN_ASSERT #??
 
 #===========================================================================#
 # directory to the source files
@@ -65,10 +64,6 @@ CYGPATH_W = @CYGPATH_W@
 all: $(EXEDECOMP)
 
 .SUFFIXES: .cpp .c .o .obj
-
-#TODO: why does this target not work?
-#what opt flag?
-#$(EXEDECOMP): $(OBJS) $(KNAP_DIR)/libKnapPisinger.a
 
 $(EXEDECOMP): $(OBJS)
 	(cd ${KNAP_DIR} && ${MAKE})

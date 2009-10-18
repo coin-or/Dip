@@ -46,7 +46,7 @@ Settings for GAP application.
 LogLevel       = 3
 
 # Path to instance data.
-DataDir        = ../../../../Decomp/data/GAP
+DataDir        = @srcdir@/../../data/GAP
 
 # Name of file for instance (assumed to be in DataDir).
 Instance        = a05100

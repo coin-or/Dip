@@ -46,7 +46,7 @@ Settings for MILPBlock application.
 LogLevel       = 3
 
 # Path to instance data.
-DataDir        = ../../../../Decomp/data/MILP/block
+DataDir        = @srcdir/../../data/MILP/block
 
 # {Pair,List}: Block file format. See README.txt.
 BlockFileFormat = List

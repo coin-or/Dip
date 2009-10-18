@@ -32,8 +32,7 @@ nodeLogInterval = 1
 msgLevel        = 2
 
 [ATM]
-DataDir     = ../../../../Decomp/data/ATM
-#DataDir     = ./
+DataDir     = @srcdir@/../../data/ATM
 
 ModelNameCore  = BUDGET
 ModelNameRelax = CASH_COUNT
