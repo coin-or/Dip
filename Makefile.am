@@ -11,7 +11,7 @@
 #============================================================================#
 AUTOMAKE_OPTIONS = foreign
 EXTRA_DIST = doxydoc/all/doxygen.conf  \
-	doxydoc/Decomp/doxygen.conf    \
+	doxydoc/Dip/doxygen.conf    \
 	doxydoc/CoinUtils/doxygen.conf \
 	doxydoc/Osi/doxygen.conf       \
 	doxydoc/Clp/doxygen.conf       \
@@ -23,7 +23,7 @@ EXTRA_DIST = doxydoc/all/doxygen.conf  \
 #                          Subdirectories                              #
 ########################################################################
 # subdirs is set by configure as the list of all subdirectories to recurse
-SUBDIRS = Decomp CoinUtils Osi Clp Cgl Cbc Alps
+SUBDIRS = Dip CoinUtils Osi Clp Cgl Cbc Alps
 SUBDIRS_DOXY = $(SUBDIRS) all
 
 ########################################################################
@@ -31,7 +31,7 @@ SUBDIRS_DOXY = $(SUBDIRS) all
 ########################################################################
 
 test: all
-	cd Decomp; $(MAKE) test
+	cd Dip; $(MAKE) test
 
 tests: all
 	for dir in $(SUBDIRS); do \
@@ -41,7 +41,7 @@ tests: all
 	done
 
 doxydocd:
-	(cd $(srcdir)/doxydoc/Decomp; doxygen doxygen.conf)
+	(cd $(srcdir)/doxydoc/Dip; doxygen doxygen.conf)
 
 doxydoc: 
 	for dir in $(SUBDIRS_DOXY); do \

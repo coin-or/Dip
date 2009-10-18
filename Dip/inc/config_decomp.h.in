@@ -1,10 +1,10 @@
 /* inc/config_decomp.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to the debug sanity check level (0 is no test) */
-#undef COIN_DECOMP_CHECKLEVEL
+#undef COIN_DIP_CHECKLEVEL
 
 /* Define to the debug verbosity level (0 is no output) */
-#undef COIN_DECOMP_VERBOSITY
+#undef COIN_DIP_VERBOSITY
 
 /* Define to 1 if the Alps package is used */
 #undef COIN_HAS_ALPS
@@ -24,8 +24,8 @@
 /* Define to 1 if the Cplex package is available */
 #undef COIN_HAS_CPX
 
-/* Define to 1 if the Decomp package is used */
-#undef COIN_HAS_DECOMP
+/* Define to 1 if the Dip package is used */
+#undef COIN_HAS_DIP
 
 /* Define to 1 if the Osi package is used */
 #undef COIN_HAS_OSI

@@ -1,7 +1,7 @@
 #============================================================================#
-# This file is part of the Decomp Solver Framework.                          #
+# This file is part of the DIP Solver Framework.                             #
 #                                                                            #
-# Decomp is distributed under the Common Public License as part of the       #
+# DIP is distributed under the Common Public License as part of the          #
 # COIN-OR repository (http://www.coin-or.org).                               #
 #                                                                            #
 # Author: Matthew Galati, Lehigh University                                  #
@@ -17,14 +17,14 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Decomp],[0.8],[matthew.galati@sas.com])
+AC_INIT([Dip],[0.8],[matthew.galati@sas.com])
 
 # copyright for configure script
 AC_COPYRIGHT([
 //===========================================================================//
-// This file is part of the Decomp Solver Framework.                         //
+// This file is part of the DIP Solver Framework.                            //
 //                                                                           //
-// Decomp is distributed under the Common Public License as part of the      //
+// DIP is distributed under the Common Public License as part of the         //
 // COIN-OR repository (http://www.coin-or.org).                              //
 //                                                                           //
 // Author: Matthew Galati, Lehigh University                                 //
@@ -57,7 +57,7 @@ AC_CANONICAL_BUILD
 AC_COIN_PROJECTDIR_INIT
 
 # Check if user wants to produce debugging code
-AC_COIN_DEBUG_COMPILE(Decomp)
+AC_COIN_DEBUG_COMPILE(Dip)
 
 # Get the name of the C++ compiler and appropriate compiler options
 AC_COIN_PROG_CXX
@@ -85,7 +85,7 @@ AC_COIN_HAS_PROJECT(Clp)
 AC_COIN_HAS_PROJECT(Cgl)
 AC_COIN_HAS_PROJECT(Cbc)
 AC_COIN_HAS_PROJECT(Alps)
-AC_COIN_HAS_PROJECT(Decomp)
+AC_COIN_HAS_PROJECT(Dip)
 
 #############################################################################
 #                            Third party solvers                            #
@@ -101,7 +101,7 @@ AM_CONDITIONAL(COIN_HAS_CLP,
 AM_CONDITIONAL(COIN_HAS_CPLEX,
                false)
 
-AC_MSG_CHECKING([for Decomp default lp solver])
+AC_MSG_CHECKING([for Dip default lp solver])
 AC_ARG_WITH([lp-solver],
 [AC_HELP_STRING([--with-lp-solver@<:@=lpsolver@:>@],
                 [specify the LP solver in small
@@ -145,7 +145,7 @@ test $coin_has_cpx = true])
 AM_CONDITIONAL(COIN_HAS_CBC,
                false)
 
-AC_MSG_CHECKING([for Decomp default ip solver])
+AC_MSG_CHECKING([for DIP default ip solver])
 AC_ARG_WITH([ip-solver],
 [AC_HELP_STRING([--with-ip-solver@<:@=ipsolver@:>@],
                 [specify the IP solver in small
@@ -191,21 +191,21 @@ test $coin_has_cpx = true])
 #   setup links to the source code.
 # NOTE: not using - just cd to examples dir to build unit test
 #AC_CONFIG_LINKS(test/MILP_Main.cpp:examples/MILP/MILP_Main.cpp)
-#AC_CONFIG_LINKS(test/MILP_DecompApp.cpp:examples/MILP/MILP_DecompApp.cpp)
+#AC_CONFIG_LINKS(test/MILP_DipApp.cpp:examples/MILP/MILP_DipApp.cpp)
 
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-# Location of Decomp for later use
-AC_SUBST(DecompINCDIR)
-AC_SUBST(DecompSRCDIR)
-DecompINCDIR=`cd $srcdir; pwd`/src
-DecompSRCDIR=`cd $srcdir; pwd`/src
+# Location of DIP for later use
+AC_SUBST(DipINCDIR)
+AC_SUBST(DipSRCDIR)
+DipINCDIR=`cd $srcdir; pwd`/src
+DipSRCDIR=`cd $srcdir; pwd`/src
 
-# To be used in applications: default Decomp defs
-AC_SUBST(DecompDEFS)
+# To be used in applications: default DIP defs
+AC_SUBST(DipDEFS)
 AC_SUBST(ARCH)
 AC_SUBST(COIN_HAS_CLP) 
 

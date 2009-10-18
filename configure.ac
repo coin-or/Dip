@@ -17,14 +17,14 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Decomp],[0.8],[matthew.galati@sas.com])
+AC_INIT([Dip],[0.8],[matthew.galati@sas.com])
 
 # copyright for configure script
 AC_COPYRIGHT([
 //===========================================================================//
-// This file is part of the Decomp Solver Framework.                         //
+// This file is part of the DIP Solver Framework.                            //
 //                                                                           //
-// Decomp is distributed under the Common Public License as part of the      //
+// DIP is distributed under the Common Public License as part of the         //
 // COIN-OR repository (http://www.coin-or.org).                              //
 //                                                                           //
 // Author: Matthew Galati, Lehigh University                                 //
@@ -70,7 +70,7 @@ AC_COIN_MAIN_SUBDIRS(Osi)
 AC_COIN_MAIN_SUBDIRS(Cgl)
 AC_COIN_MAIN_SUBDIRS(Cbc)
 AC_COIN_MAIN_SUBDIRS(Alps)
-AC_COIN_MAIN_SUBDIRS(Decomp)
+AC_COIN_MAIN_SUBDIRS(Dip)
 AC_COIN_MAIN_SUBDIRS(Data/Sample)
 
 #############################################################################
