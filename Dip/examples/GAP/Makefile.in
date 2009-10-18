@@ -65,16 +65,22 @@ all: $(EXEDECOMP)
 
 .SUFFIXES: .cpp .c .o .obj
 
-$(EXEDECOMP): $(OBJS)
-	(cd ${KNAP_DIR} && ${MAKE})
+$(EXEDECOMP): $(KNAP_DIR)/libKnapPisinger.a $(OBJS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
 
 clean:
+	(cd ${KNAP_DIR} && ${MAKE} clean)
 	rm -rf $(EXE) $(OBJS)
 
 $(KNAP_DIR)/libKnapPisinger.a:
+	echo "chmod +x data_extract.sh"
+	chmod +x data_extract.sh
+	./data_extract.sh
+	echo "chmod +x get_pisinger.sh"
+	chmod +x get_pisinger.sh
+	./get_pisinger.sh
 	(cd ${KNAP_DIR} && ${MAKE})
 
 .cpp.o:

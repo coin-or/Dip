@@ -59,8 +59,6 @@ addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
 
 install-exec-local: install-doc
 	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
-	echo "chmod +x ../examples/GAP/data_extract.sh"
-	chmod +x ../examples/GAP/data_extract.sh
 
 
 uninstall-local: uninstall-doc

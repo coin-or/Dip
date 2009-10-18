@@ -3,3 +3,4 @@ chmod +x get.pisinger
 chmod +x patch.pisinger
 ./get.pisinger
 ./patch.pisinger
+cd ../../../GAP

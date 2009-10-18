@@ -49,6 +49,6 @@ LogLevel       = 3
 DataDir        = @srcdir@/../../data/GAP
 
 # Name of file for instance (assumed to be in DataDir).
-Instance        = a05100
+Instance        = gap0515-2
 
 #
