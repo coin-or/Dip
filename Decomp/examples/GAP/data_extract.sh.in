@@ -1,8 +1,3 @@
 cd @srcdir@/../../data/GAP
-
-tar -zxvf gap_a.tar.gz
-tar -zxvf gap_b.tar.gz
-tar -zxvf gap_c.tar.gz
-tar -zxvf gap_d.tar.gz
-tar -zxvf gap_e.tar.gz
-tar -zxvf gap_tiny.tar.gz
+./get.data
+tar -zxvf data_gap.tgz
