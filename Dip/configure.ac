@@ -250,10 +250,10 @@ AC_CONFIG_FILES([Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h
                  test/Makefile
-                 decomp_addlibs.txt])
+                 dip_addlibs.txt])
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([inc/config_decomp.h])
+AC_CONFIG_HEADER([inc/config_dip.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

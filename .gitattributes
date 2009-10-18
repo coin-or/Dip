@@ -80,7 +80,7 @@ Dip/data/TSP/TSPLIB/TSPLIB_opt -text
 Dip/data/TSP/TSPLIB/tsplib.list -text
 Dip/data/TSP/TSPLIB/tsplib2.list -text
 Dip/data/VRP/vrplib.tgz -text
-Dip/decomp_addlibs.txt.in -text
+Dip/dip_addlibs.txt.in -text
 Dip/examples/AP3/AP3_DecompApp.cpp -text
 Dip/examples/AP3/AP3_DecompApp.h -text
 Dip/examples/AP3/AP3_DecompParam.h -text
@@ -221,7 +221,7 @@ Dip/examples/scripts/createDecompMember.sh -text
 Dip/examples/scripts/getTimes.sh -text
 Dip/examples/scripts/graphviz/dot2ps.sh -text
 Dip/examples/scripts/report_decomp.py -text
-Dip/inc/config_decomp.h.in -text
+Dip/inc/config_dip.h.in -text
 Dip/scripts/Copyright -text
 Dip/scripts/average.awk -text
 Dip/scripts/copyright_add.sh -text

@@ -193,7 +193,7 @@ endif
 includecoindir = $(includedir)/coin
 
 includecoin_HEADERS = \
-	../inc/config_decomp.h
+	../inc/config_dip.h
 
 #DecompAlgo
 includecoin_HEADERS +=        \
