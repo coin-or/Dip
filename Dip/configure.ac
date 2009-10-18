@@ -222,6 +222,7 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile.Examples
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm
+                 examples/TSP/data_extract.sh
                  examples/SmallIP/Makefile
                  examples/SmallIP/smallip.parm
                  examples/MILP/Makefile
