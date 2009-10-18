@@ -140,6 +140,8 @@ Dip/examples/MILP/MILP_DecompApp.h -text
 Dip/examples/MILP/MILP_Main.cpp -text
 Dip/examples/MILP/MILP_Param.h -text
 Dip/examples/MILP/Makefile.in -text
+Dip/examples/MILP/README.txt.in -text
+Dip/examples/MILP/data_extract.sh.in -text
 Dip/examples/MILP/milp.parm.in -text
 Dip/examples/MILPBlock/MILPBlock_DecompApp.cpp -text
 Dip/examples/MILPBlock/MILPBlock_DecompApp.h -text

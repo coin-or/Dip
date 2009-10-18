@@ -1,0 +1,49 @@
+============================================================================
+Introduction
+============================================================================
+This application can be used to solve a generic MILP. In the context of
+inner methods, the relaxation is chosen using a random subset of rows. In
+general, this is probably not a great idea - but is good for testing.
+
+============================================================================
+Build DECOMP
+============================================================================
+To build DECOMP:
+ (1) cd ${DECOMP_ROOT}/build
+ (2) ../configure
+ (3) make 
+ (4) make install
+To run a basic unit test.
+ (5) make test 
+
+
+============================================================================
+Build MILP
+============================================================================
+To build MILP application:
+ (1) cd ${DECOMP_ROOT}/build/Decomp/examples/MILP
+This will download and extract two sets of data:
+   (a) miplib3     - mps files from miplib3
+   (b) miplib3_pre - mps files from miplib3 after CBC2.3 presolve
+ (2) sh ./data_extract.sh
+ (3) make
+
+
+============================================================================
+Run MILP
+============================================================================
+To run MILP application:
+ (1) cd ${DECOMP_ROOT}/build/Decomp/examples/MILP
+ (2) ./decomp_milp --param ${PARMFILE} < --section:option value >
+
+Example
+with parameter file:
+ ./decomp_milp --param milp.parm
+with command line override:
+ ./decomp_milp --param milp.parm --MILP:Instance p0033
+
+============================================================================
+Notes
+============================================================================
+(1) See the example parameter file for some common options. A '#' in 
+    the parameter file is a comment and will be ignored.
