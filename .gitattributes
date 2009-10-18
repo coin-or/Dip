@@ -32,11 +32,6 @@ Decomp/data/GAP/ReadMe.txt -text
 Decomp/data/GAP/ReadMe2.txt -text
 Decomp/data/GAP/gap.opt -text
 Decomp/data/GAP/gap_a.tar.gz -text
-Decomp/data/GAP/gap_b.tar.gz -text
-Decomp/data/GAP/gap_c.tar.gz -text
-Decomp/data/GAP/gap_d.tar.gz -text
-Decomp/data/GAP/gap_e.tar.gz -text
-Decomp/data/GAP/gap_tiny.tar.gz -text
 Decomp/data/MAD/equipart/NN.tar.gz -text
 Decomp/data/MAD/equipart/madlib.equipart.list -text
 Decomp/data/MAD/equipart/madlib.equipart.opt -text
