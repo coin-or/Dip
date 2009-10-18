@@ -12,6 +12,7 @@
 
 //===========================================================================//
 #include "GAP_Instance.h"
+#include "UtilMacrosDecomp.h"
 
 //===========================================================================//
 void GAP_Instance::readInstance(string & fileName){

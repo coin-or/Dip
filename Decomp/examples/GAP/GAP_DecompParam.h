@@ -30,6 +30,7 @@
 //===========================================================================//
 class GAP_DecompParam {
  public:
+   int    LogLevel;
    string DataDir;
    string Instance;
    bool   UsePisinger;
@@ -37,6 +38,7 @@ class GAP_DecompParam {
  public:
    void getSettings(UtilParameters & utilParam){
       static const char * common = "GAP";
+      LogLevel    = utilParam.GetSetting("LogLevel",       0, common);
       DataDir     = utilParam.GetSetting("DataDir",       "",  common);
       Instance    = utilParam.GetSetting("Instance",      "",  common);    
       UsePisinger = utilParam.GetSetting("UsePisinger", true,  common);
@@ -46,6 +48,7 @@ class GAP_DecompParam {
       static const char * common = "GAP";
       (*os) << "\n=====================================================\n"
             << "GAP_DECOMP PARAMETER SETTINGS \n";
+      (*os) << common << ": LogLevel    : " << LogLevel    << endl;
       (*os) << common << ": DataDir     : " << DataDir     << endl;
       (*os) << common << ": Instance    : " << Instance    << endl;
       (*os) << common << ": UsePisinger : " << UsePisinger << endl;
@@ -54,6 +57,7 @@ class GAP_DecompParam {
    
  public:
    GAP_DecompParam():    
+      LogLevel   (0 ),
       DataDir    (""),
       Instance   (""),
       UsePisinger(true)

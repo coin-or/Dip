@@ -100,10 +100,10 @@ Decomp/examples/ATM/notes.txt -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.c.patch -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.h.patch -text
-Decomp/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.c.patch -text
-Decomp/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h -text
-Decomp/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h.in -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger.in -text
 Decomp/examples/GAP/GAP_Debug.h -text
 Decomp/examples/GAP/GAP_DecompApp.cpp -text
 Decomp/examples/GAP/GAP_DecompApp.h -text
@@ -117,6 +117,7 @@ Decomp/examples/GAP/Makefile.in -text
 Decomp/examples/GAP/README.txt.in -text
 Decomp/examples/GAP/data_extract.sh.in -text
 Decomp/examples/GAP/gap.parm.in -text
+Decomp/examples/GAP/get_pisinger.sh.in -text
 Decomp/examples/GAP/old/GAP_Knapsack.h -text
 Decomp/examples/MAD/MAD_Cliquer.h -text
 Decomp/examples/MAD/MAD_CliquerI.h -text

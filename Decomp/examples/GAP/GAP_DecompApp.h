@@ -58,18 +58,11 @@ private:
 public:
    /* @name Inherited (from virtual) methods. */
    /** Solve the relaxed problem. */
-   DecompStatus APPsolveRelaxed(
-				const int             whichBlock,
-				const double        * redCostX,
-				const double        * origCost,
-				const double          alpha,
-				const int             n_origCols,
-				const bool            checkRC,		
-				const bool            checkDup,
-				int                 * isExact,
-				OsiSolverInterface  * m_subprobSI,
-				list<DecompVar*>    & vars);
-   
+   DecompSolverStatus solveRelaxed(const int             whichBlock,
+				   const double        * redCostX,
+				   const double          convexDual,
+				   list<DecompVar*>    & vars);   
+
    /** Print an original column (format for this app). */
    void printOriginalColumn(const int   index, 
                             ostream   * os = &cout) const;
@@ -135,8 +128,7 @@ public:
    GAP_DecompApp(UtilParameters & utilParam) : 
       DecompApp   (utilParam),
       m_classTag  ("GAP-APP"),
-      m_objective (NULL),
-      m_appParam  ()
+      m_objective (NULL)
    {
       initializeApp(utilParam);
    }

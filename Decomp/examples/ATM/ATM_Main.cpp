@@ -21,7 +21,7 @@
 #include "DecompAlgoPC.h"
 #include "DecompAlgoRC.h"
 //===========================================================================//
-#include "AlpsTime.h"
+#include "UtilTimer.h"
 
 //===========================================================================//
 int main(int argc, char ** argv){
@@ -42,7 +42,7 @@ int main(int argc, char ** argv){
       bool doDirect       = utilParam.GetSetting("doDirect",       false);
       int  timeLimit      = utilParam.GetSetting("timeLimit",      60);
       
-      AlpsTimer timer;
+      UtilTimer timer;
       double    timeSetupReal = 0.0;
       double    timeSetupCpu  = 0.0;
       double    timeSolveReal = 0.0;
@@ -88,7 +88,7 @@ int main(int argc, char ** argv){
          if(doCut && doDirect){
             timer.stop();
             timeSetupCpu  = timer.getCpuTime();
-            timeSetupReal = timer.getWallClock();
+            timeSetupReal = timer.getRealTime();
 
             //---
             //--- solve
@@ -97,7 +97,7 @@ int main(int argc, char ** argv){
             algo->solveDirect(timeLimit);
             timer.stop();
             timeSolveCpu  = timer.getCpuTime();
-            timeSolveReal = timer.getWallClock();
+            timeSolveReal = timer.getRealTime();
          }
          else{            
             //---
@@ -108,7 +108,7 @@ int main(int argc, char ** argv){
 	    
 	    timer.stop();
             timeSetupCpu  = timer.getCpuTime();
-            timeSetupReal = timer.getWallClock();
+            timeSetupReal = timer.getRealTime();
 	    
             //---
             //--- solve
@@ -117,7 +117,7 @@ int main(int argc, char ** argv){
             status = alpsModel.solve();
             timer.stop();
             timeSolveCpu  = timer.getCpuTime();
-            timeSolveReal = timer.getWallClock();
+            timeSolveReal = timer.getRealTime();
 
             //TODO: move doDirect solve into alpsModel so access
             //  solution the same way?

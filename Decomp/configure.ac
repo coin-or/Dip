@@ -235,6 +235,7 @@ AC_CONFIG_FILES([Makefile
                  examples/GAP/Makefile
                  examples/GAP/gap.parm
                  examples/GAP/data_extract.sh
+		 examples/GAP/get_pisinger.sh
                  examples/MAD/Makefile
                  examples/MAD/mad.parm
                  examples/MMKP/Makefile
@@ -245,6 +246,9 @@ AC_CONFIG_FILES([Makefile
                  examples/ATM/Makefile
                  examples/ATM/atm.parm
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
+		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
+		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
+		 examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h
                  test/Makefile
                  decomp_addlibs.txt])
 

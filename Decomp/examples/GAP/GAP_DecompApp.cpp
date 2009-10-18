@@ -6,13 +6,15 @@
 //                                                                           //
 // Author: Matthew Galati, Lehigh University                                 //
 //                                                                           //
-// Copyright (C) 2002-2007, Lehigh University, Matthew Galati, and Ted Ralphs//
+// Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs//
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
 //===========================================================================//
 #include "GAP_Status.h"
 #include "GAP_DecompApp.h"
+//===========================================================================//
+#include "DecompVar.h"
 
 //===========================================================================//
 void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
@@ -80,6 +82,11 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
 				   profit + (k * nTasks));      
       m_knap.push_back(knapK);
    }
+
+   //---
+   //--- create models
+   //---
+   createModels();
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "initializeApp()", m_appParam.LogLevel, 2);
@@ -352,7 +359,7 @@ int GAP_DecompApp::createModels(){
       status = createModelPartAP(modelCore);
       if(status) return status;
       
-      setModelCore("AP", modelCore);
+      setModelCore(modelCore, "AP");
       m_models.insert(make_pair("AP", modelCore));
       
       for(i = 0; i < nMachines; i++){
@@ -360,7 +367,7 @@ int GAP_DecompApp::createModels(){
          status = createModelPartKP(modelRelax, i);
 
          modelName = "KP" + UtilIntToStr(i);
-         setModelRelax(modelName, modelRelax);
+         setModelRelax(modelRelax, modelName, i);
          m_models.insert(make_pair(modelName, modelRelax));
       }
    }
@@ -372,14 +379,13 @@ int GAP_DecompApp::createModels(){
 
 //--------------------------------------------------------------------- //
 DecompSolverStatus 
-GAP_DecompApp::solveRelaxed(
-                            const int             whichBlock,
+GAP_DecompApp::solveRelaxed(const int             whichBlock,
                             const double        * redCostX,
                             const double          convexDual,
                             list<DecompVar*>    & vars){
 
    if(!m_appParam.UsePisinger)
-      return DecompSolStatuNoSolution;
+      return DecompSolStatNoSolution;
    
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solveRelaxed()", m_appParam.LogLevel, 2);
@@ -388,6 +394,7 @@ GAP_DecompApp::solveRelaxed(
    vector<double>   solEls;
    double           varRedCost  = 0.0;
    double           varOrigCost = 0.0;         
+   double         * origCost    = m_objective;
    const double   * redCostXB   = redCostX + getOffsetI(whichBlock);
    const double   * origCostB   = origCost + getOffsetI(whichBlock);
    
@@ -405,7 +412,6 @@ GAP_DecompApp::solveRelaxed(
      }      
      }*/
 
-   *isExact = 1;   
    m_knap[whichBlock]->solve(whichBlock, 
                              redCostXB,
                              origCostB,
@@ -420,17 +426,17 @@ GAP_DecompApp::solveRelaxed(
 
    
    UTIL_DEBUG(m_appParam.LogLevel, 4,
-	      printf("PUSH var with RC = %g\n", varRedCost - alpha);
+	      printf("PUSH var with RC = %g\n", varRedCost - convexDual);
 	      );
    
    DecompVar * var = new DecompVar(solInd, solEls, 
-				   varRedCost - alpha, varOrigCost);
+				   varRedCost - convexDual, varOrigCost);
    var->setBlockId(whichBlock);
    vars.push_back(var);
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "APPsolveRelaxed()", m_appParam.LogLevel, 2);   
-   return STAT_FEASIBLE;
+   return DecompSolStatOptimal;
 }
 
 
