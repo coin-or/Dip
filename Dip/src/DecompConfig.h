@@ -32,7 +32,7 @@
 #ifndef __DECOMPCONFIG_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config_decomp.h"
+#include "config_dip.h"
 
 /* undefine macros that could conflict with those in other config.h
    files */

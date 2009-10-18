@@ -83,7 +83,7 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/inc/config_decomp.h
+CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -412,11 +412,11 @@ includecoindir = $(includedir)/coin
 # other 
 
 # Util
-includecoin_HEADERS = ../inc/config_decomp.h DecompAlgo.h \
-	DecompAlgoC.h DecompAlgoD.h DecompAlgoPC.h DecompAlgoRC.h \
-	DecompAlgoCGL.h DecompCut.h DecompCutOsi.h DecompCutPool.h \
-	DecompApp.h Decomp.h DecompStats.h DecompModel.h DecompParam.h \
-	DecompVar.h DecompVarPool.h DecompMemPool.h DecompSolution.h \
+includecoin_HEADERS = ../inc/config_dip.h DecompAlgo.h DecompAlgoC.h \
+	DecompAlgoD.h DecompAlgoPC.h DecompAlgoRC.h DecompAlgoCGL.h \
+	DecompCut.h DecompCutOsi.h DecompCutPool.h DecompApp.h \
+	Decomp.h DecompStats.h DecompModel.h DecompParam.h DecompVar.h \
+	DecompVarPool.h DecompMemPool.h DecompSolution.h \
 	DecompSolverResult.h DecompConstraintSet.h DecompWaitingCol.h \
 	DecompWaitingRow.h UtilGraphLib.h UtilHash.h UtilMacros.h \
 	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \

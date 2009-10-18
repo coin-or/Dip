@@ -67,7 +67,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/../config.sub $(srcdir)/../install-sh \
 	$(srcdir)/../ltmain.sh $(srcdir)/../missing \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/decomp_addlibs.txt.in $(top_srcdir)/configure \
+	$(srcdir)/dip_addlibs.txt.in $(top_srcdir)/configure \
 	$(top_srcdir)/examples/AP3/Makefile.in \
 	$(top_srcdir)/examples/AP3/ap3.parm.in \
 	$(top_srcdir)/examples/ATM/Makefile.in \
@@ -98,7 +98,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/VRP/Makefile.in \
 	$(top_srcdir)/examples/VRP/boost_extract.sh.in \
 	$(top_srcdir)/examples/VRP/vrp.parm.in \
-	$(top_srcdir)/inc/config_decomp.h.in \
+	$(top_srcdir)/inc/config_dip.h.in \
 	$(top_srcdir)/test/Makefile.in AUTHORS
 @HAVE_EXTERNALS_TRUE@am__append_2 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
@@ -111,7 +111,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/inc/config_decomp.h
+CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
 CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/SmallIP/Makefile \
 	examples/SmallIP/smallip.parm examples/MILP/Makefile \
@@ -130,7 +130,7 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h \
-	test/Makefile decomp_addlibs.txt
+	test/Makefile dip_addlibs.txt
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -359,7 +359,7 @@ EXTRA_DIST = $(am__append_2)
 ########################################################################
 #                  Installation of the addlibs file                    #
 ########################################################################
-addlibsfile = decomp_addlibs.txt
+addlibsfile = dip_addlibs.txt
 addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
 
 ########################################################################
@@ -407,22 +407,22 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
-inc/config_decomp.h: inc/stamp-h1
+inc/config_dip.h: inc/stamp-h1
 	@if test ! -f $@; then \
 	  rm -f inc/stamp-h1; \
 	  $(MAKE) inc/stamp-h1; \
 	else :; fi
 
-inc/stamp-h1: $(top_srcdir)/inc/config_decomp.h.in $(top_builddir)/config.status
+inc/stamp-h1: $(top_srcdir)/inc/config_dip.h.in $(top_builddir)/config.status
 	@rm -f inc/stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status inc/config_decomp.h
-$(top_srcdir)/inc/config_decomp.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_builddir) && $(SHELL) ./config.status inc/config_dip.h
+$(top_srcdir)/inc/config_dip.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
 	cd $(top_srcdir) && $(AUTOHEADER)
 	rm -f inc/stamp-h1
 	touch $@
 
 distclean-hdr:
-	-rm -f inc/config_decomp.h inc/stamp-h1
+	-rm -f inc/config_dip.h inc/stamp-h1
 examples/Makefile.Examples: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.Examples.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/Makefile.in
@@ -485,7 +485,7 @@ examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h: $(top_builddir)/config.stat
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 test/Makefile: $(top_builddir)/config.status $(top_srcdir)/test/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-decomp_addlibs.txt: $(top_builddir)/config.status $(srcdir)/decomp_addlibs.txt.in
+dip_addlibs.txt: $(top_builddir)/config.status $(srcdir)/dip_addlibs.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
 mostlyclean-libtool:

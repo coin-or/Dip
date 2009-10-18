@@ -106,10 +106,10 @@ AC_ARG_WITH([lp-solver],
 [AC_HELP_STRING([--with-lp-solver@<:@=lpsolver@:>@],
                 [specify the LP solver in small
                 letters(default lpsolver=clp)])],
-		[decomp_lp_solver=$withval],[decomp_lp_solver=clp])
+		[dip_lp_solver=$withval],[dip_lp_solver=clp])
 
 found_package=true
-case $decomp_lp_solver in 
+case $dip_lp_solver in 
    clp)
      AC_MSG_RESULT(Clp) 
      AC_COIN_HAS_PROJECT(Clp)
@@ -130,13 +130,13 @@ case $decomp_lp_solver in
 esac
 
 if test $found_package = false; then 
-  AC_MSG_ERROR(Couldn't find the $decomp_lp_solver package!)
+  AC_MSG_ERROR(Couldn't find the $dip_lp_solver package!)
 fi
 
-AM_CONDITIONAL(CLP_LP_SOLVER,[test $decomp_lp_solver = clp &&
+AM_CONDITIONAL(CLP_LP_SOLVER,[test $dip_lp_solver = clp &&
 test $coin_has_clp != unavailable &&
 test $coin_has_clp != skipping])
-AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $decomp_lp_solver = cplex &&
+AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex &&
 test $coin_has_cpx = true])
 
 #############################################################################
@@ -150,10 +150,10 @@ AC_ARG_WITH([ip-solver],
 [AC_HELP_STRING([--with-ip-solver@<:@=ipsolver@:>@],
                 [specify the IP solver in small
                 letters(default ipsolver=cbc)])],
-		[decomp_ip_solver=$withval],[decomp_ip_solver=cbc])
+		[dip_ip_solver=$withval],[dip_ip_solver=cbc])
 
 found_package=true
-case $decomp_ip_solver in 
+case $dip_ip_solver in 
    cbc)
      AC_MSG_RESULT(Cbc) 
      AC_COIN_HAS_PROJECT(Cbc)
@@ -174,13 +174,13 @@ case $decomp_ip_solver in
 esac
 
 if test $found_package = false; then 
-  AC_MSG_ERROR(Couldn't find the $decomp_ip_solver package!)
+  AC_MSG_ERROR(Couldn't find the $dip_ip_solver package!)
 fi
 
-AM_CONDITIONAL(CBC_IP_SOLVER,[test $decomp_ip_solver = cbc &&
+AM_CONDITIONAL(CBC_IP_SOLVER,[test $dip_ip_solver = cbc &&
 test $coin_has_cbc != unavailable &&
 test $coin_has_cbc != skipping])
-AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $decomp_ip_solver = cplex &&
+AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex &&
 test $coin_has_cpx = true])
 
 ##############################################################################

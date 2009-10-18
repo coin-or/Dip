@@ -54,7 +54,7 @@ distclean-local:
 #                  Installation of the addlibs file                    #
 ########################################################################
 
-addlibsfile = decomp_addlibs.txt
+addlibsfile = dip_addlibs.txt
 addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
 
 install-exec-local: install-doc

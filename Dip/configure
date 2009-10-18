@@ -21370,13 +21370,13 @@ echo $ECHO_N "checking for Dip default lp solver... $ECHO_C" >&6
 # Check whether --with-lp-solver or --without-lp-solver was given.
 if test "${with_lp_solver+set}" = set; then
   withval="$with_lp_solver"
-  decomp_lp_solver=$withval
+  dip_lp_solver=$withval
 else
-  decomp_lp_solver=clp
+  dip_lp_solver=clp
 fi;
 
 found_package=true
-case $decomp_lp_solver in
+case $dip_lp_solver in
    clp)
      echo "$as_me:$LINENO: result: Clp" >&5
 echo "${ECHO_T}Clp" >&6
@@ -21458,14 +21458,14 @@ echo "$as_me: error: Unknown LP solver!" >&2;}
 esac
 
 if test $found_package = false; then
-  { { echo "$as_me:$LINENO: error: Couldn't find the $decomp_lp_solver package!" >&5
-echo "$as_me: error: Couldn't find the $decomp_lp_solver package!" >&2;}
+  { { echo "$as_me:$LINENO: error: Couldn't find the $dip_lp_solver package!" >&5
+echo "$as_me: error: Couldn't find the $dip_lp_solver package!" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
 
 
-if test $decomp_lp_solver = clp &&
+if test $dip_lp_solver = clp &&
 test $coin_has_clp != unavailable &&
 test $coin_has_clp != skipping; then
   CLP_LP_SOLVER_TRUE=
@@ -21477,7 +21477,7 @@ fi
 
 
 
-if test $decomp_lp_solver = cplex &&
+if test $dip_lp_solver = cplex &&
 test $coin_has_cpx = true; then
   CPLEX_LP_SOLVER_TRUE=
   CPLEX_LP_SOLVER_FALSE='#'
@@ -21507,13 +21507,13 @@ echo $ECHO_N "checking for DIP default ip solver... $ECHO_C" >&6
 # Check whether --with-ip-solver or --without-ip-solver was given.
 if test "${with_ip_solver+set}" = set; then
   withval="$with_ip_solver"
-  decomp_ip_solver=$withval
+  dip_ip_solver=$withval
 else
-  decomp_ip_solver=cbc
+  dip_ip_solver=cbc
 fi;
 
 found_package=true
-case $decomp_ip_solver in
+case $dip_ip_solver in
    cbc)
      echo "$as_me:$LINENO: result: Cbc" >&5
 echo "${ECHO_T}Cbc" >&6
@@ -21595,14 +21595,14 @@ echo "$as_me: error: Unknown IP solver!" >&2;}
 esac
 
 if test $found_package = false; then
-  { { echo "$as_me:$LINENO: error: Couldn't find the $decomp_ip_solver package!" >&5
-echo "$as_me: error: Couldn't find the $decomp_ip_solver package!" >&2;}
+  { { echo "$as_me:$LINENO: error: Couldn't find the $dip_ip_solver package!" >&5
+echo "$as_me: error: Couldn't find the $dip_ip_solver package!" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
 
 
-if test $decomp_ip_solver = cbc &&
+if test $dip_ip_solver = cbc &&
 test $coin_has_cbc != unavailable &&
 test $coin_has_cbc != skipping; then
   CBC_IP_SOLVER_TRUE=
@@ -21614,7 +21614,7 @@ fi
 
 
 
-if test $decomp_ip_solver = cplex &&
+if test $dip_ip_solver = cplex &&
 test $coin_has_cpx = true; then
   CPLEX_IP_SOLVER_TRUE=
   CPLEX_IP_SOLVER_FALSE='#'
@@ -21658,11 +21658,11 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h test/Makefile decomp_addlibs.txt"
+                                                                                                                                                                                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h test/Makefile dip_addlibs.txt"
 
 
 # Here put the location and name of the configuration header file
-          ac_config_headers="$ac_config_headers inc/config_decomp.h"
+          ac_config_headers="$ac_config_headers inc/config_dip.h"
 
 
 # Finally, we let configure write all the output...
@@ -22459,9 +22459,9 @@ do
   "examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger" ;;
   "examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
-  "decomp_addlibs.txt" ) CONFIG_FILES="$CONFIG_FILES decomp_addlibs.txt" ;;
+  "dip_addlibs.txt" ) CONFIG_FILES="$CONFIG_FILES dip_addlibs.txt" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
-  "inc/config_decomp.h" ) CONFIG_HEADERS="$CONFIG_HEADERS inc/config_decomp.h" ;;
+  "inc/config_dip.h" ) CONFIG_HEADERS="$CONFIG_HEADERS inc/config_dip.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
