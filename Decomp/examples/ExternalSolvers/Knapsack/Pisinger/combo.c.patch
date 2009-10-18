@@ -1,0 +1,288 @@
+--- combo.c	2002-12-27 17:28:35.000000000 -0500
++++ /home/magh/COIN/coin-Decomp/Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.c	2009-10-06 18:43:30.000000000 -0400
+@@ -103,6 +103,7 @@
+   itype   p;              /* profit                  */
+   itype   w;              /* weight                  */
+   boolean x;              /* solution variable       */
++   int    i;/*MVG*/
+ } item;
+ 
+ /* interval record */
+@@ -206,7 +207,7 @@
+ 			          debug routines
+    ====================================================================== */
+ 
+-static void error(char *str, ...)
++static void error(const char *str, ...)
+ {
+   va_list args;
+ 
+@@ -231,8 +232,8 @@
+  * the value 2, while digital UNIX has value 3). The constant is defined
+  * in <unistd.h>, but only if _POSIX_SOURCE is defined.
+  */
+-
+-#define _POSIX_SOURCE         /* to read <unistd.h> on digital UNIX */
++#ifndef _MSC_VER
++/*#define _POSIX_SOURCE*/         /* to read <unistd.h> on digital UNIX */
+ #define _INCLUDE_POSIX_SOURCE /* to read <unistd.h> on HP-UX */
+ #include <unistd.h>           /* define the constant _SC_CLK_TCK */
+ #include <sys/times.h>        /* timing routines */
+@@ -243,8 +244,9 @@
+   double t1;
+   times(&timeend);
+   t1 = (double) (timeend.tms_utime) / sysconf(_SC_CLK_TCK);
+-  *time = t1 * 1000;
++  *time = (long)(t1 * 1000);
+ }
++#endif
+ 
+ 
+ /* ======================================================================
+@@ -264,7 +266,7 @@
+   size *= no;
+   if (size == 0) size = 1;
+   if (size != (size_t) size) error("Alloc too big %ld", size);
+-  p = malloc(size);
++  p = malloc((size_t)(size));
+   if (p == NULL) error("no memory size %ld", size);
+   return p;
+ }
+@@ -276,7 +278,7 @@
+ 
+ static void push(allinfo *a, int side, item *f, item *l)
+ {
+-  interval *pos;
++  interval *pos = NULL;
+   switch (side) {
+     case LEFT : pos = a->intv1; (a->intv1)++; break;
+     case RIGHT: pos = a->intv2; (a->intv2)--; break;
+@@ -308,9 +310,6 @@
+ 
+ static void improvesol(allinfo *a, state *v)
+ {
+-  long t;
+-  char *txt;
+-
+   if (v->wsum  > a->c) error("wrong improvesol");
+   if (v->psum <= a->z) error("not improved solution");
+ 
+@@ -334,12 +333,11 @@
+   register stype psum, wsum, ws;
+   item *f, *l;
+   btype j, k;
+-  long t;
+ 
+   /* endtime(&t); */
+ 
+   /* full solutions are easy to update */
+-  if (a->fullsol) {
++  if (a->fullsol) {     
+     for (i = a->fitem, m = a->litem+1, h = a->ffull; i != m; i++,h++) *i = *h;
+     return;
+   }
+@@ -347,8 +345,16 @@
+   /* partial solutions are more difficult as we only have MAXV last changes */
+ 
+   /* initialize break solution */
+-  for (i = a->fitem, m = a->b; i != m; i++) i->x = 1;
+-  for (i = a->b, m = a->litem+1; i != m; i++) i->x = 0;
++  for (i = a->fitem, m = a->b; i != m; i++) {
++     /*printf("set x=1 for %p p:%ld w:%ld\n",
++     i, i->p, i->w);*/
++     i->x = 1;
++  }
++  for (i = a->b, m = a->litem+1; i != m; i++){
++     /*printf("set x=0 for %p p:%ld w:%ld\n",
++     	    i, i->p, i->w);*/
++     i->x = 0;
++  }
+ 
+   /* backtrack vector */
+   psum = a->z - a->psumb;
+@@ -416,7 +422,7 @@
+ static void partsort(allinfo *a, item *f, item *l, stype ws, stype c, int what)
+ {
+   register itype mp, mw;
+-  register item *i, *j, *m;
++  register item *i, *j, *m = NULL;
+   register stype wi;
+   int d;
+ 
+@@ -467,7 +473,7 @@
+ static item *minweights(item *f, item *l, stype c)
+ {
+   register itype mw;
+-  register item *i, *j, *m;
++  register item *i, *j, *m = NULL;
+   register stype ws;
+   int d;
+ 
+@@ -502,7 +508,7 @@
+ static item *maxprofits(item *f, item *l, stype z)
+ {
+   register itype mp;
+-  register item *i, *j, *m;
++  register item *i, *j, *m = NULL;
+   register stype ps;
+   int d;
+ 
+@@ -539,7 +545,7 @@
+ {
+   register itype s;
+   register prod mp, mw;
+-  register item *i, *j, *m;
++  register item *i, *j, *m = NULL;
+   register stype ws, ps;
+   static item nn;
+   item *l1;
+@@ -583,8 +589,8 @@
+ static boolean haschance(allinfo *a, item *i, int side)
+ {
+   register itype p, w;
+-  register state *j, *m;
+-  register stype pp, ww;
++  /*register state *j, *m;*/
++  /*register stype pp, ww;*/
+ 
+   if (a->d.size == 0) return FALSE;
+ 
+@@ -719,7 +725,8 @@
+     if (ua < uopt) { suropt = s; uopt = ua; }
+     if (gr > 0) s2 = s-1; else s1 = s+1;
+   }
+-  *sur = suropt; *u = uopt;
++  *sur = suropt; 
++  *u   = (stype)(uopt);
+ }
+ 
+ 
+@@ -754,7 +761,7 @@
+   }
+ 
+   /* solve problem to optimality */
+-  z1 = ps + combo(k, l, csur, a->z-ps, 0, TRUE, TRUE);
++  z1 = ps + combo(k, l, csur, a->z-ps, (stype)0, TRUE, TRUE);
+ 
+   /* subtract weight and check cardinality */
+   for (i = f, m = l+1, no = 0; i != m; i++) { i->w -= sur; if (i->x) no++; }
+@@ -782,13 +789,17 @@
+   ntype n, card1, card2, b1;
+   stype u, minsur, maxsur, wsum;
+   itype minw, maxp, maxw;
++#ifndef _MSC_VER
+   long t1, t2;
++#endif
+ 
+   /* copy table */
++#ifndef _MSC_VER
+   give_time(&t1);
++#endif
+   relaxations++;
+   n = DIFF(a->fitem, a->litem);
+-  f = palloc(n, sizeof(item));
++  f = palloc((long)n, sizeof(item));
+   l = f + n - 1;
+   minw = a->fitem->w; maxp = maxw = wsum = 0;
+   for (j = f, i = a->fitem, m = l+1; j != m; i++, j++) {
+@@ -811,29 +822,31 @@
+   u = 0;
+   for (;;) {
+     if (card2 == b1+1) { 
+-      solvesur(a, f, l, minsur, 0, b1+1, &u); /* min card constr */
++       solvesur(a, f, l, minsur, (stype)0, b1+1, &u); /* min card constr */
+       if (u < a->z) u = a->z; /* since bound for IMPROVED solution */
+       break;
+     }
+     if (card1 == b1  ) { 
+-      solvesur(a, f, l, 0, maxsur, b1, &u); /* max card constr */
++       solvesur(a, f, l, (stype)0, maxsur, b1, &u); /* max card constr */
+       break;
+     }
+     if (card1 == b1+1) { /* dichothomy: card <= b1 or card >= b1+1 */ 
+-      solvesur(a, f, l, minsur, 0, b1+1, &u); 
+-      solvesur(a, f, l, 0, maxsur, b1, &u); 
++       solvesur(a, f, l, minsur, (stype)0, b1+1, &u); 
++       solvesur(a, f, l, (stype)0, maxsur, b1, &u); 
+       break;
+     }
+     if (card2 == b1  ) { /* dichothomy: card <= b1 or card >= b1+1 */ 
+-      solvesur(a, f, l, 0, maxsur, b1, &u); 
+-      solvesur(a, f, l, minsur, 0, b1+1, &u); 
++       solvesur(a, f, l, (stype)0, maxsur, b1, &u); 
++       solvesur(a, f, l, minsur, (stype)0, b1+1, &u); 
+       break;
+     }
+     u = a->dantzig; break;
+   }
+   if (u < a->ub) a->ub = u;
+   pfree(f);
++#ifndef _MSC_VER
+   give_time(&t2); reltime = t2 - t1;
++#endif
+ }
+ 
+ 
+@@ -922,7 +935,7 @@
+       pop(a, LEFT, &f, &l); a->ps = f->p; a->ws = f->w;
+       simpreduce(LEFT, &f, &l, a);
+       if (f != l+1) {
+-	partsort(a, f, l, 0, 0, SORTALL); a->fsort = f;
++         partsort(a, f, l, (stype)0, (stype)0, SORTALL); a->fsort = f;
+ 	a->ps = a->s->p; a->ws = a->s->w;
+       }
+     }
+@@ -937,7 +950,7 @@
+       pop(a, RIGHT, &f, &l); a->pt = l->p; a->wt = l->w;
+       simpreduce(RIGHT, &f, &l, a);
+       if (f != l+1) {
+-	partsort(a, f, l, 0, 0, SORTALL); a->lsort = l;
++         partsort(a, f, l, (stype)0, (stype)0, SORTALL); a->lsort = l;
+ 	a->pt = a->t->p; a->wt = a->t->w;
+       }
+     }
+@@ -1002,7 +1015,7 @@
+ 
+   /* create table */
+   d = &(a->d);
+-  d->set1 = palloc(sizeof(state), MAXSTATES);
++  d->set1 = palloc(sizeof(state), (long)MAXSTATES);
+   d->setm = d->set1 + MAXSTATES - 1;
+   d->size = 1;
+   d->fset = d->set1;
+@@ -1020,7 +1033,7 @@
+ 
+   /* init full solution */
+   a->fullsol = FALSE;
+-  a->ffull = palloc(DIFF(a->fitem,a->litem), sizeof(item));
++  a->ffull = palloc((long)DIFF(a->fitem,a->litem), sizeof(item));
+   a->lfull = a->ffull + DIFF(a->fitem,a->litem);
+ }
+ 
+@@ -1204,7 +1217,7 @@
+   a->b       = i;
+   a->psumb   = psum;
+   a->wsumb   = wsum;
+-  a->dantzig = psum + (r * (prod) i->p) / i->w;
++  a->dantzig = psum + (stype)((r * (prod) i->p) / i->w);
+ }
+ 
+ 
+@@ -1230,7 +1243,7 @@
+ 
+   heur     = FALSE;
+   rudi     = FALSE;
+-  inttab   = palloc(sizeof(interval), SORTSTACK);
++  inttab   = palloc(sizeof(interval), (long)SORTSTACK);
+   a.intv1b = &inttab[0];
+   a.intv2b = &inttab[SORTSTACK - 1];
+   a.intv1  = a.intv1b;
+@@ -1244,7 +1257,7 @@
+   a.master = (def && !relx);
+   a.coresize = 0;
+ 
+-  partsort(&a, a.fitem, a.litem, 0, a.c, PARTITION);
++  partsort(&a, a.fitem, a.litem, (stype)0, a.c, PARTITION);
+   findbreak(&a);
+   a.ub = (ub == 0 ? a.dantzig : ub);
+ 

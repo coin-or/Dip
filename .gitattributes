@@ -98,8 +98,12 @@ Decomp/examples/ATM/Makefile.in -text
 Decomp/examples/ATM/atm.parm.in -text
 Decomp/examples/ATM/notes.txt -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.c.patch -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.h.patch -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.c.patch -text
 Decomp/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h -text
+Decomp/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger -text
 Decomp/examples/GAP/GAP_Debug.h -text
 Decomp/examples/GAP/GAP_DecompApp.cpp -text
 Decomp/examples/GAP/GAP_DecompApp.h -text
