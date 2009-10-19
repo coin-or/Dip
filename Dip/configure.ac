@@ -17,7 +17,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.8],[matthew.galati@sas.com])
+AC_INIT([Dip],[0.8],[ted@lehigh.edu])
 
 # copyright for configure script
 AC_COPYRIGHT([
@@ -184,15 +184,24 @@ AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex &&
 test $coin_has_cpx = true])
 
 ##############################################################################
-#                   VPATH links for example input files                      #
+#                   VPATH links for unit test                                #
 ##############################################################################
-# In this case, the source code is taken from the Blis examples directory
-#   We are using the MILP application as a unit test. So, here we will
-#   setup links to the source code.
-# NOTE: not using - just cd to examples dir to build unit test
-#AC_CONFIG_LINKS(test/MILP_Main.cpp:examples/MILP/MILP_Main.cpp)
-#AC_CONFIG_LINKS(test/MILP_DipApp.cpp:examples/MILP/MILP_DipApp.cpp)
 
+AC_CONFIG_LINKS(test/MILP_DecompApp.cpp:examples/MILP/MILP_DecompApp.cpp
+		test/MILP_DecompApp.h:examples/MILP/MILP_DecompApp.h
+		test/MILP_Main.cpp:examples/MILP/MILP_Main.cpp
+		test/MILP_Param.h:examples/MILP/MILP_Param.h)
+                
+AC_COIN_LINK_INPUT_CMD
+
+#mkdir -p test
+#EXAMPLE_FILES="flugpl.mps"
+#for file in $EXAMPLE_FILES; do
+#  rm -f $file
+#  $coin_link_input_cmd `cd $srcdir/examples/Abc/data; pwd`/$file test/$file
+#done
+
+AC_COIN_DATA_PATH(Sample)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #

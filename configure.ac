@@ -17,7 +17,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.8],[matthew.galati@sas.com])
+AC_INIT([Dip],[0.8],[ted@lehigh.edu])
 
 # copyright for configure script
 AC_COPYRIGHT([

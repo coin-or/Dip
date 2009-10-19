@@ -366,6 +366,7 @@ Dip/src/old/UtilParameters.cpp.OLD -text
 Dip/src/old/UtilParameters.h -text
 Dip/src/old/UtilParameters.h.OLD -text
 Dip/src/old/UtilPortable.h.OLD -text
+Dip/test/Makefile.am -text
 Dip/test/Makefile.in -text
 /Externals -text
 /INSTALL -text

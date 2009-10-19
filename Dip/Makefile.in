@@ -82,6 +82,10 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/GAP/get_pisinger.sh.in \
 	$(top_srcdir)/examples/MAD/Makefile.in \
 	$(top_srcdir)/examples/MAD/mad.parm.in \
+	$(top_srcdir)/examples/MILP/MILP_DecompApp.cpp \
+	$(top_srcdir)/examples/MILP/MILP_DecompApp.h \
+	$(top_srcdir)/examples/MILP/MILP_Main.cpp \
+	$(top_srcdir)/examples/MILP/MILP_Param.h \
 	$(top_srcdir)/examples/MILP/Makefile.in \
 	$(top_srcdir)/examples/MILP/README.txt.in \
 	$(top_srcdir)/examples/MILP/data_extract.sh.in \
@@ -102,8 +106,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/VRP/Makefile.in \
 	$(top_srcdir)/examples/VRP/boost_extract.sh.in \
 	$(top_srcdir)/examples/VRP/vrp.parm.in \
-	$(top_srcdir)/inc/config_dip.h.in \
-	$(top_srcdir)/test/Makefile.in AUTHORS
+	$(top_srcdir)/inc/config_dip.h.in AUTHORS
 @HAVE_EXTERNALS_TRUE@am__append_2 = Externals
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Externals-stamp
 subdir = .
@@ -136,7 +139,7 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h \
-	test/Makefile dip_addlibs.txt
+	dip_addlibs.txt
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -200,6 +203,7 @@ CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINUTILSDOCDIR = @COINUTILSDOCDIR@
 COINUTILSOBJDIR = @COINUTILSOBJDIR@
 COINUTILSSRCDIR = @COINUTILSSRCDIR@
+COIN_DATA_SAMPLE_PATH = @COIN_DATA_SAMPLE_PATH@
 COIN_HAS_ALPS_FALSE = @COIN_HAS_ALPS_FALSE@
 COIN_HAS_ALPS_TRUE = @COIN_HAS_ALPS_TRUE@
 COIN_HAS_CBC_FALSE = @COIN_HAS_CBC_FALSE@
@@ -497,8 +501,6 @@ examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger: $(top_builddir)/confi
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-test/Makefile: $(top_builddir)/config.status $(top_srcdir)/test/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 dip_addlibs.txt: $(top_builddir)/config.status $(srcdir)/dip_addlibs.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 
@@ -647,7 +649,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc $(distdir)/test
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
