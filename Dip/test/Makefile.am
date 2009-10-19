@@ -22,12 +22,19 @@ nodist_unitTest_SOURCES = \
 unitTest_LDADD = \
 	$(DIPOBJDIR)/src/libDecomp.la \
 	$(ALPSOBJDIR)/src/libAlps.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
+	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+if CPLEX_LP_SOLVER
+unitTest_LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+endif
+if CPLEX_IP_SOLVER
+unitTest_LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+endif
+unitTest_LDADD += \
 	$(CBCOBJDIR)/src/libCbcSolver.la \
 	$(CBCOBJDIR)/src/libCbc.la \
 	$(CLPOBJDIR)/src/libClp.la \
-	$(OSIOBJDIR)/src/libOsi.la \
 	$(CGLOBJDIR)/src/libCgl.la \
+	$(OSIOBJDIR)/src/libOsi.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la 
 
 # List additional libraries
