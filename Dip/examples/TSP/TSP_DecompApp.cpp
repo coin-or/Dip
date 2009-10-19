@@ -14,6 +14,8 @@
 #include "TSP_DecompApp.h"
 #include "TSP_Concorde.h"
 #include "TSP_Boost.h"
+//===========================================================================//
+#include "DecompVar.h"
 
 //===========================================================================//
 void TSP_DecompApp::initializeApp(UtilParameters & utilParam)  {
@@ -258,7 +260,6 @@ TSP_DecompApp::solveRelaxed(const int          whichBlock,
    int                  n_vertices   = graphLib.n_vertices;
    int                  u, index;
 
-   //STOP
    if(m_appParam.ModelNameRelax == "1TREE"){
       vector< pair<int, double> > edge_cost;
       edge_cost.reserve(n_vertices);	 
@@ -268,24 +269,21 @@ TSP_DecompApp::solveRelaxed(const int          whichBlock,
             edge_cost.push_back(make_pair(index, redCostX[index]));
          }
       }   
-      rcStatus
-         = solveOneTree(redCostX, alpha, edge_cost, vars, cgV);
+      solveOneTree(redCostX, convexDual, edge_cost, varList, cgV);      
       solverStatus = DecompSolStatOptimal;
-      printf("new vars: %d\n", vars.size());
    }
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveRelaxed()", m_appParam.LogLevel, 2);
-   return rcStatus;
+   return solverStatus;
 }
 
 //===========================================================================//
-DecompStatus
-TSP_DecompApp::solveOneTree(const double               * cost, 
-			    const double                 alpha,
-			    vector< pair<int,double> > & edge_cost,
-			    DecompVarList              & vars,
-			    Graph                      & g) {
+void TSP_DecompApp::solveOneTree(const double               * cost, 
+                                 const double                 alpha,
+                                 vector< pair<int,double> > & edge_cost,
+                                 DecompVarList              & vars,
+                                 Graph                      & g) {
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solveOneTree()", m_appParam.LogLevel, 2);
@@ -305,16 +303,15 @@ TSP_DecompApp::solveOneTree(const double               * cost,
 		edge_cost.begin() + sort_size,
 		edge_cost.end(), UtilIsLessThan<int,double>());
 
-   //stop
-   if(m_param.LogLevel > 10){
-      cout << "Partial Sorted List [size = " << sort_size << "]" << endl;
+   if(m_appParam.LogLevel > 4){
+      (*m_osLog) << "Partial Sorted List [size = " << sort_size << "]" << endl;
       for(vector< pair<int,double> >::iterator tmp = edge_cost.begin();
 	  tmp != edge_cost.end(); tmp++){
-	 cout << "\nsorted edge_cost: " << (*tmp).first; 
+	 (*m_osLog) << "\nsorted edge_cost: " << (*tmp).first; 
 	 UtilPrintEdge((*tmp).first);
-	 cout << " cost: " << (*tmp).second;
+	 (*m_osLog) << " cost: " << (*tmp).second;
       }
-      cout << "\n";
+      (*m_osLog) << "\n";
    }  
    
    //---
@@ -325,12 +322,13 @@ TSP_DecompApp::solveOneTree(const double               * cost,
    for(tie(ei,ei_end) = edges(g); ei != ei_end; ei++){
       index = e_index_g(*ei);
       e_weight_g[*ei] = cost[index];
-      if(m_param.LogLevel > 10)
-         printf("\ncost edge(%d,%d): %g",
-                source(*ei,g), target(*ei,g), cost[index]);
+      if(m_appParam.LogLevel > 4)
+         (*m_osLog) << "cost edge( " 
+                    << source(*ei,g) << "," << target(*ei,g) << "): " 
+                    << cost[index];
       assert(index == UtilIndexU(source(*ei,g),target(*ei,g)));
    }
-
+   
 
    
    int n_edges    = graphLib.n_edges;
@@ -354,8 +352,8 @@ TSP_DecompApp::solveOneTree(const double               * cost,
    vector<graph_traits < Graph >::edge_descriptor>::iterator vei;
    kruskal_minimum_spanning_tree(g, back_inserter(spanning_tree));
 
-   if(m_param.LogLevel > 10)
-      cout << "Spanning Tree:" << endl;
+   if(m_appParam.LogLevel > 4)
+      (*m_osLog) << "Spanning Tree:" << endl;
 
    int edge_index;
    for (vei  = spanning_tree.begin(); vei != spanning_tree.end(); ++vei) {
@@ -365,9 +363,9 @@ TSP_DecompApp::solveOneTree(const double               * cost,
       inMST[edge_index]  = true;
       inds.push_back(edge_index);
 
-      if(m_param.LogLevel > 10){
+      if(m_appParam.LogLevel > 4){
 	 UtilPrintEdge(edge_index);
-	 cout << " -> " << cost[edge_index] << " rc : " << rc << endl; 
+	 (*m_osLog) << " -> " << cost[edge_index] << " rc : " << rc << endl; 
       }
 
    }
@@ -383,10 +381,10 @@ TSP_DecompApp::solveOneTree(const double               * cost,
    rc  += (*vpi).second;
    obj += graphLib.edge_wt[(*vpi).first];
    
-   if(m_param.LogLevel > 10){
-      cout << "Adding edge:" << endl;
+   if(m_appParam.LogLevel > 4){
+      (*m_osLog) << "Adding edge:" << endl;
       UtilPrintEdge((*vpi).first);
-      cout << " -> " << cost[(*vpi).first] << " rc : " << rc << endl;
+      (*m_osLog) << " -> " << cost[(*vpi).first] << " rc : " << rc << endl;
    }
 
    vpi++;
@@ -403,12 +401,12 @@ TSP_DecompApp::solveOneTree(const double               * cost,
       rc  += (*vpi).second;
       obj += graphLib.edge_wt[(*vpi).first];
 
-      if(m_param.LogLevel > 10){
-	 cout << "Adding edges:" << endl;
+      if(m_appParam.LogLevel > 4){
+	 (*m_osLog) << "Adding edges:" << endl;
 	 UtilPrintEdge((*vpi).first);
-	 cout << " -> " << cost[(*vpi).first] << " rc : " << rc << endl;
-	 cout << "Creating var with reduced = " << rc - alpha 
-	      << " obj = " << obj << endl;
+	 (*m_osLog) << " -> " << cost[(*vpi).first] << " rc : " << rc << endl;
+	 (*m_osLog) << "Creating var with reduced = " << rc - alpha 
+                    << " obj = " << obj << endl;
       }
 
       DecompVar * oneTree = new DecompVar(inds, els, rc - alpha, obj);
@@ -423,8 +421,6 @@ TSP_DecompApp::solveOneTree(const double               * cost,
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveOneTree()", m_appParam.LogLevel, 2);
-
-   return STAT_FEASIBLE;
 }
 
 //===========================================================================//
@@ -471,21 +467,21 @@ bool TSP_DecompApp::APPisUserFeasible(const double * x,
       return true;
       
       /*
-      if(isBinary(x, n_cols, tolZero)){
-	 constructRoute(m_sg); 
-	 return true; 
-      }
-      else{
-	 return false; //it is connected, but fractional
-      }
+        if(isBinary(x, n_cols, tolZero)){
+        constructRoute(m_sg); 
+        return true; 
+        }
+        else{
+        return false; //it is connected, but fractional
+        }
       */
    }
 
    //TODO: feasibility cuts?
-   //cout << "Not Feasible: disconnected, n_comp : " << n_comp << endl;
+   //(*m_osLog) << "Not Feasible: disconnected, n_comp : " << n_comp << endl;
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		      "APPisUserFeasible()", m_appParam.LogLevel, 2);
+                    "APPisUserFeasible()", m_appParam.LogLevel, 2);
 
    return false;
 }
@@ -494,11 +490,4 @@ bool TSP_DecompApp::APPisUserFeasible(const double * x,
 void TSP_DecompApp::printOriginalColumn(const int   index, 
                                         ostream   * os) const {
    UtilPrintEdge(index, os);
-}
-
-//===========================================================================//
-void TSP_DecompApp::printOriginalSolution(const int      n_cols, 
-                                          const double * solution, 
-                                          ostream      * os) const{
-   DecompApp::printOriginalSolution(n_cols, solution, os);
 }

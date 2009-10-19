@@ -72,7 +72,7 @@ int main(int argc, char ** argv){
       //--- create the driver AlpsDecomp model
       //---
       int             status = 0;
-      AlpsDecompModel alpsModel(utilParam);
+      AlpsDecompModel alpsModel(utilParam, algo);
 
       timer.stop();
       timeSetupCpu  = timer.getCpuTime();

@@ -103,6 +103,7 @@ Dip/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.c.patch -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h.in -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger.in -text
+Dip/examples/ExternalSolvers/TSP/get.concorde.in -text
 Dip/examples/GAP/GAP_Debug.h -text
 Dip/examples/GAP/GAP_DecompApp.cpp -text
 Dip/examples/GAP/GAP_DecompApp.h -text
@@ -186,6 +187,7 @@ Dip/examples/TSP/TSP_Param.h -text
 Dip/examples/TSP/TSP_SubtourCut.cpp -text
 Dip/examples/TSP/TSP_SubtourCut.h -text
 Dip/examples/TSP/data_extract.sh.in -text
+Dip/examples/TSP/get_concorde.sh.in -text
 Dip/examples/TSP/tsp.parm.in -text
 Dip/examples/VRP/Makefile.in -text
 Dip/examples/VRP/VRP_Boost.h -text

@@ -37,7 +37,7 @@ public:
 public:
    void print(){
       cout << "ConcordeSubtour: ";
-      for(int i = 0; i < inS.size(); i++){
+      for(int i = 0; i < static_cast<int>(inS.size()); i++){
 	 if(inS[i]){
 	    cout << i << " ";
 	 }

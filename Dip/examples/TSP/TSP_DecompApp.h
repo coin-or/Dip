@@ -51,20 +51,11 @@ public:
    /* @name Inherited (from virtual) methods. */
 
    /** Solve the relaxed problem. */
-   //TOOD: too messy?
-   DecompStatus
-   APPsolveRelaxed(const int             whichModel,
-		   const int             whichBlock,
-		   const double        * redCostX,
-		   const double        * origCost,
-		   const double          alpha,
-		   const int             n_origCols,
-		   const bool            checkRC,		
-		   const bool            checkDup,
-		   int                 * isExact,
-		   OsiSolverInterface  * m_subprobSI,
-		   list<DecompVar*>    & vars);
- 
+   DecompSolverStatus solveRelaxed(const int          whichBlock,
+                                   const double     * redCostX,
+                                   const double       convexDual,
+                                   DecompVarList    & varList);
+      
    int generateCuts(const double              * x, 
 		    const DecompConstraintSet & modelCore,
 		    const DecompConstraintSet & modelRelax,
@@ -73,9 +64,6 @@ public:
    bool APPisUserFeasible(const double * x, 
 			  const int      n_cols,
 			  const double   tolZero);
-   void printOriginalSolution(const int      n_cols, 
-			      const double * solution, 
-			      ostream      * os) const;
    void printOriginalColumn(const int   index, 
 			    ostream   * os) const;
 
@@ -89,6 +77,9 @@ private:
 
    /** Guts of constructor. */
    void initializeApp(UtilParameters & utilParam);
+
+   /** Create models. */
+   void createModels();
    
    /** Create the two-matching constraints. */
    void createModel2Match(DecompConstraintSet * modelCS);
@@ -98,12 +89,12 @@ private:
 
    int generateCutsSubtour(DecompCutList & newCuts);
 
-   DecompStatus solveOneTree(const double               * cost, 
-			     const double                 alpha,
-			     vector< pair<int,double> > & edge_cost,
-			     DecompVarList              & vars,
-			     Graph                      & g);
-
+   void solveOneTree(const double               * cost, 
+                     const double                 alpha,
+                     vector< pair<int,double> > & edge_cost,
+                     DecompVarList              & vars,
+                     Graph                      & g);
+   
 public:
    /** @name Constructor and Destructor */
 
@@ -111,7 +102,7 @@ public:
    TSP_DecompApp(UtilParameters & utilParam) : 
       DecompApp(utilParam),
       m_classTag("TSP-APP"),
-      m_objecive(NULL)
+      m_objective(NULL)
    {
       initializeApp(utilParam);         
    }

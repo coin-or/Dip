@@ -232,6 +232,7 @@ AC_CONFIG_FILES([Makefile
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm
                  examples/TSP/data_extract.sh
+                 examples/TSP/get_concorde.sh
                  examples/SmallIP/Makefile
                  examples/SmallIP/smallip.parm
                  examples/MILP/Makefile
@@ -262,6 +263,7 @@ AC_CONFIG_FILES([Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h
+                 examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
                  dip_addlibs.txt])
 

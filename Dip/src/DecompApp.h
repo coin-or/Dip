@@ -45,13 +45,6 @@ class DecompApp{
 
 private:
    /**
-    * Disable copy constructors.
-    */
-   DecompApp(const DecompApp &);
-   DecompApp & operator=(const DecompApp &);
-  
-private:
-   /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
    string m_classTag;
