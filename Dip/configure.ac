@@ -193,14 +193,6 @@ AC_CONFIG_LINKS(test/MILP_DecompApp.cpp:examples/MILP/MILP_DecompApp.cpp
 		test/MILP_Param.h:examples/MILP/MILP_Param.h)
                 
 AC_COIN_LINK_INPUT_CMD
-
-#mkdir -p test
-#EXAMPLE_FILES="flugpl.mps"
-#for file in $EXAMPLE_FILES; do
-#  rm -f $file
-#  $coin_link_input_cmd `cd $srcdir/examples/Abc/data; pwd`/$file test/$file
-#done
-
 AC_COIN_DATA_PATH(Sample)
 
 ##############################################################################
@@ -266,6 +258,7 @@ AC_CONFIG_FILES([Makefile
                  examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
                  dip_addlibs.txt])
+
 
 # Here put the location and name of the configuration header file
 AC_CONFIG_HEADER([inc/config_dip.h])

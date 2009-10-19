@@ -76,6 +76,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger.in \
+	$(top_srcdir)/examples/ExternalSolvers/TSP/get.concorde.in \
 	$(top_srcdir)/examples/GAP/Makefile.in \
 	$(top_srcdir)/examples/GAP/data_extract.sh.in \
 	$(top_srcdir)/examples/GAP/gap.parm.in \
@@ -102,6 +103,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/SmallIP/smallip.parm.in \
 	$(top_srcdir)/examples/TSP/Makefile.in \
 	$(top_srcdir)/examples/TSP/data_extract.sh.in \
+	$(top_srcdir)/examples/TSP/get_concorde.sh.in \
 	$(top_srcdir)/examples/TSP/tsp.parm.in \
 	$(top_srcdir)/examples/VRP/Makefile.in \
 	$(top_srcdir)/examples/VRP/boost_extract.sh.in \
@@ -121,10 +123,11 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
 CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/TSP/data_extract.sh \
-	examples/SmallIP/Makefile examples/SmallIP/smallip.parm \
-	examples/MILP/Makefile examples/MILP/milp.parm \
-	examples/MILP/data_extract.sh examples/MILP/README.txt \
-	examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm \
+	examples/TSP/get_concorde.sh examples/SmallIP/Makefile \
+	examples/SmallIP/smallip.parm examples/MILP/Makefile \
+	examples/MILP/milp.parm examples/MILP/data_extract.sh \
+	examples/MILP/README.txt examples/MILPBlock/Makefile \
+	examples/MILPBlock/milpblock.parm \
 	examples/MILPBlock/milpblock.parm2 \
 	examples/MILPBlock/data_extract.sh \
 	examples/MILPBlock/README.txt examples/AP3/Makefile \
@@ -139,7 +142,7 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h \
-	dip_addlibs.txt
+	examples/ExternalSolvers/TSP/get.concorde dip_addlibs.txt
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -441,6 +444,8 @@ examples/TSP/tsp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/TSP/get_concorde.sh: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/get_concorde.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/SmallIP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/SmallIP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/SmallIP/smallip.parm: $(top_builddir)/config.status $(top_srcdir)/examples/SmallIP/smallip.parm.in
@@ -500,6 +505,8 @@ examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger: $(top_builddir)/config.
 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/ExternalSolvers/TSP/get.concorde: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/TSP/get.concorde.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 dip_addlibs.txt: $(top_builddir)/config.status $(srcdir)/dip_addlibs.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -649,7 +656,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

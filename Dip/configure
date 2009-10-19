@@ -21654,14 +21654,6 @@ esac
 echo "$as_me:$LINENO: result: $coin_link_input_cmd" >&5
 echo "${ECHO_T}$coin_link_input_cmd" >&6
 
-
-#mkdir -p test
-#EXAMPLE_FILES="flugpl.mps"
-#for file in $EXAMPLE_FILES; do
-#  rm -f $file
-#  $coin_link_input_cmd `cd $srcdir/examples/Abc/data; pwd`/$file test/$file
-#done
-
 echo "$as_me:$LINENO: checking absolute path to data directory Sample" >&5
 echo $ECHO_N "checking absolute path to data directory Sample... $ECHO_C" >&6
 
@@ -21720,6 +21712,7 @@ CFLAGS=$CXXFLAGS
 # Here list all the files that configure should create (except for the
 # configuration header file)
                                                                                                                                                                                                                                                                                                                                                                                                                 ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/MAD/Makefile examples/MAD/mad.parm examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/boost_extract.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/TSP/get.concorde test/Makefile dip_addlibs.txt"
+
 
 
 # Here put the location and name of the configuration header file

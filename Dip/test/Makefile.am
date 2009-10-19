@@ -22,13 +22,13 @@ nodist_unitTest_SOURCES = \
 unitTest_LDADD = \
 	$(DIPOBJDIR)/src/libDecomp.la \
 	$(ALPSOBJDIR)/src/libAlps.la \
-	$(CGLOBJDIR)/src/libCgl.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(CLPOBJDIR)/src/libClp.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la \
+	$(CBCOBJDIR)/src/libCbcSolver.la \
 	$(CBCOBJDIR)/src/libCbc.la \
-	$(CBCOBJDIR)/src/libCbcSolver.la 
+	$(CLPOBJDIR)/src/libClp.la \
+	$(OSIOBJDIR)/src/libOsi.la \
+	$(CGLOBJDIR)/src/libCgl.la \
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la 
 
 # List additional libraries
 LIBS += $(ADDLIBS) \
