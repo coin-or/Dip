@@ -1,4 +1,3 @@
-# $Id: $
 #===========================================================================#
 # This file is part of the Decomp Solver Framework.                         #
 #                                                                           #
@@ -75,12 +74,6 @@ clean:
 	rm -rf $(EXE) $(OBJS)
 
 $(KNAP_DIR)/libKnapPisinger.a:
-#	echo "chmod +x data_extract.sh"
-#	chmod +x data_extract.sh
-#	./data_extract.sh
-#	echo "chmod +x get_pisinger.sh"
-#	chmod +x get_pisinger.sh
-#	./get_pisinger.sh
 	(cd ${KNAP_DIR} && ${MAKE})
 
 .cpp.o:

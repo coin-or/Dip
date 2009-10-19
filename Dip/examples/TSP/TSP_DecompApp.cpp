@@ -42,6 +42,7 @@ void TSP_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //--- read best known lb/ub 
    //---
    string bestKnownFile  = m_appParam.DataDir + UtilDirSlash();
+   bestKnownFile        += ".." + UtilDirSlash();
    bestKnownFile        += "TSPLIB_opt";
    
    ifstream is;

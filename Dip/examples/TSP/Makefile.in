@@ -1,4 +1,3 @@
-# $Id: $
 #===========================================================================#
 # This file is part of the Decomp Solver Framework.                         #
 #                                                                           #
@@ -18,68 +17,74 @@ EXEDECOMP = decomp_tsp@EXEEXT@
 OBJS         = TSP_DecompApp.@OBJEXT@
 OBJS        += TSP_CutGen.@OBJEXT@
 OBJS        += TSP_SubtourCut.@OBJEXT@
-OBJS_DECOMP  = $(OBJS) TSP_Main.@OBJEXT@
+OBJS        += TSP_Main.@OBJEXT@
 
-# Concorde
-CONCORDE_LIB = concorde.a
-CONCORDE_DIR = @srcdir@/../ExternalSolvers/TSP/concorde
+#===========================================================================#
+# additional libraries needed 
 
-# Boost
-BOOST_DIR = @srcdir@/../ExternalSolvers/Graph/boost_1_33_1
+# concorde
+CONCORDE_LIB = concorde
+CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
 
-# CHANGEME: Additional libraries
-ADDLIBS = ${CONCORDE_DIR}/${CONCORDE_LIB}
+# boost
+#BOOST_DIR = ../ExternalSolvers/Graph/boost_1_33_1
 
-# CHANGEME: Additional flags for compilation (e.g., include flags)
-ADDINCFLAGS = -I${CONCORDE_DIR} -I${CONCORDE_DIR}/INCLUDE
-ADDINCFLAGS += -I${BOOST_DIR}
+#===========================================================================#
+# additional include and linnk flags
+ADDLIBS      += $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+ADDLIBS      += $(CONCORDE_DIR)/../qsopt.a
+ADDINCFLAGS  += -I$(CONCORDE_DIR)/INCLUDE
+#ADDINCFLAGS  += -I$(BOOST_DIR)
 
-# CHANGEME: Directory to the sources for the (example) problem definition
-# files
+#===========================================================================#
+# directory to the source files
 SRCDIR = @srcdir@
-VPATH = @srcdir@
+VPATH  = @srcdir@
 
-##########################################################################
-#  Usually, you don't have to change anything below.  Note that if you   #
-#  change certain compiler options, you might have to recompile the      #
-#  COIN package.                                                         #
-##########################################################################
-
-# C++ Compiler command
+#===========================================================================#
+# C++ compiler command
 CXX = @CXX@
-
-# C++ Compiler options
+# C++ compiler options
 CXXFLAGS = @CXXFLAGS@
-
-# additional C++ Compiler options for linking
+# C++ compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-
-# Directory with COIN libraries
+#===========================================================================#
+# directory with COIN header files
+COININCDIR = @abs_include_dir@
+# directory with COIN libraries
 COINLIBDIR = @abs_lib_dir@
 
-# Necessary Include dirs (we use the CYGPATH_W variables to allow
-# compilation with Windows compilers)
+# includes, use the CYGPATH_W variables to allow compilation with win
 INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
 
-#TODO
+#===========================================================================#
+# include COIN flags and library options
 include ../Makefile.Examples
 
+#===========================================================================#
 # The following is necessary under cygwin, if native compilers are used
 CYGPATH_W = @CYGPATH_W@
 
-#TODO: needs to be conditional on alps or not
+#===========================================================================#
 all: $(EXEDECOMP)
 
 .SUFFIXES: .cpp .c .o .obj
 
-$(EXEDECOMP): $(OBJS_DECOMP)
+$(EXEDECOMP): $(CONCORDE_DIR)/$(CONCORDE_LIB).a $(OBJS)
 	bla=;\
-	for file in $(OBJS_DECOMP); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
 
+$(CONCORDE_DIR)/$(CONCORDE_LIB).a:
+	(cd $(CONCORDE_DIR)        && \
+	chmod +x ../build.concorde && \
+	../build.concorde          &&\
+	${MAKE})
+
 clean:
-	rm -rf $(EXE) $(OBJS_DECOMP) $(OBJS_ALPS)
+	(cd $(CONCORDE_DIR) && ${MAKE} clean)
+	rm -rf $(EXE) $(OBJS)
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
