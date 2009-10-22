@@ -122,7 +122,8 @@ public:
       m_classTag("D-ALGOPC") {
 
       //---
-      //--- by default turn off gomory cuts for PC
+      //--- do any parameter overrides of the defaults here
+      //---    by default turn off gomory cuts for PC
       //---
       m_param.CutCglGomory = 0;
 

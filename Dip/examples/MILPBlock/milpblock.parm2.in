@@ -43,7 +43,7 @@ Settings for decomp algorithm cutting plane method.
 CutCGL        = 1
 
 #{0,1}: use CGL Gomory, knapsack, flow-cover, MIR, clique cuts
-CutGomory     = 1
+CutCglGomory  = 1
 CutCglKnapC   = 1
 CutCglFlowC   = 1
 CutCglMir     = 1
@@ -59,7 +59,7 @@ Settings for decomp algorithm price and cut.
 CutCGL        = 1
 
 #{0,1}: use CGL Gomory, knapsack, flow-cover, MIR, clique cuts
-CutGomory     = 0
+CutCglGomory  = 0
 CutCglKnapC   = 1
 CutCglFlowC   = 1
 CutCglMir     = 1
@@ -97,7 +97,7 @@ Settings for MILPBlock application.
 LogLevel     = 3
 
 # Path to instance data.
-DataDir      = @srcdir@/../../data/MILP/block
+DataDir      = @srcdir@/../../data/MILP/block/atm
 
 # {Pair,List}: Block file format. See README.txt.
 BlockFileFormat = List
