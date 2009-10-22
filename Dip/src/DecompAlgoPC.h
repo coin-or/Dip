@@ -107,6 +107,16 @@ public:
                 bool             doSetup    = true) :
       DecompAlgo(PRICE_AND_CUT, app, utilParam),
       m_classTag("D-ALGOPC") {
+
+      //---
+      //--- do any parameter overrides of the defaults here
+      //---    by default turn off gomory cuts for PC
+      //---
+      m_param.CutCglGomory = 0;
+
+      //---
+      //--- run init setup
+      //---
       if(doSetup){
          string paramSection = DecompAlgoStr[PRICE_AND_CUT];
          initSetup(utilParam, paramSection);

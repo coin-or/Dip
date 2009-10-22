@@ -151,108 +151,152 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompModel.cpp"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompModel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompTreeNode.cpp"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompNodeDesc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgo.cpp"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompParam.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoC.cpp"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompSolution.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoCGL.cpp"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompTreeNode.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoD.cpp"
+				RelativePath="..\..\..\..\Dip\src\Decomp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoPC.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgo.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoRC.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoC.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompApp.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoCGL.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompBranch.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoD.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompConstraintSet.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoPC.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompCut.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoRC.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompCutPool.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompApp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompDebug.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompConfig.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompModel.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompConstraintSet.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompStats.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompCut.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompVar.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompCutOsi.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompVarPool.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompCutPool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilGraphLib.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompMemPool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilHash.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompModel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilKnapsack.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompParam.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilMacros.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompSolution.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilMacrosAlps.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompSolverResult.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilMacrosDecomp.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompStats.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilParameters.cpp"
+				RelativePath="..\..\..\..\Dip\src\DecompVar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\DecompVarPool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\DecompWaitingCol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\DecompWaitingRow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilGraphLib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilHash.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilKnapsack.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilMacros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilMacrosAlps.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilMacrosDecomp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilParameters.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Dip\src\UtilTimer.h"
 				>
 			</File>
 		</Filter>
@@ -263,140 +307,108 @@
 			>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompModel.h"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompModel.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompNodeDesc.h"
+				RelativePath="..\..\..\..\Dip\src\AlpsDecompTreeNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompParam.h"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgo.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompSolution.h"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoC.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\AlpsDecompTreeNode.h"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoCGL.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\Decomp.h"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoD.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgo.h"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoPC.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoC.h"
+				RelativePath="..\..\..\..\Dip\src\DecompAlgoRC.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoCGL.h"
+				RelativePath="..\..\..\..\Dip\src\DecompApp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoPC.h"
+				RelativePath="..\..\..\..\Dip\src\DecompBranch.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompAlgoRC.h"
+				RelativePath="..\..\..\..\Dip\src\DecompConstraintSet.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompApp.h"
+				RelativePath="..\..\..\..\Dip\src\DecompCut.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompConfig.h"
+				RelativePath="..\..\..\..\Dip\src\DecompCutPool.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompConstraintSet.h"
+				RelativePath="..\..\..\..\Dip\src\DecompDebug.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompCut.h"
+				RelativePath="..\..\..\..\Dip\src\DecompModel.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompCutOsi.h"
+				RelativePath="..\..\..\..\Dip\src\DecompStats.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompCutPool.h"
+				RelativePath="..\..\..\..\Dip\src\DecompVar.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompMemPool.h"
+				RelativePath="..\..\..\..\Dip\src\DecompVarPool.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompModel.h"
+				RelativePath="..\..\..\..\Dip\src\UtilGraphLib.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompParam.h"
+				RelativePath="..\..\..\..\Dip\src\UtilHash.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompSolution.h"
+				RelativePath="..\..\..\..\Dip\src\UtilKnapsack.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompStats.h"
+				RelativePath="..\..\..\..\Dip\src\UtilMacros.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompVar.h"
+				RelativePath="..\..\..\..\Dip\src\UtilMacrosAlps.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompVarPool.h"
+				RelativePath="..\..\..\..\Dip\src\UtilMacrosDecomp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompWaitingCol.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\DecompWaitingRow.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilGraphLib.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilHash.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilKnapsack.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilMacros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilMacrosAlps.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilMacrosDecomp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Decomp\src\UtilParameters.h"
+				RelativePath="..\..\..\..\Dip\src\UtilParameters.cpp"
 				>
 			</File>
 		</Filter>
