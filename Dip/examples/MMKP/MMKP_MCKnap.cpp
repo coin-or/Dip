@@ -104,13 +104,13 @@ void MMKP_MCKnap::solveTrivialMaxSum(const double * redCost,
       }      
       assert((minRedCostInd >= 0) && (minRedCostInd < m_nCols));      
       totalWeight += m_weight[minRedCostInd];
-      assert(totalWeight <= m_capacity);
       solInd.push_back(minRedCostInd);
 #ifdef MMKP_MCKNAP_DEBUG
-      printf("i:%d totalWeight:%d mincostInd:%d redCost:%g origCost:%g\n",
-         i, totalWeight, minRedCostInd, minRedCost, 
+      printf("i:%d totalWeight:%d cap:%d mincostInd:%d redCost:%g origCost:%g\n",
+             i, totalWeight, m_capacity, minRedCostInd, minRedCost, 
            origCost[minRedCostInd]);fflush(stdout);
 #endif
+      assert(totalWeight <= m_capacity);
       varRedCost  += minRedCost;
       varOrigCost += origCost[minRedCostInd];
    }
@@ -281,7 +281,7 @@ void MMKP_MCKnap::solveMCKnap(const double   * redCost,
    //---
    //CoinAssert(optsol.size == 1); //TODO
 #ifdef MMKP_MCKNAP_DEBUG
-   printf("\nstatus=%d minObj=%ld\n", status, minObj);
+   printf("\nstatus=%d minObj=%g\n", status, minObj);
 #endif
 
    switch(status){
@@ -300,7 +300,7 @@ void MMKP_MCKnap::solveMCKnap(const double   * redCost,
 	 solObj  = -solObj;
 	  
 #ifdef MMKP_MCKNAP_DEBUG
-	 printf("\nminObj = %ld, solObj = %g", minObj, solObj);
+	 printf("\nminObj = %g, solObj = %g", minObj, solObj);
 #endif
 	  
 	  

@@ -87,10 +87,10 @@ int UtilScaleDblToIntArr(const int      arrLen,
    }
    
    for(i = 0; i < arrLen; i++){
-      arrInt[i] = (int)(arrDbl[i] * scaleFactor);
+      arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
    }
    if(oneInt){
-      *oneInt = (int)(oneDbl * scaleFactor);
+      *oneInt = static_cast<int>(round(oneDbl * scaleFactor));
    }
 
    UTIL_DELARR(arrFrac);
@@ -147,9 +147,13 @@ int UtilScaleDblToIntArr(const int      arrLen,
       if(factorToBig)
          break;
    }
-   
+
+   //---
+   //--- must be careful not to trunc here
+   //---   so, we want to round
+   //---
    for(i = 0; i < arrLen; i++){
-      arrInt[i] = (int)(arrDbl[i] * scaleFactor);
+      arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
    }
 
    UTIL_DELARR(arrFrac);
