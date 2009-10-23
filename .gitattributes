@@ -165,6 +165,10 @@ Dip/examples/MMKP/MMKP_Model.h -text
 Dip/examples/MMKP/MMKP_Param.h -text
 Dip/examples/MMKP/MMKP_Status.h -text
 Dip/examples/MMKP/Makefile.in -text
+Dip/examples/MMKP/NOTES.txt -text
+Dip/examples/MMKP/README.txt.in -text
+Dip/examples/MMKP/data_extract.sh.in -text
+Dip/examples/MMKP/get_pisinger.sh.in -text
 Dip/examples/MMKP/mmkp.parm.in -text
 Dip/examples/MMKP/old/old.cpp -text
 Dip/examples/Makefile.Examples.in -text

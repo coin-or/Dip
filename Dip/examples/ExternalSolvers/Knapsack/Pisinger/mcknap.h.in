@@ -203,8 +203,8 @@ extern void inittrace(char *ext);
    ====================================================================== */
 /*MVG: TODO - not reentrant*/
 
-#define DEBUG(x) x
-/*#define DEBUG(x)*/
+/* #define DEBUG(x) x */
+#define DEBUG(x)
 
 /*solstruct solution;*/
 /*solstruct optsol;*/

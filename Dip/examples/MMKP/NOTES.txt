@@ -1,0 +1,6 @@
+I02.cpm with gomory cuts LB=-364.24 UB=inf
+  solves in 2 nodes
+I02.pc  no   gomory cuts LB=-365    UB=-299
+  solves in 13 nodes
+
+- check to see how PC + gomory does

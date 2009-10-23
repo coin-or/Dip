@@ -97,6 +97,8 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm.in \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm2.in \
 	$(top_srcdir)/examples/MMKP/Makefile.in \
+	$(top_srcdir)/examples/MMKP/data_extract.sh.in \
+	$(top_srcdir)/examples/MMKP/get_pisinger.sh.in \
 	$(top_srcdir)/examples/MMKP/mmkp.parm.in \
 	$(top_srcdir)/examples/Makefile.Examples.in \
 	$(top_srcdir)/examples/SmallIP/Makefile.in \
@@ -135,7 +137,8 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/GAP/gap.parm examples/GAP/data_extract.sh \
 	examples/GAP/get_pisinger.sh examples/MAD/Makefile \
 	examples/MAD/mad.parm examples/MMKP/Makefile \
-	examples/MMKP/mmkp.parm examples/VRP/Makefile \
+	examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh \
+	examples/MMKP/get_pisinger.sh examples/VRP/Makefile \
 	examples/VRP/vrp.parm examples/VRP/boost_extract.sh \
 	examples/ATM/Makefile examples/ATM/atm.parm \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
@@ -487,6 +490,10 @@ examples/MAD/mad.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/
 examples/MMKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MMKP/mmkp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/mmkp.parm.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MMKP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/data_extract.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MMKP/get_pisinger.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/get_pisinger.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/VRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

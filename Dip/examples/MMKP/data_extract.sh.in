@@ -1,0 +1,2 @@
+cd @srcdir@/../../data/MMKP
+tar -zxvf data.tgz

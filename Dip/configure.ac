@@ -246,6 +246,8 @@ AC_CONFIG_FILES([Makefile
                  examples/MAD/mad.parm
                  examples/MMKP/Makefile
                  examples/MMKP/mmkp.parm
+                 examples/MMKP/data_extract.sh
+                 examples/MMKP/get_pisinger.sh
                  examples/VRP/Makefile
                  examples/VRP/vrp.parm
 		 examples/VRP/boost_extract.sh

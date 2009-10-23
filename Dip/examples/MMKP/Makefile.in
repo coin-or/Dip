@@ -23,13 +23,12 @@ OBJS         += MMKP_MCKnap.@OBJEXT@
 # additional libraries needed (libKnapPisinger)
 KNAP_DIR = ../ExternalSolvers/Knapsack/Pisinger
 KNAP_LIB  = KnapPisinger
-KNAP_INC  = @srcdir@/$(KNAP_DIR)
+KNAP_INC  = $(KNAP_DIR)
 
 #===========================================================================#
 # additional include and link flags
 ADDLIBS      += -L$(KNAP_DIR) -l$(KNAP_LIB)
 ADDINCFLAGS  += -I$(KNAP_INC)
-ADDINCFLAGS  += -DCOIN_ASSERT #??
 
 #===========================================================================#
 # directory to the source files
@@ -66,12 +65,13 @@ all: $(EXEDECOMP)
 
 .SUFFIXES: .cpp .c .o .obj
 
-$(EXEDECOMP): $(OBJS) $(KNAP_DIR)/libKnapPisinger.a
+$(EXEDECOMP): $(KNAP_DIR)/libKnapPisinger.a $(OBJS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
 
 clean:
+	(cd ${KNAP_DIR} && ${MAKE} clean)
 	rm -rf $(EXE) $(OBJS)
 
 $(KNAP_DIR)/libKnapPisinger.a:
