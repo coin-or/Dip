@@ -350,7 +350,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       }
    }
    else{
-      if(!UtilIsInSet(result->m_solStatus, statusSet2, 2)){
+      if(!UtilIsInSet(result->m_solStatus, statusSet2, 3)){
          cerr << "Error: CPX IP solver 2nd status = " 
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status", 
