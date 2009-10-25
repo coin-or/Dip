@@ -72,11 +72,11 @@ Dip/data/MILP/miplib/get.data -text
 Dip/data/MILP/miplib/miplib3.list -text
 Dip/data/MMKP/MMKP.html -text
 Dip/data/MMKP/README.txt -text
-Dip/data/MMKP/data.tgz -text
 Dip/data/MMKP/gsimon/README -text
 Dip/data/MMKP/gsimon/ex_xml.tgz -text
 Dip/data/MMKP/gsimon/gen_mmkp.py -text
 Dip/data/MMKP/gsimon/genprob.sh -text
+Dip/data/MMKP/khan/data.tgz -text
 Dip/data/MMKP/mmkp.opt -text
 Dip/data/TSP/TSPLIB_opt -text
 Dip/data/TSP/get.data -text
