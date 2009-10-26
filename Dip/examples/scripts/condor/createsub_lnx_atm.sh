@@ -7,8 +7,10 @@ EXECUTABLE=${HOME}/bin/decomp/decomp_atm-g
 PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
 INIT_DIR=${HOME}/running/decomp/atm/${NAME}
 ARGS="--param ${NAME}.parm"
-INST_DIR=$HOME/COIN/coin-Decomp/Decomp/data/ATM
+INST_DIR=$HOME/COIN/coin-Dip/Dip/data/ATM
 OUT_FILE=condor.${NAME}.submit
+
+rm ${OUT_FILE}
 
 #this stuff will not change often from run to run
 UNIVERSE=vanilla
@@ -16,7 +18,7 @@ OUT_SUFF=".condor.out"
 ERR_SUFF=".condor.err.\$(Process)"
 HOLD=False
 EXEC_STATUS=`ls -lt ${EXECUTABLE}`
-MAX_SECONDS=600
+MAX_SECONDS=1000
 LOG=${INIT_DIR}condor.log
 EXTEN=""
 

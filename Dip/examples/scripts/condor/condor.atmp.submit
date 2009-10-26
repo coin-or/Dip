@@ -6,9 +6,9 @@ notify_user  = matthew.galati@sas.com
 executable   = /users/magala/bin/decomp/decomp_atm-g
 initialdir   = /users/magala/running/decomp/atm/atmp
 MAX_SECONDS  = 1000
-periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > 5000)
+periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > 1000)
 requirements = (Arch == "X86_64") && (OpSys == "LINUX")
-# executable: -rwxr-xr-x 1 magala users 34287303 Sep 30 00:41 /users/magala/bin/decomp/decomp_atm-g
+# executable: -rwxr-xr-x 1 magala users 34330601 Oct 26 17:29 /users/magala/bin/decomp/decomp_atm-g
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_25_1.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_25_1.txt --ATM:DataDate atm_randD_5_25_1.txt --ATM:DataAtmDate atm_randAD_5_25_1.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_25_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_25_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_25_1.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_25_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_25_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_25_1.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -30,7 +30,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_25_2.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_25_2.txt --ATM:DataDate atm_randD_5_25_2.txt --ATM:DataAtmDate atm_randAD_5_25_2.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_25_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_25_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_25_2.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_25_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_25_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_25_2.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -43,7 +43,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_25_3.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_25_3.txt --ATM:DataDate atm_randD_5_25_3.txt --ATM:DataAtmDate atm_randAD_5_25_3.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_25_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_25_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_25_3.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_25_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_25_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_25_3.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -56,7 +56,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_25_4.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_25_4.txt --ATM:DataDate atm_randD_5_25_4.txt --ATM:DataAtmDate atm_randAD_5_25_4.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_25_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_25_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_25_4.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_25_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_25_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_25_4.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -69,7 +69,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_25_5.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_25_5.txt --ATM:DataDate atm_randD_5_25_5.txt --ATM:DataAtmDate atm_randAD_5_25_5.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_25_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_25_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_25_5.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_25_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_25_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_25_5.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -82,7 +82,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_50_1.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_50_1.txt --ATM:DataDate atm_randD_5_50_1.txt --ATM:DataAtmDate atm_randAD_5_50_1.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_50_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_50_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_50_1.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_50_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_50_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_50_1.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -95,7 +95,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_50_2.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_50_2.txt --ATM:DataDate atm_randD_5_50_2.txt --ATM:DataAtmDate atm_randAD_5_50_2.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_50_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_50_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_50_2.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_50_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_50_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_50_2.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -108,7 +108,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_50_3.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_50_3.txt --ATM:DataDate atm_randD_5_50_3.txt --ATM:DataAtmDate atm_randAD_5_50_3.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_50_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_50_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_50_3.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_50_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_50_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_50_3.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -121,7 +121,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_50_4.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_50_4.txt --ATM:DataDate atm_randD_5_50_4.txt --ATM:DataAtmDate atm_randAD_5_50_4.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_50_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_50_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_50_4.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_50_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_50_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_50_4.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -134,7 +134,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 5_50_5.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_5_50_5.txt --ATM:DataDate atm_randD_5_50_5.txt --ATM:DataAtmDate atm_randAD_5_50_5.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_5_50_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_5_50_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_5_50_5.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_5_50_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_5_50_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_5_50_5.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -147,7 +147,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_50_1.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_50_1.txt --ATM:DataDate atm_randD_10_50_1.txt --ATM:DataAtmDate atm_randAD_10_50_1.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_50_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_50_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_50_1.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_50_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_50_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_50_1.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -160,7 +160,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_50_2.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_50_2.txt --ATM:DataDate atm_randD_10_50_2.txt --ATM:DataAtmDate atm_randAD_10_50_2.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_50_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_50_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_50_2.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_50_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_50_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_50_2.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -173,7 +173,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_50_3.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_50_3.txt --ATM:DataDate atm_randD_10_50_3.txt --ATM:DataAtmDate atm_randAD_10_50_3.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_50_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_50_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_50_3.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_50_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_50_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_50_3.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -186,7 +186,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_50_4.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_50_4.txt --ATM:DataDate atm_randD_10_50_4.txt --ATM:DataAtmDate atm_randAD_10_50_4.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_50_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_50_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_50_4.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_50_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_50_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_50_4.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -199,7 +199,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_50_5.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_50_5.txt --ATM:DataDate atm_randD_10_50_5.txt --ATM:DataAtmDate atm_randAD_10_50_5.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_50_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_50_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_50_5.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_50_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_50_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_50_5.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -212,7 +212,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_100_1.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_100_1.txt --ATM:DataDate atm_randD_10_100_1.txt --ATM:DataAtmDate atm_randAD_10_100_1.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_100_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_100_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_100_1.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_100_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_100_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_100_1.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -225,7 +225,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_100_2.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_100_2.txt --ATM:DataDate atm_randD_10_100_2.txt --ATM:DataAtmDate atm_randAD_10_100_2.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_100_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_100_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_100_2.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_100_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_100_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_100_2.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -238,7 +238,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_100_3.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_100_3.txt --ATM:DataDate atm_randD_10_100_3.txt --ATM:DataAtmDate atm_randAD_10_100_3.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_100_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_100_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_100_3.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_100_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_100_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_100_3.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -251,7 +251,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_100_4.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_100_4.txt --ATM:DataDate atm_randD_10_100_4.txt --ATM:DataAtmDate atm_randAD_10_100_4.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_100_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_100_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_100_4.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_100_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_100_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_100_4.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -264,7 +264,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 10_100_5.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_10_100_5.txt --ATM:DataDate atm_randD_10_100_5.txt --ATM:DataAtmDate atm_randAD_10_100_5.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_10_100_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_10_100_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_10_100_5.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_10_100_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_10_100_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_10_100_5.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -277,7 +277,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_100_1.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_100_1.txt --ATM:DataDate atm_randD_20_100_1.txt --ATM:DataAtmDate atm_randAD_20_100_1.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_100_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_100_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_100_1.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_100_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_100_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_100_1.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -290,7 +290,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_100_2.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_100_2.txt --ATM:DataDate atm_randD_20_100_2.txt --ATM:DataAtmDate atm_randAD_20_100_2.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_100_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_100_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_100_2.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_100_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_100_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_100_2.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -303,7 +303,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_100_3.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_100_3.txt --ATM:DataDate atm_randD_20_100_3.txt --ATM:DataAtmDate atm_randAD_20_100_3.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_100_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_100_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_100_3.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_100_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_100_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_100_3.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -316,7 +316,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_100_4.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_100_4.txt --ATM:DataDate atm_randD_20_100_4.txt --ATM:DataAtmDate atm_randAD_20_100_4.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_100_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_100_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_100_4.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_100_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_100_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_100_4.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -329,7 +329,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_100_5.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_100_5.txt --ATM:DataDate atm_randD_20_100_5.txt --ATM:DataAtmDate atm_randAD_20_100_5.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_100_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_100_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_100_5.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_100_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_100_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_100_5.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -342,7 +342,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_200_1.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_200_1.txt --ATM:DataDate atm_randD_20_200_1.txt --ATM:DataAtmDate atm_randAD_20_200_1.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_200_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_200_1.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_200_1.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_200_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_200_1.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_200_1.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -355,7 +355,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_200_2.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_200_2.txt --ATM:DataDate atm_randD_20_200_2.txt --ATM:DataAtmDate atm_randAD_20_200_2.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_200_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_200_2.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_200_2.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_200_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_200_2.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_200_2.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -368,7 +368,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_200_3.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_200_3.txt --ATM:DataDate atm_randD_20_200_3.txt --ATM:DataAtmDate atm_randAD_20_200_3.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_200_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_200_3.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_200_3.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_200_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_200_3.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_200_3.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -381,7 +381,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_200_4.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_200_4.txt --ATM:DataDate atm_randD_20_200_4.txt --ATM:DataAtmDate atm_randAD_20_200_4.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_200_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_200_4.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_200_4.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_200_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_200_4.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_200_4.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 
@@ -394,7 +394,7 @@ requirements = (Arch == "X86_64") && (OpSys == "LINUX")
      error       = 20_200_5.condor.err.$(Process)
      arguments   = --param atmp.parm --ATM:DataAtm atm_randA_20_200_5.txt --ATM:DataDate atm_randD_20_200_5.txt --ATM:DataAtmDate atm_randAD_20_200_5.txt
      should_transfer_files = YES
-     transfer_input_files = /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randA_20_200_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randD_20_200_5.txt, /users/magala/COIN/coin-Decomp/Decomp/data/ATM/atm_randAD_20_200_5.txt, /users/magala/bin/decomp/atmp.parm
+     transfer_input_files = /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randA_20_200_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randD_20_200_5.txt, /users/magala/COIN/coin-Dip/Dip/data/ATM/atm_randAD_20_200_5.txt, /users/magala/bin/decomp/atmp.parm
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = False
 

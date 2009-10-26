@@ -46,7 +46,7 @@ int UtilScaleDblToIntArr(const int      arrLen,
    //--- the rhs of row). If oneInt == NULL, then this part is skipped.
    //---
 
-   int      i, scaleFactor = 1, n_aFrac = 0, factorToBig = 0;
+   int      i, scaleFactor = 1, n_aFrac = 0, factorTooBig = 0;
    double * arrFrac = NULL;
    double   fractionalPart;
    double   oneOverEps = 1.0 / epstol;
@@ -75,14 +75,14 @@ int UtilScaleDblToIntArr(const int      arrLen,
       while(!UtilIsZero(UtilFracPart(arrFrac[i]))){
          scaleFactor *= 10;
          if(scaleFactor >= oneOverEps){
-            factorToBig = 1;
+            factorTooBig = 1;
             break;
          }
          assert(arrFrac[i] < (INT_MAX / 10));
          arrFrac[i]    *= 10;
          assert(arrFrac[i] >= 0);
       }
-      if(factorToBig)
+      if(factorTooBig)
          break;
    }
    
@@ -114,7 +114,7 @@ int UtilScaleDblToIntArr(const int      arrLen,
    //--- the rhs of row). If oneInt == NULL, then this part is skipped.
    //---
 
-   int      i, scaleFactor = 1, n_aFrac = 0, factorToBig = 0;
+   int      i, scaleFactor = 1, n_aFrac = 0, factorTooBig = 0;
    double * arrFrac = NULL;
    double   fractionalPart;
    double   oneOverEps = 1.0 / epstol;
@@ -137,14 +137,14 @@ int UtilScaleDblToIntArr(const int      arrLen,
       while(!UtilIsZero(UtilFracPart(arrFrac[i]))){
          scaleFactor *= 10;
          if(scaleFactor >= oneOverEps){
-            factorToBig = 1;
+            factorTooBig = 1;
             break;
          }
          assert(arrFrac[i] < (INT_MAX / 10));
          arrFrac[i]    *= 10;
          assert(arrFrac[i] >= 0);
       }
-      if(factorToBig)
+      if(factorTooBig)
          break;
    }
 

@@ -26,12 +26,14 @@
 
 // --------------------------------------------------------------------- //
 #include "MMKP_MCKnap.h"
+#include "UtilMacrosDecomp.h"
 extern "C"{
 #include "mcknap.h"
 }
 
 // --------------------------------------------------------------------- //
-#define MCKP_EPSILON      1.0e-4
+//#define MCKP_EPSILON      1.0e-4 //still causing overflow
+#define MCKP_EPSILON      1.0e-3
 //#define MMKP_MCKNAP_DEBUG
 
 // --------------------------------------------------------------------- //
@@ -198,6 +200,9 @@ void MMKP_MCKnap::solveMCKnap(const double   * redCost,
    //---
    double offset = 0.0;
    double minrc  = *min_element(m_costDbl, m_costDbl + m_nCols);
+#ifdef MMKP_MCKNAP_DEBUG
+   printf("\nminrc   = %g", minrc);
+#endif   
    if(minrc <= 0){
       offset = -minrc + 1;
       UtilAddOffsetArr(m_nCols, offset, m_costDbl);
@@ -223,6 +228,20 @@ void MMKP_MCKnap::solveMCKnap(const double   * redCost,
    }
 #endif
 
+   //---
+   //--- sanity check
+   //---  if any cost value becomes negative that
+   //---  denotes an overflow happened
+   //--- TODO: not sure how to do this scaling safely and
+   //---  accurately
+   //---
+   for(i = 0; i < m_nCols; i++){
+      if(m_cost[i] < 0){
+         throw UtilException("negative cost value",
+                             "solveMCKnap", "MMKP_MCKnap");
+      }
+   }
+      
    //---
    //--- setup the data structures for mcknap
    //---
