@@ -1,14 +1,19 @@
 #!/bin/bash
 
-NAME=$1 #example=atmp
+NAME=$1 #example=milpblockp
 
-#this stuff might change from run to run
 EXECUTABLE=${HOME}/bin/decomp/decomp_milpblock-g
 PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
 INIT_DIR=${HOME}/running/decomp/milpblock/${NAME}
 ARGS="--param ${NAME}.parm"
-INST_DIR=$HOME/COIN/coin-Decomp/Decomp/data/MILP/block/retail
+
+
+DATA_DIR=${HOME}/COIN/coin-Dip/Dip/data
+DRUG_DIR=${DATA_DIR}/MILP/block/drugport
+RETAIL_DIR=${DATA_DIR}/MILP/block/retail
 OUT_FILE=condor.${NAME}.submit
+
+rm ${OUT_FILE}
 
 #this stuff will not change often from run to run
 UNIVERSE=vanilla
@@ -36,6 +41,8 @@ requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
 ">>$OUT_FILE
 
 let count=0
+
+#Retail
 for i in 3 4 6 20 22 27 31 33
   do
    echo "Generating queue commands for ${i}"
@@ -43,11 +50,11 @@ for i in 3 4 6 20 22 27 31 33
    filenameB=retail${i}.block
    fileparam=${PARAM_FILE}
    echo "
-     output      = ${i}${OUT_SUFF}
-     error       = ${i}${ERR_SUFF}
+     output      = retail${i}${OUT_SUFF}
+     error       = retail${i}${ERR_SUFF}
      arguments   = "${ARGS} --MILPBlock:Instance retail${i} --MILPBlock:BlockFile retail${i}.block"
      should_transfer_files = YES
-     transfer_input_files = ${INST_DIR}/$filename, ${INST_DIR}/$filenameB, $fileparam
+     transfer_input_files = ${RETAIL_DIR}/$filename, ${RETAIL_DIR}/$filenameB, $fileparam
      WhenToTransferOutput = ON_EXIT_OR_EVICT
      hold        = $HOLD
 
@@ -57,7 +64,31 @@ for i in 3 4 6 20 22 27 31 33
    ">>$OUT_FILE
    echo -n "."
    let count=$count+1
-   done
+done
+
+#Drug Portfolio
+for i in 20 100 500
+  do
+   echo "Generating queue commands for ${i}"
+   filename=drug_port_${i}.mps
+   filenameB=drug_port_${i}.block
+   fileparam=${PARAM_FILE}
+   echo "
+     output      = drug_port_${i}${OUT_SUFF}
+     error       = drug_port_${i}${ERR_SUFF}
+     arguments   = "${ARGS} --MILPBlock:Instance drug_port_${i} --MILPBlock:BlockFile drug_port_${i}.block"
+     should_transfer_files = YES
+     transfer_input_files = ${DRUG_DIR}/$filename, ${DRUG_DIR}/$filenameB, $fileparam
+     WhenToTransferOutput = ON_EXIT_OR_EVICT
+     hold        = $HOLD
+
+   queue 1
+
+# -----------------------------------------------------------------------------
+   ">>$OUT_FILE
+   echo -n "."
+   let count=$count+1
+done
 echo ""
 echo ""
 echo "$OUT_FILE has $count jobs. Use condor_submit to submit it."
