@@ -1963,8 +1963,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       printf("clp status        = %d\n", osiClp->getModelPtr()->status());
       printf("clp prob status   = %d\n", osiClp->getModelPtr()->problemStatus());
       printf("clp second status = %d\n", osiClp->getModelPtr()->secondaryStatus());
-#endif
    }
+#endif
 
    
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
