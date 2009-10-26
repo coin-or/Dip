@@ -385,6 +385,7 @@ Dip/src/old/UtilPortable.h.OLD -text
 Dip/test/Makefile.am -text
 Dip/test/Makefile.in -text
 /Externals -text
+/Externals.trunk -text
 /INSTALL -text
 /LICENSE -text
 /Makefile.am -text
