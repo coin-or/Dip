@@ -2586,13 +2586,6 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
    //---
    if(status == STAT_INFEASIBLE){
       //---
-      //--- if we came from PHASEI, this is impossible
-      //---
-      assert(phase != PHASE_PRICE1);
-      //UtilAssert((phase != PHASE_PRICE1), 
-      //		 "PhaseI went infeasible!", m_osLog);
-
-      //---
       //--- otherwise, switch to PHASEI
       //---   NOTE: this can happen when a new cut (or branch cut) is added
       //---      
