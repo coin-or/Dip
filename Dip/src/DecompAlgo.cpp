@@ -1956,6 +1956,16 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 	    << setw(10) << m_stats.timerOther1.getRealTime()
 	    << endl;
 	    );
+
+#ifdef __DECOMP_LP_CLP__
+   {
+      OsiClpSolverInterface * osiClp  = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
+      printf("clp status        = %d\n", osiClp->getModelPtr()->status());
+      printf("clp prob status   = %d\n", osiClp->getModelPtr()->problemStatus());
+      printf("clp second status = %d\n", osiClp->getModelPtr()->secondaryStatus());
+#endif
+   }
+
    
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 	      (*m_osLog)

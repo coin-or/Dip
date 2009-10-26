@@ -230,6 +230,7 @@ Dip/examples/scripts/condor/createsub_lnx_cplex_tsp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_vrp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_mad.sh -text
 Dip/examples/scripts/condor/createsub_lnx_milpblock.sh -text
+Dip/examples/scripts/condor/createsub_lnx_mmkp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_tsp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_vrp.sh -text
 Dip/examples/scripts/condor/license_wrapper.pl -text
