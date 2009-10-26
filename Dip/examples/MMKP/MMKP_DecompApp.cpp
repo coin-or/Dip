@@ -32,15 +32,24 @@ void MMKP_DecompApp::initializeApp(UtilParameters & utilParam) {
    //---   
    string instanceFile   = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.Instance;
-   m_instance.readInstance(instanceFile);      
+   string dataFormat     = m_appParam.DataFormat;
+   if(dataFormat == "khan" || dataFormat == "hifi")
+      m_instance.readInstance(instanceFile, dataFormat);      
+   else if(dataFormat == "gsimon")
+      m_instance.readInstanceSimon(instanceFile);
+   else
+      throw UtilException("Unknown data format", 
+                          "initializeApp", "MMKP_DecompApp");
    
    //---
    //--- read best known lb/ub
    //---
-   string bestKnownFile = m_appParam.DataDir + UtilDirSlash() + "mmkp.opt";
-   m_instance.readBestKnown(bestKnownFile, m_appParam.Instance);
-   setBestKnownLB(m_instance.getBestKnownLB());
-   setBestKnownUB(m_instance.getBestKnownUB());
+   if(dataFormat == "khan"){
+      string bestKnownFile = m_appParam.DataDir + UtilDirSlash() + "mmkp.opt";
+      m_instance.readBestKnown(bestKnownFile, m_appParam.Instance);
+      setBestKnownLB(m_instance.getBestKnownLB());
+      setBestKnownUB(m_instance.getBestKnownUB());
+   }
 
    //---
    //--- open space for MMKP_MCKnap objects

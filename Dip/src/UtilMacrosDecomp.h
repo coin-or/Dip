@@ -63,8 +63,8 @@ inline void UtilPrintFuncBegin(ostream      * os,
 	 funcBegin += "-";
       }
       (*os) << left << setw(9) << classTag << ": "
-	    << setprecision(4) << setw(8) << globalTimer.getRealTime()
-	    << " [CPU: " << setprecision(4) << setw(8) 
+	    << setprecision(3) << setw(8) << globalTimer.getRealTime()
+	    << " [CPU: " << setprecision(3) << setw(8) 
             << globalTimer.getCpuTime() << "] " << funcBegin << "\n";      
    }
 }
@@ -87,10 +87,10 @@ inline void UtilPrintFuncEnd(ostream      * os,
       }
       funcEnd += ">";
       (*os) << left << setw(9) << classTag << ": " 
-	    << setprecision(4) << setw(8) << globalTimer.getRealTime() 
+	    << setprecision(3) << setw(8) << globalTimer.getRealTime() 
 	    << " [CPU: " << setprecision(4) << setw(8) 
             << globalTimer.getCpuTime() << "] " << funcEnd << " funcT = "
-	    << setprecision(4) << setw(8) << thisFuncTimer.getCpuTime()
+	    << setprecision(3) << setw(8) << thisFuncTimer.getCpuTime()
 	    << "\n";      
    }
 }

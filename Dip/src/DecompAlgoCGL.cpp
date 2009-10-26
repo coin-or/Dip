@@ -159,8 +159,13 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
        //---             1 try and put some in basis
        //---
        int crossOptions = 2;
-       int crossBasis   = 1;
+       int crossBasis   = 0;
+       //add obj cut 
+       //   obj >= dw-master obj - then generate gomory?
+       //    or do that all the time for cuts?
+       
        cutGenClpSI->crossover(crossOptions, crossBasis);
+       //cutGenClpSI->resolve();//need?
        ///////////STOP -> getting all kinds of not violated
        ///// maybe try options=2, no presolve as it might be
        ///// screwing up the model?
@@ -257,6 +262,7 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
          UTIL_DEBUG(m_logLevel, 3,
                     (*m_logStream) << 
                     "WARNING: CGL cut " << i << " not violated." << endl;
+                    osiCuts.rowCut(i).print();
                     );
       }
       else{

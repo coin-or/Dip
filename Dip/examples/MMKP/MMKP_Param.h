@@ -32,6 +32,7 @@ public:
    int    LogLevel;           //application log level
    string DataDir;            //data directory
    string Instance;           //name of instance
+   string DataFormat;         //format of data
    string ModelNameCore;      //name of model core
    string ModelNameRelax;     //name of model relax
    string ModelNameRelaxNest; //name of nested model relax
@@ -42,6 +43,7 @@ public:
       LogLevel       = utilParam.GetSetting("LogLevel",        0,      common);
       DataDir        = utilParam.GetSetting("DataDir",        "",      common);
       Instance       = utilParam.GetSetting("Instance",       "",      common);
+      DataFormat     = utilParam.GetSetting("DataFormat",     "",      common);
       ModelNameCore  = utilParam.GetSetting("ModelNameCore",  "MDKP0", common);
       ModelNameRelax = utilParam.GetSetting("ModelNameRelax", "MCKP0", common);
       ModelNameRelaxNest 
@@ -79,6 +81,7 @@ public:
       (*os) << common << ": LogLevel          : " << LogLevel      << endl;
       (*os) << common << ": DataDir           : " << DataDir       << endl;
       (*os) << common << ": Instance          : " << Instance      << endl;
+      (*os) << common << ": DataFormat        : " << DataFormat    << endl;
       (*os) << common << ": ModelNameCore     : " << ModelNameCore     << endl;
       (*os) << common << ": ModelNameRelax    : " << ModelNameRelax    << endl;
       (*os) << common << ": ModelNameRelaxNest: " << ModelNameRelaxNest<< endl;
@@ -89,7 +92,8 @@ public:
    MMKP_Param() :
       LogLevel          (0),
       DataDir           (""),
-      Instance          (""),
+      Instance          (""),                   
+      DataFormat        ("hifi"),//hifi, khan, or gsimon
       ModelNameCore     ("MDKP0"),
       ModelNameRelax    ("MCKP0"),
       ModelNameRelaxNest(""     ){}

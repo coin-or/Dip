@@ -60,7 +60,9 @@ public:
 
 public:
    /** @name Helper Methods. */
-   void readInstance(string & fileName);
+   void readInstance     (string & fileName,
+                          string & dataFormat);
+   void readInstanceSimon(string & fileName);
    void readBestKnown(string & fileName,
                       string & instanceName);
 
@@ -98,8 +100,9 @@ public:
    
    /** Default constructor. Takes an instance of UtilParameters */
    MMKP_Instance(string & fileName) {
+      string dataFormat = "hifi";
       initMembers();
-      readInstance(fileName);
+      readInstance(fileName, dataFormat);
    }
    
    /** Default destructor. */

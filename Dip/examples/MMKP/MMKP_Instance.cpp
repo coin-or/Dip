@@ -16,12 +16,13 @@
 //===========================================================================//
 
 //===========================================================================//
-#if 0
 void MMKP_Instance::readInstanceSimon(string & fileName){
    
    int      k, i, j, ij, numIJ, dummy;
    int      status = 0;
    string   dummyStr;
+   char     dummyChr;
+   char     dummyChrA[1000];
    ifstream is;
    
 
@@ -48,15 +49,21 @@ void MMKP_Instance::readInstanceSimon(string & fileName){
    if(status)
       throw UtilException("Failed to read instance",
                           "readInstance", "MMKP_Instance");
-   is.getline();
-   is.getline();
-   is.getline();
-   is.getline();
+   is.getline(dummyChrA, 1000);
+   is.getline(dummyChrA, 1000);
+   is.getline(dummyChrA, 1000);
+   is.getline(dummyChrA, 1000);
    is >> dummyStr >> m_nGroupRows //num_class
-      >> dummyStr >> m_nKnapRows;//num_dimension
-      >> m_nGroupCols
-            ////////STOP
-   
+      >> dummyStr >> m_nKnapRows; //num_dimension
+   is.getline(dummyChrA, 1000);
+   is.getline(dummyChrA, 1000);
+   is >> dummyStr >> m_nGroupCols;
+   printf("dummyStr = %s\n", dummyStr.c_str());
+   printf("nGroupRows = %d\n", m_nGroupRows);
+   printf("nKnapRows  = %d\n", m_nKnapRows);
+   printf("nGroupCols = %d\n", m_nGroupCols);
+   fflush(stdout);
+
    //---
    //--- allocate memory for capacity, value and weight
    //---
@@ -66,30 +73,52 @@ void MMKP_Instance::readInstanceSimon(string & fileName){
    m_weight   = new double*[m_nKnapRows];   
    if(!(m_capacity && m_value && m_weight))
       throw UtilExceptionMemory("readInstance", "MMKP_Instance");
-	     
+
+   for(k = 0; k < m_nKnapRows; k++){
+      m_weight[k] = new double[numIJ];
+      if(!m_weight[k])
+         throw UtilExceptionMemory("readInstance", "MMKP_Instance");
+   }
+	       
+   for(i = 0; i < m_nGroupRows; i++){
+      for(j = 0; j < m_nGroupCols; j++){
+         ij = getIndexIJ(i,j);
+         is >> m_value[ij];
+         printf("value[%d]: %g\n", ij, m_value[ij]);
+         fflush(stdout);
+         for(k = 0; k < m_nKnapRows; k++){
+            is >> m_weight[k][ij];
+            printf("weight[%d][%d]: %g\n", k, ij, m_weight[k][ij]);
+            fflush(stdout);
+         }
+      }
+      is >> dummyChr;
+      if(dummyChr == '#'){
+         is.getline(dummyChrA, 1000);
+         is.getline(dummyChrA, 1000);
+         printf("dummyChrA = %s\n", dummyChrA);
+      }
+      else{
+         is >> dummyChr;
+      }
+   }
+   
+
+   printf("dummyChr = %c\n", dummyChr);
    for(k = 0; k < m_nKnapRows; k++){
       m_weight[k] = new double[numIJ];
       if(!m_weight[k])
          throw UtilExceptionMemory("readInstance", "MMKP_Instance");
       is >> m_capacity[k];
+      printf("cap[k=%d]: %g\n", k, m_capacity[k]);
    }
-   
-   for(i = 0; i < m_nGroupRows; i++){
-      is >> dummy;
-      for(j = 0; j < m_nGroupCols; j++){
-         ij = getIndexIJ(i,j);
-         is >> m_value[ij];
-         for(k = 0; k < m_nKnapRows; k++){
-            is >> m_weight[k][ij];
-         }
-      }
-   }
-   
+      
    is.close();
 }
-#endif
+
 //===========================================================================//
-void MMKP_Instance::readInstance(string & fileName){
+void MMKP_Instance::readInstance(string & fileName,
+                                 string & dataFormat){
    
    int      k, i, j, ij, numIJ, dummy;
    int      status = 0;
@@ -125,7 +154,8 @@ void MMKP_Instance::readInstance(string & fileName){
    }
    
    for(i = 0; i < m_nGroupRows; i++){
-      is >> dummy;
+      if(dataFormat == "khan")
+         is >> dummy;
       for(j = 0; j < m_nGroupCols; j++){
          ij = getIndexIJ(i,j);
          is >> m_value[ij];

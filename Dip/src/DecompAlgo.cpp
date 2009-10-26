@@ -297,6 +297,16 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
       m_cutgenSI = new OsiClpSolverInterface();
       assert(m_cutgenSI);
       loadSIFromModel(m_cutgenSI, true);
+
+      //---
+      //--- add an objective cut to the cut generator LP
+      //---      obj >= globalLB
+      //--- 
+      if(m_algo == PRICE_AND_CUT){
+         CoinPackedVector objCut(nCols, getOrigObjective());
+         m_cutgenObjCutInd = m_cutgenSI->getNumRows();
+         m_cutgenSI->addRow(objCut, -DecompInf, DecompInf);      
+      }
    }
 
    //---
@@ -1199,6 +1209,8 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //---
    m_useInitLpDuals = true;
    m_status         = STAT_UNKNOWN;
+   m_globalLB       = globalLB;
+   m_globalUB       = globalUB;
 
 
    //---
@@ -4308,6 +4320,14 @@ int DecompAlgo::generateCuts(double        * xhat,
    //---
    if(m_param.CutCGL){
       assert(m_cutgenSI);
+      if(m_algo == PRICE_AND_CUT)
+         m_cutgenSI->setRowLower(m_cutgenObjCutInd, m_globalLB);
+      if(m_param.LogDumpModel > 1)
+         printCurrentProblem(m_cutgenSI,
+                             "CUTGEN",
+                             m_nodeStats.nodeIndex,
+                             m_nodeStats.cutCallsTotal,
+                             m_nodeStats.priceCallsTotal);      
       m_cgl->generateCuts(m_cutgenSI, 
                           m_masterSI,
                           xhat, 

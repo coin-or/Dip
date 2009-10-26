@@ -2,7 +2,7 @@
 PREFIX=10-5-5
 for t in G-CL-DS G-CL-DU G-CL-DW G-CL-S G-CL-U G-CL-W G-CU-DS G-CU-DU G-CU-DW G-CU-S G-CU-U G-CU-W G-L-DSI G-L-DSUI G-L-DSU G-L-DS G-L-DU G-L-DW G-L-S G-L-U G-L-W G-R-DSI G-R-DSU G-R-S G-R-U G-R-W G-U-DS G-U-DU G-U-DW G-U-S G-U-U G-U-W
 do   
-  v=0
+  v=1
   echo "Running " ${t} " generator"  
 # to get 25 instances each
 #   if random elemebts, instances=5, con_levels=5

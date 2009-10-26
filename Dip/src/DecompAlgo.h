@@ -147,6 +147,7 @@ protected:
     *        in original space - used for CGL cuts
     */
    OsiClpSolverInterface * m_cutgenSI;
+   int                     m_cutgenObjCutInd;
    OsiSolverInterface    * m_auxSI;
 
 
@@ -225,6 +226,9 @@ protected:
    double       m_stabEpsilon;
    bool         m_useInitLpDuals;
    map<int,int> m_artColIndToRowInd;
+
+   double       m_globalLB;
+   double       m_globalUB;
 
 public:   
    /**
@@ -773,6 +777,7 @@ public:
       m_origColUB  (),
       m_masterSI   (0),
       m_cutgenSI   (NULL),
+      m_cutgenObjCutInd(-1),
       m_auxSI      (NULL),
       m_vars       (),
       m_varpool    (),

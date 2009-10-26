@@ -413,13 +413,13 @@ void DecompAlgo::printBasisInfo(OsiSolverInterface * si,
 
 //===========================================================================//
 void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
-                                      const string               baseName,
-                                      const int                  nodeIndex,
-                                      const int                  cutPass,
-                                      const int                  pricePass,
-                                      const int                  blockId,
-                                      const bool                 printMps,
-                                      const bool                 printLp){
+                                     const string               baseName,
+                                     const int                  nodeIndex,
+                                     const int                  cutPass,
+                                     const int                  pricePass,
+                                     const int                  blockId,
+                                     const bool                 printMps,
+                                     const bool                 printLp){
   if(!si)
      return;
    string filename = DecompAlgoStr[m_algo] + "_" + baseName 
@@ -447,9 +447,9 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 
 //===========================================================================//
 void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
-                                      const string               fileName,
-                                      const bool                 printMps,
-                                      const bool                 printLp){
+                                     const string               fileName,
+                                     const bool                 printMps,
+                                     const bool                 printLp){
    string filename = fileName; 
    if(printMps)
       si->writeMps(filename.c_str());

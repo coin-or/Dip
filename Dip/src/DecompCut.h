@@ -31,10 +31,6 @@
 
 class DecompCut{
 private:
-  DecompCut(const DecompCut &);
-  DecompCut & operator=(const DecompCut &);
-
-private:
   double           m_lb;        //row lower bound   
   double           m_ub;        //row upper bound
   //THINK, or they can stick in as sense/rhs
