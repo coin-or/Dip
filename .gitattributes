@@ -110,8 +110,10 @@ Dip/examples/ExternalSolvers/Knapsack/Pisinger/combo.c.patch -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/combo.h.patch -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.c.patch -text
+Dip/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h.in -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger.in -text
+Dip/examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger.msvs -text
 Dip/examples/ExternalSolvers/TSP/get.concorde.in -text
 Dip/examples/GAP/GAP_Debug.h -text
 Dip/examples/GAP/GAP_DecompApp.cpp -text
@@ -172,7 +174,6 @@ Dip/examples/MMKP/MMKP_MemPool.h -text
 Dip/examples/MMKP/MMKP_Model.cpp -text
 Dip/examples/MMKP/MMKP_Model.h -text
 Dip/examples/MMKP/MMKP_Param.h -text
-Dip/examples/MMKP/MMKP_Status.h -text
 Dip/examples/MMKP/Makefile.in -text
 Dip/examples/MMKP/NOTES.txt -text
 Dip/examples/MMKP/README.txt.in -text
