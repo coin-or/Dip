@@ -87,7 +87,7 @@ int UtilScaleDblToIntArr(const int      arrLen,
    }
    
    for(i = 0; i < arrLen; i++){
-      arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
+	   arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
    }
    if(oneInt){
       *oneInt = static_cast<int>(round(oneDbl * scaleFactor));

@@ -303,7 +303,19 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
       //---      obj >= globalLB
       //--- 
       if(m_algo == PRICE_AND_CUT){
-         CoinPackedVector objCut(nCols, getOrigObjective());
+         //---
+         //--- THINK:
+         //--- this is causing an issue later - because packs 0's in matrix
+         //---   once gets to cut generator
+         //---         
+         //CoinPackedVector objCut(nCols, getOrigObjective());
+         CoinPackedVector objCut;
+         const double * objCoeff = getOrigObjective();
+         int i;
+		 for(i = 0; i < m_cutgenSI->getNumCols(); i++){
+            if(!UtilIsZero(objCoeff[i]))
+               objCut.insert(i, objCoeff[i]);
+         }         
          m_cutgenObjCutInd = m_cutgenSI->getNumRows();
          m_cutgenSI->addRow(objCut, -DecompInf, DecompInf);      
       }
@@ -4320,8 +4332,12 @@ int DecompAlgo::generateCuts(double        * xhat,
    //---
    if(m_param.CutCGL){
       assert(m_cutgenSI);
-      if(m_algo == PRICE_AND_CUT)
-         m_cutgenSI->setRowLower(m_cutgenObjCutInd, m_globalLB);
+      if(m_algo == PRICE_AND_CUT){
+         //TODO: this could be tighter in the tree
+         double gLB = getNodeIndex() ? m_globalLB :
+            m_nodeStats.objBest.first;
+         m_cutgenSI->setRowLower(m_cutgenObjCutInd, gLB);
+      }
       if(m_param.LogDumpModel > 1)
          printCurrentProblem(m_cutgenSI,
                              "CUTGEN",

@@ -42,6 +42,10 @@ const double UtilSmallerThanTooBig = 1.0e19;
 #define INT_MAX (static_cast<int>((~(static_cast<unsigned int>(0))) >> 1))
 #endif
 
+#ifndef round
+#define round(x) floor(x+0.5)
+#endif
+
 // =========================================================================
 
 // =========================================================================

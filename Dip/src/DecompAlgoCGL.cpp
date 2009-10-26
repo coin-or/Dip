@@ -159,7 +159,7 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
        //---             1 try and put some in basis
        //---
        int crossOptions = 2;
-       int crossBasis   = 0;
+       int crossBasis   = 1;
        //add obj cut 
        //   obj >= dw-master obj - then generate gomory?
        //    or do that all the time for cuts?
@@ -197,7 +197,7 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
       nCliqueCuts = osiCuts.sizeCuts() - nTotalCuts;
       nTotalCuts  = osiCuts.sizeCuts();
    }
-   if(m_genOddHole){
+   if(m_genOddHole){               
       UTIL_MSG(m_logLevel, 3,
                (*m_logStream) << "Calling cut generator: cliques\n";
                );
