@@ -72,7 +72,7 @@ for i in `seq 9`
    echo "
      output      = INST0${i}${OUT_SUFF}
      error       = INST0${i}${ERR_SUFF}
-     arguments   = "${ARGS} --MMKP:Instance INST${i}"
+     arguments   = "${ARGS} --MMKP:Instance INST0${i}"
      should_transfer_files = YES
      transfer_input_files = ${DATA_DIR}/$filename, $fileparam
      WhenToTransferOutput = ON_EXIT_OR_EVICT

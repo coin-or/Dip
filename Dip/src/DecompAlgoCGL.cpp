@@ -158,6 +158,7 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
        //---   basis   - 0 use all slack basis
        //---             1 try and put some in basis
        //---
+#ifdef TRUNK_BUILD
        int crossOptions = 2;
        int crossBasis   = 1;
        //add obj cut 
@@ -165,6 +166,7 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
        //    or do that all the time for cuts?
        
        cutGenClpSI->crossover(crossOptions, crossBasis);
+#endif
        //cutGenClpSI->resolve();//need?
        ///////////STOP -> getting all kinds of not violated
        ///// maybe try options=2, no presolve as it might be
