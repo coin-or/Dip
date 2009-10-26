@@ -40,9 +40,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/I &quot;..\..\..\..\Decomp\src&quot; /I &quot;..\..\..\..\BuildTools\headers&quot; /I &quot;..\..\..\..\CoinUtils\src&quot; /I &quot;..\..\..\..\Osi\src&quot; /I &quot;..\..\..\..\Osi\src\OsiCbc&quot; /I &quot;..\..\..\..\Osi\src\OsiSpx&quot; /I &quot;..\..\..\..\Osi\src\OsiVol&quot; /I &quot;..\..\..\..\Osi\src\OsiOsl&quot; /I &quot;..\..\..\..\Osi\src\OsiXpr&quot; /I &quot;..\..\..\..\Osi\src\OsiCpx&quot; /I &quot;..\..\..\..\Osi\src\OsiClp&quot; /I &quot;..\..\..\..\Cgl\src&quot; /I &quot;..\..\..\..\Cgl\src\CglTwomir&quot; /I &quot;..\..\..\..\Cgl\src\CglMixedIntegerRounding&quot; /I &quot;..\..\..\..\Cgl\src\CglMixedIntegerRounding2&quot; /I &quot;..\..\..\..\Cgl\src\CglFlowCover&quot; /I &quot;..\..\..\..\Cgl\src\CglClique&quot; /I &quot;..\..\..\..\Cgl\src\CglOddHole&quot; /I &quot;..\..\..\..\Cgl\src\CglKnapsackCover&quot; /I &quot;..\..\..\..\Cgl\src\CglGomory&quot; /I &quot;..\..\..\..\Cgl\src\CglPreProcess&quot; /I &quot;..\..\..\..\Cgl\src\CglProbing&quot; /I &quot;..\..\..\..\Clp\src&quot; /I &quot;..\..\..\..\Cbc\src&quot; /I &quot;..\..\..\..\Alps\src&quot;"
+				AdditionalOptions="/I &quot;..\..\..\..\Dip\src&quot; /I &quot;..\..\..\..\BuildTools\headers&quot; /I &quot;..\..\..\..\CoinUtils\src&quot; /I &quot;..\..\..\..\Osi\src&quot; /I &quot;..\..\..\..\Osi\src\OsiCbc&quot; /I &quot;..\..\..\..\Osi\src\OsiSpx&quot; /I &quot;..\..\..\..\Osi\src\OsiVol&quot; /I &quot;..\..\..\..\Osi\src\OsiOsl&quot; /I &quot;..\..\..\..\Osi\src\OsiXpr&quot; /I &quot;..\..\..\..\Osi\src\OsiCpx&quot; /I &quot;..\..\..\..\Osi\src\OsiClp&quot; /I &quot;..\..\..\..\Cgl\src&quot; /I &quot;..\..\..\..\Cgl\src\CglTwomir&quot; /I &quot;..\..\..\..\Cgl\src\CglMixedIntegerRounding&quot; /I &quot;..\..\..\..\Cgl\src\CglMixedIntegerRounding2&quot; /I &quot;..\..\..\..\Cgl\src\CglFlowCover&quot; /I &quot;..\..\..\..\Cgl\src\CglClique&quot; /I &quot;..\..\..\..\Cgl\src\CglOddHole&quot; /I &quot;..\..\..\..\Cgl\src\CglKnapsackCover&quot; /I &quot;..\..\..\..\Cgl\src\CglGomory&quot; /I &quot;..\..\..\..\Cgl\src\CglPreProcess&quot; /I &quot;..\..\..\..\Cgl\src\CglProbing&quot; /I &quot;..\..\..\..\Clp\src&quot; /I &quot;..\..\..\..\Cbc\src&quot; /I &quot;..\..\..\..\Alps\src&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Decomp\examples\ExternalSolvers\Knapsack\Pisinger"
+				AdditionalIncludeDirectories="..\..\..\..\Dip\examples\ExternalSolvers\Knapsack\Pisinger"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -175,19 +175,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_DecompApp.cpp"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_DecompApp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_Instance.cpp"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_Instance.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_Main.cpp"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_Main.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_MCKnap.cpp"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_MCKnap.cpp"
 				>
 			</File>
 		</Filter>
@@ -197,27 +197,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_DecompApp.h"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_DecompApp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_Instance.h"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_Instance.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_MCKnap.h"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_MCKnap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_MemPool.h"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_MemPool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_Param.h"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_Model.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Decomp\examples\MMKP\MMKP_Status.h"
+				RelativePath="..\..\..\..\Dip\examples\MMKP\MMKP_Param.h"
 				>
 			</File>
 		</Filter>

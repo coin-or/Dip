@@ -20,6 +20,8 @@ Settings for all decomp algorithms.
 [DECOMP]
 LogLevel      = 3
 LogDebugLevel = 3
+LogDumpModel  = 2
+LimitTime     = 600
 
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
@@ -32,12 +34,16 @@ Settings for decomp algorithm price and cut.
   section=PRICE_AND_CUT
 #############################################################################
 [PRICE_AND_CUT]
+LogLpLevel = 3
 
 #############################################################################
 Settings for ALPS framework.
   section=ALPS
 #############################################################################
 [ALPS]
+nodeLogInterval = 1
+msgLevel        = 3
+timeLimit       = 600
 
 #############################################################################
 Settings for MILPBlock application.
@@ -48,14 +54,14 @@ Settings for MILPBlock application.
 LogLevel       = 3
 
 # Path to instance data.
-DataDir        = ../../../../Dip/data/MILP/block/atm
+DataDir        = ../../../../Dip/data/MILP/block/drugport
 
 # {Pair,List}: Block file format. See README.txt.
-BlockFileFormat = List
+BlockFileFormat = Pair
 
 # Name of block file (assumed to be in DataDir).
-BlockFile       = atm_5_10_1.block
+BlockFile       = drug_port_20.block
 
 # Name of MPS file for instance (assumed to be in DataDir).
-Instance        = atm_5_10_1
+Instance        = drug_port_20
 

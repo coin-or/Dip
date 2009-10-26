@@ -171,7 +171,6 @@ Dip/examples/MMKP/MMKP_MCKnap.cpp -text
 Dip/examples/MMKP/MMKP_MCKnap.h -text
 Dip/examples/MMKP/MMKP_Main.cpp -text
 Dip/examples/MMKP/MMKP_MemPool.h -text
-Dip/examples/MMKP/MMKP_Model.cpp -text
 Dip/examples/MMKP/MMKP_Model.h -text
 Dip/examples/MMKP/MMKP_Param.h -text
 Dip/examples/MMKP/Makefile.in -text

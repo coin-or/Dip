@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -152,11 +153,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\..\Decomp\examples\ExternalSolvers\Knapsack\Pisinger\combo.c"
+				RelativePath="..\..\..\..\..\..\Dip\examples\ExternalSolvers\Knapsack\Pisinger\combo.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\Decomp\examples\ExternalSolvers\Knapsack\Pisinger\mcknap.c"
+				RelativePath="..\..\..\..\..\..\Dip\examples\ExternalSolvers\Knapsack\Pisinger\mcknap.c"
 				>
 			</File>
 		</Filter>
@@ -166,11 +167,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\..\Decomp\examples\ExternalSolvers\Knapsack\Pisinger\combo.h"
+				RelativePath="..\..\..\..\..\..\Dip\examples\ExternalSolvers\Knapsack\Pisinger\combo.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\..\Decomp\examples\ExternalSolvers\Knapsack\Pisinger\mcknap.h"
+				RelativePath="..\..\..\..\..\..\Dip\examples\ExternalSolvers\Knapsack\Pisinger\mcknap.h"
 				>
 			</File>
 		</Filter>
