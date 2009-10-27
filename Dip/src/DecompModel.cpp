@@ -159,6 +159,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    string cbcGapSet    = "0";
    string cbcCutoff    = "-cutoff";   
    string cbcCutoffSet = UtilDblToStr(cutoff);
+   string cbcSLog      = "-slog";
+   string cbcSLogSet   = "2";
    if(doExact)
       cbcGapSet = UtilDblToStr(param.SubProbGapLimitExact);
    else
@@ -166,6 +168,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      
+   //argv[argc++] = cbcSLog.c_str();    //for extra debugging
+   //argv[argc++] = cbcSLogSet.c_str(); //for extra debugging
    argv[argc++] = cbcGap.c_str();   
    argv[argc++] = cbcGapSet.c_str();
    if(doCutoff){
