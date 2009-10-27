@@ -1,15 +1,16 @@
 #!/bin/bash
 
 NAME=$1 #example=gapp
+OPT=$2  #example=-g or -O
 
-EXECUTABLE=${HOME}/bin/decomp/decomp_gap-g
+EXECUTABLE=${HOME}/bin/decomp/decomp_gap${OPT}
 PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
-INIT_DIR=${HOME}/running/decomp/gap/${NAME}
+INIT_DIR=${HOME}/running/decomp${OPT}/gap/${NAME}
 ARGS="--param ${NAME}.parm"
 
 
 DATA_DIR=${HOME}/COIN/coin-Dip/Dip/data/GAP
-OUT_FILE=condor.${NAME}.submit
+OUT_FILE=condor${OPT}.${NAME}.submit
 
 rm ${OUT_FILE}
 

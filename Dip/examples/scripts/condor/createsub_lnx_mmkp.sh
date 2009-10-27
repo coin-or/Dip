@@ -1,15 +1,16 @@
 #!/bin/bash
 
 NAME=$1 #example=mmkpp
+OPT=$2  #example=-g or -O
 
-EXECUTABLE=${HOME}/bin/decomp/decomp_mmkp-g
+EXECUTABLE=${HOME}/bin/decomp/decomp_mmkp${OPT}
 PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
-INIT_DIR=${HOME}/running/decomp/mmkp/${NAME}
+INIT_DIR=${HOME}/running/decomp${OPT}/mmkp/${NAME}
 ARGS="--param ${NAME}.parm"
 
 
 DATA_DIR=${HOME}/COIN/coin-Dip/Dip/data/MMKP/hifi
-OUT_FILE=condor.${NAME}.submit
+OUT_FILE=condor${OPT}.${NAME}.submit
 
 rm ${OUT_FILE}
 

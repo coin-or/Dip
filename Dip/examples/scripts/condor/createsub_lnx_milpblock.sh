@@ -1,17 +1,18 @@
 #!/bin/bash
 
 NAME=$1 #example=milpblockp
+OPT=$2  #example=-g or -O
 
-EXECUTABLE=${HOME}/bin/decomp/decomp_milpblock-g
+EXECUTABLE=${HOME}/bin/decomp/decomp_milpblock${OPT}
 PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
-INIT_DIR=${HOME}/running/decomp/milpblock/${NAME}
+INIT_DIR=${HOME}/running/decomp${OPT}/milpblock/${NAME}
 ARGS="--param ${NAME}.parm"
 
 
 DATA_DIR=${HOME}/COIN/coin-Dip/Dip/data
 DRUG_DIR=${DATA_DIR}/MILP/block/drugport
 RETAIL_DIR=${DATA_DIR}/MILP/block/retail
-OUT_FILE=condor.${NAME}.submit
+OUT_FILE=condor${OPT}.${NAME}.submit
 
 rm ${OUT_FILE}
 

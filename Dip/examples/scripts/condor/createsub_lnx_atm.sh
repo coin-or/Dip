@@ -1,14 +1,15 @@
 #!/bin/bash
 
 NAME=$1 #example=atmp
+OPT=$2  #example=-g or -O
 
 #this stuff might change from run to run
-EXECUTABLE=${HOME}/bin/decomp/decomp_atm-g
+EXECUTABLE=${HOME}/bin/decomp/decomp_atm${OPT}
 PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
-INIT_DIR=${HOME}/running/decomp/atm/${NAME}
+INIT_DIR=${HOME}/running/decomp${OPT}/atm/${NAME}
 ARGS="--param ${NAME}.parm"
 INST_DIR=$HOME/COIN/coin-Dip/Dip/data/ATM
-OUT_FILE=condor.${NAME}.submit
+OUT_FILE=condor${OPT}.${NAME}.submit
 
 rm ${OUT_FILE}
 
