@@ -238,6 +238,9 @@ Dip/examples/scripts/condor/createsub_lnx_vrp.sh -text
 Dip/examples/scripts/condor/license_wrapper.pl -text
 Dip/examples/scripts/condor/license_wrapper_tsp.pl -text
 Dip/examples/scripts/condor/license_wrapper_vrp.pl -text
+Dip/examples/scripts/condor/report.awk -text
+Dip/examples/scripts/condor/report.sh -text
+Dip/examples/scripts/condor/report2.sh -text
 Dip/examples/scripts/condor/reset.sh -text
 Dip/examples/scripts/condor/submit.sh -text
 Dip/examples/scripts/createDecompMember.sh -text

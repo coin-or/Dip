@@ -418,9 +418,11 @@ void DecompAlgoPC::phaseDone(){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "phaseDone()", m_param.LogDebugLevel, 1);   
    //probably too expensive to solve every node! - do every 10 nodes?
-   if(m_param.SolveMasterAsIp &&
-      (getNodeIndex() % 10 == 0))
+   if(m_param.SolveMasterAsIp       &&
+      m_stopCriteria != DecompStopTime){
+      //(getNodeIndex() % 10 == 0))
       solutionUpdateAsIP();
+   }
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "phaseDone()", m_param.LogDebugLevel, 1);   
 }
