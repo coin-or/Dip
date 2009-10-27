@@ -221,6 +221,7 @@ Dip/examples/VRP/build_cvrpsep.sh.in -text
 Dip/examples/VRP/vrp.parm.in -text
 Dip/examples/scripts/addedge.awk -text
 Dip/examples/scripts/addedges.sh -text
+Dip/examples/scripts/build.sh -text
 Dip/examples/scripts/condor/condor.atmp.submit -text
 Dip/examples/scripts/condor/condor.milpblockp.submit -text
 Dip/examples/scripts/condor/createsub_lnx_ap3.sh -text
@@ -228,6 +229,7 @@ Dip/examples/scripts/condor/createsub_lnx_atm.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_mad.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_tsp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_vrp.sh -text
+Dip/examples/scripts/condor/createsub_lnx_gap.sh -text
 Dip/examples/scripts/condor/createsub_lnx_mad.sh -text
 Dip/examples/scripts/condor/createsub_lnx_milpblock.sh -text
 Dip/examples/scripts/condor/createsub_lnx_mmkp.sh -text

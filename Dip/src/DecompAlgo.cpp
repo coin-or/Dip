@@ -1899,7 +1899,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //---
    //--- was missing all along? 9/28/09
    //---
+   //#ifdef __DECOMP_LP_CLP__
+   //m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
+   //#else
    m_masterSI->setHintParam(OsiDoPresolveInResolve, true, OsiHintDo);
+   //#endif
    
    //m_masterSI->setIntParam(OsiMaxNumIteration, maxInnerIter);
   
@@ -2010,6 +2014,22 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //sanity check
       if(m_algo != CUT)
 	 checkMasterDualObj(); 
+
+
+      //---
+      //--- HACK: there is some bug in CLP where infeasible is declared optimal
+      //---   but then we get back solution at state when it internally gave up
+      //---   
+      //--- Check to see if some lambda < 0 - i.e., junk. If so, assume that
+      //---  it meant to return infeasible.
+      //---
+      for(i = 0; i < nCols; i++){
+         if(colSol[i] < -1){
+            (*m_osLog) << "ERROR: NEGATIVE LAMBDA, but Osi returns as optimal"
+                       << " assume it was meant to be infeasible." << endl;
+            status = STAT_INFEASIBLE;
+         }
+      }
    }
    else if(m_masterSI->isProvenPrimalInfeasible()){
       status = STAT_INFEASIBLE;
@@ -2026,6 +2046,17 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    else{
       assert(0);
    }
+
+
+   //---
+   //--- HACK: there is some bug in CLP where infeasible is declared optimal
+   //---   but then we get back solution at state when it internally gave up
+   //---   
+   //--- Check to see if some lambda < 0 - i.e., junk. If so, assume that
+   //---  it meant to return infeasible.
+   //---
+   
+
    m_stats.thisSolUpdate.push_back(m_stats.timerOther1.getRealTime()); 
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -4392,8 +4423,8 @@ int DecompAlgo::generateCuts(double        * xhat,
       //---   this is what we want since D will be deleted after this
       //---
       m_vars.splice(m_vars.end(), D.m_vars);
-      printf("VARS moved into CPM object\n");
-      printVars(m_osLog);//use this to warm start DW
+      //printf("VARS moved into CPM object\n");
+      //printVars(m_osLog);//use this to warm start DW
 
 
 

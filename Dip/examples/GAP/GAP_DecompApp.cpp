@@ -36,7 +36,8 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
    string instanceFile = m_appParam.DataDir
       + UtilDirSlash() + m_appParam.Instance;
    m_instance.readInstance(instanceFile);
- 
+
+#if 0 
    //---
    //--- read best known lb/ub
    //--
@@ -62,6 +63,7 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
          }
       }
    }
+#endif
 
    //---
    //--- open space for GAP_Knapsack objects
