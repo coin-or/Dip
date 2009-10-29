@@ -221,7 +221,7 @@ MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
       const char * colName = m_mpsIO.columnName(i);
       if(colName)
          model->colNames.push_back(colName);
-      if(integerVars[i]){
+      if(integerVars && integerVars[i]){
          model->integerVars.push_back(i);            
       }
    }   
@@ -309,7 +309,7 @@ MILPBlock_DecompApp::createModelPart(const int   nRowsPart,
       const char * colName = m_mpsIO.columnName(i);
       if(colName)
          model->colNames.push_back(colName);
-      if(integerVars[i]){
+      if(integerVars && integerVars[i]){
          model->integerVars.push_back(i);            
       }
    }   
