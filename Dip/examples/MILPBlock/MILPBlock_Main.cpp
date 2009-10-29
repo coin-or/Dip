@@ -57,7 +57,10 @@ int main(int argc, char ** argv){
       //--- create the algorithm (a DecompAlgo)
       //---
       DecompAlgo * algo = NULL;
-      assert(doCut + doPriceCut == 1);
+      if((doCut + doPriceCut) != 1)
+         throw UtilException("doCut or doPriceCut must be set", 
+                             "main", "main");
+      //assert(doCut + doPriceCut == 1);
 
       //---
       //--- create the CPM algorithm object
