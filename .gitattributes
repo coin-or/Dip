@@ -5,6 +5,8 @@ Dip/LICENSE -text
 Dip/Makefile.am -text
 Dip/Makefile.in -text
 Dip/README -text
+Dip/bugs/PRICE_AND_CUT_subProb_relax0.n0.c0.p0.b0.lp -text
+Dip/bugs/main.cpp -text
 Dip/configure -text
 Dip/configure.ac -text
 Dip/data/AP3/Grundel.tgz -text

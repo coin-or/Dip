@@ -34,7 +34,6 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
    bool   hasColNames = false;
    bool   hasRowNames = false;
    double ax          = 0.0;
-   double obj         = 0.0;
    double clb         = 0.0;
    double cub         = 0.0;  
    double rlb         = 0.0;
@@ -249,6 +248,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_nSolutions = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
+   printf("cbc.isProveOptimal() = %d\n", cbc.isProvenOptimal());
    if(cbc.isProvenOptimal()){
       result->m_nSolutions = 1;
       result->m_isOptimal  = true;      
