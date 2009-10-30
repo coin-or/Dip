@@ -200,9 +200,12 @@ MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
       i = *vit;
       model->colLB[i] = colLB[*vit];
       model->colUB[i] = colUB[*vit];
-      if(m_appParam.ColumnUB < 1.0e15)
-	 if(colUB[i] > 1.0e15)
+      if(m_appParam.ColumnUB <  1.0e15)
+	 if(colUB[i] >  1.0e15)
 	    model->colUB[i] = m_appParam.ColumnUB;
+      if(m_appParam.ColumnLB > -1.0e15)
+	 if(colLB[i] < -1.0e15)
+	    model->colLB[i] = m_appParam.ColumnLB;
    }
 
    //---
@@ -293,10 +296,15 @@ MILPBlock_DecompApp::createModelPart(const int   nRowsPart,
    //---
    if(m_appParam.ColumnUB < 1.0e15){
       for(i = 0; i < nCols; i++){
-	 //printf("i: %5d lb: %8.5f ub:%8.5f\n", i, colLB[i], colUB[i]);
 	 if(colUB[i] > 1.0e15){
-	    //printf("colUB[%d]: %g\n", i, colUB[i]);
 	    model->colUB[i] = m_appParam.ColumnUB;
+	 }
+      }
+   }
+   if(m_appParam.ColumnLB > -1.0e15){
+      for(i = 0; i < nCols; i++){
+	 if(colLB[i] < -1.0e15){
+	    model->colLB[i] = m_appParam.ColumnLB;
 	 }
       }
    }

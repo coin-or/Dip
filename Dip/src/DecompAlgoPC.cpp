@@ -429,6 +429,13 @@ void DecompAlgoPC::phaseDone(){
 
 //===========================================================================//
 void DecompAlgoPC::solutionUpdateAsIP(){
+
+   //---
+   //--- if node was already found infeasible, just return
+   //---
+   if(m_status == STAT_INFEASIBLE)
+      return;
+
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solutionUpdateAsIp()", m_param.LogDebugLevel, 1);   
    
@@ -437,8 +444,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //--- no point in doing this if only one block, we check each
    //---  new column to see if it is feasible to original already
    //---
-   assert(m_numConvexCon > 1);
-
+   assert(m_numConvexCon > 1);   
 
    int  i;
    int  nMasterCols = m_masterSI->getNumCols();//lambda 

@@ -1224,7 +1224,13 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    m_globalLB       = globalLB;
    m_globalUB       = globalUB;
 
-
+   //---
+   //--- check SolveMasterAsIp setting
+   //---   on by default, but if only one block, turn off
+   //---
+   if(m_numConvexCon == 1)
+      m_param.SolveMasterAsIp = 0;
+   
    //---
    //--- init stats and timer
    //--- 

@@ -25,6 +25,7 @@ public:
    string BlockFile;
    string BlockFileFormat;
    double ColumnUB; //hack since missing extreme rays
+   double ColumnLB; //hack since missing extreme rays
 
 public:
    void getSettings(UtilParameters & utilParam){
@@ -35,7 +36,8 @@ public:
       BlockFile    = utilParam.GetSetting("BlockFile",    "",    common);    
       BlockFileFormat 
 	 = utilParam.GetSetting("BlockFileFormat",    "",    common);    
-      ColumnUB     = utilParam.GetSetting("ColumnUB", 1.0e20, common);
+      ColumnUB     = utilParam.GetSetting("ColumnUB",  1.0e20, common);
+      ColumnLB     = utilParam.GetSetting("ColumnLB", -1.0e20, common);
    }
 
    void dumpSettings(ostream * os = &cout){
@@ -48,6 +50,7 @@ public:
       (*os) << common << ": BlockFile       : " << BlockFile       << endl;
       (*os) << common << ": BlockFileFormat : " << BlockFileFormat << endl;
       (*os) << common << ": ColumnUB        : " << ColumnUB        << endl;
+      (*os) << common << ": ColumnLB        : " << ColumnLB        << endl;
       (*os) << "\n=====================================================\n";
    }
    
@@ -58,7 +61,8 @@ public:
       Instance       (""),
       BlockFile      (""), 
       BlockFileFormat(""),
-      ColumnUB       (1.e20)
+      ColumnUB       ( 1.e20),
+      ColumnLB       (-1.e20)
 {};
    ~MILPBlock_Param() {};
 };

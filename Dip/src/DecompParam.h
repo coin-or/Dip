@@ -251,7 +251,7 @@ public:
       SubProbGapLimitInexact = 1.0e-1;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
-      SolveMasterAsIp      = 0;
+      SolveMasterAsIp      = 1;//TODO: turn off if one block
       SolveRelaxAsIp       = 0;
       InitVarsWithCutDC    = 0;
       InitVarsWithIP       = 0;
