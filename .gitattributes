@@ -220,6 +220,9 @@ Dip/examples/VRP/VRP_SPPRC.cpp -text
 Dip/examples/VRP/boost_extract.sh.in -text
 Dip/examples/VRP/build_concorde.sh.in -text
 Dip/examples/VRP/build_cvrpsep.sh.in -text
+Dip/examples/VRP/get_boost.sh.in -text
+Dip/examples/VRP/get_concorde.sh.in -text
+Dip/examples/VRP/get_cvrpsep.sh.in -text
 Dip/examples/VRP/vrp.parm.in -text
 Dip/examples/scripts/addedge.awk -text
 Dip/examples/scripts/addedges.sh -text
