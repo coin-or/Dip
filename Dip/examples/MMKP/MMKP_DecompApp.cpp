@@ -428,6 +428,9 @@ MMKP_DecompApp::solveRelaxed(const int          whichBlock,
                              const double       convexDual,
                              DecompVarList    & varList){
                                             
+   if(!m_appParam.UsePisinger)
+      return DecompSolStatNoSolution;
+
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solveRelaxed()", m_appParam.LogLevel, 2);
    

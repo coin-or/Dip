@@ -36,6 +36,7 @@ public:
    string ModelNameCore;      //name of model core
    string ModelNameRelax;     //name of model relax
    string ModelNameRelaxNest; //name of nested model relax
+   bool   UsePisinger;
 
 public:
    void getSettings(UtilParameters & utilParam){
@@ -48,6 +49,7 @@ public:
       ModelNameRelax = utilParam.GetSetting("ModelNameRelax", "MCKP0", common);
       ModelNameRelaxNest 
          = utilParam.GetSetting("ModelNameRelaxNest", "", common);
+      UsePisinger    = utilParam.GetSetting("UsePisinger", true,  common);
       if(!checkOptions())
          throw UtilException("Bad Parameter", "getSettings", "MMKP_Param");
    }
@@ -85,6 +87,7 @@ public:
       (*os) << common << ": ModelNameCore     : " << ModelNameCore     << endl;
       (*os) << common << ": ModelNameRelax    : " << ModelNameRelax    << endl;
       (*os) << common << ": ModelNameRelaxNest: " << ModelNameRelaxNest<< endl;
+      (*os) << common << ": UsePisinger       : " << UsePisinger       << endl;
       (*os) <<   "=====================================================\n";
    }
    
@@ -96,7 +99,8 @@ public:
       DataFormat        ("hifi"),//hifi, khan, or gsimon
       ModelNameCore     ("MDKP0"),
       ModelNameRelax    ("MCKP0"),
-      ModelNameRelaxNest(""     ){}
+      ModelNameRelaxNest(""     ),
+      UsePisinger       (true   ){}
    ~MMKP_Param() {};
 };
 

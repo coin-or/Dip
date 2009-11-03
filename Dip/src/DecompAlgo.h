@@ -230,6 +230,8 @@ protected:
    double       m_globalLB;
    double       m_globalUB;
 
+   vector<double> m_phaseIObj;
+
 public:   
    /**
     * @}

@@ -1243,6 +1243,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    m_nodeStats.objBest.second = globalUB;
    m_compressColsLastPrice    = 0;
    m_compressColsLastNumCols  = m_masterSI->getNumCols();
+   m_phaseIObj.clear();
    
    //---
    //--- get initial phase
@@ -2657,6 +2658,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	 UTIL_MSG(m_app->m_param.LogDebugLevel, 3,  
 		  (*m_osLog) 
 		  << "PhaseIObj= " << UtilDblToStr(phaseIObj) << endl;);
+         m_phaseIObj.push_back(phaseIObj);
 	 if(phaseIObj <= DecompZero){
 	    //---
 	    //--- switch to PHASE II (art=0)

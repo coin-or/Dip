@@ -25,20 +25,72 @@ void DecompAlgoD::phaseUpdate(DecompPhase  & phase,
 			      DecompStatus & status){   
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "phaseUpdate()", m_param.LogDebugLevel, 2);
-   //don't need now?
+
    DecompAlgo::phaseUpdate(phase, status);
-   //if(phase == PHASE_PRICE2)
-   //   phase = PHASE_DONE;   
 
    if(phase == PHASE_DONE && status == STAT_FEASIBLE){
      //---
      //--- then a decomposition was found, return it
      //---
    }
-  
 
+   //---
+   //--- TODO:
+   //--- are we stuck?
+   //---   11/3/09: I13 PhaseIObj not moving
+   //--- TODO: use tailoff function
+   //---
+   int    changeLen      = 10;
+   double changePerLimit = 0.1;
+   if(static_cast<int>(m_phaseIObj.size()) > changeLen){
+      vector< double >::reverse_iterator it = m_phaseIObj.rbegin();
+      int    len       = 0;
+      double prevBound = (*it);
+      double diff      = DecompInf;
+      double sumDiff   = 0.0;
+      double aveDiff   = 0.0;
+      double perDiff   = 0.0;
+      for( ; it != m_phaseIObj.rend(); it++){
+         diff = fabs(prevBound - (*it));
+         UTIL_DEBUG(m_param.LogDebugLevel, 3,	      
+                    (*m_osLog) 
+                    << setw(10) << "prevBound="
+                    << setw(10) << UtilDblToStr(prevBound, 2)
+                    << setw(10) << ", thisBound="
+                    << setw(10) << UtilDblToStr((*it)) << endl;
+                    );
+         sumDiff   += diff;
+         prevBound  = (*it);
+         len++;
+         if(len >= changeLen)
+            break;
+      }
+      aveDiff = sumDiff / len;
+      if(UtilIsZero(prevBound)){
+         perDiff = aveDiff;
+      }
+      else{
+         perDiff = 100 * aveDiff / fabs(prevBound);
+      }
+      UTIL_MSG(m_param.LogDebugLevel, 2,	      
+               (*m_osLog) 
+               << setw(10) << "Percentage difference in obj bound="
+               << setw(10) << UtilDblToStr(perDiff, 2) << endl;
+               );
+      
+      //---
+      //--- if the average percentage difference is less than some threshold
+      //---    than we are tailing off
+      //---
+      if(perDiff <= changePerLimit){
+         printf("DC is tailing off - STOP PROCESS\n");
+         phase          = PHASE_DONE;
+         m_stopCriteria = DecompStopTailOff;
+      }
+   }
+   
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "phaseUpdate()", m_param.LogDebugLevel, 2);
+                    "phaseUpdate()", m_param.LogDebugLevel, 2);
 }
 
 //===========================================================================//
@@ -47,10 +99,11 @@ void DecompAlgoD::phaseDone(){
 		      "phaseDone()", m_param.LogDebugLevel, 1);   
    
    if(m_stopCriteria != DecompStopInfeasible){
-     printVars(m_osLog);//use this to warm start DW
-     return;
+      if(m_param.LogDebugLevel >= 3)
+         printVars(m_osLog);//use this to warm start DW
+      return;
    }
-
+   
    //---
    //--- decomposition could not be found, this means the 
    //---  point we are decomposing is not inside P' and we can 
@@ -73,8 +126,10 @@ void DecompAlgoD::phaseDone(){
    double lhs = 0.0;      
    for(i = 0; i < m_numOrigCols; i++){
       lhs -= dualSol[i] * m_xhatD[i];
-      printf("i:%4d u:%5g x:%5g lhs:%5g\n",
-	     i, dualSol[i], m_xhatD[i], lhs);
+      if(m_param.LogDebugLevel >= 3){
+         printf("i:%4d u:%5g x:%5g lhs:%5g\n",
+                i, dualSol[i], m_xhatD[i], lhs);
+      }
    }
 
    //---
@@ -86,7 +141,9 @@ void DecompAlgoD::phaseDone(){
 	 alpha = dualSol[m_numOrigCols + b];
    }
    lhs -= alpha;
-   printf("alpha:%5g lhs:%5g\n", alpha, lhs);
+   if(m_param.LogDebugLevel >= 3){
+      printf("alpha:%5g lhs:%5g\n", alpha, lhs);
+   }
    if(lhs < 0){
       printf(" VIOLATED FARKAS CUT lhs = %g\n", lhs);
       CoinPackedVector cut;

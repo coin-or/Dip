@@ -34,7 +34,7 @@ extern "C"{
 // --------------------------------------------------------------------- //
 //#define MCKP_EPSILON      1.0e-4 //still causing overflow
 #define MCKP_EPSILON      1.0e-3
-//#define MMKP_MCKNAP_DEBUG
+#define MMKP_MCKNAP_DEBUG
 
 // --------------------------------------------------------------------- //
 #include "UtilMacros.h"
@@ -215,16 +215,17 @@ void MMKP_MCKnap::solveMCKnap(const double   * redCost,
    m_cscale = UtilScaleDblToIntArr(m_nCols, m_costDbl, m_cost, MCKP_EPSILON);
 
 #ifdef MMKP_MCKNAP_DEBUG
+   double diff;
    printf("\noffset   = %g", offset);
    printf("\nm_cscale = %d", m_cscale);
    printf("\nm_wscale = %d", m_wscale);
    printf("\ncapacity = %d", m_capacity);
    for(i = 0; i < m_nCols; i++){
       pair<int,int> ij = getIndexInv(i);
-      printf("\ncostDbl[%d: %d, %d]: %g",
-	     i, ij.first, ij.second, m_costDbl[i]);
-      printf("\ncostInt[%d: %d, %d]: %d",
-	     i, ij.first, ij.second, m_cost[i]);
+      diff = fabs((m_costDbl[i]*m_cscale) - m_cost[i]);
+      printf("\n[%d: %d, %d]: dbl-> %12.5f int-> %8d diff-> %12.5f",
+	     i, ij.first, ij.second, m_costDbl[i], m_cost[i], diff);
+      assert( diff < 0.99 );
    }
 #endif
 
