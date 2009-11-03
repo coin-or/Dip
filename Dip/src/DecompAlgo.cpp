@@ -1213,7 +1213,9 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
             << ", phaseLast = "<< DecompPhaseStr[m_phaseLast]
 	    << ") gLB = "      << UtilDblToStr(globalLB) 
 	    << " gUB = "       << UtilDblToStr(globalUB) 
-	    << " gap = "       << UtilDblToStr(gap,5) << endl;
+	    << " gap = "       << UtilDblToStr(gap,5) 
+            << " time = "      << UtilDblToStr(globalTimer.getCpuTime(), 3)
+            << endl;
 	    );
    
    //---
@@ -1968,12 +1970,14 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 	    );
 
 #ifdef __DECOMP_LP_CLP__
-   {
-      OsiClpSolverInterface * osiClp  = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
-      printf("clp status        = %d\n", osiClp->getModelPtr()->status());
-      printf("clp prob status   = %d\n", osiClp->getModelPtr()->problemStatus());
-      printf("clp second status = %d\n", osiClp->getModelPtr()->secondaryStatus());
-   }
+   UTIL_DEBUG(m_param.LogDebugLevel, 4,
+              {
+                 OsiClpSolverInterface * osiClp  = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
+                 printf("clp status        = %d\n", osiClp->getModelPtr()->status());
+                 printf("clp prob status   = %d\n", osiClp->getModelPtr()->problemStatus());
+                 printf("clp second status = %d\n", osiClp->getModelPtr()->secondaryStatus());
+              }
+              );
 #endif
 
    

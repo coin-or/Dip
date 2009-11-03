@@ -366,8 +366,10 @@ void MMKP_MCKnap::solveMCKnap(const double   * redCost,
       //maxwsum <= c, so just pick the max elements from each group
       solveTrivialMaxSum(redCost, origCost, solInd, 
 			 varRedCost, varOrigCost);
+#ifdef MMKP_MCKNAP_DEBUG	     
       printf("trivial sum varRedCost=%g varOrigCost=%g\n",
 	     varRedCost, varOrigCost);
+#endif
       break;
    default:
       assert(0);

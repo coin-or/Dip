@@ -40,6 +40,9 @@ void DecompAlgoPC::phaseInit(DecompPhase & phase){
    //TODO: not getting cuts since only populate A'' in beginning
    //  by adding cuts this adds some of the integrality property
    //  otherwise the only thing causing infeasibility is the branching
+   //TODO: to get cuts would want to populate m_auxSI with 
+   //  the current core model - not too bad since only once 
+   //  a node? but even without cuts, see if it helps
    if(m_auxSI){
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
                  (*m_osLog) << "Solve the LP of compact formulation." << endl;

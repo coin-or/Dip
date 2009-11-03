@@ -557,23 +557,22 @@ void DecompAlgoD::createMasterProblem(DecompVarList & initVars){
       m_masterSI->setColNames(colNames, 0, colNames.size(), 0);
 
 
-   {      
-      for(r = 0; r < m_masterSI->getNumRows(); r++){	
-	 const string rowN = m_masterSI->getRowName(r);
-	 printf("Row[%4d] Name: %30s Type: %20s\n",
-		r, 
-		rowN.c_str(),
-		DecompRowTypeStr[m_masterRowType[r]].c_str());
-      }
-      for(c = 0; c < m_masterSI->getNumCols(); c++){	
-	 const string colN = m_masterSI->getColName(c);
-	 printf("Col[%4d] Name: %30s Type: %20s\n",
-		c, 
-		colN.c_str(),
-		DecompColTypeStr[m_masterColType[c]].c_str());
-      }
-      
-   }    
+   UTIL_DEBUG(m_param.LogDebugLevel, 4,                 
+              for(r = 0; r < m_masterSI->getNumRows(); r++){	
+                 const string rowN = m_masterSI->getRowName(r);
+                 printf("Row[%4d] Name: %30s Type: %20s\n",
+                        r, 
+                        rowN.c_str(),
+                        DecompRowTypeStr[m_masterRowType[r]].c_str());
+              }
+              for(c = 0; c < m_masterSI->getNumCols(); c++){	
+                 const string colN = m_masterSI->getColName(c);
+                 printf("Col[%4d] Name: %30s Type: %20s\n",
+                        c, 
+                        colN.c_str(),
+                        DecompColTypeStr[m_masterColType[c]].c_str());
+              }
+              );
 
    //---
    //--- reset unique col index id
