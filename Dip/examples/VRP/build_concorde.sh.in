@@ -1,5 +1,0 @@
-cd @srcdir@/../ExternalSolvers/TSP/concorde03
-tar -zxvf co031219.tgz
-cd concorde
-./configure
-make
