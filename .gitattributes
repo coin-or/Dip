@@ -243,6 +243,7 @@ Dip/examples/scripts/condor/license_wrapper.pl -text
 Dip/examples/scripts/condor/license_wrapper_tsp.pl -text
 Dip/examples/scripts/condor/license_wrapper_vrp.pl -text
 Dip/examples/scripts/condor/report.awk -text
+Dip/examples/scripts/condor/report.root.awk -text
 Dip/examples/scripts/condor/report.sh -text
 Dip/examples/scripts/condor/report2.sh -text
 Dip/examples/scripts/condor/reset.sh -text

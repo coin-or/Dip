@@ -12,6 +12,7 @@ do
           cat $f
       fi
     done
-    grep "TotalCPU" *.out > report.out
+    grep "TotalCPU" *.out > report.txt
+    grep "Process Node 1 " *.out > report.root.txt
   done
 done
