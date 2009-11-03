@@ -94,13 +94,14 @@ int main(int argc, char ** argv){
          //---
          //--- create the driver AlpsDecomp model
          //---
+         int             status = 0;
          AlpsDecompModel alpsModel(utilParam, algo);
       
          //---
          //--- solve
          //---
          timer.start();      
-         alpsModel.solve();
+         status = alpsModel.solve();
          timer.stop();
          timeSolveCpu  = timer.getCpuTime();
          timeSolveReal = timer.getRealTime();
@@ -109,7 +110,8 @@ int main(int argc, char ** argv){
          //--- sanity check
          //---
          cout << setiosflags(ios::fixed|ios::showpoint);
-         cout << "BestLB  " << setw(10) 
+         cout << "Status= " << status 
+              << "BestLB= " << setw(10) 
               << UtilDblToStr(alpsModel.getGlobalLB(),5)
               << " BestUB= " << setw(10)
               << UtilDblToStr(alpsModel.getGlobalUB(),5)        

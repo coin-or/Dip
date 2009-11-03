@@ -444,8 +444,10 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 	      if(printLp)
 	      (*m_osLog) << "calling writeLp  filename = " << filename << endl;
 	      );
-   if(printMps)
-      si->writeMps(filename.c_str());
+   if(printMps){
+      si->writeMpsNative(filename.c_str(), NULL, NULL, 2);
+      //si->writeMps(filename.c_str());
+   }
    if(printLp)      
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
    UtilPrintFuncEnd(m_osLog, m_classTag,

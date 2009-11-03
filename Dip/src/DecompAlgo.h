@@ -463,7 +463,7 @@ public:
                             const int                  cutPass,
                             const int                  pricePass,
                             const int                  blockId    = -1,
-                            const bool                 printMps   = false,
+                            const bool                 printMps   = true,//false,
                             const bool                 printLp    = true);
    /**
     *

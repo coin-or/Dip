@@ -23,6 +23,10 @@ MAX_SECONDS=1000
 LOG=${INIT_DIR}condor.log
 EXTEN=""
 
+#MAX_SECONDS  = ${MAX_SECONDS}
+#periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > ${MAX_SECONDS})
+
+
 echo "
 universe     = $UNIVERSE
 notification = Error
@@ -30,8 +34,6 @@ log          = ${LOG}
 notify_user  = matthew.galati@sas.com
 executable   = ${EXECUTABLE}
 initialdir   = ${INIT_DIR}
-MAX_SECONDS  = ${MAX_SECONDS}
-periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > ${MAX_SECONDS})
 requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
 # executable: ${EXEC_STATUS}
 # -----------------------------------------------------------------------------

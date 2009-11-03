@@ -7,4 +7,5 @@ do
   mkdir ${HOME}/running/decomp${1}/${i}/${i}p2
   mkdir ${HOME}/running/decomp${1}/${i}/${i}c
   mkdir ${HOME}/running/decomp${1}/${i}/${i}c2
+  mkdir ${HOME}/running/decomp${1}/${i}/${i}d
 done
