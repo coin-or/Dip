@@ -1,4 +1,4 @@
 cd ../ExternalSolvers/TSP
 chmod +x get.concorde
 ./get.concorde
-cd ../../../VRP
+

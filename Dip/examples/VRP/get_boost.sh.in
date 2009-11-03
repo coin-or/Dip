@@ -1,4 +1,4 @@
 cd ../ExternalSolvers/Graph
 chmod +x get.boost
 ./get.boost
-cd ../../../VRP
+
