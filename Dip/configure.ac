@@ -249,14 +249,18 @@ AC_CONFIG_FILES([Makefile
                  examples/MMKP/data_extract.sh
                  examples/MMKP/get_pisinger.sh
                  examples/VRP/Makefile
-                 examples/VRP/vrp.parm
-		 examples/VRP/boost_extract.sh
+                 examples/VRP/vrp.parm                 
+                 examples/VRP/get_boost.sh
+                 examples/VRP/get_concorde.sh
+                 examples/VRP/get_cvrpsep.sh
                  examples/ATM/Makefile
                  examples/ATM/atm.parm
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h
+                 examples/ExternalSolvers/VRP/get.cvrpsep
+                 examples/ExternalSolvers/Graph/get.boost
                  examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
                  dip_addlibs.txt])
