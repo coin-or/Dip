@@ -68,14 +68,21 @@ void DecompAlgo::checkBlocksColumns(){
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "checkBlocksColumns()", m_param.LogDebugLevel, 2);
+
+   if(m_modelRelax.size() == 0)
+      return; 
+
    //---
    //--- sanity check that the blocks are column disjoint
    //---
    map<int, DecompAlgoModel>::iterator mid1;
    map<int, DecompAlgoModel>::iterator mid2;
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
-      DecompAlgoModel & modelRelax1 = (*mid1).second;
-      set<int>        & activeCols1 
+      DecompAlgoModel     & modelRelax1 = (*mid1).second;
+      DecompConstraintSet * model       = modelRelax1.getModel();
+      if(!model->getMatrix())
+         return;
+      set<int>            & activeCols1 
          = modelRelax1.getModel()->activeColumnsS;
       for(mid2 = m_modelRelax.begin(); mid2 != m_modelRelax.end(); mid2++){
          if(mid1 == mid2)

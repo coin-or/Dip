@@ -25,23 +25,26 @@ OBJS        += VRP_Main.@OBJEXT@
 
 # Concorde
 CONCORDE_LIB = concorde.a
-CONCORDE_DIR = @srcdir@/../ExternalSolvers/TSP/concorde03/concorde
+CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
+CONCORDE_INC = ${CONCORDE_DIR}/INCLUDE
+QSOPT_DIR    = ../ExternalSolvers/TSP
+QSOPT_LIB    = qsopt.a
 
 # Boost
-BOOST_DIR = @srcdir@/../ExternalSolvers/Graph/boost_1_33_1
+BOOST_DIR = ../ExternalSolvers/Graph/boost_1_40_0
 
-# CVRPSep
-CVRPSEP_DIR = @srcdir@/../ExternalSolvers/VRP/CVRPSEP
-CVRPSEP_LIB = libcvrpsep.a
+# CVRPSEP
+CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP
+CVRPSEP_LIB = cvrpsep
 
 #===========================================================================#
 # additional include and link flags
-ADDLIBS  = ${CONCORDE_DIR}/${CONCORDE_LIB}
-ADDLIBS += ${CVRPSEP_DIR}/obj/${CVRPSEP_LIB} 
-
-ADDINCFLAGS  = -I${CONCORDE_DIR} -I${CONCORDE_DIR}/INCLUDE
-ADDINCFLAGS += -I${BOOST_DIR}
-ADDINCFLAGS += -I${CVRPSEP_DIR}
+ADDLIBS      += $(CONCORDE_DIR)/$(CONCORDE_LIB)
+ADDLIBS      += $(CONCORDE_DIR)/$(QSOPT_LIB) 
+ADDINCFLAGS  += -I$(CONCORDE_INC)
+ADDLIBS      += -L$(CVRPSEP_DIR)/obj -l$(CVRPSEP_LIB)
+ADDINCFLAGS  += -I$(CVRPSEP_DIR)
+#ADDINCFLAGS  += -I${BOOST_DIR}
 
 #===========================================================================#
 # directory to the source files
@@ -79,10 +82,19 @@ all: $(EXEDECOMP)
 
 .SUFFIXES: .cpp .c .o .obj
 
-$(EXEDECOMP): $(OBJS)
+$(EXEDECOMP): $(CONCORDE_DIR)/$(CONCORDE_LIB) $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a $(OBJS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+$(CONCORDE_DIR)/$(CONCORDE_LIB):
+	(cd ${CONCORDE_DIR} \
+        && ./configure --with-qsopt=@abs_lib_dir@/../Dip/examples/ExternalSolvers/TSP \
+	&& make)
+
+$(CVRPSEP_DIR)/$(CVRPSEP_LIB).a:
+	(cd $(CVRPSEP_DIR) && make)
+
 
 clean:
 	rm -rf $(EXE) $(OBJS)

@@ -21,6 +21,7 @@
 #include "VRP_Instance.h"
 #include "VRP_Param.h"
 // --------------------------------------------------------------------- //
+#define VRP_DECOMPAPP_USECONCORDE
 #ifdef VRP_DECOMPAPP_USECONCORDE
 #include "VRP_Concorde.h"
 #endif

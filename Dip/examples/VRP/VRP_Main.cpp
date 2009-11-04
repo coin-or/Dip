@@ -72,6 +72,7 @@ int main(int argc, char ** argv){
       //---
       //--- create the driver AlpsDecomp model
       //---
+      int             status = 0;
       AlpsDecompModel alpsModel(utilParam, algo);
       
       timer.stop();
@@ -82,27 +83,44 @@ int main(int argc, char ** argv){
       //--- solve
       //---
       timer.start();      
-      alpsModel.solve();
+      status = alpsModel.solve();
       timer.stop();
       timeSolveCpu  = timer.getCpuTime();
       timeSolveReal = timer.getRealTime();
-      
+
       //---
       //--- sanity check
       //---
       cout << setiosflags(ios::fixed|ios::showpoint);
-      cout << "Instance = "  << Instance;
-      if(alpsModel.getBestObj() > 1.0e16)
-         cout << " Solution = 1.0e20";
-      else
-         cout << " Solution = " << alpsModel.getBestObj();
-      cout << " [ "          << vrp.getBestKnownLB()
-	   << " , "          << vrp.getBestKnownUB() << " ]"
-	   << " SetupCPU = " << timeSetupCpu
-	   << " SolveCPU = " << timeSolveCpu << endl;      
-      //double diff = alpsModel.getBestObj() - vrp.getBestKnownUB();
-      //CoinAssert(UtilIsZero(diff));
-      //CoinAssert(alpsModel.getBestObj() >= vrp.getBestKnownUB());
+      cout << "Status= "   << status  
+           << " BestLB=  " << setw(10) 
+           << UtilDblToStr(alpsModel.getGlobalLB(),5)
+           << " BestUB= " << setw(10)
+           << UtilDblToStr(alpsModel.getGlobalUB(),5)        
+           << " Nodes= " << setw(6) 
+           << alpsModel.getNumNodesProcessed()
+           << " SetupCPU= "  << timeSetupCpu
+           << " SolveCPU= "  << timeSolveCpu 
+           << " TotalCPU= "  << timeSetupCpu + timeSolveCpu
+           << " SetupReal= " << timeSetupReal
+           << " SolveReal= " << timeSolveReal
+           << " TotalReal= " << timeSetupReal + timeSolveReal
+           << endl;      
+      
+      if(status == AlpsExitStatusOptimal && vrp.getBestKnownUB() < 1.0e50){
+         //---
+         //--- the assumption here is that the BestKnownLB/UB is optimal
+         //---
+         double diff 
+            = fabs(vrp.getBestKnownUB() - alpsModel.getGlobalUB());
+         if(diff > 1.0e-4){
+            cerr << "ERROR. BestKnownUB= " << vrp.getBestKnownUB()
+                 << " but DECOMP claims GlobalUB= " 
+                 << alpsModel.getGlobalUB() << endl;
+            throw UtilException("Invalid claim of optimal.", 
+                                "main", "DECOMP");
+         }
+      }
 
       //---
       //--- free local memory
