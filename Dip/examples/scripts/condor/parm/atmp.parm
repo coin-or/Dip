@@ -1,0 +1,27 @@
+doCut           = 0
+doPriceCut      = 1
+
+[DECOMP]
+LogLevel      = 2
+LogDebugLevel = 0
+LimitTime     = 600
+SolveMasterAsIp = 0
+
+[ALPS]
+nodeLogInterval = 1
+#msgLevel        = 2
+timeLimit       = 600
+
+[ATM]
+DataDir     = .
+
+ModelNameCore  = BUDGET
+ModelNameRelax = CASH_COUNT
+
+DataAtm     = atm_randA_10_50_1.txt
+DataDate    = atm_randD_10_50_1.txt
+DataAtmDate = atm_randAD_10_50_1.txt
+
+NumSteps    = 10
+
+#
