@@ -111,7 +111,7 @@ int main(int argc, char ** argv){
          //---
          cout << setiosflags(ios::fixed|ios::showpoint);
          cout << "Status= " << status 
-              << "BestLB= " << setw(10) 
+              << " BestLB= " << setw(10) 
               << UtilDblToStr(alpsModel.getGlobalLB(),5)
               << " BestUB= " << setw(10)
               << UtilDblToStr(alpsModel.getGlobalUB(),5)        

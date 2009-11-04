@@ -1,4 +1,4 @@
-for i in atm gap milpblock mmkp
+for i in atm milpblock mmkp #gap
 do
   echo "condor_submit condor${1}.${i}p.submit"
   condor_submit condor${1}.${i}p.submit

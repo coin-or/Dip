@@ -65,29 +65,29 @@ for i in 3 4 6 20 22 27 31 33
    let count=$count+1
 done
 
-#Drug Portfolio
-for i in 20 100 500
-  do
-   echo "Generating queue commands for ${i}"
-   filename=drug_port_${i}.mps
-   filenameB=drug_port_${i}.block
-   fileparam=${PARAM_FILE}
-   echo "
-     output      = drug_port_${i}${OUT_SUFF}
-     error       = drug_port_${i}${ERR_SUFF}
-     arguments   = "${ARGS} --MILPBlock:Instance drug_port_${i} --MILPBlock:BlockFile drug_port_${i}.block"
-     should_transfer_files = YES
-     transfer_input_files = ${DRUG_DIR}/$filename, ${DRUG_DIR}/$filenameB, $fileparam
-     WhenToTransferOutput = ON_EXIT_OR_EVICT
-     hold        = $HOLD
+# #Drug Portfolio
+# for i in 20 100 500
+#   do
+#    echo "Generating queue commands for ${i}"
+#    filename=drug_port_${i}.mps
+#    filenameB=drug_port_${i}.block
+#    fileparam=${PARAM_FILE}
+#    echo "
+#      output      = drug_port_${i}${OUT_SUFF}
+#      error       = drug_port_${i}${ERR_SUFF}
+#      arguments   = "${ARGS} --MILPBlock:Instance drug_port_${i} --MILPBlock:BlockFile drug_port_${i}.block"
+#      should_transfer_files = YES
+#      transfer_input_files = ${DRUG_DIR}/$filename, ${DRUG_DIR}/$filenameB, $fileparam
+#      WhenToTransferOutput = ON_EXIT_OR_EVICT
+#      hold        = $HOLD
 
-   queue 1
+#    queue 1
 
-# -----------------------------------------------------------------------------
-   ">>$OUT_FILE
-   echo -n "."
-   let count=$count+1
-done
+# # -----------------------------------------------------------------------------
+#    ">>$OUT_FILE
+#    echo -n "."
+#    let count=$count+1
+# done
 echo ""
 echo ""
 echo "$OUT_FILE has $count jobs. Use condor_submit to submit it."
