@@ -4,7 +4,7 @@ use warnings;
 
 my $MIN_AVAIL = 2;	# how many should i leave for others
 my $USER = "magh";
-my $EXECUTABLE = "/home/magh/bin/decomp/alps_mad";
+my $EXECUTABLE = "/home/magh/bin/decomp/alps_mad";  #is this visible to all of blaze?
 my $SLEEP_RANGE = 60;
 my $r = rand($SLEEP_RANGE);
 sleep($r);
