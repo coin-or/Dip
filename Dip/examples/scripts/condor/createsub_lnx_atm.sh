@@ -26,6 +26,11 @@ EXTEN=""
 #MAX_SECONDS  = ${MAX_SECONDS}
 #periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > ${MAX_SECONDS})
 
+#orclus
+#requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
+#inferno
+#requirements = (Subnet == "192.168.3")
+
 
 echo "
 universe     = $UNIVERSE
@@ -34,7 +39,7 @@ log          = ${LOG}
 notify_user  = matthew.galati@sas.com
 executable   = ${EXECUTABLE}
 initialdir   = ${INIT_DIR}
-requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
+requirements = (Subnet == \"192.168.3\")
 # executable: ${EXEC_STATUS}
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------

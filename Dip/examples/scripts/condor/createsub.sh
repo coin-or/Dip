@@ -3,7 +3,7 @@
 #p  = pc
 #p  = pc+solveMasterAsIp
 #d  = direct
-for i in atm milpblock mmkp #gap
+for i in atm milpblock mmkp gap
 do
   ./createsub_lnx_${i}.sh ${i}p $1
   ./createsub_lnx_${i}.sh ${i}p2 $1

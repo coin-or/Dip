@@ -24,6 +24,12 @@ MAX_SECONDS=1000
 LOG=${INIT_DIR}condor.log
 EXTEN=""
 
+#orclus
+#requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
+#inferno
+#requirements = (Subnet == "192.168.3")
+
+
 echo "
 universe     = $UNIVERSE
 notification = Error
@@ -31,7 +37,7 @@ log          = ${LOG}
 notify_user  = matthew.galati@sas.com
 executable   = ${EXECUTABLE}
 initialdir   = ${INIT_DIR}
-requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
+requirements = (Subnet == \"192.168.3\")
 # executable: ${EXEC_STATUS}
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
