@@ -9,23 +9,6 @@ awk -F'.' '{print $1 " ->" $0'} $1 > tmp
 #change INF to 999999
 sed 's/INF/999999/' tmp > tmp2
 
-# awk '
-# {
-# if($7 > 1.0e15){
-#    printf "Instance= %15s LB= %12.3f UB= %12s Gap= %10s Nodes= %10d Cpu= %10.2f Real= %10.2f\n",$1,$5,999999,999999,$9,$15,$21;
-# }
-# else{
-#    if($7 > 0){
-#       printf "Instance= %15s LB= %12.3f UB= %12.3f Gap= %10.4f Nodes= %10d Cpu= %10.2f Real= %10.2f\n",$1,$5,$7,($7-$5)/$7,$9,$15,$21;
-#    }
-#    else{
-#       printf "Instance= %15s LB= %12.3f UB= %12.3f Gap= %10.4f Nodes= %10d Cpu= %10.2f Real= %10.2f\n",$1,$5,$7,($7-$5)/(-$7),$9,$15,$21;
-#    }
-#  }
-# }' tmp > tmp2
- 
-#awk -F'_' '{print $2 " " $3 " " $4}' tmp2 > tmp3
-
 # $1     , $15,  $5, $7,      $9
 #instance, time, LB, UB, gap, nodes
 
@@ -40,7 +23,18 @@ sed 's/INF/999999/' tmp > tmp2
 awk -v time="$TIME" '
 {
    timeLim = time-(time/20);
-   if($7 == 999999){ #no ub
+   if($5 == -999999){ # no lb
+      if($15 >= timeLim){ #exceed time
+         printf "%15s & T        & $\\infty$ & $\\infty$ & $\\infty$  & %8d\n", 
+            $1,$9;
+      }
+      else{
+         #no lb, did not exceed time limit <-- error?
+         printf "%15s & %8.2f & & $\\infty$ & $\\infty$ & $\\infty$  & %8d\n",   
+            $1,$15,$9;
+      }
+   }   
+   else if($7 == 999999){ #no ub
       if($15 >= timeLim){ #exceed time
          printf "%15s & T        & %10.2f & $\\infty$ & $\\infty$  & %8d\n", 
             $1,$5,$9;
