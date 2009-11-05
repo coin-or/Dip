@@ -1,10 +1,10 @@
-for i in atm milpblock mmkp #gap
+for i in atm milpblock mmkp gap
 do
   cp report.direct.awk ${HOME}/running/decomp${1}/${i}/${i}d/
   for t in p p2 c c2
   do
     echo ${HOME}/running/decomp${1}/${i}/${i}${t}        
-    cp report.awk ${HOME}/running/decomp${1}/${i}/${i}${t}/
+    cp report.awk      ${HOME}/running/decomp${1}/${i}/${i}${t}/
     cp report.root.awk ${HOME}/running/decomp${1}/${i}/${i}${t}/
     cd ${HOME}/running/decomp${1}/${i}/${i}${t}    
     ./report.awk report.txt ${i}${t} 600

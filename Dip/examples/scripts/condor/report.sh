@@ -1,4 +1,4 @@
-for i in atm milpblock mmkp #gap
+for i in atm milpblock mmkp gap
 do
   for t in p p2 c c2
   do

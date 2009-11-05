@@ -39,7 +39,7 @@ log          = ${LOG}
 notify_user  = matthew.galati@sas.com
 executable   = ${EXECUTABLE}
 initialdir   = ${INIT_DIR}
-requirements = (Subnet == \"192.168.3\")
+requirements = (Arch == \"X86_64\") && (OpSys == \"LINUX\")
 # executable: ${EXEC_STATUS}
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
