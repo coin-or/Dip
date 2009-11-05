@@ -230,12 +230,15 @@ Dip/examples/scripts/condor/copy.sh -text
 Dip/examples/scripts/condor/createsub.sh -text
 Dip/examples/scripts/condor/createsub_lnx_ap3.sh -text
 Dip/examples/scripts/condor/createsub_lnx_atm.sh -text
+Dip/examples/scripts/condor/createsub_lnx_atm_inferno.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_mad.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_tsp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_cplex_vrp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_gap.sh -text
+Dip/examples/scripts/condor/createsub_lnx_gap_inferno.sh -text
 Dip/examples/scripts/condor/createsub_lnx_mad.sh -text
 Dip/examples/scripts/condor/createsub_lnx_milpblock.sh -text
+Dip/examples/scripts/condor/createsub_lnx_milpblock_inferno.sh -text
 Dip/examples/scripts/condor/createsub_lnx_mmkp.sh -text
 Dip/examples/scripts/condor/createsub_lnx_mmkp_inferno.sh -text
 Dip/examples/scripts/condor/createsub_lnx_tsp.sh -text
