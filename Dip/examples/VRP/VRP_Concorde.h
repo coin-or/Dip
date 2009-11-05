@@ -221,7 +221,7 @@ class VRP_Concorde {
       //---
 #if VRP_CONCORDE_DEBUG > 0  
       for(i = 0; i < nOrigEdges; i++){
-      	 printf("origGraphCost[%d -> %s]: %g\n", 
+      	 printf("origGraphCost[%d -> %s]: %10.5f\n", 
                 i, UtilEdgeToStr(i).c_str(), origGraphCost[i]);
       }
 #endif
@@ -229,7 +229,7 @@ class VRP_Concorde {
 					      origGraphCost + nOrigEdges);
       const double   offset     = min(0.0, *minElement);
 #if VRP_CONCORDE_DEBUG > 0
-      printf("minElement = %g offset = %g\n", *minElement, -offset);
+      printf("minElement = %10.5f offset = %10.5f\n", *minElement, -offset);
 #endif
       memcpy(origGraphCostDbl, origGraphCost, nOrigEdges * sizeof(double));
       if(offset < 0.0){
@@ -242,19 +242,19 @@ class VRP_Concorde {
       //---    this should avoid any kind of overflow and
       //---    give accuracy at the 4th decimal place which should be
       //---    sufficient
-      //--- NOTE: epsilon=1.0e-6 causes overflow issues
+      //--- NOTE: epsilon=1.0e-6, 1.0e-4 causes overflow issues
       //---
       //int scaleFactor = 
       UtilScaleDblToIntArr(nOrigEdges, 
                            origGraphCostDbl,
-                           origGraphCostInt, 1.0e-4);
+                           origGraphCostInt, 1.0e-3);
       //UtilScaleDblToIntArrCC(nOrigEdges, 
       //                                   origGraphCostDbl,
       //                                   origGraphCostInt);
 #if VRP_CONCORDE_DEBUG > 0
       //printf("scaleFactor = %d\n", scaleFactor);      
       for(i = 0; i < nOrigEdges; i++){
-         printf("origGraphCost[%d]: %10g -> %10d\n", 
+         printf("origGraphCost[%d]: %10.5f -> %10d\n", 
                 i, 
                 origGraphCostDbl[i],
                 origGraphCostInt[i]);
@@ -346,17 +346,17 @@ class VRP_Concorde {
 	 }
       }
 
-#if VRP_CONCORDE_DEBUG > 0
-      for(i = 0; i < nEdges; i++){
+      //#if VRP_CONCORDE_DEBUG > 0
+      //for(i = 0; i < nEdges; i++){
          //printf("newGraphCostInt[%d -> %s]: %d\n", 
          //     i, UtilEdgeToStr(i).c_str(), edgeValue[i]);
-         printf("newGraphCostInt[%d -> (%d,%d)]: %d\n", 
-                i, 
-                edgeList[2*i],
-                edgeList[2*i+1], 
-                edgeValue[i]);
-      }
-#endif
+         //printf("newGraphCostInt[%d -> (%d,%d)]: %d\n", 
+		//        i, 
+      //     edgeList[2*i],
+      //        edgeList[2*i+1], 
+      //        edgeValue[i]);
+      //}
+      //#endif
    }
 
    int solveTSP(vector<int>    & vrpRouteInd,

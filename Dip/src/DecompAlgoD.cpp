@@ -40,7 +40,7 @@ void DecompAlgoD::phaseUpdate(DecompPhase  & phase,
    //---   11/3/09: I13 PhaseIObj not moving
    //--- TODO: use tailoff function
    //---
-   int    changeLen      = 10;
+   int    changeLen      = 20;
    double changePerLimit = 0.1;
    if(static_cast<int>(m_phaseIObj.size()) > changeLen){
       vector< double >::reverse_iterator it = m_phaseIObj.rbegin();

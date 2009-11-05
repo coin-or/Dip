@@ -58,14 +58,16 @@ int UtilScaleDblToIntArr(const int      arrLen,
       fractionalPart = UtilFracPart(arrDbl[i]);
       if(!UtilIsZero(fractionalPart)){
          fractionalPart     *= oneOverEps;
-         arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
+         arrFrac[n_aFrac++]  = static_cast<int>(round(fractionalPart))
+	    * (double)epstol;
       }
    }
    if(oneInt){
       fractionalPart = UtilFracPart(oneDbl);
       if(!UtilIsZero(fractionalPart)){
          fractionalPart     *= oneOverEps;
-         arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
+         arrFrac[n_aFrac++]  = static_cast<int>(round(fractionalPart))
+	    * (double)epstol;
       }
    }
 
@@ -87,7 +89,7 @@ int UtilScaleDblToIntArr(const int      arrLen,
    }
    
    for(i = 0; i < arrLen; i++){
-	   arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
+      arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
    }
    if(oneInt){
       *oneInt = static_cast<int>(round(oneDbl * scaleFactor));
@@ -125,9 +127,15 @@ int UtilScaleDblToIntArr(const int      arrLen,
    
    for(i = 0; i < arrLen; i++){
       fractionalPart = UtilFracPart(arrDbl[i]);
+      //printf("arrDbl[%d]=%10.5f fracPart=%6.5f\n",
+      //     i, arrDbl[i], fractionalPart);
       if(!UtilIsZero(fractionalPart)){
          fractionalPart     *= oneOverEps;
-         arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
+	 //printf("fracPart is not zero oneOverEps= %10.5f fracPart= %10.5f\n",
+	 //oneOverEps, fractionalPart);
+         arrFrac[n_aFrac++]  = static_cast<int>(round(fractionalPart)) 
+	    * (double)epstol;
+	 //printf("arrFrac[%d] = %10.5f\n", (n_aFrac-1), arrFrac[n_aFrac-1]);
       }
    }
 
