@@ -527,5 +527,77 @@ void MILPBlock_DecompApp::createModels(){
 		    "createModels()", m_appParam.LogLevel, 2);   
 }
 
+#if 0
+//===========================================================================//
+DecompSolverStatus 
+MILPBlock_DecompApp::solveRelaxedNest(const int          whichBlock,
+				      const double     * redCostX,
+				      const double       convexDual,
+				      DecompVarList    & varList){
+   
+   //---
+   //--- solve full model heuristically  as IP
+   //---   if get incumbent, break them out into approriate blocks
+   //---   and return those partial columns
+   //---
 
+
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "solveRelaxedNest()", m_appParam.LogLevel, 2);
+   
+   /////STOP
+   //---
+   //--- this allows user direct access to access methods in 
+   //---   algorithm interface (in case they want to use any 
+   //---   of its data)
+   //---
+   //--- for example, if the user wants to enforce the branching
+   //---   decisions in the oracle
+   //--- TODO: can this be done using mcknap solver?
+   //---
+   //const DecompAlgo * decompAlgo = getDecompAlgo();
+   //const double     * colLBNode  = decompAlgo->getColLBNode();
+   //const double     * colUBNode  = decompAlgo->getColUBNode();
+
+   //---
+   //--- in the case where oracle=MCKP0, we have a specialized solver
+   //--- in the case where oracle=MDKP,  we do not have a specialized solver
+   //---   so, we just return with no solution and the framework will 
+   //---   attempt to use the built-in MILP solver
+   //---
+   DecompSolverStatus solverStatus = DecompSolStatNoSolution;
+   if(m_appParam.ModelNameRelax == "MCKP0"){
+      vector<int>           solInd;
+      vector<double>        solEls;
+      double                varRedCost    = 0.0;
+      double                varOrigCost   = 0.0;
+      MMKP_MCKnap         * mcknapK       = m_mcknap[whichBlock];
+      //TODO: check status return codes here
+      mcknapK->solveMCKnap(redCostX, m_objective,
+                           solInd, solEls, varRedCost, varOrigCost);
+      assert(static_cast<int>(solInd.size()) == m_instance.getNGroupRows());
+      
+      UTIL_DEBUG(m_param.LogDebugLevel, 4,
+                 printf("PUSH var with k = %d RC = %g origCost = %g\n", 
+                        whichBlock, varRedCost - convexDual, varOrigCost);
+                 );
+      
+      //the user should not have to calculate orig cost too
+      //  the framework can do this... in fact the framework shoudl
+      //  calculate red-cost too... but the user might want to check this stuff
+      
+      //this is way too confusing for user to remember they need -alpha!
+      //  let framework do that - also setting the block id - framework!
+      DecompVar * var = new DecompVar(solInd, solEls, 
+                                      varRedCost - convexDual, varOrigCost);
+      var->setBlockId(whichBlock);
+      varList.push_back(var);      
+      solverStatus = DecompSolStatOptimal;
+   }
+           
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+                    "solveRelaxedNest()", m_appParam.LogLevel, 2);
+   return solverStatus;
+}
+#endif
 

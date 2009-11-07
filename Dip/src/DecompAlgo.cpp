@@ -1949,6 +1949,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_PRICE1:
    case PHASE_PRICE2:
       m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
+      //changed to primal on 11/7
+      m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
       //commented out 11/7
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
@@ -1959,11 +1961,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #endif
       break;
    case PHASE_CUT:
-#ifdef DO_INTERIOR
-      CPXhybbaropt(env, lp, 0);
-#else
+      m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
       m_masterSI->resolve();
-#endif
       break;
    default:
       assert(0);
