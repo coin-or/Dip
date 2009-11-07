@@ -15,7 +15,7 @@ do
   done
   grep "DIRECT SOLVE" *.out > report.direct.txt
 
-  for t in p p3 p4 p5 c c2
+  for t in p p3 p4 p5 p6 c c2
   do
     echo ${HOME}/running${VERSION}/decomp${OPT}/${i}/${i}${t}    
     cd ${HOME}/running${VERSION}/decomp${OPT}/${i}/${i}${t}    
