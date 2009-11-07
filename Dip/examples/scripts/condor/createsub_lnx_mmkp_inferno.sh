@@ -2,16 +2,14 @@
 
 NAME=$1 #example=mmkpp
 OPT=$2  #example=-g or -O
-
-#orclus
-#EXECUTABLE=${HOME}/bin/decomp/decomp_mmkp${OPT}
+VERSION=$3 #example=   or -10 (the latter uses cpx10.2)
 
 #inferno
 EXECUTABLE=/usr/local/bin/perl
 
-PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
-INIT_DIR=${HOME}/running/decomp${OPT}/mmkp/${NAME}
-WRAP_DIR=${HOME}/running
+PARAM_FILE=${HOME}/bin${VERSION}/decomp/${NAME}.parm
+INIT_DIR=${HOME}/running${VERSION}/decomp${OPT}/mmkp/${NAME}
+WRAP_DIR=${HOME}/running${VERSION}
 ARGS="--param ${NAME}.parm"
 
 
@@ -38,6 +36,10 @@ EXTEN=""
 #requirements = (Subnet == "192.168.3")
 #notify_user  = magh@lehigh.edu
 
+#release the job on hold after so many minutes
+#periodic_release = (JobStatus == 5) && (CurrentTime - EnteredCurrentStatus > ${HOLD_SECONDS})
+
+
 echo "
 #get your environment
 getenv       = TRUE
@@ -55,6 +57,7 @@ periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > ${MA
 
 #release the job on hold after so many minutes
 periodic_release = (JobStatus == 5) && (CurrentTime - EnteredCurrentStatus > ${HOLD_SECONDS})
+
 
 # executable: ${EXEC_STATUS}
 # -----------------------------------------------------------------------------

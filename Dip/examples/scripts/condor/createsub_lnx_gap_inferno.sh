@@ -1,17 +1,15 @@
 #!/bin/bash
 
-NAME=$1 #example=gapp
-OPT=$2  #example=-g or -O
+NAME=$1    #example=gapp
+OPT=$2     #example=-g or -O
+VERSION=$3 #example=   or -10 (the latter uses cpx10.2)
 
-#EXECUTABLE=${HOME}/bin/decomp/decomp_gap${OPT}
 #inferno
 EXECUTABLE=/usr/local/bin/perl
-
-PARAM_FILE=${HOME}/bin/decomp/${NAME}.parm
-INIT_DIR=${HOME}/running/decomp${OPT}/gap/${NAME}
-WRAP_DIR=${HOME}/running
+PARAM_FILE=${HOME}/bin${VERSION}/decomp/${NAME}.parm
+INIT_DIR=${HOME}/running${VERSION}/decomp${OPT}/gap/${NAME}
+WRAP_DIR=${HOME}/running${VERSION}
 ARGS="--param ${NAME}.parm"
-
 
 DATA_DIR=${HOME}/COIN/coin-Dip/Dip/data/GAP
 OUT_FILE=condor${OPT}.${NAME}.submit
@@ -34,6 +32,9 @@ EXTEN=""
 #inferno
 #requirements = (Subnet == "192.168.3")
 
+#release the job on hold after so many minutes
+#periodic_release = (JobStatus == 5) && (CurrentTime - EnteredCurrentStatus > ${HOLD_SECONDS})
+
 
 echo "
 #get your environment
@@ -52,6 +53,7 @@ periodic_remove = (JobStatus == 2) && (CurrentTime - EnteredCurrentStatus > ${MA
 
 #release the job on hold after so many minutes
 periodic_release = (JobStatus == 5) && (CurrentTime - EnteredCurrentStatus > ${HOLD_SECONDS})
+
 
 # executable: ${EXEC_STATUS}
 # -----------------------------------------------------------------------------
