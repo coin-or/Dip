@@ -330,7 +330,9 @@ public:
       //TODO: make param
       double tightGap = m_param.MasterGapLimit;
       if(m_param.LogDebugLevel >= 2){
-	 (*m_osLog) << "DW GAP = " << UtilDblToStr(m_relGap) << "\n";
+	 (*m_osLog) << "DW GAP = " << UtilDblToStr(m_relGap) 
+		    << " isTight = " << (m_relGap <= tightGap) 
+		    << "\n";
       }
       if(m_relGap <= tightGap)
 	 return true;

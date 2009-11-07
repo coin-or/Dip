@@ -2438,11 +2438,12 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    else{
       relGap = fabs(mostNegRC) / fabs(zDW_UB);
    }
-   if(m_param.LogDebugLevel >= 2){
-      (*m_osLog) << "DW relGap = " << UtilDblToStr(relGap) << "\n";
-   }
    if(relGap <= tightGap)
       isGapTight = true;
+   if(m_param.LogDebugLevel >= 2){
+      (*m_osLog) << "DW relGap = " << UtilDblToStr(relGap) 
+		 << " isTight = " << isGapTight << "\n";
+   }
    m_relGap = relGap;
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -2814,18 +2815,17 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
       //---
       //--- are we suggesting another price phase but gap is tight?
       //---
-	  //--- ppp, gaptight, ccppp, gaptight c
-	  gapTight = isGapTight();
-	  if(gapTight && isCutPossible)
-		  if(cutCallsTotal == 0 ||  //haven't even tried cuts yet
-			 varsThisRound > 0){    //some new vars, try cut again
-		  //---
-		  //--- we haven't even tried cuts yet, give it a try
-		  //---
-		  nextPhase = PHASE_CUT;
-	  }
-      if(nextPhase == PHASE_PRICE2 && gapTight
-		   ){
+      //--- ppp, gaptight, ccppp, gaptight c
+      gapTight = isGapTight();
+      if(gapTight && isCutPossible)
+	 if(cutCallsTotal == 0 ||  //haven't even tried cuts yet
+	    varsThisRound > 0){    //some new vars, try cut again
+	    //---
+	    //--- we haven't even tried cuts yet, give it a try
+	    //---
+	    nextPhase = PHASE_CUT;
+	 }
+      if(nextPhase == PHASE_PRICE2 && gapTight){
          m_stopCriteria = DecompStopGap;
          
          //---
@@ -2876,6 +2876,45 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    goto PHASE_UPDATE_FINISH;
 	 }
 
+	 //---
+	 //--- if tight was gap, the we went to cuts and found none,
+	 //---   then stop on gap
+	 //---
+	 gapTight = isGapTight();
+	 if(priceCallsTotal > 0 && cutsThisCall == 0 && gapTight){
+	    m_stopCriteria = DecompStopGap;
+	    
+	    //---
+	    //--- Even if we are stop on gap, we need to be careful of 
+	    //--- the following: If the last solution was integral (no 
+	    //--- branching candidates) but we are not done pricing out 
+	    //--- (i.e., a column with negative RC still exist) and we 
+	    //--- declare that we are tailing off then the node will get 
+	    //--- put back in the node work queue. This can lead to that 
+	    //--- node being repeatedly stopped and reseted. It is better 
+	    //--- to just price it out since we cannot branch on it in 
+	    //--- this state.
+	    //---
+	    UTIL_DEBUG(m_param.LogDebugLevel, 3,
+		       (*m_osLog) << "Gap is tight" << endl;);
+	    int    branchedOnIndex = -1;
+	    double branchedOnValue =  0;
+	    chooseBranchVar(branchedOnIndex, branchedOnValue);
+	    if(branchedOnIndex != -1){
+	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
+			  (*m_osLog) << "Gap is tight and we have a " 
+			  << "branch candidate" << endl;);
+	       nextPhase = PHASE_DONE;
+	       goto PHASE_UPDATE_FINISH;
+	    }
+	    else{
+	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
+			  (*m_osLog) << "Gap is tight and we have NO " 
+			  << "branch candidate" << endl;);
+	    }
+	 }
+	 
+      
 	 //---
 	 //--- Princess Bride (1987):
 	 //---   "truly, you have a dizzying intellect"
