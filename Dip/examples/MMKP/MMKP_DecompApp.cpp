@@ -237,6 +237,46 @@ void MMKP_DecompApp::createModels(){
       m_models.push_back(modelRelax);
       setModelRelax(modelRelax, m_appParam.ModelNameRelax);
    }
+
+   //---
+   //--- Model
+   //---    relax = MDKP (with knapsack constraints 1..floor(m/2))
+   //---    relax = MDKP (with knapsack constraints 1..m) -> nested
+   //---    core  = MCP  (with choice constraints)
+   //---
+   //--- A' (relax) = MDKP
+   //---   sum{i in 1..n, j in 1..l[i]}  r[k,i,j] x[i,j] <= b[k], k in 1..m
+   //---   x[i,j] in {0,1}, i in 1..n, j in 1..l[i]
+   //--- A'' (master) + missing from MDKP
+   //---   sum{j in 1..l[i]}                      x[i,j]  = 1   , i in 1..n
+   //---   x[i,j] in [0,1], i in 1..n, j in 1..l[i]
+   //---
+   //--- which half? those with tight knapsack
+   //---
+   if(m_appParam.ModelNameCore == "MMKPHalf"){
+      DecompConstraintSet * modelCore  = new DecompConstraintSet();      
+      createModelPartMMKPHalf(modelCore);
+      m_models.push_back(modelCore);
+      setModelCore(modelCore, m_appParam.ModelNameCore);
+   }
+   if(m_appParam.ModelNameRelax == "MDKPHalf"){      
+      DecompConstraintSet * modelRelax = new DecompConstraintSet();
+      createModelPartMDKPHalf(modelRelax);
+      m_models.push_back(modelRelax);
+      setModelRelax(modelRelax, m_appParam.ModelNameRelax);
+   }
+   if(m_appParam.ModelNameRelaxNest == "MDKP"){      
+      DecompConstraintSet * modelRelax = new DecompConstraintSet();
+      createModelPartMDKP(modelRelax);
+      m_models.push_back(modelRelax);
+      setModelRelaxNest(modelRelax, m_appParam.ModelNameRelax);
+   }
+   if(m_appParam.ModelNameRelaxNest == "MMKP"){      
+      DecompConstraintSet * modelRelax = new DecompConstraintSet();
+      createModelPartMMKP(modelRelax);
+      m_models.push_back(modelRelax);
+      setModelRelaxNest(modelRelax, m_appParam.ModelNameRelax);
+   }
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModels()", m_appParam.LogLevel, 2);
 }
@@ -258,6 +298,18 @@ void MMKP_DecompApp::createModelPartMDKPCompl(DecompConstraintSet * model,
    for(i = 0; i < nKnapRows; i++){
       if(i == whichKnap)
          continue;
+      whichKnaps.push_back(i);
+   }
+   createModelPartMDKP(model, whichKnaps);
+}
+
+//===========================================================================//
+void MMKP_DecompApp::createModelPartMDKPHalf(DecompConstraintSet * model){
+   int         i;
+   vector<int> whichKnaps;
+   const int   nKnapRows  = m_instance.getNKnapRows();
+   const int   nHalfRows  = static_cast<int>(std::floor(nKnapRows/2.0));
+   for(i = 0; i < nHalfRows; i++){
       whichKnaps.push_back(i);
    }
    createModelPartMDKP(model, whichKnaps);
@@ -333,6 +385,27 @@ void MMKP_DecompApp::createModelPartMCKP(DecompConstraintSet * model,
                                          int                   whichKnap){
    vector<int> whichKnaps;
    whichKnaps.push_back(whichKnap);
+   createModelPartMCKP(model, whichKnaps);
+}
+
+//===========================================================================//
+void MMKP_DecompApp::createModelPartMMKPHalf(DecompConstraintSet * model){
+   vector<int> whichKnaps;
+   int         i;
+   const int   nKnapRows  = m_instance.getNKnapRows();
+   const int   nHalfRows  = static_cast<int>(std::floor(nKnapRows/2.0));
+   for(i = nHalfRows; i < nKnapRows; i++)
+      whichKnaps.push_back(i);
+   createModelPartMCKP(model, whichKnaps);
+}
+
+//===========================================================================//
+void MMKP_DecompApp::createModelPartMMKP(DecompConstraintSet * model){
+   vector<int> whichKnaps;
+   int         i;
+   const int   nKnapRows  = m_instance.getNKnapRows();
+   for(i = 0; i < nKnapRows; i++)
+      whichKnaps.push_back(i);
    createModelPartMCKP(model, whichKnaps);
 }
 

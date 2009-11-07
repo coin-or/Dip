@@ -56,17 +56,24 @@ public:
 
    bool checkOptions(){
       bool optionsOk = true;
-      if(!(ModelNameCore == "MDKP0" || ModelNameCore == "MCP")){
+      if(!(ModelNameCore == "MDKP0" || 
+	   ModelNameCore == "MCP"   ||
+	   ModelNameCore == "MMKPHalf")){
          cerr << "Error: Parameter ModelNameCore = " << ModelNameCore
               << " is not a defined model choice." << endl;
          optionsOk = false;
       }
-      if(!(ModelNameRelax == "MCKP0" || ModelNameRelax == "MDKP")){
+      if(!(ModelNameRelax == "MCKP0" || 
+	   ModelNameRelax == "MDKP"  ||
+	   ModelNameRelax == "MDKPHalf")){
          cerr << "Error: Parameter ModelNameRelax = " << ModelNameRelax
               << " is not a defined model choice." << endl;
          optionsOk = false;
       }
-      if(!(ModelNameRelaxNest == "MC2KP0" || ModelNameRelaxNest == "")){
+      if(!(ModelNameRelaxNest == "MC2KP0" || 
+	   ModelNameRelaxNest == "MDKP"   ||
+	   ModelNameRelaxNest == "MMKP"   ||
+	   ModelNameRelaxNest == "")){
          cerr << "Error: Parameter ModelNameRelaxNest = " 
               << ModelNameRelaxNest
               << " is not a defined model choice." << endl;

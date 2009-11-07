@@ -89,11 +89,14 @@ public:
                              int                   whichKnap2);
    void createModelPartMCKP(DecompConstraintSet * model,
                             vector<int>         & whichKnaps);
+   void createModelPartMMKPHalf(DecompConstraintSet * model);
+   void createModelPartMMKP(DecompConstraintSet * model);
    
    /* Create MDKP model. */
    void createModelPartMDKPCompl(DecompConstraintSet * model,
                                  int                   whichKnap = 0);
    void createModelPartMDKP(DecompConstraintSet * model);
+   void createModelPartMDKPHalf(DecompConstraintSet * model);
    void createModelPartMDKP(DecompConstraintSet * model,
                             vector<int>         & whichKnaps);
 
