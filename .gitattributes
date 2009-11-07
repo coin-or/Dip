@@ -69,6 +69,8 @@ Dip/data/MILP/block/retail.direct.parm -text
 Dip/data/MILP/block/retail.direct.sh -text
 Dip/data/MILP/block/retail.pc.parm -text
 Dip/data/MILP/block/retail.pc.sh -text
+Dip/data/MILP/block/ssr/ssr1.block -text
+Dip/data/MILP/block/ssr/ssr1.mps -text
 Dip/data/MILP/miplib/cbcpre.sh -text
 Dip/data/MILP/miplib/get.data -text
 Dip/data/MILP/miplib/miplib3.list -text
