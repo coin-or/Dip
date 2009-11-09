@@ -1,43 +1,20 @@
-doGenRandom  = 0
-randSeed     = 1
-randNumAtms  = 5
-randNumDates = 25
-
 doCut           = 0
 doPriceCut      = 1
 doDirect        = 0
 timeLimit       = 3600
 
 [DECOMP]
-LogLevel      = 3
-LogAppLevel   = 1
-LogLpLevel    = 0
-LogDebugLevel = 3
-CutCGL        = 1
-CutCglKnapC   = 1
-CutCglFlowC   = 1
-CutCglMir     = 1
-CutCglClique  = 1
+LogLevel      = 2
 SolveMasterAsIp = 1
 LimitTime = 3600
 
-[CUT]
-CutCglGomory = 1
-
-[PRICE_AND_CUT]
-CutCglGomory = 0
-InitVarsWithCutDC       = 0
-LimitRoundCutIters      = 10
-LimitRoundPriceIters    = 10
-LimitInitVars           = 2
 
 [ALPS]
 nodeLogInterval = 1
-msgLevel        = 2
 timeLimit       = 3600
 
 [ATM]
-DataDir     = /home/magh/AFS/coin-Decomp/Decomp/data/ATM
+DataDir     = /home/magh/AFS/COIN/coin-Dip/Dip/data/ATM
 
 ModelNameCore  = BUDGET
 ModelNameRelax = CASH_COUNT
