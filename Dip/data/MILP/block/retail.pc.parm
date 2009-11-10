@@ -1,44 +1,25 @@
 doCut         = 0
 doPriceCut    = 1
-doRelaxCut    = 0
 doDirect      = 0
 timeLimit     = 3600
 
 [DECOMP]
-LogLevel      = 1
-LogAppLevel   = 0
-LogLpLevel    = 0
-LogDebugLevel = 1
-LogDumpModel  = 0
-CutCGL        = 1
-CutCglKnapC   = 1
-CutCglFlowC   = 1
-CutCglMir     = 1
-CutCglClique  = 1
+LogLevel      = 2
 LimitTime = 3600
 
-[CUT]
-CutGomory = 1
-
 [PRICE_AND_CUT]
-CutCglGomory            = 0
 SolveMasterAsIp         = 1
-CutCGL                  = 1
-LimitRoundCutIters      = 10
-LimitRoundPriceIters    = 10
-LimitInitVars           = 2
-InitVarsWithIP          = 1
-InitVarsWithIPLimitTime = 10
+#InitVarsWithIP          = 1
+#InitVarsWithIPLimitTime = 10
 
 [ALPS]
-nodeLogInterval = 100
-msgLevel        = 2
+nodeLogInterval = 1
 timeLimit       = 3600
 
 [MILPBlock]
-LogLevel     = 3
+LogLevel     = 2
 
-DataDir     = /home/magh/AFS/coin-Decomp/Decomp/data/MILP/block/retail
+DataDir     = /home/magh/AFS/COIN/coin-Dip/Dip/data/MILP/block/retail
 
 #BlockFile       = atm_5_10_1.block
 #BlockFileFormat = List
