@@ -67,6 +67,8 @@ Dip/data/MILP/block/results/retail_cpx11.3600.txt -text
 Dip/data/MILP/block/results/retail_pc1.300.txt -text
 Dip/data/MILP/block/results/retail_pc1.3600.txt -text
 Dip/data/MILP/block/results/retail_pc2.3600.txt -text
+Dip/data/MILP/block/results/retail_pc_1.3600.txt -text
+Dip/data/MILP/block/results/retail_pc_2.3600.txt -text
 Dip/data/MILP/block/retail.direct.parm -text
 Dip/data/MILP/block/retail.direct.sh -text
 Dip/data/MILP/block/retail.pc.parm -text
