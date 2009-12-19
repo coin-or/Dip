@@ -46,10 +46,11 @@ Settings for MMKP application.
 LogLevel       = 2
 
 # Path to instance data.
-DataDir        = @srcdir@/../../data/MMKP
+DataFormat     = hifi
+DataDir        = @srcdir@/../../data/MMKP/hifi
 
 # Name of file for instance (assumed to be in DataDir).
-Instance        = I02
+Instance        = I2
 ModelNameCore   = MDKP0
 ModelNameRelax  = MCKP0
 
