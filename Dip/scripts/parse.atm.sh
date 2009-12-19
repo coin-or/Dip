@@ -6,5 +6,5 @@
 awk '{print $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12}' pc.3600.2 > tmp.2
 awk '{print $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12 "\\\\ \\hline"}' pc.3600.1 > tmp.1
 
-paste cpx.3600 pc.3600.2 pc.3600.1 > results.3600
+paste cpx.3600 tmp.2 tmp.1 > results.3600
 

@@ -38,7 +38,8 @@ else{
  }
 }
 }' tmp2 > tmp3
-sort -n +0 -1 +2 -3 tmp3 > pc.${TIME}
+#sort -n +0 -1 +2 -3 tmp3 > pc.${TIME}
+sort tmp3 > pc.${TIME}
 
 #rm tmp
 #rm tmp2
