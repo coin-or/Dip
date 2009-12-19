@@ -191,7 +191,6 @@ Dip/examples/MMKP/get_pisinger.sh.in -text
 Dip/examples/MMKP/mmkp.parm.in -text
 Dip/examples/MMKP/old/old.cpp -text
 Dip/examples/Makefile.Examples.in -text
-Dip/examples/SSR/test -text
 Dip/examples/SmallIP/Makefile.in -text
 Dip/examples/SmallIP/README.txt.in -text
 Dip/examples/SmallIP/SmallIP_DecompApp.cpp -text
