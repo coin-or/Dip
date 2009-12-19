@@ -18,6 +18,7 @@
 //===========================================================================//
 #include "CoinWarmStartBasis.hpp"
 
+//#define   DO_INTERIOR //also in DecompAlgo
 
 //===========================================================================//
 void DecompAlgoPC::phaseInit(DecompPhase & phase){
@@ -214,7 +215,7 @@ int DecompAlgoPC::compressColumns(){
    //   if(c < nMasterCols)
    //	 isBasic[c] = true;
    //}
-
+#ifndef DO_INTERIOR
    bool            mustDeleteWS = false;
    CoinWarmStartBasis * warmStart    
       = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(mustDeleteWS));
@@ -224,7 +225,7 @@ int DecompAlgoPC::compressColumns(){
    }
    if(mustDeleteWS)
       UTIL_DELPTR(warmStart);
-   
+#endif   
    //---
    //--- sanity check
    //---    m_vars should contain just the structural columns

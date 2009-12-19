@@ -22,6 +22,7 @@
 //#define DEBUG_SOLVE_RELAXED
 //#define   RELAXED_THREADED
 #define   NTHREADS   2
+//#define   DO_INTERIOR //also in DecompAlgoPC
 
 //===========================================================================//
 //#define STAB_DUMERLE
@@ -1909,7 +1910,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    
    m_stats.timerOther1.reset();
    
-   int i;
+   int i, cpxStat=0, cpxMethod=0;
    DecompStatus status = STAT_UNKNOWN;
 
    //---
@@ -1941,7 +1942,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
    int preInd = 0;
    CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
-   //printf("preind=%d\n",preInd);
+   printf("preind=%d\n",preInd);
 #endif
 
   
@@ -1949,13 +1950,20 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_PRICE1:
    case PHASE_PRICE2:
       m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
-      //changed to primal on 11/7
-      m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-      //commented out 11/7
+
+      //m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+      m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+
+
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 #ifdef DO_INTERIOR //TODO: option, not compile time
-      CPXhybbaropt(env, lp, 0);
+      //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
+      CPXbaropt(env, lp);
+      cpxMethod = CPXgetmethod(env, lp);
+      cpxStat = CPXgetstat(env, lp);
+      if(cpxStat)
+	 printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
 #else
       m_masterSI->resolve();
 #endif
@@ -2049,7 +2057,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
          }
       }
    }
-   else if(m_masterSI->isProvenPrimalInfeasible()){
+   else if(m_masterSI->isProvenPrimalInfeasible() ||
+	   m_masterSI->isProvenDualInfeasible()){
+      //for interior, if infeasible, the status is not
+      //  getting picked up properly by OSI
+
+
       status = STAT_INFEASIBLE;
       //---
       //--- it is possible that presolver determined infeasibility
@@ -2061,9 +2074,18 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       m_masterSI->resolve();
       m_masterSI->setHintParam(OsiDoPresolveInResolve, true,  OsiHintDo);
    }
-   else{
-      assert(0);
-   }
+   else
+      {
+#ifdef DO_INTERIOR
+	 if(m_masterSI->isDualObjectiveLimitReached()){
+	    status = STAT_INFEASIBLE;
+	 }
+	 else
+#endif
+	    {
+	       assert(0);
+	    }
+      }
 
 
    //---
@@ -2667,7 +2689,8 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 		  (*m_osLog) 
 		  << "PhaseIObj= " << UtilDblToStr(phaseIObj) << endl;);
          m_phaseIObj.push_back(phaseIObj);
-	 if(phaseIObj <= DecompZero){
+	 //if(phaseIObj <= DecompZero){
+	 if(phaseIObj <= DecompEpsilon){ //11/09/09
 	    //---
 	    //--- switch to PHASE II (art=0)
 	    //---
@@ -3851,6 +3874,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    M->transposeTimes(pi, uA);
 
 
+#ifndef DO_INTERIOR 
    for(i = 0; i < nCols; i++){
       if(!UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ){
 	 printf("ERR in COMPL-SLACK i:%d objC:%15.10f uA:%15.10f x:%15.10f\n",
@@ -3863,6 +3887,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 assert(0);
       }      
    }
+#endif
    UTIL_DELARR(uA);
 
 
