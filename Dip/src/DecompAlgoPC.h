@@ -40,6 +40,9 @@ private:
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
    string m_classTag;
+   vector<double> m_dual;    //duals from stabilized (if bound improved)
+   vector<double> m_dualRM;  //duals from restricted master
+   vector<double> m_dualST;  //duals from stabilized method
 
    /**
     * @}
@@ -62,6 +65,39 @@ private:
       return DecompAlgo::generateVarsFea(newVars, mostNegReducedCost);
    }
    virtual void phaseInit(DecompPhase & phase);
+
+
+   virtual const double * getRowPrice() const {
+      //---
+      //--- return the duals to be used in pricing step
+      //---
+#ifdef DUAL_SMOOTHING
+      //---
+      //--- resize dual vectors
+      //---
+      int nRows = m_masterSI->getNumRows();
+      m_dual.resize(nRows);
+      m_dualRM.resize(nRows);
+      m_dualST.resize(nRows);
+
+      //---
+      //--- calculate smoothed dual
+      //---    pi_ST = alpha * pi_Bar + (1-alpha) * pi_RM
+      //---
+      int    r;
+      double u      = m_masterSI->getRowPrice();
+      double alpha  = m_param.DualAlphStab;
+      double alpha1 = 1.0 - alpha; 
+      copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+      for(r = 0; r < nRows; r++){
+         m_dualST[r] = (alpha * m_dual[r]) + (alpha1 * m_dualRM[r]);
+      }      
+      return &m_dual[0];
+#else      
+      return m_masterSI->getRowPrice();
+#endif
+   }
+
    
    /**
     * @}

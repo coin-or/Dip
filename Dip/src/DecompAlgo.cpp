@@ -3693,12 +3693,11 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //--- every block every time (default for now).
    //---
 
-   int            i, b;
-   DecompVarList  potentialVars;
-   DecompConstraintSet          * modelCore   = m_modelCore.getModel();
+   int                   i, b;
+   DecompVarList         potentialVars;
+   DecompConstraintSet * modelCore   = m_modelCore.getModel();
    const int      m             = m_masterSI->getNumRows();
-   //const int      nBaseCoreRows = modelCore->nBaseRows;//what about cuts?
-   int      nBaseCoreRows = modelCore->nBaseRows;//what about cuts?
+   int            nBaseCoreRows = modelCore->nBaseRows;
    const int      nCoreCols     = modelCore->getNumCols();
    const double * u             = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
@@ -3708,27 +3707,16 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int    whichBlock;
    double varRedCost;
    DecompVarList::iterator it;
-   vector<double*> dualRays;
-
 
    if(m_algo == DECOMP)
       nBaseCoreRows = nCoreCols;
-                     
+   
+   assert(!m_masterSI->isProvenPrimalInfeasible());
+   u = getRowPrice();
+
 
    
-   if(m_masterSI->isProvenPrimalInfeasible()){
-      printf("MASTER IS INFEASIBLE, using DualRay\n");
-      assert(0);//we use art - this should not happen
-      dualRays   = getDualRays(1000);
-      assert(dualRays[0]);
-      u = dualRays[0];
-   }
-   else{
-      u = getRowPrice();
-   }      
-
-
-   //includes artificials now!
+   //THINK: includes artificials now
    redCostX = new double[nCoreCols]; // (c - uhat.A") in x-space
    assert(redCostX);
 
@@ -3876,7 +3864,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
 #ifndef DO_INTERIOR 
    for(i = 0; i < nCols; i++){
-      if(!UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ){
+      if(!UtilIsZero( x[i], 1.0e-5 ) &&
+         !UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ){
 	 printf("ERR in COMPL-SLACK i:%d objC:%15.10f uA:%15.10f x:%15.10f\n",
 		i, objC[i], uA[i], x[i]); fflush(stdout);
 	 assert(0);
@@ -4365,10 +4354,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //---
    UTIL_DELARR(u_adjusted);
    UTIL_DELARR(redCostX);
-   for(r = 0; r < (int)dualRays.size(); r++){
-      UTIL_DELARR(dualRays[r]);
-   }
-
 
    m_stats.thisGenVars.push_back(m_stats.timerOther1.getRealTime()); 
    UtilPrintFuncEnd(m_osLog, m_classTag,

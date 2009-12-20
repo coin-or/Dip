@@ -103,6 +103,8 @@ public:
    //  hopefully identify infeasibiity in tree quicker
    int    InitCompactSolve;
 
+   double DualStabAlpha;
+
    /**
     * @}
     */
@@ -153,6 +155,7 @@ public:
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
       PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
+      PARAM_getSetting("DualAlphaStab",        DualStabAlpha);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -218,6 +221,7 @@ public:
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
       UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
+      UtilPrintParameter(os, sec, "DualAlphaStab",     DualAlphaStab);
       (*os) << "========================================================\n";
    }
 
@@ -257,6 +261,7 @@ public:
       InitVarsWithIP       = 0;
       InitVarsWithIPLimitTime = 10;
       InitCompactSolve      = 0;
+      DualAlphaStab         = 0.10;
    }
    
    void dumpSettings(ostream * os = &cout){
