@@ -155,7 +155,7 @@ public:
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
       PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
-      PARAM_getSetting("DualAlphaStab",        DualStabAlpha);
+      PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -221,7 +221,7 @@ public:
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
       UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
-      UtilPrintParameter(os, sec, "DualAlphaStab",     DualAlphaStab);
+      UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       (*os) << "========================================================\n";
    }
 
@@ -261,7 +261,7 @@ public:
       InitVarsWithIP       = 0;
       InitVarsWithIPLimitTime = 10;
       InitCompactSolve      = 0;
-      DualAlphaStab         = 0.10;
+      DualStabAlpha         = 0.10;
    }
    
    void dumpSettings(ostream * os = &cout){

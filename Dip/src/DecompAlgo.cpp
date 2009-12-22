@@ -1798,6 +1798,18 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	 }
       }
    }
+
+   if(m_xhatIPBest){
+      UTIL_DEBUG(m_param.LogLevel, 3,
+		 (*m_osLog) << "Best Feasible Solution with Quality = " 
+		 << UtilDblToStr(m_xhatIPBest->getQuality(), 6) << "\n";
+		 m_app->printOriginalSolution(modelCore->getNumCols(),
+					      modelCore->getColNames(),
+					      m_xhatIPBest->getValues());
+		 );
+   }
+
+
    UTIL_DEBUG(m_param.LogDebugLevel, 3,
 	      (*m_osLog) << "StatOut     : " 
 	      << DecompStatusStr[m_status] << "\n";
