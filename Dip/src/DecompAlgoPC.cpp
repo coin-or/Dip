@@ -481,6 +481,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    //--- build argument list
    //---
+   //TODO: time limit
+   //TODO: cutoff param
    const char * argv[20];
    int    argc         = 0;
    string cbcExe       = "cbc";
@@ -600,6 +602,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    int status = 0;
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
                            m_param.SubProbGapLimitExact);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+                          "solutionUpdateAsIp", "DecompAlgoPC");
+
+   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
+                           m_param.SolveMasterAsIpLimitTime);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+                          "solutionUpdateAsIp", "DecompAlgoPC");
+      
+   status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, m_globalUB);
    if(status)
       throw UtilException("CPXsetdblparam failure", 
                           "solutionUpdateAsIp", "DecompAlgoPC");

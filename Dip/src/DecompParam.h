@@ -41,6 +41,8 @@ public:
    int    LogDumpModel;
    int    LimitInitVars; 
 
+   int    DebugLevel;//=0 (default), =1 (extra checks on duals, etc)
+
    double TolZero;
    int    LimitTotalCutIters;
    int    LimitTotalPriceIters;
@@ -85,6 +87,7 @@ public:
    //solve master as IP at end of each node (this should only be done
    //  if there are more than one blocks)
    int    SolveMasterAsIp;
+   double SolveMasterAsIpLimitTime;
    
    //0 = If a user function is defined, it will use the user function.
    //    If the user returns an exact solution, it will not run the built-in
@@ -125,6 +128,7 @@ public:
       PARAM_getSetting("LogLpLevel",           LogLpLevel);
       PARAM_getSetting("LogDumpModel",         LogDumpModel);
       PARAM_getSetting("LimitInitVars",        LimitInitVars);
+      PARAM_getSetting("DebugLevel",           DebugLevel);
       PARAM_getSetting("TolZero",              TolZero);
       PARAM_getSetting("LimitTotalCutIters",   LimitTotalCutIters);
       PARAM_getSetting("LimitTotalPriceIters", LimitTotalPriceIters);
@@ -150,6 +154,7 @@ public:
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
       PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
+      PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
       PARAM_getSetting("InitVarsWithCutDC",    InitVarsWithCutDC);
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
@@ -189,6 +194,7 @@ public:
       UtilPrintParameter(os, sec, "LogLpLevel",          LogLpLevel);
       UtilPrintParameter(os, sec, "LogDumpModel",        LogDumpModel);
       UtilPrintParameter(os, sec, "LimitInitVars",       LimitInitVars);
+      UtilPrintParameter(os, sec, "DebugLevel",          DebugLevel);
       UtilPrintParameter(os, sec, "TolZero",             TolZero);
       UtilPrintParameter(os, sec, "LimitTotalCutIters",  LimitTotalCutIters);
       UtilPrintParameter(os, sec, "LimitTotalPriceIters",LimitTotalPriceIters);
@@ -216,6 +222,7 @@ public:
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
       UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);  
       UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
       UtilPrintParameter(os, sec, "InitVarsWithCutDC",   InitVarsWithCutDC);
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
@@ -231,6 +238,7 @@ public:
       LogLpLevel           = 0;
       LogDumpModel         = 0;
       LimitInitVars        = 5;
+      DebugLevel           = 0;
       TolZero              = DecompEpsilon;
       LimitTotalCutIters   = COIN_INT_MAX;
       LimitTotalPriceIters = COIN_INT_MAX;
@@ -256,6 +264,7 @@ public:
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
       SolveMasterAsIp      = 1;//TODO: turn off if one block
+      SolveMasterAsIpLimitTime = 30;
       SolveRelaxAsIp       = 0;
       InitVarsWithCutDC    = 0;
       InitVarsWithIP       = 0;

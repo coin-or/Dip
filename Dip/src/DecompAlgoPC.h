@@ -10,6 +10,7 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
+#define DUAL_SMOOTHING
 
 //===========================================================================//
 #ifndef DecompAlgoPC_h_
@@ -67,7 +68,7 @@ private:
    virtual void phaseInit(DecompPhase & phase);
 
 
-   virtual const double * getRowPrice() const {
+   virtual const double * getRowPrice()  {
       //---
       //--- return the duals to be used in pricing step
       //---
@@ -75,7 +76,7 @@ private:
       //---
       //--- resize dual vectors
       //---
-      int nRows = m_masterSI->getNumRows();
+      size_t nRows = m_masterSI->getNumRows();
       m_dual.resize(nRows);
       m_dualRM.resize(nRows);
       m_dualST.resize(nRows);
@@ -84,20 +85,47 @@ private:
       //--- calculate smoothed dual
       //---    pi_ST = alpha * pi_Bar + (1-alpha) * pi_RM
       //---
-      int    r;
-      double u      = m_masterSI->getRowPrice();
-      double alpha  = m_param.DualAlphStab;
-      double alpha1 = 1.0 - alpha; 
+      int            r;
+      const double * u      = m_masterSI->getRowPrice();
+      double         alpha  = m_param.DualStabAlpha;
+      double         alpha1 = 1.0 - alpha; 
       copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
       for(r = 0; r < nRows; r++){
          m_dualST[r] = (alpha * m_dual[r]) + (alpha1 * m_dualRM[r]);
       }      
-      return &m_dual[0];
+
+      const vector<string> & rowNames = m_masterSI->getRowNames();
+      for(r = 0; r < m_masterSI->getNumRows(); r++){
+	 if(!(UtilIsZero(m_dual[r]) && UtilIsZero(m_dualRM[r]) && UtilIsZero(m_dualST[r]))){
+	    if(r < static_cast<int>(rowNames.size())){
+	       printf("MASTER %25s DUAL[%6d->%20s] = %12.10f RM = %12.10f ST = %12.10f\n",
+		      DecompRowTypeStr[m_masterRowType[r]].c_str(),
+		      r, rowNames[r].c_str(), m_dual[r], m_dualRM[r], m_dualST[r]);
+	    }
+	    else
+	       printf("MASTER %25s DUAL[%6d] = %12.10f RM = %12.10f ST = %12.10f\n",
+		      DecompRowTypeStr[m_masterRowType[r]].c_str(),
+		      r, m_dual[r], m_dualRM[r], m_dualST[r]);
+	 }
+      }
+	 
+      return &m_dualST[0];
 #else      
       return m_masterSI->getRowPrice();
 #endif
    }
 
+
+   virtual void setObjBoundLB(const double thisBound){
+      if(thisBound > m_nodeStats.objBest.first){
+#ifdef DUAL_SMOOTHING
+	 printf("Bound improved %g to %g, update duals\n",
+		m_nodeStats.objBest.first, thisBound);
+	 copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
+#endif
+      }
+      DecompAlgo::setObjBoundLB(thisBound);
+   }
    
    /**
     * @}

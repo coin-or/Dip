@@ -408,7 +408,7 @@ public:
 
    //here just for RC... ugh...
    //this is where a full working OsiNull might make life easier.
-   virtual const double * getRowPrice() const {
+   virtual const double * getRowPrice() {
       return m_masterSI->getRowPrice();
    }
 
@@ -673,7 +673,7 @@ public:
    /**
     * Set the current LB and update best/history.
     */
-   inline void setObjBoundLB(const double thisBound){
+   virtual void setObjBoundLB(const double thisBound){
       if(thisBound > m_nodeStats.objBest.first){
 	 m_nodeStats.objBest.first = thisBound;
       }

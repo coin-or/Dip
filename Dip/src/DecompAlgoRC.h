@@ -178,7 +178,7 @@ public:
 public:   
    bool isDone();
    //name - change to getDual?
-   const double * getRowPrice() const {
+   const double * getRowPrice() {
       return &m_u[0];
    }
  //user needs to do?
