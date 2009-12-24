@@ -317,7 +317,18 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");
-   
+
+   //---
+   //--- starting with CPX12, parallel MIP is on by default
+   //---   we do not want that (usually)
+   //--- TODO: make this a user option
+   //---
+#if CPX_VERSION >= 1100
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+			  "solveOsiAsIp", "DecompAlgoModel");
+#endif
    //---
    //--- solve the MILP
    //---
