@@ -23,6 +23,7 @@
 //#define   RELAXED_THREADED
 #define   NTHREADS   2
 //#define   DO_INTERIOR //also in DecompAlgoPC
+#define DUAL_SMOOTHING
 
 //===========================================================================//
 //#define STAB_DUMERLE
@@ -4807,7 +4808,6 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       //this is ugly, fix this later... make a helper funciton of DecompVar?
 
       //TODO: this is very expensive - use hash like in cuts
-#define DUAL_SMOOTHING
       if(m_varpool.isDuplicate(m_vars, waitingCol)){
 #ifndef DUAL_SMOOTHING
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
