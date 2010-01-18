@@ -45,27 +45,29 @@ host_triplet = @host@
 noinst_PROGRAMS = unitTest$(EXEEXT)
 @CPLEX_LP_SOLVER_TRUE@am__append_1 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 @CPLEX_IP_SOLVER_TRUE@am__append_2 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-@CLP_LP_SOLVER_TRUE@am__append_3 = -D__DECOMP_LP_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_4 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
+@COIN_HAS_ASL_TRUE@am__append_3 = $(ASL_CPPFLAGS) -DCOIN_HAS_ASL
+@COIN_HAS_ASL_TRUE@am__append_4 = $(ASLLIB)
+@CLP_LP_SOLVER_TRUE@am__append_5 = -D__DECOMP_LP_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_6 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
 @CPLEX_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @CPLEX_LP_SOLVER_TRUE@	-D__DECOMP_LP_CPX__
-@CPLEX_LP_SOLVER_TRUE@am__append_5 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@CPLEX_LP_SOLVER_TRUE@am__append_7 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@am__append_6 = -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+@CBC_IP_SOLVER_TRUE@am__append_8 = -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
 @CBC_IP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc` \
 @CBC_IP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
 @CBC_IP_SOLVER_TRUE@	-D__DECOMP_IP_CBC__
-@CBC_IP_SOLVER_TRUE@am__append_7 = $(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
+@CBC_IP_SOLVER_TRUE@am__append_9 = $(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
 @CBC_IP_SOLVER_TRUE@	$(CBCOBJDIR)/src/libCbc.la
 
-@CBC_IP_SOLVER_TRUE@am__append_8 = `cat $(CBCOBJDIR)/cbc_addlibs.txt`
-@CPLEX_IP_SOLVER_TRUE@am__append_9 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
+@CBC_IP_SOLVER_TRUE@am__append_10 = `cat $(CBCOBJDIR)/cbc_addlibs.txt`
+@CPLEX_IP_SOLVER_TRUE@am__append_11 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
 @CPLEX_IP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
 @CPLEX_IP_SOLVER_TRUE@	-D__DECOMP_IP_CPX__
-@CPLEX_IP_SOLVER_TRUE@am__append_10 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@CPLEX_IP_SOLVER_TRUE@am__append_12 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -84,13 +86,15 @@ unitTest_OBJECTS = $(nodist_unitTest_OBJECTS)
 @CPLEX_LP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 @CPLEX_IP_SOLVER_TRUE@am__DEPENDENCIES_3 =  \
 @CPLEX_IP_SOLVER_TRUE@	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+am__DEPENDENCIES_4 =
+@COIN_HAS_ASL_TRUE@am__DEPENDENCIES_5 = $(am__DEPENDENCIES_4)
 unitTest_DEPENDENCIES = $(DIPOBJDIR)/src/libDecomp.la \
 	$(ALPSOBJDIR)/src/libAlps.la \
 	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_3) $(CBCOBJDIR)/src/libCbcSolver.la \
 	$(CBCOBJDIR)/src/libCbc.la $(CLPOBJDIR)/src/libClp.la \
 	$(CGLOBJDIR)/src/libCgl.la $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__DEPENDENCIES_5)
 depcomp = $(SHELL) $(top_srcdir)/../depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -115,7 +119,7 @@ ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-ADDLIBS = `cat $(CLPOBJDIR)/clp_addlibs.txt` $(am__append_8)
+ADDLIBS = `cat $(CLPOBJDIR)/clp_addlibs.txt` $(am__append_10)
 ADD_CFLAGS = @ADD_CFLAGS@
 ADD_CXXFLAGS = @ADD_CXXFLAGS@
 ALPSDOCDIR = @ALPSDOCDIR@
@@ -328,7 +332,7 @@ unitTest_LDADD = $(DIPOBJDIR)/src/libDecomp.la \
 	$(am__append_2) $(CBCOBJDIR)/src/libCbcSolver.la \
 	$(CBCOBJDIR)/src/libCbc.la $(CLPOBJDIR)/src/libClp.la \
 	$(CGLOBJDIR)/src/libCgl.la $(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la
+	$(COINUTILSOBJDIR)/src/libCoinUtils.la $(am__append_4)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
@@ -350,10 +354,11 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(DIPSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(CLPSRCDIR)/src` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
 	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
 	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(CLPSRCDIR)/src` -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` $(am__append_3) \
-	$(am__append_4) $(am__append_6) $(am__append_9)
+	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` $(am__append_3) \
+	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` -I`$(CYGPATH_W) \
+	$(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
+	$(am__append_5) $(am__append_6) $(am__append_8) \
+	$(am__append_11)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
@@ -363,8 +368,8 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                     Includes for LP Solver                           #
 ########################################################################
 LDADD = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(CLPOBJDIR)/src/libClp.la $(am__append_5) $(am__append_7) \
-	$(am__append_10)
+	$(CLPOBJDIR)/src/libClp.la $(am__append_7) $(am__append_9) \
+	$(am__append_12)
 all: all-am
 
 .SUFFIXES:

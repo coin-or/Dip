@@ -71,6 +71,11 @@ AM_CPPFLAGS = \
         -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
         -I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
 
+if COIN_HAS_ASL
+  AM_CPPFLAGS += $(ASL_CPPFLAGS) -DCOIN_HAS_ASL
+  unitTest_LDADD += $(ASLLIB)
+endif
+
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
