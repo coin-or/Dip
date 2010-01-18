@@ -12,6 +12,9 @@
 /* Define to 1 if the Alps package is used */
 #undef COIN_HAS_ALPS
 
+/* If defined, the Ampl Solver Library is available. */
+#undef COIN_HAS_ASL
+
 /* Define to 1 if the Cbc package is used */
 #undef COIN_HAS_CBC
 

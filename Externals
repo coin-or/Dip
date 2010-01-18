@@ -1,11 +1,11 @@
 BuildTools        https://projects.coin-or.org/svn/BuildTools/releases/0.5.29
-Cbc               https://projects.coin-or.org/svn/Cbc/releases/2.3.2/Cbc
-CoinUtils         https://projects.coin-or.org/svn/CoinUtils/releases/2.5.1/CoinUtils
-Osi               https://projects.coin-or.org/svn/Osi/releases/0.100.2/Osi
-Cgl               https://projects.coin-or.org/svn/Cgl/releases/0.54.2/Cgl
-Clp               https://projects.coin-or.org/svn/Clp/releases/1.10.2/Clp
+Cbc               https://projects.coin-or.org/svn/Cbc/stable/2.4/Cbc
+CoinUtils         https://projects.coin-or.org/svn/CoinUtils/releases/2.6.0/CoinUtils
+Osi               https://projects.coin-or.org/svn/Osi/releases/0.102.0/Osi
+Cgl               https://projects.coin-or.org/svn/Cgl/stable/0.55/Cgl
+Clp               https://projects.coin-or.org/svn/Clp/releases/1.11.0/Clp
 Alps              https://projects.coin-or.org/svn/CHiPPS/Alps/releases/1.1.1/Alps
 Data/Sample       https://projects.coin-or.org/svn/Data/releases/1.0.7/Sample
 ThirdParty/Blas   https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/releases/1.0.14
-ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/releases/1.0.19
+ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/releases/1.0.20
 
