@@ -23,7 +23,7 @@
 //#define   RELAXED_THREADED
 #define   NTHREADS   2
 //#define   DO_INTERIOR //also in DecompAlgoPC
-#define DUAL_SMOOTHING
+//#define DUAL_SMOOTHING
 
 //===========================================================================//
 //#define STAB_DUMERLE
