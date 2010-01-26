@@ -86,6 +86,7 @@ public:
 
    //solve master as IP at end of each node (this should only be done
    //  if there are more than one blocks)
+   //TODO: how often? after every pass?
    int    SolveMasterAsIp;
    double SolveMasterAsIpLimitTime;
    
@@ -107,6 +108,12 @@ public:
    int    InitCompactSolve;
 
    double DualStabAlpha;
+   
+   //when solving using IP solver, algorithm for initial relaxation
+   //when solving using IP solver, algorithm for subproblems
+   //  options= dual, primal, barrier
+   //string IpAlgoStart;
+   //string IpAlgoSub;
 
    /**
     * @}
@@ -161,6 +168,8 @@ public:
       PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
+      //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
+      //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -229,6 +238,8 @@ public:
       UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
+      //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
+      //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
    }
 
@@ -271,6 +282,8 @@ public:
       InitVarsWithIPLimitTime = 10;
       InitCompactSolve      = 0;
       DualStabAlpha         = 0.10;
+      //IpAlgoStart           = "dual";
+      //IpAlgoSub             = "dual";
    }
    
    void dumpSettings(ostream * os = &cout){

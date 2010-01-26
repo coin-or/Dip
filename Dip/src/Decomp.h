@@ -162,6 +162,12 @@ enum DecompRoundRobin {
 };
 
 //===========================================================================//
+enum DecompFunction {
+   DecompFuncGeneric          = 0,
+   DecompFuncGenerateInitVars = 1
+};
+
+//===========================================================================//
 enum DecompRowType{
    //original row
    DecompRow_Original,

@@ -232,6 +232,8 @@ protected:
 
    vector<double> m_phaseIObj;
 
+   int          m_function;//calling function
+
 public:   
    /**
     * @}

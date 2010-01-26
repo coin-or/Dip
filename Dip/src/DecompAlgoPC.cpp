@@ -628,10 +628,12 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    result.m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result.m_solStatus2 = 0;
 
-   const int statusSet[3] = {CPXMIP_OPTIMAL,
+   const int statusSet[5] = {CPXMIP_OPTIMAL,
 			     CPXMIP_OPTIMAL_TOL,
-			     CPXMIP_INFEASIBLE};
-   if(!UtilIsInSet(result.m_solStatus, statusSet, 3)){
+			     CPXMIP_INFEASIBLE,
+			     CPXMIP_TIME_LIM_FEAS,
+			     CPXMIP_TIME_LIM_INFEAS};
+   if(!UtilIsInSet(result.m_solStatus, statusSet, 5)){
       cerr << "Error: CPX IP solver status = " << result.m_solStatus << endl;
       throw UtilException("CPX solver status", 
                           "solutionUpdateAsIp", "DecompAlgoPC");
@@ -648,7 +650,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       result.m_isOptimal  = true;      
    }
    else{
-      if(result.m_solStatus == CPXMIP_INFEASIBLE){
+      if(result.m_solStatus == CPXMIP_INFEASIBLE ||
+	 result.m_solStatus == CPXMIP_TIME_LIM_INFEAS){
          result.m_nSolutions = 0;
          result.m_isOptimal  = true;         
       }

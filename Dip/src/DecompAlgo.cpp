@@ -1207,6 +1207,11 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "processNode()", m_param.LogDebugLevel, 1);
+
+   if(m_algo == RELAX_AND_CUT){
+      printf("In this version of DIP, Relax and Cut is currently disabled.");
+      return STAT_UNKNOWN;
+   }
    
    UTIL_MSG(m_param.LogLevel, 2,
 	    double gap = DecompInf;
@@ -2131,6 +2136,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "generateInitVars()", m_param.LogDebugLevel, 2);
+   m_function = DecompFuncGenerateInitVars;
 
    //---
    //--- APP: create an initial set of points F'[0] subseteq F'
@@ -2384,7 +2390,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
    //---   if we were lucky enough to find an incumbent in init vars
    //---
    //setCutoffUB(getCutoffUB());
-
+   m_function = DecompFuncGeneric;
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "generateInitVars()", m_param.LogDebugLevel, 2);
    nInitVars = static_cast<int>(initVars.size());
@@ -2705,7 +2711,8 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 		  << "PhaseIObj= " << UtilDblToStr(phaseIObj) << endl;);
          m_phaseIObj.push_back(phaseIObj);
 	 //if(phaseIObj <= DecompZero){
-	 if(phaseIObj <= DecompEpsilon){ //11/09/09
+	 //if(phaseIObj <= DecompEpsilon){ //11/09/09
+	 if(phaseIObj <= 1.0e-9){ //01/22/10 - forestry
 	    //---
 	    //--- switch to PHASE II (art=0)
 	    //---
@@ -5586,6 +5593,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 
    bool doCutoff = m_param.SubProbUseCutoff;
    bool doExact  = isNested ? false : true;
+   doExact       = m_function == DecompFuncGenerateInitVars ? false : doExact;
 
    //---
    //--- run user method, but disregard so we can compare
