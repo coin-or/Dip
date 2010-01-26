@@ -1957,9 +1957,9 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
 
 
-   int preInd = 0;
-   CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
-   printf("preind=%d\n",preInd);
+   //int preInd = 0;
+   //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
+   //printf("preind=%d\n",preInd);
 #endif
 
   

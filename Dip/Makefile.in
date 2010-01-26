@@ -104,7 +104,9 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/MMKP/mmkp.parm.in \
 	$(top_srcdir)/examples/Makefile.Examples.in \
 	$(top_srcdir)/examples/SmallIP/Makefile.in \
+	$(top_srcdir)/examples/SmallIP/README.txt.in \
 	$(top_srcdir)/examples/SmallIP/smallip.parm.in \
+	$(top_srcdir)/examples/SmallIP/test.sh.in \
 	$(top_srcdir)/examples/TSP/Makefile.in \
 	$(top_srcdir)/examples/TSP/data_extract.sh.in \
 	$(top_srcdir)/examples/TSP/get_concorde.sh.in \
@@ -130,7 +132,8 @@ CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
 CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/TSP/data_extract.sh \
 	examples/TSP/get_concorde.sh examples/SmallIP/Makefile \
-	examples/SmallIP/smallip.parm examples/MILP/Makefile \
+	examples/SmallIP/smallip.parm examples/SmallIP/README.txt \
+	examples/SmallIP/test.sh examples/MILP/Makefile \
 	examples/MILP/milp.parm examples/MILP/data_extract.sh \
 	examples/MILP/README.txt examples/MILPBlock/Makefile \
 	examples/MILPBlock/milpblock.parm \
@@ -463,6 +466,10 @@ examples/TSP/get_concorde.sh: $(top_builddir)/config.status $(top_srcdir)/exampl
 examples/SmallIP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/SmallIP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/SmallIP/smallip.parm: $(top_builddir)/config.status $(top_srcdir)/examples/SmallIP/smallip.parm.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/SmallIP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/SmallIP/README.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/SmallIP/test.sh: $(top_builddir)/config.status $(top_srcdir)/examples/SmallIP/test.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MILP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
