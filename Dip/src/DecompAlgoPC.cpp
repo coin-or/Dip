@@ -1000,7 +1000,9 @@ int DecompAlgoPC::addCutsFromPool(){
    //---
    DecompCutPool::iterator li;
    for(li = m_cutpool.begin(); li != m_cutpool.end(); li++){
-      printf("CUT VIOLATION = %g\n", (*li).getViolation());
+      if(m_param.LogDebugLevel >= 3){
+         (*m_osLog) << "CUT VIOLATION = " << (*li).getViolation() << endl;
+      }
       if((*li).getViolation() < DecompEpsilon){//PARM
 	 break;
       }

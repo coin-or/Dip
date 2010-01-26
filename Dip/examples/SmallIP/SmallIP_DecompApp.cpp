@@ -15,7 +15,7 @@
 #include "SmallIP_DecompApp.h"
 //===========================================================================//
 //parameters
-const int LogLevel   = 2;
+const int LogLevel   = 1;
 const int whichRelax = 1; //1 matches book chapter and thesis
 
 //===========================================================================//

@@ -197,6 +197,7 @@ Dip/examples/SmallIP/SmallIP_DecompApp.cpp -text
 Dip/examples/SmallIP/SmallIP_DecompApp.h -text
 Dip/examples/SmallIP/SmallIP_Main.cpp -text
 Dip/examples/SmallIP/smallip.parm.in -text
+Dip/examples/SmallIP/test.sh.in -text
 Dip/examples/TSP/Makefile.in -text
 Dip/examples/TSP/TSP_Boost.h -text
 Dip/examples/TSP/TSP_Concorde.h -text

@@ -248,7 +248,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_nSolutions = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
-   printf("cbc.isProveOptimal() = %d\n", cbc.isProvenOptimal());
+   //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
    if(cbc.isProvenOptimal()){
       result->m_nSolutions = 1;
       result->m_isOptimal  = true;      

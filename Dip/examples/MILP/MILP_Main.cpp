@@ -135,7 +135,7 @@ int main(int argc, char ** argv){
                     << " but DECOMP claims GlobalUB= " 
                     << alpsModel.getGlobalUB() << endl;
                throw UtilException("Invalid claim of optimal.", 
-                                   "main", "DECOMP");
+                                   "main", "MILP");
             }
          }
 	 

@@ -237,6 +237,8 @@ AC_CONFIG_FILES([Makefile
                  examples/TSP/get_concorde.sh
                  examples/SmallIP/Makefile
                  examples/SmallIP/smallip.parm
+                 examples/SmallIP/README.txt
+                 examples/SmallIP/test.sh
                  examples/MILP/Makefile
                  examples/MILP/milp.parm
                  examples/MILP/data_extract.sh

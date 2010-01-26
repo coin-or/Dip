@@ -2,14 +2,14 @@
 Introduction
 ============================================================================
 This application gives a simple example of solving a small integer 
-program using DECOMP.
+program using DIP.
 
 
 ============================================================================
-Build DECOMP
+Build DIP
 ============================================================================
-To build DECOMP:
- (1) cd ${DECOMP_ROOT}/build
+To build DIP:
+ (1) cd ${DIP_ROOT}/build
  (2) ../configure
  (3) make 
  (4) make install
@@ -21,7 +21,7 @@ To run a basic unit test.
 Build SmallIP
 ============================================================================
 To build SmallIP application:
- (1) cd ${DECOMP_ROOT}/build/Decomp/examples/SmallIP
+ (1) cd ${DIP_ROOT}/build/Dip/examples/SmallIP
  (2) make
 
 
@@ -29,7 +29,7 @@ To build SmallIP application:
 Run SmallIP
 ============================================================================
 To run SmallIP application:
- (1) cd ${DECOMP_ROOT}/build/Decomp/examples/SmallIP
+ (1) cd ${DIP_ROOT}/build/Dip/examples/SmallIP
  (2) ./decomp_smallip --param ${PARMFILE} < --section:option value >
 
 Example

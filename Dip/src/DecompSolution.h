@@ -43,6 +43,7 @@ public:
          << setw(14);
       
       os << "-------------------------" << endl;
+      os << "Quality = " << getQuality() << endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
 	    os << setw(6) << i << " " << m_values[i] << endl;

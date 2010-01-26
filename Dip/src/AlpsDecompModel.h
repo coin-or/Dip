@@ -122,6 +122,9 @@ public:
       m_param     (utilParam),
       m_decompAlgo(decompAlgo)
    {
+      if(decompAlgo == NULL)
+         throw UtilException("No DecompAlgo algorithm has been set.",
+                             "AlpsDecompModel","AlpsDecompModel");
       setAlpsSettings();
    }
    
@@ -210,11 +213,14 @@ public:
       return m_decompAlgo->getModelCore().getModel()->getNumCols();
    }
 
+   inline const DecompSolution * getBestSolution() const {
+      return m_decompAlgo->getXhatIPBest();
+   }
+
    const double getGlobalLB() const { return m_bestLB;}
    const double getGlobalUB() const { return m_bestUB;}
    const int    getSolStatus() const { return m_alpsStatus;}
-   const int getNumNodesProcessed() const { return m_nodesProcessed;}
-   int getSolStatus();
+   const int    getNumNodesProcessed() const { return m_nodesProcessed;}
 
    /**
     * @}

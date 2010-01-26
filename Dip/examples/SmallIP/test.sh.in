@@ -1,0 +1,2 @@
+./decomp_smallip --doCut      1
+./decomp_smallip --doPriceCut 1

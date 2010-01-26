@@ -1209,8 +1209,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                       "processNode()", m_param.LogDebugLevel, 1);
 
    if(m_algo == RELAX_AND_CUT){
-      printf("In this version of DIP, Relax and Cut is currently disabled.");
-      return STAT_UNKNOWN;
+      throw UtilException("In this version of DIP, Relax and Cut is currently disabled.", "processNode", "DecompAlgo");
    }
    
    UTIL_MSG(m_param.LogLevel, 2,
