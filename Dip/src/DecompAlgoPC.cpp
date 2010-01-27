@@ -914,14 +914,16 @@ void DecompAlgoPC::addCutsToPool(const double  *  x,
 	 isDupPool = false;
 	 for(ci = m_cutpool.begin(); ci != m_cutpool.end(); ci++){
 	    if((*li)->getStrHash() == (*ci).getCutPtr()->getStrHash()){
-	       (*m_osLog) << "CUT "                         << cutIndex    
-			  << " is Duplicate with Pool Cut " << cutIndexPool
-			  << "\n";
-	       (*m_osLog) << "CUT           Hash = " 
-			  << (*li)->getStrHash() << "\n";
-	       (*m_osLog) << "CUT (in Pool) Hash = "
-			  << (*ci).getCutPtr()->getStrHash() << "\n";
-	       (*li)->print();
+               UTIL_MSG(m_param.LogLevel, 3,
+                        (*m_osLog) << "CUT "              << cutIndex    
+                        << " is Duplicate with Pool Cut " << cutIndexPool
+                        << endl;                        
+                        (*m_osLog) << "CUT           Hash = " 
+                        << (*li)->getStrHash() << endl;
+                        (*m_osLog) << "CUT (in Pool) Hash = "
+                        << (*ci).getCutPtr()->getStrHash() << endl;
+                        (*li)->print();
+                        );
 	       isDupPool = true;
 	       break;
 	    }           

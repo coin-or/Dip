@@ -153,9 +153,15 @@ void DecompAlgo::checkMasterDualObj(){
    if(!UtilIsZero(dualObj,1.0e-3)){
       relViol = actViol / std::fabs(dualObj);
    }
-   if(relViol > 1.0e-4)
+   if(relViol > 1.0e-4){
+      cerr << "checkMasterDualObj" 
+           << setw(10) << "primalObj="
+           << setw(10) << UtilDblToStr(primalObj,3)
+           << setw(10) << "dualObj="
+           << setw(10) << UtilDblToStr(dualObj, 3) << endl;      
       throw UtilException("primal and dual obj do not match", 
                           "checkMasterDualObj", "DecompAlgo");
+   }
 }
 
 //===========================================================================//
