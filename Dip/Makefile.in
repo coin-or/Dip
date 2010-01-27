@@ -98,6 +98,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/MILPBlock/data_extract.sh.in \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm.in \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm2.in \
+	$(top_srcdir)/examples/MILPBlock/test.sh.in \
 	$(top_srcdir)/examples/MMKP/Makefile.in \
 	$(top_srcdir)/examples/MMKP/data_extract.sh.in \
 	$(top_srcdir)/examples/MMKP/get_pisinger.sh.in \
@@ -139,16 +140,17 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/MILPBlock/milpblock.parm \
 	examples/MILPBlock/milpblock.parm2 \
 	examples/MILPBlock/data_extract.sh \
-	examples/MILPBlock/README.txt examples/AP3/Makefile \
-	examples/AP3/ap3.parm examples/GAP/Makefile \
-	examples/GAP/gap.parm examples/GAP/data_extract.sh \
-	examples/GAP/get_pisinger.sh examples/MAD/Makefile \
-	examples/MAD/mad.parm examples/MMKP/Makefile \
-	examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh \
-	examples/MMKP/get_pisinger.sh examples/VRP/Makefile \
-	examples/VRP/vrp.parm examples/VRP/get_boost.sh \
-	examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh \
-	examples/ATM/Makefile examples/ATM/atm.parm \
+	examples/MILPBlock/README.txt examples/MILPBlock/test.sh \
+	examples/AP3/Makefile examples/AP3/ap3.parm \
+	examples/GAP/Makefile examples/GAP/gap.parm \
+	examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh \
+	examples/MAD/Makefile examples/MAD/mad.parm \
+	examples/MMKP/Makefile examples/MMKP/mmkp.parm \
+	examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh \
+	examples/VRP/Makefile examples/VRP/vrp.parm \
+	examples/VRP/get_boost.sh examples/VRP/get_concorde.sh \
+	examples/VRP/get_cvrpsep.sh examples/ATM/Makefile \
+	examples/ATM/atm.parm \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -488,6 +490,8 @@ examples/MILPBlock/milpblock.parm2: $(top_builddir)/config.status $(top_srcdir)/
 examples/MILPBlock/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILPBlock/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/README.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MILPBlock/test.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/test.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/AP3/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/AP3/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
