@@ -173,6 +173,7 @@ Dip/examples/MILPBlock/README.txt.in -text
 Dip/examples/MILPBlock/data_extract.sh.in -text
 Dip/examples/MILPBlock/milpblock.parm.in -text
 Dip/examples/MILPBlock/milpblock.parm2.in -text
+Dip/examples/MILPBlock/test.sh.in -text
 Dip/examples/MMKP/MMKP_DecompApp.cpp -text
 Dip/examples/MMKP/MMKP_DecompApp.h -text
 Dip/examples/MMKP/MMKP_Instance.cpp -text
