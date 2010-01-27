@@ -92,7 +92,6 @@ int main(int argc, char ** argv){
 	 //---
 	 //--- create the driver AlpsDecomp model
 	 //---
-         int             status = 0;
 	 AlpsDecompModel alpsModel(utilParam, algo);
 	 
 	 timer.stop();
@@ -103,7 +102,7 @@ int main(int argc, char ** argv){
 	 //--- solve
 	 //---
 	 timer.start();      
-	 status = alpsModel.solve();
+	 alpsModel.solve();
 	 timer.stop();
 	 timeSolveCpu  = timer.getCpuTime();
 	 timeSolveReal = timer.getRealTime();
@@ -112,7 +111,7 @@ int main(int argc, char ** argv){
 	 //--- sanity check
 	 //---
 	 cout << setiosflags(ios::fixed|ios::showpoint);
-	 cout << "Status= "   << status  
+	 cout << "Status= "   << alpsModel.getSolStatus()  
 	      << " BestLB=  " << setw(10) 
 	      << UtilDblToStr(alpsModel.getGlobalLB(),5)
 	      << " BestUB= " << setw(10)
@@ -126,7 +125,28 @@ int main(int argc, char ** argv){
 	      << " SolveReal= " << timeSolveReal
 	      << " TotalReal= " << timeSetupReal + timeSolveReal
 	      << endl;      
-	 
+
+         //---
+         //--- sanity check
+         //---   if user defines bestLB==bestUB (i.e., known optimal)
+         //---   and solved claims we have optimal, check that they match
+         //---
+         double epsilon  = 1.0e-5;
+         double userLB   = milp.getBestKnownLB();
+         double userUB   = milp.getBestKnownUB();
+         double userDiff = fabs(userUB - userLB);
+         if(alpsModel.getSolStatus() == AlpsExitStatusOptimal &&
+            userDiff                  < epsilon){
+            double diff = fabs(alpsModel.getGlobalUB() - userUB);
+            if(diff > epsilon){
+               cerr << "ERROR. BestKnownLB/UB= " 
+                    << userUB << " but DIP claims GlobalUB= " 
+                    << alpsModel.getGlobalUB() << endl;
+               throw UtilException("Invalid claim of optimal.",
+                                   "main", "MILPBlock");
+            }
+         }
+         	 
 	 //---
 	 //--- free local memory
 	 //---

@@ -248,6 +248,7 @@ AC_CONFIG_FILES([Makefile
                  examples/MILPBlock/milpblock.parm2
                  examples/MILPBlock/data_extract.sh
                  examples/MILPBlock/README.txt
+                 examples/MILPBlock/test.sh
                  examples/AP3/Makefile
                  examples/AP3/ap3.parm
                  examples/GAP/Makefile

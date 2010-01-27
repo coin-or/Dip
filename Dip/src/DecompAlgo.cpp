@@ -1714,7 +1714,9 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    //---	 
 	    if(isTailoffLB(m_param.TailoffLength,
 			   m_param.TailoffPercent)){
-	       printf("TAILING OFF -- STOP processNode\n");
+               UTIL_MSG(m_param.LogLevel, 2,
+                        (*m_osLog) << "Tailing off. Stop processing node."
+                        << endl;);
 	       m_stopCriteria = DecompStopTailOff;
 	       m_phaseLast    = m_phase;
 	       m_phase        = PHASE_DONE;

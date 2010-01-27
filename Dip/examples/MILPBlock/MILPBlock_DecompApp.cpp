@@ -45,6 +45,13 @@ void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
                  << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
 
    //---
+   //--- set best known lb/ub
+   //---
+   double offset = m_mpsIO.objectiveOffset();
+   setBestKnownLB(m_appParam.BestKnownLB + offset);
+   setBestKnownUB(m_appParam.BestKnownUB + offset);
+
+   //---
    //--- read block file
    //---
    readBlockFile();
@@ -71,7 +78,8 @@ void MILPBlock_DecompApp::readBlockFile(){
    UtilOpenFile(is, fileName.c_str());
 
    int i, rowId, numRowsInBlock, blockId;
-   printf("Reading %s\n", fileName.c_str());
+   if(m_appParam.LogLevel >= 1)
+      (*m_osLog) << "Reading " << fileName << endl;
    if(m_appParam.BlockFileFormat == "List" ||
       m_appParam.BlockFileFormat == "LIST"){
 
@@ -93,7 +101,6 @@ void MILPBlock_DecompApp::readBlockFile(){
 	 vector<int> rowsInBlock;
 	 for(i = 0; i < numRowsInBlock; i++){
 	    is >> rowId;
-	    //printf("block=%d rowId=%d\n", blockId, rowId);
 	    rowsInBlock.push_back(rowId);
 	 }
 	 m_blocks.insert(make_pair(blockId, rowsInBlock));
@@ -123,13 +130,15 @@ void MILPBlock_DecompApp::readBlockFile(){
       assert(0);
    }
 
-   map<int, vector<int> >::iterator mit;
-   vector<int>           ::iterator vit;
-   for(mit = m_blocks.begin(); mit != m_blocks.end(); mit++){
-      (*m_osLog) << "Block " << (*mit).first << " : ";
-      for(vit = (*mit).second.begin(); vit != (*mit).second.end(); vit++)
-	 (*m_osLog) << (*vit) << " ";
-      (*m_osLog) << endl;
+   if(m_appParam.LogLevel >= 3){
+      map<int, vector<int> >::iterator mit;
+      vector<int>           ::iterator vit;
+      for(mit = m_blocks.begin(); mit != m_blocks.end(); mit++){
+         (*m_osLog) << "Block " << (*mit).first << " : ";
+         for(vit = (*mit).second.begin(); vit != (*mit).second.end(); vit++)
+            (*m_osLog) << (*vit) << " ";
+         (*m_osLog) << endl;
+      }
    }
    
    is.close();
@@ -171,8 +180,10 @@ MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
    int            nMasterOnlyCols =
       static_cast<int>(masterOnlyCols.size());
 
-   printf("nCols           = %d\n", nCols);
-   printf("nMasterOnlyCols = %d\n", nMasterOnlyCols);
+   if(m_appParam.LogLevel >= 1){
+      (*m_osLog) << "nCols           = " << nCols << endl;
+      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
+   }
 
    if(nMasterOnlyCols == 0)
       return NULL;
@@ -236,13 +247,17 @@ MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
    CoinPackedVector row;
    string           rowName  = "fake_row";
    int              colIndex = masterOnlyCols[0];
-   printf("masteronly colindex=%d\n", colIndex);
-   printf("colUB now rowUB    =%g\n", model->colUB[colIndex]);
+   if(m_appParam.LogLevel >= 2){
+      (*m_osLog) << "Masteronly colindex = " << colIndex << endl;
+      (*m_osLog) << "  colUB now rowUB   = " << model->colUB[colIndex] << endl;
+   }
    row.insert(colIndex, 1.0);
    model->appendRow(row, -DecompInf, model->colUB[colIndex], rowName);
 
-   printf("model numcols= %d\n", model->getNumCols());
-   printf("model numrows= %d\n", model->getNumRows());
+   if(m_appParam.LogLevel >= 2){
+      (*m_osLog) << "model numcols= " << model->getNumCols() << endl;
+      (*m_osLog) << "model numrows= " << model->getNumRows() << endl;
+   }
 
    return model;   
 }
@@ -388,7 +403,7 @@ void MILPBlock_DecompApp::createModels(){
    //---
    m_objective = new double[nCols];
    if(!m_objective)
-      throw UtilExceptionMemory("createModels", "MMKP_DecompApp");
+      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
    memcpy(m_objective, 
           m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
    setModelObjective(m_objective);
@@ -409,9 +424,9 @@ void MILPBlock_DecompApp::createModels(){
    for(mit = m_blocks.begin(); mit != m_blocks.end(); mit++){
       vector<int> & rowsRelax  = (*mit).second;
       int           nRowsRelax = static_cast<int>(rowsRelax.size());
-      printf("Create model part nRowsRelax = %d (Block=%d)\n", 
-	     nRowsRelax, (*mit).first); 
-      fflush(stdout);
+      if(m_appParam.LogLevel >= 1)
+         (*m_osLog) << "Create model part nRowsRelax = " 
+                    << nRowsRelax << " (Block=" << (*mit).first << ")" << endl;
       DecompConstraintSet * modelRelax 
          = createModelPart(nRowsRelax, &rowsRelax[0]);
 
@@ -423,9 +438,12 @@ void MILPBlock_DecompApp::createModels(){
       findActiveColumns(rowsRelax, activeColsSet);
       for(sit = activeColsSet.begin(); sit != activeColsSet.end(); sit++)
          modelRelax->activeColumns.push_back(*sit);
-      printf("Active Columns:\n");
-      UtilPrintVector(modelRelax->activeColumns);
-      UtilPrintVector(modelRelax->activeColumns, modelCore->getColNames());
+      if(m_appParam.LogLevel >= 3){
+         (*m_osLog) << "Active Columns:" << endl;
+         UtilPrintVector(modelRelax->activeColumns, m_osLog);
+         UtilPrintVector(modelRelax->activeColumns, 
+                         modelCore->getColNames(), m_osLog);
+      }
 
       //---
       //--- save a pointer so we can delete it later
@@ -439,7 +457,7 @@ void MILPBlock_DecompApp::createModels(){
    //---
    int * colMarker = new int[nCols];
    if(!colMarker)
-      throw UtilExceptionMemory("createModels", "MMKP_DecompApp");
+      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
    UtilFillN(colMarker, nCols, 0);
    
    vector<int>                      ::iterator vi;
@@ -453,15 +471,20 @@ void MILPBlock_DecompApp::createModels(){
 
    for(i = 0; i < nCols; i++){
       if(!colMarker[i]){
-	 (*m_osLog) << "Column " << setw(5) << i << " -> "
-		    << setw(25) << modelCore->colNames[i]
-		    << " is not in union of blocks." << endl;
+         if(m_appParam.LogLevel >= 3){
+            (*m_osLog) << "Column " << setw(5) << i << " -> "
+                       << setw(25) << modelCore->colNames[i]
+                       << " is not in union of blocks." << endl;
+         }
 	 modelCore->masterOnlyCols.push_back(i);
       }
    }
-   (*m_osLog) << "Master only columns:" << endl;
-   UtilPrintVector(modelCore->masterOnlyCols);
-   UtilPrintVector(modelCore->masterOnlyCols, modelCore->colNames);
+   if(m_appParam.LogLevel >= 3){
+      (*m_osLog) << "Master only columns:" << endl;
+      UtilPrintVector(modelCore->masterOnlyCols, m_osLog);
+      UtilPrintVector(modelCore->masterOnlyCols, 
+                      modelCore->colNames, m_osLog);
+   }
 
    //---
    //--- set core and system in framework
@@ -497,23 +520,24 @@ void MILPBlock_DecompApp::createModels(){
    //---
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
    if(nMasterOnlyCols){
-      printf("Create model part Master-Only.\n");
+      if(m_appParam.LogLevel >= 1)
+         (*m_osLog) << "Create model part Master-Only." << endl;
       DecompConstraintSet * modelMasterOnly
 	 = createModelMasterOnly(modelCore->masterOnlyCols);
-      UtilPrintVector(modelMasterOnly->activeColumns);
-      UtilPrintVector(modelMasterOnly->activeColumns, 
-		      modelCore->getColNames());
       int nBlocks = static_cast<int>(m_blocks.size());
       m_modelR.insert(make_pair(nBlocks, modelMasterOnly));
+
       //---
       //--- set system in framework
       //---
       setModelRelax(modelMasterOnly, "master_only", nBlocks);
       
-      printf("Active Columns:\n");
-      UtilPrintVector(modelMasterOnly->activeColumns);
-      UtilPrintVector(modelMasterOnly->activeColumns, 
-		      modelCore->getColNames());
+      if(m_appParam.LogLevel >= 3){
+         (*m_osLog) << "Active Columns:" << endl;
+         UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
+         UtilPrintVector(modelMasterOnly->activeColumns, 
+                         modelCore->getColNames(), m_osLog);
+      }
    }
       
    //---
@@ -527,6 +551,7 @@ void MILPBlock_DecompApp::createModels(){
 		    "createModels()", m_appParam.LogLevel, 2);   
 }
 
+/*
 #if 0
 //===========================================================================//
 DecompSolverStatus 
@@ -600,4 +625,4 @@ MILPBlock_DecompApp::solveRelaxedNest(const int          whichBlock,
    return solverStatus;
 }
 #endif
-
+*/

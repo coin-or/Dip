@@ -46,6 +46,8 @@ public:
       (*os) << common << ": LogLevel    : " << LogLevel     << endl;
       (*os) << common << ": RandomSeed  : " << RandomSeed   << endl;
       (*os) << common << ": RelaxPercent: " << RelaxPercent << endl;
+      (*os) << common << ": BestKnownLB : " << BestKnownLB  << endl;
+      (*os) << common << ": BestKnownUB : " << BestKnownUB  << endl;
       (*os) << common << ": DataDir     : " << DataDir      << endl;
       (*os) << common << ": Instance    : " << Instance     << endl;
       (*os) << "\n=====================================================\n";

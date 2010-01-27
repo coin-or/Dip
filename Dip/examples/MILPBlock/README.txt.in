@@ -9,9 +9,11 @@ definitions of the blocks (using row-ids).
 ============================================================================
 ToDo List
 ============================================================================
+* allow initial columns input (flat file)
 * allow row-names to identify blocks and internally map to row-ids
-* use a package like Mondriaan to automaticall find reorder the MILP matrix
+* use a package like Mondriaan to automatically find reorder the MILP matrix
   into single-border block angular format
+* add extreme rays
 
 
 ============================================================================

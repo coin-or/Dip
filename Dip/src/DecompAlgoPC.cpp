@@ -685,19 +685,24 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       
    if(result.m_nSolutions){
       double * rsolution = new double[modelCore->getNumCols()];
-      assert(rsolution);
-
-      printf("Solve as IP found a solution.\n");
-
-      recomposeSolution(result.m_solution, rsolution);      
-      assert(isIPFeasible(rsolution));
+      if(!rsolution)
+         throw UtilExceptionMemory("solutionUpdateAsIp", "DecompAlgoPC");
+      
+      UTIL_MSG(m_param.LogLevel, 3,
+               (*m_osLog) << "Solve as IP found a solution." << endl;);
+      
+      recomposeSolution(result.m_solution, rsolution);            
+      if(!isIPFeasible(rsolution))
+         throw UtilException("Recomposed solution is not feasible",
+                             "solutionUpdateAsIp", "DecompAlgoPC");
       
       if(m_app->APPisUserFeasible(rsolution,
 				  modelCore->getNumCols(),
 				  m_param.TolZero)){
-	 printf("m_xhat is APP FEASIBLE, m_xhatIPFeas size = %d\n",
-		(int)m_xhatIPFeas.size());
-	 
+         UTIL_MSG(m_param.LogLevel, 3,
+                  (*m_osLog) << "Solution is app-feasible, nSolutions="
+                  << (int)m_xhatIPFeas.size(););
+         
 	 //check for dup sol - TODO: make func                  
 	 bool isDup = m_xhatIPFeas.size() > 0 ? true : false;
 	 vector<DecompSolution*>::iterator vit;
@@ -714,7 +719,9 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 	    }
 	 }	 
 	 if(isDup){
-	    printf("IS DUP, not pushing\n");
+            UTIL_MSG(m_param.LogLevel, 3,
+                     (*m_osLog) << "Solution is a duplicate, not pushing."
+                     << endl;);
 	 }
 	 else{
 	    DecompSolution * decompSol
@@ -722,8 +729,6 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 				    rsolution,
 				    getOrigObjective());
 	    m_xhatIPFeas.push_back(decompSol);
-	    printf("m_xhatIPFeas size = %d\n", (int)m_xhatIPFeas.size());
-            
 
 	    vector<DecompSolution*>::iterator vi;
 	    DecompSolution * viBest = NULL;
