@@ -600,6 +600,22 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //--- set parameters
    //---
    int status = 0;
+   if(logIpLevel){
+      status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_ON);
+      if(status)
+	 throw UtilException("CPXsetintparam failure", 
+			     "solveOsiAsIp", "DecompAlgoModel");
+      status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
+      if(status)
+	 throw UtilException("CPXsetintparam failure", 
+			     "solveOsiAsIp", "DecompAlgoModel");
+   }
+   else{
+      status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
+      if(status)
+	 throw UtilException("CPXsetintparam failure", 
+			     "solveOsiAsIp", "DecompAlgoModel");
+   }
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
                            m_param.SubProbGapLimitExact);
    if(status)
