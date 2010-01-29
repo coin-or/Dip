@@ -1939,6 +1939,18 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    DecompStatus status = STAT_UNKNOWN;
 
    //---
+   //--- solve the master as an integer program
+   //---
+   if(m_phase != PHASE_PRICE1 &&
+      m_nodeStats.priceCallsTotal         && 
+      m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0){
+      UTIL_MSG(m_param.LogLevel, 2,
+               (*m_osLog) << "SolveMasterAsIp: PriceCallsTotal=" <<
+               m_nodeStats.priceCallsTotal << endl;);
+      solutionUpdateAsIP();
+   }
+
+   //---
    //--- was missing all along? 9/28/09
    //---
    //#ifdef __DECOMP_LP_CLP__

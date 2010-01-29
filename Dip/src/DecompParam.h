@@ -93,8 +93,12 @@ public:
    //solve master as IP at end of each node (this should only be done
    //  if there are more than one blocks)
    //TODO: how often? after every pass?
-   int    SolveMasterAsIp;
+
+   int    SolveMasterAsIp;         //{0,1}
+   int    SolveMasterAsIpFreqNode; //solve every n nodes
+   int    SolveMasterAsIpFreqPass; //solve every n passes (within one node)
    double SolveMasterAsIpLimitTime;
+   double SolveMasterAsIpLimitGap;
    
    //0 = If a user function is defined, it will use the user function.
    //    If the user returns an exact solution, it will not run the built-in
@@ -167,7 +171,10 @@ public:
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
       PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
+      PARAM_getSetting("SolveMasterAsFreqNode",SolveMasterAsIpFreqNode);
+      PARAM_getSetting("SolveMasterAsFreqPass",SolveMasterAsIpFreqPass);
       PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
+      PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
       PARAM_getSetting("InitVarsWithCutDC",    InitVarsWithCutDC);
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
@@ -237,7 +244,10 @@ public:
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
       UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);  
       UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",  SolveMasterAsIpFreqNode);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",  SolveMasterAsIpFreqPass);
       UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
       UtilPrintParameter(os, sec, "InitVarsWithCutDC",   InitVarsWithCutDC);
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
@@ -276,18 +286,21 @@ public:
       CutCglOddHole        = 1;
       CutCglGomory         = 1;
       SubProbUseCutoff     = 0;
-      SubProbGapLimitExact   = 1.0e-4;
-      SubProbGapLimitInexact = 1.0e-1;
+      SubProbGapLimitExact   = 0.0001; // 0.01% gap
+      SubProbGapLimitInexact = 0.1;    //10.00% gap
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
-      SolveMasterAsIp      = 1;//TODO: turn off if one block
+      SolveMasterAsIp          = 1;//TODO: turn off if one block
+      SolveMasterAsIpFreqNode  = 1;
+      SolveMasterAsIpFreqPass  = 1000;
       SolveMasterAsIpLimitTime = 30;
-      SolveRelaxAsIp       = 0;
-      InitVarsWithCutDC    = 0;
-      InitVarsWithIP       = 0;
-      InitVarsWithIPLimitTime = 10;
-      InitCompactSolve      = 0;
-      DualStabAlpha         = 0.10;
+      SolveMasterAsIpLimitGap  = 0.05; //5% gap
+      SolveRelaxAsIp           = 0;
+      InitVarsWithCutDC        = 0;
+      InitVarsWithIP           = 0;
+      InitVarsWithIPLimitTime  = 10;
+      InitCompactSolve         = 0;
+      DualStabAlpha            = 0.10;
       //IpAlgoStart           = "dual";
       //IpAlgoSub             = "dual";
    }
