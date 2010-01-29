@@ -171,8 +171,8 @@ public:
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
       PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
-      PARAM_getSetting("SolveMasterAsFreqNode",SolveMasterAsIpFreqNode);
-      PARAM_getSetting("SolveMasterAsFreqPass",SolveMasterAsIpFreqPass);
+      PARAM_getSetting("SolveMasterAsIpFreqNode",SolveMasterAsIpFreqNode);
+      PARAM_getSetting("SolveMasterAsIpFreqPass",SolveMasterAsIpFreqPass);
       PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
