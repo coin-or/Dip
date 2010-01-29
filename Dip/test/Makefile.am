@@ -1,6 +1,6 @@
 # Copyright (C) 2009 Lehigh University and others.
 # All Rights Reserved.
-# This file is distributed under the Common Public License 1.0
+# This file is distributed under the Eclipse Public License
 
 ## $Id: Makefile.am 507 2006-06-03 03:20:16Z andreasw $
 
