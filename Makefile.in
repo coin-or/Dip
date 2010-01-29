@@ -14,6 +14,21 @@
 
 @SET_MAKE@
 
+#============================================================================#
+# This file is part of the DIP Solver Framework.                             #
+#                                                                            #
+# DIP is distributed under the Eclipse Public License as part of the         #
+# COIN-OR repository (http://www.coin-or.org).                               #
+#                                                                            #
+# Author: Matthew Galati, SAS Institute Inc.                                 #
+#                                                                            #
+# Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
+#                    Ted Ralphs, Lehigh University                           #
+#                                                                            #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, Ted Ralphs     #
+# All Rights Reserved.                                                       #
+#============================================================================#
+
 # Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Common Public License.
@@ -225,18 +240,6 @@ sol_cc_compiler = @sol_cc_compiler@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-
-#============================================================================#
-# This file is part of the DECOMP Solver Framework.                          #
-#                                                                            #
-# DECOMP is distributed under the Common Public License as part of the       #
-# COIN-OR repository (http://www.coin-or.org).                               #
-#                                                                            #
-# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)        #
-#                                                                            #
-# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, and Ted Ralphs.#
-# All Rights Reserved.                                                       #
-#============================================================================#
 AUTOMAKE_OPTIONS = foreign
 EXTRA_DIST = doxydoc/all/doxygen.conf doxydoc/Dip/doxygen.conf \
 	doxydoc/CoinUtils/doxygen.conf doxydoc/Osi/doxygen.conf \

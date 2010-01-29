@@ -1,12 +1,15 @@
 #============================================================================#
-# This file is part of the DECOMP Solver Framework.                          #
+# This file is part of the DIP Solver Framework.                             #
 #                                                                            #
-# DECOMP is distributed under the Common Public License as part of the       #
+# DIP is distributed under the Eclipse Public License as part of the         #
 # COIN-OR repository (http://www.coin-or.org).                               #
 #                                                                            #
-# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)        #
+# Author: Matthew Galati,  SAS Institute Inc.                                #
 #                                                                            #
-# Copyright (C) 2002-2007, Lehigh University, Matthew Galati, and Ted Ralphs.#
+# Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
+#                    Ted Ralphs, Lehigh University                           #
+#                                                                            #
+# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
