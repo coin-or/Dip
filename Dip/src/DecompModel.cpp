@@ -154,8 +154,10 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    string cbcQuit      = "-quit";
    string cbcLog       = "-log";
    string cbcLogSet    = UtilIntToStr(logIpLevel);
-   string cbcGap       = "-allowableGap";
+   string cbcGap       = "-ratio";
    string cbcGapSet    = "0";
+   string cbcTime      = "-seconds";
+   string cbcTimeSet   = UtilDblToStr(param.SolveMasterAsIpLimitTime);
    string cbcCutoff    = "-cutoff";   
    string cbcCutoffSet = UtilDblToStr(cutoff);
    string cbcSLog      = "-slog";
@@ -171,6 +173,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //argv[argc++] = cbcSLogSet.c_str(); //for extra debugging
    argv[argc++] = cbcGap.c_str();   
    argv[argc++] = cbcGapSet.c_str();
+   argv[argc++] = cbcTime.c_str();
+   argv[argc++] = cbcTimeSet.c_str();
    if(doCutoff){
       argv[argc++] = cbcCutoff.c_str();
       argv[argc++] = cbcCutoffSet.c_str();

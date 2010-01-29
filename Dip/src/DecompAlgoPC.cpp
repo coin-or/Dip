@@ -418,13 +418,11 @@ int DecompAlgoPC::compressColumns(){
 
 //===========================================================================//
 void DecompAlgoPC::phaseDone(){
-   //TODO: try later... 
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "phaseDone()", m_param.LogDebugLevel, 1);   
-   //probably too expensive to solve every node! - do every 10 nodes?
-   if(m_param.SolveMasterAsIp       &&
+		      "phaseDone()", m_param.LogDebugLevel, 1);     
+   if(m_param.SolveMasterAsIp                                &&
+      getNodeIndex() % m_param.SolveMasterAsIpFreqNode == 0  &&
       m_stopCriteria != DecompStopTime){
-      //(getNodeIndex() % 10 == 0))
       solutionUpdateAsIP();
    }
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -481,8 +479,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    //--- build argument list
    //---
-   //TODO: time limit
-   //TODO: cutoff param
+   //TODO: time limit, cutoff,gap
    const char * argv[20];
    int    argc         = 0;
    string cbcExe       = "cbc";
@@ -490,9 +487,21 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    string cbcQuit      = "-quit";
    string cbcLog       = "-log";
    string cbcLogSet    = UtilIntToStr(logIpLevel);
+   string cbcGap       = "-ratio";
+   string cbcGapSet    = UtilDblToStr(m_param.SolveMasterAsIpLimitGap);
+   string cbcTime      = "-seconds";
+   string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsIpLimitTime);
+   string cbcCutoff    = "-cutoff";   
+   string cbcCutoffSet = UtilDblToStr(m_globalUB);
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      
+   argv[argc++] = cbcGap.c_str();   
+   argv[argc++] = cbcGapSet.c_str();
+   argv[argc++] = cbcTime.c_str();
+   argv[argc++] = cbcTimeSet.c_str();
+   argv[argc++] = cbcCutoff.c_str();
+   argv[argc++] = cbcCutoffSet.c_str();
    argv[argc++] = cbcSolve.c_str();
    argv[argc++] = cbcQuit.c_str();
 
@@ -533,7 +542,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
     *    6 stopped on solutions
     *    7 linear relaxation unbounded
     */
-   const int statusSet2[3] = {0,1,2};
+   const int statusSet2[4] = {0,1,2,4};
    result.m_solStatus2 = cbc.secondaryStatus();
 
    //---
@@ -541,7 +550,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---   unless due to cutoff. But, after branching it
    //---   can be infeasible.
    //---
-   if(!UtilIsInSet(result.m_solStatus2, statusSet2, 3)){
+   if(!UtilIsInSet(result.m_solStatus2, statusSet2, 4)){
       cerr << "Error: CBC IP solver 2nd status = " 
 	   << result.m_solStatus2 << endl;
       throw UtilException("CBC solver 2nd status", 
@@ -553,23 +562,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    result.m_nSolutions = 0;
    result.m_isOptimal  = false;
-   if(cbc.isProvenOptimal()){
-      result.m_nSolutions = 1;
-      result.m_isOptimal  = true;      
-   }
-   else{
-      if(cbc.isProvenInfeasible()){
-         result.m_nSolutions = 0;
-         result.m_isOptimal  = true;         
-      }
-      else{
-         //---
-         //--- else it must have stopped on gap
-         //---
-         result.m_nSolutions = 1;
-         result.m_isOptimal  = false;      
-      }
-   }
+   //TODO: can get multple solutions!
+   //   how to retrieve?
+   //TODO: look into setHotstartSolution... done automatically
+   //   look at one call to the next
+   //TODO: look into setNumberThreads
+   //TODO: redo cpx in this same way - it could be stopping on time, not gap
+   int nSolutions = cbc.getSolutionCount();
+   result.m_nSolutions = nSolutions ? 1 : 0;
+   if(cbc.isProvenOptimal() ||
+      cbc.isProvenInfeasible())
+      result.m_isOptimal  = true;            
    
    //---
    //--- get copy of solution
@@ -617,7 +620,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 			     "solveOsiAsIp", "DecompAlgoModel");
    }
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
-                           m_param.SubProbGapLimitExact);
+                           m_param.SolveMasterAsIpLimitGap);
    if(status)
       throw UtilException("CPXsetdblparam failure", 
                           "solutionUpdateAsIp", "DecompAlgoPC");
@@ -671,6 +674,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
          result.m_nSolutions = 0;
          result.m_isOptimal  = true;         
       }
+      //STOP - could have stopped on time... not just gap... do 
+      //something like did in CBC
       else{
          //---
          //--- else it must have stopped on gap
