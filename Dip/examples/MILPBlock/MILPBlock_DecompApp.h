@@ -72,6 +72,8 @@ private:
    DecompConstraintSet * createModelPart(const int   nRowsPart,
                                          const int * rowsPart);
    DecompConstraintSet * createModelMasterOnly(vector<int> & masterOnlyCols);
+   void                  createModelMasterOnlys(vector<int> & masterOnlyCols);
+
 
 
    /** Read block file. */
