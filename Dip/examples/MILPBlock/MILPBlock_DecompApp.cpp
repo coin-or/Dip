@@ -627,26 +627,27 @@ void MILPBlock_DecompApp::createModels(){
       if(m_appParam.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
 
-#if MASTER_ONLY_ONE
-      DecompConstraintSet * modelMasterOnly
-	 = createModelMasterOnly(modelCore->masterOnlyCols);
-      int nBlocks = static_cast<int>(m_blocks.size());
-      m_modelR.insert(make_pair(nBlocks, modelMasterOnly));
+      if(m_appParam.MasterOnlyOneBlock){
+         DecompConstraintSet * modelMasterOnly
+            = createModelMasterOnly(modelCore->masterOnlyCols);
+         int nBlocks = static_cast<int>(m_blocks.size());
+         m_modelR.insert(make_pair(nBlocks, modelMasterOnly));
 
-      //---
-      //--- set system in framework
-      //---
-      setModelRelax(modelMasterOnly, "master_only", nBlocks);
-
-      if(m_appParam.LogLevel >= 3){
-         (*m_osLog) << "Active Columns:" << endl;
-         UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
-         UtilPrintVector(modelMasterOnly->activeColumns, 
-                         modelCore->getColNames(), m_osLog);
+         //---
+         //--- set system in framework
+         //---
+         setModelRelax(modelMasterOnly, "master_only", nBlocks);
+         
+         if(m_appParam.LogLevel >= 3){
+            (*m_osLog) << "Active Columns:" << endl;
+            UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
+            UtilPrintVector(modelMasterOnly->activeColumns, 
+                            modelCore->getColNames(), m_osLog);
+         }
       }
-#else
-      createModelMasterOnlys(modelCore->masterOnlyCols);
-#endif
+      else{
+         createModelMasterOnlys(modelCore->masterOnlyCols);
+      }
    }
       
    //---
