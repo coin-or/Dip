@@ -177,7 +177,6 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    getModelsFromApp();
 
    m_numConvexCon = static_cast<int>(m_modelRelax.size());
-   assert(m_numConvexCon >= 1);
 
    DecompConstraintSet * modelCore = m_modelCore.getModel();   
    assert(modelCore);

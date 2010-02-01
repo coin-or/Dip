@@ -48,6 +48,12 @@ public:
    vector<int>          columnMarker; //active, non-active, master-only
    bool                 prepHasRun;
 
+   //for storage of several rows of row-majored sparse matrix
+   //  to be used with appendRows
+   vector<CoinBigIndex> m_rowBeg;
+   vector<int         > m_rowInd;
+   vector<double      > m_rowVal;
+
 public:
    inline const CoinPackedMatrix * getMatrix() const { return M; };
    inline const int getNumRows() const { return M->getNumRows(); }
@@ -87,8 +93,7 @@ public:
 			 string           & rowName){
       appendRow(row, loBound, upBound);
       rowNames.push_back(rowName);         
-   }
-   
+   }   
    inline void reserve(const int nCols,
 		       const int nRows){
       M->reserve(nRows, nCols);
