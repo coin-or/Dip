@@ -1,5 +1,6 @@
 * text=auto !eol
 /AUTHORS -text
+/Dependencies -text
 Dip/AUTHORS -text
 Dip/LICENSE -text
 Dip/Makefile.am -text

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GAP", "GAP\GAP.vcproj", "{568F75AF-E4B6-4629-A191-888E9A3DA9E1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DBEA3904-F0B8-408A-9E1A-6497FEBE8C42} = {DBEA3904-F0B8-408A-9E1A-6497FEBE8C42}
@@ -32,9 +32,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmallIP", "SmallIP\SmallIP.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pisinger", "..\Decomp\ExternalSolvers\Knapsack\Pisinger\Pisinger.vcproj", "{D3A136DC-EADA-456D-9311-4C48C6831D02}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libAlps", "..\..\..\Alps\MSVisualStudio\v8\libAlps.vcproj", "{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbc", "..\..\..\Cbc\MSVisualStudio\v9\libCbc\libCbc.vcproj", "{363BA154-FEC9-4E1E-BC23-93CEC58AB785}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C4867F15-438D-4FF8-8388-62FBAAA9786C} = {C4867F15-438D-4FF8-8388-62FBAAA9786C}
+		{4F8F7D1C-3A9E-444D-8EE9-77F33FA05994} = {4F8F7D1C-3A9E-444D-8EE9-77F33FA05994}
+		{02D45875-A8CF-41B9-990B-3699C0ECFE10} = {02D45875-A8CF-41B9-990B-3699C0ECFE10}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "..\..\..\Cgl\MSVisualStudio\v9\libCgl\libCgl.vcproj", "{DBEA3904-F0B8-408A-9E1A-6497FEBE8C42}"
 EndProject
@@ -133,6 +136,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MilpBlock", "MilpBlock\Milp
 		{7D98E2CB-876E-4F75-9F71-77D3FE87E149} = {7D98E2CB-876E-4F75-9F71-77D3FE87E149}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libAlps", "..\..\..\Alps\MSVisualStudio\v9\libAlps.vcproj", "{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -155,10 +160,6 @@ Global
 		{D3A136DC-EADA-456D-9311-4C48C6831D02}.Debug|Win32.Build.0 = Debug|Win32
 		{D3A136DC-EADA-456D-9311-4C48C6831D02}.Release|Win32.ActiveCfg = Release|Win32
 		{D3A136DC-EADA-456D-9311-4C48C6831D02}.Release|Win32.Build.0 = Release|Win32
-		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Debug|Win32.ActiveCfg = Debug|Win32
-		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Debug|Win32.Build.0 = Debug|Win32
-		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Release|Win32.ActiveCfg = Release|Win32
-		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Release|Win32.Build.0 = Release|Win32
 		{363BA154-FEC9-4E1E-BC23-93CEC58AB785}.Debug|Win32.ActiveCfg = Debug|Win32
 		{363BA154-FEC9-4E1E-BC23-93CEC58AB785}.Debug|Win32.Build.0 = Debug|Win32
 		{363BA154-FEC9-4E1E-BC23-93CEC58AB785}.Release|Win32.ActiveCfg = Release|Win32
@@ -219,6 +220,10 @@ Global
 		{07D289A2-098E-45E1-A48C-637DE0ADFAE1}.Debug|Win32.Build.0 = Debug|Win32
 		{07D289A2-098E-45E1-A48C-637DE0ADFAE1}.Release|Win32.ActiveCfg = Release|Win32
 		{07D289A2-098E-45E1-A48C-637DE0ADFAE1}.Release|Win32.Build.0 = Release|Win32
+		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Debug|Win32.ActiveCfg = Debug|Win32
+		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Debug|Win32.Build.0 = Debug|Win32
+		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Release|Win32.ActiveCfg = Release|Win32
+		{246A8CAC-4D2A-4D9D-9B5A-BEB99C0F2E89}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
