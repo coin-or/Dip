@@ -24,6 +24,7 @@ public:
    string Instance;
    string BlockFile;
    string BlockFileFormat;
+   string InitSolutionFile;
    double BestKnownLB;
    double BestKnownUB;
    double ColumnUB; //hack since missing extreme rays
@@ -38,9 +39,11 @@ public:
       LogLevel     = utilParam.GetSetting("LogLevel",     0,     common);
       DataDir      = utilParam.GetSetting("DataDir",      "",    common);
       Instance     = utilParam.GetSetting("Instance",     "",    common);    
-      BlockFile    = utilParam.GetSetting("BlockFile",    "",    common);    
+      BlockFile    = utilParam.GetSetting("BlockFile",    "",    common);
       BlockFileFormat 
          = utilParam.GetSetting("BlockFileFormat",    "",    common);    
+      InitSolutionFile
+         = utilParam.GetSetting("InitSolutionFile",    "",    common);    
       BestKnownLB  = utilParam.GetSetting("BestKnownLB",  -1.e100, common);
       BestKnownUB  = utilParam.GetSetting("BestKnownUB",   1.e100, common);
       ColumnUB     = utilParam.GetSetting("ColumnUB",      1.e20,  common);
@@ -53,15 +56,16 @@ public:
       static const char * common = "MILPBlock";
       (*os) << "\n=====================================================\n"
             << "MILPBlock_DECOMP PARAMETER SETTINGS \n";
-      (*os) << common << ": LogLevel          : " << LogLevel        << endl;
-      (*os) << common << ": DataDir           : " << DataDir         << endl;
-      (*os) << common << ": Instance          : " << Instance        << endl;
-      (*os) << common << ": BlockFile         : " << BlockFile       << endl;
-      (*os) << common << ": BlockFileFormat   : " << BlockFileFormat << endl;
-      (*os) << common << ": BestKnownLB       : " << BestKnownLB     << endl;
-      (*os) << common << ": BestKnownUB       : " << BestKnownUB     << endl;
-      (*os) << common << ": ColumnUB          : " << ColumnUB        << endl;
-      (*os) << common << ": ColumnLB          : " << ColumnLB        << endl;
+      (*os) << common << ": LogLevel          : " << LogLevel         << endl;
+      (*os) << common << ": DataDir           : " << DataDir          << endl;
+      (*os) << common << ": Instance          : " << Instance         << endl;
+      (*os) << common << ": BlockFile         : " << BlockFile        << endl;
+      (*os) << common << ": BlockFileFormat   : " << BlockFileFormat  << endl;
+      (*os) << common << ": InitSolutionFile  : " << InitSolutionFile << endl;
+      (*os) << common << ": BestKnownLB       : " << BestKnownLB      << endl;
+      (*os) << common << ": BestKnownUB       : " << BestKnownUB      << endl;
+      (*os) << common << ": ColumnUB          : " << ColumnUB         << endl;
+      (*os) << common << ": ColumnLB          : " << ColumnLB         << endl;
       (*os) << common << ": MasterOnlyOneBlock: " 
             << MasterOnlyOneBlock << endl;
       (*os) << "\n=====================================================\n";
@@ -74,6 +78,7 @@ public:
       Instance       (""),
       BlockFile      (""), 
       BlockFileFormat(""),
+      InitSolutionFile(""),
       BestKnownLB    (-1.e100),
       BestKnownUB    ( 1.e100),
       ColumnUB       ( 1.e20),

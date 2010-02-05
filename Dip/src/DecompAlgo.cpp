@@ -5576,6 +5576,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    int                   whichBlock = algoModel.getBlockId();
    bool                  isRoot     = getNodeIndex() ? false : true;
    DecompConstraintSet * modelCore  = getModelCore().getModel();
+   DecompConstraintSet * model      = algoModel.getModel();
 
 #ifndef RELAXED_THREADED
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
@@ -5587,6 +5588,52 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 #endif
 
    DecompStatus rc     = STAT_UNKNOWN;
+
+   //---
+   //--- deal with the special case of master-only variables
+   //---   
+   if(model->m_masterOnly){
+      //---
+      //--- In this case, we simply have a one-variable problem with 
+      //---  uppper and lower column bounds. Just check to see if the
+      //---  cost is positive (choose lower bound) or negative (choose upper
+      //---  bound).
+      //---
+      m_isColGenExact          = true;
+      solveResult->m_isOptimal = true;
+      solveResult->m_isCutoff  = false;
+
+      vector<int>    ind;
+      vector<double> els;
+      double varRedCost      = 0.0;
+      double varOrigCost     = 0.0;      
+      int    masterOnlyIndex = model->m_masterOnlyIndex;
+      ind.push_back(masterOnlyIndex);
+      if(redCostX[masterOnlyIndex] >= 0){
+         els.push_back(model->m_masterOnlyLB);
+         varRedCost  = redCostX[masterOnlyIndex] * model->m_masterOnlyLB;
+         varOrigCost = origCost[masterOnlyIndex] * model->m_masterOnlyLB;
+      }
+      else{
+         els.push_back(model->m_masterOnlyUB);
+         varRedCost  = redCostX[masterOnlyIndex] * model->m_masterOnlyUB;
+         varOrigCost = origCost[masterOnlyIndex] * model->m_masterOnlyUB;
+      }
+      varRedCost -= alpha;
+
+      DecompVar * var = new DecompVar(ind, els, varRedCost, varOrigCost);
+      var->setBlockId(whichBlock);
+      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+                 var->print(););
+      vars.push_back(var);
+      
+#ifndef RELAXED_THREADED   
+      m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+                       "solveRelaxed()", m_param.LogDebugLevel, 2);
+#endif
+      return STAT_UNKNOWN;
+   }
 
 #ifndef RELAXED_THREADED
    m_stats.timerOther2.reset();

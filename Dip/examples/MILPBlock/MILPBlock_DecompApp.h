@@ -73,6 +73,7 @@ private:
                                          const int * rowsPart);
    DecompConstraintSet * createModelMasterOnly(vector<int> & masterOnlyCols);
    void                  createModelMasterOnlys(vector<int> & masterOnlyCols);
+   void                  createModelMasterOnlys2(vector<int> & masterOnlyCols);
 
 
 

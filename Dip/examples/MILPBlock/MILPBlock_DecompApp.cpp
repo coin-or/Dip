@@ -144,6 +144,87 @@ void MILPBlock_DecompApp::readBlockFile(){
    is.close();
 }
 
+/*
+//===========================================================================//
+void MILPBlock_DecompApp::readInitSolutionFile(){
+
+   ifstream is;
+   string   fileName = m_appParam.DataDir 
+      + UtilDirSlash() + m_appParam.InitSolutionFile;
+   ////////////STOP
+   
+   //---
+   //--- open file streams
+   //---
+   UtilOpenFile(is, fileName.c_str());
+
+   int i, rowId, numRowsInBlock, blockId;
+   if(m_appParam.LogLevel >= 1)
+      (*m_osLog) << "Reading " << fileName << endl;
+   if(m_appParam.BlockFileFormat == "List" ||
+      m_appParam.BlockFileFormat == "LIST"){
+
+      //---
+      //--- The block file defines those rows in each block.
+      //---   <block id>  <num rows in block>
+      //---     <row ids...>
+      //---   <block id>  <num rows in block>
+      //---     <row ids...>
+      //---
+      
+      //---
+      //--- TODO: also allow row names (instead of row ids)
+      //---      
+      while(!is.eof()){
+	 is >> blockId;
+	 is >> numRowsInBlock;
+	 if(is.eof()) break;
+	 vector<int> rowsInBlock;
+	 for(i = 0; i < numRowsInBlock; i++){
+	    is >> rowId;
+	    rowsInBlock.push_back(rowId);
+	 }
+	 m_blocks.insert(make_pair(blockId, rowsInBlock));
+	 if(is.eof()) break;      
+      }
+   }
+   else if(m_appParam.BlockFileFormat == "Pair" ||
+	   m_appParam.BlockFileFormat == "PAIR"){
+      //---
+      //--- <block id> <row id> 
+      //---  ...
+      //---
+      int blockIdCurr = 0;
+      is >> blockId;
+      while(!is.eof()){
+	 vector<int> rowsInBlock;
+	 while(blockId == blockIdCurr && !is.eof()){
+	    is >> rowId;
+	    rowsInBlock.push_back(rowId);
+	    is >> blockId;
+	 }
+	 m_blocks.insert(make_pair(blockIdCurr, rowsInBlock));	 
+	 blockIdCurr = blockId;
+	 if(is.eof()) break;
+      }      
+   } else{
+      assert(0);
+   }
+
+   if(m_appParam.LogLevel >= 3){
+      map<int, vector<int> >::iterator mit;
+      vector<int>           ::iterator vit;
+      for(mit = m_blocks.begin(); mit != m_blocks.end(); mit++){
+         (*m_osLog) << "Block " << (*mit).first << " : ";
+         for(vit = (*mit).second.begin(); vit != (*mit).second.end(); vit++)
+            (*m_osLog) << (*vit) << " ";
+         (*m_osLog) << endl;
+      }
+   }
+   
+   is.close();
+   }*/
+
 //===========================================================================//
 void 
 MILPBlock_DecompApp::findActiveColumns(const vector<int> & rowsPart,
@@ -263,6 +344,56 @@ MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
          (*m_osLog) << "model numcols= " << model->getNumCols() << endl;
          (*m_osLog) << "model numrows= " << model->getNumRows() << endl;
       }
+
+      m_modelR.insert(make_pair(nBlocks, model));
+      setModelRelax(model, 
+                    "master_only" + UtilIntToStr(i), nBlocks);
+      nBlocks++;
+   }
+
+   return;   
+}
+
+//===========================================================================//
+void
+MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
+
+   int            nBlocks     = static_cast<int>(m_blocks.size());
+   const int      nCols       = m_mpsIO.getNumCols();
+   const double * colLB       = m_mpsIO.getColLower();
+   const double * colUB       = m_mpsIO.getColUpper();
+   const char   * integerVars = m_mpsIO.integerColumns();
+   int            nMasterOnlyCols =
+      static_cast<int>(masterOnlyCols.size());
+
+   if(m_appParam.LogLevel >= 1){
+      (*m_osLog) << "nCols           = " << nCols << endl;
+      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
+   }
+
+   if(nMasterOnlyCols == 0)
+      return;
+
+
+   int i, j;
+   vector<int>::iterator vit;
+   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
+      i = *vit;
+
+      //THINK:
+      //  what-if master-only var is integer and bound is not at integer
+            
+      DecompConstraintSet * model = new DecompConstraintSet();
+      model->m_masterOnly      = true;
+      model->m_masterOnlyIndex = i;
+      model->m_masterOnlyLB    = colLB[i];
+      model->m_masterOnlyUB    = colUB[i];
+      if(m_appParam.ColumnUB <  1.0e15)
+	 if(colUB[i] >  1.0e15)
+	    model->m_masterOnlyUB = m_appParam.ColumnUB;
+      if(m_appParam.ColumnLB > -1.0e15)
+	 if(colLB[i] < -1.0e15)
+	    model->m_masterOnlyLB = m_appParam.ColumnLB;
 
       m_modelR.insert(make_pair(nBlocks, model));
       setModelRelax(model, 
@@ -646,7 +777,8 @@ void MILPBlock_DecompApp::createModels(){
          }
       }
       else{
-         createModelMasterOnlys(modelCore->masterOnlyCols);
+         //createModelMasterOnlys(modelCore->masterOnlyCols);
+         createModelMasterOnlys2(modelCore->masterOnlyCols);
       }
    }
       

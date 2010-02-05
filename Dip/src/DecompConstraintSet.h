@@ -54,6 +54,12 @@ public:
    vector<int         > m_rowInd;
    vector<double      > m_rowVal;
 
+   //for special case of master-only vars
+   bool                 m_masterOnly;
+   int                  m_masterOnlyIndex;
+   double               m_masterOnlyLB;
+   double               m_masterOnlyUB;
+
 public:
    inline const CoinPackedMatrix * getMatrix() const { return M; };
    inline const int getNumRows() const { return M->getNumRows(); }
@@ -104,21 +110,25 @@ public:
    }
 public:
    DecompConstraintSet() : 
-      M(0), 
-      nBaseRowsOrig(0),
-      nBaseRows(0),
-      rowSense(),
-      rowRhs(),
-      rowLB(), 
-      rowUB(), 
-      colLB(), 
-      colUB(), 
-      integerVars(),
-      colNames(),
-      rowNames(),
-      prepHasRun(false)
+      M                (0), 
+      nBaseRowsOrig    (0),
+      nBaseRows        (0),
+      rowSense         (),
+      rowRhs           (),
+      rowLB            (), 
+      rowUB            (), 
+      colLB            (), 
+      colUB            (), 
+      integerVars      (),
+      colNames         (),
+      rowNames         (),
+      prepHasRun       (false),
+      m_masterOnly     (false),
+      m_masterOnlyIndex(0),
+      m_masterOnlyLB   (0.0),
+      m_masterOnlyUB   (0.0)
    {};
-  
+   
    ~DecompConstraintSet() {
       UTIL_DELPTR(M);    
    };
