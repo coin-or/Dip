@@ -79,13 +79,6 @@ public:
    map<int, DecompAppModel>          m_modelRelax;
    map<int, vector<DecompAppModel> > m_modelRelaxNest;   
 
-
-   //DecompConstraintSet          * m_modelCore;
-   //vector<DecompConstraintSet*>   m_modelRelaxV;
-   //string                         m_modelCoreName;
-   //vector<string>                 m_modelRelaxNameV;
-
-
    /**
     * Pointers to the algorithm objects.
     *   NOTE: only for the advanced user -- this allows the user 
@@ -211,8 +204,6 @@ public:
       return m_decompAlgo;
    }
 
-
-   //Cut(this){
 public:
    DecompApp(UtilParameters & utilParam) :
       m_classTag  ("D-APP"),

@@ -26,7 +26,7 @@ void DecompConstraintSet::prepareModel(){
    //---   2.) create row hash
    //---   3.) set nBaseRows
    //---   4.) flip to row ordered, if neccessary (for relaxed too)
-   //--- TODO: put timer on this ??
+   //---   5.) mark integers
    //---
    if(!M)
       return;
@@ -75,6 +75,14 @@ void DecompConstraintSet::prepareModel(){
    
    for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
       columnMarker[*vit] = DecompColMasterOnly;   
+
+   //---
+   //--- mark integers
+   //---
+   UtilFillN(integerMark, getNumCols(), 'C');
+   for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
+      integerMark[*vit] = 'I';
+   }   
 }
 
 //===========================================================================//

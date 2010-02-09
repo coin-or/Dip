@@ -110,7 +110,10 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
 	 //Notify, but don't mark in feasible unless 10x worse.
 	 UTIL_DEBUG(logLevel, 4,
 		    cout 
-		    << "Point violates row ax[" << r << "]: " 
+		    << "Point violates row ";
+                    if(hasRowNames)
+                       cout << " -> " << rowNames[r];
+                    cout << " ax[" << r << "]: " 
 		    << UtilDblToStr(ax)
 		    << " LB: " << UtilDblToStr(rlb) 
 		    << " UB: " << UtilDblToStr(rub) 

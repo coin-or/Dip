@@ -530,6 +530,11 @@ public:
               m_masterColType[index] == DecompCol_ArtForCutL    ||
               m_masterColType[index] == DecompCol_ArtForCutG);
    }
+
+   void breakOutPartial(const double  * xHat,
+                        DecompVarList & newVars,
+                        const double    intTol = 1.0e-5);
+      
    
 
 

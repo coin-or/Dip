@@ -40,6 +40,7 @@ public:
    vector<double>       colLB;
    vector<double>       colUB;
    vector<int>          integerVars;
+   vector<char>         integerMark; //'C' = continuous, 'I' = integral
    vector<string>       colNames;
    vector<string>       rowNames;
    vector<int>          activeColumns; //if block, define the active columns
@@ -59,6 +60,7 @@ public:
    int                  m_masterOnlyIndex;
    double               m_masterOnlyLB;
    double               m_masterOnlyUB;
+   bool                 m_masterOnlyIsInt;
 
 public:
    inline const CoinPackedMatrix * getMatrix() const { return M; };
@@ -72,12 +74,14 @@ public:
    inline const vector<string> & getColNames() const {return colNames;}   
    inline vector<string> & getRowNamesMutable() {return rowNames;}
    inline vector<string> & getColNamesMutable() {return colNames;}
+   inline const char   * getIntegerMark() { return &integerMark[0];}
    inline const int    * getIntegerVars() { return &integerVars[0];}
    inline const double * getColLB() const { return &colLB[0]; };
    inline const double * getColUB() const { return &colUB[0]; };
    inline const double * getRowLB() const { return &rowLB[0]; };
    inline const double * getRowUB() const { return &rowUB[0]; };
    inline const bool     hasPrepRun() const { return prepHasRun; };
+   inline const bool     isMasterOnly() const { return m_masterOnly; };
 
 public:
    void prepareModel();
@@ -113,20 +117,12 @@ public:
       M                (0), 
       nBaseRowsOrig    (0),
       nBaseRows        (0),
-      rowSense         (),
-      rowRhs           (),
-      rowLB            (), 
-      rowUB            (), 
-      colLB            (), 
-      colUB            (), 
-      integerVars      (),
-      colNames         (),
-      rowNames         (),
       prepHasRun       (false),
       m_masterOnly     (false),
       m_masterOnlyIndex(0),
       m_masterOnlyLB   (0.0),
-      m_masterOnlyUB   (0.0)
+      m_masterOnlyUB   (0.0),
+      m_masterOnlyIsInt(false)
    {};
    
    ~DecompConstraintSet() {

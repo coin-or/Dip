@@ -451,17 +451,40 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    assert(m_numConvexCon > 1);   
 
-   int  i;
+   int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda 
    bool isRoot      = getNodeIndex() ? false : true;
    int  logIpLevel  = m_param.LogLpLevel;
 
    //---
    //--- set master columns (lambda) to integer
+   //---  for those columns which blocks that have
+   //---  only continuous variables, do NOT set to 
+   //---  integer (this will happen often with master-only
+   //---  variables)
    //---
-   for(i = 0; i < nMasterCols; i++){      
+   for(i = 0; i < nMasterCols; i++){
       if(isMasterColStructural(i))
 	 m_masterSI->setInteger(i);
+   }
+   
+   //TODO: is this expensive? if so,
+   //  better to use column type info
+   //  like above
+   DecompVarList            ::iterator li;            
+   map<int, DecompAlgoModel>::iterator mit; 
+   for(li = m_vars.begin(); li != m_vars.end(); li++){
+      b   = (*li)->getBlockId();      
+      mit = m_modelRelax.find(b);
+      assert(mit != m_modelRelax.end());      
+      DecompAlgoModel     & algoModel = (*mit).second;
+      DecompConstraintSet * model     = algoModel.getModel();
+      if(( model->m_masterOnly && model->m_masterOnlyIsInt) ||
+         (!model->m_masterOnly && model->getNumInts() == 0)){
+         m_masterSI->setContinuous((*li)->getColMasterIndex());
+         printf("set back to continuous index=%d block=%d\n",
+                b, (*li)->getColMasterIndex());
+      }
    }
 
    if(m_param.LogDumpModel >= 2)

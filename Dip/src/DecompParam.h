@@ -115,6 +115,8 @@ public:
    int    InitCompactSolve;
 
    double DualStabAlpha;
+
+   int    BreakOutPartial;
    
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
@@ -178,6 +180,7 @@ public:
       PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
+      PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
       //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
       //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
@@ -251,6 +254,7 @@ public:
       UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
+      UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
       //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
       //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
@@ -298,6 +302,7 @@ public:
       InitVarsWithIPLimitTime  = 10;
       InitCompactSolve         = 0;
       DualStabAlpha            = 0.10;
+      BreakOutPartial          = 0;
       //IpAlgoStart           = "dual";
       //IpAlgoSub             = "dual";
    }
