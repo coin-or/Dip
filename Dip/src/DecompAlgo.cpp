@@ -2041,15 +2041,23 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
    //---
    //--- solve the master as an integer program
+   //---    since the user might have given us a good IP feasible
+   //---    init solution, let's always solve master as IP as soon 
+   //---    as we get into PHASE 2
    //---
-   if(m_phase != PHASE_PRICE1 &&
-      m_nodeStats.priceCallsTotal         && 
-      m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0){
+   if((m_phase != PHASE_PRICE1      &&
+       m_nodeStats.priceCallsTotal  && 
+       m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0) 
+      ||
+      m_firstPhase2Call){
       UTIL_MSG(m_param.LogLevel, 2,
                (*m_osLog) << "SolveMasterAsIp: PriceCallsTotal=" <<
-               m_nodeStats.priceCallsTotal << endl;);
+               m_nodeStats.priceCallsTotal 
+               << endl;);
       solutionUpdateAsIP();
+      if(m_firstPhase2Call) m_firstPhase2Call = false;
    }
+   
 
    //---
    //--- was missing all along? 9/28/09
@@ -2266,13 +2274,22 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
    //---
    m_app->generateInitVars(initVars);
    
+   //TODO: think - if user gives a partial feasible solution
+   //   and this part is not run then PI master can be infeasible
+   //   which will cause an issue
+   //Should probably have this on irregardless of what we get from user.
+   //Another reason this has to run is because if user gives a solution
+   //  with some master-only vars set to their LB=0. This will not be
+   //  added as 0-columns. So, will have convexity constraints that are
+   //  0=1.
    int nInitVars = static_cast<int>(initVars.size());
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 	      (*m_osLog) 
 	      << "nInitVars from app = " << nInitVars 
 	      << " userLimit = " << limit << endl;
 	      );
-   
+
+   nInitVars = 0;//THINK
    if(nInitVars < limit){      
       //---
       //--- create an initial set of points F'[0] subseteq F'
@@ -2498,8 +2515,8 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 				    (*vli)->getOriginalCost());
             m_xhatIPBest = decompSol;
 	    m_xhatIPFeas.push_back(decompSol);
-            //printf("var is ip feas with obj = %g\n",
-            //     (*vli)->getOriginalCost());
+            printf("var is ip feas with obj = %g\n",
+                   (*vli)->getOriginalCost());
 	    setObjBoundUB((*vli)->getOriginalCost());
 	 }
       }
@@ -2837,6 +2854,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    //--- switch to PHASE II (art=0)
 	    //---
 	    masterPhaseItoII();
+            m_firstPhase2Call = true;
 	    m_nodeStats.resetCutRound();
 	    m_nodeStats.resetPriceRound();
 	    if(m_algo == DECOMP){

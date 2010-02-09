@@ -49,19 +49,13 @@ private:
    /** Definition of blocks (by rows). */
    map<int, vector<int> > m_blocks;
 
-   /** Store the columns that appear in master only.*/
-   //vector<int> m_masterOnlyVars;
-
 private:
+
    /* @name Inherited (from virtual) methods. */
 
-   /** Solve the relaxed problem. */
-   //virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
-   //				   const double     * redCostX,
-   //				   const double       convexDual,
-   //				   DecompVarList    & varList);
-      
-private:
+   /** Generate init columns. */
+   virtual int generateInitVars(DecompVarList & initVars);
+
    /** @name Helper functions (private). */
 
    /** Initialize application. */
@@ -75,6 +69,7 @@ private:
    void                  createModelMasterOnlys(vector<int> & masterOnlyCols);
    void                  createModelMasterOnlys2(vector<int> & masterOnlyCols);
 
+   void                  readInitSolutionFile(DecompVarList & initVars);
 
 
    /** Read block file. */

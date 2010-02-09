@@ -144,86 +144,128 @@ void MILPBlock_DecompApp::readBlockFile(){
    is.close();
 }
 
-/*
 //===========================================================================//
-void MILPBlock_DecompApp::readInitSolutionFile(){
+void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
 
    ifstream is;
    string   fileName = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.InitSolutionFile;
-   ////////////STOP
+
+   //---
+   //--- create map from col name to col index
+   //---
+   int                    i;
+   map<string,int>        colNameToIndex;
+   const vector<string> & colNames = m_modelC->getColNames();
+   for(i = 0; i < m_modelC->getNumCols(); i++)
+      colNameToIndex.insert(make_pair(colNames[i], i));
    
+   //---
+   //--- create a map from col index to block index
+   //---
+   map<int,int> colIndexToBlockIndex;
+   map<int, DecompConstraintSet*>::iterator mit;
+   const double * colLB = m_modelC->getColLB();
+   const double * colUB = m_modelC->getColUB();
+   for(mit = m_modelR.begin(); mit != m_modelR.end(); mit++){
+      int                   blockIndex = mit->first;
+      DecompConstraintSet * model      = mit->second;
+      if(model->m_masterOnly){         
+         colIndexToBlockIndex.insert(make_pair(model->m_masterOnlyIndex,
+                                               blockIndex));
+      }
+      else{         
+         const vector<int> & activeColumns = model->getActiveColumns();
+         vector<int>::const_iterator vit;
+         for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++){
+            colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
+         }
+      }
+   }
+
    //---
    //--- open file streams
    //---
    UtilOpenFile(is, fileName.c_str());
-
-   int i, rowId, numRowsInBlock, blockId;
    if(m_appParam.LogLevel >= 1)
       (*m_osLog) << "Reading " << fileName << endl;
-   if(m_appParam.BlockFileFormat == "List" ||
-      m_appParam.BlockFileFormat == "LIST"){
 
-      //---
-      //--- The block file defines those rows in each block.
-      //---   <block id>  <num rows in block>
-      //---     <row ids...>
-      //---   <block id>  <num rows in block>
-      //---     <row ids...>
-      //---
-      
-      //---
-      //--- TODO: also allow row names (instead of row ids)
-      //---      
-      while(!is.eof()){
-	 is >> blockId;
-	 is >> numRowsInBlock;
-	 if(is.eof()) break;
-	 vector<int> rowsInBlock;
-	 for(i = 0; i < numRowsInBlock; i++){
-	    is >> rowId;
-	    rowsInBlock.push_back(rowId);
-	 }
-	 m_blocks.insert(make_pair(blockId, rowsInBlock));
-	 if(is.eof()) break;      
+   //---
+   //--- create variables for each block of each solution
+   //---
+   int    solutionIndex, colIndex, blockIndex;
+   string colName;
+   double colValue;
+   char   line[1000];
+   map< pair<int,int>, pair< vector<int>,vector<double> > > varTemp;
+   map< pair<int,int>, pair< vector<int>,vector<double> > >::iterator it;
+   is.getline(line, 1000);
+
+
+   //TODO? master-only
+   // 1. if user gives lb, then add lb only
+   //    if 0, add 0-col? or just let it take care of from PI?   
+   // 2. if user gives ub, then add ub only
+   // 3. if user gives betwen bounds, then add lb and ub
+   //    unless it is general integer
+   while(!is.eof()){
+      is >> solutionIndex >> colName >> colValue;
+      if(is.eof()) break;
+      colIndex        = colNameToIndex[colName];
+      blockIndex      = colIndexToBlockIndex[colIndex];
+      DecompConstraintSet * model = m_modelR[blockIndex];
+      if(model->m_masterOnly){
+         printf("MasterOnly col=%s value=%g lb=%g ub=%g",
+                colName.c_str(), colValue, colLB[colIndex], colUB[colIndex]);
+         if(colValue < (colUB[colIndex]-1.0e-5) &&
+            colValue > (colLB[colIndex]+1.0e-5)){
+            printf(" --> in between bounds");
+            //TODO: if so, should add both lb and ub
+         }
+         printf("\n");
+      }
+      pair<int,int> p = make_pair(solutionIndex, blockIndex);
+      it = varTemp.find(p);
+      if(it == varTemp.end()){         
+         vector<int>    ind;
+         vector<double> els;
+         ind.push_back(colIndex);
+         els.push_back(colValue);
+         varTemp.insert(make_pair(p, make_pair(ind, els)));
+      }
+      else{
+         vector<int>    & ind = it->second.first;
+         vector<double> & els = it->second.second;
+         ind.push_back(colIndex);
+         els.push_back(colValue);         
       }
    }
-   else if(m_appParam.BlockFileFormat == "Pair" ||
-	   m_appParam.BlockFileFormat == "PAIR"){
-      //---
-      //--- <block id> <row id> 
-      //---  ...
-      //---
-      int blockIdCurr = 0;
-      is >> blockId;
-      while(!is.eof()){
-	 vector<int> rowsInBlock;
-	 while(blockId == blockIdCurr && !is.eof()){
-	    is >> rowId;
-	    rowsInBlock.push_back(rowId);
-	    is >> blockId;
-	 }
-	 m_blocks.insert(make_pair(blockIdCurr, rowsInBlock));	 
-	 blockIdCurr = blockId;
-	 if(is.eof()) break;
-      }      
-   } else{
-      assert(0);
+
+   //---
+   //--- create DecompVar's from varTemp
+   //---
+   for(it = varTemp.begin(); it != varTemp.end(); it++){
+      const pair<int,int>                 & indexPair  = it->first;
+      pair< vector<int>, vector<double> > & columnPair = it->second;
+      double      origCost = 0.0;
+      for(i = 0; i < static_cast<int>(columnPair.first.size()); i++){
+         origCost += columnPair.second[i] *
+            m_objective[columnPair.first[i]];            
+      }
+      DecompVar * var = new DecompVar(columnPair.first,
+                                      columnPair.second,
+                                      -1.0,
+                                      origCost);
+      var->setBlockId(indexPair.second);
+
+      var->print(m_osLog, colNames);
+
+      initVars.push_back(var);
+      printf("Adding initial variable with origCost = %g\n", origCost);
    }
 
-   if(m_appParam.LogLevel >= 3){
-      map<int, vector<int> >::iterator mit;
-      vector<int>           ::iterator vit;
-      for(mit = m_blocks.begin(); mit != m_blocks.end(); mit++){
-         (*m_osLog) << "Block " << (*mit).first << " : ";
-         for(vit = (*mit).second.begin(); vit != (*mit).second.end(); vit++)
-            (*m_osLog) << (*vit) << " ";
-         (*m_osLog) << endl;
-      }
-   }
-   
    is.close();
-   }*/
+}
 
 //===========================================================================//
 void 
@@ -792,6 +834,19 @@ void MILPBlock_DecompApp::createModels(){
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createModels()", m_appParam.LogLevel, 2);   
+}
+
+
+//===========================================================================//
+int MILPBlock_DecompApp::generateInitVars(DecompVarList & initVars){	
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "generateInitVars()", m_appParam.LogLevel, 2);
+
+   readInitSolutionFile(initVars);
+   
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+                    "generateInitVars()", m_appParam.LogLevel, 2);  
+   return static_cast<int>(initVars.size());
 }
 
 /*
