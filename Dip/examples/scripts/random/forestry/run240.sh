@@ -9,4 +9,4 @@ $DIR/decomp_milpblock --param $DIR/milpblockR.parm240 --PRICE_AND_CUT:CompressCo
 echo "Running 240-dip4"
 $DIR/decomp_milpblock --param $DIR/milpblockR.parm240 --PRICE_AND_CUT:CompressColumns 0 --PRICE_AND_CUT:SolveMasterAsIpFreqPass 2 --PRICE_AND_CUT:BreakOutPartial 1 > rand240.dip4.txt
 echo "Running 240-dip5"
-$DIR/decomp_milpblock --param $DIR/milpblockR.parm240 --PRICE_AND_CUT:CompressColumns 0 --PRICE_AND_CUT:BreakOutPartial > rand240.dip5.txt
+$DIR/decomp_milpblock --param $DIR/milpblockR.parm240 --PRICE_AND_CUT:CompressColumns 0 --PRICE_AND_CUT:BreakOutPartial 1 > rand240.dip5.txt

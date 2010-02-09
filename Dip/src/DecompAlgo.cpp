@@ -1249,6 +1249,8 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
       }
    }
 
+   printf("newVars = %d\n", newVars.size());
+
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "breakOutPartial()", m_param.LogDebugLevel, 1);
 }
@@ -4723,6 +4725,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    DecompConstraintSet * modelCore = m_modelCore.getModel();
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "addVarsToPool()", m_param.LogDebugLevel, 2);
+   printf("varpool size=%d\n", m_varpool.size());
 
    //---
    //--- sanity check - make sure the number of rows in core is
@@ -4905,6 +4908,8 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 	 m_varpool.push_back(waitingCol);
       }
    } //END: for(li = newVars.begin(); li != newVars.end(); li++)
+
+   printf("varpool size=%d\n", m_varpool.size());
 
    UTIL_DELARR(denseCol);
    UtilPrintFuncEnd(m_osLog, m_classTag,
