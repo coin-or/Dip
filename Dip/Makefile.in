@@ -88,6 +88,9 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/GAP/get_pisinger.sh.in \
 	$(top_srcdir)/examples/MAD/Makefile.in \
 	$(top_srcdir)/examples/MAD/mad.parm.in \
+	$(top_srcdir)/examples/MCF/Makefile.in \
+	$(top_srcdir)/examples/MCF/data_extract.sh.in \
+	$(top_srcdir)/examples/MCF/mcf.parm.in \
 	$(top_srcdir)/examples/MILP/MILP_DecompApp.cpp \
 	$(top_srcdir)/examples/MILP/MILP_DecompApp.h \
 	$(top_srcdir)/examples/MILP/MILP_Main.cpp \
@@ -148,12 +151,13 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/GAP/Makefile examples/GAP/gap.parm \
 	examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh \
 	examples/MAD/Makefile examples/MAD/mad.parm \
-	examples/MMKP/Makefile examples/MMKP/mmkp.parm \
-	examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh \
-	examples/VRP/Makefile examples/VRP/vrp.parm \
-	examples/VRP/get_boost.sh examples/VRP/get_concorde.sh \
-	examples/VRP/get_cvrpsep.sh examples/ATM/Makefile \
-	examples/ATM/atm.parm \
+	examples/MCF/Makefile examples/MCF/mcf.parm \
+	examples/MCF/data_extract.sh examples/MMKP/Makefile \
+	examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh \
+	examples/MMKP/get_pisinger.sh examples/VRP/Makefile \
+	examples/VRP/vrp.parm examples/VRP/get_boost.sh \
+	examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh \
+	examples/ATM/Makefile examples/ATM/atm.parm \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -512,6 +516,12 @@ examples/MAD/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MAD/mad.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/mad.parm.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MCF/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MCF/mcf.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/mcf.parm.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MCF/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/data_extract.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MMKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MMKP/mmkp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/mmkp.parm.in
@@ -696,7 +706,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc
+	$(mkdir_p) $(distdir)/. $(distdir)/.. $(distdir)/../BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
