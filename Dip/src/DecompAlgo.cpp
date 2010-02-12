@@ -1085,7 +1085,8 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 	 colIndex++;
 	 break;
       default:
-	 assert(0);
+         throw UtilException("Range constraints are not yet supported. Please break up your range constraints into two constraints.", 
+                             "masterMatrixAddArtCols", "DecompAlgo");
       }
    }   
 }
@@ -1249,7 +1250,7 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
       }
    }
 
-   printf("newVars = %d\n", newVars.size());
+   //printf("newVars = %d\n", newVars.size());
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "breakOutPartial()", m_param.LogDebugLevel, 1);
@@ -1789,7 +1790,8 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                   nChanges 
                      = m_nodeStats.cutsThisCall + m_nodeStats.varsThisCall;
                   
-                  printf("BreakOutPartial newVars = %d\n", partialVars.size());
+                  (*m_osLog) << "BreakOutPartial newVars = "
+                             << partialVars.size() << endl;
                }
             }
         
@@ -2036,7 +2038,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    
    m_stats.timerOther1.reset();
    
-   int i, cpxStat=0, cpxMethod=0;
+   int i;
    DecompStatus status = STAT_UNKNOWN;
 
    //---
@@ -2075,6 +2077,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
+   int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
@@ -4743,7 +4746,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    DecompConstraintSet * modelCore = m_modelCore.getModel();
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "addVarsToPool()", m_param.LogDebugLevel, 2);
-   printf("varpool size=%d\n", m_varpool.size());
+   //printf("varpool size=%d\n", m_varpool.size());
 
    //---
    //--- sanity check - make sure the number of rows in core is
@@ -4927,7 +4930,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       }
    } //END: for(li = newVars.begin(); li != newVars.end(); li++)
 
-   printf("varpool size=%d\n", m_varpool.size());
+   //printf("varpool size=%d\n", m_varpool.size());
 
    UTIL_DELARR(denseCol);
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -5632,7 +5635,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    OsiSolverInterface  * subprobSI  = algoModel.getOsi();
    int                   whichBlock = algoModel.getBlockId();
    bool                  isRoot     = getNodeIndex() ? false : true;
-   DecompConstraintSet * modelCore  = getModelCore().getModel();
    DecompConstraintSet * model      = algoModel.getModel();
 
 #ifndef RELAXED_THREADED
@@ -5643,8 +5645,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 	      );
    m_stats.timerOther1.reset();
 #endif
-
-   DecompStatus rc     = STAT_UNKNOWN;
 
    //---
    //--- deal with the special case of master-only variables
@@ -5696,7 +5696,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    m_stats.timerOther2.reset();
 #endif
 
-   int isExact  = 0;
    int nVars    = static_cast<int>(vars.size());
    int nNewVars = 0;
 
@@ -5769,7 +5768,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       assert(subprobSI);
       double * milpSolution = NULL;
       double   rcBestCol    = DecompInf;
-      double   milpObj      = DecompInf;
       
       //---
       //--- reset the objective to reduced cost

@@ -453,7 +453,6 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 
    int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda 
-   bool isRoot      = getNodeIndex() ? false : true;
    int  logIpLevel  = m_param.LogLpLevel;
 
    //---

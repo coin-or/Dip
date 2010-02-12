@@ -83,6 +83,7 @@ Dip/data/MAD/steiner/PST.tar.gz -text
 Dip/data/MAD/steiner/madlib.steiner.list -text
 Dip/data/MAD/steiner/madlib.steiner.opt -text
 Dip/data/MAD/unzip.sh -text
+Dip/data/MCF/get.data -text
 Dip/data/MEWCP/maxclique_data.txt -text
 Dip/data/MILP/block/get.data -text
 Dip/data/MILP/block/results/parameters.txt -text

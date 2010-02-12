@@ -20,7 +20,7 @@ int MCF_Instance::readInstance(string & fileName,
                                bool     addDummyArcs){
    
    ifstream is;   
-   status = UtilOpenFile(is, fileName.c_str());   
+   int      status = UtilOpenFile(is, fileName.c_str());   
    if(status)
       throw UtilException("Failed to read instance",
                           "readInstance", "MCF_Instance");
@@ -31,9 +31,9 @@ int MCF_Instance::readInstance(string & fileName,
    int    commodities_read = 0;;
    char   line[1000];
    char   name[1000];
-   while(s.good()) {
-      s.getline(line, 1000);
-      if (s.gcount() >= 999) {
+   while(is.good()) {
+      is.getline(line, 1000);
+      if (is.gcount() >= 999) {
          cerr << "ERROR: Input file is incorrect. "
               << "A line more than 1000 characters is found." << endl;
          return 1;
@@ -51,16 +51,16 @@ int MCF_Instance::readInstance(string & fileName,
          if(!m_arcs)
             throw UtilExceptionMemory("readInstance", "MCF_DecompApp");
          m_commodities = new commodity[m_numCommodities];
-         if(!m_commodites)
+         if(!m_commodities)
             throw UtilExceptionMemory("readInstance", "MCF_DecompApp");
          break;
       case 'c':
          break;
       case 'd':
          if (sscanf(line, "d%i%i%i",
-                    &commodities[commodities_read].source,
-                    &commodities[commodities_read].sink,
-                    &commodities[commodities_read].demand) != 3) {
+                    &m_commodities[commodities_read].source,
+                    &m_commodities[commodities_read].sink,
+                    &m_commodities[commodities_read].demand) != 3) {
             cerr << "ERROR: Input file is incorrect. (d line)" << endl;
             return 1;
          }
@@ -68,15 +68,15 @@ int MCF_Instance::readInstance(string & fileName,
          break;
       case 'a':
          if (sscanf(line, "a%i%i%i%i%lf",
-                    &arcs[arcs_read].tail,
-                    &arcs[arcs_read].head,
-                    &arcs[arcs_read].lb,
-                    &arcs[arcs_read].ub,
-                    &arcs[arcs_read].weight) != 5) {
+                    &m_arcs[arcs_read].tail,
+                    &m_arcs[arcs_read].head,
+                    &m_arcs[arcs_read].lb,
+                    &m_arcs[arcs_read].ub,
+                    &m_arcs[arcs_read].weight) != 5) {
             cerr << "Input file is incorrect. (a line)" << endl;
             return 1;
          }
-         sumweight += fabs(arcs[arcs_read].weight);
+         sumweight += fabs(m_arcs[arcs_read].weight);
          ++arcs_read;
          break;
       default:
@@ -100,14 +100,15 @@ int MCF_Instance::readInstance(string & fileName,
    
    if (addDummyArcs) {
       for (int i = 0; i < m_numCommodities; ++i) {
-         arcs[m_numArcs].tail   = commodities[i].source;
-         arcs[m_numArcs].head   = commodities[i].sink;
-         arcs[m_numArcs].lb     = 0;
-         arcs[m_numArcs].ub     = commodities[i].demand;
-         arcs[m_numArcs].weight = sumweight+1;
+         m_arcs[m_numArcs].tail   = m_commodities[i].source;
+         m_arcs[m_numArcs].head   = m_commodities[i].sink;
+         m_arcs[m_numArcs].lb     = 0;
+         m_arcs[m_numArcs].ub     = m_commodities[i].demand;
+         m_arcs[m_numArcs].weight = sumweight+1;
          ++m_numArcs;
       }
    }
    is.close();
+   return 0;
 }
 

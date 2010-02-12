@@ -525,7 +525,7 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
 		      "solveDirect()", m_param.LogDebugLevel, 2);
 
    DecompVarList dummy;
-   int           i, status, nNodes;
+   int           i, nNodes;
    double        objLB      = -DecompInf;
    double        objUB      =  DecompInf;
    int           logIpLevel = m_param.LogLpLevel;      

@@ -57,7 +57,8 @@ public:
 
 public:
    /** @name Helper Methods. */
-   void readInstance(string & fileName)
+   int readInstance(string & fileName,
+                    bool     addDummyArcs = true);
 
    inline void initMembers(){
       m_problemName     = "";

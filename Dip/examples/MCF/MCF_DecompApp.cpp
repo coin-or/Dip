@@ -99,8 +99,8 @@ void MCF_DecompApp::createModels(){
    int   k, a, colIndex;
    int   numCommodities = m_instance.m_numCommodities;
    int   numArcs        = m_instance.m_numArcs;
-   arc * arcs           = m_instance.m_arcs;
-   int   numCols        = m_numCommodities * m_numArcs;
+   int   numCols        = numCommodities * numArcs;
+   MCF_Instance::arc * arcs = m_instance.m_arcs;
 
    //---
    //--- Construct the objective function and set it
@@ -110,9 +110,9 @@ void MCF_DecompApp::createModels(){
    if(!m_objective)
       throw UtilExceptionMemory("createModels", "MCF_DecompApp");
    colIndex = 0;
-   for(k = 0; k < m_numCommodities; k++)
-      for(a = 0; a < m_numArcs; a++)
-         m_objective[colIndex++] = m_arcs[a].weight;
+   for(k = 0; k < numCommodities; k++)
+      for(a = 0; a < numArcs; a++)
+         m_objective[colIndex++] = arcs[a].weight;
 
    //---
    //--- set the objective 
@@ -129,10 +129,10 @@ void MCF_DecompApp::createModels(){
    //---
    //--- create the relaxed/subproblem models and set them
    //---
-   for(k = 0; k < m_numCommodities; k++){
+   for(k = 0; k < numCommodities; k++){
       DecompConstraintSet * modelRelax = new DecompConstraintSet();      
       createModelRelax(modelRelax, k);         
-      setModelRelax(modelRelax, "relax" + UtilIntToStr(k));
+      setModelRelax(modelRelax, "relax" + UtilIntToStr(k), k);
    }
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -151,9 +151,9 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
    int   k, a, colIndex;
    int   numCommodities = m_instance.m_numCommodities;
    int   numArcs        = m_instance.m_numArcs;
-   arc * arcs           = m_instance.m_arcs;
    int   numCols        = numCommodities * numArcs;
    int   numRows        = 2              * numArcs;
+   MCF_Instance::arc * arcs = m_instance.m_arcs;
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createModelCore()", m_appParam.LogLevel, 2);
@@ -174,8 +174,8 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
    UtilFillN(model->colUB, numCols,  DecompInf);
    for(a = 0; a < numArcs; a++){
       CoinPackedVector row;
-      double           arcLB = arc[a].lb;
-      double           arcUB = arc[a].ub;
+      double           arcLB = arcs[a].lb;
+      double           arcUB = arcs[a].ub;
       for(k = 0; k < numCommodities; k++){
          colIndex = k * numArcs + a;
          model->colLB[colIndex] = arcLB;
@@ -183,7 +183,8 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
          row.insert(colIndex, 1.0);
       }
       //TODO: any issue with range constraints?
-      model->appendRow(row, arc[a].lb, arc[a].ub);
+      model->appendRow(row, -DecompInf, arcUB);
+      model->appendRow(row, arcLB,  DecompInf);
    }
       
    //---
@@ -210,14 +211,14 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet * model,
    //---           =  d[k] if i=t
    //---           =  0, otherwise
    //---
-   int         s, t, a, i, head, tail, colIndex;
+   int         a, i, head, tail, colIndex, source, sink;
    int         numCommodities = m_instance.m_numCommodities;
    int         numArcs        = m_instance.m_numArcs;
-   int         numNodes       = m_instance.m_numNodes;
-   arc       * arcs           = m_instance.m_arcs;
-   commodity * commodities    = m_instance.m_commodities;
+   int         numNodes       = m_instance.m_numNodes;   
    int         numCols        = numCommodities * numArcs;
    int         numRows        = numNodes;
+   MCF_Instance::arc       * arcs        = m_instance.m_arcs;
+   MCF_Instance::commodity * commodities = m_instance.m_commodities;
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createModelRelax()", m_appParam.LogLevel, 2);
@@ -234,8 +235,8 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet * model,
    //---
    //--- get this commodity's source and sink node
    //---
-   s = commodities[k].source;
-   t = commodities[k].sink;
+   source = commodities[commId].source;
+   sink   = commodities[commId].sink;
    
    //---
    //--- create the rows 
@@ -275,8 +276,8 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet * model,
    UtilFillN(model->colUB, numCols,  0.0);
    colIndex = commId * numArcs;
    for(a = 0; a < numArcs; a++){
-      double           arcLB = arc[a].lb;
-      double           arcUB = arc[a].ub;
+      double           arcLB = arcs[a].lb;
+      double           arcUB = arcs[a].ub;
       model->colLB[colIndex] = arcLB;
       model->colUB[colIndex] = arcUB;
       model->activeColumns.push_back(colIndex);

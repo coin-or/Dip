@@ -66,7 +66,7 @@ public:
    MCF_DecompApp(UtilParameters & utilParam) :
       DecompApp   (utilParam),
       m_classTag  ("MCF-APP"),
-      m_objective (NULL),
+      m_objective (NULL)
    {
       initializeApp(utilParam);                    
    }

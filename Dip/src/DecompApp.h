@@ -200,7 +200,10 @@ public:
       m_modelRelaxNest[blockId].push_back(appModel);
    }
    
-   inline DecompAlgo * getDecompAlgo() {
+   //inline DecompAlgo * getDecompAlgo() {
+   // return m_decompAlgo;
+   //}
+   inline DecompAlgo * getDecompAlgo() const  {
       return m_decompAlgo;
    }
 
