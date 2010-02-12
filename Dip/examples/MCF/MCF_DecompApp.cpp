@@ -186,6 +186,18 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
       model->appendRow(row, -DecompInf, arcUB);
       model->appendRow(row, arcLB,  DecompInf);
    }
+
+   //---
+   //--- create column names (helps with debugging)
+   //---
+   for(k = 0; k < numCommodities; k++){
+      for(a = 0; a < numArcs; a++){
+         string colName = "x[comm=" + UtilIntToStr(k) + ",(" +
+            UtilIntToStr(arcs[a].tail) + "," +
+            UtilIntToStr(arcs[a].head) + ")]";
+         model->colNames.push_back(colName);
+      }
+   }
       
    //---
    //--- set the indices of the integer variables of model
