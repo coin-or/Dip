@@ -133,6 +133,8 @@ public:
    virtual void printOriginalColumn(const int   index, 
                                     ostream   * os = &cout) const;
   
+   //TODO: change api so colNames comes from modelCore if exists
+   //  rather than - to simplify API 
    virtual void printOriginalSolution(const int              n_cols, 
                                       const vector<string> & colNames,
                                       const double         * solution,
