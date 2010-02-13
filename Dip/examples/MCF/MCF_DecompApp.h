@@ -47,6 +47,9 @@ private:
    /** The model objective coefficients (original space). */
    double * m_objective;
 
+   /** Model constraint systems. */
+   vector<DecompConstraintSet*> m_models;
+
 public:
    /** @name Helper functions (public). */   
 
@@ -73,6 +76,7 @@ public:
    
    virtual ~MCF_DecompApp() {
       UTIL_DELARR(m_objective);
+      UtilDeleteVectorPtr(m_models);
    };
 };
 

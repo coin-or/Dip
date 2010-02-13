@@ -2076,7 +2076,6 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
-   int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
@@ -2106,6 +2105,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 #ifdef DO_INTERIOR //TODO: option, not compile time
+      int cpxStat=0, cpxMethod=0;
       //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
       CPXbaropt(env, lp);
       cpxMethod = CPXgetmethod(env, lp);

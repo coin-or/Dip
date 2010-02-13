@@ -37,6 +37,11 @@
 using namespace std;
 
 // =========================================================================
+#if not defined(_MSC_VER)
+#include <malloc.h>
+#endif
+
+// =========================================================================
 const string UtilSpaces   = " \t\r\n";
 const double UtilEpsilon  = 1.0e-6;
 const double UtilTooBig   = 1.0e20;
@@ -69,13 +74,9 @@ enum UtilStatus {
 // Debug Macros                                                             
 // =========================================================================
 #ifdef NDEBUG
-
-
-
 //use with LogDebugLevel
-//#define UTIL_DEBUG(param, level, x)
-//TEMP - while debugging
-#define UTIL_DEBUG(param, level, x) if(param >= level) {x fflush(stdout);}
+#define UTIL_DEBUG(param, level, x)
+//#define UTIL_DEBUG(param, level, x) if(param >= level) {x fflush(stdout);}
 #else
 #define UTIL_DEBUG(param, level, x) if(param >= level) {x fflush(stdout);}
 #endif
@@ -320,6 +321,72 @@ inline double UtilAve(const double * x,
 }
 
 // =========================================================================
+// String Macros                                                             
+// =========================================================================
+
+// ------------------------------------------------------------------------- //
+inline string UtilStringRandom(int iLength) {
+   string strReturn;
+   srand( (unsigned int)time(NULL) );
+   for( int i = 0 ; i < iLength ; ++i ) {
+      int iNumber;
+      iNumber = rand()%122;
+      if( 48 > iNumber )
+         iNumber += 48;
+      if( ( 57 < iNumber ) && ( 65 > iNumber ) )
+         iNumber += 7;
+      if( ( 90 < iNumber ) && ( 97 > iNumber ) )
+         iNumber += 6;
+      strReturn += (char)iNumber;
+   }  
+   srand(1);
+   return strReturn;
+} 
+
+// ------------------------------------------------------------------------- //
+//trims white space (as defined by UtilSpaces) in-place
+inline string & UtilStrTrim(string       & s,
+                            const string & t = UtilSpaces) {
+   if(s.size() == 0)
+      return s;
+   string::size_type pos = s.find_last_not_of(t);
+   if(pos != string::npos) {
+      s.erase(pos + 1);
+      pos = s.find_first_not_of(t);
+      if(pos != string::npos) s.erase(0, pos);
+   }
+   else s.erase(s.begin(), s.end());
+   return s;
+}
+
+// ------------------------------------------------------------------------- //
+// returns a lower case version of the string in-place
+inline string & UtilStrToLower(string & s) {
+   // Purify did not like this version:
+   //   transform (s.begin(), s.end(), s.begin(), myToLower());
+   if(s.size() == 0)
+      return s;
+   int i;
+   for (i = 0; s[i] != '\0'; i++)
+      s[i] = static_cast<char>(tolower(s[i]));
+   return s;
+}
+
+
+// ------------------------------------------------------------------------- //
+// returns an upper case version of the string in-place
+inline string & UtilStrToUpper(string & s) {
+   // Purify did not like this version:
+   //   transform (s.begin(), s.end(), s.begin(), myToUpper());   
+   int i;
+   if(s.size() == 0)
+      return s;
+   for (i = 0; s[i] != '\0'; i++)
+      s[i] = static_cast<char>(toupper(s[i]));
+   return s;
+}
+
+// =========================================================================
 // Other Macros
 // =========================================================================
 
@@ -405,6 +472,21 @@ inline string UtilDblToStr(const double x,
       ss << x;
    }
    return ss.str();
+}
+
+// ------------------------------------------------------------------------- //
+inline void UtilPrintMemUsage(ostream  * os       = &cout,
+			      int        logLevel = 0,
+			      int        logLimit = 2){
+#if not defined(_MSC_VER)
+   if(logLevel >= logLimit){
+      struct mallinfo memInfo = mallinfo();
+      double memUsage = static_cast<double>(memInfo.uordblks +
+					    memInfo.hblkhd) / 1024.0;
+      memUsage /= 1024.0;
+      (*os) << "memUsage = " << UtilDblToStr(memUsage, 2) << " MB\n";
+   }
+#endif
 }
 
 // ------------------------------------------------------------------------- //
@@ -544,10 +626,8 @@ inline void UtilFlipRowLtoG(const int    len,
       return;
   
    if(sense == 'G'){
-      //C++ row to negate? TODO
-      for(int i = 0; i < len; i++){
+      for(int i = 0; i < len; i++)
          els[i] = -els[i];
-      }
       sense = 'L';
       rhs   = -rhs;    
    }
@@ -692,72 +772,6 @@ inline int UtilOpenFile(ifstream     & is,
    return UtilOpenFile(is, fileName.c_str());
 }
 
-// =========================================================================
-// String Macros                                                             
-// =========================================================================
-
-// ------------------------------------------------------------------------- //
-inline string UtilStringRandom(int iLength) {
-   string strReturn;
-   srand( (unsigned int)time(NULL) );
-   for( int i = 0 ; i < iLength ; ++i ) {
-      int iNumber;
-      iNumber = rand()%122;
-      if( 48 > iNumber )
-         iNumber += 48;
-      if( ( 57 < iNumber ) && ( 65 > iNumber ) )
-         iNumber += 7;
-      if( ( 90 < iNumber ) && ( 97 > iNumber ) )
-         iNumber += 6;
-      strReturn += (char)iNumber;
-   }  
-   srand(1);
-   return strReturn;
-} 
-
-// ------------------------------------------------------------------------- //
-//trims white space (as defined by UtilSpaces) in-place
-inline string & UtilStrTrim(string       & s,
-                            const string & t = UtilSpaces) {
-   if(s.size() == 0)
-      return s;
-   string::size_type pos = s.find_last_not_of(t);
-   if(pos != string::npos) {
-      s.erase(pos + 1);
-      //pos = s.find_first_not_of(' ');
-      pos = s.find_first_not_of(t);
-      if(pos != string::npos) s.erase(0, pos);
-   }
-   else s.erase(s.begin(), s.end());
-   return s;
-}
-
-// ------------------------------------------------------------------------- //
-// returns a lower case version of the string in-place
-inline string & UtilStrToLower(string & s) {
-   // Purify did not like this version:
-   //   transform (s.begin(), s.end(), s.begin(), myToLower());
-   if(s.size() == 0)
-      return s;
-   int i;
-   for (i = 0; s[i] != '\0'; i++)
-      s[i] = static_cast<char>(tolower(s[i]));
-   return s;
-}
-
-
-// ------------------------------------------------------------------------- //
-// returns an upper case version of the string in-place
-inline string & UtilStrToUpper(string & s) {
-   // Purify did not like this version:
-   //   transform (s.begin(), s.end(), s.begin(), myToUpper());   
-   int i;
-   if(s.size() == 0)
-      return s;
-   for (i = 0; s[i] != '\0'; i++)
-      s[i] = static_cast<char>(toupper(s[i]));
-   return s;
-}
 
 
 #endif
