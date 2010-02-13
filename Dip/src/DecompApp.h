@@ -79,13 +79,6 @@ public:
    map<int, DecompAppModel>          m_modelRelax;
    map<int, vector<DecompAppModel> > m_modelRelaxNest;   
 
-
-   //DecompConstraintSet          * m_modelCore;
-   //vector<DecompConstraintSet*>   m_modelRelaxV;
-   //string                         m_modelCoreName;
-   //vector<string>                 m_modelRelaxNameV;
-
-
    /**
     * Pointers to the algorithm objects.
     *   NOTE: only for the advanced user -- this allows the user 
@@ -140,6 +133,8 @@ public:
    virtual void printOriginalColumn(const int   index, 
                                     ostream   * os = &cout) const;
   
+   //TODO: change api so colNames comes from modelCore if exists
+   //  rather than - to simplify API 
    virtual void printOriginalSolution(const int              n_cols, 
                                       const vector<string> & colNames,
                                       const double         * solution,
@@ -207,12 +202,13 @@ public:
       m_modelRelaxNest[blockId].push_back(appModel);
    }
    
-   inline DecompAlgo * getDecompAlgo() {
+   //inline DecompAlgo * getDecompAlgo() {
+   // return m_decompAlgo;
+   //}
+   inline DecompAlgo * getDecompAlgo() const  {
       return m_decompAlgo;
    }
 
-
-   //Cut(this){
 public:
    DecompApp(UtilParameters & utilParam) :
       m_classTag  ("D-APP"),

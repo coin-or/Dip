@@ -367,7 +367,7 @@ int DecompAlgoRC::generateVars(const DecompStatus   stat,
      m_rc[c] = origObjective[c] - m_rc[c];
   }
 
-  double alpha = 0.0;
+  //double alpha = 0.0;
   DecompVarList potentialVars;
   //TODO: stat return, restrict how many? pass that in to user?
   //only take those with negative reduced cost?

@@ -83,6 +83,7 @@ Dip/data/MAD/steiner/PST.tar.gz -text
 Dip/data/MAD/steiner/madlib.steiner.list -text
 Dip/data/MAD/steiner/madlib.steiner.opt -text
 Dip/data/MAD/unzip.sh -text
+Dip/data/MCF/get.data -text
 Dip/data/MEWCP/maxclique_data.txt -text
 Dip/data/MILP/block/get.data -text
 Dip/data/MILP/block/results/parameters.txt -text
@@ -180,6 +181,18 @@ Dip/examples/MAD/Makefile.in -text
 Dip/examples/MAD/ReadMe.txt -text
 Dip/examples/MAD/TODO -text
 Dip/examples/MAD/mad.parm.in -text
+Dip/examples/MCF/MCF_DecompApp.cpp -text
+Dip/examples/MCF/MCF_DecompApp.h -text
+Dip/examples/MCF/MCF_Instance.cpp -text
+Dip/examples/MCF/MCF_Instance.h -text
+Dip/examples/MCF/MCF_Main.cpp -text
+Dip/examples/MCF/MCF_Param.h -text
+Dip/examples/MCF/MMKP_Main.cpp -text
+Dip/examples/MCF/MMKP_Model.h -text
+Dip/examples/MCF/Makefile.in -text
+Dip/examples/MCF/README.txt.in -text
+Dip/examples/MCF/data_extract.sh.in -text
+Dip/examples/MCF/mcf.parm.in -text
 Dip/examples/MILP/MILP_DecompApp.cpp -text
 Dip/examples/MILP/MILP_DecompApp.h -text
 Dip/examples/MILP/MILP_Main.cpp -text
@@ -311,6 +324,10 @@ Dip/examples/scripts/condor/submit.sh -text
 Dip/examples/scripts/createDecompMember.sh -text
 Dip/examples/scripts/getTimes.sh -text
 Dip/examples/scripts/graphviz/dot2ps.sh -text
+Dip/examples/scripts/random/forestry/run100.sh -text
+Dip/examples/scripts/random/forestry/run200.sh -text
+Dip/examples/scripts/random/forestry/run240.sh -text
+Dip/examples/scripts/random/forestry/run40.sh -text
 Dip/examples/scripts/report_decomp.py -text
 Dip/inc/config_dip.h.in -text
 Dip/scripts/Copyright -text

@@ -145,6 +145,129 @@ void MILPBlock_DecompApp::readBlockFile(){
 }
 
 //===========================================================================//
+void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
+
+   ifstream is;
+   string   fileName = m_appParam.DataDir 
+      + UtilDirSlash() + m_appParam.InitSolutionFile;
+
+   //---
+   //--- create map from col name to col index
+   //---
+   int                    i;
+   map<string,int>        colNameToIndex;
+   const vector<string> & colNames = m_modelC->getColNames();
+   for(i = 0; i < m_modelC->getNumCols(); i++)
+      colNameToIndex.insert(make_pair(colNames[i], i));
+   
+   //---
+   //--- create a map from col index to block index
+   //---
+   map<int,int> colIndexToBlockIndex;
+   map<int, DecompConstraintSet*>::iterator mit;
+   const double * colLB = m_modelC->getColLB();
+   const double * colUB = m_modelC->getColUB();
+   for(mit = m_modelR.begin(); mit != m_modelR.end(); mit++){
+      int                   blockIndex = mit->first;
+      DecompConstraintSet * model      = mit->second;
+      if(model->m_masterOnly){         
+         colIndexToBlockIndex.insert(make_pair(model->m_masterOnlyIndex,
+                                               blockIndex));
+      }
+      else{         
+         const vector<int> & activeColumns = model->getActiveColumns();
+         vector<int>::const_iterator vit;
+         for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++){
+            colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
+         }
+      }
+   }
+
+   //---
+   //--- open file streams
+   //---
+   UtilOpenFile(is, fileName.c_str());
+   if(m_appParam.LogLevel >= 1)
+      (*m_osLog) << "Reading " << fileName << endl;
+
+   //---
+   //--- create variables for each block of each solution
+   //---
+   int    solutionIndex, colIndex, blockIndex;
+   string colName;
+   double colValue;
+   char   line[1000];
+   map< pair<int,int>, pair< vector<int>,vector<double> > > varTemp;
+   map< pair<int,int>, pair< vector<int>,vector<double> > >::iterator it;
+   is.getline(line, 1000);
+
+
+   //TODO? master-only
+   // 1. if user gives lb, then add lb only
+   //    if 0, add 0-col? or just let it take care of from PI?   
+   // 2. if user gives ub, then add ub only
+   // 3. if user gives betwen bounds, then add lb and ub
+   //    unless it is general integer
+   while(!is.eof()){
+      is >> solutionIndex >> colName >> colValue;
+      if(is.eof()) break;
+      colIndex        = colNameToIndex[colName];
+      blockIndex      = colIndexToBlockIndex[colIndex];
+      DecompConstraintSet * model = m_modelR[blockIndex];
+      if(model->m_masterOnly){
+         printf("MasterOnly col=%s value=%g lb=%g ub=%g",
+                colName.c_str(), colValue, colLB[colIndex], colUB[colIndex]);
+         if(colValue < (colUB[colIndex]-1.0e-5) &&
+            colValue > (colLB[colIndex]+1.0e-5)){
+            printf(" --> in between bounds");
+            //TODO: if so, should add both lb and ub
+         }
+         printf("\n");
+      }
+      pair<int,int> p = make_pair(solutionIndex, blockIndex);
+      it = varTemp.find(p);
+      if(it == varTemp.end()){         
+         vector<int>    ind;
+         vector<double> els;
+         ind.push_back(colIndex);
+         els.push_back(colValue);
+         varTemp.insert(make_pair(p, make_pair(ind, els)));
+      }
+      else{
+         vector<int>    & ind = it->second.first;
+         vector<double> & els = it->second.second;
+         ind.push_back(colIndex);
+         els.push_back(colValue);         
+      }
+   }
+
+   //---
+   //--- create DecompVar's from varTemp
+   //---
+   for(it = varTemp.begin(); it != varTemp.end(); it++){
+      const pair<int,int>                 & indexPair  = it->first;
+      pair< vector<int>, vector<double> > & columnPair = it->second;
+      double      origCost = 0.0;
+      for(i = 0; i < static_cast<int>(columnPair.first.size()); i++){
+         origCost += columnPair.second[i] *
+            m_objective[columnPair.first[i]];            
+      }
+      DecompVar * var = new DecompVar(columnPair.first,
+                                      columnPair.second,
+                                      -1.0,
+                                      origCost);
+      var->setBlockId(indexPair.second);
+
+      var->print(m_osLog, colNames);
+
+      initVars.push_back(var);
+      printf("Adding initial variable with origCost = %g\n", origCost);
+   }
+
+   is.close();
+}
+
+//===========================================================================//
 void 
 MILPBlock_DecompApp::findActiveColumns(const vector<int> & rowsPart,
                                        set<int>          & activeColsSet){
@@ -167,6 +290,161 @@ MILPBlock_DecompApp::findActiveColumns(const vector<int> & rowsPart,
          activeColsSet.insert(indR[k]);
       }
    }
+}
+
+//===========================================================================//
+void
+MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
+
+   int            nBlocks     = static_cast<int>(m_blocks.size());
+   const int      nCols       = m_mpsIO.getNumCols();
+   const double * colLB       = m_mpsIO.getColLower();
+   const double * colUB       = m_mpsIO.getColUpper();
+   const char   * integerVars = m_mpsIO.integerColumns();
+   int            nMasterOnlyCols =
+      static_cast<int>(masterOnlyCols.size());
+
+   if(m_appParam.LogLevel >= 1){
+      (*m_osLog) << "nCols           = " << nCols << endl;
+      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
+   }
+
+   if(nMasterOnlyCols == 0)
+      return;
+
+
+   int i, j;
+   vector<int>::iterator vit;
+   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
+      i = *vit;
+            
+      DecompConstraintSet * model = new DecompConstraintSet();
+      model->M = new CoinPackedMatrix(false, 0.0, 0.0);
+      if(!model->M)
+         throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
+      //TODO: Ouch - memory wise - this creates a block per
+      //  master-only var of size nCols! that is dense space??
+      //similar issue for SSR... when size of nCols is big
+      //need to treat these special and not create the explicit
+      //block or constraint system at all
+      model->M->setDimensions(0, nCols);
+      model->reserve(1, nCols);
+      
+      //---
+      //--- fix all non-active columns to 0, this is everything
+      //---  except the master-only columns
+      //---
+      UtilFillN(model->colLB, nCols, 0.0);
+      UtilFillN(model->colUB, nCols, 0.0);
+      
+      //---
+      //--- set the master-only vars but watch for unbounded
+      //---
+      model->colLB[i] = colLB[*vit];
+      model->colUB[i] = colUB[*vit];
+      if(m_appParam.ColumnUB <  1.0e15)
+	 if(colUB[i] >  1.0e15)
+	    model->colUB[i] = m_appParam.ColumnUB;
+      if(m_appParam.ColumnLB > -1.0e15)
+	 if(colLB[i] < -1.0e15)
+	    model->colLB[i] = m_appParam.ColumnLB;
+
+      //---
+      //--- the master-only columns are the only active columns
+      //---
+      model->activeColumns.push_back(i);
+      
+      //---
+      //--- set the indices of the integer variables of modelRelax
+      //---  also set the column names, if they exist
+      //---
+      for(j = 0; j < nCols; j++){
+         const char * colName = m_mpsIO.columnName(j);
+         if(colName)
+            model->colNames.push_back(colName);
+         if(integerVars && integerVars[j]){
+            model->integerVars.push_back(j);            
+         }
+      }   
+
+      //---
+      //--- to avoid any issues with an empty constraint matrix
+      //---   just add one column bound as an explicity row
+      //---
+      CoinPackedVector row;
+      string           rowName  = "fake_row";
+      int              colIndex = i;
+      if(m_appParam.LogLevel >= 2){
+         (*m_osLog) << "Masteronly colindex = " << colIndex << endl;
+         (*m_osLog) << "  colUB now rowUB   = " << model->colUB[colIndex] 
+                    << endl;
+      }
+      row.insert(colIndex, 1.0);
+      model->appendRow(row, -DecompInf, model->colUB[colIndex], rowName);
+
+      if(m_appParam.LogLevel >= 2){
+         (*m_osLog) << "model numcols= " << model->getNumCols() << endl;
+         (*m_osLog) << "model numrows= " << model->getNumRows() << endl;
+      }
+
+      m_modelR.insert(make_pair(nBlocks, model));
+      setModelRelax(model, 
+                    "master_only" + UtilIntToStr(i), nBlocks);
+      nBlocks++;
+   }
+
+   return;   
+}
+
+//===========================================================================//
+void
+MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
+
+   int            nBlocks     = static_cast<int>(m_blocks.size());
+   const int      nCols       = m_mpsIO.getNumCols();
+   const double * colLB       = m_mpsIO.getColLower();
+   const double * colUB       = m_mpsIO.getColUpper();
+   const char   * integerVars = m_mpsIO.integerColumns();
+   int            nMasterOnlyCols =
+      static_cast<int>(masterOnlyCols.size());
+
+   if(m_appParam.LogLevel >= 1){
+      (*m_osLog) << "nCols           = " << nCols << endl;
+      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
+   }
+
+   if(nMasterOnlyCols == 0)
+      return;
+
+
+   int i, j;
+   vector<int>::iterator vit;
+   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
+      i = *vit;
+
+      //THINK:
+      //  what-if master-only var is integer and bound is not at integer
+            
+      DecompConstraintSet * model = new DecompConstraintSet();
+      model->m_masterOnly      = true;
+      model->m_masterOnlyIndex = i;
+      model->m_masterOnlyLB    = colLB[i];
+      model->m_masterOnlyUB    = colUB[i];
+      model->m_masterOnlyIsInt = integerVars[i];//0=cont, 1=integer
+      if(m_appParam.ColumnUB <  1.0e15)
+	 if(colUB[i] >  1.0e15)
+	    model->m_masterOnlyUB = m_appParam.ColumnUB;
+      if(m_appParam.ColumnLB > -1.0e15)
+	 if(colLB[i] < -1.0e15)
+	    model->m_masterOnlyLB = m_appParam.ColumnLB;
+
+      m_modelR.insert(make_pair(nBlocks, model));
+      setModelRelax(model, 
+                    "master_only" + UtilIntToStr(i), nBlocks);
+      nBlocks++;
+   }
+
+   return;   
 }
 
 //===========================================================================//
@@ -522,21 +800,28 @@ void MILPBlock_DecompApp::createModels(){
    if(nMasterOnlyCols){
       if(m_appParam.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
-      DecompConstraintSet * modelMasterOnly
-	 = createModelMasterOnly(modelCore->masterOnlyCols);
-      int nBlocks = static_cast<int>(m_blocks.size());
-      m_modelR.insert(make_pair(nBlocks, modelMasterOnly));
 
-      //---
-      //--- set system in framework
-      //---
-      setModelRelax(modelMasterOnly, "master_only", nBlocks);
-      
-      if(m_appParam.LogLevel >= 3){
-         (*m_osLog) << "Active Columns:" << endl;
-         UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
-         UtilPrintVector(modelMasterOnly->activeColumns, 
-                         modelCore->getColNames(), m_osLog);
+      if(m_appParam.MasterOnlyOneBlock){
+         DecompConstraintSet * modelMasterOnly
+            = createModelMasterOnly(modelCore->masterOnlyCols);
+         int nBlocks = static_cast<int>(m_blocks.size());
+         m_modelR.insert(make_pair(nBlocks, modelMasterOnly));
+
+         //---
+         //--- set system in framework
+         //---
+         setModelRelax(modelMasterOnly, "master_only", nBlocks);
+         
+         if(m_appParam.LogLevel >= 3){
+            (*m_osLog) << "Active Columns:" << endl;
+            UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
+            UtilPrintVector(modelMasterOnly->activeColumns, 
+                            modelCore->getColNames(), m_osLog);
+         }
+      }
+      else{
+         //createModelMasterOnlys(modelCore->masterOnlyCols);
+         createModelMasterOnlys2(modelCore->masterOnlyCols);
       }
    }
       
@@ -549,6 +834,19 @@ void MILPBlock_DecompApp::createModels(){
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createModels()", m_appParam.LogLevel, 2);   
+}
+
+
+//===========================================================================//
+int MILPBlock_DecompApp::generateInitVars(DecompVarList & initVars){	
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "generateInitVars()", m_appParam.LogLevel, 2);
+
+   readInitSolutionFile(initVars);
+   
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+                    "generateInitVars()", m_appParam.LogLevel, 2);  
+   return static_cast<int>(initVars.size());
 }
 
 /*

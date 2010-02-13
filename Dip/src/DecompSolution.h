@@ -16,6 +16,7 @@
 #ifndef DECOMP_SOLUTION_INCLUDED
 #define DECOMP_SOLUTION_INCLUDED
 
+//TODO: make this public AlpsDecompSolution?
 class DecompSolution {
 protected:
    /** Length of solution (number of columns). */
@@ -101,7 +102,6 @@ public:
       m_quality(quality)
    {
       CoinAssert(m_size > 0);
-
       m_values = new double[m_size];
       CoinAssertHint(m_values, "Error: Out of Memory"); 
       memcpy(m_values, values, m_size * sizeof(double));
@@ -115,7 +115,6 @@ public:
       m_quality(0.0)
    {
       CoinAssert(m_size > 0);
-
       m_values = new double[m_size];
       CoinAssertHint(m_values, "Error: Out of Memory"); 
       memcpy(m_values, values, m_size * sizeof(double));
@@ -123,10 +122,8 @@ public:
       //---
       //--- calculate quality
       //---
-      for(int i = 0; i < size; i++){
+      for(int i = 0; i < size; i++)
 	 m_quality += cost[i] * values[i];
-      }
-
    }
    
    virtual ~DecompSolution() {  

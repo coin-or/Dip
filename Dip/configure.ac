@@ -263,6 +263,9 @@ AC_CONFIG_FILES([Makefile
 		 examples/GAP/get_pisinger.sh
                  examples/MAD/Makefile
                  examples/MAD/mad.parm
+                 examples/MCF/Makefile
+                 examples/MCF/mcf.parm
+                 examples/MCF/data_extract.sh
                  examples/MMKP/Makefile
                  examples/MMKP/mmkp.parm
                  examples/MMKP/data_extract.sh

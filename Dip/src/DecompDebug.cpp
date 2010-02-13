@@ -525,7 +525,7 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
 		      "solveDirect()", m_param.LogDebugLevel, 2);
 
    DecompVarList dummy;
-   int           i, status, nNodes;
+   int           i, nNodes;
    double        objLB      = -DecompInf;
    double        objUB      =  DecompInf;
    int           logIpLevel = m_param.LogLpLevel;      
@@ -639,6 +639,7 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
       dynamic_cast<OsiIpSolverInterface*>(m_masterSI);
    CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
    CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
+   int       status = 0;
 
    //---
    //--- set the time limit

@@ -236,6 +236,7 @@ protected:
    vector<double> m_phaseIObj;
 
    int          m_function;//calling function
+   bool         m_firstPhase2Call;
 
 public:   
    /**
@@ -530,6 +531,11 @@ public:
               m_masterColType[index] == DecompCol_ArtForCutL    ||
               m_masterColType[index] == DecompCol_ArtForCutG);
    }
+
+   void breakOutPartial(const double  * xHat,
+                        DecompVarList & newVars,
+                        const double    intTol = 1.0e-5);
+      
    
 
 
@@ -806,7 +812,8 @@ public:
       m_colUBNode(NULL),
       m_relGap(DecompInf),
       m_stopCriteria(DecompStopNo),
-      m_masterObjLast(DecompInf)
+      m_masterObjLast(DecompInf),
+      m_firstPhase2Call(false)
    {
       m_app->m_decompAlgo = this;
    }

@@ -114,7 +114,10 @@ public:
    //  hopefully identify infeasibiity in tree quicker
    int    InitCompactSolve;
 
+   int    DualStab;
    double DualStabAlpha;
+
+   int    BreakOutPartial;
    
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
@@ -168,8 +171,8 @@ public:
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
       PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
-      PARAM_getSetting("SolveMasterAsFreqNode",SolveMasterAsIpFreqNode);
-      PARAM_getSetting("SolveMasterAsFreqPass",SolveMasterAsIpFreqPass);
+      PARAM_getSetting("SolveMasterAsIpFreqNode",SolveMasterAsIpFreqNode);
+      PARAM_getSetting("SolveMasterAsIpFreqPass",SolveMasterAsIpFreqPass);
       PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
@@ -177,7 +180,9 @@ public:
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
       PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
+      PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
+      PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
       //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
       //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
@@ -250,7 +255,9 @@ public:
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
       UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
+      UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
+      UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
       //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
       //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
@@ -297,7 +304,9 @@ public:
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
       InitCompactSolve         = 0;
+      DualStab                 = 0;
       DualStabAlpha            = 0.10;
+      BreakOutPartial          = 0;
       //IpAlgoStart           = "dual";
       //IpAlgoSub             = "dual";
    }
