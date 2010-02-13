@@ -1,3 +1,4 @@
+- OsiCpx message handling - seeing all messages twice
 - projection for blocks to save memory (see SSR)
 - clean-up and document parameter names
 - Relax and Cut ---> what to do if no UB!?

@@ -639,6 +639,7 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
       dynamic_cast<OsiIpSolverInterface*>(m_masterSI);
    CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
    CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
+   int       status = 0;
 
    //---
    //--- set the time limit

@@ -26,7 +26,6 @@
 //#define   RELAXED_THREADED
 #define   NTHREADS   2
 //#define   DO_INTERIOR //also in DecompAlgoPC
-//#define DUAL_SMOOTHING
 
 //===========================================================================//
 //#define STAB_DUMERLE
@@ -4111,8 +4110,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 //---  since the calculated reduced cost is based on the smoothed
 	 //---  duals
 	 //---  
-#ifndef DUAL_SMOOTHING
-	 if(!UtilIsZero(rcLP[(*it)->getColMasterIndex()] 
+	 if(!m_param.DualStab &&
+	    !UtilIsZero(rcLP[(*it)->getColMasterIndex()] 
 			- (redCost-alpha), 1.0e-3)){
 	    //---
 	    //--- this whole next section is an expansion of log
@@ -4193,7 +4192,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    assert(0);
 	    (*m_osLog) << endl;
 	 } //END: if(!UtilIsZero(rcLP[(*it)->getColMasterIndex()] ...
-#endif      
       } //END: for(it = m_vars.begin(); it != m_vars.end(); it++)
    } //END: if(m_param.DebugLevel >= 1)
 
@@ -4889,7 +4887,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       //  this is ugly, fix this later... make a helper funciton of DecompVar?
       //TODO: this is very expensive - use hash like in cuts
       if(m_varpool.isDuplicate(m_vars, waitingCol)){
-#ifndef DUAL_SMOOTHING
+
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
                     (*m_osLog) << "Duplicate variable, already in vars!!\n";
 		    );
@@ -4899,11 +4897,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 		    (*m_osLog) << "\nVARS:\n";
 		    printVars(m_osLog);  
 		    );
-#else
-	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		    (*m_osLog) << "Duplicate variable, already in vars!!\n";
-		    );
-#endif
+
 	 waitingCol.deleteVar();
 	 waitingCol.deleteCol();
 	 if(m_algo != RELAX_AND_CUT){ //?? 

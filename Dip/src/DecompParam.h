@@ -114,6 +114,7 @@ public:
    //  hopefully identify infeasibiity in tree quicker
    int    InitCompactSolve;
 
+   int    DualStab;
    double DualStabAlpha;
 
    int    BreakOutPartial;
@@ -179,6 +180,7 @@ public:
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
       PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
+      PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
       PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
       //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
@@ -253,6 +255,7 @@ public:
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
       UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
+      UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
       //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
@@ -301,6 +304,7 @@ public:
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
       InitCompactSolve         = 0;
+      DualStab                 = 0;
       DualStabAlpha            = 0.10;
       BreakOutPartial          = 0;
       //IpAlgoStart           = "dual";
