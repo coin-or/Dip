@@ -5806,10 +5806,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //---
       //--- solve: min cx, s.t. A'x >= b', x in Z ([A,b] is in modelRelax.M)
       //---    
-
       //TODO: get best N feasible solutions? is this possible with CBC
       //  this can help if this is the primary form of col-gen     
-
       algoModel.solveOsiAsIp(solveResult,
                              m_param,
                              doExact,
@@ -5844,61 +5842,64 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       // THINK: we really don't want to force the user to create vars
       // and check rc and obj, etc... but they might know how to be smart
       // and produce more than one, etc... THINK
-
       if(milpSolution){
          //---
          //--- create a DecompVar (shat) from the optimal solution      
          //---
          vector<int>    ind;
          vector<double> els;
-         int c;
+         int    i, c;
          double varRedCost  = 0.0; //stupid - == obj ??
          double varOrigCost = 0.0;
-         for(c = 0; c < n_origCols; c++){
-            if(!UtilIsZero(milpSolution[c], m_app->m_param.TolZero)){
-               ind.push_back(c);
-               els.push_back(milpSolution[c]);	    
-               //the reduced cost of shat: (c-uA").s
-               varRedCost  += redCostX[c] * milpSolution[c];	    
-               //the original cost of shat: c.s
-               varOrigCost += origCost[c] * milpSolution[c];
-               UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                          (*m_osLog) << "c: " << c 
-                          << " varOrigCost = " << varOrigCost
-                          << " origCost = " << origCost[c]
-                          << " solution = " << milpSolution[c] << endl;
-                          );
-            }
-         }
+	 if(model->isSparse()){
+	    //TODO: this can just be a vector? ever need arb access?
+	    map<int,int>::const_iterator mcit;
+	    const map<int,int> & sparseToOrig = model->getMapSparseToOrig();
+	    for(mcit  = sparseToOrig.begin(); 
+		mcit != sparseToOrig.end(); mcit++){
+	       i = mcit->first;  //sparse-index
+	       c = mcit->second; //original-index	       
+	       if(!UtilIsZero(milpSolution[i], m_app->m_param.TolZero)){
+		  ind.push_back(c);				
+		  els.push_back(milpSolution[i]);	    
+		  //the reduced cost of shat: (c-uA").s
+		  varRedCost  += redCostX[c] * milpSolution[i];	    
+		  //the original cost of shat: c.s
+		  varOrigCost += origCost[c] * milpSolution[i];
+		  UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+			     (*m_osLog) << "c: " << c 
+			     << " varOrigCost = " << varOrigCost
+			     << " origCost = " << origCost[c]
+			     << " solution = " << milpSolution[i] << endl;
+			     );
+	       }
+	    }
+	 }
+	 else{
+	    for(c = 0; c < n_origCols; c++){
+	       if(!UtilIsZero(milpSolution[c], m_app->m_param.TolZero)){
+		  ind.push_back(c);
+		  els.push_back(milpSolution[c]);	    
+		  //the reduced cost of shat: (c-uA").s
+		  varRedCost  += redCostX[c] * milpSolution[c];	    
+		  //the original cost of shat: c.s
+		  varOrigCost += origCost[c] * milpSolution[c];
+		  UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+			     (*m_osLog) << "c: " << c 
+			     << " varOrigCost = " << varOrigCost
+			     << " origCost = " << origCost[c]
+			     << " solution = " << milpSolution[c] << endl;
+			     );
+	       }
+	    }
+	 }
          varRedCost -= alpha;//RC = c-uA''s - alpha    
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
                     (*m_osLog) << "alpha      = " << alpha << "\n";
                     (*m_osLog) << "varRedCost = " << varRedCost << "\n";
                     (*m_osLog) << "varOrigCost = " << varOrigCost << "\n";
                     );
-	    
-	    
-         /*double bestVarFromApp = DecompInf;
-           if(rc != STAT_UNKNOWN){
-           if(nNewVars >= 1){
-           const DecompVar * appVar = vars.back();
-           UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-           (*m_osLog) << "VAR from application varRedCost = "
-           << appVar->getReducedCost() << endl;
-           );
-           bestVarFromApp = appVar->getReducedCost();
-           }
-           UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-           (*m_osLog) << "VAR from CBC varRedCost         = "
-           << varRedCost << endl;
-           );
-           //assert(varRedCost <= (bestVarFromApp + 1.0e-2));
-           if(isExact){
-           assert( UtilIsZero(varRedCost-bestVarFromApp, 1.0e-2) );
-           }
-           }*/
-	    
-	    
+	    	    
          DecompVar * var = new DecompVar(ind, els, varRedCost, varOrigCost);
          var->setBlockId(whichBlock);
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
@@ -5907,14 +5908,13 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       }
    } //END:   if((rc == STAT_UNKNOWN)  || (!isExact && nNewVars <= 0)){ 
 
-
-
    //---
    //--- sanity check - if user provides a full description of 
    //---  relaxed problem, make sure the variables from either app or IP
    //---  solver are valid
    //---
-   if(vars.size() > 0) {
+   //TODO: make this check work for sparse as well
+   if(!model->isSparse() && vars.size() > 0) {
       //---
       //--- get a pointer to the relaxed model for this block
       //---   even if this check is for a nested model, it should
