@@ -14,6 +14,8 @@ Dip/MSVisualStudio/v9/DecompExamples/ATM/atm.parm -text
 Dip/MSVisualStudio/v9/DecompExamples/DecompExamples.sln -text
 Dip/MSVisualStudio/v9/DecompExamples/GAP/GAP.vcproj -text
 Dip/MSVisualStudio/v9/DecompExamples/GAP/gap.parm -text
+Dip/MSVisualStudio/v9/DecompExamples/MCF/MCF.vcproj -text
+Dip/MSVisualStudio/v9/DecompExamples/MCF/mcf.parm -text
 Dip/MSVisualStudio/v9/DecompExamples/MMKP/MMKP.vcproj -text
 Dip/MSVisualStudio/v9/DecompExamples/MMKP/mmkp.parm -text
 Dip/MSVisualStudio/v9/DecompExamples/Milp/Milp.vcproj -text
@@ -187,8 +189,6 @@ Dip/examples/MCF/MCF_Instance.cpp -text
 Dip/examples/MCF/MCF_Instance.h -text
 Dip/examples/MCF/MCF_Main.cpp -text
 Dip/examples/MCF/MCF_Param.h -text
-Dip/examples/MCF/MMKP_Main.cpp -text
-Dip/examples/MCF/MMKP_Model.h -text
 Dip/examples/MCF/Makefile.in -text
 Dip/examples/MCF/README.txt.in -text
 Dip/examples/MCF/data_extract.sh.in -text

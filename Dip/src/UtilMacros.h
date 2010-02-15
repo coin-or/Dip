@@ -456,9 +456,10 @@ inline string UtilIntToStr(const int i){
 
 // ------------------------------------------------------------------------- //
 inline string UtilDblToStr(const double x, 
-			   const int    precision = -1){
+			   const int    precision = -1,
+                           const double tooBig    = UtilSmallerThanTooBig){
    stringstream ss;
-   if(fabs(x) > UtilSmallerThanTooBig){
+   if(fabs(x) > tooBig){
       if(x < 0)
 	 ss << "-INF";
       else

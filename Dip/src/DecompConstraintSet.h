@@ -69,7 +69,7 @@ public:
    
 public:
    inline const bool isSparse() const {
-      return m_origToSparse.size(); };
+	   return m_origToSparse.size() ? true : false; };
    inline const CoinPackedMatrix * getMatrix() const { return M; };
    inline const int getNumRows() const { 
       return M ? M->getNumRows() : static_cast<int>(colUB.size()); }

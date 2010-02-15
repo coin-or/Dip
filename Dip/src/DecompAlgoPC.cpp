@@ -517,7 +517,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    string cbcTime      = "-seconds";
    string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsIpLimitTime);
    string cbcCutoff    = "-cutoff";   
-   string cbcCutoffSet = UtilDblToStr(m_globalUB);
+   string cbcCutoffSet = UtilDblToStr(m_globalUB, -1, 1.0e100);
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      

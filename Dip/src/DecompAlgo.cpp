@@ -4315,7 +4315,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       bool useCutoff = false;
       bool useExact  = true;
       if(m_phase == PHASE_PRICE2)
-         useCutoff = m_param.SubProbUseCutoff;
+		  useCutoff = m_param.SubProbUseCutoff ? true : false;
       
       map<int, DecompAlgoModel>::iterator mit; 
       for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
@@ -5703,7 +5703,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //    IP solver (use this for debugging).
    
 
-   bool doCutoff = m_param.SubProbUseCutoff;
+   bool doCutoff = m_param.SubProbUseCutoff ? true : false;
    bool doExact  = isNested ? false : true;
    doExact       = m_function == DecompFuncGenerateInitVars ? false : doExact;
 

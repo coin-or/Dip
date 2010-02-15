@@ -1143,7 +1143,7 @@ void ATM_DecompApp::createModels(){
    //---   x3[a]
    //----  v[a,d] (binary)
    //---
-   int i, a, d;
+   int i, a;
    int nDates  = m_instance.getNDates();
    int nAtms   = m_instance.getNAtms();
    int numCols = numCoreCols();
