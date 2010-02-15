@@ -30,6 +30,7 @@
 class MCF_Param {
 public:
    int    LogLevel;           //application log level
+   int    UseSparse;          //use sparse version of relaxations
    string DataDir;            //data directory
    string Instance;           //name of instance
 
@@ -37,6 +38,7 @@ public:
    void getSettings(UtilParameters & utilParam){
       static const char * common = "MCF";
       LogLevel       = utilParam.GetSetting("LogLevel",        0,      common);
+      UseSparse      = utilParam.GetSetting("UseSparse",       0,      common);
       DataDir        = utilParam.GetSetting("DataDir",        "",      common);
       Instance       = utilParam.GetSetting("Instance",       "",      common);
       if(!checkOptions())
@@ -53,6 +55,7 @@ public:
       (*os) << "\n=====================================================\n"
             << "MCF_DECOMP PARAMETER SETTINGS \n";
       (*os) << common << ": LogLevel          : " << LogLevel      << endl;
+      (*os) << common << ": UseSparse         : " << UseSparse     << endl;
       (*os) << common << ": DataDir           : " << DataDir       << endl;
       (*os) << common << ": Instance          : " << Instance      << endl;
       (*os) <<   "=====================================================\n";
@@ -61,6 +64,7 @@ public:
 public:
    MCF_Param() :
       LogLevel          (0),
+      UseSparse         (0),
       DataDir           (""),
       Instance          ("")
    {}

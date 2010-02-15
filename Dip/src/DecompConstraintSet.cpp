@@ -27,6 +27,7 @@ void DecompConstraintSet::prepareModel(){
    //---   3.) set nBaseRows
    //---   4.) flip to row ordered, if neccessary (for relaxed too)
    //---   5.) mark integers
+   //---   6.) if sparse, set active columns
    //---
    if(!M)
       return;
@@ -53,11 +54,22 @@ void DecompConstraintSet::prepareModel(){
    prepHasRun = true;
 
    //---
-   //--- if active columns were not set, set to all columns
+   //--- if active columns were not set (or sparse), set to all columns
+   //---   note: this is in terms of the original indices (not sparse)
    //---
-   int nActiveColumns = static_cast<int>(activeColumns.size());
-   if(!nActiveColumns)
-      UtilIotaN(activeColumns, getNumCols(), 0);
+   if(isSparse()){
+      map<int,int>::const_iterator mcit;
+      activeColumns.reserve(m_sparseToOrig.size());
+      for(mcit  = m_sparseToOrig.begin(); 
+          mcit != m_sparseToOrig.end(); mcit++){
+         activeColumns.push_back(mcit->second);
+      }
+   }
+   else{
+      int nActiveColumns = static_cast<int>(activeColumns.size());
+      if(!nActiveColumns)
+         UtilIotaN(activeColumns, getNumCols(), 0);
+   }
 
    //---
    //--- create set from vector - easier to check overlap, etc

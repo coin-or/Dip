@@ -61,6 +61,8 @@ public:
    void createModelCore(DecompConstraintSet * model);
    void createModelRelax(DecompConstraintSet * model,
                          int                   commId);
+   void createModelRelaxSparse(DecompConstraintSet * model,
+                               int                   commId);
 
 public:
    /** @name Constructor and Destructor */

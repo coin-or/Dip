@@ -50,16 +50,15 @@ static void * solveRelaxedThread(void * args);
 #endif
 typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
 struct SolveRelaxedThreadArgs {
-   DecompAlgo         * algo;
+   DecompAlgo         *  algo;
    int                   threadId;
    int                   batchSz;//blocks
    int                 * batch;  //blocks
-   vector<DecompAlgoModel*>   * algoModel;
-   
+   vector<DecompAlgoModel*>  * algoModel;   
    int                   nBaseCoreRows;
    double              * u;
    double              * redCostX;
-   const double              * origCost;
+   const double        * origCost;
    int                   n_origCols;
    bool                  checkDup;
    bool                  doExact;
@@ -79,6 +78,7 @@ void DecompAlgo::checkBlocksColumns(){
    //---
    //--- sanity check that the blocks are column disjoint
    //---
+   ///STOP - how to do this for sparse case?
    map<int, DecompAlgoModel>::iterator mid1;
    map<int, DecompAlgoModel>::iterator mid2;
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
