@@ -33,6 +33,12 @@ void DecompConstraintSet::prepareModel(){
       return;
    if(M->isColOrdered())
       M->reverseOrdering();
+
+   int numRows     = getNumRows();
+   int numCols     = getNumCols();
+   int numColsOrig = getNumColsOrig();
+   printf("numCols=%d numColsOrig=%d numRows=%d\n",
+          numCols, numColsOrig, numRows);
    
    checkSenseAndBound();    
    createRowHash();//TODO: don't need for relaxed
@@ -44,11 +50,11 @@ void DecompConstraintSet::prepareModel(){
    //---
    int i, j;
    if(rowNames.size() == 0){
-      for(i = 0; i < getNumRows(); i++)
+      for(i = 0; i < numRows; i++)
          rowNames.push_back("r(" + UtilIntToStr(i) + ")");
    }
    if(colNames.size() == 0){
-      for(j = 0; j < getNumCols(); j++)
+      for(j = 0; j < numCols; j++)
          colNames.push_back("x(" + UtilIntToStr(j) + ")");
    }
    prepHasRun = true;
@@ -68,7 +74,7 @@ void DecompConstraintSet::prepareModel(){
    else{
       int nActiveColumns = static_cast<int>(activeColumns.size());
       if(!nActiveColumns)
-         UtilIotaN(activeColumns, getNumCols(), 0);
+         UtilIotaN(activeColumns, numColsOrig, 0);
    }
 
    //---
@@ -79,19 +85,18 @@ void DecompConstraintSet::prepareModel(){
       activeColumnsS.insert(*vit);
 
    //---
-   //--- set column markers
+   //--- set column markers (original number of cols)
    //---
-   UtilFillN(columnMarker, getNumCols(), (int)DecompColNonActive);
+   UtilFillN(columnMarker, numColsOrig, (int)DecompColNonActive);
    for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++)
-      columnMarker[*vit] = DecompColActive;
-   
+      columnMarker[*vit] = DecompColActive;   
    for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
       columnMarker[*vit] = DecompColMasterOnly;   
 
    //---
-   //--- mark integers
+   //--- mark integers (original number of cols)
    //---
-   UtilFillN(integerMark, getNumCols(), 'C');
+   UtilFillN(integerMark, numColsOrig, 'C');
    for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
       integerMark[*vit] = 'I';
    }   

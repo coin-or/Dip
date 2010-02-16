@@ -384,12 +384,14 @@ public:
    virtual int addCutsFromPool();
 
    bool isIPFeasible(const double * x,
-		     const double   feasVarTol = 1.0e-6,  //0.0001%
+		     const bool     isXSparse  = false,
+                     const double   feasVarTol = 1.0e-6,  //0.0001%
                      const double   feasConTol = 1.0e-5,  //0.001%
 		     const double   intTol     = 1.0e-5); //0.001%
 
    bool isLPFeasible(const double * x,
-		     const double   feasVarTol = 1.0e-6,  //0.001%
+		     const bool     isXSparse  = false,
+                     const double   feasVarTol = 1.0e-6,  //0.001%
                      const double   feasConTol = 1.0e-5); //0.01%
 
    //fugly

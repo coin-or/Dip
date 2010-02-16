@@ -131,11 +131,13 @@ void MCF_DecompApp::createModels(){
    //---
    for(k = 0; k < numCommodities; k++){
       DecompConstraintSet * modelRelax = new DecompConstraintSet();
+      string                modelName  = "relax" + UtilIntToStr(k);
       if(m_appParam.UseSparse)
          createModelRelaxSparse(modelRelax, k);
       else
          createModelRelax(modelRelax, k);
-      setModelRelax(modelRelax, "relax" + UtilIntToStr(k), k);
+      
+      setModelRelax(modelRelax, modelName, k);
    }
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -195,9 +197,9 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
    //---
    for(k = 0; k < numCommodities; k++){
       for(a = 0; a < numArcs; a++){
-         string colName = "x[comm=" + UtilIntToStr(k) + ",(" +
+         string colName = "x(comm_" + UtilIntToStr(k) + ",(" +
             UtilIntToStr(arcs[a].tail) + "," +
-            UtilIntToStr(arcs[a].head) + ")]";
+            UtilIntToStr(arcs[a].head) + "))";
          model->colNames.push_back(colName);
       }
    }
@@ -322,11 +324,13 @@ void MCF_DecompApp::createModelRelaxSparse(DecompConstraintSet * model,
    //---           =  d[k] if i=t
    //---           =  0, otherwise
    //---
-   int         a, i, head, tail, origColIndex, source, sink, colIndex;
+   int         a, i, head, tail, origColIndex, source, sink;
    int         numArcs        = m_instance.m_numArcs;
    int         numNodes       = m_instance.m_numNodes;   
+   int         numCommodities = m_instance.m_numCommodities;
    int         numCols        = numArcs;
    int         numRows        = numNodes;
+   int         numColsOrig    = numArcs * numCommodities;
    MCF_Instance::arc       * arcs        = m_instance.m_arcs;
    MCF_Instance::commodity * commodities = m_instance.m_commodities;
 
@@ -341,6 +345,7 @@ void MCF_DecompApp::createModelRelaxSparse(DecompConstraintSet * model,
       throw UtilExceptionMemory("createModelCore", "MCF_DecompApp");
    model->M->setDimensions(0, numCols);
    model->reserve(numRows, numCols);
+   model->setSparse(numColsOrig);
 
    //---
    //--- get this commodity's source and sink node
@@ -357,14 +362,10 @@ void MCF_DecompApp::createModelRelaxSparse(DecompConstraintSet * model,
       for(a = 0; a < numArcs; a++){
          tail = arcs[a].tail;
          head = arcs[a].head;
-         if(head == i){
-            colIndex = numArcs + a;
-            row.insert(colIndex, 1.0);
-         }
-         else if(tail == i){
-            colIndex = numArcs + a;
-            row.insert(colIndex, -1.0);
-         }
+         if(head == i)
+            row.insert(a, 1.0);
+         else if(tail == i)
+            row.insert(a, -1.0);
       }
       if(i == source)
          model->appendRow(row, 

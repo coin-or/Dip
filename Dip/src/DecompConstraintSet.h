@@ -64,17 +64,25 @@ public:
    bool                 m_masterOnlyIsInt;
 
    //for special case of sparse representation
+   bool          m_isSparse;
+   int           m_numColsOrig;
    map<int, int> m_origToSparse;
    map<int, int> m_sparseToOrig;
    
 public:
+   inline void setSparse(const int numColsOrig){
+      m_numColsOrig = numColsOrig;
+      m_isSparse    = true;
+   }
    inline const bool isSparse() const {
-	   return m_origToSparse.size() ? true : false; };
+      return m_origToSparse.size() ? true : false; };
    inline const CoinPackedMatrix * getMatrix() const { return M; };
    inline const int getNumRows() const { 
       return M ? M->getNumRows() : static_cast<int>(colUB.size()); }
    inline const int getNumCols() const { 
       return M ? M->getNumCols() : static_cast<int>(colLB.size()); }
+   inline const int getNumColsOrig() const { 
+      return isSparse() ? m_numColsOrig : getNumCols(); };
    inline const int getNumInts() const {
       return static_cast<int>(integerVars.size());}
    inline const vector<int>    & getActiveColumns() const {
@@ -153,7 +161,9 @@ public:
       m_masterOnlyIndex(0),
       m_masterOnlyLB   (0.0),
       m_masterOnlyUB   (0.0),
-      m_masterOnlyIsInt(false)
+      m_masterOnlyIsInt(false),
+      m_isSparse       (false),
+      m_numColsOrig    (0)
    {};
    
    ~DecompConstraintSet() {

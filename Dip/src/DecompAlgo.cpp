@@ -510,6 +510,10 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    map<int, DecompAlgoModel>::iterator mit;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      //TODO: for cut gen do we really want this model explicit??
+      //   currently cannot do if sparse without alot of work
+      if(relax->isSparse())
+         continue;
       if(relax->M){
 	 nRowsR  = relax->getNumRows();
 
@@ -551,6 +555,8 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    int rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      if(relax->isSparse())
+         continue;
       if(relax->M){
 	 nRowsR  = relax->getNumRows();
 	 memcpy(rowLB + rowIndex, relax->getRowLB(),
@@ -606,6 +612,8 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      if(relax->isSparse())
+         continue;
       if(relax->M){
          vector<string> & rowNamesR = relax->rowNames;
 	 nRowsR = relax->getNumRows();
@@ -2046,11 +2054,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //---    init solution, let's always solve master as IP as soon 
    //---    as we get into PHASE 2
    //---
-   if((m_phase != PHASE_PRICE1      &&
-       m_nodeStats.priceCallsTotal  && 
-       m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0) 
-      ||
-      m_firstPhase2Call){
+   if(m_param.SolveMasterAsIp       &&
+      ((m_phase != PHASE_PRICE1      &&
+        m_nodeStats.priceCallsTotal  && 
+        m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0) 
+       ||
+       m_firstPhase2Call)){
       UTIL_MSG(m_param.LogLevel, 2,
                (*m_osLog) << "SolveMasterAsIp: PriceCallsTotal=" <<
                m_nodeStats.priceCallsTotal 
@@ -5402,6 +5411,7 @@ int DecompAlgo::addCutsFromPool(){
 
 //------------------------------------------------------------------------- //
 bool DecompAlgo::isIPFeasible(const double * x,
+                              const bool     isXSparse,
                               const double   feasVarTol,
                               const double   feasConTol,
                               const double   intTol){
@@ -5419,7 +5429,7 @@ bool DecompAlgo::isIPFeasible(const double * x,
       hasColNames = true;
 
    bool ipFeas = true;
-   if(!isLPFeasible(x, feasVarTol, feasConTol)){
+   if(!isLPFeasible(x, isXSparse, feasVarTol, feasConTol)){
       ipFeas = false;
       goto FUNC_EXIT;
    }
@@ -5461,6 +5471,7 @@ bool DecompAlgo::isIPFeasible(const double * x,
 
 //------------------------------------------------------------------------- //
 bool DecompAlgo::isLPFeasible(const double * x,
+                              const bool     isXSparse,
                               const double   feasVarTol,
                               const double   feasConTol){
 
@@ -5489,6 +5500,7 @@ bool DecompAlgo::isLPFeasible(const double * x,
 		      "isLPFeasible()", m_param.LogDebugLevel, 2);
    
    bool lpFeas = m_modelCore.isPointFeasible(x, 
+                                             isXSparse,
                                              m_param.LogDebugLevel,
                                              feasVarTol,
                                              feasConTol);
@@ -5500,6 +5512,7 @@ bool DecompAlgo::isLPFeasible(const double * x,
       map<int, DecompAlgoModel>::iterator mit;
       for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
 	 lpFeas = (*mit).second.isPointFeasible(x, 
+                                                isXSparse,
 						m_param.LogDebugLevel,
 						feasVarTol,
 						feasConTol);
