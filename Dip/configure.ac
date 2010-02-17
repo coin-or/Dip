@@ -20,7 +20,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.8.1],[ted@lehigh.edu])
+AC_INIT([Dip],[0.8stable],[ted@lehigh.edu])
 
 # copyright for configure script
 AC_COPYRIGHT([
