@@ -81,7 +81,7 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
          (xj > 0 && UtilIsZero(cub)))
          relViol = actViol;
       else
-         relViol = actViol / std::fabs(x[c]);      
+         relViol = actViol / std::fabs(xj);      
       if(relViol > feasVarTol){
          //Notify, but don't mark in feasible unless 10x worse.
          UTIL_DEBUG(logLevel, 4,
