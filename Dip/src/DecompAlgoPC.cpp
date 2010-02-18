@@ -819,6 +819,16 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 	 m_masterSI->setContinuous(i);
    }
 
+#ifdef __DECOMP_IP_CPX__
+   //---
+   //--- set time back 
+   //---
+   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, DecompInf);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+                          "solutionUpdateAsIp", "DecompAlgoPC");
+#endif
+
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solutionUpdateAsIp()", m_param.LogDebugLevel, 1);   
 }

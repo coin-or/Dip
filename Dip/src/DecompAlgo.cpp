@@ -2088,17 +2088,15 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-#ifdef DO_INTERIOR
    CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
-#endif
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
 
 
-   //int preInd = 0;
-   //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
-   //printf("preind=%d\n",preInd);
+   int preInd = 0;
+   CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
+   printf("preind=%d\n",preInd);
 #endif
 
   
@@ -2107,8 +2105,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_PRICE2:
       m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
 
-      //m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-      m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+      m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+      //m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
 
 
       //if(m_algo == DECOMP)//THINK!
@@ -2145,16 +2143,25 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #ifdef __DECOMP_LP_CLP__
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
               {
-                 OsiClpSolverInterface * osiClp  = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
-                 printf("clp status        = %d\n", osiClp->getModelPtr()->status());
-                 printf("clp prob status   = %d\n", osiClp->getModelPtr()->problemStatus());
-                 printf("clp second status = %d\n", osiClp->getModelPtr()->secondaryStatus());
+                 OsiClpSolverInterface * osiClp  
+		    = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
+                 printf("clp status        = %d\n", 
+			osiClp->getModelPtr()->status());
+                 printf("clp prob status   = %d\n", 
+			osiClp->getModelPtr()->problemStatus());
+                 printf("clp second status = %d\n", 
+			osiClp->getModelPtr()->secondaryStatus());
               }
               );
 #endif
+#ifdef __DECOMP_LP_CPX__  
+   int cpxStat = CPXgetstat(env, lp);
+   if(cpxStat)
+      printf("cpxStat = %d\n", cpxStat);   
+#endif
 
    
-   UTIL_DEBUG(m_param.LogDebugLevel, 4,
+   UTIL_DEBUG(m_param.LogDebugLevel, 3,
 	      (*m_osLog)
 	      << "Iteration Count               : "
 	      << m_masterSI->getIterationCount() << "\n"
