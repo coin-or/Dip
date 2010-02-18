@@ -150,6 +150,8 @@ void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
    ifstream is;
    string   fileName = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.InitSolutionFile;
+   if(m_appParam.InitSolutionFile == "")
+      return;
 
    //---
    //--- create map from col name to col index

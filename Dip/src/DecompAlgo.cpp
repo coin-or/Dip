@@ -715,6 +715,9 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- set the row counts
    //---
    m_nRowsOrig   = nRowsCore;
+   //if(m_param.BranchNew)
+   // m_nRowsBranch = 0;
+   //else
    m_nRowsBranch = 2 * nIntVars;
    m_nRowsConvex = m_numConvexCon;
    m_nRowsCuts   = 0;
@@ -734,6 +737,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //---   We want to add these directly to the core so as to facilitate
    //---   operations to expand rows. Basically, we treat these just like cuts.
    //---
+   //if(!m_param.BranchNew)
    coreMatrixAppendColBounds();
    nRowsCore = modelCore->getNumRows();
    
@@ -1170,7 +1174,10 @@ void DecompAlgo::coreMatrixAppendColBounds(){
 	 modelCore->rowLB.push_back(-DecompInf);
 	 modelCore->rowUB.push_back(colUBCore[j]);
 	 sense = 'L';
-	 rhs   = colUBCore[j];
+         if(m_param.BranchNew)
+            rhs = DecompInf;
+         else
+            rhs   = colUBCore[j];
 	 if(doNames){
 	    string rowName = "ub(" + colNames[j] + ")";
 	    rowNames.push_back(rowName);
@@ -1182,7 +1189,10 @@ void DecompAlgo::coreMatrixAppendColBounds(){
 	 modelCore->rowLB.push_back(colLBCore[j]);
 	 modelCore->rowUB.push_back(DecompInf);
 	 sense = 'G';
-	 rhs   = colLBCore[j];
+         if(m_param.BranchNew)
+            rhs = -DecompInf;
+         else
+            rhs   = colLBCore[j];
 	 if(doNames){
 	    string rowName = "lb(" + colNames[j] + ")";
 	    rowNames.push_back(rowName);
