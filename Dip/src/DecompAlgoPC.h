@@ -77,7 +77,7 @@ private:
 	 //---
 	 //--- resize dual vectors
 	 //---
-	 size_t nRows = m_masterSI->getNumRows();
+	 int nRows = static_cast<int>(m_masterSI->getNumRows());
 	 m_dual.resize(nRows);
 	 m_dualRM.resize(nRows);
 	 m_dualST.resize(nRows);

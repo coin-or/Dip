@@ -125,6 +125,8 @@ public:
    //string IpAlgoStart;
    //string IpAlgoSub;
 
+   int    BranchNew; //{0,1}
+
    /**
     * @}
     */
@@ -183,6 +185,7 @@ public:
       PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
       PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
+      PARAM_getSetting("BranchNew",            BranchNew);
       //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
       //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
@@ -258,6 +261,7 @@ public:
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
+      UtilPrintParameter(os, sec, "BranchNew",   BranchNew);
       //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
       //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
@@ -307,6 +311,7 @@ public:
       DualStab                 = 0;
       DualStabAlpha            = 0.10;
       BreakOutPartial          = 0;
+      BranchNew                = 1;
       //IpAlgoStart           = "dual";
       //IpAlgoSub             = "dual";
    }

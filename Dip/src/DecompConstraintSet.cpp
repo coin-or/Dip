@@ -27,11 +27,18 @@ void DecompConstraintSet::prepareModel(){
    //---   3.) set nBaseRows
    //---   4.) flip to row ordered, if neccessary (for relaxed too)
    //---   5.) mark integers
+   //---   6.) if sparse, set active columns
    //---
    if(!M)
       return;
    if(M->isColOrdered())
       M->reverseOrdering();
+
+   int numRows     = getNumRows();
+   int numCols     = getNumCols();
+   int numColsOrig = getNumColsOrig();
+   printf("numCols=%d numColsOrig=%d numRows=%d\n",
+          numCols, numColsOrig, numRows);
    
    checkSenseAndBound();    
    createRowHash();//TODO: don't need for relaxed
@@ -43,21 +50,32 @@ void DecompConstraintSet::prepareModel(){
    //---
    int i, j;
    if(rowNames.size() == 0){
-      for(i = 0; i < getNumRows(); i++)
+      for(i = 0; i < numRows; i++)
          rowNames.push_back("r(" + UtilIntToStr(i) + ")");
    }
    if(colNames.size() == 0){
-      for(j = 0; j < getNumCols(); j++)
+      for(j = 0; j < numCols; j++)
          colNames.push_back("x(" + UtilIntToStr(j) + ")");
    }
    prepHasRun = true;
 
    //---
-   //--- if active columns were not set, set to all columns
+   //--- if active columns were not set (or sparse), set to all columns
+   //---   note: this is in terms of the original indices (not sparse)
    //---
-   int nActiveColumns = static_cast<int>(activeColumns.size());
-   if(!nActiveColumns)
-      UtilIotaN(activeColumns, getNumCols(), 0);
+   if(isSparse()){
+      map<int,int>::const_iterator mcit;
+      activeColumns.reserve(m_sparseToOrig.size());
+      for(mcit  = m_sparseToOrig.begin(); 
+          mcit != m_sparseToOrig.end(); mcit++){
+         activeColumns.push_back(mcit->second);
+      }
+   }
+   else{
+      int nActiveColumns = static_cast<int>(activeColumns.size());
+      if(!nActiveColumns)
+         UtilIotaN(activeColumns, numColsOrig, 0);
+   }
 
    //---
    //--- create set from vector - easier to check overlap, etc
@@ -67,19 +85,18 @@ void DecompConstraintSet::prepareModel(){
       activeColumnsS.insert(*vit);
 
    //---
-   //--- set column markers
+   //--- set column markers (original number of cols)
    //---
-   UtilFillN(columnMarker, getNumCols(), (int)DecompColNonActive);
+   UtilFillN(columnMarker, numColsOrig, (int)DecompColNonActive);
    for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++)
-      columnMarker[*vit] = DecompColActive;
-   
+      columnMarker[*vit] = DecompColActive;   
    for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
       columnMarker[*vit] = DecompColMasterOnly;   
 
    //---
-   //--- mark integers
+   //--- mark integers (original number of cols)
    //---
-   UtilFillN(integerMark, getNumCols(), 'C');
+   UtilFillN(integerMark, numColsOrig, 'C');
    for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
       integerMark[*vit] = 'I';
    }   

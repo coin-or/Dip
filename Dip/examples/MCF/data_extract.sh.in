@@ -1,4 +1,4 @@
 cd @srcdir@/../../data/MCF
 ./get.data
-tar -zxvf data_gap.tgz
+tar -zxvf data_mcf.tgz
 

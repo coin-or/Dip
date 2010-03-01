@@ -517,7 +517,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    string cbcTime      = "-seconds";
    string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsIpLimitTime);
    string cbcCutoff    = "-cutoff";   
-   string cbcCutoffSet = UtilDblToStr(m_globalUB);
+   string cbcCutoffSet = UtilDblToStr(m_globalUB, -1, 1.0e100);
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      
@@ -747,7 +747,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 				  m_param.TolZero)){
          UTIL_MSG(m_param.LogLevel, 3,
                   (*m_osLog) << "Solution is app-feasible, nSolutions="
-                  << (int)m_xhatIPFeas.size(););
+                  << (int)m_xhatIPFeas.size() << endl;);
          
 	 //check for dup sol - TODO: make func                  
 	 bool isDup = m_xhatIPFeas.size() > 0 ? true : false;
@@ -793,24 +793,21 @@ void DecompAlgoPC::solutionUpdateAsIP(){
             } 
 	 }
       }
-      UTIL_DELARR(rsolution);
-   }
-   
-   if(m_param.LogDebugLevel >= 3){
-      int j;
-      const vector<string> & colNames = m_masterSI->getColNames();            
-      for(j = 0; j < m_masterSI->getNumCols(); j++){
-         if(fabs(result.m_solution[j]) > DecompEpsilon){
-            if(j < static_cast<int>(colNames.size()))
-               printf("MASTER %25s PRIM[%6d->%20s] = %12.10f\n",
-                      DecompColTypeStr[m_masterColType[j]].c_str(), 
-                      j, colNames[j].c_str(), result.m_solution[j]);
-            else
-               printf("MASTER %25s PRIM[%6d] = %12.10f\n",
-                      DecompColTypeStr[m_masterColType[j]].c_str(), 
-                      j, result.m_solution[j]);
+      if(m_param.LogDebugLevel >= 3){
+         int j;
+         const vector<string> & colNames = modelCore->getColNames();
+         for(j = 0; j < modelCore->getNumCols(); j++){
+            if(fabs(rsolution[j]) > DecompEpsilon){
+               if(j < static_cast<int>(colNames.size()))
+                  printf("MASTER PRIM[%6d->%20s] = %12.10f\n",
+                         j, colNames[j].c_str(), rsolution[j]);
+               else
+                  printf("MASTER PRIM[%6d] = %12.10f\n",
+                         j, rsolution[j]);
+            }
          }
       }
+      UTIL_DELARR(rsolution);
    }
    
    
@@ -821,6 +818,16 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       if(isMasterColStructural(i))
 	 m_masterSI->setContinuous(i);
    }
+
+#ifdef __DECOMP_IP_CPX__
+   //---
+   //--- set time back 
+   //---
+   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, DecompInf);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+                          "solutionUpdateAsIp", "DecompAlgoPC");
+#endif
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solutionUpdateAsIp()", m_param.LogDebugLevel, 1);   

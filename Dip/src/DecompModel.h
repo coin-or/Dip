@@ -98,28 +98,53 @@ public:
       assert(m_osi);
       assert(m_colIndices);
       assert(m_numCols == m_osi->getNumCols());
-      m_osi->setObjCoeffSet(m_colIndices, m_colIndices + m_numCols, objCoeff);
+      if(getModel()->isSparse()){
+	 const DecompConstraintSet * model = getModel();
+	 const map<int,int> & origToSparse = model->getMapOrigToSparse();
+	 map<int,int>::const_iterator mcit;
+	 for(mcit = origToSparse.begin(); 
+	     mcit != origToSparse.end(); mcit++){
+	    m_osi->setObjCoeff(mcit->second,           //sparse-index
+			       objCoeff[mcit->first]); //original-index
+	 }
+      }
+      else
+	 m_osi->setObjCoeffSet(m_colIndices, 
+			       m_colIndices + m_numCols, objCoeff);
    }
 
    void setActiveColBounds(const double * colLB,
                            const double * colUB){
       DecompConstraintSet * model         = getModel();
       vector<int>         & activeColumns = model->activeColumns;
-      if(activeColumns.size()){
-         vector<int>::iterator vi;
-         for(vi = activeColumns.begin(); vi != activeColumns.end(); vi++)
-            m_osi->setColBounds(*vi, colLB[*vi], colUB[*vi]);
+      //---
+      //--- if no active columns are set,  assume they are all active
+      //---   for e.g., in the case of one block (or sparse)
+      //---
+      if(model->isSparse()){
+         const map<int,int> & origToSparse = model->getMapOrigToSparse();
+         map<int,int>::const_iterator mcit;
+         for(mcit = origToSparse.begin(); 	
+             mcit != origToSparse.end(); mcit++){
+            m_osi->setColLower(mcit->second,        //sparse-index
+                               colLB[mcit->first]); //original-index
+            m_osi->setColUpper(mcit->second,        //sparse-index
+                               colUB[mcit->first]); //original-index
+         }
       }
       else{
-         //---
-         //--- if no active columns are set, assume they are all active
-         //---   for e.g., in the case of one block
-         //---
-         m_osi->setColLower(colLB);
-         m_osi->setColUpper(colUB);
+         if(activeColumns.size()){
+            vector<int>::iterator vi;
+            for(vi = activeColumns.begin(); vi != activeColumns.end(); vi++)
+               m_osi->setColBounds(*vi, colLB[*vi], colUB[*vi]);
+         }
+         else{
+	    m_osi->setColLower(colLB);
+	    m_osi->setColUpper(colUB);
+	 }
       }
    }
-
+   
 public:
    OsiSolverInterface  * getOsi() const { return m_osi; }
 
@@ -132,6 +157,7 @@ public:
                      double               cutoff);
 
    bool isPointFeasible(const double * x,
+                        const bool     isXSparse  = false,
                         const int      logLevel   = 0,
                         const double   feasVarTol = 1.0e-5,
                         const double   feasConTol = 1.0e-4);

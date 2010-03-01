@@ -20,6 +20,7 @@
 #include "Decomp.h"
 #include "UtilMacros.h"
 
+// --------------------------------------------------------------------- //
 enum ColMarkerType {
    DecompColNonActive = 0,
    DecompColActive    = 1,
@@ -62,10 +63,26 @@ public:
    double               m_masterOnlyUB;
    bool                 m_masterOnlyIsInt;
 
+   //for special case of sparse representation
+   bool          m_isSparse;
+   int           m_numColsOrig;
+   map<int, int> m_origToSparse;
+   map<int, int> m_sparseToOrig;
+   
 public:
+   inline void setSparse(const int numColsOrig){
+      m_numColsOrig = numColsOrig;
+      m_isSparse    = true;
+   }
+   inline const bool isSparse() const {
+      return m_origToSparse.size() ? true : false; };
    inline const CoinPackedMatrix * getMatrix() const { return M; };
-   inline const int getNumRows() const { return M->getNumRows(); }
-   inline const int getNumCols() const { return M->getNumCols(); }
+   inline const int getNumRows() const { 
+      return M ? M->getNumRows() : static_cast<int>(colUB.size()); }
+   inline const int getNumCols() const { 
+      return M ? M->getNumCols() : static_cast<int>(colLB.size()); }
+   inline const int getNumColsOrig() const { 
+      return isSparse() ? m_numColsOrig : getNumCols(); };
    inline const int getNumInts() const {
       return static_cast<int>(integerVars.size());}
    inline const vector<int>    & getActiveColumns() const {
@@ -82,6 +99,11 @@ public:
    inline const double * getRowUB() const { return &rowUB[0]; };
    inline const bool     hasPrepRun() const { return prepHasRun; };
    inline const bool     isMasterOnly() const { return m_masterOnly; };
+   inline const map<int,int> & getMapOrigToSparse() const {
+      return m_origToSparse;};
+   inline const map<int,int> & getMapSparseToOrig() const {
+      return m_sparseToOrig;};
+   
 
 public:
    void prepareModel();
@@ -90,6 +112,7 @@ public:
    void sensesToBounds();
    void boundsToSenses();
    void fixNonActiveColumns();
+
    inline void appendRow(CoinPackedVector & row,
 			 double             loBound,
 			 double             upBound){
@@ -104,6 +127,22 @@ public:
       appendRow(row, loBound, upBound);
       rowNames.push_back(rowName);         
    }   
+
+   inline void pushCol(const double loBound,
+		       const double upBound,
+		       const bool   isInteger   = false,
+		       const int    origIndex   = -1){
+      int index = static_cast<int>(colLB.size());
+      colLB.push_back(loBound);
+      colUB.push_back(upBound);
+      if(isInteger)
+	 integerVars.push_back(index);
+      if(origIndex >= 0){
+	 m_origToSparse.insert(make_pair(origIndex, index));
+	 m_sparseToOrig.insert(make_pair(index, origIndex));
+      }
+   }
+
    inline void reserve(const int nCols,
 		       const int nRows){
       M->reserve(nRows, nCols);
@@ -122,7 +161,9 @@ public:
       m_masterOnlyIndex(0),
       m_masterOnlyLB   (0.0),
       m_masterOnlyUB   (0.0),
-      m_masterOnlyIsInt(false)
+      m_masterOnlyIsInt(false),
+      m_isSparse       (false),
+      m_numColsOrig    (0)
    {};
    
    ~DecompConstraintSet() {

@@ -130,9 +130,14 @@ void MCF_DecompApp::createModels(){
    //--- create the relaxed/subproblem models and set them
    //---
    for(k = 0; k < numCommodities; k++){
-      DecompConstraintSet * modelRelax = new DecompConstraintSet();      
-      createModelRelax(modelRelax, k);         
-      setModelRelax(modelRelax, "relax" + UtilIntToStr(k), k);
+      DecompConstraintSet * modelRelax = new DecompConstraintSet();
+      string                modelName  = "relax" + UtilIntToStr(k);
+      if(m_appParam.UseSparse)
+         createModelRelaxSparse(modelRelax, k);
+      else
+         createModelRelax(modelRelax, k);
+      
+      setModelRelax(modelRelax, modelName, k);
    }
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -192,9 +197,9 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
    //---
    for(k = 0; k < numCommodities; k++){
       for(a = 0; a < numArcs; a++){
-         string colName = "x[comm=" + UtilIntToStr(k) + ",(" +
+         string colName = "x(comm_" + UtilIntToStr(k) + ",(" +
             UtilIntToStr(arcs[a].tail) + "," +
-            UtilIntToStr(arcs[a].head) + ")]";
+            UtilIntToStr(arcs[a].head) + "))";
          model->colNames.push_back(colName);
       }
    }
@@ -303,4 +308,88 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet * model,
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModelRelax()", m_appParam.LogLevel, 2);
+}
+
+//===========================================================================//
+void MCF_DecompApp::createModelRelaxSparse(DecompConstraintSet * model,
+                                           int                   commId){
+
+   //---
+   //--- SUBPROBLEM (A'): (one block for each k in K)
+   //---      sum{(j,i) in A} x[k,i,j] - 
+   //---         sum{(i,j) in A} x[k,i,j] = d[i,k], for all i in N
+   //---      x[k,i,j] integer >= l[i,j] <= u[i,j], for all (i,j) in A
+   //--- For k=(s,t) in K,
+   //---    d[i,k] = -d[k] if i=s
+   //---           =  d[k] if i=t
+   //---           =  0, otherwise
+   //---
+   int         a, i, head, tail, origColIndex, source, sink;
+   int         numArcs        = m_instance.m_numArcs;
+   int         numNodes       = m_instance.m_numNodes;   
+   int         numCommodities = m_instance.m_numCommodities;
+   int         numCols        = numArcs;
+   int         numRows        = numNodes;
+   int         numColsOrig    = numArcs * numCommodities;
+   MCF_Instance::arc       * arcs        = m_instance.m_arcs;
+   MCF_Instance::commodity * commodities = m_instance.m_commodities;
+
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "createModelRelaxSparse()", m_appParam.LogLevel, 2);
+
+   //---
+   //--- create space for the model matrix (row-majored)
+   //---
+   model->M = new CoinPackedMatrix(false, 0.0, 0.0);
+   if(!model->M)
+      throw UtilExceptionMemory("createModelCore", "MCF_DecompApp");
+   model->M->setDimensions(0, numCols);
+   model->reserve(numRows, numCols);
+   model->setSparse(numColsOrig);
+
+   //---
+   //--- get this commodity's source and sink node
+   //---
+   source = commodities[commId].source;
+   sink   = commodities[commId].sink;
+   
+   //---
+   //--- create the rows 
+   //---   NOTE: this is somewhat inefficient (but simple)
+   //---
+   for(i = 0; i < numNodes; i++){
+      CoinPackedVector row;
+      for(a = 0; a < numArcs; a++){
+         tail = arcs[a].tail;
+         head = arcs[a].head;
+         if(head == i)
+            row.insert(a, 1.0);
+         else if(tail == i)
+            row.insert(a, -1.0);
+      }
+      if(i == source)
+         model->appendRow(row, 
+                          -commodities[commId].demand, 
+                          -commodities[commId].demand);
+      else if(i == sink)
+         model->appendRow(row, 
+                          commodities[commId].demand, 
+                          commodities[commId].demand);
+      else 
+         model->appendRow(row, 0.0, 0.0);
+   }
+
+   //---
+   //--- set the colLB, colUB, integerVars and sparse mapping
+   //---
+   origColIndex = commId * numArcs;
+   for(a = 0; a < numArcs; a++){
+      double           arcLB = arcs[a].lb;
+      double           arcUB = arcs[a].ub;
+      model->pushCol(arcLB, arcUB, true, origColIndex);
+      origColIndex++;      
+   }
+      
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+                    "createModelRelaxSparse()", m_appParam.LogLevel, 2);
 }

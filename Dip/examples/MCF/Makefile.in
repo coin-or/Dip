@@ -64,7 +64,6 @@ $(EXEDECOMP): $(OBJS)
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
 
 clean:
-	(cd ${KNAP_DIR} && ${MAKE} clean)
 	rm -rf $(EXE) $(OBJS)
 
 .cpp.o:

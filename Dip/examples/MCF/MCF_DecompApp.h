@@ -47,6 +47,9 @@ private:
    /** The model objective coefficients (original space). */
    double * m_objective;
 
+   /** Model constraint systems. */
+   vector<DecompConstraintSet*> m_models;
+
 public:
    /** @name Helper functions (public). */   
 
@@ -58,6 +61,8 @@ public:
    void createModelCore(DecompConstraintSet * model);
    void createModelRelax(DecompConstraintSet * model,
                          int                   commId);
+   void createModelRelaxSparse(DecompConstraintSet * model,
+                               int                   commId);
 
 public:
    /** @name Constructor and Destructor */
@@ -73,6 +78,7 @@ public:
    
    virtual ~MCF_DecompApp() {
       UTIL_DELARR(m_objective);
+      UtilDeleteVectorPtr(m_models);
    };
 };
 

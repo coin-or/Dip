@@ -150,6 +150,8 @@ void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
    ifstream is;
    string   fileName = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.InitSolutionFile;
+   if(m_appParam.InitSolutionFile == "")
+      return;
 
    //---
    //--- create map from col name to col index
@@ -417,7 +419,7 @@ MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
       return;
 
 
-   int i, j;
+   int i;
    vector<int>::iterator vit;
    for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
       i = *vit;
@@ -430,7 +432,7 @@ MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
       model->m_masterOnlyIndex = i;
       model->m_masterOnlyLB    = colLB[i];
       model->m_masterOnlyUB    = colUB[i];
-      model->m_masterOnlyIsInt = integerVars[i];//0=cont, 1=integer
+	  model->m_masterOnlyIsInt = integerVars[i] ? true : false;//0=cont, 1=integer
       if(m_appParam.ColumnUB <  1.0e15)
 	 if(colUB[i] >  1.0e15)
 	    model->m_masterOnlyUB = m_appParam.ColumnUB;

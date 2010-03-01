@@ -50,16 +50,15 @@ static void * solveRelaxedThread(void * args);
 #endif
 typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
 struct SolveRelaxedThreadArgs {
-   DecompAlgo         * algo;
+   DecompAlgo         *  algo;
    int                   threadId;
    int                   batchSz;//blocks
    int                 * batch;  //blocks
-   vector<DecompAlgoModel*>   * algoModel;
-   
+   vector<DecompAlgoModel*>  * algoModel;   
    int                   nBaseCoreRows;
    double              * u;
    double              * redCostX;
-   const double              * origCost;
+   const double        * origCost;
    int                   n_origCols;
    bool                  checkDup;
    bool                  doExact;
@@ -79,6 +78,7 @@ void DecompAlgo::checkBlocksColumns(){
    //---
    //--- sanity check that the blocks are column disjoint
    //---
+   ///STOP - how to do this for sparse case?
    map<int, DecompAlgoModel>::iterator mid1;
    map<int, DecompAlgoModel>::iterator mid2;
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
@@ -510,6 +510,10 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    map<int, DecompAlgoModel>::iterator mit;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      //TODO: for cut gen do we really want this model explicit??
+      //   currently cannot do if sparse without alot of work
+      if(relax->isSparse())
+         continue;
       if(relax->M){
 	 nRowsR  = relax->getNumRows();
 
@@ -551,6 +555,8 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    int rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      if(relax->isSparse())
+         continue;
       if(relax->M){
 	 nRowsR  = relax->getNumRows();
 	 memcpy(rowLB + rowIndex, relax->getRowLB(),
@@ -606,6 +612,8 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      if(relax->isSparse())
+         continue;
       if(relax->M){
          vector<string> & rowNamesR = relax->rowNames;
 	 nRowsR = relax->getNumRows();
@@ -707,6 +715,9 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- set the row counts
    //---
    m_nRowsOrig   = nRowsCore;
+   //if(m_param.BranchNew)
+   // m_nRowsBranch = 0;
+   //else
    m_nRowsBranch = 2 * nIntVars;
    m_nRowsConvex = m_numConvexCon;
    m_nRowsCuts   = 0;
@@ -726,6 +737,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //---   We want to add these directly to the core so as to facilitate
    //---   operations to expand rows. Basically, we treat these just like cuts.
    //---
+   //if(!m_param.BranchNew)
    coreMatrixAppendColBounds();
    nRowsCore = modelCore->getNumRows();
    
@@ -1162,7 +1174,10 @@ void DecompAlgo::coreMatrixAppendColBounds(){
 	 modelCore->rowLB.push_back(-DecompInf);
 	 modelCore->rowUB.push_back(colUBCore[j]);
 	 sense = 'L';
-	 rhs   = colUBCore[j];
+         if(m_param.BranchNew)
+            rhs = DecompInf;
+         else
+            rhs   = colUBCore[j];
 	 if(doNames){
 	    string rowName = "ub(" + colNames[j] + ")";
 	    rowNames.push_back(rowName);
@@ -1174,7 +1189,10 @@ void DecompAlgo::coreMatrixAppendColBounds(){
 	 modelCore->rowLB.push_back(colLBCore[j]);
 	 modelCore->rowUB.push_back(DecompInf);
 	 sense = 'G';
-	 rhs   = colLBCore[j];
+         if(m_param.BranchNew)
+            rhs = -DecompInf;
+         else
+            rhs   = colLBCore[j];
 	 if(doNames){
 	    string rowName = "lb(" + colNames[j] + ")";
 	    rowNames.push_back(rowName);
@@ -2046,11 +2064,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //---    init solution, let's always solve master as IP as soon 
    //---    as we get into PHASE 2
    //---
-   if((m_phase != PHASE_PRICE1      &&
-       m_nodeStats.priceCallsTotal  && 
-       m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0) 
-      ||
-      m_firstPhase2Call){
+   if(m_param.SolveMasterAsIp       &&
+      ((m_phase != PHASE_PRICE1      &&
+        m_nodeStats.priceCallsTotal  && 
+        m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0) 
+       ||
+       m_firstPhase2Call)){
       UTIL_MSG(m_param.LogLevel, 2,
                (*m_osLog) << "SolveMasterAsIp: PriceCallsTotal=" <<
                m_nodeStats.priceCallsTotal 
@@ -2076,21 +2095,18 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
-   int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-#ifdef DO_INTERIOR
    CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
-#endif
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
 
 
-   //int preInd = 0;
-   //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
-   //printf("preind=%d\n",preInd);
+   int preInd = 0;
+   CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
+   printf("preind=%d\n",preInd);
 #endif
 
   
@@ -2099,13 +2115,14 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_PRICE2:
       m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
 
-      //m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-      m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+      m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+      //m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
 
 
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 #ifdef DO_INTERIOR //TODO: option, not compile time
+      int cpxStat=0, cpxMethod=0;
       //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
       CPXbaropt(env, lp);
       cpxMethod = CPXgetmethod(env, lp);
@@ -2136,16 +2153,25 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #ifdef __DECOMP_LP_CLP__
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
               {
-                 OsiClpSolverInterface * osiClp  = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
-                 printf("clp status        = %d\n", osiClp->getModelPtr()->status());
-                 printf("clp prob status   = %d\n", osiClp->getModelPtr()->problemStatus());
-                 printf("clp second status = %d\n", osiClp->getModelPtr()->secondaryStatus());
+                 OsiClpSolverInterface * osiClp  
+		    = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
+                 printf("clp status        = %d\n", 
+			osiClp->getModelPtr()->status());
+                 printf("clp prob status   = %d\n", 
+			osiClp->getModelPtr()->problemStatus());
+                 printf("clp second status = %d\n", 
+			osiClp->getModelPtr()->secondaryStatus());
               }
               );
 #endif
+#ifdef __DECOMP_LP_CPX__  
+   int cpxStat = CPXgetstat(env, lp);
+   if(cpxStat)
+      printf("cpxStat = %d\n", cpxStat);   
+#endif
 
    
-   UTIL_DEBUG(m_param.LogDebugLevel, 4,
+   UTIL_DEBUG(m_param.LogDebugLevel, 3,
 	      (*m_osLog)
 	      << "Iteration Count               : "
 	      << m_masterSI->getIterationCount() << "\n"
@@ -2553,35 +2579,37 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "updateObjBoundLB()", m_param.LogDebugLevel, 2);
 
-#ifdef STAB_DUMERLE
-   const double * dualSol = m_masterSI->getRowPrice();
-   const double * rowRhs  = m_masterSI->getRightHandSide();
-   double         zDW_UB  = 0.0;
+
+   //for DualStab, this returns smoothed duals
    int r;
-   for(r = 0; r < m_masterSI->getNumRows(); r++){
-      zDW_UB += dualSol[r] * rowRhs[r];
-   }
-   printf("MasterObj = %g SumPiB = %g\n",
-	  getMasterObjValue(), zDW_UB);
-#else
-   double zDW_UB = getMasterObjValue();
-#endif
+   const double * dualSol      = getRowPrice();
+   const double * rowRhs       = m_masterSI->getRightHandSide();
+   double         zDW_UBPrimal = getMasterObjValue();
+   double         zDW_UBDual   = 0.0;
+   double         zDW_UB       = 0.0;
+   for(r = 0; r < m_masterSI->getNumRows(); r++)
+      zDW_UBDual += dualSol[r] * rowRhs[r];
 
 
-   double zDW_LB = zDW_UB + mostNegRC;
+   //if dual stab - use Dual?
+   double zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBoundLB(zDW_LB);
 
-   //---
-   //--- THINK: if do stabilization
-   //---  zDW_RMP = b*u ?
-   //--- NO - because zDW_RMP = cx + delta*slacks
+   if(!m_param.DualStab && !UtilIsZero(zDW_UBDual-zDW_UBPrimal, 1.0e-3)){
+      (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal) 
+                 << endl;
+      (*m_osLog) << "MasterObj [dual]   = " << UtilDblToStr(zDW_UBDual) 
+                 << endl;
+      throw UtilException("Primal and Dual Master Obj Not Matching.",
+                          "checkBlocksColumns", "DecompAlgo");
+   }
 
    //TODO: stats - we want to play zDW_LB vs UB... 
-
    UTIL_MSG(m_param.LogDebugLevel, 3,
 	    (*m_osLog)
-	    << "MasterObj = "   << UtilDblToStr(zDW_UB)
-	    << "\tmostNegRC = " << UtilDblToStr(mostNegRC) << "\n"
+	    << "MasterObj[primal] = " << UtilDblToStr(zDW_UBPrimal)
+            << "\t[dual] = "          << UtilDblToStr(zDW_UBDual)
+	    << "\tmostNegRC = "       << UtilDblToStr(mostNegRC) << "\n"
 	    << "ThisLB = "      << UtilDblToStr(zDW_LB) << "\t"
 	    << "BestLB = "      << UtilDblToStr(m_nodeStats.objBest.first)
 	    << "\n";
@@ -2598,11 +2626,13 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 	      << endl;
 	      ); 
 
+   zDW_UB = zDW_UBPrimal;
    if((getNodeIndex() == 0) &&
       (zDW_LB > (m_app->getBestKnownUB() + DecompEpsilon))){
       (*m_osLog) << "ERROR: in root node, bestKnownUB = " 
-		 << m_app->getBestKnownUB() << " thisBoundLB = " 
-		 << zDW_LB << endl;
+		 << UtilDblToStr(m_app->getBestKnownUB()) 
+                 << " thisBoundLB = " 
+		 << UtilDblToStr(zDW_LB) << endl;
       assert(0);
    }
 	      
@@ -4315,7 +4345,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       bool useCutoff = false;
       bool useExact  = true;
       if(m_phase == PHASE_PRICE2)
-         useCutoff = m_param.SubProbUseCutoff;
+		  useCutoff = m_param.SubProbUseCutoff ? true : false;
       
       map<int, DecompAlgoModel>::iterator mit; 
       for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
@@ -5402,6 +5432,7 @@ int DecompAlgo::addCutsFromPool(){
 
 //------------------------------------------------------------------------- //
 bool DecompAlgo::isIPFeasible(const double * x,
+                              const bool     isXSparse,
                               const double   feasVarTol,
                               const double   feasConTol,
                               const double   intTol){
@@ -5419,7 +5450,7 @@ bool DecompAlgo::isIPFeasible(const double * x,
       hasColNames = true;
 
    bool ipFeas = true;
-   if(!isLPFeasible(x, feasVarTol, feasConTol)){
+   if(!isLPFeasible(x, isXSparse, feasVarTol, feasConTol)){
       ipFeas = false;
       goto FUNC_EXIT;
    }
@@ -5461,6 +5492,7 @@ bool DecompAlgo::isIPFeasible(const double * x,
 
 //------------------------------------------------------------------------- //
 bool DecompAlgo::isLPFeasible(const double * x,
+                              const bool     isXSparse,
                               const double   feasVarTol,
                               const double   feasConTol){
 
@@ -5489,6 +5521,7 @@ bool DecompAlgo::isLPFeasible(const double * x,
 		      "isLPFeasible()", m_param.LogDebugLevel, 2);
    
    bool lpFeas = m_modelCore.isPointFeasible(x, 
+                                             isXSparse,
                                              m_param.LogDebugLevel,
                                              feasVarTol,
                                              feasConTol);
@@ -5500,6 +5533,7 @@ bool DecompAlgo::isLPFeasible(const double * x,
       map<int, DecompAlgoModel>::iterator mit;
       for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
 	 lpFeas = (*mit).second.isPointFeasible(x, 
+                                                isXSparse,
 						m_param.LogDebugLevel,
 						feasVarTol,
 						feasConTol);
@@ -5703,7 +5737,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //    IP solver (use this for debugging).
    
 
-   bool doCutoff = m_param.SubProbUseCutoff;
+   bool doCutoff = m_param.SubProbUseCutoff ? true : false;
    bool doExact  = isNested ? false : true;
    doExact       = m_function == DecompFuncGenerateInitVars ? false : doExact;
 
@@ -5806,10 +5840,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //---
       //--- solve: min cx, s.t. A'x >= b', x in Z ([A,b] is in modelRelax.M)
       //---    
-
       //TODO: get best N feasible solutions? is this possible with CBC
       //  this can help if this is the primary form of col-gen     
-
       algoModel.solveOsiAsIp(solveResult,
                              m_param,
                              doExact,
@@ -5844,61 +5876,64 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       // THINK: we really don't want to force the user to create vars
       // and check rc and obj, etc... but they might know how to be smart
       // and produce more than one, etc... THINK
-
       if(milpSolution){
          //---
          //--- create a DecompVar (shat) from the optimal solution      
          //---
          vector<int>    ind;
          vector<double> els;
-         int c;
+         int    i, c;
          double varRedCost  = 0.0; //stupid - == obj ??
          double varOrigCost = 0.0;
-         for(c = 0; c < n_origCols; c++){
-            if(!UtilIsZero(milpSolution[c], m_app->m_param.TolZero)){
-               ind.push_back(c);
-               els.push_back(milpSolution[c]);	    
-               //the reduced cost of shat: (c-uA").s
-               varRedCost  += redCostX[c] * milpSolution[c];	    
-               //the original cost of shat: c.s
-               varOrigCost += origCost[c] * milpSolution[c];
-               UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                          (*m_osLog) << "c: " << c 
-                          << " varOrigCost = " << varOrigCost
-                          << " origCost = " << origCost[c]
-                          << " solution = " << milpSolution[c] << endl;
-                          );
-            }
-         }
+	 if(model->isSparse()){
+	    //TODO: this can just be a vector? ever need arb access?
+	    map<int,int>::const_iterator mcit;
+	    const map<int,int> & sparseToOrig = model->getMapSparseToOrig();
+	    for(mcit  = sparseToOrig.begin(); 
+		mcit != sparseToOrig.end(); mcit++){
+	       i = mcit->first;  //sparse-index
+	       c = mcit->second; //original-index	       
+	       if(!UtilIsZero(milpSolution[i], m_app->m_param.TolZero)){
+		  ind.push_back(c);				
+		  els.push_back(milpSolution[i]);	    
+		  //the reduced cost of shat: (c-uA").s
+		  varRedCost  += redCostX[c] * milpSolution[i];	    
+		  //the original cost of shat: c.s
+		  varOrigCost += origCost[c] * milpSolution[i];
+		  UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+			     (*m_osLog) << "c: " << c 
+			     << " varOrigCost = " << varOrigCost
+			     << " origCost = " << origCost[c]
+			     << " solution = " << milpSolution[i] << endl;
+			     );
+	       }
+	    }
+	 }
+	 else{
+	    for(c = 0; c < n_origCols; c++){
+	       if(!UtilIsZero(milpSolution[c], m_app->m_param.TolZero)){
+		  ind.push_back(c);
+		  els.push_back(milpSolution[c]);	    
+		  //the reduced cost of shat: (c-uA").s
+		  varRedCost  += redCostX[c] * milpSolution[c];	    
+		  //the original cost of shat: c.s
+		  varOrigCost += origCost[c] * milpSolution[c];
+		  UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+			     (*m_osLog) << "c: " << c 
+			     << " varOrigCost = " << varOrigCost
+			     << " origCost = " << origCost[c]
+			     << " solution = " << milpSolution[c] << endl;
+			     );
+	       }
+	    }
+	 }
          varRedCost -= alpha;//RC = c-uA''s - alpha    
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
                     (*m_osLog) << "alpha      = " << alpha << "\n";
                     (*m_osLog) << "varRedCost = " << varRedCost << "\n";
                     (*m_osLog) << "varOrigCost = " << varOrigCost << "\n";
                     );
-	    
-	    
-         /*double bestVarFromApp = DecompInf;
-           if(rc != STAT_UNKNOWN){
-           if(nNewVars >= 1){
-           const DecompVar * appVar = vars.back();
-           UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-           (*m_osLog) << "VAR from application varRedCost = "
-           << appVar->getReducedCost() << endl;
-           );
-           bestVarFromApp = appVar->getReducedCost();
-           }
-           UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-           (*m_osLog) << "VAR from CBC varRedCost         = "
-           << varRedCost << endl;
-           );
-           //assert(varRedCost <= (bestVarFromApp + 1.0e-2));
-           if(isExact){
-           assert( UtilIsZero(varRedCost-bestVarFromApp, 1.0e-2) );
-           }
-           }*/
-	    
-	    
+	    	    
          DecompVar * var = new DecompVar(ind, els, varRedCost, varOrigCost);
          var->setBlockId(whichBlock);
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
@@ -5907,14 +5942,13 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       }
    } //END:   if((rc == STAT_UNKNOWN)  || (!isExact && nNewVars <= 0)){ 
 
-
-
    //---
    //--- sanity check - if user provides a full description of 
    //---  relaxed problem, make sure the variables from either app or IP
    //---  solver are valid
    //---
-   if(vars.size() > 0) {
+   //TODO: make this check work for sparse as well
+   if(!model->isSparse() && vars.size() > 0) {
       //---
       //--- get a pointer to the relaxed model for this block
       //---   even if this check is for a nested model, it should

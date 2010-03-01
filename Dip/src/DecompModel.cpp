@@ -20,6 +20,7 @@
 
 //===========================================================================//
 bool DecompAlgoModel::isPointFeasible(const double * x,
+                                      const bool     isXSparse,
                                       const int      logLevel,
                                       const double   feasVarTol,
                                       const double   feasConTol){
@@ -31,11 +32,12 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
    if(!M)
       return true;
 
-   int    c, r;
+   int    c, r, i;
    int    precision   = 7;
    bool   isFeas      = true;
    bool   hasColNames = false;
    bool   hasRowNames = false;
+   double xj          = 0.0;
    double ax          = 0.0;
    double clb         = 0.0;
    double cub         = 0.0;  
@@ -53,36 +55,49 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
    //---
    //--- do we satisfy all (active) column bounds
    //---
-   vector<int>::const_iterator it;
-   const vector<int> & activeColumns  = model->getActiveColumns();
+   vector<int> ::const_iterator it;
+   map<int,int>::const_iterator mcit;
+   const vector<int>  & activeColumns  = model->getActiveColumns();
+   bool                 isSparse       = model->isSparse();
+   const map<int,int> & origToSparse   = model->getMapOrigToSparse();
+   const map<int,int> & sparseToOrig   = model->getMapSparseToOrig();
    for(it = activeColumns.begin(); it != activeColumns.end(); it++){
-      c        = *it;
+      if(isSparse){
+         mcit = origToSparse.find(*it);
+         c    = mcit->second;
+         xj   = isXSparse ? x[c] : x[*it];
+      }
+      else{
+         c  = *it;
+         xj = x[c];
+         assert(!isXSparse);
+      }      
       clb      = model->colLB[c];
       cub      = model->colUB[c];      
-      actViol = std::max<double>(clb - x[c], x[c] - cub);
+      actViol = std::max<double>(clb - xj, xj - cub);
       actViol = std::max<double>(actViol, 0.0);
-      if(UtilIsZero(x[c], feasVarTol) ||
-	 (x[c] < 0 && UtilIsZero(clb)) ||
-         (x[c] > 0 && UtilIsZero(cub)))
-	 relViol = actViol;
+      if(UtilIsZero(xj, feasVarTol) ||
+         (xj < 0 && UtilIsZero(clb)) ||
+         (xj > 0 && UtilIsZero(cub)))
+         relViol = actViol;
       else
-	 relViol = actViol / std::fabs(x[c]);      
+         relViol = actViol / std::fabs(xj);      
       if(relViol > feasVarTol){
-	 //Notify, but don't mark in feasible unless 10x worse.
-	 UTIL_DEBUG(logLevel, 4,
+         //Notify, but don't mark in feasible unless 10x worse.
+         UTIL_DEBUG(logLevel, 4,
                     cout << "Point violates column " << c;
                     if(hasColNames)
                        cout << " -> " << colNames[c];
                     cout << " LB= " << UtilDblToStr(clb,precision)
-		    << " x= "  << UtilDblToStr(x[c],precision)
-		    << " UB= " << UtilDblToStr(cub,precision) 
-		    << " RelViol= " << UtilDblToStr(relViol,precision)
-		    << endl;
-		    );
-	 if(relViol > feasVarTol10){
-	    isFeas = false;
-	    goto FUNC_EXIT;
-	 }
+                    << " x= "  << UtilDblToStr(xj,precision)
+                    << " UB= " << UtilDblToStr(cub,precision) 
+                    << " RelViol= " << UtilDblToStr(relViol,precision)
+                    << endl;
+                    );
+         if(relViol > feasVarTol10){
+            isFeas = false;
+            goto FUNC_EXIT;
+         }
       }      
    }
    
@@ -93,7 +108,33 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
    //---         original base rows
    //---
    for(r = 0; r < model->getNumRows(); r++){
-      ax  = model->M->getVector(r).dotProduct(x);
+      if(isSparse){
+         if(isXSparse){
+            ax  = model->M->getVector(r).dotProduct(x);
+         }
+         else{
+            //TODO: "sparse" is the wrong word here - should be using
+            // the word projected for param, etc... 
+            //---
+            //--- x is with respect to the original set of columns,
+            //---   but the matrix is the sparse version
+            //---
+            const CoinShallowPackedVector v = model->M->getVector(r);
+            const int      len = v.getNumElements();
+            const int    * ind = v.getIndices();
+            const double * els = v.getElements();            
+            ax = 0.0;
+            for(i = 0; i < len; i++){
+               mcit = sparseToOrig.find(ind[i]);
+               c    = mcit->second;
+               ax  += x[c] * els[i];
+            }            
+         }
+      }
+      else{
+         ax  = model->M->getVector(r).dotProduct(x);
+         assert(!isXSparse);
+      }
       rlb = model->rowLB[r];
       rub = model->rowUB[r];
       actViol = std::max<double>(rlb - ax, ax - rub);     
