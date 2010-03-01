@@ -2579,35 +2579,37 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "updateObjBoundLB()", m_param.LogDebugLevel, 2);
 
-#ifdef STAB_DUMERLE
-   const double * dualSol = m_masterSI->getRowPrice();
-   const double * rowRhs  = m_masterSI->getRightHandSide();
-   double         zDW_UB  = 0.0;
+
+   //for DualStab, this returns smoothed duals
    int r;
-   for(r = 0; r < m_masterSI->getNumRows(); r++){
-      zDW_UB += dualSol[r] * rowRhs[r];
-   }
-   printf("MasterObj = %g SumPiB = %g\n",
-	  getMasterObjValue(), zDW_UB);
-#else
-   double zDW_UB = getMasterObjValue();
-#endif
+   const double * dualSol      = getRowPrice();
+   const double * rowRhs       = m_masterSI->getRightHandSide();
+   double         zDW_UBPrimal = getMasterObjValue();
+   double         zDW_UBDual   = 0.0;
+   double         zDW_UB       = 0.0;
+   for(r = 0; r < m_masterSI->getNumRows(); r++)
+      zDW_UBDual += dualSol[r] * rowRhs[r];
 
 
-   double zDW_LB = zDW_UB + mostNegRC;
+   //if dual stab - use Dual?
+   double zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBoundLB(zDW_LB);
 
-   //---
-   //--- THINK: if do stabilization
-   //---  zDW_RMP = b*u ?
-   //--- NO - because zDW_RMP = cx + delta*slacks
+   if(!m_param.DualStab && !UtilIsZero(zDW_UBDual-zDW_UBPrimal, 1.0e-3)){
+      (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal) 
+                 << endl;
+      (*m_osLog) << "MasterObj [dual]   = " << UtilDblToStr(zDW_UBDual) 
+                 << endl;
+      throw UtilException("Primal and Dual Master Obj Not Matching.",
+                          "checkBlocksColumns", "DecompAlgo");
+   }
 
    //TODO: stats - we want to play zDW_LB vs UB... 
-
    UTIL_MSG(m_param.LogDebugLevel, 3,
 	    (*m_osLog)
-	    << "MasterObj = "   << UtilDblToStr(zDW_UB)
-	    << "\tmostNegRC = " << UtilDblToStr(mostNegRC) << "\n"
+	    << "MasterObj[primal] = " << UtilDblToStr(zDW_UBPrimal)
+            << "\t[dual] = "          << UtilDblToStr(zDW_UBDual)
+	    << "\tmostNegRC = "       << UtilDblToStr(mostNegRC) << "\n"
 	    << "ThisLB = "      << UtilDblToStr(zDW_LB) << "\t"
 	    << "BestLB = "      << UtilDblToStr(m_nodeStats.objBest.first)
 	    << "\n";
@@ -2624,11 +2626,13 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 	      << endl;
 	      ); 
 
+   zDW_UB = zDW_UBPrimal;
    if((getNodeIndex() == 0) &&
       (zDW_LB > (m_app->getBestKnownUB() + DecompEpsilon))){
       (*m_osLog) << "ERROR: in root node, bestKnownUB = " 
-		 << m_app->getBestKnownUB() << " thisBoundLB = " 
-		 << zDW_LB << endl;
+		 << UtilDblToStr(m_app->getBestKnownUB()) 
+                 << " thisBoundLB = " 
+		 << UtilDblToStr(zDW_LB) << endl;
       assert(0);
    }
 	      
