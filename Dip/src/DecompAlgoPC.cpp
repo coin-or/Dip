@@ -169,7 +169,7 @@ int DecompAlgoPC::compressColumns(){
    const double   CompressColsSizeMultLimit = 2.0;
    const int      nMasterCols               = m_masterSI->getNumCols();
    const int      nMasterRows               = m_masterSI->getNumRows();
-   const double * masterSolution            = getMasterColSolution();
+   const double * masterSolution            = getMasterPrimalSolution();
    int nColsSinceLast 
       = nMasterCols - m_compressColsLastNumCols;
    int nIterSinceLast      
@@ -315,7 +315,8 @@ int DecompAlgoPC::compressColumns(){
                 }*/
 
 
-      m_masterSI->deleteCols(lpColsToDelete.size(), &lpColsToDelete[0]);
+      m_masterSI->deleteCols(static_cast<int>(lpColsToDelete.size()), 
+			     &lpColsToDelete[0]);
 
       m_cutpool.setRowsAreValid(false);
       UTIL_DEBUG(m_param.LogLevel, 3,
@@ -1208,9 +1209,11 @@ int DecompAlgoPC::addCutsFromPool(){
    //--- add the row names to master
    //---
    if(rowNames.size() > 0)
-      m_masterSI->setRowNames(rowNames, 0, rowNames.size(), rowIndex0);
+      m_masterSI->setRowNames(rowNames, 0, 
+			      static_cast<int>(rowNames.size()), rowIndex0);
    if(colNames.size() > 0)
-      m_masterSI->setColNames(colNames, 0, colNames.size(), colIndex0);
+      m_masterSI->setColNames(colNames, 0, 
+			      static_cast<int>(colNames.size()), colIndex0);
 
 
        

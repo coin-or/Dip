@@ -64,9 +64,9 @@ bool DecompVarPool::isDuplicate(const DecompVarList    & vars,
    for(vi = vars.begin(); vi != vars.end(); vi++){
       if(((*vi)->getBlockId() == wcol.getVarPtr()->getBlockId()) &&
          ((*vi)->getStrHash() == wcol.getVarPtr()->getStrHash())) {
-	 printf("check dup var %s vs waitingCol %s\n",
-		(*vi)->getStrHash().c_str(),
-		wcol.getVarPtr()->getStrHash().c_str());	 
+	 //printf("check dup var %s vs waitingCol %s\n",
+	 //(*vi)->getStrHash().c_str(),
+	 //wcol.getVarPtr()->getStrHash().c_str());	 
 	 //printf("IS DUP HERE\n");
 	 return true;
       }

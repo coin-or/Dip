@@ -1368,7 +1368,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 
    if(m_status != STAT_INFEASIBLE){
       //for CPM, can't this just access from m_masterSI?
-      recomposeSolution(getMasterColSolution(), m_xhat);
+      recomposeSolution(getMasterPrimalSolution(), m_xhat);
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
                  m_app->printOriginalSolution(modelCore->getNumCols(),
                                               modelCore->getColNames(),
@@ -1531,7 +1531,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    //--- THINK....
 	    //---
 	    if(m_status == STAT_FEASIBLE)
-	       m_varpool.setReducedCosts(getRowPrice(), m_status);
+	       m_varpool.setReducedCosts(getMasterDualSolution(), m_status);
 	    else{
 	       //if doing RC, never called??
 	       const double * u = getDualRays(1)[0];
@@ -1721,7 +1721,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	 //---
 	 //TODO: should this whole section be phaseDone?
 	 if(nChanges && m_status != STAT_INFEASIBLE){
-	    recomposeSolution(getMasterColSolution(), m_xhat);
+	    recomposeSolution(getMasterPrimalSolution(), m_xhat);
 	    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		       m_app->printOriginalSolution(modelCore->getNumCols(),
                                                     modelCore->getColNames(),
@@ -2104,9 +2104,9 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
 
 
-   int preInd = 0;
-   CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
-   printf("preind=%d\n",preInd);
+   //int preInd = 0;
+   //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
+   //printf("preind=%d\n",preInd);
 #endif
 
   
@@ -2127,8 +2127,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       CPXbaropt(env, lp);
       cpxMethod = CPXgetmethod(env, lp);
       cpxStat = CPXgetstat(env, lp);
-      if(cpxStat)
-	 printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
+      //if(cpxStat)
+      // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
 #else
       m_masterSI->resolve();
 #endif
@@ -2166,8 +2166,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #endif
 #ifdef __DECOMP_LP_CPX__  
    int cpxStat = CPXgetstat(env, lp);
-   if(cpxStat)
-      printf("cpxStat = %d\n", cpxStat);   
+   //if(cpxStat)
+   // printf("cpxStat = %d\n", cpxStat);   
 #endif
 
    
@@ -2197,13 +2197,20 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //if we are using cpx, we need to save the 
       //solution and we cannot use getColSolution() later on
       //for example, after addCols is called, cache is lost
-      const int      nCols  = m_masterSI->getNumCols();
-      const double * colSol = m_masterSI->getColSolution();
-      colSolution.clear();
-      colSolution.reserve(nCols);
+      const int      nCols   = m_masterSI->getNumCols();
+      const int      nRows   = m_masterSI->getNumRows();
+      const double * primSol = m_masterSI->getColSolution();
+      const double * dualSol = m_masterSI->getRowPrice();
+      m_primSolution.clear();
+      m_primSolution.reserve(nCols);
+      m_dualSolution.clear();
+      m_dualSolution.reserve(nRows);
       for(i = 0; i < nCols; i++)
-	 colSolution.push_back(colSol[i]);
-      assert((int)colSolution.size() == nCols);
+	 m_primSolution.push_back(primSol[i]);
+      for(i = 0; i < nRows; i++)
+	 m_dualSolution.push_back(dualSol[i]);
+      assert((int)m_primSolution.size() == nCols);
+      assert((int)m_dualSolution.size() == nRows);
       
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		 (*m_osLog)
@@ -2224,7 +2231,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //---  it meant to return infeasible.
       //---
       for(i = 0; i < nCols; i++){
-         if(colSol[i] < -1){
+         if(primSol[i] < -1){
             (*m_osLog) << "ERROR: NEGATIVE LAMBDA, but Osi returns as optimal"
                        << " assume it was meant to be infeasible." << endl;
             status = STAT_INFEASIBLE;
@@ -2582,7 +2589,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 
    //for DualStab, this returns smoothed duals
    int r;
-   const double * dualSol      = getRowPrice();
+   const double * dualSol      = getMasterDualSolution();
    const double * rowRhs       = m_masterSI->getRightHandSide();
    double         zDW_UBPrimal = getMasterObjValue();
    double         zDW_UBDual   = 0.0;
@@ -2592,7 +2599,8 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 
 
    //if dual stab - use Dual?
-   double zDW_LB = zDW_UBPrimal + mostNegRC;
+   //double zDW_LB = zDW_UBPrimal + mostNegRC;
+   double zDW_LB = zDW_UBDual + mostNegRC;
    setObjBoundLB(zDW_LB);
 
    if(!m_param.DualStab && !UtilIsZero(zDW_UBDual-zDW_UBPrimal, 1.0e-3)){
@@ -3574,8 +3582,8 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    m_masterSI->enableSimplexInterface(false);
 
    //with simplex interface, this is slightly different... 
-   const double * colSolution = m_masterSI->getColSolution();
-   const double * rowAct      = m_masterSI->getRowActivity();//==slacks?
+   const double * primSolution = m_masterSI->getColSolution();
+   const double * rowAct       = m_masterSI->getRowActivity();//==slacks?
 
    double * tabRhs   = new double[m];//osi_clp does not give this?
    //B-1b just equals x, but what if art column then is slack var
@@ -3590,7 +3598,7 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    for(r = 0; r < m; r++){
       i = basics[r];
       if(i < n){
-	 tabRhs[r] = colSolution[i]; //should == B-1b
+	 tabRhs[r] = primSolution[i]; //should == B-1b
 	 //printf("tabRhs[c:%d]: %g\n", i, tabRhs[r]);
       }
       else{
@@ -3904,7 +3912,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       nBaseCoreRows = nCoreCols;
    
    assert(!m_masterSI->isProvenPrimalInfeasible());
-   u = getRowPrice();
+   u = getMasterDualSolution();
 
 
    

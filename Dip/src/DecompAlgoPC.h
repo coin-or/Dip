@@ -69,7 +69,7 @@ private:
    virtual void phaseInit(DecompPhase & phase);
 
 
-   virtual const double * getRowPrice()  {
+   virtual const double * getMasterDualSolution()  {
       //---
       //--- return the duals to be used in pricing step
       //---
@@ -87,7 +87,7 @@ private:
 	 //---    pi_ST = alpha * pi_Bar + (1-alpha) * pi_RM
 	 //---
 	 int            r;
-	 const double * u      = m_masterSI->getRowPrice();
+	 const double * u      = &m_dualSolution[0];
 	 double         alpha  = m_param.DualStabAlpha;
 	 double         alpha1 = 1.0 - alpha; 
 	 copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
@@ -96,31 +96,33 @@ private:
 	 }      
 	 
 	 const vector<string> & rowNames = m_masterSI->getRowNames();
-	 for(r = 0; r < m_masterSI->getNumRows(); r++){
-	    if(!(UtilIsZero(m_dual[r]) && 
-		 UtilIsZero(m_dualRM[r]) && UtilIsZero(m_dualST[r]))){
-	       if(r < static_cast<int>(rowNames.size())){
-		  (*m_osLog) << "MASTER " 
-			     << DecompRowTypeStr[m_masterRowType[r]]
-			     << " DUAL[ " << r << "->" << rowNames[r]
-			     << "] = " << m_dual[r] << " RM = " 
-			     << m_dualRM[r] << " ST = " << m_dualST[r]
-			     << endl;
+	 if(m_param.LogDebugLevel >= 3){
+	    for(r = 0; r < m_masterSI->getNumRows(); r++){
+	       if(!(UtilIsZero(m_dual[r]) && 
+		    UtilIsZero(m_dualRM[r]) && UtilIsZero(m_dualST[r]))){
+		  if(r < static_cast<int>(rowNames.size())){
+		     (*m_osLog) << "MASTER " 
+				<< DecompRowTypeStr[m_masterRowType[r]]
+				<< " DUAL[ " << r << "->" << rowNames[r]
+				<< "] = " << m_dual[r] << " RM = " 
+				<< m_dualRM[r] << " ST = " << m_dualST[r]
+				<< endl;
+		  }
+		  else
+		     (*m_osLog) << "MASTER " 
+				<< DecompRowTypeStr[m_masterRowType[r]]
+				<< " DUAL[ " << r
+				<< "] = " << m_dual[r] << " RM = " 
+				<< m_dualRM[r] << " ST = " << m_dualST[r]
+				<< endl;
 	       }
-	       else
-		  (*m_osLog) << "MASTER " 
-			     << DecompRowTypeStr[m_masterRowType[r]]
-			     << " DUAL[ " << r
-			     << "] = " << m_dual[r] << " RM = " 
-			     << m_dualRM[r] << " ST = " << m_dualST[r]
-			     << endl;
 	    }
 	 }
-	 
 	 return &m_dualST[0];
       }
-      else
-	 return m_masterSI->getRowPrice();
+      else{
+	 return &m_dualSolution[0];
+      }
    }
    
 
