@@ -188,7 +188,8 @@ protected:
 
 
    //for cpx
-   vector<double> colSolution;
+   vector<double> m_primSolution;
+   vector<double> m_dualSolution;
 
    bool m_isColGenExact;
 
@@ -414,14 +415,6 @@ public:
    virtual void setMasterBounds(const double * lbs,
 				const double * ubs);
 
-   //here just for RC... ugh...
-   //this is where a full working OsiNull might make life easier.
-   virtual const double * getRowPrice() {
-      return m_masterSI->getRowPrice();
-   }
-
-
-
    int chooseBranchVar(int    & branchedOnIndex,
 		       double & branchedOnValue);
 
@@ -632,38 +625,24 @@ public:
       return m_nodeStats.priceCallsTotal;
    }
 
-#if 1
-   inline const double * getMasterColSolution() const {
-      return &colSolution[0];
+   inline const double * getMasterPrimalSolution() const {
+      return &m_primSolution[0];
+   }
+   virtual const double * getMasterDualSolution() {
+      return &m_dualSolution[0];
    }
 
    inline double getMasterObjValue() const {
-      //don't believe this, could have just added a col
-      //int nc = m_masterSI->getNumCols();
-
-      //be careful that this is always using the PhaseII obj
-      
-      //double * objCoef   = m_app->m_model.objCoeff; //THINK
-
-      int nc = static_cast<int>(colSolution.size());
+      //NOTE: be careful that this is always using the PhaseII obj
+      int nc = static_cast<int>(m_primSolution.size());
       const double * objCoef = m_masterSI->getObjCoefficients();
-      const double * colSol  = getMasterColSolution();  
+      const double * primSol  = getMasterPrimalSolution();  
       double retVal = 0.0;
       for ( int i=0 ; i<nc ; i++ ){
-	 retVal += objCoef[i]*colSol[i];
+	 retVal += objCoef[i]*primSol[i];
       }
       return retVal;
    }
-
-#else
-   inline const double * getMasterColSolution() const {
-      return m_masterSI->getColSolution();
-   }
-   inline double getMasterObjValue() const {
-      return m_masterSI->getObjValue(); //if we use base version
-   }
-#endif
-
 
    inline const int getStopCriteria() const {
       return m_stopCriteria;
