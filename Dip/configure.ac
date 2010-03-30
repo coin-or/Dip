@@ -211,7 +211,6 @@ AC_CONFIG_LINKS(test/MILP_DecompApp.cpp:examples/MILP/MILP_DecompApp.cpp
 		test/MILP_Param.h:examples/MILP/MILP_Param.h)
                 
 AC_COIN_LINK_INPUT_CMD
-AC_COIN_DATA_PATH(Sample)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
