@@ -129,7 +129,7 @@ endif
 
 test: unitTest$(EXEEXT)
 
-	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir $(COIN_DATA_SAMPLE_PATH) --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir $(DATASRCDIR)/Sample --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
 
 .PHONY: test
 
