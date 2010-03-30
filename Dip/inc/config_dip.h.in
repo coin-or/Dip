@@ -30,6 +30,9 @@
 /* Define to 1 if the Cplex package is available */
 #undef COIN_HAS_CPX
 
+/* Define to 1 if the Data package is used */
+#undef COIN_HAS_DATA
+
 /* Define to 1 if the Dip package is used */
 #undef COIN_HAS_DIP
 

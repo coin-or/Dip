@@ -483,7 +483,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COINUTILSDOCDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE OSISRCDIR OSIOBJDIR OSIDOCDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CLPSRCDIR CLPOBJDIR CLPDOCDIR COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CGLSRCDIR CGLOBJDIR CGLDOCDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CBCSRCDIR CBCOBJDIR CBCDOCDIR COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE ALPSSRCDIR ALPSOBJDIR ALPSDOCDIR COIN_HAS_ALPS_TRUE COIN_HAS_ALPS_FALSE DIPSRCDIR DIPOBJDIR DIPDOCDIR COIN_HAS_DIP_TRUE COIN_HAS_DIP_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE ASLLIB ASL_CPPFLAGS COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE COIN_HAS_CPLEX_TRUE COIN_HAS_CPLEX_FALSE CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE CBC_IP_SOLVER_TRUE CBC_IP_SOLVER_FALSE CPLEX_IP_SOLVER_TRUE CPLEX_IP_SOLVER_FALSE COIN_DATA_SAMPLE_PATH DipINCDIR DipSRCDIR DipDEFS ARCH COIN_HAS_CLP CLLCFLAGS LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ADDLIBS FADDLIBS ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX MPICXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COIN_HAS_READLINE_TRUE COIN_HAS_READLINE_FALSE COINUTILSSRCDIR COINUTILSOBJDIR COINUTILSDOCDIR COIN_HAS_COINUTILS_TRUE COIN_HAS_COINUTILS_FALSE DATASRCDIR DATAOBJDIR DATADOCDIR COIN_HAS_DATA_TRUE COIN_HAS_DATA_FALSE OSISRCDIR OSIOBJDIR OSIDOCDIR COIN_HAS_OSI_TRUE COIN_HAS_OSI_FALSE CLPSRCDIR CLPOBJDIR CLPDOCDIR COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE CGLSRCDIR CGLOBJDIR CGLDOCDIR COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CBCSRCDIR CBCOBJDIR CBCDOCDIR COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE ALPSSRCDIR ALPSOBJDIR ALPSDOCDIR COIN_HAS_ALPS_TRUE COIN_HAS_ALPS_FALSE DIPSRCDIR DIPOBJDIR DIPDOCDIR COIN_HAS_DIP_TRUE COIN_HAS_DIP_FALSE CPXINCDIR CPXLIB COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE ASLLIB ASL_CPPFLAGS COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE COIN_HAS_CPLEX_TRUE COIN_HAS_CPLEX_FALSE CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE CBC_IP_SOLVER_TRUE CBC_IP_SOLVER_FALSE CPLEX_IP_SOLVER_TRUE CPLEX_IP_SOLVER_FALSE COIN_DATA_SAMPLE_PATH DipINCDIR DipSRCDIR DipDEFS ARCH COIN_HAS_CLP CLLCFLAGS LIBEXT VPATH_DISTCLEANFILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -20759,6 +20759,7 @@ fi
 #############################################################################
 #                              COIN components                              #
 #############################################################################
+
 echo "$as_me:$LINENO: checking for COIN project CoinUtils" >&5
 echo $ECHO_N "checking for COIN project CoinUtils... $ECHO_C" >&6
 
@@ -20816,6 +20817,64 @@ fi
 
 echo "$as_me:$LINENO: result: $coin_has_coinutils" >&5
 echo "${ECHO_T}$coin_has_coinutils" >&6
+
+echo "$as_me:$LINENO: checking for COIN project Data" >&5
+echo $ECHO_N "checking for COIN project Data... $ECHO_C" >&6
+
+# First check, if the sub-project is actually available (ToDo: allow
+# other locations)
+
+coin_has_data=unavailable
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = Data; then
+      coin_has_data=skipping
+    fi
+  done
+fi
+
+if test $coin_has_data != skipping; then
+  if test $PACKAGE_TARNAME = data; then
+    coin_has_data=.
+  else
+    if test -d $srcdir/../Data; then
+      coin_has_data=../Data
+    fi
+  fi
+fi
+
+if test $coin_has_data != unavailable &&
+   test $coin_has_data != skipping; then
+  # Set the #define if the component is available
+
+cat >>confdefs.h <<\_ACEOF
+#define COIN_HAS_DATA 1
+_ACEOF
+
+
+  # Set the variables for source and object code location
+
+  DATASRCDIR=`cd $srcdir/$coin_has_data; pwd`
+
+  DATAOBJDIR=`pwd`/$coin_has_data
+
+  DATADOCDIR=$abs_lib_dir/../share/doc/coin/Data
+fi
+
+  # Define the Makefile conditional
+
+
+if test $coin_has_data != unavailable &&
+                test $coin_has_data != skipping; then
+  COIN_HAS_DATA_TRUE=
+  COIN_HAS_DATA_FALSE='#'
+else
+  COIN_HAS_DATA_TRUE='#'
+  COIN_HAS_DATA_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_data" >&5
+echo "${ECHO_T}$coin_has_data" >&6
 
 echo "$as_me:$LINENO: checking for COIN project Osi" >&5
 echo $ECHO_N "checking for COIN project Osi... $ECHO_C" >&6
@@ -22107,6 +22166,13 @@ echo "$as_me: error: conditional \"COIN_HAS_COINUTILS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${COIN_HAS_DATA_TRUE}" && test -z "${COIN_HAS_DATA_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_DATA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"COIN_HAS_DATA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${COIN_HAS_OSI_TRUE}" && test -z "${COIN_HAS_OSI_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_OSI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -22923,6 +22989,11 @@ s,@COINUTILSOBJDIR@,$COINUTILSOBJDIR,;t t
 s,@COINUTILSDOCDIR@,$COINUTILSDOCDIR,;t t
 s,@COIN_HAS_COINUTILS_TRUE@,$COIN_HAS_COINUTILS_TRUE,;t t
 s,@COIN_HAS_COINUTILS_FALSE@,$COIN_HAS_COINUTILS_FALSE,;t t
+s,@DATASRCDIR@,$DATASRCDIR,;t t
+s,@DATAOBJDIR@,$DATAOBJDIR,;t t
+s,@DATADOCDIR@,$DATADOCDIR,;t t
+s,@COIN_HAS_DATA_TRUE@,$COIN_HAS_DATA_TRUE,;t t
+s,@COIN_HAS_DATA_FALSE@,$COIN_HAS_DATA_FALSE,;t t
 s,@OSISRCDIR@,$OSISRCDIR,;t t
 s,@OSIOBJDIR@,$OSIOBJDIR,;t t
 s,@OSIDOCDIR@,$OSIDOCDIR,;t t
