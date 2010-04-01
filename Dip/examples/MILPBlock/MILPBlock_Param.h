@@ -49,7 +49,7 @@ public:
       ColumnUB     = utilParam.GetSetting("ColumnUB",      1.e20,  common);
       ColumnLB     = utilParam.GetSetting("ColumnLB",     -1.e20,  common);
       MasterOnlyOneBlock = 
-         utilParam.GetSetting("MasterOnlyOneBlock",            1,  common);
+         utilParam.GetSetting("MasterOnlyOneBlock",            0,  common);
    }
 
    void dumpSettings(ostream * os = &cout){
@@ -83,7 +83,7 @@ public:
       BestKnownUB    ( 1.e100),
       ColumnUB       ( 1.e20),
       ColumnLB       (-1.e20),
-      MasterOnlyOneBlock(1)
+      MasterOnlyOneBlock(0)
 {};
    ~MILPBlock_Param() {};
 };
