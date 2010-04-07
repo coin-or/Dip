@@ -37,6 +37,7 @@ Dip/configure -text
 Dip/configure.ac -text
 Dip/data/AP3/ReadMe.txt -text
 Dip/data/AP3/Saltzman.tgz -text
+Dip/data/ATM/ampl.tgz -text
 Dip/data/ATM/atm.direct.parm -text
 Dip/data/ATM/atm.direct.sh -text
 Dip/data/ATM/atm.opt -text
