@@ -69,7 +69,7 @@ Dip/data/MAD/madlib.list -text
 Dip/data/MAD/madlib.opt.xls -text
 Dip/data/MAD/madlibMPS/createAll.sh -text
 Dip/data/MAD/madlibMPS/createOne.sh -text
-Dip/data/MAD/miplib/PRIMAL.tar.gz -text
+Dip/data/MAD/miplib/ReadMe.txt -text
 Dip/data/MAD/miplib/changename.sh -text
 Dip/data/MAD/miplib/madlib.miplib.list -text
 Dip/data/MAD/miplib/madlib.miplib.opt -text
