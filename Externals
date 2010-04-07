@@ -1,9 +1,9 @@
 BuildTools  https://projects.coin-or.org/svn/BuildTools/releases/0.5.29
-Cbc  https://projects.coin-or.org/svn/Cbc/releases/2.4.1/Cbc
+Cbc  https://projects.coin-or.org/svn/Cbc/stable/2.4/Cbc
 CoinUtils  https://projects.coin-or.org/svn/CoinUtils/releases/2.6.0/CoinUtils
 Osi  https://projects.coin-or.org/svn/Osi/releases/0.102.1/Osi
 Cgl  https://projects.coin-or.org/svn/Cgl/releases/0.55.0/Cgl
-Clp  https://projects.coin-or.org/svn/Clp/releases/1.11.1/Clp
+Clp  https://projects.coin-or.org/svn/Clp/stable/1.11/Clp
 Alps  https://projects.coin-or.org/svn/CHiPPS/Alps/releases/1.1.1/Alps
 Data/Sample  https://projects.coin-or.org/svn/Data/releases/1.0.7/Sample
 ThirdParty/Blas  https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/releases/1.0.14
