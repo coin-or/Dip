@@ -5483,11 +5483,11 @@ bool DecompAlgo::isIPFeasible(const double * x,
    }
    
    
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
-	      m_app->printOriginalSolution(modelCore->getNumCols(), 
-                                           modelCore->getColNames(),
-                                           x);
-	      );
+   UTIL_MSG(m_app->m_param.LogDebugLevel, 4,
+	    m_app->printOriginalSolution(modelCore->getNumCols(), 
+					 modelCore->getColNames(),
+					 x);
+	    );
    
  FUNC_EXIT:
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,

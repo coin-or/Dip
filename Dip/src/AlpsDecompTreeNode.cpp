@@ -202,6 +202,36 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //---
       if(decompAlgo->getXhatIPBest())
          checkIncumbent(model, decompAlgo->getXhatIPBest());
+      
+      //---
+      //--- This is a first attempt at a redesign of branching rows.
+      //---  We still have all of them explicitly defined, but we
+      //---  relax them and only explicitly enforce things as we branch.
+      //---
+      //--- A more advanced attempt would treat branching rows as cuts
+      //---  and add them dynamically.
+      //---
+      //--- In root node, set all branching rows to "free" by relaxing
+      //---   lb and ub.
+      //---
+      //--- NOTE: this should also be done for all nodes except for the
+      //---   rows that represent bounds that we have branched on.
+      //---
+      /*
+      if(decompAlgo->m_algo == PRICE_AND_CUT){
+	 ////////////////////////////////////////
+	 ///////////////////STOP
+	 ////////////////////////////////////////
+	 double * lbsInf = new double[n_cols];
+	 double * ubsInf = new double[n_cols];
+	 for(c = 0; c < n_cols; c++){
+	    lbsInf[c] = -DecompInfinity;
+	    ubsInf[c] =  DecompInfinity;
+	 } 
+         decompAlgo->setMasterBounds(lbsInf, ubsInf);
+	 UTIL_DELARR(lbsInf);
+	 UTIL_DELARR(ubsInf);
+	 }*/
    }
    
       

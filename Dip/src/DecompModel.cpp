@@ -74,6 +74,17 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
       }      
       clb      = model->colLB[c];
       cub      = model->colUB[c];      
+      UTIL_DEBUG(logLevel, 5,
+		 if(!UtilIsZero(xj)){
+		    cout << "Point " << c;
+		    if(hasColNames)
+		       cout << " -> " << colNames[c];
+		    cout << " LB= " << UtilDblToStr(clb,precision)
+			 << " x= "  << UtilDblToStr(xj,precision)
+			 << " UB= " << UtilDblToStr(cub,precision) 
+			 << endl;
+		 }
+		 );
       actViol = std::max<double>(clb - xj, xj - cub);
       actViol = std::max<double>(actViol, 0.0);
       if(UtilIsZero(xj, feasVarTol) ||
