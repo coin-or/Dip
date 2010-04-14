@@ -83,12 +83,14 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/ExternalSolvers/TSP/get.concorde.in \
 	$(top_srcdir)/examples/ExternalSolvers/VRP/get.cvrpsep.in \
 	$(top_srcdir)/examples/GAP/Makefile.in \
+	$(top_srcdir)/examples/GAP/README.txt.in \
 	$(top_srcdir)/examples/GAP/data_extract.sh.in \
 	$(top_srcdir)/examples/GAP/gap.parm.in \
 	$(top_srcdir)/examples/GAP/get_pisinger.sh.in \
 	$(top_srcdir)/examples/MAD/Makefile.in \
 	$(top_srcdir)/examples/MAD/mad.parm.in \
 	$(top_srcdir)/examples/MCF/Makefile.in \
+	$(top_srcdir)/examples/MCF/README.txt.in \
 	$(top_srcdir)/examples/MCF/data_extract.sh.in \
 	$(top_srcdir)/examples/MCF/mcf.parm.in \
 	$(top_srcdir)/examples/MILP/MILP_DecompApp.cpp \
@@ -106,6 +108,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/MILPBlock/milpblock.parm2.in \
 	$(top_srcdir)/examples/MILPBlock/test.sh.in \
 	$(top_srcdir)/examples/MMKP/Makefile.in \
+	$(top_srcdir)/examples/MMKP/README.txt.in \
 	$(top_srcdir)/examples/MMKP/data_extract.sh.in \
 	$(top_srcdir)/examples/MMKP/get_pisinger.sh.in \
 	$(top_srcdir)/examples/MMKP/mmkp.parm.in \
@@ -150,14 +153,16 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/AP3/Makefile examples/AP3/ap3.parm \
 	examples/GAP/Makefile examples/GAP/gap.parm \
 	examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh \
-	examples/MAD/Makefile examples/MAD/mad.parm \
-	examples/MCF/Makefile examples/MCF/mcf.parm \
-	examples/MCF/data_extract.sh examples/MMKP/Makefile \
+	examples/GAP/README.txt examples/MAD/Makefile \
+	examples/MAD/mad.parm examples/MCF/Makefile \
+	examples/MCF/mcf.parm examples/MCF/data_extract.sh \
+	examples/MCF/README.txt examples/MMKP/Makefile \
 	examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh \
-	examples/MMKP/get_pisinger.sh examples/VRP/Makefile \
-	examples/VRP/vrp.parm examples/VRP/get_boost.sh \
-	examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh \
-	examples/ATM/Makefile examples/ATM/atm.parm \
+	examples/MMKP/get_pisinger.sh examples/MMKP/README.txt \
+	examples/VRP/Makefile examples/VRP/vrp.parm \
+	examples/VRP/get_boost.sh examples/VRP/get_concorde.sh \
+	examples/VRP/get_cvrpsep.sh examples/ATM/Makefile \
+	examples/ATM/atm.parm \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -516,6 +521,8 @@ examples/GAP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/exampl
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/GAP/get_pisinger.sh: $(top_builddir)/config.status $(top_srcdir)/examples/GAP/get_pisinger.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/GAP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/GAP/README.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MAD/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MAD/mad.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/mad.parm.in
@@ -526,6 +533,8 @@ examples/MCF/mcf.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MCF/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MCF/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/README.txt.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MMKP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MMKP/mmkp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/mmkp.parm.in
@@ -533,6 +542,8 @@ examples/MMKP/mmkp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MM
 examples/MMKP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MMKP/get_pisinger.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/get_pisinger.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/MMKP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MMKP/README.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/VRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

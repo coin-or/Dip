@@ -262,15 +262,18 @@ AC_CONFIG_FILES([Makefile
                  examples/GAP/gap.parm
                  examples/GAP/data_extract.sh
 		 examples/GAP/get_pisinger.sh
+		 examples/GAP/README.txt
                  examples/MAD/Makefile
                  examples/MAD/mad.parm
                  examples/MCF/Makefile
                  examples/MCF/mcf.parm
                  examples/MCF/data_extract.sh
+		 examples/MCF/README.txt
                  examples/MMKP/Makefile
                  examples/MMKP/mmkp.parm
                  examples/MMKP/data_extract.sh
                  examples/MMKP/get_pisinger.sh
+		 examples/MMKP/README.txt
                  examples/VRP/Makefile
                  examples/VRP/vrp.parm                 
                  examples/VRP/get_boost.sh
