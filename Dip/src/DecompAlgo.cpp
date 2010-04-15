@@ -1457,20 +1457,35 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                      gap = fabs(m_nodeStats.objBest.second-
                                 m_nodeStats.objBest.first);
                }
-	       (*m_osLog)
-	       << "Processing Node " << nodeIndex
-	       << " (algo = "     << DecompAlgoStr[m_algo] 
-	       << ", phase = "    << DecompPhaseStr[m_phase]
-	       << ") thisLB = "      
-	       << UtilDblToStr(m_nodeStats.objBest.first)
-	       << " globalUB = " 
-	       << UtilDblToStr(m_nodeStats.objBest.second) 
-               << " gap = "       << UtilDblToStr(gap,5) 
-               << " time = "      << UtilDblToStr(globalTimer.getCpuTime(), 3)
-	       << endl;
+	       int nHistorySize 
+	       = static_cast<int>(m_nodeStats.objHistoryLB.size());
+	       if(nHistorySize > 0){		  
+		  DecompObjBound & objBound 
+		     = m_nodeStats.objHistoryLB[nHistorySize-1];
+		  (*m_osLog)
+		     << "Processing Node "<< setw(5)  << nodeIndex
+		     << " algo = "        << setw(10) << DecompAlgoStr[m_algo] 
+		     << " phase = "       << setw(10) << DecompPhaseStr[m_phase]
+		     << " cutpass = "     << setw(5)  << objBound.cutPass
+		     << " pricepass = "   << setw(5)  << objBound.pricePass
+		     << " thisLB = "      << setw(10) 
+		     << UtilDblToStr(objBound.thisBound,6)
+		     << " thisUB = "      << setw(10) 
+		     << UtilDblToStr(objBound.thisBoundUB,6)
+		     << " nodeLB = "
+		     << UtilDblToStr(m_nodeStats.objBest.first)
+		     << " globalUB = " 
+		     << UtilDblToStr(m_nodeStats.objBest.second) 
+		     << " gap = "       << UtilDblToStr(gap,5) 
+		     << " time = "      << UtilDblToStr(globalTimer.getCpuTime(), 3)
+		     << endl;
+	       }		
+	       else{
+		  //TODO
+	       }	       
 	       );
 
-      
+   
       //---
       //--- update the phase based on parms, status and current phase
       //---
@@ -2601,7 +2616,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    //if dual stab - use Dual?
    //double zDW_LB = zDW_UBPrimal + mostNegRC;
    double zDW_LB = zDW_UBDual + mostNegRC;
-   setObjBoundLB(zDW_LB);
+   setObjBoundLB(zDW_LB, zDW_UBDual);
 
    if(!m_param.DualStab && !UtilIsZero(zDW_UBDual-zDW_UBPrimal, 1.0e-3)){
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal) 

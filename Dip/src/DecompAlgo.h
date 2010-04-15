@@ -665,23 +665,24 @@ public:
    /**
     * Set the current LB and update best/history.
     */
-   virtual void setObjBoundLB(const double thisBound){
+   virtual void setObjBoundLB(const double thisBound,
+			      const double thisBoundUB){
       if(thisBound > m_nodeStats.objBest.first){
 	 m_nodeStats.objBest.first = thisBound;
       }
 
       DecompObjBound objBound;
-      objBound.lbOrUb    = 0;
-      objBound.cutPass   = m_nodeStats.cutCallsTotal;
-      objBound.pricePass = m_nodeStats.priceCallsTotal;      
-      objBound.thisBound = thisBound;
-      objBound.bestBound = m_nodeStats.objBest.first;
+      objBound.lbOrUb      = 0;
+      objBound.cutPass     = m_nodeStats.cutCallsTotal;
+      objBound.pricePass   = m_nodeStats.priceCallsTotal;      
+      objBound.thisBound   = thisBound;
+      objBound.thisBoundUB = thisBoundUB;
+      objBound.bestBound   = m_nodeStats.objBest.first;
 #ifdef UTIL_USE_TIMERS
-      objBound.timeStamp = globalTimer.getRealTime();
+      objBound.timeStamp   = globalTimer.getRealTime();
 #else
-      objBound.timeStamp = -1;
-#endif
-      
+      objBound.timeStamp   = -1;
+#endif      
       m_nodeStats.objHistoryLB.push_back(objBound);
    }
    

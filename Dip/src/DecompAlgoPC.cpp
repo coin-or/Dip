@@ -661,6 +661,13 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    if(status)
       throw UtilException("CPXsetdblparam failure", 
                           "solutionUpdateAsIp", "DecompAlgoPC");
+
+#if CPX_VERSION >= 1100
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
+   if(status)
+      throw UtilException("CPXsetintparam failure", 
+			  "solutionUpdateAsIp", "DecompAlgoPC");
+#endif
       
    //---
    //--- solve the MILP

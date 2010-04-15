@@ -85,7 +85,7 @@ bool DecompAlgoC::updateObjBoundLB(const double mostNegRC){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "updateObjBoundLB()", m_param.LogDebugLevel, 2);
    double thisBoundLB = m_masterSI->getObjValue();
-   setObjBoundLB(thisBoundLB);
+   setObjBoundLB(thisBoundLB, thisBoundLB);
 
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      (*m_osLog)

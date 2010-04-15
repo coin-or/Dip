@@ -126,7 +126,8 @@ private:
    }
    
 
-   virtual void setObjBoundLB(const double thisBound){
+   virtual void setObjBoundLB(const double thisBound,
+			      const double thisBoundUB){
       if(m_param.DualStab){
 	 if(thisBound > m_nodeStats.objBest.first){
 	    (*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
@@ -134,7 +135,7 @@ private:
 	    copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
 	 }
       }
-      DecompAlgo::setObjBoundLB(thisBound);
+      DecompAlgo::setObjBoundLB(thisBound, thisBoundUB);
    }
    
    /**

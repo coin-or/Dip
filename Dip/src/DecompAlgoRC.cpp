@@ -663,7 +663,7 @@ bool DecompAlgoRC::updateObjBoundLB(const double mostNegRC){
    }
    //double thisBoundLB = shatVar->getReducedCost() + constant;
    double thisBoundLB = mostNegRC + constant;
-   setObjBoundLB(thisBoundLB);
+   setObjBoundLB(thisBoundLB, constant);
 
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      (*m_osLog)
