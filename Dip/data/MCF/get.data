@@ -1,1 +1,1 @@
-wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/data_mcf.tgz
+wget --no-check-certificate http://coral.ie.lehigh.edu/~magh/decomp/data_mcf.tgz
