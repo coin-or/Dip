@@ -159,14 +159,8 @@ int DecompAlgoPC::compressColumns(){
 
    m_stats.timerOther1.reset();
 
-   //TODO: make parameters
-
-   const int      CompressColsIterFreq      = 10; //every 10 iterations, or
-   //  if this is small? can get in infy loop?
-   // even at size 10! we can get into an infy loop... 
-   // how to detect?
- 
-   const double   CompressColsSizeMultLimit = 2.0;
+   const int      CompressColsIterFreq      = m_param.CompressColumnsIterFreq; 
+   const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
    const int      nMasterCols               = m_masterSI->getNumCols();
    const int      nMasterRows               = m_masterSI->getNumRows();
    const double * masterSolution            = getMasterPrimalSolution();
@@ -262,10 +256,15 @@ int DecompAlgoPC::compressColumns(){
 	      printVars(m_osLog););
    
    DecompVarList::iterator li = m_vars.begin();            
+   int nCols       = 0;
+   int nColsNoDel  = 0;
+   int nColsBasic  = 0;
+   int nColsEffPos = 0;
    while(li != m_vars.end()){
       colMasterIndex             = (*li)->getColMasterIndex();
       indexShift[colMasterIndex] = shift;
       assert(isMasterColStructural(colMasterIndex));
+      nCols++;
 
       //---
       //--- do not delete any columns that were marked "NoDelete" 
@@ -274,6 +273,7 @@ int DecompAlgoPC::compressColumns(){
       //---
       if(m_masterColType[colMasterIndex] == DecompCol_Structural_NoDelete){
 	 li++;
+	 nColsNoDel++;
 	 continue;
       }
 
@@ -281,6 +281,11 @@ int DecompAlgoPC::compressColumns(){
       //--- do not delete any columns that are basic
       //--- do not delete any columns with non-negative effectiveness
       //---
+      if(isBasic[colMasterIndex])
+	 nColsBasic++;
+      if((*li)->getEffectiveness() >= 0)
+	 nColsEffPos++;
+
       if(isBasic[colMasterIndex] || ((*li)->getEffectiveness() >= 0)){
 	 li++;
 	 continue;
@@ -317,12 +322,17 @@ int DecompAlgoPC::compressColumns(){
 
       m_masterSI->deleteCols(static_cast<int>(lpColsToDelete.size()), 
 			     &lpColsToDelete[0]);
-
+      
       m_cutpool.setRowsAreValid(false);
-      UTIL_DEBUG(m_param.LogLevel, 3,
-		 (*m_osLog) << "Num Columns Deleted = " 
-		 << lpColsToDelete.size() << endl;
-		 );
+      UTIL_MSG(m_param.LogLevel, 3,
+	       (*m_osLog) << "Num Columns Deleted = " 
+	       << lpColsToDelete.size() 
+	       << " Cols = " << nCols
+	       << " NoDel = " << nColsNoDel
+	       << " Basic = " << nColsBasic
+	       << " EffPos = " << nColsEffPos
+	       << endl;
+	       );
 
 
 

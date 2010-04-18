@@ -33,11 +33,8 @@ void DecompAlgoC::createMasterProblem(DecompVarList & initVars){
    //--- m_modelCore  contains [A'', b''] in terms of x
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createMasterProblem()", m_param.LogDebugLevel, 2);
-
-   //DecompConstraintSet          * modelCore   = getModelCore();
-   //vector<DecompConstraintSet*> & modelRelaxV = getModelRelaxV();
-   loadSIFromModel(m_masterSI);// modelCore, modelRelaxV);
+		      "createMasterProblem()", m_param.LogDebugLevel, 2);  
+   loadSIFromModel(m_masterSI);
    if(m_param.CutCGL){
       m_cutgenSI = new OsiClpSolverInterface();
       CoinAssertHint(m_cutgenSI, "Error: Out of Memory");

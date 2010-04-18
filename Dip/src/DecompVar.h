@@ -93,6 +93,11 @@ public:
       return false;
    }
 
+   bool doesSatisfyBounds(int            denseLen,
+			  double       * denseArr,
+			  const double * lbs,
+			  const double * ubs);
+
    void fillDenseArr(int      len,
                      double * arr);
   

@@ -16,6 +16,33 @@
 #include "DecompVar.h"
 
 // --------------------------------------------------------------------- //
+//this is not good enough - this only checks the nonzero elements
+//   what if we branch to fix a component to 1, need to make sure that
+//   is in this set - will have to compare vs dense array
+bool DecompVar::doesSatisfyBounds(int            denseLen,
+				  double       * denseArr,
+				  const double * lbs,
+				  const double * ubs){
+
+   int            j;
+   double         xj;
+   fillDenseArr(denseLen, denseArr);
+   for (j = 0; j < denseLen; ++j){
+      xj = denseArr[j];
+      printf("j:%d xj:%g lb:%g ub:%g --> ",
+	     j, xj, lbs[j], ubs[j]);
+      if(xj < (lbs[j] - DecompEpsilon) ||
+	 xj > (ubs[j] + DecompEpsilon)){
+	 printf(" false\n");
+	 return false;	 
+      }
+      else
+	 printf("\n");
+   }
+   return true;
+}
+
+// --------------------------------------------------------------------- //
 void DecompVar::fillDenseArr(int      len,
                              double * arr){
    CoinFillN(arr, len, 0.0);

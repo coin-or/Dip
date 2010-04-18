@@ -63,6 +63,8 @@ public:
    double MasterGapLimit;
 
    int    CompressColumns;
+   int    CompressColumnsIterFreq;     //num iters between compress
+   double CompressColumnsSizeMultLimit;//don't compress unless number of cols increased by this mult
    int    CutDC;
    int    CutCGL;
    
@@ -125,7 +127,8 @@ public:
    //string IpAlgoStart;
    //string IpAlgoSub;
 
-   int    BranchNew; //{0,1}
+   int    BranchEnforceInSubProb;
+   int    BranchEnforceInMaster;
 
    /**
     * @}
@@ -159,6 +162,8 @@ public:
       PARAM_getSetting("TailoffPercent",       TailoffPercent);       
       PARAM_getSetting("MasterGapLimit",       MasterGapLimit);
       PARAM_getSetting("CompressColumns",      CompressColumns);       
+      PARAM_getSetting("CompressColumnsIterFreq",      CompressColumnsIterFreq);       
+      PARAM_getSetting("CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);       
       PARAM_getSetting("CutDC",                CutDC);
       PARAM_getSetting("CutCGL",               CutCGL);
       PARAM_getSetting("CutCglKnapC",          CutCglKnapC);
@@ -185,7 +190,8 @@ public:
       PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
       PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
-      PARAM_getSetting("BranchNew",            BranchNew);
+      PARAM_getSetting("BranchEnforceInSubProb", BranchEnforceInSubProb);
+      PARAM_getSetting("BranchEnforceInMaster",  BranchEnforceInMaster);
       //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
       //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
@@ -233,6 +239,8 @@ public:
       UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);      
       UtilPrintParameter(os, sec, "MasterGapLimit",      MasterGapLimit);      
       UtilPrintParameter(os, sec, "CompressColumns",     CompressColumns);
+      UtilPrintParameter(os, sec, "CompressColumnsIterFreq",      CompressColumnsIterFreq);
+      UtilPrintParameter(os, sec, "CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);
       UtilPrintParameter(os, sec, "CutDC",               CutDC);
       UtilPrintParameter(os, sec, "CutCGL",              CutCGL);
       UtilPrintParameter(os, sec, "CutCglKnapC",         CutCglKnapC);
@@ -261,7 +269,8 @@ public:
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
-      UtilPrintParameter(os, sec, "BranchNew",   BranchNew);
+      UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   BranchEnforceInSubProb);
+      UtilPrintParameter(os, sec, "BranchEnforceInMaster",    BranchEnforceInMaster);
       //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
       //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
@@ -285,6 +294,8 @@ public:
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
       CompressColumns      = 1;
+      CompressColumnsIterFreq      = 2;
+      CompressColumnsSizeMultLimit = 1.20;
       CutDC                = 0;
       CutCGL               = 1;
       CutCglKnapC          = 1;
@@ -311,7 +322,8 @@ public:
       DualStab                 = 0;
       DualStabAlpha            = 0.10;
       BreakOutPartial          = 0;
-      BranchNew                = 1;
+      BranchEnforceInSubProb   = 0;
+      BranchEnforceInMaster    = 1;
       //IpAlgoStart           = "dual";
       //IpAlgoSub             = "dual";
    }

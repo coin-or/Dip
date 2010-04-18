@@ -414,6 +414,8 @@ public:
    }
    virtual void setMasterBounds(const double * lbs,
 				const double * ubs);
+   virtual void setSubProbBounds(const double * lbs,
+				 const double * ubs);
 
    int chooseBranchVar(int    & branchedOnIndex,
 		       double & branchedOnValue);
@@ -564,6 +566,9 @@ public:
    }
    inline const DecompAlgoModel & getModelCore() const {
       return m_modelCore;}
+
+   inline const int getAlgo() const {
+      return m_algo;}
 
    inline DecompAlgoModel & getModelRelax(const int blockId){
       map<int,DecompAlgoModel>::iterator mit;

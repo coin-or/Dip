@@ -322,7 +322,7 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
          CoinPackedVector objCut;
          const double * objCoeff = getOrigObjective();
          int i;
-		 for(i = 0; i < m_cutgenSI->getNumCols(); i++){
+	 for(i = 0; i < m_cutgenSI->getNumCols(); i++){
             if(!UtilIsZero(objCoeff[i]))
                objCut.insert(i, objCoeff[i]);
          }         
@@ -359,14 +359,14 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    
    int r;
    for(r = 0; r < modelCore->getNumRows(); r++){
-      if(fabs(dualSol[r]) > DecompEpsilon){
-         if(r < static_cast<int>(rowNames.size())){
-            printf("INIT DUAL FOR CORE ROW[%6d -> %25s] = %12.10f\n", 
-                   r, rowNames[r].c_str(), dualSol[r]);
-         }
-         else
-            printf("INIT DUAL[%6d] = %12.10f\n", r, dualSol[r]);
-      }
+   if(fabs(dualSol[r]) > DecompEpsilon){
+   if(r < static_cast<int>(rowNames.size())){
+   printf("INIT DUAL FOR CORE ROW[%6d -> %25s] = %12.10f\n", 
+   r, rowNames[r].c_str(), dualSol[r]);
+   }
+   else
+   printf("INIT DUAL[%6d] = %12.10f\n", r, dualSol[r]);
+   }
    }
    #endif*/
    
@@ -470,8 +470,8 @@ void DecompAlgo::getModelsFromApp(){
 }
 
 //===========================================================================//
-void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
-                                 bool                           doInt){
+void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
+                                 bool                 doInt){
    
    //---
    //--- Initialize the solver interface.
@@ -483,7 +483,6 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface           * si,
    //--- relaxV contains [A',  b' ] in terms of x (if explicit)
    //--- core   contains [A'', b''] in terms of x
    //---
-
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "loadSIFromModel()", m_param.LogDebugLevel, 2);
   
@@ -715,10 +714,10 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- set the row counts
    //---
    m_nRowsOrig   = nRowsCore;
-   //if(m_param.BranchNew)
-   // m_nRowsBranch = 0;
-   //else
-   m_nRowsBranch = 2 * nIntVars;
+   if(m_param.BranchEnforceInMaster)
+      m_nRowsBranch = 2 * nIntVars;
+   else
+      m_nRowsBranch = 0;
    m_nRowsConvex = m_numConvexCon;
    m_nRowsCuts   = 0;
    
@@ -737,8 +736,8 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //---   We want to add these directly to the core so as to facilitate
    //---   operations to expand rows. Basically, we treat these just like cuts.
    //---
-   //if(!m_param.BranchNew)
-   coreMatrixAppendColBounds();
+   if(m_param.BranchEnforceInMaster)
+      coreMatrixAppendColBounds();
    nRowsCore = modelCore->getNumRows();
    
    //THINK - what need this for?
@@ -752,8 +751,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //---  make room for original rows, branching rows and convexity rows
    //---
    int                nRows    = m_nRowsOrig + m_nRowsBranch + m_nRowsConvex;
-   int                nColsMax = nInitVars  
-      + 2 * (m_nRowsOrig + m_nRowsBranch); 
+   int                nColsMax = nInitVars  + 2 * (m_nRowsOrig + m_nRowsBranch); 
    double           * colLB    = new double[nColsMax];
    double           * colUB    = new double[nColsMax];
    double           * objCoeff = new double[nColsMax];   
@@ -780,15 +778,16 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, 'O');
-   startRow = m_nRowsOrig;
-   endRow   = m_nRowsOrig + m_nRowsBranch;
-   masterMatrixAddArtCols(masterM, 
-			  colLB, 
-			  colUB, 
-			  objCoeff, 
-			  colNames,
-			  startRow, endRow, 'B');
-   
+   if(m_nRowsBranch > 0){
+      startRow = m_nRowsOrig;
+      endRow   = m_nRowsOrig + m_nRowsBranch;
+      masterMatrixAddArtCols(masterM, 
+			     colLB, 
+			     colUB, 
+			     objCoeff, 
+			     colNames,
+			     startRow, endRow, 'B');
+   }
       
    int colIndex     = 0;
    int blockIndex   = 0;
@@ -1174,10 +1173,7 @@ void DecompAlgo::coreMatrixAppendColBounds(){
 	 modelCore->rowLB.push_back(-DecompInf);
 	 modelCore->rowUB.push_back(colUBCore[j]);
 	 sense = 'L';
-         if(m_param.BranchNew)
-            rhs = DecompInf;
-         else
-            rhs   = colUBCore[j];
+	 rhs   = colUBCore[j];
 	 if(doNames){
 	    string rowName = "ub(" + colNames[j] + ")";
 	    rowNames.push_back(rowName);
@@ -1189,10 +1185,7 @@ void DecompAlgo::coreMatrixAppendColBounds(){
 	 modelCore->rowLB.push_back(colLBCore[j]);
 	 modelCore->rowUB.push_back(DecompInf);
 	 sense = 'G';
-         if(m_param.BranchNew)
-            rhs = -DecompInf;
-         else
-            rhs   = colLBCore[j];
+	 rhs   = colLBCore[j];
 	 if(doNames){
 	    string rowName = "lb(" + colNames[j] + ")";
 	    rowNames.push_back(rowName);
@@ -1473,10 +1466,12 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		     << " thisUB = "      << setw(10) 
 		     << UtilDblToStr(objBound.thisBoundUB,6)
 		     << " nodeLB = "
-		     << UtilDblToStr(m_nodeStats.objBest.first)
+		     << UtilDblToStr(m_nodeStats.objBest.first,6)
+		     << " globalLB = " 
+		     << UtilDblToStr(m_globalLB,6) 
 		     << " globalUB = " 
-		     << UtilDblToStr(m_nodeStats.objBest.second) 
-		     << " gap = "       << UtilDblToStr(gap,5) 
+		     << UtilDblToStr(m_nodeStats.objBest.second,6) 
+		     << " nodeGap = "       << UtilDblToStr(gap,5) 
 		     << " time = "      << UtilDblToStr(globalTimer.getCpuTime(), 3)
 		     << endl;
 	       }		
@@ -1586,33 +1581,33 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	 //---
          /*#ifdef STAB_DUMERLE
            m_stabEpsilon *= 0.95;
-	 dualSol = m_masterSI->getRowPrice();	 
-	 int i, r;
-	 for(i = 0; i < m_masterSI->getNumCols(); i++){
-         DecompColType type = m_masterColType[i];
-         if(isMasterColArtificial(i)){
-         if(type == DecompCol_ArtForRowL    ||
-         type == DecompCol_ArtForBranchL ||
-         type == DecompCol_ArtForCutL){
-         r = m_artColIndToRowInd[i];
-         printf("Master Col i=%d type=%s r=%d dual=%g\n",
-         i, DecompColTypeStr[type].c_str(), r, dualSol[r]);
-         m_masterSI->setObjCoeff(i, -dualSol[r]);
-         }
-         else if(type == DecompCol_ArtForRowG    ||
-         type == DecompCol_ArtForBranchG ||
-         type == DecompCol_ArtForCutG){
-         r = m_artColIndToRowInd[i];
-         printf("Master Col i=%d type=%s r=%d dual=%g\n",
-         i, DecompColTypeStr[type].c_str(), r, dualSol[r]);
-         m_masterSI->setObjCoeff(i, dualSol[r]);         
-         }
-         //CAN'T DO THIS IF IN PHASEI!
-         //m_masterSI->setColBounds(i, 0.0, 0.0);//TODO
-         m_masterSI->setColBounds(i, 0.0, m_stabEpsilon);//TODO
-         }
-	 }
-         #endif*/
+	   dualSol = m_masterSI->getRowPrice();	 
+	   int i, r;
+	   for(i = 0; i < m_masterSI->getNumCols(); i++){
+	   DecompColType type = m_masterColType[i];
+	   if(isMasterColArtificial(i)){
+	   if(type == DecompCol_ArtForRowL    ||
+	   type == DecompCol_ArtForBranchL ||
+	   type == DecompCol_ArtForCutL){
+	   r = m_artColIndToRowInd[i];
+	   printf("Master Col i=%d type=%s r=%d dual=%g\n",
+	   i, DecompColTypeStr[type].c_str(), r, dualSol[r]);
+	   m_masterSI->setObjCoeff(i, -dualSol[r]);
+	   }
+	   else if(type == DecompCol_ArtForRowG    ||
+	   type == DecompCol_ArtForBranchG ||
+	   type == DecompCol_ArtForCutG){
+	   r = m_artColIndToRowInd[i];
+	   printf("Master Col i=%d type=%s r=%d dual=%g\n",
+	   i, DecompColTypeStr[type].c_str(), r, dualSol[r]);
+	   m_masterSI->setObjCoeff(i, dualSol[r]);         
+	   }
+	   //CAN'T DO THIS IF IN PHASEI!
+	   //m_masterSI->setColBounds(i, 0.0, 0.0);//TODO
+	   m_masterSI->setColBounds(i, 0.0, m_stabEpsilon);//TODO
+	   }
+	   }
+	   #endif*/
 
 
 	 break;
@@ -1985,76 +1980,131 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    return m_status;
 }
 
+
 //--------------------------------------------------------------------- //
-void DecompAlgo::setMasterBounds(const double * lbs,
-                                 const double * ubs){
+void DecompAlgo::setSubProbBounds(const double * lbs,
+				  const double * ubs){
+
+   if(!m_param.BranchEnforceInSubProb)
+      return;
    
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "setMasterBounds()", m_param.LogDebugLevel, 2);
-   
-   int       c, coreColIndex;
-   DecompConstraintSet * modelCore = m_modelCore.getModel();   
-   const int nIntVars = modelCore->getNumInts();
-   const int nCols    = modelCore->getNumCols();
-   const int beg      = modelCore->nBaseRowsOrig;
-
+		      "setSubProbBounds()", m_param.LogDebugLevel, 2);
+      
    //---
    //--- make copy so we can enforce in subproblems
    //---
+   DecompConstraintSet * modelCore = m_modelCore.getModel();  
+   const int             nCols     = modelCore->getNumCols();
    memcpy(m_colLBNode, lbs, nCols * sizeof(double));
    memcpy(m_colUBNode, ubs, nCols * sizeof(double));
+
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+		    "setSubProbBounds()", m_param.LogDebugLevel, 2);
+}
+
+//--------------------------------------------------------------------- //
+void DecompAlgo::setMasterBounds(const double * lbs,
+                                 const double * ubs){
+
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "setMasterBounds()", m_param.LogDebugLevel, 2);
+
+   if(!m_param.BranchEnforceInMaster){
+      assert(m_param.BranchEnforceInSubProb);
+      //---
+      //--- must remove (or fix to 0) any column in master that 
+      //---    does not satisfy the branching bounds
+      //---      
+      DecompVarList::iterator li;            
+      int            masterColIndex;      
+      DecompConstraintSet * modelCore = m_modelCore.getModel();   
+      const int             nCols     = modelCore->getNumCols();
+      const double        * colUB     = m_masterSI->getColUpper();
+      double              * denseS    = new double[nCols];
+      for(li = m_vars.begin(); li != m_vars.end(); li++){
+	 masterColIndex = (*li)->getColMasterIndex();
+	 assert(isMasterColStructural(masterColIndex));
+	 if(!(*li)->doesSatisfyBounds(nCols,denseS,lbs,ubs)){	    
+	    //---
+	    //--- if needs to be fixed
+	    //---
+	    if(colUB[masterColIndex] > DecompEpsilon){
+	       printf("set masterColIndex=%d UB to 0\n", masterColIndex);
+	       m_masterSI->setColBounds(masterColIndex, 0.0, 0.0);
+	    }
+	 }
+	 else{
+	    //---
+	    //--- if needs to be unfixed (from previous node)
+	    //---
+	    if(colUB[masterColIndex] <= 0){
+	       printf("set masterColIndex=%d UB to inf\n", masterColIndex);
+	       m_masterSI->setColBounds(masterColIndex, 0.0, DecompInf);
+	    }
+	 }
+      }
+      UTIL_DELARR(denseS);
+   }
+   else{
+      int                   c, coreColIndex;
+      DecompConstraintSet * modelCore = m_modelCore.getModel();   
+      const int             nIntVars  = modelCore->getNumInts();
+      const int             nCols     = modelCore->getNumCols();
+      const int             beg       = modelCore->nBaseRowsOrig;
    
-   //TODO: can reuse this memory
-   int      nRows   = 2 * nIntVars;
-   int    * index   = new int[nRows];
-   char   * sense   = new char[nRows];
-   double * rhs     = new double[nRows];
-   double * range   = new double[nRows];
-   const int * integerVars = modelCore->getIntegerVars();
-
-
-   //lbs,ubs is indexed on core column index
-   // but c is being looped over integers here... 
-
-   //---
-   //--- the row index for column c's UB (x <= u) is: beg            + c
-   //--- the row index for column c's LB (x >= l) is: beg + nIntVars + c
-   //---
-   for(c = 0; c < nIntVars; c++){
-      //x <= u
-      coreColIndex = integerVars[c];
-      index[c]     = beg + c; //row index into master
-      sense[c]     = 'L';
-      rhs  [c]     = ubs[coreColIndex];
-      range[c]     = 0.0;
-      if(m_masterRowType[beg+c] != DecompRow_Branch){
-	 printf("ERROR: row %d type: %s\n",
-		beg+c,
-		DecompRowTypeStr[m_masterRowType[beg+c]].c_str());
+      //TODO: can reuse this memory
+      int      nRows   = 2 * nIntVars;
+      int    * index   = new int[nRows];
+      char   * sense   = new char[nRows];
+      double * rhs     = new double[nRows];
+      double * range   = new double[nRows];
+      const int * integerVars = modelCore->getIntegerVars();
+   
+   
+      //lbs,ubs is indexed on core column index
+      // but c is being looped over integers here... 
+   
+      //---
+      //--- the row index for column c's UB (x <= u) is: beg            + c
+      //--- the row index for column c's LB (x >= l) is: beg + nIntVars + c
+      //---
+      for(c = 0; c < nIntVars; c++){
+	 //x <= u
+	 coreColIndex = integerVars[c];
+	 index[c]     = beg + c; //row index into master
+	 sense[c]     = 'L';
+	 rhs  [c]     = ubs[coreColIndex];
+	 range[c]     = 0.0;
+	 if(m_masterRowType[beg+c] != DecompRow_Branch){
+	    printf("ERROR: row %d type: %s\n",
+		   beg+c,
+		   DecompRowTypeStr[m_masterRowType[beg+c]].c_str());
+	 }
+	 assert(m_masterRowType[beg+c] == DecompRow_Branch);
       }
-      assert(m_masterRowType[beg+c] == DecompRow_Branch);
-   }
-   for(c = nIntVars; c < (2*nIntVars); c++){
-      //x >= l
-      coreColIndex = integerVars[c - nIntVars];
-      index[c]     = beg + c; 
-      sense[c]     = 'G';
-      rhs  [c]     = lbs[coreColIndex];
-      range[c]     = 0.0;
-      if(m_masterRowType[beg+c] != DecompRow_Branch){
-	 printf("ERROR: row %d type: %s\n",
-		beg+c,
-		DecompRowTypeStr[m_masterRowType[beg+c]].c_str());
+      for(c = nIntVars; c < (2*nIntVars); c++){
+	 //x >= l
+	 coreColIndex = integerVars[c - nIntVars];
+	 index[c]     = beg + c; 
+	 sense[c]     = 'G';
+	 rhs  [c]     = lbs[coreColIndex];
+	 range[c]     = 0.0;
+	 if(m_masterRowType[beg+c] != DecompRow_Branch){
+	    printf("ERROR: row %d type: %s\n",
+		   beg+c,
+		   DecompRowTypeStr[m_masterRowType[beg+c]].c_str());
+	 }
+	 assert(m_masterRowType[beg+c] == DecompRow_Branch);
       }
-      assert(m_masterRowType[beg+c] == DecompRow_Branch);
+   
+      m_masterSI->setRowSetTypes(index, index+(2*nIntVars), sense, rhs, range);
+      UTIL_DELARR(index);
+      UTIL_DELARR(sense);
+      UTIL_DELARR(rhs);
+      UTIL_DELARR(range);
    }
-  
-   m_masterSI->setRowSetTypes(index, index+(2*nIntVars), sense, rhs, range);
-   UTIL_DELARR(index);
-   UTIL_DELARR(sense);
-   UTIL_DELARR(rhs);
-   UTIL_DELARR(range);
-
+   
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "setMasterBounds()", m_param.LogDebugLevel, 2);   
 }
@@ -4368,7 +4418,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       bool useCutoff = false;
       bool useExact  = true;
       if(m_phase == PHASE_PRICE2)
-		  useCutoff = m_param.SubProbUseCutoff ? true : false;
+	 useCutoff = m_param.SubProbUseCutoff ? true : false;
       
       map<int, DecompAlgoModel>::iterator mit; 
       for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
