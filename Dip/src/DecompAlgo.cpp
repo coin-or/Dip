@@ -2050,7 +2050,7 @@ void DecompAlgo::setMasterBounds(const double * lbs,
       int                   c, coreColIndex;
       DecompConstraintSet * modelCore = m_modelCore.getModel();   
       const int             nIntVars  = modelCore->getNumInts();
-      const int             nCols     = modelCore->getNumCols();
+      //const int             nCols     = modelCore->getNumCols();
       const int             beg       = modelCore->nBaseRowsOrig;
    
       //TODO: can reuse this memory
@@ -2163,7 +2163,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-   CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+   //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
@@ -2230,7 +2230,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
               );
 #endif
 #ifdef __DECOMP_LP_CPX__  
-   int cpxStat = CPXgetstat(env, lp);
+   //int cpxStat = CPXgetstat(env, lp);
    //if(cpxStat)
    // printf("cpxStat = %d\n", cpxStat);   
 #endif
@@ -2536,10 +2536,8 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
    if(m_param.InitVarsWithIP){
       printf("======= BEGIN Gen Init Vars - call Direct IP solver\n");
       DecompAlgoC          direct(m_app, m_utilParam);
-      DecompSolverResult * result = new DecompSolverResult(nCoreCols);
-      assert(result);
-
-      direct.solveDirect(m_param.InitVarsWithIPLimitTime, result);
+      DecompSolverResult * result = NULL;
+      result = direct.solveDirect(m_param.InitVarsWithIPLimitTime);
       if(result->m_solution){
 	 //---
 	 //--- if an incumbent was found, create a var(s) from it

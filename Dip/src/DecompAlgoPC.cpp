@@ -655,12 +655,28 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 	 throw UtilException("CPXsetintparam failure", 
 			     "solveOsiAsIp", "DecompAlgoModel");
    }
-   status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
-                           m_param.SolveMasterAsIpLimitGap);
+   if(m_firstPhase2Call){
+      //---
+      //--- if calling with first Phase2 call, it is meant to 
+      //---   "recombine" partial columns - i.e., if the user
+      //---   produced a fully feasible solution that was then
+      //---   separated into blocks - we want to be sure it 
+      //---   at least recombines it
+      //--- so, make the stop on gap very small
+      //---
+      //--- TODO: we should get this incumbent in the system without
+      //--- forcing the call to IP solver just to recombine
+      //---
+      status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 0.005); //0.5%
+   }
+   else{
+      status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
+			      m_param.SolveMasterAsIpLimitGap);
+   }
    if(status)
       throw UtilException("CPXsetdblparam failure", 
-                          "solutionUpdateAsIp", "DecompAlgoPC");
-
+			  "solutionUpdateAsIp", "DecompAlgoPC");
+   
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
                            m_param.SolveMasterAsIpLimitTime);
    if(status)

@@ -512,9 +512,8 @@ void DecompAlgo::printCuts(ostream * os){
 }
 
 //===========================================================================//
-void DecompAlgoC::solveDirect(int                  timeLimit,
-			      DecompSolverResult * result){
-
+DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
+					       
    //---
    //--- Solve the original IP with a generic IP solver.
    //---
@@ -539,6 +538,11 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
    //--- start timer
    //---
    UtilTimer timer; timer.start();
+
+   //---
+   //--- create a results object
+   //---
+   DecompSolverResult * result = new DecompSolverResult(numCols);
    
    //---
    //--- create the master problem
@@ -728,5 +732,7 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
               << endl;
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveDirect()", m_param.LogDebugLevel, 2);  
+
+   return result;
 }
 

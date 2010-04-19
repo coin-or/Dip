@@ -54,7 +54,7 @@ int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
    
    //CoinAssert(branchedOnIndex >= 0);
    UTIL_MSG(m_param.LogDebugLevel, 3,
-	    int nColNames = modelCore->colNames.size();
+	    int nColNames = static_cast<int>(modelCore->colNames.size());
 	    (*m_osLog) << "branchOnInd = " << branchedOnIndex << " -> ";
 	    if( branchedOnIndex  < nColNames && 
 		branchedOnIndex >= 0)
