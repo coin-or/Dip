@@ -29,15 +29,16 @@ bool DecompVar::doesSatisfyBounds(int            denseLen,
    fillDenseArr(denseLen, denseArr);
    for (j = 0; j < denseLen; ++j){
       xj = denseArr[j];
-      printf("j:%d xj:%g lb:%g ub:%g --> ",
-	     j, xj, lbs[j], ubs[j]);
+      //printf("j:%d xj:%g lb:%g ub:%g --> ",
+      //     j, xj, lbs[j], ubs[j]);
       if(xj < (lbs[j] - DecompEpsilon) ||
 	 xj > (ubs[j] + DecompEpsilon)){
-	 printf(" false\n");
-	 return false;	 
+	//printf(" false\n");
+	return false;	 
       }
-      else
-	 printf("\n");
+      else{
+	//printf("\n");
+      }
    }
    return true;
 }

@@ -31,19 +31,24 @@ void DecompConstraintSet::prepareModel(){
    //---
    if(!M)
       return;
+
+   UtilPrintMemUsage(&cout, 2, 2);
    if(M->isColOrdered())
       M->reverseOrdering();
 
    int numRows     = getNumRows();
    int numCols     = getNumCols();
    int numColsOrig = getNumColsOrig();
+   UtilPrintMemUsage(&cout, 2, 2);
    printf("numCols=%d numColsOrig=%d numRows=%d\n",
           numCols, numColsOrig, numRows);
    
    checkSenseAndBound();    
+   printf("(1) --> "); UtilPrintMemUsage(&cout, 2, 2);
    createRowHash();//TODO: don't need for relaxed
+   printf("(2) --> "); UtilPrintMemUsage(&cout, 2, 2);
    nBaseRows = getNumRows();
-
+   
    //TODO: make this an option
    //---
    //--- if row/col names are not given, make up default ones
@@ -58,6 +63,7 @@ void DecompConstraintSet::prepareModel(){
          colNames.push_back("x(" + UtilIntToStr(j) + ")");
    }
    prepHasRun = true;
+   printf("(3) --> ");UtilPrintMemUsage(&cout, 2, 2);
 
    //---
    //--- if active columns were not set (or sparse), set to all columns
@@ -76,6 +82,7 @@ void DecompConstraintSet::prepareModel(){
       if(!nActiveColumns)
          UtilIotaN(activeColumns, numColsOrig, 0);
    }
+   printf("(4) --> "); UtilPrintMemUsage(&cout, 2, 2);
 
    //---
    //--- create set from vector - easier to check overlap, etc
@@ -83,15 +90,17 @@ void DecompConstraintSet::prepareModel(){
    vector<int>::iterator vit;
    for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++)
       activeColumnsS.insert(*vit);
+   printf("(5) --> "); UtilPrintMemUsage(&cout, 2, 2);
 
    //---
    //--- set column markers (original number of cols)
    //---
-   UtilFillN(columnMarker, numColsOrig, (int)DecompColNonActive);
-   for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++)
-      columnMarker[*vit] = DecompColActive;   
-   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
-      columnMarker[*vit] = DecompColMasterOnly;   
+   //UtilFillN(columnMarker, numColsOrig, (int)DecompColNonActive);
+   //for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++)
+   // columnMarker[*vit] = DecompColActive;   
+   //for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
+   // columnMarker[*vit] = DecompColMasterOnly;   
+   //printf("(6) --> "); UtilPrintMemUsage(&cout, 2, 2);
 
    //---
    //--- mark integers (original number of cols)
@@ -100,6 +109,7 @@ void DecompConstraintSet::prepareModel(){
    for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
       integerMark[*vit] = 'I';
    }   
+   printf("(7) --> "); UtilPrintMemUsage(&cout, 2, 2);
 }
 
 //===========================================================================//

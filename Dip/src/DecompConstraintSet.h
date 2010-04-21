@@ -47,7 +47,7 @@ public:
    vector<int>          activeColumns; //if block, define the active columns
    set<int>             activeColumnsS;//if block, define the active columns
    vector<int>          masterOnlyCols;
-   vector<int>          columnMarker; //active, non-active, master-only
+   //vector<int>          columnMarker; //active, non-active, master-only
    bool                 prepHasRun;
 
    //for storage of several rows of row-majored sparse matrix
