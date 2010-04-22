@@ -1471,8 +1471,8 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		     << UtilDblToStr(m_globalLB,6) 
 		     << " globalUB = " 
 		     << UtilDblToStr(m_nodeStats.objBest.second,6) 
-		     << " nodeGap = "       << UtilDblToStr(gap,5) 
-		     << " time = "      << UtilDblToStr(globalTimer.getCpuTime(), 3)
+		     << " nodeGap = " << UtilDblToStr(gap,5) 
+		     << " time = "    << UtilDblToStr(globalTimer.getCpuTime(), 3)
 		     << endl;
 	       }		
 	       else{
@@ -1743,13 +1743,9 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    //this is checked again in phase update...
 	    //first, check to see if LP solution is already ip and user feas
 	    if(isIPFeasible(m_xhat)){
-	       //printf("m_xhat is IP FEASIBLE\n");
 	       if(m_app->APPisUserFeasible(m_xhat,
 					   modelCore->getNumCols(),
 					   m_param.TolZero)){
-		  //printf("m_xhat is APP FEASIBLE, m_xhatIPFeas size = %d\n",
-                  // (int)m_xhatIPFeas.size());
-		  
 		  //check for dup sol                  
 		  bool isDup = m_xhatIPFeas.size() > 0 ? true : false;
 		  vector<DecompSolution*>::iterator vit;
@@ -4330,12 +4326,14 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- here is where you would thread it
       //---
 #ifdef RELAXED_THREADED
+      /*
       //round-robin assign blocks to threads
       printf("===== START Threaded solve of subproblems. =====\n");
       pthread_t                  threads[NTHREADS];
       pthread_attr_t             pthread_custom_attr;
       SolveRelaxedThreadArgs     arg[NTHREADS];
-      DecompSolverResult      ** solverResultT = new DecompSolverResult*[NTHREADS]; 
+      DecompSolverResult      ** solverResultT 
+         = new DecompSolverResult*[NTHREADS]; 
       DecompVarList              potentialVarsT[NTHREADS];
       int * batch[NTHREADS];
       int   batchSize[NTHREADS];
@@ -4410,8 +4408,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 }
       }
       //put the vars from all threads into one vector
-
-
+      */
 #else
       bool useCutoff = false;
       bool useExact  = true;
@@ -4455,7 +4452,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       
       map<int, vector<DecompAlgoModel> >::iterator mivt;
       vector<DecompAlgoModel>           ::iterator vit; 
-      //TODO: need time limit and gap limit?
       useExact  = false;
       useCutoff = true;
       for(mivt  = m_modelRelaxNest.begin(); 
@@ -4481,11 +4477,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
             }            
          }
       } 
-
-
-
-
-
 #endif
    }
    else{
@@ -4493,6 +4484,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //---
       //--- keep trying until find a block with candidate variable
       //---
+      bool foundNegRC = false;
       for(i = 0; i < m_numConvexCon; i++){
 	 b = (m_rrLastBlock + 1) % m_numConvexCon;
 
@@ -4502,10 +4494,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
          DecompAlgoModel & algoModel = (*mit).second;
          subprobSI = algoModel.getOsi();
-
-	 //if(static_cast<int>(m_subprobSI.size()) > b)
-         // subprobSI = m_subprobSI[b];
-
 
 	 //---
 	 //--- PC: get dual vector
@@ -4535,7 +4523,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 m_rrIterSinceAll++;
 	 m_rrLastBlock = b;
 
-	 bool foundNegRC = false;
+         foundNegRC = false;
 	 for(it = potentialVars.begin(); it != potentialVars.end(); it++){
 	    varRedCost = (*it)->getReducedCost();
 	    if(varRedCost < -epsilonRedCost){ //TODO: strict, -dualTOL?
@@ -4546,6 +4534,14 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 if(foundNegRC)
 	    break;
       }
+
+      //---
+      //--- if we searched through all the blocks but still didn't
+      //---  find any columns with negative reduced cost, then we CAN
+      //---  update the LB and should - as we have priced out
+      //---
+      if(!foundNegRC)
+         m_rrIterSinceAll = 0;
    }
 
 
@@ -4621,6 +4617,10 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	       << " mostNegReducedCost: " << mostNegReducedCost << "\n";
 	       );      
    }
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,   
+              (*m_osLog) << "m_rrIterSinceAll = " 
+              << m_rrIterSinceAll << endl; 
+              );
    
    potentialVars.clear(); //THINK? what does clear do exactly ?   
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,   
