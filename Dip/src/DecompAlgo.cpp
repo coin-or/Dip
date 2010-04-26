@@ -503,6 +503,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //--- append to bottom the relax matrix/matrices
    //---  create block file (for use in MILPBlock app)
    //---
+   //#define CREATE_BLOCKFILE
 #ifdef CREATE_BLOCKFILE
    ofstream os("blockFile.txt");
 #endif

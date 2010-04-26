@@ -44,6 +44,7 @@ Dip/data/ATM/atm.direct.sh -text
 Dip/data/ATM/atm.opt -text
 Dip/data/ATM/atm.pc.parm -text
 Dip/data/ATM/atm.pc.sh -text
+Dip/data/ATM/get.data -text
 Dip/data/ATM/original.tgz -text
 Dip/data/ATM/results/atm_cpx11.300.txt -text
 Dip/data/ATM/results/atm_cpx11.3600.txt -text
