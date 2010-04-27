@@ -105,6 +105,15 @@ void DecompAlgo::checkBlocksColumns(){
                  << modelRelax2.getBlockId() 
                  << " -> " << modelRelax2.getModelName() << " overlap." 
                  << endl;
+            set<int>::iterator it;
+            for(it  = activeCols1inter2.begin();
+                it != activeCols1inter2.end(); it++){
+               (*m_osLog) << "Column " << setw(5) << *it << " -> ";
+               if(modelRelax2.getModel()->colNames.size() > 0)
+                  (*m_osLog) 
+                     << setw(25) << modelRelax2.getModel()->colNames[*it];
+               (*m_osLog) << " is found in both blocks." << endl;
+            } 
             throw UtilException("Columns in some blocks overlap.",
 				"checkBlocksColumns", "DecompAlgo");
          }
@@ -503,7 +512,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //--- append to bottom the relax matrix/matrices
    //---  create block file (for use in MILPBlock app)
    //---
-   //#define CREATE_BLOCKFILE
+#define CREATE_BLOCKFILE
 #ifdef CREATE_BLOCKFILE
    ofstream os("blockFile.txt");
 #endif
