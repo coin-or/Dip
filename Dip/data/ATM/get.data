@@ -1,1 +1,1 @@
-wget --no-check-certificate http://coral.ie.lehigh.edu/~magh/decomp/atm_rand.tgz
+wget http://coral.ie.lehigh.edu/~magh/decomp/atm_rand.tgz

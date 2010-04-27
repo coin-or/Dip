@@ -601,11 +601,27 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
 	 const double           * rowUB = m_masterSI->getRowUpper();
 	 const double             rLB   = rowLB[r];
 	 const double             rUB   = rowUB[r];
-	 const CoinShallowPackedVector vec = M->getVector(r);
+	 CoinShallowPackedVector vecS = M->getVector(r);
+         CoinPackedVector        vec(vecS);
+         //printf("delete and move to end row r=%d %s\n", 
+         //     r, m_masterSI->getRowName(r).c_str());
+         //vec.print();
 
 	 rowToDelete[0] = r;
+
+         //string fileName = "directMILP_" + UtilIntToStr(i);
+         //printCurrentProblem(m_masterSI, fileName);
+
 	 m_masterSI->deleteRows(1, rowToDelete);
-	 m_masterSI->addRow(vec, rLB, rUB);	 
+
+         //fileName = "directMILP_" + UtilIntToStr(i) + ".2";
+         //printCurrentProblem(m_masterSI, fileName);
+
+	 m_masterSI->addRow(vec, rLB, rUB);	
+
+         //fileName = "directMILP_" + UtilIntToStr(i) + ".3";
+         //printCurrentProblem(m_masterSI, fileName);
+ 
       }
 
       for(i = 0; i < colsToPermute; i++){
