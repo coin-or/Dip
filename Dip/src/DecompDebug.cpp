@@ -614,20 +614,8 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
          //vec.print();
 
 	 rowToDelete[0] = r;
-
-         //string fileName = "directMILP_" + UtilIntToStr(i);
-         //printCurrentProblem(m_masterSI, fileName);
-
 	 m_masterSI->deleteRows(1, rowToDelete);
-
-         //fileName = "directMILP_" + UtilIntToStr(i) + ".2";
-         //printCurrentProblem(m_masterSI, fileName);
-
-	 m_masterSI->addRow(vec, rLB, rUB);	
-
-         //fileName = "directMILP_" + UtilIntToStr(i) + ".3";
-         //printCurrentProblem(m_masterSI, fileName);
- 
+	 m_masterSI->addRow(vec, rLB, rUB);	 
       }
 
       for(i = 0; i < colsToPermute; i++){
@@ -646,6 +634,9 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
 	 const double             obj   = objC[c];
 	 const CoinShallowPackedVector vecS = M->getVector(c);
 	 CoinPackedVector              vec(vecS);
+
+	 /////////// THIS IS WRONG ///////////
+	 //TODO: copy integer info!
 
 	 colToDelete[0] = c;
 	 m_masterSI->deleteCols(1, colToDelete);

@@ -24,6 +24,7 @@ public:
    string Instance;
    string BlockFile;
    string BlockFileFormat;
+   string PermuteFile;
    string InitSolutionFile;
    double BestKnownLB;
    double BestKnownUB;
@@ -40,6 +41,7 @@ public:
       DataDir      = utilParam.GetSetting("DataDir",      "",    common);
       Instance     = utilParam.GetSetting("Instance",     "",    common);    
       BlockFile    = utilParam.GetSetting("BlockFile",    "",    common);
+      BlockFile    = utilParam.GetSetting("PermuteFile",  "",    common);
       BlockFileFormat 
          = utilParam.GetSetting("BlockFileFormat",    "",    common);    
       InitSolutionFile
@@ -60,6 +62,7 @@ public:
       (*os) << common << ": DataDir           : " << DataDir          << endl;
       (*os) << common << ": Instance          : " << Instance         << endl;
       (*os) << common << ": BlockFile         : " << BlockFile        << endl;
+      (*os) << common << ": PermuteFile       : " << PermuteFile      << endl;
       (*os) << common << ": BlockFileFormat   : " << BlockFileFormat  << endl;
       (*os) << common << ": InitSolutionFile  : " << InitSolutionFile << endl;
       (*os) << common << ": BestKnownLB       : " << BestKnownLB      << endl;
@@ -73,16 +76,17 @@ public:
    
 public:
    MILPBlock_Param():    
-      LogLevel       (0 ),
-      DataDir        (""),
-      Instance       (""),
-      BlockFile      (""), 
-      BlockFileFormat(""),
+      LogLevel        (0 ),
+      DataDir         (""),
+      Instance        (""),
+      BlockFile       (""), 
+      PermuteFile     (""), 
+      BlockFileFormat (""),
       InitSolutionFile(""),
-      BestKnownLB    (-1.e100),
-      BestKnownUB    ( 1.e100),
-      ColumnUB       ( 1.e20),
-      ColumnLB       (-1.e20),
+      BestKnownLB     (-1.e100),
+      BestKnownUB     ( 1.e100),
+      ColumnUB        ( 1.e20),
+      ColumnLB        (-1.e20),
       MasterOnlyOneBlock(0)
 {};
    ~MILPBlock_Param() {};

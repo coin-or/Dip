@@ -71,6 +71,31 @@ void MILPBlock_DecompApp::readBlockFile(){
    ifstream is;
    string   fileName = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.BlockFile;
+
+   //---
+   //--- is there a permutation file?
+   //---  this file just remaps the row ids
+   //--- (for use in submission of atm to MIPLIB2010 and debugging)
+   //---
+   map<int,int>           permute;
+   map<int,int>::iterator mit;
+   string       fileNameP = m_appParam.DataDir 
+      + UtilDirSlash() + m_appParam.PermuteFile;
+   
+   if(m_appParam.PermuteFile.size() > 0){
+      ifstream isP;
+      int      rowIdOld, rowIdNew;
+      //---
+      //--- open file streams
+      //---
+      UtilOpenFile(isP, fileName.c_str());
+      while(!isP.eof()){
+	 if(isP.eof()) break;
+	 isP >> rowIdOld >> rowIdNew;
+	 permute.insert(make_pair(rowIdOld, rowIdNew));
+      }
+   }
+
    
    //---
    //--- open file streams
@@ -101,7 +126,11 @@ void MILPBlock_DecompApp::readBlockFile(){
 	 vector<int> rowsInBlock;
 	 for(i = 0; i < numRowsInBlock; i++){
 	    is >> rowId;
-	    rowsInBlock.push_back(rowId);
+	    mit = permute.find(rowId);
+	    if(mit != permute.end())
+	       rowsInBlock.push_back(mit->second);
+	    else
+	       rowsInBlock.push_back(rowId);
 	 }
 	 m_blocks.insert(make_pair(blockId, rowsInBlock));
 	 if(is.eof()) break;      
@@ -119,7 +148,11 @@ void MILPBlock_DecompApp::readBlockFile(){
 	 vector<int> rowsInBlock;
 	 while(blockId == blockIdCurr && !is.eof()){
 	    is >> rowId;
-	    rowsInBlock.push_back(rowId);
+	    mit = permute.find(rowId);
+	    if(mit != permute.end())
+	       rowsInBlock.push_back(mit->second);
+	    else
+	       rowsInBlock.push_back(rowId);
 	    is >> blockId;
 	 }
 	 m_blocks.insert(make_pair(blockIdCurr, rowsInBlock));	 
