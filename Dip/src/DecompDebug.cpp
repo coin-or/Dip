@@ -638,7 +638,8 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
 	 const double             cLB   = colLB[c];
 	 const double             cUB   = colUB[c];
 	 const double             obj   = objC[c];
-	 const CoinShallowPackedVector vec = M->getVector(c);
+	 const CoinShallowPackedVector vecS = M->getVector(c);
+	 CoinPackedVector              vec(vecS);
 
 	 colToDelete[0] = c;
 	 m_masterSI->deleteCols(1, colToDelete);
