@@ -41,7 +41,7 @@ public:
       DataDir      = utilParam.GetSetting("DataDir",      "",    common);
       Instance     = utilParam.GetSetting("Instance",     "",    common);    
       BlockFile    = utilParam.GetSetting("BlockFile",    "",    common);
-      BlockFile    = utilParam.GetSetting("PermuteFile",  "",    common);
+      PermuteFile  = utilParam.GetSetting("PermuteFile",  "",    common);
       BlockFileFormat 
          = utilParam.GetSetting("BlockFileFormat",    "",    common);    
       InitSolutionFile
@@ -80,8 +80,8 @@ public:
       DataDir         (""),
       Instance        (""),
       BlockFile       (""), 
-      PermuteFile     (""), 
       BlockFileFormat (""),
+      PermuteFile     (""), 
       InitSolutionFile(""),
       BestKnownLB     (-1.e100),
       BestKnownUB     ( 1.e100),

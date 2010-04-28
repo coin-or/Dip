@@ -94,6 +94,7 @@ void MILPBlock_DecompApp::readBlockFile(){
 	 isP >> rowIdOld >> rowIdNew;
 	 permute.insert(make_pair(rowIdOld, rowIdNew));
       }
+      isP.close();
    }
 
    
