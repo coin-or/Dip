@@ -905,7 +905,8 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    UtilFillN(zeroSol, nColsCore, 0.0);
    //TODO - REVISIT - that's not the right check
    //  needs to be feasible to subproblem?
-   bool     isZeroFeas = isIPFeasible(zeroSol);     
+   //bool     isZeroFeas = isIPFeasible(zeroSol);     
+   bool isZeroFeas = m_param.MasterConvexityLessThan;
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      if(isZeroFeas)
 		 (*m_osLog) << "Zero Sol is Feasible - relax convexity con.\n";
@@ -2600,30 +2601,32 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
    //---
    //--- check init vars for incumbent
    //---
-   DecompVarList::iterator vli;
-   for(vli = initVars.begin(); vli != initVars.end(); vli++){
-      //---
-      //--- unlikey to happen - but we should check ALL columns
-      //---  to see if they are IP feasible 
-      //---
-      (*vli)->fillDenseArr(modelCore->getNumCols(),
-                           m_memPool.dblArrNCoreCols);            
-      
-      if(isIPFeasible(m_memPool.dblArrNCoreCols)){               
-	 if(m_app->APPisUserFeasible(m_memPool.dblArrNCoreCols,
-				     modelCore->getNumCols(),
-				     m_param.TolZero)){
-	    DecompSolution * decompSol
-	       = new DecompSolution(modelCore->getNumCols(),
-				    m_memPool.dblArrNCoreCols,
-				    (*vli)->getOriginalCost());
-            m_xhatIPBest = decompSol;
-	    m_xhatIPFeas.push_back(decompSol);
-            printf("var is ip feas with obj = %g\n",
-                   (*vli)->getOriginalCost());
-	    setObjBoundUB((*vli)->getOriginalCost());
+   if(m_numConvexCon == 1){	 
+      DecompVarList::iterator vli;
+      for(vli = initVars.begin(); vli != initVars.end(); vli++){
+	 //---
+	 //--- unlikey to happen - but we should check ALL columns
+	 //---  to see if they are IP feasible 
+	 //---
+	 (*vli)->fillDenseArr(modelCore->getNumCols(),
+			      m_memPool.dblArrNCoreCols);            
+	 
+	 if(isIPFeasible(m_memPool.dblArrNCoreCols)){               
+	    if(m_app->APPisUserFeasible(m_memPool.dblArrNCoreCols,
+					modelCore->getNumCols(),
+					m_param.TolZero)){
+	       DecompSolution * decompSol
+		  = new DecompSolution(modelCore->getNumCols(),
+				       m_memPool.dblArrNCoreCols,
+				       (*vli)->getOriginalCost());
+	       m_xhatIPBest = decompSol;
+	       m_xhatIPFeas.push_back(decompSol);
+	       printf("var is ip feas with obj = %g\n",
+		      (*vli)->getOriginalCost());
+	       setObjBoundUB((*vli)->getOriginalCost());
+	    }
 	 }
-      }
+      }      
    }
 
    //---
@@ -4570,29 +4573,33 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //---  to see if they are IP feasible - whether or not the
       //---  column has negative red-cost or not
       //---
-      (*it)->fillDenseArr(modelCore->getNumCols(),
-			  m_memPool.dblArrNCoreCols);            
 
-      //---
-      //--- STOP: this isIpFeasible uses isLPFeasible
-      //---   isLPFeasible should have 2 settings
-      //---    here, it can be true, but might not be
-      //---    if checking recompsed point, it must be true, else bug
-      //--- 
-
-
-
-      if(isIPFeasible(m_memPool.dblArrNCoreCols)){               
-	 if(m_app->APPisUserFeasible(m_memPool.dblArrNCoreCols,
-				     modelCore->getNumCols(),
-				     m_param.TolZero)){
-	    DecompSolution * decompSol
-	       = new DecompSolution(modelCore->getNumCols(),
-				    m_memPool.dblArrNCoreCols,
-				    (*it)->getOriginalCost());
-	    //TODO: solution pool?
-	    m_xhatIPFeas.push_back(decompSol);
-	    setObjBoundUB((*it)->getOriginalCost());       
+      //THINK: in blocks case, these are partial columns
+      //  and this check can be relatively expensive for
+      //  large number of original columns.
+      //But, it is impossible for the partial column to
+      //  be feasible to full IP - so this check is useless.
+      if(m_numConvexCon == 1){	 
+	 (*it)->fillDenseArr(modelCore->getNumCols(),
+			     m_memPool.dblArrNCoreCols);            	 
+	 //---
+	 //--- STOP: this isIpFeasible uses isLPFeasible
+	 //---   isLPFeasible should have 2 settings
+	 //---    here, it can be true, but might not be
+	 //---    if checking recompsed point, it must be true, else bug
+	 //--- 
+	 if(isIPFeasible(m_memPool.dblArrNCoreCols)){               
+	    if(m_app->APPisUserFeasible(m_memPool.dblArrNCoreCols,
+					modelCore->getNumCols(),
+					m_param.TolZero)){
+	       DecompSolution * decompSol
+		  = new DecompSolution(modelCore->getNumCols(),
+				       m_memPool.dblArrNCoreCols,
+				       (*it)->getOriginalCost());
+	       //TODO: solution pool?
+	       m_xhatIPFeas.push_back(decompSol);
+	       setObjBoundUB((*it)->getOriginalCost());       
+	    }
 	 }
       }
             

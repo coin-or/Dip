@@ -79,6 +79,12 @@ public:
 
    double SubProbGapLimitExact;
    double SubProbGapLimitInexact;
+   
+   //This option only works with Cpx:
+   // DecompDualSimplex = 0,
+   // DecompPrimSimplex = 1,
+   // DecompBarrier     = 2
+   int    SubProbSolverStartAlgo;
 
    //n = 0: do all blocks each time
    //n > 0: do all blocks every n*numBlocks iterations
@@ -129,6 +135,7 @@ public:
 
    int    BranchEnforceInSubProb;
    int    BranchEnforceInMaster;
+   int    MasterConvexityLessThan; //0='E', 1='L'
 
    /**
     * @}
@@ -175,6 +182,7 @@ public:
       PARAM_getSetting("SubProbUseCutoff",     SubProbUseCutoff);
       PARAM_getSetting("SubProbGapLimitExact", SubProbGapLimitExact);
       PARAM_getSetting("SubProbGapLimitInexact",SubProbGapLimitInexact);
+      PARAM_getSetting("SubProbSolverStartAlgo",SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
       PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
@@ -190,8 +198,9 @@ public:
       PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
       PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
-      PARAM_getSetting("BranchEnforceInSubProb", BranchEnforceInSubProb);
-      PARAM_getSetting("BranchEnforceInMaster",  BranchEnforceInMaster);
+      PARAM_getSetting("BranchEnforceInSubProb",  BranchEnforceInSubProb);
+      PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
+      PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
       //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
@@ -254,6 +263,8 @@ public:
                          SubProbGapLimitExact);
       UtilPrintParameter(os, sec, "SubProbGapLimitInexact", 
                          SubProbGapLimitInexact);
+      UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
+                         SubProbSolverStartAlgo);
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
       UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);  
       UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
@@ -271,6 +282,7 @@ public:
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
       UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   BranchEnforceInSubProb);
       UtilPrintParameter(os, sec, "BranchEnforceInMaster",    BranchEnforceInMaster);
+      UtilPrintParameter(os, sec, "MasterConvexityLessThan", MasterConvexityLessThan);
       //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
       //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
@@ -307,6 +319,7 @@ public:
       SubProbUseCutoff     = 0;
       SubProbGapLimitExact   = 0.0001; // 0.01% gap
       SubProbGapLimitInexact = 0.1;    //10.00% gap
+      SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
       SolveMasterAsIp          = 1;//TODO: turn off if one block
@@ -324,6 +337,7 @@ public:
       BreakOutPartial          = 0;
       BranchEnforceInSubProb   = 0;
       BranchEnforceInMaster    = 1;
+      MasterConvexityLessThan  = 0;
       //IpAlgoStart           = "dual";
       //IpAlgoSub             = "dual";
    }

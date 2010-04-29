@@ -159,6 +159,12 @@ enum DecompGenericStatus {
    DecompStatOutOfMemory = 2
 };
 
+enum DecompSolverType {
+   DecompDualSimplex = 0,
+   DecompPrimSimplex = 1,
+   DecompBarrier     = 2
+};
+
 enum DecompRoundRobin {
    RoundRobinRotate    = 0,
    RoundRobinMostNegRC = 1

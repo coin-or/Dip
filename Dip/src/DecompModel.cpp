@@ -407,6 +407,22 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");
+   int startAlgo = 0;
+   switch(param.SubProbSolverStartAlgo){
+   case DecompDualSimplex:
+      startAlgo = CPX_ALG_DUAL;
+      break;
+   case DecompPrimSimplex:
+      startAlgo = CPX_ALG_PRIMAL;
+      break;
+   case DecompBarrier:
+      startAlgo = CPX_ALG_BARRIER;
+      break;
+   }
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_STARTALG, startAlgo);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+			  "solveOsiAsIp", "DecompAlgoModel");   
 #endif
    //---
    //--- solve the MILP
