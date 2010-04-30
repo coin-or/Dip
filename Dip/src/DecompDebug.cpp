@@ -454,11 +454,11 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 	      (*m_osLog) << "calling writeLp  filename = " << filename << endl;
 	      );
    if(printMps){
-      //#ifdef __DECOMP_IP_CPX__
-      //si->writeMps(filename.c_str());
-      //#else
+#ifdef __DECOMP_IP_CPX__
       si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
-      //#endif
+#else
+      si->writeMps(filename.c_str());
+#endif
    }
    if(printLp)      
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
@@ -474,8 +474,11 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
    string filename = fileName; 
    if(printMps){
       //TODO: col/row names have to explicitly pass in
+#ifdef __DECOMP_IP_CPX__
       si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
-      //si->writeMps(filename.c_str());
+#else
+      si->writeMps(filename.c_str());
+#endif
    }
    if(printLp)
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
