@@ -479,6 +479,8 @@ inline string UtilDblToStr(const double x,
 inline void UtilPrintMemUsage(ostream  * os       = &cout,
 			      int        logLevel = 0,
 			      int        logLimit = 2){
+// This doesn't build in gcc 4.5 (at least on MinGW)
+#if 0
 #if not defined(_MSC_VER)
    if(logLevel >= logLimit){
       struct mallinfo memInfo = mallinfo();
@@ -487,6 +489,7 @@ inline void UtilPrintMemUsage(ostream  * os       = &cout,
       memUsage /= 1024.0;
       (*os) << "memUsage = " << UtilDblToStr(memUsage, 2) << " MB\n";
    }
+#endif
 #endif
 }
 
