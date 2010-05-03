@@ -760,8 +760,11 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- create a matrix for the master LP
    //---  make room for original rows, branching rows and convexity rows
    //---
-   int                nRows    = m_nRowsOrig + m_nRowsBranch + m_nRowsConvex;
-   int                nColsMax = nInitVars  + 2 * (m_nRowsOrig + m_nRowsBranch); 
+   int                nRows    = m_nRowsOrig + m_nRowsConvex;
+   if(m_param.BranchEnforceInMaster)
+      nRows += m_nRowsBranch;
+   int                nColsMax = nInitVars  
+      + 2 * (m_nRowsOrig + m_nRowsBranch + m_nRowsConvex); 
    double           * colLB    = new double[nColsMax];
    double           * colUB    = new double[nColsMax];
    double           * objCoeff = new double[nColsMax];   
@@ -779,6 +782,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- create artifical columns in master LP for:
    //---  original rows
    //---  branching rows
+   //---  convexity rows
    //---
    startRow = 0;
    endRow   = m_nRowsOrig;  
@@ -787,7 +791,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  colUB, 
 			  objCoeff, 
 			  colNames,
-			  startRow, endRow, 'O');
+			  startRow, endRow, DecompRow_Original);
    if(m_nRowsBranch > 0){
       startRow = m_nRowsOrig;
       endRow   = m_nRowsOrig + m_nRowsBranch;
@@ -796,8 +800,16 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			     colUB, 
 			     objCoeff, 
 			     colNames,
-			     startRow, endRow, 'B');
+			     startRow, endRow, DecompRow_Branch);
    }
+   startRow = m_nRowsOrig + m_nRowsBranch;
+   endRow   = m_nRowsOrig + m_nRowsBranch + m_nRowsConvex;
+   masterMatrixAddArtCols(masterM, 
+			  colLB, 
+			  colUB, 
+			  objCoeff, 
+			  colNames,
+			  startRow, endRow, DecompRow_Convex);
       
    int colIndex     = 0;
    int blockIndex   = 0;
@@ -1029,13 +1041,13 @@ void DecompAlgo::masterMatrixAddArtCol(CoinPackedMatrix * masterM,
 
 //===========================================================================//
 void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
-                                        double          * colLB,
-                                        double          * colUB,
-                                        double          * objCoeff,
-                                        vector<string>  & colNames,
-                                        int               startRow,
-                                        int               endRow,
-                                        char              origOrBranch){
+                                        double           * colLB,
+                                        double           * colUB,
+                                        double           * objCoeff,
+                                        vector<string>   & colNames,
+                                        int                startRow,
+                                        int                endRow,
+					DecompRowType      rowType){
    
    //---
    //--- min sp + sm
@@ -1044,31 +1056,63 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
    //--- ax <= b --> ax      - sm <= b,          sm >= 0 
    //--- ax >= b --> ax + sp      >= b, sp >= 0
    //---
-   int              r, colIndex;
    DecompConstraintSet * modelCore = m_modelCore.getModel();
    vector<char>   & rowSense  = modelCore->rowSense;
    vector<string> & rowNames  = modelCore->rowNames;
+   int              nCoreRows = modelCore->getNumRows();
    bool             hasNames  = rowNames.empty() ? false : true;
-   string           colName;
-   string           strIndex;
-   string           colNameL  = origOrBranch == 'O' ? "sOL(c_" : "sBL(c_";
-   string           colNameG  = origOrBranch == 'O' ? "sOG(c_" : "sBG(c_";
-   DecompColType    colTypeL  = origOrBranch == 'O' ? 
-      DecompCol_ArtForRowL : DecompCol_ArtForBranchL;
-   DecompColType    colTypeG  = origOrBranch == 'O' ? 
-      DecompCol_ArtForRowG : DecompCol_ArtForBranchG;
+
+   int              r, colIndex;
+   string           colName, strIndex, colNameL, colNameG;
+   DecompColType    colTypeL, colTypeG;
+      
+   switch(rowType){
+   case DecompRow_Original:
+      colNameL = "sOL(c_";
+      colNameG = "sOG(c_";
+      colTypeL = DecompCol_ArtForRowL;
+      colTypeG = DecompCol_ArtForRowG;
+      break;
+   case DecompRow_Branch:
+      colNameL = "sBL(c_";
+      colNameG = "sBG(c_";
+      colTypeL = DecompCol_ArtForBranchL;
+      colTypeG = DecompCol_ArtForBranchG;
+      break;
+   case DecompRow_Convex:
+      colNameL = "sCL(c_";
+      colNameG = "sCG(c_";
+      colTypeL = DecompCol_ArtForConvexL;
+      colTypeG = DecompCol_ArtForConvexG;
+      break;
+   default:
+      throw UtilException("Bad row type", 
+			  "masterMatrixAddArtCols", "DecompAlgo"); 
+   }
    
+   string rowNameR;
+   char   rowSenseR;
    colIndex = masterM->getNumCols();
    for(r = startRow; r < endRow; r++){
       if(hasNames)
 	 strIndex = UtilIntToStr(colIndex);
-      switch(rowSense[r]){
+      if(rowType == DecompRow_Convex){
+	 rowSenseR = 'E';//NOTE: what if <=?
+	 rowNameR  = "convex(b_" + UtilIntToStr(r - nCoreRows) + ")";
+      }
+      else{
+	 rowSenseR = rowSense[r];
+	 rowNameR  = rowNames[r];
+      }
+      //printf("rowSense[%d]=%c\n", r, rowSense[r]);
+      
+      switch(rowSenseR){
       case 'L':
 	 masterMatrixAddArtCol(masterM, 'L', r, colIndex, colTypeL,
 			       colLB[colIndex], colUB[colIndex], 
 			       objCoeff[colIndex]);
 	 if(hasNames){
-	    colName = colNameL + strIndex + "_" + rowNames[r] + ")";
+	    colName = colNameL + strIndex + "_" + rowNameR + ")";
 	    colNames.push_back(colName);
 	 }
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
@@ -1079,7 +1123,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 			       colLB[colIndex], colUB[colIndex],
 			       objCoeff[colIndex]);
 	 if(hasNames){
-	    colName = colNameG + strIndex + "_" + rowNames[r] + ")";
+	    colName = colNameG + strIndex + "_" + rowNameR + ")";
 	    colNames.push_back(colName);
 	 }
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
@@ -1090,7 +1134,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 			       colLB[colIndex], colUB[colIndex], 
 			       objCoeff[colIndex]);
 	 if(hasNames){
-	    colName = colNameL + strIndex + "_" + rowNames[r] + ")";
+	    colName = colNameL + strIndex + "_" + rowNameR + ")";
 	    colNames.push_back(colName);
 	 }
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
@@ -1099,7 +1143,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 			       colLB[colIndex], colUB[colIndex],
 			       objCoeff[colIndex]);
 	 if(hasNames){
-	    colName = colNameG + strIndex + "_" + rowNames[r] + ")";
+	    colName = colNameG + strIndex + "_" + rowNameR + ")";
 	    colNames.push_back(colName);
 	 }
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
@@ -2017,28 +2061,47 @@ void DecompAlgo::setMasterBounds(const double * lbs,
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "setMasterBounds()", m_param.LogDebugLevel, 2);
 
+   //TODO: how to handle case where relax is not defined explicitly
+   //  like in GAP... 
    if(!m_param.BranchEnforceInMaster){
       assert(m_param.BranchEnforceInSubProb);
       //---
-      //--- must remove (or fix to 0) any column in master that 
-      //---    does not satisfy the branching bounds
-      //---      
+      //--- Must remove (or fix to 0) any column in master that 
+      //---    does not satisfy the branching bounds.
+      //--- However -- be careful that these bounds should
+      //---    only be applied to their relevant blocks.
+      //---
+      //--- For example, if branch is x(abc,2)=1, and 2 is 
+      //---    the block id, we do not want to remove columns
+      //---    in block 1 where x(abc,1)=0. That is a partial
+      //---    column which might have x(abc,2)=0 in projected
+      //---    space, but should remain in that branching node.
+      //--- Otherwise, it will just be reproduced at the next 
+      //---    phase of generating vars for block 0.
+      //---
       DecompVarList::iterator li;            
       int            masterColIndex;      
       DecompConstraintSet * modelCore = m_modelCore.getModel();   
       const int             nCols     = modelCore->getNumCols();
       const double        * colUB     = m_masterSI->getColUpper();
       double              * denseS    = new double[nCols];
+      map<int, DecompAlgoModel>::iterator mit;
       for(li = m_vars.begin(); li != m_vars.end(); li++){
 	 masterColIndex = (*li)->getColMasterIndex();
 	 assert(isMasterColStructural(masterColIndex));
-	 if(!(*li)->doesSatisfyBounds(nCols,denseS,lbs,ubs)){	    
+	 mit = m_modelRelax.find((*li)->getBlockId());
+	 assert(mit != m_modelRelax.end());
+	 if(!(*li)->doesSatisfyBounds(nCols,denseS, 
+				      mit->second,
+				      lbs,ubs)){    
 	    //---
 	    //--- if needs to be fixed
 	    //---
 	    if(colUB[masterColIndex] > DecompEpsilon){
-	       printf("set masterColIndex=%d UB to 0\n", masterColIndex);
+	       //printf("set masterColIndex=%d UB to 0\n", masterColIndex);
 	       m_masterSI->setColBounds(masterColIndex, 0.0, 0.0);
+	       if(m_param.LogDebugLevel >= 4)
+		  (*li)->print(&cout, modelCore->getColNames());
 	    }
 	 }
 	 else{
@@ -2046,8 +2109,10 @@ void DecompAlgo::setMasterBounds(const double * lbs,
 	    //--- if needs to be unfixed (from previous node)
 	    //---
 	    if(colUB[masterColIndex] <= 0){
-	       printf("set masterColIndex=%d UB to inf\n", masterColIndex);
+	       //printf("set masterColIndex=%d UB to inf\n", masterColIndex);
 	       m_masterSI->setColBounds(masterColIndex, 0.0, DecompInf);
+	       if(m_param.LogDebugLevel >= 4)
+		  (*li)->print(&cout, modelCore->getColNames());
 	    }
 	 }
       }
@@ -4178,10 +4243,15 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 
 	 //---
 	 //--- sanity check - none of the columns currently in master
-	 //--- should have negative reduced cost
+	 //---    should have negative reduced cost
+	 //--- unless they have been fixed to 0 by branching
 	 //---
-	 double rcLPi = rcLP[(*it)->getColMasterIndex()];
-	 if(rcLPi < -epsilonRedCost ){  
+	 const double * colLB = m_masterSI->getColLower();
+	 const double * colUB = m_masterSI->getColUpper();
+	 int            index = (*it)->getColMasterIndex();
+	 double         rcLPi = rcLP[index];
+	 if(rcLPi        < -epsilonRedCost && 
+	    colUB[index] > DecompEpsilon){  
 	    (*m_osLog) << "VAR v-index:" << var_index++ 
 		       << " m-index: " << (*it)->getColMasterIndex()
 		       << " b-index: " << b
@@ -5007,7 +5077,10 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       if(m_varpool.isDuplicate(m_vars, waitingCol)){
 
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-                    (*m_osLog) << "Duplicate variable, already in vars!!\n";
+                    (*m_osLog) << "Duplicate variable, already in vars!!\n";		    
+		    (*li)->print(m_osLog,
+				 modelCore->getColNames(),
+				 NULL);
 		    );
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 		    (*m_osLog) << "\nVAR POOL:\n";

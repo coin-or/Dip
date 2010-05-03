@@ -24,6 +24,7 @@
 #include "UtilMacrosDecomp.h"
 
 class DecompApp;
+class DecompAlgoModel;
 
 // --------------------------------------------------------------------- //
 class DecompVar{
@@ -93,10 +94,11 @@ public:
       return false;
    }
 
-   bool doesSatisfyBounds(int            denseLen,
-			  double       * denseArr,
-			  const double * lbs,
-			  const double * ubs);
+   bool doesSatisfyBounds(int                     denseLen,
+			  double                * denseArr,
+			  const DecompAlgoModel & model,
+			  const double          * lbs,
+			  const double          * ubs);
 
    void fillDenseArr(int      len,
                      double * arr);

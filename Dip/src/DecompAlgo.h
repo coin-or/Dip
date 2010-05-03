@@ -515,7 +515,7 @@ public:
                                        vector<string>   & colNames,
                                        int                startRow,
                                        int                endRow,
-                                       char               origOrBranch);
+                                       DecompRowType      rowType);
    void masterPhaseItoII();
    void masterPhaseIItoI();
 
@@ -528,6 +528,8 @@ public:
               m_masterColType[index] == DecompCol_ArtForRowG    ||
               m_masterColType[index] == DecompCol_ArtForBranchL ||
               m_masterColType[index] == DecompCol_ArtForBranchG ||
+              m_masterColType[index] == DecompCol_ArtForConvexL ||
+              m_masterColType[index] == DecompCol_ArtForConvexG ||
               m_masterColType[index] == DecompCol_ArtForCutL    ||
               m_masterColType[index] == DecompCol_ArtForCutG);
    }

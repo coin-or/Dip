@@ -473,6 +473,8 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const bool                 printLp){
    string filename = fileName; 
    if(printMps){
+      const char ** rowNames = NULL;
+      const char ** colNames = NULL;
       //TODO: col/row names have to explicitly pass in
 #ifdef __DECOMP_IP_CPX__
       si->writeMpsNative(filename.c_str(), NULL, NULL, 1);

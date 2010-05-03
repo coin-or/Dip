@@ -14,30 +14,43 @@
 //===========================================================================//
 
 #include "DecompVar.h"
+#include "DecompModel.h"
 
 // --------------------------------------------------------------------- //
-//this is not good enough - this only checks the nonzero elements
-//   what if we branch to fix a component to 1, need to make sure that
-//   is in this set - will have to compare vs dense array
-bool DecompVar::doesSatisfyBounds(int            denseLen,
-				  double       * denseArr,
-				  const double * lbs,
-				  const double * ubs){
+//Design question - we use a check over the entire space to simplify
+// storage of branching bounds. But, in reality, for node 1, for example,
+// these has only been one branch - so we only need to check one number.
+//This could be much faster if we are willing to do more accounting related
+// to branching.
+bool DecompVar::doesSatisfyBounds(int                     denseLen,
+				  double                * denseArr,
+				  const DecompAlgoModel & model,
+				  const double          * lbs,
+				  const double          * ubs){
 
    int            j;
    double         xj;
-   fillDenseArr(denseLen, denseArr);
-   for (j = 0; j < denseLen; ++j){
-      xj = denseArr[j];
-      //printf("j:%d xj:%g lb:%g ub:%g --> ",
-      //     j, xj, lbs[j], ubs[j]);
-      if(xj < (lbs[j] - DecompEpsilon) ||
-	 xj > (ubs[j] + DecompEpsilon)){
-	//printf(" false\n");
-	return false;	 
+   vector<int> ::const_iterator it;
+   map<int,int>::const_iterator mcit;
+   DecompConstraintSet * modelRelax    = model.getModel();
+   const vector<int>  & activeColumns  = modelRelax->getActiveColumns();
+   bool                 isSparse       = modelRelax->isSparse();
+   const map<int,int> & origToSparse   = modelRelax->getMapOrigToSparse();
+
+   fillDenseArr(denseLen, denseArr);//TODO: expensive... 
+   for(it = activeColumns.begin(); it != activeColumns.end(); it++){
+      if(isSparse){
+         mcit = origToSparse.find(*it);
+         j    = mcit->second;
+         xj   = denseArr[j];
       }
       else{
-	//printf("\n");
+         j  = *it;
+         xj = denseArr[j];
+      }      
+      if(xj < (lbs[j] - DecompEpsilon) ||
+	 xj > (ubs[j] + DecompEpsilon)){
+	 return false;	 
       }
    }
    return true;

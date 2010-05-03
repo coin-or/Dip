@@ -135,8 +135,11 @@ public:
       else{
          if(activeColumns.size()){
             vector<int>::iterator vi;
-            for(vi = activeColumns.begin(); vi != activeColumns.end(); vi++)
+            for(vi = activeColumns.begin(); vi != activeColumns.end(); vi++){
+	       //printf("setColBounds i:%d to LB:%g UB:%g\n",
+	       //     *vi, colLB[*vi], colUB[*vi]);
                m_osi->setColBounds(*vi, colLB[*vi], colUB[*vi]);
+	    }
          }
          else{
 	    m_osi->setColLower(colLB);
