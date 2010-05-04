@@ -140,6 +140,15 @@ int main(int argc, char ** argv){
                  << " SolveReal= " << timeSolveReal
                  << " TotalReal= " << timeSetupReal + timeSolveReal
                  << endl;      
+
+	    //---
+	    //--- now, initialize direct solve with best
+	    //---   solution to PC
+	    //---	    
+	    DecompAlgo * algoC = new DecompAlgoC(&atm, &utilParam);
+	    algoC->solveDirect(timeLimit, 
+			       algo->getXhatIPBest());
+	    delete algoC;
          }
 	 
          //---

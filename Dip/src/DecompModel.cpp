@@ -215,15 +215,19 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    string cbcGap       = "-ratio";
    string cbcGapSet    = "0";
    string cbcTime      = "-seconds";
-   string cbcTimeSet   = UtilDblToStr(param.SolveMasterAsIpLimitTime);
+   string cbcTimeSet   = "0";
    string cbcCutoff    = "-cutoff";   
    string cbcCutoffSet = UtilDblToStr(cutoff);
    string cbcSLog      = "-slog";
    string cbcSLogSet   = "2";
-   if(doExact)
-      cbcGapSet = UtilDblToStr(param.SubProbGapLimitExact);
-   else
-      cbcGapSet = UtilDblToStr(param.SubProbGapLimitInexact);
+   if(doExact){
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact);
+      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitExact);
+   }
+   else{
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact);
+      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitInexact);
+   }
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      
@@ -388,6 +392,22 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");
+
+   if(doExact){
+      if(param.SubProbTimeLimitExact < COIN_DBL_MAX){
+	 status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
+				 param.SubProbTimeLimitExact);
+      }
+   }
+   else{
+      if(param.SubProbTimeLimitInexact < COIN_DBL_MAX){
+	 status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
+				 param.SubProbTimeLimitInexact);
+      }
+   }
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+			  "solveOsiAsIp", "DecompAlgoModel");
    
    if(doCutoff)
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, cutoff);
@@ -403,7 +423,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //--- TODO: make this a user option
    //---
 #if CPX_VERSION >= 1100
-   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, param.SubProbNumThreads);
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");
@@ -435,12 +455,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result->m_solStatus2 = 0;
 
-   const int statusSet1[2] = {CPXMIP_OPTIMAL,
-			      CPXMIP_OPTIMAL_TOL};
-   const int statusSet2[3] = {CPXMIP_OPTIMAL,
-			      CPXMIP_OPTIMAL_TOL,
+   const int statusSet1[3] = {CPXMIP_OPTIMAL,
+			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
+			      CPXMIP_TIME_LIM_FEAS};
+   const int statusSet2[4] = {CPXMIP_OPTIMAL,
+			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
+			      CPXMIP_TIME_LIM_FEAS,
 			      CPXMIP_INFEASIBLE};
-   if(!UtilIsInSet(result->m_solStatus, statusSet2, 3)){
+   if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
       cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CPX solver status", 
                           "solveOsiAsIp", "DecompAlgoModel");
@@ -452,7 +474,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //---   can be infeasible.
    //---
    if(!doCutoff && isRoot){
-      if(!UtilIsInSet(result->m_solStatus, statusSet1, 2)){
+      if(!UtilIsInSet(result->m_solStatus, statusSet1, 3)){
          cerr << "Error: CPX IP solver 2nd status = " 
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status", 
@@ -460,7 +482,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       }
    }
    else{
-      if(!UtilIsInSet(result->m_solStatus, statusSet2, 3)){
+      if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
          cerr << "Error: CPX IP solver 2nd status = " 
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status", 
@@ -474,9 +496,13 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_nSolutions = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
-   if(result->m_solStatus == CPXMIP_OPTIMAL ||
-      result->m_solStatus == CPXMIP_OPTIMAL_TOL){
+   //TODO: multiple solution
+   if(UtilIsInSet(result->m_solStatus, statusSet1, 3)){
       result->m_nSolutions = 1;
+   }
+
+   printf("solStatus = %d\n", result->m_solStatus);
+   if(result->m_solStatus == CPXMIP_OPTIMAL){
       result->m_isOptimal  = true;      
    }
    else{
@@ -487,9 +513,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       }
       else{
          //---
-         //--- else it must have stopped on gap
+         //--- else it must have stopped on gap or time
          //---
-         result->m_nSolutions = 1;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;      
       }

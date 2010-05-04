@@ -473,8 +473,8 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const bool                 printLp){
    string filename = fileName; 
    if(printMps){
-      const char ** rowNames = NULL;
-      const char ** colNames = NULL;
+      //const char ** rowNames = NULL;
+      //const char ** colNames = NULL;
       //TODO: col/row names have to explicitly pass in
 #ifdef __DECOMP_IP_CPX__
       si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
@@ -523,7 +523,8 @@ void DecompAlgo::printCuts(ostream * os){
 }
 
 //===========================================================================//
-DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
+DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
+					      const DecompSolution * startSol){
 					       
    //---
    //--- Solve the original IP with a generic IP solver.
@@ -573,7 +574,7 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
 
 
    //#define PERMUTE_STUFF
-#ifdef  PERMUTE_STUFF
+   /*#ifdef  PERMUTE_STUFF
 
    //---
    //--- randomly permute rows and cols for MIPLIB2010
@@ -581,79 +582,79 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
    //---    delete random cols, append to end
    //---
    {
-      int k, r, c, tmp;
-      int nCols         = m_masterSI->getNumCols();
-      int nRows         = m_masterSI->getNumRows();
-      int rowsToPermute = static_cast<int>(nRows / 7);
-      int colsToPermute = static_cast<int>(nCols / 7);     
-      vector<int>  newRowInd; //old row to new row index
-      int rowToDelete[1];
-      int colToDelete[1];
-
-      srand(1);
-      for(i = 0; i < nRows; i++){
-	 newRowInd.push_back(i);
-      }
-      for(i = 0; i < rowsToPermute; i++){
-	 r = UtilURand(0, nRows-1);
-	 //---
-	 //--- Example:
-	 //---     0,1,2,3,4,5,6 (r=2)
-	 //---  -> 0,1,3,4,5,6,2
-	 //---
-	 tmp = newRowInd[r];
-	 for(k = r; k < (nRows-1); k++){
-	    newRowInd[k] = newRowInd[k+1];
-	 }
-	 newRowInd[nRows-1] = tmp;
-
-	 const CoinPackedMatrix * M     = m_masterSI->getMatrixByRow();
-	 const double           * rowLB = m_masterSI->getRowLower();
-	 const double           * rowUB = m_masterSI->getRowUpper();
-	 const double             rLB   = rowLB[r];
-	 const double             rUB   = rowUB[r];
-	 CoinShallowPackedVector vecS = M->getVector(r);
-         CoinPackedVector        vec(vecS);
-         //printf("delete and move to end row r=%d %s\n", 
-         //     r, m_masterSI->getRowName(r).c_str());
-         //vec.print();
-
-	 rowToDelete[0] = r;
-	 m_masterSI->deleteRows(1, rowToDelete);
-	 m_masterSI->addRow(vec, rLB, rUB);	 
-      }
-
-      for(i = 0; i < colsToPermute; i++){
-	 c = UtilURand(0, nCols-1);
-	 //---
-	 //--- Example:
-	 //---     0,1,2,3,4,5,6 (r=2)
-	 //---  -> 0,1,3,4,5,6,2
-	 //---
-	 const CoinPackedMatrix * M     = m_masterSI->getMatrixByCol();
-	 const double           * colLB = m_masterSI->getColLower();
-	 const double           * colUB = m_masterSI->getColUpper();
-	 const double           * objC  = m_masterSI->getObjCoefficients();
-	 const double             cLB   = colLB[c];
-	 const double             cUB   = colUB[c];
-	 const double             obj   = objC[c];
-	 const CoinShallowPackedVector vecS = M->getVector(c);
-	 CoinPackedVector              vec(vecS);
-
-	 /////////// THIS IS WRONG ///////////
-	 //TODO: copy integer info!
-
-	 colToDelete[0] = c;
-	 m_masterSI->deleteCols(1, colToDelete);
-	 m_masterSI->addCol(vec, cLB, cUB, obj);	 
-      }
-
-      printf("\n\nNew Row Map\n");
-      for(i = 0; i < nRows; i++){
-	 printf("%10d%10d\n", i, newRowInd[i]);
-      }
+   int k, r, c, tmp;
+   int nCols         = m_masterSI->getNumCols();
+   int nRows         = m_masterSI->getNumRows();
+   int rowsToPermute = static_cast<int>(nRows / 7);
+   int colsToPermute = static_cast<int>(nCols / 7);     
+   vector<int>  newRowInd; //old row to new row index
+   int rowToDelete[1];
+   int colToDelete[1];
+   
+   srand(1);
+   for(i = 0; i < nRows; i++){
+   newRowInd.push_back(i);
    }
-#endif   
+   for(i = 0; i < rowsToPermute; i++){
+   r = UtilURand(0, nRows-1);
+   //---
+   //--- Example:
+   //---     0,1,2,3,4,5,6 (r=2)
+   //---  -> 0,1,3,4,5,6,2
+   //---
+   tmp = newRowInd[r];
+   for(k = r; k < (nRows-1); k++){
+   newRowInd[k] = newRowInd[k+1];
+   }
+   newRowInd[nRows-1] = tmp;
+   
+   const CoinPackedMatrix * M     = m_masterSI->getMatrixByRow();
+   const double           * rowLB = m_masterSI->getRowLower();
+   const double           * rowUB = m_masterSI->getRowUpper();
+   const double             rLB   = rowLB[r];
+   const double             rUB   = rowUB[r];
+   CoinShallowPackedVector vecS = M->getVector(r);
+   CoinPackedVector        vec(vecS);
+   //printf("delete and move to end row r=%d %s\n", 
+   //     r, m_masterSI->getRowName(r).c_str());
+   //vec.print();
+   
+   rowToDelete[0] = r;
+   m_masterSI->deleteRows(1, rowToDelete);
+   m_masterSI->addRow(vec, rLB, rUB);	 
+   }
+   
+   for(i = 0; i < colsToPermute; i++){
+   c = UtilURand(0, nCols-1);
+   //---
+   //--- Example:
+   //---     0,1,2,3,4,5,6 (r=2)
+   //---  -> 0,1,3,4,5,6,2
+   //---
+   const CoinPackedMatrix * M     = m_masterSI->getMatrixByCol();
+   const double           * colLB = m_masterSI->getColLower();
+   const double           * colUB = m_masterSI->getColUpper();
+   const double           * objC  = m_masterSI->getObjCoefficients();
+   const double             cLB   = colLB[c];
+   const double             cUB   = colUB[c];
+   const double             obj   = objC[c];
+   const CoinShallowPackedVector vecS = M->getVector(c);
+   CoinPackedVector              vec(vecS);
+   
+   /////////// THIS IS WRONG ///////////
+   //TODO: copy integer info!
+   
+   colToDelete[0] = c;
+   m_masterSI->deleteCols(1, colToDelete);
+   m_masterSI->addCol(vec, cLB, cUB, obj);	 
+   }
+   
+   printf("\n\nNew Row Map\n");
+   for(i = 0; i < nRows; i++){
+   printf("%10d%10d\n", i, newRowInd[i]);
+   }
+   }
+   #endif   */
 
    
    //---
@@ -740,6 +741,24 @@ DecompSolverResult * DecompAlgoC::solveDirect(int timeLimit){
    CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
    CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
    int       status = 0;
+
+   masterSICpx->switchToMIP();//need?
+
+   if(startSol){
+      int            nCols    = masterSICpx->getNumCols();
+      int            beg[1]   = {0};
+      int          * varInd   = new int[nCols];
+      const double * solution = startSol->getValues();
+      assert(nCols == startSol->getSize());
+      UtilIotaN(varInd, nCols, 0);
+      status = CPXaddmipstarts(cpxEnv, cpxLp,
+			       1, nCols, beg, varInd, solution, NULL, NULL);
+      if(status)
+	 throw UtilException("CPXaddmipstarts failure", 
+			     "solveDirect", "DecompAlgoC");
+      UTIL_DELARR(varInd);
+   }
+
 
    //---
    //--- set the time limit

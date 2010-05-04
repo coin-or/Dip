@@ -1624,6 +1624,8 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    //---
 	    addVarsFromPool();            
 	 }
+	 //TODO: don't need check m_isColGenExact if we
+	 //  use LB's in mostNegRC (rather than varRedCost)... 
 	 if(m_isColGenExact           && 
 	    m_rrIterSinceAll == 0     &&
 	    m_status == STAT_FEASIBLE &&
@@ -2496,6 +2498,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	 //--- APP: solve zSP(c + eps) 
 	 //---
          map<int, DecompAlgoModel>::iterator mit; 
+	 double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
             DecompAlgoModel & algoModel = (*mit).second;
             solveRelaxed(costeps,               //reduced cost (fake here)
@@ -2506,6 +2509,15 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
                          algoModel,
 			 &subprobResult,        //results
 			 initVars);             //var list to populate
+	    if(attempts == 0){
+	       /////////////////////////////////////////STOP
+	       //TODO: have to treat masterOnly differently
+	       //  we don't correctly populate LB/UB in
+	       //  subprobResult object - so contribution is wrong
+	       sumInitLB += subprobResult.m_objLB;
+	       printf("ThisLB = %g, sumInitLB = %g\n",
+		      subprobResult.m_objLB, sumInitLB);
+	    }
 	 }
 
          
@@ -4677,6 +4689,18 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- for multi-blocks the mostNegReducedCost is the
       //--- sum of the best reduced costs over all blocks
       //---  NOTE: we need all blocks to make it valid
+      //---
+      ////////////STOP: this would explain why the LB seems wrong
+      ////////////  on ATM model, since we were stopping on gap, but
+      ////////////  declaring it optimal. Now, it is fixed and the bound
+      ////////////  should be valid, but stopping on gap won't be valid.
+
+      //--- TODO: if a block was NOT solved to optimality,
+      //---  we can still use the problems LB, but that will NOT
+      //---  be equivalent to its varRedCost - so we need to return
+      //---  that value as well, if we want to use it
+      //--- The red-cost does not have to be used in bound calculation
+      //---  it is only relevant for deciding on entering columns
       //---
       if(varRedCost < mostNegRCvec[whichBlock])
 	 mostNegRCvec[whichBlock] = varRedCost;

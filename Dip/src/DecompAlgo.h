@@ -492,10 +492,11 @@ public:
    /**
     *
     */
-   //virtual void solveDirect(int                  timeLimit = COIN_INT_MAX,
-   //		    DecompSolverResult * result    = NULL){};
-   virtual DecompSolverResult * solveDirect(int timeLimit = COIN_INT_MAX){
+   virtual DecompSolverResult * 
+      solveDirect(int                    timeLimit = COIN_INT_MAX,
+		  const DecompSolution * startSol  = NULL){
       return NULL;}
+   
 
 
 

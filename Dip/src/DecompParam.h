@@ -79,6 +79,9 @@ public:
 
    double SubProbGapLimitExact;
    double SubProbGapLimitInexact;
+   double SubProbTimeLimitExact;
+   double SubProbTimeLimitInexact;
+   int    SubProbNumThreads;
    
    //This option only works with Cpx:
    // DecompDualSimplex = 0,
@@ -182,6 +185,9 @@ public:
       PARAM_getSetting("SubProbUseCutoff",     SubProbUseCutoff);
       PARAM_getSetting("SubProbGapLimitExact", SubProbGapLimitExact);
       PARAM_getSetting("SubProbGapLimitInexact",SubProbGapLimitInexact);
+      PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
+      PARAM_getSetting("SubProbTimeLimitInexact",SubProbTimeLimitInexact);
+      PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
       PARAM_getSetting("SubProbSolverStartAlgo",SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
@@ -201,8 +207,6 @@ public:
       PARAM_getSetting("BranchEnforceInSubProb",  BranchEnforceInSubProb);
       PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
-      //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
-      //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -263,6 +267,11 @@ public:
                          SubProbGapLimitExact);
       UtilPrintParameter(os, sec, "SubProbGapLimitInexact", 
                          SubProbGapLimitInexact);
+      UtilPrintParameter(os, sec, "SubProbTimeLimitExact",   
+                         SubProbTimeLimitExact);
+      UtilPrintParameter(os, sec, "SubProbTimeLimitInexact", 
+                         SubProbTimeLimitInexact);
+      UtilPrintParameter(os, sec, "SubProbNumThreads", SubProbNumThreads);
       UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
                          SubProbSolverStartAlgo);
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
@@ -283,8 +292,6 @@ public:
       UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   BranchEnforceInSubProb);
       UtilPrintParameter(os, sec, "BranchEnforceInMaster",    BranchEnforceInMaster);
       UtilPrintParameter(os, sec, "MasterConvexityLessThan", MasterConvexityLessThan);
-      //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
-      //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
       (*os) << "========================================================\n";
    }
 
@@ -300,8 +307,7 @@ public:
       LimitTotalPriceIters = COIN_INT_MAX;
       LimitRoundCutIters   = COIN_INT_MAX;
       LimitRoundPriceIters = COIN_INT_MAX;
-      LimitTime            = COIN_DBL_MAX;
-     
+      LimitTime            = COIN_DBL_MAX;     
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
@@ -319,6 +325,9 @@ public:
       SubProbUseCutoff     = 0;
       SubProbGapLimitExact   = 0.0001; // 0.01% gap
       SubProbGapLimitInexact = 0.1;    //10.00% gap
+      SubProbTimeLimitExact   = COIN_DBL_MAX;
+      SubProbTimeLimitInexact = COIN_DBL_MAX;
+      SubProbNumThreads       = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
@@ -338,8 +347,6 @@ public:
       BranchEnforceInSubProb   = 0;
       BranchEnforceInMaster    = 1;
       MasterConvexityLessThan  = 0;
-      //IpAlgoStart           = "dual";
-      //IpAlgoSub             = "dual";
    }
    
    void dumpSettings(ostream * os = &cout){
