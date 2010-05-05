@@ -124,7 +124,7 @@ public:
       if(model->isSparse()){
          const map<int,int> & origToSparse = model->getMapOrigToSparse();
          map<int,int>::const_iterator mcit;
-         for(mcit = origToSparse.begin(); 	
+         for(mcit  = origToSparse.begin(); 	
              mcit != origToSparse.end(); mcit++){
             m_osi->setColLower(mcit->second,        //sparse-index
                                colLB[mcit->first]); //original-index

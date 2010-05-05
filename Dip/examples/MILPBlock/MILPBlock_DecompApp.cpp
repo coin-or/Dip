@@ -181,6 +181,8 @@ void MILPBlock_DecompApp::readBlockFile(){
 //===========================================================================//
 void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
 
+   //TODO: is this ok for sparse?
+
    ifstream is;
    string   fileName = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.InitSolutionFile;
@@ -329,7 +331,7 @@ MILPBlock_DecompApp::findActiveColumns(const vector<int> & rowsPart,
 }
 
 //===========================================================================//
-void
+/*void
 MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
 
    int            nBlocks     = static_cast<int>(m_blocks.size());
@@ -430,7 +432,7 @@ MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
    }
 
    return;   
-}
+   }*/
 
 //===========================================================================//
 void
@@ -484,7 +486,7 @@ MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
 }
 
 //===========================================================================//
-DecompConstraintSet * 
+/*DecompConstraintSet * 
 MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
 					  
    const int      nCols       = m_mpsIO.getNumCols();
@@ -575,12 +577,14 @@ MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
 
    return model;   
 }
+*/
 
 //===========================================================================//
-DecompConstraintSet * 
-MILPBlock_DecompApp::createModelPart(const int   nRowsPart,
-                                     const int * rowsPart){
-
+void
+MILPBlock_DecompApp::createModelPart(DecompConstraintSet * model,
+				     const int             nRowsPart,
+                                     const int           * rowsPart){
+   
    const int      nCols       = m_mpsIO.getNumCols();
    const double * rowLB       = m_mpsIO.getRowLower();
    const double * rowUB       = m_mpsIO.getRowUpper();
@@ -588,7 +592,6 @@ MILPBlock_DecompApp::createModelPart(const int   nRowsPart,
    const double * colUB       = m_mpsIO.getColUpper();
    const char   * integerVars = m_mpsIO.integerColumns();
    
-   DecompConstraintSet * model = new DecompConstraintSet();
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
    if(!model->M)
       throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
@@ -602,9 +605,11 @@ MILPBlock_DecompApp::createModelPart(const int   nRowsPart,
    int i, r;
    for(i = 0; i < nRowsPart; i++){
       r = rowsPart[i];
-      const char * rowName = m_mpsIO.rowName(r);
-      if(rowName)
-         model->rowNames.push_back(rowName);
+      if(m_appParam.UseNames){
+	 const char * rowName = m_mpsIO.rowName(r);
+	 if(rowName)
+	    model->rowNames.push_back(rowName);
+      }
       model->rowLB.push_back(rowLB[r]);
       model->rowUB.push_back(rowUB[r]);
    }
@@ -643,16 +648,130 @@ MILPBlock_DecompApp::createModelPart(const int   nRowsPart,
    //---  also set the column names, if they exist
    //---
    for(i = 0; i < nCols; i++){
-      const char * colName = m_mpsIO.columnName(i);
-      if(colName)
-         model->colNames.push_back(colName);
+      if(m_appParam.UseNames){
+	 const char * colName = m_mpsIO.columnName(i);
+	 if(colName)
+	    model->colNames.push_back(colName);
+      }
       if(integerVars && integerVars[i]){
          model->integerVars.push_back(i);            
       }
    }   
-   return model;   
 }
 
+//===========================================================================//
+void
+MILPBlock_DecompApp::createModelPartSparse(DecompConstraintSet * model,
+					   const int             nRowsPart,
+					   const int           * rowsPart){
+
+   const int      nColsOrig   = m_mpsIO.getNumCols();
+   const double * rowLB       = m_mpsIO.getRowLower();
+   const double * rowUB       = m_mpsIO.getRowUpper();
+   const double * colLB       = m_mpsIO.getColLower();
+   const double * colUB       = m_mpsIO.getColUpper();
+   const char   * integerVars = m_mpsIO.integerColumns();
+
+   //---
+   //--- set model as sparse
+   //---
+   model->setSparse(nColsOrig);
+
+   int                   nCols, origIndex, newIndex;
+   vector<int>::iterator vit;
+   newIndex = 0;
+   for(vit  = model->activeColumns.begin();
+       vit != model->activeColumns.end(); vit++){
+      origIndex = *vit;
+
+      model->pushCol(colLB[origIndex], 
+		     colUB[origIndex],
+		     integerVars[origIndex] == 0 ? false : true,
+		     origIndex);	     
+
+      //---
+      //--- big fat hack... we don't deal with dual rays yet,
+      //---  so, we assume subproblems are bounded
+      //---
+      if(m_appParam.ColumnUB < 1.0e15){
+	 if(colUB[origIndex] > 1.0e15){
+	    model->colUB[newIndex] = m_appParam.ColumnUB;
+	 }
+      }
+      if(m_appParam.ColumnLB > -1.0e15){
+	 if(colLB[origIndex] < -1.0e15){
+	    model->colLB[newIndex] = m_appParam.ColumnLB;
+	 }
+      }
+
+      if(m_appParam.UseNames){
+	 const char * colName = m_mpsIO.columnName(origIndex);
+	 if(colName)
+	    model->colNames.push_back(colName);
+      }
+      newIndex++;
+   }
+
+   nCols    = static_cast<int>(model->activeColumns.size());
+   assert(static_cast<int>(model->colLB.size()) == nCols);
+   assert(static_cast<int>(model->colUB.size()) == nCols);
+   
+   model->M = new CoinPackedMatrix(false, 0.0, 0.0);
+   if(!model->M)
+      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
+   model->M->setDimensions(0, nCols);
+   model->reserve(nRowsPart, nCols);
+
+   //---
+   //--- for each row in rowsPart, create the row using sparse mapping
+   //---
+   int                      i, k, r, begInd;
+   const map<int,int>     & origToSparse   = model->getMapOrigToSparse();   
+   const CoinPackedMatrix * M              = m_mpsIO.getMatrixByRow(); 
+   const int              * matInd         = M->getIndices();
+   const CoinBigIndex     * matBeg         = M->getVectorStarts();
+   const int              * matLen         = M->getVectorLengths();
+   const double           * matVal         = M->getElements();
+   const int              * matIndI        = NULL;
+   const double           * matValI        = NULL;
+
+   vector<CoinBigIndex>   & rowBeg         = model->m_rowBeg;//used as temp
+   vector<int         >   & rowInd         = model->m_rowInd;//used as temp
+   vector<double      >   & rowVal         = model->m_rowVal;//used as temp
+   map<int,int>::const_iterator mit;
+
+   begInd = 0;
+   rowBeg.push_back(0);
+   for(i = 0; i < nRowsPart; i++){
+      r = rowsPart[i];
+      if(m_appParam.UseNames){
+	 const char * rowName = m_mpsIO.rowName(r);
+	 if(rowName)
+	    model->rowNames.push_back(rowName);
+      }
+      model->rowLB.push_back(rowLB[r]);
+      model->rowUB.push_back(rowUB[r]);
+
+      matIndI = matInd + matBeg[r];
+      matValI = matVal + matBeg[r];
+      for(k = 0; k < matLen[r]; k++){
+	 origIndex = matIndI[k];
+	 mit       = origToSparse.find(origIndex);
+	 assert(mit != origToSparse.end());
+	 rowInd.push_back(mit->second);
+	 rowVal.push_back(matValI[k]);			  
+      }
+      begInd += matLen[r];
+      rowBeg.push_back(begInd);
+   }
+   model->M->appendRows(nRowsPart,
+			&rowBeg[0],
+			&rowInd[0],
+			&rowVal[0]);
+   rowBeg.clear();
+   rowInd.clear();
+   rowVal.clear();
+}
 
 //===========================================================================//
 void MILPBlock_DecompApp::createModels(){
@@ -725,7 +844,8 @@ void MILPBlock_DecompApp::createModels(){
    //---
    //--- Construct the core matrix.
    //---
-   DecompConstraintSet * modelCore = createModelPart(nRowsCore, rowsCore);
+   DecompConstraintSet * modelCore = new DecompConstraintSet();
+   createModelPart(modelCore, nRowsCore, rowsCore);
       
    //---
    //--- save a pointer so we can delete it later
@@ -738,12 +858,14 @@ void MILPBlock_DecompApp::createModels(){
    for(mit = m_blocks.begin(); mit != m_blocks.end(); mit++){
       vector<int> & rowsRelax  = (*mit).second;
       int           nRowsRelax = static_cast<int>(rowsRelax.size());
+
       if(m_appParam.LogLevel >= 1)
          (*m_osLog) << "Create model part nRowsRelax = " 
                     << nRowsRelax << " (Block=" << (*mit).first << ")" << endl;
-      DecompConstraintSet * modelRelax 
-         = createModelPart(nRowsRelax, &rowsRelax[0]);
 
+      DecompConstraintSet * modelRelax = new DecompConstraintSet();
+      CoinAssertHint(modelRelax, "Error: Out of Memory");
+      
       //---
       //--- find and set active columns
       //---
@@ -751,12 +873,20 @@ void MILPBlock_DecompApp::createModels(){
       set<int> activeColsSet;
       findActiveColumns(rowsRelax, activeColsSet);
       for(sit = activeColsSet.begin(); sit != activeColsSet.end(); sit++)
-         modelRelax->activeColumns.push_back(*sit);
+	 modelRelax->activeColumns.push_back(*sit);
       if(m_appParam.LogLevel >= 3){
-         (*m_osLog) << "Active Columns:" << endl;
-         UtilPrintVector(modelRelax->activeColumns, m_osLog);
-         UtilPrintVector(modelRelax->activeColumns, 
-                         modelCore->getColNames(), m_osLog);
+	 (*m_osLog) << "Active Columns:" << endl;
+	 UtilPrintVector(modelRelax->activeColumns, m_osLog);
+	 if(modelCore->getColNames().size() > 0)
+	    UtilPrintVector(modelRelax->activeColumns, 
+			    modelCore->getColNames(), m_osLog);
+      }
+      
+      if(m_appParam.UseSparse){
+	 createModelPartSparse(modelRelax, nRowsRelax, &rowsRelax[0]);
+      }
+      else{	 
+	 createModelPart(modelRelax, nRowsRelax, &rowsRelax[0]);
       }
 
       //---
@@ -796,8 +926,9 @@ void MILPBlock_DecompApp::createModels(){
    if(m_appParam.LogLevel >= 3){
       (*m_osLog) << "Master only columns:" << endl;
       UtilPrintVector(modelCore->masterOnlyCols, m_osLog);
-      UtilPrintVector(modelCore->masterOnlyCols, 
-                      modelCore->colNames, m_osLog);
+      if(modelCore->getColNames().size() > 0)
+	 UtilPrintVector(modelCore->masterOnlyCols, 
+			 modelCore->getColNames(), m_osLog);
    }
 
    //---
@@ -806,19 +937,12 @@ void MILPBlock_DecompApp::createModels(){
    setModelCore(modelCore, "core");
    
    for(mdi = m_modelR.begin(); mdi != m_modelR.end(); mdi++){
-      //---
-      //--- append master-only cols to each block
-      //---
-      //vector<int> & activeColumns = (*mdi).second->activeColumns;
-      //activeColumns.insert(activeColumns.end(),
-      //		   modelCore->masterOnlyCols.begin(),
-      //		   modelCore->masterOnlyCols.end());
-      
-      //---
-      //--- fix column bounds on non-active columns
-      //---
-      (*mdi).second->fixNonActiveColumns();
-      
+      if(!m_appParam.UseSparse){
+	 //---
+	 //--- fix column bounds on non-active columns
+	 //---
+	 (*mdi).second->fixNonActiveColumns();
+      }
       //---
       //--- set system in framework
       //---
@@ -837,6 +961,7 @@ void MILPBlock_DecompApp::createModels(){
       if(m_appParam.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
 
+      /*
       if(m_appParam.MasterOnlyOneBlock){
          DecompConstraintSet * modelMasterOnly
             = createModelMasterOnly(modelCore->masterOnlyCols);
@@ -851,14 +976,14 @@ void MILPBlock_DecompApp::createModels(){
          if(m_appParam.LogLevel >= 3){
             (*m_osLog) << "Active Columns:" << endl;
             UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
-            UtilPrintVector(modelMasterOnly->activeColumns, 
-                            modelCore->getColNames(), m_osLog);
+	    if(modelCore->getColNames().size() > 0)
+	       UtilPrintVector(modelMasterOnly->activeColumns, 
+			       modelCore->getColNames(), m_osLog);
          }
       }
-      else{
-         //createModelMasterOnlys(modelCore->masterOnlyCols);
-         createModelMasterOnlys2(modelCore->masterOnlyCols);
-      }
+      else{*/
+      createModelMasterOnlys2(modelCore->masterOnlyCols);
+      //}
    }
       
    //---

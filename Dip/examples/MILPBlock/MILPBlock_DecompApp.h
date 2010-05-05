@@ -65,8 +65,14 @@ private:
    void                  createModels();
    DecompConstraintSet * createModelPart(const int   nRowsPart,
                                          const int * rowsPart);
-   DecompConstraintSet * createModelMasterOnly(vector<int> & masterOnlyCols);
-   void                  createModelMasterOnlys(vector<int> & masterOnlyCols);
+   void createModelPart(DecompConstraintSet * model,
+			const int             nRowsPart,
+			const int           * rowsPart);
+   void createModelPartSparse(DecompConstraintSet * model,
+			      const int             nRowsPart,
+			      const int           * rowsPart);   
+   //DecompConstraintSet * createModelMasterOnly(vector<int> & masterOnlyCols);
+   //void                  createModelMasterOnlys(vector<int> & masterOnlyCols);
    void                  createModelMasterOnlys2(vector<int> & masterOnlyCols);
 
    void                  readInitSolutionFile(DecompVarList & initVars);

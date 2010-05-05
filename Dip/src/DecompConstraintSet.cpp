@@ -82,6 +82,7 @@ void DecompConstraintSet::prepareModel(){
       if(!nActiveColumns)
          UtilIotaN(activeColumns, numColsOrig, 0);
    }
+   printf("nActiveColumns = %d\n", activeColumns.size());
    printf("(4) --> "); UtilPrintMemUsage(&cout, 2, 2);
 
    //---

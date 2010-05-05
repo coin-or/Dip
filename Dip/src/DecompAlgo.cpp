@@ -705,7 +705,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
   
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createMasterProblem()", m_param.LogDebugLevel, 2);
-
+   printf("here 1");fflush(stdout);
    DecompConstraintSet * modelCore = m_modelCore.getModel();   
    assert(modelCore); //TODO - can core be empty?   
 
@@ -749,6 +749,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    if(m_param.BranchEnforceInMaster)
       coreMatrixAppendColBounds();
    nRowsCore = modelCore->getNumRows();
+   printf("here 2");fflush(stdout);
    
    //THINK - what need this for?
    //number of original core rows
@@ -777,6 +778,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- set the number of rows, we will add columns
    //---
    masterM->setDimensions(nRows, 0);
+   printf("here 3");fflush(stdout);
    
    //---
    //--- create artifical columns in master LP for:
@@ -792,6 +794,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Original);
+   printf("here 4");fflush(stdout);
    if(m_nRowsBranch > 0){
       startRow = m_nRowsOrig;
       endRow   = m_nRowsOrig + m_nRowsBranch;
@@ -810,6 +813,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Convex);
+   printf("here 5");fflush(stdout);
       
    int colIndex     = 0;
    int blockIndex   = 0;
@@ -899,6 +903,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
       //---
       UTIL_DELPTR(sparseCol); 
    } //END: for(li = initVars.begin(); li != initVars.end(); li++)
+   printf("here 6");fflush(stdout);
    
    //---
    //--- insert the initial set of variables into the master variable list
@@ -958,6 +963,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			   colLB, colUB, objCoeff, 
 			   &masterRowLB[0], 
 			   &masterRowUB[0]);
+   printf("here 7");fflush(stdout);
           
    //---
    //--- load column and row names to OSI
@@ -978,6 +984,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    }
    if(nColNames > 0)
       m_masterSI->setColNames(colNames, 0, nColNames, 0);
+   printf("here 8");fflush(stdout);
 
    //TODO: make a function
    UTIL_DEBUG(m_param.LogDebugLevel, 4,                 
@@ -1012,7 +1019,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    UTIL_DELARR(objCoeff);
    UTIL_DELARR(zeroSol);
    UTIL_DELARR(dblArrNCoreCols);
-   
+   printf("here 9");fflush(stdout);
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createMasterProblem()", m_param.LogDebugLevel, 2);
 }
@@ -1026,6 +1033,9 @@ void DecompAlgo::masterMatrixAddArtCol(CoinPackedMatrix * masterM,
                                        double          & colLB,
                                        double          & colUB,
                                        double          & objCoeff){
+
+   //////////////////////////////////// STOP
+   //TODO: this is WAY too slow... need to use appendCols
    CoinPackedVector artCol;
    if(LorG == 'L')
       artCol.insert(rowIndex, -1.0);
@@ -2100,21 +2110,25 @@ void DecompAlgo::setMasterBounds(const double * lbs,
 	    //--- if needs to be fixed
 	    //---
 	    if(colUB[masterColIndex] > DecompEpsilon){
-	       //printf("set masterColIndex=%d UB to 0\n", masterColIndex);
 	       m_masterSI->setColBounds(masterColIndex, 0.0, 0.0);
-	       if(m_param.LogDebugLevel >= 4)
-		  (*li)->print(&cout, modelCore->getColNames());
+	       if(m_param.LogDebugLevel >= 4){
+		  (*m_osLog) << "Set masterColIndex=" << masterColIndex
+			     << " UB to 0" << endl;
+		  (*li)->print(m_osLog, modelCore->getColNames());
+	       }
 	    }
 	 }
 	 else{
 	    //---
 	    //--- if needs to be unfixed (from previous node)
 	    //---
-	    if(colUB[masterColIndex] <= 0){
-	       //printf("set masterColIndex=%d UB to inf\n", masterColIndex);
+	    if(colUB[masterColIndex] <= 0){	       
 	       m_masterSI->setColBounds(masterColIndex, 0.0, DecompInf);
-	       if(m_param.LogDebugLevel >= 4)
-		  (*li)->print(&cout, modelCore->getColNames());
+	       if(m_param.LogDebugLevel >= 4){
+		  (*m_osLog) << "Set masterColIndex=" << masterColIndex
+			     << " UB to INF" << endl;
+		  (*li)->print(m_osLog, modelCore->getColNames());
+	       }
 	    }
 	 }
       }
