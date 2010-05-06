@@ -52,7 +52,6 @@ int main(int argc, char ** argv){
       //--- start overall timer
       //---
       timer.start();
-
       if(doGenRandom){
 	 //---
 	 //--- generate a random instance
