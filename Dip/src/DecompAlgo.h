@@ -678,6 +678,8 @@ public:
     */
    virtual void setObjBoundLB(const double thisBound,
 			      const double thisBoundUB){
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
       if(thisBound > m_nodeStats.objBest.first){
 	 m_nodeStats.objBest.first = thisBound;
       }
@@ -695,6 +697,8 @@ public:
       objBound.timeStamp   = -1;
 #endif      
       m_nodeStats.objHistoryLB.push_back(objBound);
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
    }
    
    /**
