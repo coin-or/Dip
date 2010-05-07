@@ -197,6 +197,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogLpLevel;
 
+   double * solution = new double[numCols];
+   assert(solution);
+
+   //---
+   //--- clear out any old solutions
+   //---
+   result->m_solution.clear();
+
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
@@ -341,8 +349,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_objLB = cbc.getBestPossibleObjValue();
    if(result->m_nSolutions >= 1){
       result->m_objUB = cbc.getObjValue();
-      memcpy(result->m_solution, 
-             cbc.getColSolution(), numCols * sizeof(double));
+      const double * solDbl = cbc.getColSolution();
+      vector<double> solVec(solDbl, solDbl + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      //memcpy(result->m_solution, 
+      //  cbc.getColSolution(), numCols * sizeof(double));
+      assert(result->m_nSolutions == 
+	     static_cast<int>(result->m_solution.size()));
    }
 #endif
 
@@ -496,11 +510,35 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_nSolutions = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
-   //TODO: multiple solution
    if(UtilIsInSet(result->m_solStatus, statusSet1, 3)){
-      result->m_nSolutions = 1;
-   }
+      int    i;
+      int    nSols = CPXgetsolnpoolnumsolns(cpxEnv, cpxLp);
+      double objVal;
+      printf("Number of solutions in solution pool = %d\n",
+	     nSols);
+      //TODO: currently just take up to the limit,
+      //  but, should sort by objective and take n least?
+      nSols = std::min<int>(nSols, param.SubProbNumSolLimit);
+      for(i = 0; i < nSols; i++){
+	 status = CPXgetsolnpoolobjval(cpxEnv, cpxLp, i, &objVal);
+	 if(status)
+	    throw UtilException("CPXgetsolnpoolobjval", 
+				"solveOsiAsIp", "DecompAlgoModel");
+	 printf("Sol %4d: Obj: %10g\n", i, objVal);
 
+	 status = CPXgetsolnpoolx(cpxEnv, cpxLp, i, 
+				  solution, 0, numCols-1);
+	 vector<double> solVec(solution, solution + numCols);
+	 result->m_solution.push_back(solVec);
+	 result->m_nSolutions++;
+	 assert(result->m_nSolutions == 
+		static_cast<int>(result->m_solution.size()));	 
+	 //memcpy(result->m_solution, 
+	 //	osiCpx->getColSolution(), numCols * sizeof(double));
+      }
+      result->m_nSolutions = nSols;
+   }
+   
    printf("solStatus = %d\n", result->m_solStatus);
    if(result->m_solStatus == CPXMIP_OPTIMAL){
       result->m_isOptimal  = true;      
@@ -532,8 +570,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       if(status)
 	 throw UtilException("CPXgetmipobjval failure", 
 			     "solveOsiAsIp", "DecompAlgoModel");
-      memcpy(result->m_solution, 
-             osiCpx->getColSolution(), numCols * sizeof(double));
    }
 #endif
+
+   UTIL_DELARR(solution);
 }

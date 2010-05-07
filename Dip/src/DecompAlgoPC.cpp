@@ -506,7 +506,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 			  m_nodeStats.priceCallsTotal);
 
    DecompConstraintSet * modelCore = m_modelCore.getModel();
-   DecompSolverResult    result(m_masterSI->getNumCols());;
+   //DecompSolverResult    result(m_masterSI->getNumCols());
+   DecompSolverResult    result;
 
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
@@ -615,11 +616,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //--- get copy of solution
    //---
    result.m_objLB = cbc.getBestPossibleObjValue();
-   if(result.m_nSolutions >= 1){
+   if(nSolutions >= 1){
       result.m_objUB = cbc.getObjValue();
-      memcpy(result.m_solution, 
-             cbc.getColSolution(), 
-             nMasterCols * sizeof(double));
+
+      const double * solDbl = cbc.getColSolution();
+      vector<double> solVec(solDbl, solDbl + nMasterCols);
+      result->m_solution.push_back(solVec);
+      assert(result->m_nSolutions == 
+	     static_cast<int>(result->m_solution.size()));
+      //memcpy(result.m_solution, 
+      //     cbc.getColSolution(), 
+      //     nMasterCols * sizeof(double));
    }
 #endif
 
@@ -758,9 +765,15 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       if(status)
 	 throw UtilException("CPXgetmipobjval failure", 
                              "solutionUpdateAsIp", "DecompAlgoPC");
-      memcpy(result.m_solution, 
-             osiCpx->getColSolution(), 
-             nMasterCols * sizeof(double));
+
+      const double * solDbl = osiCpx->getColSolution();
+      vector<double> solVec(solDbl, solDbl + nMasterCols);
+      result.m_solution.push_back(solVec);
+      assert(result.m_nSolutions == 
+	     static_cast<int>(result.m_solution.size()));
+      //memcpy(result.m_solution, 
+      //     cbc.getColSolution(), 
+      //     nMasterCols * sizeof(double));
    }
 
 #endif      
@@ -773,7 +786,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       UTIL_MSG(m_param.LogLevel, 3,
                (*m_osLog) << "Solve as IP found a solution." << endl;);
       
-      recomposeSolution(result.m_solution, rsolution);            
+
+      recomposeSolution(result.getSolution(0), rsolution);
       if(!isIPFeasible(rsolution))
          throw UtilException("Recomposed solution is not feasible",
                              "solutionUpdateAsIp", "DecompAlgoPC");

@@ -428,6 +428,44 @@ void DecompAlgo::printBasisInfo(OsiSolverInterface * si,
 }
 
 //===========================================================================//
+void DecompAlgo::printCurrentProblemDual(OsiSolverInterface * si,
+					 const string         baseName,
+					 const int            nodeIndex,
+					 const int            cutPass,
+					 const int            pricePass){
+   if(!si)
+      return;
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
+   
+#ifdef __DECOMP_LP_CPX__
+   OsiCpxSolverInterface * siCpx
+      = dynamic_cast<OsiCpxSolverInterface*>(si);
+   CPXENVptr env = siCpx->getEnvironmentPtr();
+   CPXLPptr  lp  = siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+
+   string filename = DecompAlgoStr[m_algo] + "_" + baseName 
+      + ".n" + UtilIntToStr(nodeIndex)
+      + ".c" + UtilIntToStr(cutPass) 
+      + ".p" + UtilIntToStr(pricePass)
+      + ".dual.mps";
+   double objShift;
+   int status = CPXdualwrite(env, lp, filename.c_str(), &objShift);
+   if(status)
+      throw UtilException("CPXdualwrite failure", 
+			  "printCurrentProblemDual", "DecompAlgo");
+   
+   printf("objShift in dual = %g\n", objShift);
+   UTIL_DEBUG(m_param.LogDebugLevel, 3,	      
+	      (*m_osLog) << "calling CPXdualwrite filename = " 
+	      << filename << endl;
+	      );
+#endif
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+		    "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
+}
+
+//===========================================================================//
 void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const string               baseName,
                                      const int                  nodeIndex,
@@ -554,7 +592,7 @@ DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
    //---
    //--- create a results object
    //---
-   DecompSolverResult * result = new DecompSolverResult(numCols);
+   DecompSolverResult * result = new DecompSolverResult();
    
    //---
    //--- create the master problem
@@ -720,8 +758,12 @@ DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
    if(cbc.isProvenOptimal() || cbc.isSecondsLimitReached()){      
       objUB = cbc.getObjValue();
       if(result && cbc.getSolutionCount()){
-         const double * solution = cbc.getColSolution();
-         copy(solution, solution+numCols, result->m_solution);
+         const double * solDbl = cbc.getColSolution();
+	 vector<double> solVec(solDbl, solDbl + numCols);
+	 result->m_solution.push_back(solVec);
+	 assert(result->m_nSolutions == 
+		static_cast<int>(result->m_solution.size()));
+	 //copy(solution, solution+numCols, result->m_solution);
       }
    }
 
@@ -810,8 +852,12 @@ DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
                              "solveDirect", "DecompAlgoC");
 
       if(result){	 
-         const double * solution = m_masterSI->getColSolution();
-	 copy(solution, solution+numCols, result->m_solution);
+         const double * solDbl = m_masterSI->getColSolution();
+	 vector<double> solVec(solDbl, solDbl + numCols);
+	 result->m_solution.push_back(solVec);
+	 assert(result->m_nSolutions == 
+		static_cast<int>(result->m_solution.size()));
+	 //copy(solution, solution+numCols, result->m_solution);
       }
    }
 

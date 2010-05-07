@@ -38,41 +38,47 @@ class DecompSolverResult {
     * @{
     */
    //----------------------------------------------------------------------//
-public:
-   int      m_solStatus;
-   int      m_solStatus2;
-   double   m_objLB;
-   double   m_objUB;
-   bool     m_isOptimal;
-   bool     m_isCutoff;
-   int      m_nSolutions;
-   double * m_solution;
+public :
+   int       m_solStatus;
+   int       m_solStatus2;
+   double    m_objLB;
+   double    m_objUB;
+   bool      m_isOptimal;
+   bool      m_isCutoff;   
+   int       m_nSolutions;
+   vector< vector<double> > m_solution;
+   //double ** m_solution;
    /**
     * @}
     */
 
 public:
+   const double * getSolution(const int solIndex){
+      vector<double> & solution = m_solution[solIndex];
+      return &solution[0];
+   }
+
    /**
     * Default constructors.
     */   
-   DecompSolverResult(const int nOrigCols):
+   DecompSolverResult()://const int nOrigCols):
       m_solStatus (-1),
       m_solStatus2(-1),
       m_objLB     (-DecompInf),
       m_objUB     ( DecompInf),
       m_isOptimal (false),
       m_isCutoff  (false),
-      m_nSolutions(0),
-      m_solution  (0)
+      m_nSolutions(0)
+      //m_solution  (0)
    {
-      m_solution = new double[nOrigCols];
+      //m_solution = new double[nOrigCols];
    }
    
    /**
     * Destructor.
     */
    ~DecompSolverResult(){
-      UTIL_DELARR(m_solution);
+      //UTIL_DELARR(m_solution);
    }
    /**
     * @}

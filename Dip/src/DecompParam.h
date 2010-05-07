@@ -82,6 +82,7 @@ public:
    double SubProbTimeLimitExact;
    double SubProbTimeLimitInexact;
    int    SubProbNumThreads;
+   int    SubProbNumSolLimit;
    
    //This option only works with Cpx:
    // DecompDualSimplex = 0,
@@ -188,6 +189,7 @@ public:
       PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
       PARAM_getSetting("SubProbTimeLimitInexact",SubProbTimeLimitInexact);
       PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
+      PARAM_getSetting("SubProbNumSolLimit",     SubProbNumSolLimit);
       PARAM_getSetting("SubProbSolverStartAlgo",SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
@@ -271,7 +273,8 @@ public:
                          SubProbTimeLimitExact);
       UtilPrintParameter(os, sec, "SubProbTimeLimitInexact", 
                          SubProbTimeLimitInexact);
-      UtilPrintParameter(os, sec, "SubProbNumThreads", SubProbNumThreads);
+      UtilPrintParameter(os, sec, "SubProbNumThreads",  SubProbNumThreads);
+      UtilPrintParameter(os, sec, "SubProbNumSolLimit", SubProbNumSolLimit);
       UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
                          SubProbSolverStartAlgo);
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
@@ -328,6 +331,7 @@ public:
       SubProbTimeLimitExact   = COIN_DBL_MAX;
       SubProbTimeLimitInexact = COIN_DBL_MAX;
       SubProbNumThreads       = 1;
+      SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;

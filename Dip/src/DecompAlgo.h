@@ -462,6 +462,12 @@ public:
    /**
     *
     */
+   void printCurrentProblemDual(OsiSolverInterface * si,
+				const string         baseName,
+				const int            nodeIndex,
+				const int            cutPass,
+				const int            pricePass);
+
    void printCurrentProblem(const OsiSolverInterface * si,
                             const string               baseName,
                             const int                  nodeIndex,

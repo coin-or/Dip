@@ -704,8 +704,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 
   
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createMasterProblem()", m_param.LogDebugLevel, 2);
-   printf("here 1");fflush(stdout);
+		      "createMasterProblem()", m_param.LogDebugLevel, 2);  
    DecompConstraintSet * modelCore = m_modelCore.getModel();   
    assert(modelCore); //TODO - can core be empty?   
 
@@ -749,7 +748,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    if(m_param.BranchEnforceInMaster)
       coreMatrixAppendColBounds();
    nRowsCore = modelCore->getNumRows();
-   printf("here 2");fflush(stdout);
    
    //THINK - what need this for?
    //number of original core rows
@@ -778,7 +776,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //--- set the number of rows, we will add columns
    //---
    masterM->setDimensions(nRows, 0);
-   printf("here 3");fflush(stdout);
    
    //---
    //--- create artifical columns in master LP for:
@@ -794,7 +791,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Original);
-   printf("here 4");fflush(stdout);
    if(m_nRowsBranch > 0){
       startRow = m_nRowsOrig;
       endRow   = m_nRowsOrig + m_nRowsBranch;
@@ -813,7 +809,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Convex);
-   printf("here 5");fflush(stdout);
       
    int colIndex     = 0;
    int blockIndex   = 0;
@@ -903,7 +898,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
       //---
       UTIL_DELPTR(sparseCol); 
    } //END: for(li = initVars.begin(); li != initVars.end(); li++)
-   printf("here 6");fflush(stdout);
    
    //---
    //--- insert the initial set of variables into the master variable list
@@ -963,7 +957,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			   colLB, colUB, objCoeff, 
 			   &masterRowLB[0], 
 			   &masterRowUB[0]);
-   printf("here 7");fflush(stdout);
           
    //---
    //--- load column and row names to OSI
@@ -984,7 +977,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    }
    if(nColNames > 0)
       m_masterSI->setColNames(colNames, 0, nColNames, 0);
-   printf("here 8");fflush(stdout);
 
    //TODO: make a function
    UTIL_DEBUG(m_param.LogDebugLevel, 4,                 
@@ -1019,7 +1011,6 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    UTIL_DELARR(objCoeff);
    UTIL_DELARR(zeroSol);
    UTIL_DELARR(dblArrNCoreCols);
-   printf("here 9");fflush(stdout);
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createMasterProblem()", m_param.LogDebugLevel, 2);
 }
@@ -2495,7 +2486,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
       aveC = UtilAve(objCoeff, nCoreCols);
       
       attempts = 0;
-      DecompSolverResult subprobResult(nCoreCols);
+      DecompSolverResult subprobResult;//nCoreCols);
       while((nInitVars < limit) && (attempts < limit2)){         
 	 //---
 	 //--- perturb the cost vector
@@ -2636,13 +2627,16 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
       DecompAlgoC          direct(m_app, m_utilParam);
       DecompSolverResult * result = NULL;
       result = direct.solveDirect(m_param.InitVarsWithIPLimitTime);
-      if(result->m_solution){
+      if(result->m_nSolutions){
 	 //---
 	 //--- if an incumbent was found, create a var(s) from it
 	 //---
-	 if(m_numConvexCon == 1){
+	 //TODO: safe to assume 0th is the best
+	 const double * solution = result->getSolution(0);
+	 if(m_numConvexCon == 1){	
 	    DecompVar * directVar = new DecompVar(nCoreCols,
-						  result->m_solution,
+						  solution,
+						  //result->m_solution,
 						  0.0, result->m_objUB);
 	    initVars.push_back(directVar);
 	 }
@@ -2659,10 +2653,10 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	       vector<int>::iterator it;
 	       for(it  = activeColumns.begin(); 
 		   it != activeColumns.end(); it++){
-		  if(!UtilIsZero(result->m_solution[*it])){
+		  if(!UtilIsZero(solution[*it])){
 		     ind.push_back(*it);
-		     els.push_back(result->m_solution[*it]);
-		     origCost += objCoeff[*it] * result->m_solution[*it];
+		     els.push_back(solution[*it]);
+		     origCost += objCoeff[*it] * solution[*it];
 		  }
 	       }
 	       DecompVar * directVar 
@@ -2677,11 +2671,11 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	 double bestBoundUB = m_nodeStats.objBest.second;
 	 if(result->m_objUB < bestBoundUB){
 	    DecompSolution * directSol = new DecompSolution(nCoreCols,
-							    result->m_solution,
+							    solution,
 							    result->m_objUB);
 	    m_xhatIPFeas.push_back(directSol);
 	    m_xhatIPBest = directSol;
-	    setObjBoundUB(result->m_objUB);	    
+	    setObjBoundUB(result->m_objUB);
 	 }
       }
       
@@ -4272,7 +4266,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 //---    should have negative reduced cost
 	 //--- unless they have been fixed to 0 by branching
 	 //---
-	 const double * colLB = m_masterSI->getColLower();
+	 //const double * colLB = m_masterSI->getColLower();
 	 const double * colUB = m_masterSI->getColUpper();
 	 int            index = (*it)->getColMasterIndex();
 	 double         rcLPi = rcLP[index];
@@ -4423,7 +4417,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    }
    
    vector<double>     mostNegRCvec(m_numConvexCon, DecompInf);  
-   DecompSolverResult solveResult(nCoreCols);
+   DecompSolverResult solveResult;
    OsiSolverInterface          * subprobSI   = NULL;
 
    //---
@@ -5810,7 +5804,7 @@ static void * solveRelaxedThread(void * args){
       
       bool useExact  = true;
       bool useCutoff = false;
-      DecompSolverResult solveResult(nCoreCols);
+      DecompSolverResult solveResult();
 
       //too many cases where ned locks - make threaded version
       algo->solveRelaxed(redCostX,
@@ -5993,7 +5987,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //---
       
       assert(subprobSI);
-      double * milpSolution = NULL;
+
       double   rcBestCol    = DecompInf;
       
       //---
@@ -6049,11 +6043,12 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
                              alpha-DecompEpsilon);      
       
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
-      if(solveResult->m_nSolutions)
-         milpSolution = solveResult->m_solution;
+
+      //double * milpSolution = NULL;
+      //if(solveResult->m_nSolutions)
+      // milpSolution = solveResult->m_solution;
       
-      
-#ifndef RELAXED_THREADED      
+     
       //TODO:
       //     z_DW is a LB on z_IP
       //During DW we get... z*_DW + RC* <= z_DW <= z*_DW
@@ -6063,53 +6058,53 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //we can choose to stop and branch any time we want - 
       // we sometimes wait for rc=0 but really we can just look at
       // gap between DW's lb and ub... 
-      
-      
       m_isColGenExact = solveResult->m_isOptimal;
-
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		 (*m_osLog) << "m_isColGenExact = " << m_isColGenExact << endl;
 		 );
-#endif
+
       
       // THINK: we really don't want to force the user to create vars
       // and check rc and obj, etc... but they might know how to be smart
       // and produce more than one, etc... THINK
-      if(milpSolution){
-         //---
-         //--- create a DecompVar (shat) from the optimal solution      
-         //---
-         vector<int>    ind;
-         vector<double> els;
-         int    i, c;
-         double varRedCost  = 0.0; //stupid - == obj ??
-         double varOrigCost = 0.0;
-	 if(model->isSparse()){
-	    //TODO: this can just be a vector? ever need arb access?
-	    map<int,int>::const_iterator mcit;
-	    const map<int,int> & sparseToOrig = model->getMapSparseToOrig();
-	    for(mcit  = sparseToOrig.begin(); 
-		mcit != sparseToOrig.end(); mcit++){
-	       i = mcit->first;  //sparse-index
-	       c = mcit->second; //original-index	       
-	       if(!UtilIsZero(milpSolution[i], m_app->m_param.TolZero)){
-		  ind.push_back(c);				
-		  els.push_back(milpSolution[i]);	    
-		  //the reduced cost of shat: (c-uA").s
-		  varRedCost  += redCostX[c] * milpSolution[i];	    
-		  //the original cost of shat: c.s
-		  varOrigCost += origCost[c] * milpSolution[i];
-		  UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-			     (*m_osLog) << "c: " << c 
-			     << " varOrigCost = " << varOrigCost
-			     << " origCost = " << origCost[c]
+      if(solveResult->m_nSolutions){
+	 int k;
+	 for(k = 0; k < solveResult->m_nSolutions; k++){
+	    const double * milpSolution = solveResult->getSolution(k);
+	    //---
+	    //--- create a DecompVar (shat) from the optimal solution      
+	    //---
+	    vector<int>    ind;
+	    vector<double> els;
+	    int    i, c;
+	    double varRedCost  = 0.0; //stupid - == obj ??
+	    double varOrigCost = 0.0;
+	    if(model->isSparse()){
+	       //TODO: this can just be a vector? ever need arb access?
+	       map<int,int>::const_iterator mcit;
+	       const map<int,int> & sparseToOrig = model->getMapSparseToOrig();
+	       for(mcit  = sparseToOrig.begin(); 
+		   mcit != sparseToOrig.end(); mcit++){
+		  i = mcit->first;  //sparse-index
+		  c = mcit->second; //original-index	       
+		  if(!UtilIsZero(milpSolution[i], m_app->m_param.TolZero)){
+		     ind.push_back(c);				
+		     els.push_back(milpSolution[i]);	    
+		     //the reduced cost of shat: (c-uA").s
+		     varRedCost  += redCostX[c] * milpSolution[i];	    
+		     //the original cost of shat: c.s
+		     varOrigCost += origCost[c] * milpSolution[i];
+		     UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+				(*m_osLog) << "c: " << c 
+				<< " varOrigCost = " << varOrigCost
+				<< " origCost = " << origCost[c]
 			     << " solution = " << milpSolution[i] << endl;
-			     );
+				);
+		  }
 	       }
 	    }
-	 }
-	 else{
-	    for(c = 0; c < n_origCols; c++){
+	    else{
+	       for(c = 0; c < n_origCols; c++){
 	       if(!UtilIsZero(milpSolution[c], m_app->m_param.TolZero)){
 		  ind.push_back(c);
 		  els.push_back(milpSolution[c]);	    
@@ -6124,20 +6119,21 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 			     << " solution = " << milpSolution[c] << endl;
 			     );
 	       }
+	       }
 	    }
+	    varRedCost -= alpha;//RC = c-uA''s - alpha    
+	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		       (*m_osLog) << "alpha      = " << alpha << "\n";
+		       (*m_osLog) << "varRedCost = " << varRedCost << "\n";
+		       (*m_osLog) << "varOrigCost = " << varOrigCost << "\n";
+		       );
+	    
+	    DecompVar * var = new DecompVar(ind, els, varRedCost, varOrigCost);
+	    var->setBlockId(whichBlock);
+	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		       var->print(););
+	    vars.push_back(var);
 	 }
-         varRedCost -= alpha;//RC = c-uA''s - alpha    
-         UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-                    (*m_osLog) << "alpha      = " << alpha << "\n";
-                    (*m_osLog) << "varRedCost = " << varRedCost << "\n";
-                    (*m_osLog) << "varOrigCost = " << varOrigCost << "\n";
-                    );
-	    	    
-         DecompVar * var = new DecompVar(ind, els, varRedCost, varOrigCost);
-         var->setBlockId(whichBlock);
-         UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                    var->print(););
-         vars.push_back(var);
       }
    } //END:   if((rc == STAT_UNKNOWN)  || (!isExact && nNewVars <= 0)){ 
 

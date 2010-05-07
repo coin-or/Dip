@@ -74,6 +74,14 @@ private:
       //--- return the duals to be used in pricing step
       //---
       if(m_param.DualStab){
+
+	 if(m_param.LogDumpModel > 1)
+	    printCurrentProblemDual(m_masterSI,
+				    "masterProb",
+				    m_nodeStats.nodeIndex,
+				    m_nodeStats.cutCallsTotal,
+				    m_nodeStats.priceCallsTotal);
+
 	 //---
 	 //--- resize dual vectors
 	 //---
