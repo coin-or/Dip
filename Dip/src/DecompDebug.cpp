@@ -855,6 +855,7 @@ DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
          const double * solDbl = m_masterSI->getColSolution();
 	 vector<double> solVec(solDbl, solDbl + numCols);
 	 result->m_solution.push_back(solVec);
+	 result->m_nSolutions++;
 	 assert(result->m_nSolutions == 
 		static_cast<int>(result->m_solution.size()));
 	 //copy(solution, solution+numCols, result->m_solution);
