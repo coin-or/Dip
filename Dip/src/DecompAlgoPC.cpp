@@ -621,9 +621,9 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 
       const double * solDbl = cbc.getColSolution();
       vector<double> solVec(solDbl, solDbl + nMasterCols);
-      result->m_solution.push_back(solVec);
-      assert(result->m_nSolutions == 
-	     static_cast<int>(result->m_solution.size()));
+      result.m_solution.push_back(solVec);
+      assert(result.m_nSolutions == 
+	     static_cast<int>(result.m_solution.size()));
       //memcpy(result.m_solution, 
       //     cbc.getColSolution(), 
       //     nMasterCols * sizeof(double));
