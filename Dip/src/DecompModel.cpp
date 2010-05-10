@@ -456,6 +456,23 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");   
+
+
+   //---
+   //--- check the mip starts solution pool, never let it get too 
+   //---   big, and refresh it periodically - assuming that the last
+   //---   ones in the list are the last ones used - which would have the
+   //---   best potential to help warm start
+   //--- never let it get bigger than 10 solutions, 
+   //---   when refresh - keep only last 2
+   //---
+   int nMipStarts = CPXgetnummipstarts(cpxEnv, cpxLp);
+   if(nMipStarts > 10){
+      status = CPXdelmipstarts(cpxEnv, cpxLp, 0, nMipStarts-3);
+      if(status)
+	 throw UtilException("CPXdelmipstarts failure", 
+			     "solveOsiAsIp", "DecompAlgoModel");   
+   }
 #endif
    //---
    //--- solve the MILP
