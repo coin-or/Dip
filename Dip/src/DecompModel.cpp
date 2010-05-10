@@ -352,7 +352,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       const double * solDbl = cbc.getColSolution();
       vector<double> solVec(solDbl, solDbl + numCols);
       result->m_solution.push_back(solVec);
-      result->m_nSolutions++;
       //memcpy(result->m_solution, 
       //  cbc.getColSolution(), numCols * sizeof(double));
       assert(result->m_nSolutions == 
