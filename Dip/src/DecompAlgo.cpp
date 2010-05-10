@@ -4398,10 +4398,15 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       } //END: for(it = m_vars.begin(); it != m_vars.end(); it++)
    } //END: if(m_param.DebugLevel >= 1)
 
-  
-
-
-
+   //---
+   //--- ask the user which blocks should be solved
+   //---
+   vector<int> blocksToSolve;
+   //m_app->solveRelaxedWhich(blocksToSolve);
+   UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+	    (*m_osLog) << "Blocks to solve: ";
+	    UtilPrintVector(blocksToSolve, m_osLog);
+	    );
 
    //---
    //--- if doing round-robin, solve just one block unless
@@ -4414,14 +4419,15 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	      << " lastBlock= "              <<  m_rrLastBlock << endl;
 	      );
    int doAllBlocks = false;
-   if(m_rrIterSinceAll >= (m_param.RoundRobinInterval * m_numConvexCon)){
+   if(m_phase          == PHASE_PRICE1 ||
+      m_rrIterSinceAll >= (m_param.RoundRobinInterval * m_numConvexCon)){
       doAllBlocks      = true;
       m_rrIterSinceAll = 0;
    }
    
-   vector<double>     mostNegRCvec(m_numConvexCon, DecompInf);  
-   DecompSolverResult solveResult;
-   OsiSolverInterface          * subprobSI   = NULL;
+   vector<double>       mostNegRCvec(m_numConvexCon, DecompInf);  
+   DecompSolverResult   solveResult;
+   OsiSolverInterface * subprobSI   = NULL;
 
    //---
    //--- solve min{ (c - u.A'')x - alpha |  x in F'}
