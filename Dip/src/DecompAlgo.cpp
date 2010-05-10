@@ -2259,9 +2259,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_PRICE2:
       m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
 
-      m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-      //m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+      if(m_param.SolveMasterUpdateAlgo == DecompDualSimplex)
+	 m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+      else
+	 m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
 
+      //TODO: interior
 
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);

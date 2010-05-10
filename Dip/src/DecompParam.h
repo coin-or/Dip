@@ -108,6 +108,12 @@ public:
    int    SolveMasterAsIpFreqPass; //solve every n passes (within one node)
    double SolveMasterAsIpLimitTime;
    double SolveMasterAsIpLimitGap;
+
+   // DecompDualSimplex = 0,
+   // DecompPrimSimplex = 1,
+   // DecompBarrier     = 2
+   int    SolveMasterUpdateAlgo;
+   
    
    //0 = If a user function is defined, it will use the user function.
    //    If the user returns an exact solution, it will not run the built-in
@@ -193,11 +199,12 @@ public:
       PARAM_getSetting("SubProbSolverStartAlgo",SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
-      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
+      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);      
       PARAM_getSetting("SolveMasterAsIpFreqNode",SolveMasterAsIpFreqNode);
       PARAM_getSetting("SolveMasterAsIpFreqPass",SolveMasterAsIpFreqPass);
       PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
+      PARAM_getSetting("SolveMasterUpdateAlgo",    SolveMasterUpdateAlgo);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
       PARAM_getSetting("InitVarsWithCutDC",    InitVarsWithCutDC);
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
@@ -280,14 +287,21 @@ public:
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
       UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);  
       UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",  SolveMasterAsIpFreqNode);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",  SolveMasterAsIpFreqPass);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",  
+			 SolveMasterAsIpFreqNode);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",  
+			 SolveMasterAsIpFreqPass);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", 
+			 SolveMasterAsIpLimitTime);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",  
+			 SolveMasterAsIpLimitGap);
+      UtilPrintParameter(os, sec, "SolveMasterUpdateAlgo",   
+			 SolveMasterUpdateAlgo);
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
       UtilPrintParameter(os, sec, "InitVarsWithCutDC",   InitVarsWithCutDC);
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
-      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
+      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   
+			 InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
@@ -341,6 +355,7 @@ public:
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
+      SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
