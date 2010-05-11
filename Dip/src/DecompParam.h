@@ -146,6 +146,7 @@ public:
    int    BranchEnforceInSubProb;
    int    BranchEnforceInMaster;
    int    MasterConvexityLessThan; //0='E', 1='L'
+   double ParallelColsLimit;       //cosine of angle >, then consider parallel
 
    /**
     * @}
@@ -216,6 +217,7 @@ public:
       PARAM_getSetting("BranchEnforceInSubProb",  BranchEnforceInSubProb);
       PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
+      PARAM_getSetting("ParllelColsLimit",        ParallelColsLimit);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -306,12 +308,17 @@ public:
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
-      UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   BranchEnforceInSubProb);
-      UtilPrintParameter(os, sec, "BranchEnforceInMaster",    BranchEnforceInMaster);
-      UtilPrintParameter(os, sec, "MasterConvexityLessThan", MasterConvexityLessThan);
+      UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   
+                         BranchEnforceInSubProb);
+      UtilPrintParameter(os, sec, "BranchEnforceInMaster",    
+                         BranchEnforceInMaster);
+      UtilPrintParameter(os, sec, "MasterConvexityLessThan", 
+                         MasterConvexityLessThan);
+      UtilPrintParameter(os, sec, "ParallelColsLimit", 
+                         ParallelColsLimit);
       (*os) << "========================================================\n";
    }
-
+   
    void setDefaults(){
       LogLevel             = 0;
       LogDebugLevel        = 0;
@@ -366,6 +373,7 @@ public:
       BranchEnforceInSubProb   = 0;
       BranchEnforceInMaster    = 1;
       MasterConvexityLessThan  = 0;
+      ParallelColsLimit        = 0.85;
    }
    
    void dumpSettings(ostream * os = &cout){

@@ -512,7 +512,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //--- append to bottom the relax matrix/matrices
    //---  create block file (for use in MILPBlock app)
    //---
-   //#define CREATE_BLOCKFILE
+#define CREATE_BLOCKFILE
 #ifdef CREATE_BLOCKFILE
    ofstream os("blockFile.txt");
 #endif
@@ -4399,16 +4399,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    } //END: if(m_param.DebugLevel >= 1)
 
    //---
-   //--- ask the user which blocks should be solved
-   //---
-   vector<int> blocksToSolve;
-   //m_app->solveRelaxedWhich(blocksToSolve);
-   UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
-	    (*m_osLog) << "Blocks to solve: ";
-	    UtilPrintVector(blocksToSolve, m_osLog);
-	    );
-
-   //---
    //--- if doing round-robin, solve just one block unless
    //---   in PhaseI (do all blocks)
    //---   in PhaseII every n iterations (so we can get a valid update to LB)
@@ -4592,6 +4582,17 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 #endif
    }
    else{
+
+      //---
+      //--- ask the user which blocks should be solved
+      //---    
+      vector<int> blocksToSolve;
+      //m_app->solveRelaxedWhich(blocksToSolve);
+      UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+               (*m_osLog) << "Blocks to solve: ";
+               UtilPrintVector(blocksToSolve, m_osLog);
+               );
+
 
       //---
       //--- keep trying until find a block with candidate variable
@@ -4968,6 +4969,7 @@ int DecompAlgo::generateCuts(double        * xhat,
 //member of varpool versus algo class? different for DC??
 void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 
+   int                   blockIndex;
    double              * denseCol  = NULL;
    CoinPackedVector    * sparseCol = NULL;
    DecompConstraintSet * modelCore = m_modelCore.getModel();
@@ -4995,7 +4997,20 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       denseCol = new double[modelCore->getNumRows() + m_numConvexCon];
    }
 
-   int blockIndex;
+
+   //---
+   //--- is it ok to purge vars that are parallel?
+   //---   just make sure at least one gets thru so process can continue
+   //--- NOTE: in case of RoundRobin, this will cause parallel check
+   //---   to never be activated, if pull in only one col at a time
+   //---
+   
+   //---
+   //--- as soon as found one good, can purge rest
+   //---   problem is, what if cols are par, par, not-par, not-par
+   //---   then, we accept the first two, even though should not have
+   //---
+   bool foundGoodCol = false; 
    DecompVarList::iterator li;
    for(li = newVars.begin(); li != newVars.end(); li++){
       //--- 
@@ -5137,12 +5152,11 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 	    m_nodeStats.varsThisRound--;
 	 }
 	 continue;
-      }
-
+      }   
 
       if(m_varpool.isDuplicate(waitingCol)){
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		    (*m_osLog) << "Duplicate variable, already in var pool\n";
+		    (*m_osLog) << "Duplicate variable, already in var pool.\n";
 		    );
 	 waitingCol.deleteVar();
 	 waitingCol.deleteCol();
@@ -5150,13 +5164,33 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 	    m_nodeStats.varsThisCall--;
 	    m_nodeStats.varsThisRound--;
 	 }
+         continue;
       }
-      else{      
-	 m_varpool.push_back(waitingCol);
+      
+      //---
+      //--- check to see if this var is parallel to the ones in LP
+      //---   cosine=1.0 means the vars are exactly parallel
+      //---
+      if(foundGoodCol &&
+         m_varpool.isParallel(m_vars, waitingCol, m_param.ParallelColsLimit)){
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog) << "Parallel variable, already in vars.\n";
+		    );
+	 waitingCol.deleteVar();
+	 waitingCol.deleteCol();
+	 if(m_algo != RELAX_AND_CUT){ //??
+	    m_nodeStats.varsThisCall--;
+	    m_nodeStats.varsThisRound--;
+	 }
+         continue;
       }
+      
+      //---
+      //--- passed all filters, add the column to var pool
+      //---
+      m_varpool.push_back(waitingCol);
+      foundGoodCol = true;
    } //END: for(li = newVars.begin(); li != newVars.end(); li++)
-
-   //printf("varpool size=%d\n", m_varpool.size());
 
    UTIL_DELARR(denseCol);
    UtilPrintFuncEnd(m_osLog, m_classTag,

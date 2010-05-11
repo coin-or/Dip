@@ -16,28 +16,24 @@
 #ifndef DECOMP_WAITING_COL_INCLUDE
 #define DECOMP_WAITING_COL_INCLUDE
 
-//class DecompVar;
 #include "Decomp.h"
 #include "DecompVar.h"
 #include "UtilMacros.h"
 
 // ---------------------------------------------------------------------- //
 class DecompWaitingCol {
- private:
-  //THINK
-  //DecompWaitingCol & operator=(const DecompWaitingCol &);
 
  private:
   DecompVar        * m_var;  //s        the variable
   CoinPackedVector * m_col;  //(A'' s)  the column
   
  public:
-  inline DecompVar          * getVarPtr() const      { return m_var; }
-  inline CoinPackedVector * getColPtr() const      { return m_col; }
-  inline const double getReducedCost() const {return m_var->getReducedCost();}
-  inline const double getLowerBound() const { return m_var->getLowerBound(); }
-  inline const double getUpperBound() const { return m_var->getUpperBound(); }
-  inline const double getOrigCost() const { return m_var->getOriginalCost(); }
+  inline DecompVar        * getVarPtr() const { return m_var; }
+  inline CoinPackedVector * getColPtr() const { return m_col; }
+  inline const double getReducedCost() const  { return m_var->getReducedCost();}
+  inline const double getLowerBound() const   { return m_var->getLowerBound(); }
+  inline const double getUpperBound() const   { return m_var->getUpperBound(); }
+  inline const double getOrigCost() const     { return m_var->getOriginalCost(); }
   
   inline void   deleteCol() { UTIL_DELPTR(m_col); }
   inline void   deleteVar() { UTIL_DELPTR(m_var); }

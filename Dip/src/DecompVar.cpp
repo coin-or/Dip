@@ -34,8 +34,6 @@ bool DecompVar::doesSatisfyBounds(int                     denseLen,
    map<int,int>::const_iterator mcit;
    DecompConstraintSet * modelRelax    = model.getModel();
    const vector<int>  & activeColumns  = modelRelax->getActiveColumns();
-   //bool                 isSparse       = modelRelax->isSparse();
-   //const map<int,int> & origToSparse   = modelRelax->getMapOrigToSparse();
 
    //---
    //--- activeColumns are in original space
@@ -45,28 +43,8 @@ bool DecompVar::doesSatisfyBounds(int                     denseLen,
    for(it = activeColumns.begin(); it != activeColumns.end(); it++){
       j  = *it;
       xj = denseArr[j];
-
-      //if(isSparse){
-	 //---
-	 //--- *it is original space (lbs, ubs, denseArr)
-	 //---   j is sparse space   
-         //---
-      // mcit = origToSparse.find(*it);
-      // j    = mcit->second;
-      // xj   = denseArr[j];
-      // lb   = lbs[*it];
-      // ub   = ubs[*it];
-      //printf("isSparse orig:%d sparse:%d xj:%g\n",
-      //	*it, j, xj);
-      //}
-      //else{
-      //  j  = *it;
-      //  xj = denseArr[j];
-      //      
       if(xj < (lbs[j] - DecompEpsilon) ||
 	 xj > (ubs[j] + DecompEpsilon)){
-	 //printf("FALSE j:%d xj:%g lb:%g ub:%g\n",
-	 //j, xj, lbs[j], ubs[j]);
 	 return false;	 
       }
    }

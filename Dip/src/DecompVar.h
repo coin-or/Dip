@@ -41,6 +41,7 @@ private:
    string           m_strHash;
    int              m_blockId;
    int              m_colMasterIndex;
+   double           m_norm;
   
 public:
    inline double getOriginalCost()   const { return m_origCost;}
@@ -51,6 +52,7 @@ public:
    inline string getStrHash()        const { return m_strHash; }
    inline int    getBlockId()        const { return m_blockId; }
    inline int    getColMasterIndex() const { return m_colMasterIndex; }
+   inline double getNorm()           const { return m_norm; }
 
    inline void   setColMasterIndex(const int colIndex)  {
       m_colMasterIndex = colIndex;
@@ -79,6 +81,14 @@ public:
        Return the new effectiveness count. */
    inline void decreaseEffCnt() {
       m_effCnt = m_effCnt >= 0 ? -1 : m_effCnt - 1;
+   }
+
+   inline double calcNorm(){
+      return m_norm = m_s.twoNorm();
+   }
+
+   inline void sortVar(){
+      m_s.sortIncrIndex();
    }
 
    bool   isEquivalent(const DecompVar & dvar){ 
@@ -118,7 +128,8 @@ public:
       m_effCnt  (source.m_effCnt),
       m_strHash (source.m_strHash),
       m_blockId (source.m_blockId),
-      m_colMasterIndex (source.m_colMasterIndex)
+      m_colMasterIndex (source.m_colMasterIndex),
+      m_norm    (source.m_norm)
    {}
 
    DecompVar & operator=(const DecompVar & rhs)
@@ -142,7 +153,8 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {}
 
    DecompVar(const vector<int>    & ind, 
@@ -155,7 +167,8 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {      
       if(ind.size() > 0){
          m_s.setConstant(static_cast<int>(ind.size()), 
@@ -163,6 +176,8 @@ public:
 	 
          m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
                                           &ind[0], els);
+         m_norm    = calcNorm();
+         sortVar();
       }
    }
 
@@ -176,7 +191,8 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0) 
    {      
       if(ind.size() > 0){
          m_s.setVector(static_cast<int>(ind.size()), 
@@ -184,6 +200,8 @@ public:
 	 
          m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
                                           &ind[0], &els[0]);
+         m_norm    = calcNorm();
+         sortVar();
       }
    }
 
@@ -197,11 +215,14 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {
       if(len > 0){
          m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
          m_strHash = UtilCreateStringHash(len, ind, els);
+         m_norm    = calcNorm();
+         sortVar();
       }
    }
 
@@ -217,11 +238,14 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {
       if(len > 0){
          m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
          m_strHash = UtilCreateStringHash(len, ind, els);
+         m_norm    = calcNorm();
+         sortVar();
       }
    }
 
@@ -235,11 +259,14 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {
       if(len > 0){
          m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
          m_strHash = UtilCreateStringHash(len, ind, els);
+         m_norm    = calcNorm();
+         sortVar();
       }
    }
 
@@ -254,11 +281,14 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {
       if(len > 0){
          m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
          m_strHash = UtilCreateStringHash(len, ind, els);
+         m_norm    = calcNorm();
+         sortVar();
       }
    }
    
@@ -272,11 +302,15 @@ public:
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
-      m_colMasterIndex(-1)
+      m_colMasterIndex(-1),
+      m_norm    (0.0)
    {
       UtilPackedVectorFromDense(denseLen, denseArray, DecompEpsilon, m_s);
-      if(m_s.getNumElements() > 0)
+      if(m_s.getNumElements() > 0){
          m_strHash = UtilCreateStringHash(denseLen, denseArray);
+         m_norm    = calcNorm();
+         sortVar();
+      }
    }
   
    virtual ~DecompVar(){};

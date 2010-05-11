@@ -210,6 +210,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    CbcModel cbc(*m_osi);
    CbcMain0(cbc);
 
+
+   //int i;
+   //const double * colUB = cbc.getColUpper();
+   //for(i = 0; i < cbc.getNumCols(); i++){
+   //  printf("col %d -> ub: %g\n",
+   //         i, colUB[i]);
+   //}
+
    //---
    //--- build argument list
    //---
