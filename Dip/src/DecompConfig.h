@@ -81,4 +81,8 @@
 
 #endif /* HAVE_CONFIG_H */
 
+#ifndef DIP_VERSION
+#define DIP_VERSION "trunk"
+#endif
+
 #endif /*__DECOMPCONFIG_H__ */

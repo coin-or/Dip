@@ -21,7 +21,6 @@
 
 // =========================================================================
 #include "Decomp.h"
-#include "DecompConfig.h"
 #include "CoinError.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinHelperFunctions.hpp"

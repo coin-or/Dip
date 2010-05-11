@@ -421,10 +421,10 @@ includecoindir = $(includedir)/coin
 # other 
 
 # Util
-includecoin_HEADERS = ../inc/config_dip.h DecompAlgo.h DecompAlgoC.h \
-	DecompAlgoD.h DecompAlgoPC.h DecompAlgoRC.h DecompAlgoCGL.h \
-	DecompCut.h DecompCutOsi.h DecompCutPool.h DecompApp.h \
-	Decomp.h DecompStats.h DecompModel.h DecompParam.h DecompVar.h \
+includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
+	DecompAlgoPC.h DecompAlgoRC.h DecompAlgoCGL.h DecompCut.h \
+	DecompCutOsi.h DecompCutPool.h DecompApp.h Decomp.h \
+	DecompStats.h DecompModel.h DecompParam.h DecompVar.h \
 	DecompVarPool.h DecompMemPool.h DecompSolution.h \
 	DecompSolverResult.h DecompConstraintSet.h DecompWaitingCol.h \
 	DecompWaitingRow.h UtilGraphLib.h UtilHash.h UtilMacros.h \
@@ -629,7 +629,6 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../inc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -755,9 +754,6 @@ uninstall-am: uninstall-includecoinHEADERS uninstall-info-am \
 
 
 install-exec-local:
-	echo "#ifndef HAVE_CONFIG_H" >bla
-	echo "#define HAVE_CONFIG_H" >>bla
-	echo "#endif" >> bla
 	cat $(srcdir)/$(ConfigHeader) >> bla
 	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 	rm -f bla
