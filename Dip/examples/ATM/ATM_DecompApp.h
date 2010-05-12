@@ -95,13 +95,15 @@ public:
       //---       x1[a,t] in {0,1}, z[a,t] >= 0
       int nAtms  = m_instance.getNAtms();
       int nPairs = m_instance.getNPairs();
-      int nSteps = m_appParam.NumSteps;
-      int nCols  = (2 * (nAtms*nSteps + nPairs + nAtms)) + nPairs;
+      int nCols  = (2 * (getNAtmsSteps() + nPairs + nAtms)) + nPairs;
       return nCols;
    }
    
    inline const int getNAtmsSteps() const {
-      return m_instance.getNAtms() * m_appParam.NumSteps;
+      if(m_appParam.UseTightModel)
+	 return m_instance.getNAtms() * (m_appParam.NumSteps+1);
+      else
+	 return m_instance.getNAtms() * m_appParam.NumSteps;
    }
    
    //---
@@ -141,10 +143,16 @@ public:
    }
 
    inline const int colIndex_x1(const int a, const int t) const {
-      return getColOffset_x1() + ((a * m_appParam.NumSteps) + t);
+      int tLen = m_appParam.NumSteps;
+      if(m_appParam.UseTightModel)
+	 tLen++;
+      return getColOffset_x1() + ((a * tLen) + t);
    }
    inline const int colIndex_z(const int a, const int t) const {
-      return getColOffset_z() + ((a * m_appParam.NumSteps) + t);
+      int tLen = m_appParam.NumSteps;
+      if(m_appParam.UseTightModel)
+	 tLen++;
+      return getColOffset_z() + ((a * tLen) + t);
    }
    inline const int colIndex_fp(const int pairIndex) const {
       return getColOffset_fp() + pairIndex;         

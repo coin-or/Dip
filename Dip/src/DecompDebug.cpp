@@ -428,6 +428,44 @@ void DecompAlgo::printBasisInfo(OsiSolverInterface * si,
 }
 
 //===========================================================================//
+void DecompAlgo::printCurrentProblemDual(OsiSolverInterface * si,
+					 const string         baseName,
+					 const int            nodeIndex,
+					 const int            cutPass,
+					 const int            pricePass){
+   if(!si)
+      return;
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
+   
+#ifdef __DECOMP_LP_CPX__
+   OsiCpxSolverInterface * siCpx
+      = dynamic_cast<OsiCpxSolverInterface*>(si);
+   CPXENVptr env = siCpx->getEnvironmentPtr();
+   CPXLPptr  lp  = siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+
+   string filename = DecompAlgoStr[m_algo] + "_" + baseName 
+      + ".n" + UtilIntToStr(nodeIndex)
+      + ".c" + UtilIntToStr(cutPass) 
+      + ".p" + UtilIntToStr(pricePass)
+      + ".dual.mps";
+   double objShift;
+   int status = CPXdualwrite(env, lp, filename.c_str(), &objShift);
+   if(status)
+      throw UtilException("CPXdualwrite failure", 
+			  "printCurrentProblemDual", "DecompAlgo");
+   
+   printf("objShift in dual = %g\n", objShift);
+   UTIL_DEBUG(m_param.LogDebugLevel, 3,	      
+	      (*m_osLog) << "calling CPXdualwrite filename = " 
+	      << filename << endl;
+	      );
+#endif
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+		    "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
+}
+
+//===========================================================================//
 void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const string               baseName,
                                      const int                  nodeIndex,
@@ -454,8 +492,11 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 	      (*m_osLog) << "calling writeLp  filename = " << filename << endl;
 	      );
    if(printMps){
-      si->writeMpsNative(filename.c_str(), NULL, NULL, 2);
-      //si->writeMps(filename.c_str());
+#ifdef __DECOMP_IP_CPX__
+      si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
+#else
+      si->writeMps(filename.c_str());
+#endif
    }
    if(printLp)      
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
@@ -469,8 +510,16 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const bool                 printMps,
                                      const bool                 printLp){
    string filename = fileName; 
-   if(printMps)
+   if(printMps){
+      //const char ** rowNames = NULL;
+      //const char ** colNames = NULL;
+      //TODO: col/row names have to explicitly pass in
+#ifdef __DECOMP_IP_CPX__
+      si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
+#else
       si->writeMps(filename.c_str());
+#endif
+   }
    if(printLp)
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
 }
@@ -512,9 +561,9 @@ void DecompAlgo::printCuts(ostream * os){
 }
 
 //===========================================================================//
-void DecompAlgoC::solveDirect(int                  timeLimit,
-			      DecompSolverResult * result){
-
+DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
+					      const DecompSolution * startSol){
+					       
    //---
    //--- Solve the original IP with a generic IP solver.
    //---
@@ -539,6 +588,11 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
    //--- start timer
    //---
    UtilTimer timer; timer.start();
+
+   //---
+   //--- create a results object
+   //---
+   DecompSolverResult * result = new DecompSolverResult();
    
    //---
    //--- create the master problem
@@ -555,6 +609,91 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
    //---  
    for(i = 0; i < numInts; i++)
       m_masterSI->setInteger(modelCore->integerVars[i]);
+
+
+   //#define PERMUTE_STUFF
+   /*#ifdef  PERMUTE_STUFF
+
+   //---
+   //--- randomly permute rows and cols for MIPLIB2010
+   //---    delete random rows, append to end
+   //---    delete random cols, append to end
+   //---
+   {
+   int k, r, c, tmp;
+   int nCols         = m_masterSI->getNumCols();
+   int nRows         = m_masterSI->getNumRows();
+   int rowsToPermute = static_cast<int>(nRows / 7);
+   int colsToPermute = static_cast<int>(nCols / 7);     
+   vector<int>  newRowInd; //old row to new row index
+   int rowToDelete[1];
+   int colToDelete[1];
+   
+   srand(1);
+   for(i = 0; i < nRows; i++){
+   newRowInd.push_back(i);
+   }
+   for(i = 0; i < rowsToPermute; i++){
+   r = UtilURand(0, nRows-1);
+   //---
+   //--- Example:
+   //---     0,1,2,3,4,5,6 (r=2)
+   //---  -> 0,1,3,4,5,6,2
+   //---
+   tmp = newRowInd[r];
+   for(k = r; k < (nRows-1); k++){
+   newRowInd[k] = newRowInd[k+1];
+   }
+   newRowInd[nRows-1] = tmp;
+   
+   const CoinPackedMatrix * M     = m_masterSI->getMatrixByRow();
+   const double           * rowLB = m_masterSI->getRowLower();
+   const double           * rowUB = m_masterSI->getRowUpper();
+   const double             rLB   = rowLB[r];
+   const double             rUB   = rowUB[r];
+   CoinShallowPackedVector vecS = M->getVector(r);
+   CoinPackedVector        vec(vecS);
+   //printf("delete and move to end row r=%d %s\n", 
+   //     r, m_masterSI->getRowName(r).c_str());
+   //vec.print();
+   
+   rowToDelete[0] = r;
+   m_masterSI->deleteRows(1, rowToDelete);
+   m_masterSI->addRow(vec, rLB, rUB);	 
+   }
+   
+   for(i = 0; i < colsToPermute; i++){
+   c = UtilURand(0, nCols-1);
+   //---
+   //--- Example:
+   //---     0,1,2,3,4,5,6 (r=2)
+   //---  -> 0,1,3,4,5,6,2
+   //---
+   const CoinPackedMatrix * M     = m_masterSI->getMatrixByCol();
+   const double           * colLB = m_masterSI->getColLower();
+   const double           * colUB = m_masterSI->getColUpper();
+   const double           * objC  = m_masterSI->getObjCoefficients();
+   const double             cLB   = colLB[c];
+   const double             cUB   = colUB[c];
+   const double             obj   = objC[c];
+   const CoinShallowPackedVector vecS = M->getVector(c);
+   CoinPackedVector              vec(vecS);
+   
+   /////////// THIS IS WRONG ///////////
+   //TODO: copy integer info!
+   
+   colToDelete[0] = c;
+   m_masterSI->deleteCols(1, colToDelete);
+   m_masterSI->addCol(vec, cLB, cUB, obj);	 
+   }
+   
+   printf("\n\nNew Row Map\n");
+   for(i = 0; i < nRows; i++){
+   printf("%10d%10d\n", i, newRowInd[i]);
+   }
+   }
+   #endif   */
+
    
    //---
    //--- dump full milp
@@ -619,8 +758,12 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
    if(cbc.isProvenOptimal() || cbc.isSecondsLimitReached()){      
       objUB = cbc.getObjValue();
       if(result && cbc.getSolutionCount()){
-         const double * solution = cbc.getColSolution();
-         copy(solution, solution+numCols, result->m_solution);
+         const double * solDbl = cbc.getColSolution();
+	 vector<double> solVec(solDbl, solDbl + numCols);
+	 result->m_solution.push_back(solVec);
+	 assert(result->m_nSolutions == 
+		static_cast<int>(result->m_solution.size()));
+	 //copy(solution, solution+numCols, result->m_solution);
       }
    }
 
@@ -640,6 +783,24 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
    CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
    CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
    int       status = 0;
+
+   masterSICpx->switchToMIP();//need?
+
+   if(startSol){
+      int            nCols    = masterSICpx->getNumCols();
+      int            beg[1]   = {0};
+      int          * varInd   = new int[nCols];
+      const double * solution = startSol->getValues();
+      assert(nCols == startSol->getSize());
+      UtilIotaN(varInd, nCols, 0);
+      status = CPXaddmipstarts(cpxEnv, cpxLp,
+			       1, nCols, beg, varInd, solution, NULL, NULL);
+      if(status)
+	 throw UtilException("CPXaddmipstarts failure", 
+			     "solveDirect", "DecompAlgoC");
+      UTIL_DELARR(varInd);
+   }
+
 
    //---
    //--- set the time limit
@@ -691,8 +852,13 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
                              "solveDirect", "DecompAlgoC");
 
       if(result){	 
-         const double * solution = m_masterSI->getColSolution();
-	 copy(solution, solution+numCols, result->m_solution);
+         const double * solDbl = m_masterSI->getColSolution();
+	 vector<double> solVec(solDbl, solDbl + numCols);
+	 result->m_solution.push_back(solVec);
+	 result->m_nSolutions++;
+	 assert(result->m_nSolutions == 
+		static_cast<int>(result->m_solution.size()));
+	 //copy(solution, solution+numCols, result->m_solution);
       }
    }
 
@@ -728,5 +894,7 @@ void DecompAlgoC::solveDirect(int                  timeLimit,
               << endl;
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveDirect()", m_param.LogDebugLevel, 2);  
+
+   return result;
 }
 

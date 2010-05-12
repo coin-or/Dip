@@ -74,6 +74,14 @@ private:
       //--- return the duals to be used in pricing step
       //---
       if(m_param.DualStab){
+
+	 if(m_param.LogDumpModel > 1)
+	    printCurrentProblemDual(m_masterSI,
+				    "masterProb",
+				    m_nodeStats.nodeIndex,
+				    m_nodeStats.cutCallsTotal,
+				    m_nodeStats.priceCallsTotal);
+
 	 //---
 	 //--- resize dual vectors
 	 //---
@@ -81,16 +89,38 @@ private:
 	 m_dual.resize(nRows);
 	 m_dualRM.resize(nRows);
 	 m_dualST.resize(nRows);
-	 
+
+	 printf("cutCallsTotal=%d, priceCallsTotal=%d\n",
+		m_nodeStats.cutCallsTotal,
+		m_nodeStats.priceCallsTotal);
 	 //---
 	 //--- calculate smoothed dual
 	 //---    pi_ST = alpha * pi_Bar + (1-alpha) * pi_RM
+	 //--- this is dual feasible because it is taking
+	 //---    a convex combination of previously dual feasible
+	 //---    vectors
+	 //--- need to be careful here, as the init dual is 0, which
+	 //---    might not be dual feasible, therefore, in the first
+	 //---    iteration, we need to skip the smoothing and enforce
+	 //---    that the first dual be set to dualRM
 	 //---
 	 int            r;
 	 const double * u      = &m_dualSolution[0];
 	 double         alpha  = m_param.DualStabAlpha;
 	 double         alpha1 = 1.0 - alpha; 
 	 copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+
+	 //---
+	 //--- for both the first PhaseI and first PhaseII calls,
+	 //---   be sure to set the dual vector to dualRM as dual=0
+	 //---   might not be feasible
+	 //---
+	 if(((m_nodeStats.cutCallsTotal + 
+	      m_nodeStats.priceCallsTotal) == 1) || m_firstPhase2Call){
+	    (*m_osLog) << "Init dual to dualRM" << endl;
+	    copy(m_dualRM.begin(), m_dualRM.end(), m_dual.begin());
+	 }
+	 
 	 for(r = 0; r < nRows; r++){
 	    m_dualST[r] = (alpha * m_dual[r]) + (alpha1 * m_dualRM[r]);
 	 }      
@@ -126,7 +156,10 @@ private:
    }
    
 
-   virtual void setObjBoundLB(const double thisBound){
+   virtual void setObjBoundLB(const double thisBound,
+			      const double thisBoundUB){
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
       if(m_param.DualStab){
 	 if(thisBound > m_nodeStats.objBest.first){
 	    (*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
@@ -134,7 +167,9 @@ private:
 	    copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
 	 }
       }
-      DecompAlgo::setObjBoundLB(thisBound);
+      DecompAlgo::setObjBoundLB(thisBound, thisBoundUB);
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
    }
    
    /**

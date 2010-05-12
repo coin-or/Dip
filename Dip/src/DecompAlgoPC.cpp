@@ -159,14 +159,8 @@ int DecompAlgoPC::compressColumns(){
 
    m_stats.timerOther1.reset();
 
-   //TODO: make parameters
-
-   const int      CompressColsIterFreq      = 10; //every 10 iterations, or
-   //  if this is small? can get in infy loop?
-   // even at size 10! we can get into an infy loop... 
-   // how to detect?
- 
-   const double   CompressColsSizeMultLimit = 2.0;
+   const int      CompressColsIterFreq      = m_param.CompressColumnsIterFreq; 
+   const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
    const int      nMasterCols               = m_masterSI->getNumCols();
    const int      nMasterRows               = m_masterSI->getNumRows();
    const double * masterSolution            = getMasterPrimalSolution();
@@ -262,10 +256,15 @@ int DecompAlgoPC::compressColumns(){
 	      printVars(m_osLog););
    
    DecompVarList::iterator li = m_vars.begin();            
+   int nCols       = 0;
+   int nColsNoDel  = 0;
+   int nColsBasic  = 0;
+   int nColsEffPos = 0;
    while(li != m_vars.end()){
       colMasterIndex             = (*li)->getColMasterIndex();
       indexShift[colMasterIndex] = shift;
       assert(isMasterColStructural(colMasterIndex));
+      nCols++;
 
       //---
       //--- do not delete any columns that were marked "NoDelete" 
@@ -274,6 +273,7 @@ int DecompAlgoPC::compressColumns(){
       //---
       if(m_masterColType[colMasterIndex] == DecompCol_Structural_NoDelete){
 	 li++;
+	 nColsNoDel++;
 	 continue;
       }
 
@@ -281,6 +281,11 @@ int DecompAlgoPC::compressColumns(){
       //--- do not delete any columns that are basic
       //--- do not delete any columns with non-negative effectiveness
       //---
+      if(isBasic[colMasterIndex])
+	 nColsBasic++;
+      if((*li)->getEffectiveness() >= 0)
+	 nColsEffPos++;
+
       if(isBasic[colMasterIndex] || ((*li)->getEffectiveness() >= 0)){
 	 li++;
 	 continue;
@@ -317,12 +322,17 @@ int DecompAlgoPC::compressColumns(){
 
       m_masterSI->deleteCols(static_cast<int>(lpColsToDelete.size()), 
 			     &lpColsToDelete[0]);
-
+      
       m_cutpool.setRowsAreValid(false);
-      UTIL_DEBUG(m_param.LogLevel, 3,
-		 (*m_osLog) << "Num Columns Deleted = " 
-		 << lpColsToDelete.size() << endl;
-		 );
+      UTIL_MSG(m_param.LogLevel, 3,
+	       (*m_osLog) << "Num Columns Deleted = " 
+	       << lpColsToDelete.size() 
+	       << " Cols = " << nCols
+	       << " NoDel = " << nColsNoDel
+	       << " Basic = " << nColsBasic
+	       << " EffPos = " << nColsEffPos
+	       << endl;
+	       );
 
 
 
@@ -479,7 +489,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       assert(mit != m_modelRelax.end());      
       DecompAlgoModel     & algoModel = (*mit).second;
       DecompConstraintSet * model     = algoModel.getModel();
-      if(( model->m_masterOnly && model->m_masterOnlyIsInt) ||
+      //if(( model->m_masterOnly && model->m_masterOnlyIsInt) ||
+      if(( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
          (!model->m_masterOnly && model->getNumInts() == 0)){
          m_masterSI->setContinuous((*li)->getColMasterIndex());
          printf("set back to continuous index=%d block=%d\n",
@@ -495,7 +506,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 			  m_nodeStats.priceCallsTotal);
 
    DecompConstraintSet * modelCore = m_modelCore.getModel();
-   DecompSolverResult    result(m_masterSI->getNumCols());;
+   //DecompSolverResult    result(m_masterSI->getNumCols());
+   DecompSolverResult    result;
 
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
@@ -604,11 +616,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //--- get copy of solution
    //---
    result.m_objLB = cbc.getBestPossibleObjValue();
-   if(result.m_nSolutions >= 1){
+   if(nSolutions >= 1){
       result.m_objUB = cbc.getObjValue();
-      memcpy(result.m_solution, 
-             cbc.getColSolution(), 
-             nMasterCols * sizeof(double));
+
+      const double * solDbl = cbc.getColSolution();
+      vector<double> solVec(solDbl, solDbl + nMasterCols);
+      result.m_solution.push_back(solVec);
+      assert(result.m_nSolutions == 
+	     static_cast<int>(result.m_solution.size()));
+      //memcpy(result.m_solution, 
+      //     cbc.getColSolution(), 
+      //     nMasterCols * sizeof(double));
    }
 #endif
 
@@ -645,12 +663,28 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 	 throw UtilException("CPXsetintparam failure", 
 			     "solveOsiAsIp", "DecompAlgoModel");
    }
-   status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
-                           m_param.SolveMasterAsIpLimitGap);
+   if(m_firstPhase2Call){
+      //---
+      //--- if calling with first Phase2 call, it is meant to 
+      //---   "recombine" partial columns - i.e., if the user
+      //---   produced a fully feasible solution that was then
+      //---   separated into blocks - we want to be sure it 
+      //---   at least recombines it
+      //--- so, make the stop on gap very small
+      //---
+      //--- TODO: we should get this incumbent in the system without
+      //--- forcing the call to IP solver just to recombine
+      //---
+      status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 0.005); //0.5%
+   }
+   else{
+      status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 
+			      m_param.SolveMasterAsIpLimitGap);
+   }
    if(status)
       throw UtilException("CPXsetdblparam failure", 
-                          "solutionUpdateAsIp", "DecompAlgoPC");
-
+			  "solutionUpdateAsIp", "DecompAlgoPC");
+   
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
                            m_param.SolveMasterAsIpLimitTime);
    if(status)
@@ -661,6 +695,13 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    if(status)
       throw UtilException("CPXsetdblparam failure", 
                           "solutionUpdateAsIp", "DecompAlgoPC");
+
+#if CPX_VERSION >= 1100
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
+   if(status)
+      throw UtilException("CPXsetintparam failure", 
+			  "solutionUpdateAsIp", "DecompAlgoPC");
+#endif
       
    //---
    //--- solve the MILP
@@ -672,6 +713,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    result.m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result.m_solStatus2 = 0;
+   cout << "CPX IP solver status = " << result.m_solStatus << endl;
 
    const int statusSet[5] = {CPXMIP_OPTIMAL,
 			     CPXMIP_OPTIMAL_TOL,
@@ -723,9 +765,15 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       if(status)
 	 throw UtilException("CPXgetmipobjval failure", 
                              "solutionUpdateAsIp", "DecompAlgoPC");
-      memcpy(result.m_solution, 
-             osiCpx->getColSolution(), 
-             nMasterCols * sizeof(double));
+
+      const double * solDbl = osiCpx->getColSolution();
+      vector<double> solVec(solDbl, solDbl + nMasterCols);
+      result.m_solution.push_back(solVec);
+      assert(result.m_nSolutions == 
+	     static_cast<int>(result.m_solution.size()));
+      //memcpy(result.m_solution, 
+      //     cbc.getColSolution(), 
+      //     nMasterCols * sizeof(double));
    }
 
 #endif      
@@ -738,7 +786,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       UTIL_MSG(m_param.LogLevel, 3,
                (*m_osLog) << "Solve as IP found a solution." << endl;);
       
-      recomposeSolution(result.m_solution, rsolution);            
+
+      recomposeSolution(result.getSolution(0), rsolution);
       if(!isIPFeasible(rsolution))
          throw UtilException("Recomposed solution is not feasible",
                              "solutionUpdateAsIp", "DecompAlgoPC");

@@ -63,6 +63,8 @@ public:
    double MasterGapLimit;
 
    int    CompressColumns;
+   int    CompressColumnsIterFreq;     //num iters between compress
+   double CompressColumnsSizeMultLimit;//don't compress unless number of cols increased by this mult
    int    CutDC;
    int    CutCGL;
    
@@ -77,6 +79,16 @@ public:
 
    double SubProbGapLimitExact;
    double SubProbGapLimitInexact;
+   double SubProbTimeLimitExact;
+   double SubProbTimeLimitInexact;
+   int    SubProbNumThreads;
+   int    SubProbNumSolLimit;
+   
+   //This option only works with Cpx:
+   // DecompDualSimplex = 0,
+   // DecompPrimSimplex = 1,
+   // DecompBarrier     = 2
+   int    SubProbSolverStartAlgo;
 
    //n = 0: do all blocks each time
    //n > 0: do all blocks every n*numBlocks iterations
@@ -96,6 +108,12 @@ public:
    int    SolveMasterAsIpFreqPass; //solve every n passes (within one node)
    double SolveMasterAsIpLimitTime;
    double SolveMasterAsIpLimitGap;
+
+   // DecompDualSimplex = 0,
+   // DecompPrimSimplex = 1,
+   // DecompBarrier     = 2
+   int    SolveMasterUpdateAlgo;
+   
    
    //0 = If a user function is defined, it will use the user function.
    //    If the user returns an exact solution, it will not run the built-in
@@ -125,7 +143,10 @@ public:
    //string IpAlgoStart;
    //string IpAlgoSub;
 
-   int    BranchNew; //{0,1}
+   int    BranchEnforceInSubProb;
+   int    BranchEnforceInMaster;
+   int    MasterConvexityLessThan; //0='E', 1='L'
+   double ParallelColsLimit;       //cosine of angle >, then consider parallel
 
    /**
     * @}
@@ -159,6 +180,8 @@ public:
       PARAM_getSetting("TailoffPercent",       TailoffPercent);       
       PARAM_getSetting("MasterGapLimit",       MasterGapLimit);
       PARAM_getSetting("CompressColumns",      CompressColumns);       
+      PARAM_getSetting("CompressColumnsIterFreq",      CompressColumnsIterFreq);       
+      PARAM_getSetting("CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);       
       PARAM_getSetting("CutDC",                CutDC);
       PARAM_getSetting("CutCGL",               CutCGL);
       PARAM_getSetting("CutCglKnapC",          CutCglKnapC);
@@ -170,13 +193,19 @@ public:
       PARAM_getSetting("SubProbUseCutoff",     SubProbUseCutoff);
       PARAM_getSetting("SubProbGapLimitExact", SubProbGapLimitExact);
       PARAM_getSetting("SubProbGapLimitInexact",SubProbGapLimitInexact);
+      PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
+      PARAM_getSetting("SubProbTimeLimitInexact",SubProbTimeLimitInexact);
+      PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
+      PARAM_getSetting("SubProbNumSolLimit",     SubProbNumSolLimit);
+      PARAM_getSetting("SubProbSolverStartAlgo",SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
-      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
+      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);      
       PARAM_getSetting("SolveMasterAsIpFreqNode",SolveMasterAsIpFreqNode);
       PARAM_getSetting("SolveMasterAsIpFreqPass",SolveMasterAsIpFreqPass);
       PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
+      PARAM_getSetting("SolveMasterUpdateAlgo",    SolveMasterUpdateAlgo);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
       PARAM_getSetting("InitVarsWithCutDC",    InitVarsWithCutDC);
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
@@ -185,9 +214,10 @@ public:
       PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
       PARAM_getSetting("BreakOutPartial",      BreakOutPartial);
-      PARAM_getSetting("BranchNew",            BranchNew);
-      //PARAM_getSetting("IpAlgoStart",          IpAlgoStart);
-      //PARAM_getSetting("IpAlgoSub",            IpAlgoSub);
+      PARAM_getSetting("BranchEnforceInSubProb",  BranchEnforceInSubProb);
+      PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
+      PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
+      PARAM_getSetting("ParllelColsLimit",        ParallelColsLimit);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -233,6 +263,8 @@ public:
       UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);      
       UtilPrintParameter(os, sec, "MasterGapLimit",      MasterGapLimit);      
       UtilPrintParameter(os, sec, "CompressColumns",     CompressColumns);
+      UtilPrintParameter(os, sec, "CompressColumnsIterFreq",      CompressColumnsIterFreq);
+      UtilPrintParameter(os, sec, "CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);
       UtilPrintParameter(os, sec, "CutDC",               CutDC);
       UtilPrintParameter(os, sec, "CutCGL",              CutCGL);
       UtilPrintParameter(os, sec, "CutCglKnapC",         CutCglKnapC);
@@ -246,27 +278,47 @@ public:
                          SubProbGapLimitExact);
       UtilPrintParameter(os, sec, "SubProbGapLimitInexact", 
                          SubProbGapLimitInexact);
+      UtilPrintParameter(os, sec, "SubProbTimeLimitExact",   
+                         SubProbTimeLimitExact);
+      UtilPrintParameter(os, sec, "SubProbTimeLimitInexact", 
+                         SubProbTimeLimitInexact);
+      UtilPrintParameter(os, sec, "SubProbNumThreads",  SubProbNumThreads);
+      UtilPrintParameter(os, sec, "SubProbNumSolLimit", SubProbNumSolLimit);
+      UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
+                         SubProbSolverStartAlgo);
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
       UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);  
       UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",  SolveMasterAsIpFreqNode);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",  SolveMasterAsIpFreqPass);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",  
+			 SolveMasterAsIpFreqNode);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",  
+			 SolveMasterAsIpFreqPass);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", 
+			 SolveMasterAsIpLimitTime);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",  
+			 SolveMasterAsIpLimitGap);
+      UtilPrintParameter(os, sec, "SolveMasterUpdateAlgo",   
+			 SolveMasterUpdateAlgo);
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
       UtilPrintParameter(os, sec, "InitVarsWithCutDC",   InitVarsWithCutDC);
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
-      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   InitVarsWithIPLimitTime);
+      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   
+			 InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
-      UtilPrintParameter(os, sec, "BranchNew",   BranchNew);
-      //UtilPrintParameter(os, sec, "IpAlgoStart",       IpAlgoStart);
-      //UtilPrintParameter(os, sec, "IpAlgoSub",         IpAlgoSub);
+      UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   
+                         BranchEnforceInSubProb);
+      UtilPrintParameter(os, sec, "BranchEnforceInMaster",    
+                         BranchEnforceInMaster);
+      UtilPrintParameter(os, sec, "MasterConvexityLessThan", 
+                         MasterConvexityLessThan);
+      UtilPrintParameter(os, sec, "ParallelColsLimit", 
+                         ParallelColsLimit);
       (*os) << "========================================================\n";
    }
-
+   
    void setDefaults(){
       LogLevel             = 0;
       LogDebugLevel        = 0;
@@ -279,12 +331,13 @@ public:
       LimitTotalPriceIters = COIN_INT_MAX;
       LimitRoundCutIters   = COIN_INT_MAX;
       LimitRoundPriceIters = COIN_INT_MAX;
-      LimitTime            = COIN_DBL_MAX;
-     
+      LimitTime            = COIN_DBL_MAX;     
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
       CompressColumns      = 1;
+      CompressColumnsIterFreq      = 2;
+      CompressColumnsSizeMultLimit = 1.20;
       CutDC                = 0;
       CutCGL               = 1;
       CutCglKnapC          = 1;
@@ -296,6 +349,11 @@ public:
       SubProbUseCutoff     = 0;
       SubProbGapLimitExact   = 0.0001; // 0.01% gap
       SubProbGapLimitInexact = 0.1;    //10.00% gap
+      SubProbTimeLimitExact   = COIN_DBL_MAX;
+      SubProbTimeLimitInexact = COIN_DBL_MAX;
+      SubProbNumThreads       = 1;
+      SubProbNumSolLimit      = 1;
+      SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
       SolveMasterAsIp          = 1;//TODO: turn off if one block
@@ -304,6 +362,7 @@ public:
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
+      SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
@@ -311,9 +370,10 @@ public:
       DualStab                 = 0;
       DualStabAlpha            = 0.10;
       BreakOutPartial          = 0;
-      BranchNew                = 1;
-      //IpAlgoStart           = "dual";
-      //IpAlgoSub             = "dual";
+      BranchEnforceInSubProb   = 0;
+      BranchEnforceInMaster    = 1;
+      MasterConvexityLessThan  = 0;
+      ParallelColsLimit        = 0.85;
    }
    
    void dumpSettings(ostream * os = &cout){

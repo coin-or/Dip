@@ -78,13 +78,25 @@ void ATM_DecompApp::addColumnNamesAT(DecompConstraintSet * model,
    const int nSteps = m_appParam.NumSteps;
    colIndex = offset;
    for(a = 0; a < nAtms; a++){
-      for(t = 0; t < nSteps; t++){
-         colName = prefix + "("
-            + UtilIntToStr(colIndex)    + "_"
-            + m_instance.getAtmName(a) + "," 
-            + UtilIntToStr(t+1) + ")";
-         model->colNames.push_back(colName);
-	 colIndex++;
+      if(m_appParam.UseTightModel){
+	 for(t = 0; t <= nSteps; t++){
+	    colName = prefix + "("
+	       + UtilIntToStr(colIndex)    + "_"
+	       + m_instance.getAtmName(a) + "," 
+	       + UtilIntToStr(t) + ")";
+	    model->colNames.push_back(colName);
+	    colIndex++;
+	 }
+      }
+      else{
+	 for(t = 0; t < nSteps; t++){
+	    colName = prefix + "("
+	       + UtilIntToStr(colIndex)    + "_"
+	       + m_instance.getAtmName(a) + "," 
+	       + UtilIntToStr(t+1) + ")";
+	    model->colNames.push_back(colName);
+	    colIndex++;
+	 }
       }
    }
 }
@@ -175,17 +187,20 @@ void ATM_DecompApp::createModelColumns(DecompConstraintSet * model,
       int index_z  = getColOffset_z();
       int index_x2 = getColOffset_x2();
       int index_x3 = getColOffset_x3();
+      int end      = nSteps;
+      if(m_appParam.UseTightModel)
+	 end++;
       for(a = 0; a < nAtms; a++){
          if(a != atmIndex){
             model->colUB[index_x2] = 0.0;
             model->colUB[index_x3] = 0.0;
-            for(t = 0; t < nSteps; t++){
+            for(t = 0; t < end; t++){
                model->colUB[index_x1++] = 0.0;
                model->colUB[index_z ++] = 0.0;
             }
          }
          else{
-            for(t = 0; t < nSteps; t++){
+            for(t = 0; t < end; t++){
 	       model->activeColumns.push_back(index_x1++);
 	       model->activeColumns.push_back(index_z++);
 	    }
@@ -271,36 +286,75 @@ void ATM_DecompApp::createModelColumns(DecompConstraintSet * model,
 //===========================================================================//
 int ATM_DecompApp::createConZtoX(DecompConstraintSet * model,
 				 const int             atmIndex){
+
    //---
-   //---       z[a,t] <= x1[a,t],            
-   //---       z[a,t] <= x2[a],              
-   //---       z[a,t] >= x1[a,t] + x2[a] - 1.
+   //---  for a in A, t in T:
+   //---     z[a,t] = x1[a,t] * x2[a] 
+   //---         <==>
+   //--- OLD:
+   //---  for a in A:
+   //---     sum{t in T}  x1[a,t] <= 1 (where, T = 1..n)
+   //---  for a in A, t in T:
+   //---     z[a,t] >= 0 <= 1,                  
+   //---     z[a,t] <= x1[a,t],            
+   //---     z[a,t] <= x2[a],              
+   //---     z[a,t] >= x1[a,t] + x2[a] - 1.
+   //--- NEW: 
+   //---  for a in A:
+   //---     sum{t in T}  x1[a,t] = 1 (where, T = 0..n)
+   //---     sum{t in T}   z[a,t] = x2[a]
+   //---  for a in A, t in T:
+   //---     z[a,t] >= 0 <= 1,                  
+   //---     z[a,t] <= x1[a,t].
    //---
    int       t;
    int       nRows = 0;
    const int nSteps = m_appParam.NumSteps;
-   for(t = 0; t < nSteps; t++){
-      CoinPackedVector row1, row2, row3;
-      string strAT = "(a_" 
-	 + m_instance.getAtmName(atmIndex) + ",t_" + UtilIntToStr(t+1) + ")";
-      string rowName1 = "ztox1" + strAT;
-      string rowName2 = "ztox2" + strAT;
-      string rowName3 = "ztox3" + strAT;
-      
-      row1.insert(colIndex_z (atmIndex,t),  1.0);
-      row1.insert(colIndex_x1(atmIndex,t), -1.0);
-      model->appendRow(row1, -DecompInf, 0.0, rowName1);
-
-      row2.insert(colIndex_z (atmIndex,t),  1.0);
-      row2.insert(colIndex_x2(atmIndex)  , -1.0);
-      model->appendRow(row2, -DecompInf, 0.0, rowName2);
-      
-      row3.insert(colIndex_z (atmIndex,t),  1.0);
-      row3.insert(colIndex_x1(atmIndex,t), -1.0);
-      row3.insert(colIndex_x2(atmIndex)  , -1.0);
-      model->appendRow(row3, -1.0, DecompInf, rowName3);
-
-      nRows+=3;         
+   if(m_appParam.UseTightModel){
+      for(t = 0; t <= nSteps; t++){
+	 CoinPackedVector row;
+	 string strAT = "(a_" + m_instance.getAtmName(atmIndex) 
+	    + ",t_" + UtilIntToStr(t) + ")";
+	 string rowName = "ztox1" + strAT;	 
+	 row.insert(colIndex_z (atmIndex,t),  1.0);
+	 row.insert(colIndex_x1(atmIndex,t), -1.0);
+	 model->appendRow(row, -DecompInf, 0.0, rowName);
+	 nRows++;
+      }
+      CoinPackedVector row2;
+      string rowName2 = "ztox2(a_" 
+	 + m_instance.getAtmName(atmIndex) + ")"; 
+      row2.insert(colIndex_x2(atmIndex), -1.0);
+      for(t = 0; t <= nSteps; t++){
+	 row2.insert(colIndex_z (atmIndex,t),  1.0);
+      }
+      model->appendRow(row2, 0.0, 0.0, rowName2);	 
+      nRows++;         
+   }
+   else{
+      for(t = 0; t < nSteps; t++){
+	 CoinPackedVector row1, row2, row3;
+	 string strAT = "(a_" + m_instance.getAtmName(atmIndex) 
+	    + ",t_" + UtilIntToStr(t+1) + ")";
+	 string rowName1 = "ztox1" + strAT;
+	 string rowName2 = "ztox2" + strAT;
+	 string rowName3 = "ztox3" + strAT;
+	 
+	 row1.insert(colIndex_z (atmIndex,t),  1.0);
+	 row1.insert(colIndex_x1(atmIndex,t), -1.0);
+	 model->appendRow(row1, -DecompInf, 0.0, rowName1);
+	 
+	 row2.insert(colIndex_z (atmIndex,t),  1.0);
+	 row2.insert(colIndex_x2(atmIndex)  , -1.0);
+	 model->appendRow(row2, -DecompInf, 0.0, rowName2);
+	 
+	 row3.insert(colIndex_z (atmIndex,t),  1.0);
+	 row3.insert(colIndex_x1(atmIndex,t), -1.0);
+	 row3.insert(colIndex_x2(atmIndex)  , -1.0);
+	 model->appendRow(row3, -1.0, DecompInf, rowName3);
+	 
+	 nRows+=3;         
+      }
    }
    return nRows;
 }
@@ -315,9 +369,16 @@ int ATM_DecompApp::createConPickOne(DecompConstraintSet * model,
    int              t;
    CoinPackedVector row;
    string rowName = "pickone_x1(a_" + m_instance.getAtmName(atmIndex) + ")";
-   for(t = 0; t < m_appParam.NumSteps; t++)
-      row.insert(colIndex_x1(atmIndex,t), 1.0);
-   model->appendRow(row, -DecompInf, 1.0, rowName);
+   if(m_appParam.UseTightModel){
+      for(t = 0; t <= m_appParam.NumSteps; t++)
+	 row.insert(colIndex_x1(atmIndex,t), 1.0);
+      model->appendRow(row, 1.0, 1.0, rowName);
+   }
+   else{
+      for(t = 0; t < m_appParam.NumSteps; t++)
+	 row.insert(colIndex_x1(atmIndex,t), 1.0);
+      model->appendRow(row, -DecompInf, 1.0, rowName);
+   }
    return 1;
 }
 
@@ -371,13 +432,6 @@ DecompConstraintSet * ATM_DecompApp::createModelCore1(bool includeCount){
    if(includeCount)
       nRows += nAtms;
 
-   /*const int nAtms = m_instance.getNAtms();
-     const int nSteps = m_appParam.NumSteps;
-     nRows += 3 * nAtms * nSteps;
-     nRows += nAtms;*/
-
-
-
    DecompConstraintSet * model = new DecompConstraintSet();
    CoinAssertHint(model, "Error: Out of Memory");
 
@@ -416,12 +470,6 @@ DecompConstraintSet * ATM_DecompApp::createModelCore1(bool includeCount){
 	 createConCount(model, a);
       }
    }
-   /*for(a = 0; a < nAtms; a++){
-     createConZtoX(model, a);
-     }
-     for(a = 0; a < nAtms; a++){
-     createConPickOne(model, a);
-     }*/
    
    //---
    //--- create model columns
@@ -442,13 +490,8 @@ DecompConstraintSet * ATM_DecompApp::createModelCore2(){
 
    int                 a;
    const int           nAtms   = m_instance.getNAtms();
-   //const int           nSteps  = m_appParam.NumSteps;
    const int           nCols   = numCoreCols();
-#if 0
-   const int           nRows   = (2*nAtms) + (3*nAtms*nSteps); 
-#else
    const int           nRows   = (2*nAtms);
-#endif
    int                 rowCnt  = 0;
 
    //---
@@ -479,9 +522,6 @@ DecompConstraintSet * ATM_DecompApp::createModelCore2(){
    for(a = 0; a < nAtms; a++){
       rowCnt += createConPickOne(model, a);
       rowCnt += createConCount  (model, a);
-#if 0
-      rowCnt += createConZtoX   (model, a);
-#endif
    }
    printf("nRows = %d, rowCnt = %d\n", nRows, rowCnt);
    assert(rowCnt == nRows);
@@ -503,12 +543,14 @@ DecompConstraintSet * ATM_DecompApp::createModelCoreCount(){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createModelCoreCount()", m_appParam.LogLevel, 2);
 
-   int                 a;
+   int                 a, nRows;
    const int           nAtms      = m_instance.getNAtms();
    const int           nAtmsSteps = getNAtmsSteps();
-   //const int           nSteps     = m_appParam.NumSteps;
    const int           nCols      = numCoreCols();
-   const int           nRows      = nAtms + (3*nAtmsSteps) + nAtms;
+   if(m_appParam.UseTightModel)
+      nRows = 3*nAtms +   nAtmsSteps;
+   else
+      nRows = 2*nAtms + 3*nAtmsSteps;
    int                 rowCnt     = 0;
 
    //---
@@ -536,16 +578,7 @@ DecompConstraintSet * ATM_DecompApp::createModelCoreCount(){
       rowCnt += createConZtoX   (model, a);//OPT
       rowCnt += createConPickOne(model, a);//OPT
    }
-
-   //STOP - add conZtoX to core and remove from relax to 
-   //  see if helps
-   for(a = 0; a < nAtms; a++){
-
-      //rowCnt += createConCount  (model, a);
-      
-   }
-
-
+   //THINK - add conZtoX to core and remove from relax?
    printf("nRows = %d, rowCnt = %d\n", nRows, rowCnt);
    assert(rowCnt == nRows);
    
@@ -649,9 +682,17 @@ ATM_DecompApp::createModelRelax1(const int a,
       row.insert(colIndex_fm(pairIndex), -1.0);
       coefA = -a_ad[*vi] / nSteps;
       coefC = -c_ad[*vi] / nSteps;
-      for(t = 0; t < nSteps; t++){ 
-	 row.insert(colIndex_x1(a,t), (t+1) * coefA);
-	 row.insert(colIndex_z (a,t), (t+1) * coefC);                        
+      if(m_appParam.UseTightModel){
+	 for(t = 0; t <= nSteps; t++){ 
+	    row.insert(colIndex_x1(a,t), t * coefA);
+	    row.insert(colIndex_z (a,t), t * coefC);
+	 }
+      }
+      else{
+	 for(t = 0; t < nSteps; t++){ 
+	    row.insert(colIndex_x1(a,t), (t+1) * coefA);
+	    row.insert(colIndex_z (a,t), (t+1) * coefC);
+	 }
       }
       row.insert(colIndex_x2(a), -b_ad[*vi]);
       row.insert(colIndex_x3(a), -d_ad[*vi]);
@@ -712,7 +753,7 @@ DecompConstraintSet * ATM_DecompApp::createModelRelax2(const int d){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createModelRelax2()", m_appParam.LogLevel, 2);
    
-   int                a, t, nRows, pairIndex;
+   int                a, t, nRows, pairIndex, nRowsMax;
    double             rhs, coefA, coefC;
    pair<int,int>      adP;
    vector<int>::const_iterator vi;
@@ -730,11 +771,10 @@ DecompConstraintSet * ATM_DecompApp::createModelRelax2(const int d){
    const double      * B_d       = m_instance.get_B_d();
 
    const int           nCols     = numCoreCols();
-#if 0
-   int                 nRowsMax  = 2*nAtms + 1;
-#else
-   int                 nRowsMax  = 2*nAtms + 1 + (3*nAtms*nSteps);
-#endif
+   if(m_appParam.UseTightModel)
+      nRowsMax  = 3*nAtms + 1 + getNAtmsSteps();
+   else
+      nRowsMax  = 2*nAtms + 1 + (3*getNAtmsSteps());
 
    //---
    //--- A'[d] for d in D (independent blocks)
@@ -795,9 +835,17 @@ DecompConstraintSet * ATM_DecompApp::createModelRelax2(const int d){
       row.insert(colIndex_fm(pairIndex), -1.0);
       coefA = -a_ad[*vi] / nSteps;
       coefC = -c_ad[*vi] / nSteps;
-      for(t = 0; t < nSteps; t++){ 
-	 row.insert(colIndex_x1(a,t), (t+1) * coefA);
-	 row.insert(colIndex_z (a,t), (t+1) * coefC);                        
+      if(m_appParam.UseTightModel){
+	 for(t = 0; t <= nSteps; t++){ 
+	    row.insert(colIndex_x1(a,t), t * coefA);
+	    row.insert(colIndex_z (a,t), t * coefC);
+	 }
+      }
+      else{
+	 for(t = 0; t < nSteps; t++){ 
+	    row.insert(colIndex_x1(a,t), (t+1) * coefA);
+	    row.insert(colIndex_z (a,t), (t+1) * coefC);
+	 }
       }
       row.insert(colIndex_x2(a), -b_ad[*vi]);
       row.insert(colIndex_x3(a), -d_ad[*vi]);
@@ -825,11 +873,8 @@ DecompConstraintSet * ATM_DecompApp::createModelRelax2(const int d){
    model->appendRow(rowBudget, -DecompInf, B_d[d], rowNameBudget);
    nRows++;
 
-#if 1
   for(a = 0; a < nAtms; a++)
      nRows += createConZtoX(model, a);
-#endif
-
    assert(nRows <= nRowsMax);
    
    //---
@@ -850,7 +895,7 @@ DecompConstraintSet * ATM_DecompApp::createModelRelaxCount(){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createModelRelaxCount()", m_appParam.LogLevel, 2);
    
-   int                a, d, t, nRows, pairIndex;
+   int                a, d, t, nRows, pairIndex, nRowsMax;
    double             rhs, coefA, coefC;
    pair<int,int>      adP;
    vector<int>::const_iterator vi;
@@ -871,9 +916,13 @@ DecompConstraintSet * ATM_DecompApp::createModelRelaxCount(){
    const double      * B_d       = m_instance.get_B_d();
 
    const int           nCols     = numCoreCols();
-   int                 nRowsMax  = nDates + nAtms + (3*nAtmsSteps) + 2*nPairs;
+   if(m_appParam.UseTightModel)
+      nRowsMax  = nDates + 2*nAtms +   nAtmsSteps + 2*nPairs;
+   else
+      nRowsMax  = nDates +   nAtms + 3*nAtmsSteps + 2*nPairs;
 
-   //try the nested idea - so master has ConZtoX and we price without that
+   //TODO:
+   // try the nested idea - so master has ConZtoX and we price without that
    //   but we solve with gap the harder oracle with those constraints
 
    //---
@@ -946,9 +995,17 @@ DecompConstraintSet * ATM_DecompApp::createModelRelaxCount(){
       row.insert(colIndex_fm(pairIndex), -1.0);
       coefA = -a_ad[*vi] / nSteps;
       coefC = -c_ad[*vi] / nSteps;
-      for(t = 0; t < nSteps; t++){ 
-	 row.insert(colIndex_x1(a,t), (t+1) * coefA);
-	 row.insert(colIndex_z (a,t), (t+1) * coefC);                        
+      if(m_appParam.UseTightModel){
+	 for(t = 0; t <= nSteps; t++){ 
+	    row.insert(colIndex_x1(a,t), t * coefA);
+	    row.insert(colIndex_z (a,t), t * coefC);
+	 }
+      }
+      else{
+	 for(t = 0; t < nSteps; t++){ 
+	    row.insert(colIndex_x1(a,t), (t+1) * coefA);
+	    row.insert(colIndex_z (a,t), (t+1) * coefC);
+	 }
       }
       row.insert(colIndex_x2(a), -b_ad[*vi]);
       row.insert(colIndex_x3(a), -d_ad[*vi]);
@@ -985,19 +1042,14 @@ DecompConstraintSet * ATM_DecompApp::createModelRelaxCount(){
    //---       z[a,t] <= x1[a,t],            
    //---       z[a,t] <= x2[a],              
    //---       z[a,t] >= x1[a,t] + x2[a] - 1.      
-   //---
-   
-   //STOP
-
+   //---   
    //THINK: if you use this, shouldn't we postprocess z=x1*x2?
    //  putting those constaints in master are unneccessary... 
    //  in fact, why not just do that in block version too... 
-
-   for(a = 0; a < nAtms; a++){
+   //for(a = 0; a < nAtms; a++){
       //nRows += createConZtoX(model, a);
       //nRows += createConPickOne(model, a);
-   }
-
+   //}
    assert(nRows <= nRowsMax);
    
    //---
@@ -1098,7 +1150,6 @@ void ATM_DecompApp::createModels(){
    //---        <==>
    //---    sum{d in D} v[a,d]                  <= K[a]
    //---
-   //---
 
    //---
    //--- (Approximate) MILP Reformulation
@@ -1134,6 +1185,34 @@ void ATM_DecompApp::createModels(){
    //---
 
    //---
+   //--- UPDATE (April 2010). 
+   //---
+   //--- A tighter formulation of the 
+   //---   linearization of product of a binary and a continuous 
+   //---   is possible due to the constraint: sum{t in T}  x1[a,t] <= 1
+   //---
+   //---  For a in A, t in T:
+   //---     z[a,t] = x1[a,t] * x2[a] 
+   //---         <==>
+   //--- OLD:
+   //---  for a in A:
+   //---     sum{t in T}  x1[a,t] <= 1 (where, T = 1..n)
+   //---  for a in A, t in T:
+   //---     z[a,t] >= 0 <= 1,                  
+   //---     z[a,t] <= x1[a,t],            
+   //---     z[a,t] <= x2[a],              
+   //---     z[a,t] >= x1[a,t] + x2[a] - 1.
+   //--- NEW: 
+   //---  for a in A:
+   //---     sum{t in T}  x1[a,t] = 1 (where, T = 0..n)
+   //---     sum{t in T}   z[a,t] = x2[a]
+   //---  for a in A, t in T:
+   //---     z[a,t] >= 0 <= 1,                  
+   //---     z[a,t] <= x1[a,t].
+   //---
+
+
+   //---
    //--- Columns
    //---   x1[a,t] (binary)
    //---   z [a,t]
@@ -1144,7 +1223,6 @@ void ATM_DecompApp::createModels(){
    //----  v[a,d] (binary)
    //---
    int i, a;
-   int nDates  = m_instance.getNDates();
    int nAtms   = m_instance.getNAtms();
    int numCols = numCoreCols();
 
@@ -1281,16 +1359,13 @@ bool ATM_DecompApp::APPisUserFeasible(const double * x,
 
    const int           nSteps    = m_appParam.NumSteps;
    const int           nAtms     = m_instance.getNAtms();
-   const int           nDates    = m_instance.getNDates();
    const vector<int> & pairsAD   = m_instance.getPairsAD();   
    const double      * K_a       = m_instance.get_K_a();
-   const double      * B_d       = m_instance.get_B_d();
    const double      * a_ad      = m_instance.get_a_ad(); //dense storage
    const double      * b_ad      = m_instance.get_b_ad(); //dense storage
    const double      * c_ad      = m_instance.get_c_ad(); //dense storage
    const double      * d_ad      = m_instance.get_d_ad(); //dense storage
    const double      * e_ad      = m_instance.get_e_ad(); //dense storage
-   const double      * w_ad      = m_instance.get_w_ad(); //dense storage
    double            * count     = new double[nAtms];
     
    //---
@@ -1317,10 +1392,19 @@ bool ATM_DecompApp::APPisUserFeasible(const double * x,
       rhs  = e_ad[*vi]
 	 + b_ad[*vi] * x[colIndex_x2(a)]
 	 + d_ad[*vi] * x[colIndex_x3(a)];
-      for(t = 0; t < nSteps; t++){
-	 coeff = (double)(t+1) / (double)nSteps;
-	 rhs += a_ad[*vi] * coeff * x[colIndex_x1(a,t)];
-	 rhs += c_ad[*vi] * coeff * x[colIndex_z (a,t)];
+      if(m_appParam.UseTightModel){
+	 for(t = 0; t <= nSteps; t++){
+	    coeff = (double)(t) / (double)nSteps;
+	    rhs += a_ad[*vi] * coeff * x[colIndex_x1(a,t)];
+	    rhs += c_ad[*vi] * coeff * x[colIndex_z (a,t)];
+	 }
+      }
+      else{
+	 for(t = 0; t < nSteps; t++){
+	    coeff = (double)(t+1) / (double)nSteps;
+	    rhs += a_ad[*vi] * coeff * x[colIndex_x1(a,t)];
+	    rhs += c_ad[*vi] * coeff * x[colIndex_z (a,t)];
+	 }
       }
       actViol = fabs(lhs-rhs);
       if(UtilIsZero(lhs,1.0e-3))

@@ -40,14 +40,6 @@
 using namespace std;
 
 //===========================================================================//
-// DECOMP Headers                                                            //
-//===========================================================================//
-//---
-//--- include config header file here
-//---
-#include "DecompConfig.h"
-
-//===========================================================================//
 // DECOMP Enums, Constants and Typedefs                                      //
 //===========================================================================//
 
@@ -159,6 +151,12 @@ enum DecompGenericStatus {
    DecompStatOutOfMemory = 2
 };
 
+enum DecompSolverType {
+   DecompDualSimplex = 0,
+   DecompPrimSimplex = 1,
+   DecompBarrier     = 2
+};
+
 enum DecompRoundRobin {
    RoundRobinRotate    = 0,
    RoundRobinMostNegRC = 1
@@ -202,6 +200,10 @@ enum DecompColType {
    DecompCol_ArtForBranchL,
    //artifical column for branching row (G for >=)
    DecompCol_ArtForBranchG,
+   //artifical column for convexity row (L for <=)
+   DecompCol_ArtForConvexL,
+   //artifical column for convexity row (G for >=)
+   DecompCol_ArtForConvexG,
    //artifical column for cut (L for <=)
    DecompCol_ArtForCutL,
    //artifical column for cutG(L for >=)
@@ -209,13 +211,15 @@ enum DecompColType {
    //marker used for deletion
    DecompCol_ToBeDeleted
 };
-const string DecompColTypeStr[9] = {
+const string DecompColTypeStr[11] = {
    "DecompCol_Structural",
    "DecompCol_Structural_NoDelete",
    "DecompCol_ArtForRowL",
    "DecompCol_ArtForRowG",
    "DecompCol_ArtForBranchL",
    "DecompCol_ArtForBranchG",
+   "DecompCol_ArtForConvexL",
+   "DecompCol_ArtForConvexG",
    "DecompCol_ArtForCutL",
    "DecompCol_ArtForCutG",
    "DecompCol_ToBeDeleted"

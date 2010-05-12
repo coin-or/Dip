@@ -414,6 +414,8 @@ public:
    }
    virtual void setMasterBounds(const double * lbs,
 				const double * ubs);
+   virtual void setSubProbBounds(const double * lbs,
+				 const double * ubs);
 
    int chooseBranchVar(int    & branchedOnIndex,
 		       double & branchedOnValue);
@@ -460,6 +462,12 @@ public:
    /**
     *
     */
+   void printCurrentProblemDual(OsiSolverInterface * si,
+				const string         baseName,
+				const int            nodeIndex,
+				const int            cutPass,
+				const int            pricePass);
+
    void printCurrentProblem(const OsiSolverInterface * si,
                             const string               baseName,
                             const int                  nodeIndex,
@@ -490,8 +498,12 @@ public:
    /**
     *
     */
-   virtual void solveDirect(int                  timeLimit = COIN_INT_MAX,
-			    DecompSolverResult * result    = NULL){};
+   virtual DecompSolverResult * 
+      solveDirect(int                    timeLimit = COIN_INT_MAX,
+		  const DecompSolution * startSol  = NULL){
+      return NULL;}
+   
+
 
 
 
@@ -510,7 +522,7 @@ public:
                                        vector<string>   & colNames,
                                        int                startRow,
                                        int                endRow,
-                                       char               origOrBranch);
+                                       DecompRowType      rowType);
    void masterPhaseItoII();
    void masterPhaseIItoI();
 
@@ -523,6 +535,8 @@ public:
               m_masterColType[index] == DecompCol_ArtForRowG    ||
               m_masterColType[index] == DecompCol_ArtForBranchL ||
               m_masterColType[index] == DecompCol_ArtForBranchG ||
+              m_masterColType[index] == DecompCol_ArtForConvexL ||
+              m_masterColType[index] == DecompCol_ArtForConvexG ||
               m_masterColType[index] == DecompCol_ArtForCutL    ||
               m_masterColType[index] == DecompCol_ArtForCutG);
    }
@@ -564,6 +578,9 @@ public:
    }
    inline const DecompAlgoModel & getModelCore() const {
       return m_modelCore;}
+
+   inline const int getAlgo() const {
+      return m_algo;}
 
    inline DecompAlgoModel & getModelRelax(const int blockId){
       map<int,DecompAlgoModel>::iterator mit;
@@ -665,24 +682,29 @@ public:
    /**
     * Set the current LB and update best/history.
     */
-   virtual void setObjBoundLB(const double thisBound){
+   virtual void setObjBoundLB(const double thisBound,
+			      const double thisBoundUB){
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
       if(thisBound > m_nodeStats.objBest.first){
 	 m_nodeStats.objBest.first = thisBound;
       }
 
       DecompObjBound objBound;
-      objBound.lbOrUb    = 0;
-      objBound.cutPass   = m_nodeStats.cutCallsTotal;
-      objBound.pricePass = m_nodeStats.priceCallsTotal;      
-      objBound.thisBound = thisBound;
-      objBound.bestBound = m_nodeStats.objBest.first;
+      objBound.lbOrUb      = 0;
+      objBound.cutPass     = m_nodeStats.cutCallsTotal;
+      objBound.pricePass   = m_nodeStats.priceCallsTotal;      
+      objBound.thisBound   = thisBound;
+      objBound.thisBoundUB = thisBoundUB;
+      objBound.bestBound   = m_nodeStats.objBest.first;
 #ifdef UTIL_USE_TIMERS
-      objBound.timeStamp = globalTimer.getRealTime();
+      objBound.timeStamp   = globalTimer.getRealTime();
 #else
-      objBound.timeStamp = -1;
-#endif
-      
+      objBound.timeStamp   = -1;
+#endif      
       m_nodeStats.objHistoryLB.push_back(objBound);
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
    }
    
    /**

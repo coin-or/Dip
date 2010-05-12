@@ -74,6 +74,17 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
       }      
       clb      = model->colLB[c];
       cub      = model->colUB[c];      
+      UTIL_DEBUG(logLevel, 5,
+		 if(!UtilIsZero(xj)){
+		    cout << "Point " << c;
+		    if(hasColNames)
+		       cout << " -> " << colNames[c];
+		    cout << " LB= " << UtilDblToStr(clb,precision)
+			 << " x= "  << UtilDblToStr(xj,precision)
+			 << " UB= " << UtilDblToStr(cub,precision) 
+			 << endl;
+		 }
+		 );
       actViol = std::max<double>(clb - xj, xj - cub);
       actViol = std::max<double>(actViol, 0.0);
       if(UtilIsZero(xj, feasVarTol) ||
@@ -186,10 +197,26 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogLpLevel;
 
+   double * solution = new double[numCols];
+   assert(solution);
+
+   //---
+   //--- clear out any old solutions
+   //---
+   result->m_solution.clear();
+
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
    CbcMain0(cbc);
+
+
+   //int i;
+   //const double * colUB = cbc.getColUpper();
+   //for(i = 0; i < cbc.getNumCols(); i++){
+   //  printf("col %d -> ub: %g\n",
+   //         i, colUB[i]);
+   //}
 
    //---
    //--- build argument list
@@ -204,15 +231,19 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    string cbcGap       = "-ratio";
    string cbcGapSet    = "0";
    string cbcTime      = "-seconds";
-   string cbcTimeSet   = UtilDblToStr(param.SolveMasterAsIpLimitTime);
+   string cbcTimeSet   = "0";
    string cbcCutoff    = "-cutoff";   
    string cbcCutoffSet = UtilDblToStr(cutoff);
    string cbcSLog      = "-slog";
    string cbcSLogSet   = "2";
-   if(doExact)
-      cbcGapSet = UtilDblToStr(param.SubProbGapLimitExact);
-   else
-      cbcGapSet = UtilDblToStr(param.SubProbGapLimitInexact);
+   if(doExact){
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact);
+      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitExact);
+   }
+   else{
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact);
+      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitInexact);
+   }
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      
@@ -326,8 +357,13 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_objLB = cbc.getBestPossibleObjValue();
    if(result->m_nSolutions >= 1){
       result->m_objUB = cbc.getObjValue();
-      memcpy(result->m_solution, 
-             cbc.getColSolution(), numCols * sizeof(double));
+      const double * solDbl = cbc.getColSolution();
+      vector<double> solVec(solDbl, solDbl + numCols);
+      result->m_solution.push_back(solVec);
+      //memcpy(result->m_solution, 
+      //  cbc.getColSolution(), numCols * sizeof(double));
+      assert(result->m_nSolutions == 
+	     static_cast<int>(result->m_solution.size()));
    }
 #endif
 
@@ -377,6 +413,22 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");
+
+   if(doExact){
+      if(param.SubProbTimeLimitExact < COIN_DBL_MAX){
+	 status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
+				 param.SubProbTimeLimitExact);
+      }
+   }
+   else{
+      if(param.SubProbTimeLimitInexact < COIN_DBL_MAX){
+	 status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, 
+				 param.SubProbTimeLimitInexact);
+      }
+   }
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+			  "solveOsiAsIp", "DecompAlgoModel");
    
    if(doCutoff)
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, cutoff);
@@ -392,10 +444,43 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //--- TODO: make this a user option
    //---
 #if CPX_VERSION >= 1100
-   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, param.SubProbNumThreads);
    if(status)
       throw UtilException("CPXsetdblparam failure", 
 			  "solveOsiAsIp", "DecompAlgoModel");
+   int startAlgo = 0;
+   switch(param.SubProbSolverStartAlgo){
+   case DecompDualSimplex:
+      startAlgo = CPX_ALG_DUAL;
+      break;
+   case DecompPrimSimplex:
+      startAlgo = CPX_ALG_PRIMAL;
+      break;
+   case DecompBarrier:
+      startAlgo = CPX_ALG_BARRIER;
+      break;
+   }
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_STARTALG, startAlgo);
+   if(status)
+      throw UtilException("CPXsetdblparam failure", 
+			  "solveOsiAsIp", "DecompAlgoModel");   
+
+
+   //---
+   //--- check the mip starts solution pool, never let it get too 
+   //---   big, and refresh it periodically - assuming that the last
+   //---   ones in the list are the last ones used - which would have the
+   //---   best potential to help warm start
+   //--- never let it get bigger than 10 solutions, 
+   //---   when refresh - keep only last 2
+   //---
+   int nMipStarts = CPXgetnummipstarts(cpxEnv, cpxLp);
+   if(nMipStarts > 10){
+      status = CPXdelmipstarts(cpxEnv, cpxLp, 0, nMipStarts-3);
+      if(status)
+	 throw UtilException("CPXdelmipstarts failure", 
+			     "solveOsiAsIp", "DecompAlgoModel");   
+   }
 #endif
    //---
    //--- solve the MILP
@@ -408,12 +493,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result->m_solStatus2 = 0;
 
-   const int statusSet1[2] = {CPXMIP_OPTIMAL,
-			      CPXMIP_OPTIMAL_TOL};
-   const int statusSet2[3] = {CPXMIP_OPTIMAL,
-			      CPXMIP_OPTIMAL_TOL,
+   const int statusSet1[3] = {CPXMIP_OPTIMAL,
+			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
+			      CPXMIP_TIME_LIM_FEAS};
+   const int statusSet2[4] = {CPXMIP_OPTIMAL,
+			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
+			      CPXMIP_TIME_LIM_FEAS,
 			      CPXMIP_INFEASIBLE};
-   if(!UtilIsInSet(result->m_solStatus, statusSet2, 3)){
+   if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
       cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CPX solver status", 
                           "solveOsiAsIp", "DecompAlgoModel");
@@ -425,7 +512,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //---   can be infeasible.
    //---
    if(!doCutoff && isRoot){
-      if(!UtilIsInSet(result->m_solStatus, statusSet1, 2)){
+      if(!UtilIsInSet(result->m_solStatus, statusSet1, 3)){
          cerr << "Error: CPX IP solver 2nd status = " 
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status", 
@@ -433,7 +520,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       }
    }
    else{
-      if(!UtilIsInSet(result->m_solStatus, statusSet2, 3)){
+      if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
          cerr << "Error: CPX IP solver 2nd status = " 
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status", 
@@ -447,9 +534,37 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_nSolutions = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
-   if(result->m_solStatus == CPXMIP_OPTIMAL ||
-      result->m_solStatus == CPXMIP_OPTIMAL_TOL){
-      result->m_nSolutions = 1;
+   if(UtilIsInSet(result->m_solStatus, statusSet1, 3)){
+      int    i;
+      int    nSols = CPXgetsolnpoolnumsolns(cpxEnv, cpxLp);
+      double objVal;
+      printf("Number of solutions in solution pool = %d\n",
+	     nSols);
+      //TODO: currently just take up to the limit,
+      //  but, should sort by objective and take n least?
+      nSols = std::min<int>(nSols, param.SubProbNumSolLimit);
+      for(i = 0; i < nSols; i++){
+	 status = CPXgetsolnpoolobjval(cpxEnv, cpxLp, i, &objVal);
+	 if(status)
+	    throw UtilException("CPXgetsolnpoolobjval", 
+				"solveOsiAsIp", "DecompAlgoModel");
+	 printf("Sol %4d: Obj: %10g\n", i, objVal);
+
+	 status = CPXgetsolnpoolx(cpxEnv, cpxLp, i, 
+				  solution, 0, numCols-1);
+	 vector<double> solVec(solution, solution + numCols);
+	 result->m_solution.push_back(solVec);
+	 result->m_nSolutions++;
+	 assert(result->m_nSolutions == 
+		static_cast<int>(result->m_solution.size()));	 
+	 //memcpy(result->m_solution, 
+	 //	osiCpx->getColSolution(), numCols * sizeof(double));
+      }
+      result->m_nSolutions = nSols;
+   }
+   
+   printf("solStatus = %d\n", result->m_solStatus);
+   if(result->m_solStatus == CPXMIP_OPTIMAL){
       result->m_isOptimal  = true;      
    }
    else{
@@ -460,9 +575,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       }
       else{
          //---
-         //--- else it must have stopped on gap
+         //--- else it must have stopped on gap or time
          //---
-         result->m_nSolutions = 1;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;      
       }
@@ -480,8 +594,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       if(status)
 	 throw UtilException("CPXgetmipobjval failure", 
 			     "solveOsiAsIp", "DecompAlgoModel");
-      memcpy(result->m_solution, 
-             osiCpx->getColSolution(), numCols * sizeof(double));
    }
 #endif
+
+   UTIL_DELARR(solution);
 }

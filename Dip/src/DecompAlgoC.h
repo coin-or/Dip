@@ -103,11 +103,14 @@ private:
 
    void setMasterBounds(const double * lbs,
 			const double * ubs);
+   void setSubProbBounds(const double * lbs,
+			 const double * ubs){};
 
 public:
-   void solveDirect(int                  timeLimit = COIN_INT_MAX,
-		    DecompSolverResult * result    = NULL);
-   
+   virtual DecompSolverResult * 
+      solveDirect(int                    timeLimit = COIN_INT_MAX,
+		  const DecompSolution * startSol  = NULL);
+
    
    /**
     * @}

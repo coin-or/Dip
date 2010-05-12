@@ -192,11 +192,8 @@ endif
 # and that therefore should be installed in 'install'
 includecoindir = $(includedir)/coin
 
-includecoin_HEADERS = \
-	../inc/config_dip.h
-
 #DecompAlgo
-includecoin_HEADERS +=        \
+includecoin_HEADERS =        \
 	DecompAlgo.h      \
 	DecompAlgoC.h     \
 	DecompAlgoD.h     \
@@ -252,9 +249,6 @@ includecoin_HEADERS +=             \
 ConfigHeader = DecompConfig.h
 
 install-exec-local:
-	echo "#ifndef HAVE_CONFIG_H" >bla
-	echo "#define HAVE_CONFIG_H" >>bla
-	echo "#endif" >> bla
 	cat $(srcdir)/$(ConfigHeader) >> bla
 	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
 	rm -f bla

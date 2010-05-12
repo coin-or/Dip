@@ -603,18 +603,24 @@ void DecompAlgoD::createMasterProblem(DecompVarList & initVars){
       assert(static_cast<int>(modelCore->colNames.size()) == 
                  modelCore->getNumCols());
       m_masterSI->setRowNames(modelCore->colNames,
-                              0, modelCore->colNames.size(), 0);
+                              0, 
+			      static_cast<int>(modelCore->colNames.size()), 
+			      0);
       vector<string> conRowNames;
       for(r = 0; r < m_numConvexCon; r++){
          string rowName = "conv(b_" + UtilIntToStr(r) + ")";         
          conRowNames.push_back(rowName);
       }
       m_masterSI->setRowNames(conRowNames,
-                              0, conRowNames.size(),
-                              modelCore->colNames.size());      
+                              0, 
+			      static_cast<int>(conRowNames.size()),
+                              static_cast<int>(modelCore->colNames.size()));
    }
    if(colNames.size() > 0)
-      m_masterSI->setColNames(colNames, 0, colNames.size(), 0);
+      m_masterSI->setColNames(colNames, 
+			      0, 
+			      static_cast<int>(colNames.size()), 
+			      0);
 
 
    UTIL_DEBUG(m_param.LogDebugLevel, 4,                 

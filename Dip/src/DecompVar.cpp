@@ -14,6 +14,42 @@
 //===========================================================================//
 
 #include "DecompVar.h"
+#include "DecompModel.h"
+
+// --------------------------------------------------------------------- //
+//Design question - we use a check over the entire space to simplify
+// storage of branching bounds. But, in reality, for node 1, for example,
+// these has only been one branch - so we only need to check one number.
+//This could be much faster if we are willing to do more accounting related
+// to branching.
+bool DecompVar::doesSatisfyBounds(int                     denseLen,
+				  double                * denseArr,
+				  const DecompAlgoModel & model,
+				  const double          * lbs,
+				  const double          * ubs){
+
+   int            j;
+   double         xj;//, lb, ub;
+   vector<int> ::const_iterator it;
+   map<int,int>::const_iterator mcit;
+   DecompConstraintSet * modelRelax    = model.getModel();
+   const vector<int>  & activeColumns  = modelRelax->getActiveColumns();
+
+   //---
+   //--- activeColumns are in original space
+   //---    denseArr, lbs, ubs are all in original space
+   //---
+   fillDenseArr(denseLen, denseArr);//TODO: expensive... 
+   for(it = activeColumns.begin(); it != activeColumns.end(); it++){
+      j  = *it;
+      xj = denseArr[j];
+      if(xj < (lbs[j] - DecompEpsilon) ||
+	 xj > (ubs[j] + DecompEpsilon)){
+	 return false;	 
+      }
+   }
+   return true;
+}
 
 // --------------------------------------------------------------------- //
 void DecompVar::fillDenseArr(int      len,

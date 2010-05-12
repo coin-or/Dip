@@ -31,8 +31,9 @@ struct DecompObjBound
    int    cutPass;
    int    pricePass;
    double timeStamp;
-   double thisBound;
-   double bestBound;
+   double thisBound;  //=zDW_LB      (for lbOrUb=0)
+   double thisBoundUB;//=zDW_UB      (for lbOrUb=0)
+   double bestBound;  //=max{zDW_LB} (for lbOrUb=0)
 
    bool operator<(const DecompObjBound & objBound) const {
       if(timeStamp < objBound.timeStamp)
@@ -48,9 +49,7 @@ public:
 
    vector< DecompObjBound > objHistoryLB;
    vector< DecompObjBound > objHistoryUB;
-
-   //vector< pair<double, double> > objHistory;
-   pair<double, double>           objBest;
+   pair<double, double>     objBest;
 
    int    nodeIndex;
    int    cutsThisRound;

@@ -15,17 +15,23 @@
 
 #include "DecompApp.h"
 #include "DecompVar.h"
-
-
+#include "DecompConfig.h"
 
 // --------------------------------------------------------------------- //
 void DecompApp::startupLog(){
-   if(m_param.LogLevel > 0){
+   if(m_param.LogLevel >= 0){
       (*m_osLog)
 	 << "\n========================================================"
 	 << "\n========================================================"
-	 <<   "\nWelcome to DECOMP v" << DecompVersion << "."
-	 <<   "\n  Copyright (c) 2004-2010 Lehigh University."
+	 <<   "\nWelcome to the DIP Decomposition Framework"
+	 <<   "\nCopyright 2002-2010 Lehigh University and others"
+	 <<   "\nAll Rights Reserved"
+	 <<   "\nDistributed under the Eclipse Public License 1.0"
+	 <<   "\nVersion: " << DIP_VERSION
+	 <<   "\nBuild Date: " << __DATE__
+#ifdef DIP_SVN_REV
+	 <<   "\nRevision Number: " << DIP_SVN_REV
+#endif
 	 << "\n========================================================"
 	 << "\n========================================================"
 	 << "\n";

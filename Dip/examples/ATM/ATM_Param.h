@@ -32,6 +32,7 @@ public:
    string DataDate;          //data file (dates)
    string DataAtmDate;       //data file (atms x dates)
    int    NumSteps;          //number of steps for discretization of NLP
+   bool   UseTightModel;     //use tighter formulation of z=xy
    string ModelNameCore;     //name of model core
    string ModelNameRelax;    //name of model relax
    string ModelNameRelaxNest;//name of nested model relax
@@ -39,27 +40,30 @@ public:
 public:
    void getSettings(UtilParameters & utilParam){
       static const char * common = "ATM";
-      LogLevel       = utilParam.GetSetting("LogLevel",        0, common);
-      DataDir        = utilParam.GetSetting("DataDir",        "", common);
-      DataAtm        = utilParam.GetSetting("DataAtm",        "", common);    
-      DataDate       = utilParam.GetSetting("DataDate",       "", common);    
-      DataAtmDate    = utilParam.GetSetting("DataAtmDate",    "", common);    
-      NumSteps       = utilParam.GetSetting("NumSteps",       10, common);
-      ModelNameCore  = utilParam.GetSetting("ModelNameCore",  "", common);
-      ModelNameRelax = utilParam.GetSetting("ModelNameRelax", "", common);
-      ModelNameRelaxNest = utilParam.GetSetting("ModelNameRelaxNest", "", common);
+      LogLevel       = utilParam.GetSetting("LogLevel",         0, common);
+      DataDir        = utilParam.GetSetting("DataDir",         "", common);
+      DataAtm        = utilParam.GetSetting("DataAtm",         "", common);    
+      DataDate       = utilParam.GetSetting("DataDate",        "", common);    
+      DataAtmDate    = utilParam.GetSetting("DataAtmDate",     "", common);    
+      NumSteps       = utilParam.GetSetting("NumSteps",        10, common);
+      UseTightModel  = utilParam.GetSetting("UseTightModel", true, common);
+      ModelNameCore  = utilParam.GetSetting("ModelNameCore",   "", common);
+      ModelNameRelax = utilParam.GetSetting("ModelNameRelax",  "", common);
+      ModelNameRelaxNest 
+	 = utilParam.GetSetting("ModelNameRelaxNest", "", common);
    }
    
    void dumpSettings(ostream * os = &cout){
       static const char * common = "ATM";
       (*os) << "\n=====================================================\n"
             << "ATM_DECOMP PARAMETER SETTINGS \n";
-      (*os) << common << ": LogLevel    : " << LogLevel    << endl;
-      (*os) << common << ": DataDir     : " << DataDir     << endl;
-      (*os) << common << ": DataAtm     : " << DataAtm     << endl;
-      (*os) << common << ": DataDate    : " << DataDate    << endl;
-      (*os) << common << ": DataAtmDate : " << DataAtmDate << endl;
-      (*os) << common << ": NumSteps    : " << NumSteps    << endl;
+      (*os) << common << ": LogLevel          : " << LogLevel          << endl;
+      (*os) << common << ": DataDir           : " << DataDir           << endl;
+      (*os) << common << ": DataAtm           : " << DataAtm           << endl;
+      (*os) << common << ": DataDate          : " << DataDate          << endl;
+      (*os) << common << ": DataAtmDate       : " << DataAtmDate       << endl;
+      (*os) << common << ": NumSteps          : " << NumSteps          << endl;
+      (*os) << common << ": UseTightModel     : " << UseTightModel     << endl;
       (*os) << common << ": ModelNameCore     : " << ModelNameCore     << endl;
       (*os) << common << ": ModelNameRelax    : " << ModelNameRelax    << endl;
       (*os) << common << ": ModelNameRelaxNest: " << ModelNameRelaxNest<< endl;
@@ -68,12 +72,13 @@ public:
    
 public:
    ATM_Param():    
-      LogLevel    (0),
-      DataDir     (""),
-      DataAtm     (""),
-      DataDate    (""),
-      DataAtmDate (""),
-      NumSteps    (0),
+      LogLevel          (0),
+      DataDir           (""),
+      DataAtm           (""),
+      DataDate          (""),
+      DataAtmDate       (""),
+      NumSteps          (0),
+      UseTightModel     (true),
       ModelNameCore     (""),
       ModelNameRelax    (""),
       ModelNameRelaxNest(""){};

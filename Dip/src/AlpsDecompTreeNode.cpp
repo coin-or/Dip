@@ -132,11 +132,13 @@ int AlpsDecompTreeNode::process(bool isRoot,
    double currentUB       = getKnowledgeBroker()->getIncumbentValue();
    double parentObjValue  = getQuality();   
    double primalTolerance = 1.0e-6;
-   double globalLB = -DecompInf;
-   double globalUB =  DecompInf;
+   double globalLB        = -DecompInf;
+   double globalUB        =  DecompInf;
    double thisQuality;
-   AlpsTreeNode * bestNode = NULL;
 
+   AlpsTreeNode        * bestNode  = NULL;
+   const double        * lbs       = desc->lowerBounds_;
+   const double        * ubs       = desc->upperBounds_;      
    const DecompApp     * app       = decompAlgo->getDecompApp();
    DecompConstraintSet * modelCore = decompAlgo->getModelCore().getModel();   
    const int             n_cols    = modelCore->getNumCols();
@@ -164,25 +166,23 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //--- reset user-currentUB (if none given, this will have no effect)
    //---
    decompAlgo->setObjBoundUB(decompAlgo->getCutoffUB());
-   
+
    if(!isRoot){
       //---
       //--- set the master column bounds (for this node in tree)
       //---
-      const double * lbs = desc->lowerBounds_;
-      const double * ubs = desc->upperBounds_;
-      if(!isRoot){
-         //---
-         //--- for debugging, print column bounds that differ from original
-         //---
-         UTIL_MSG(param.msgLevel, 3,
-                  int              c;
-                  double           diffLB;
-                  double           diffUB;
-                  vector<double> & colLBCore = modelCore->colLB; 
-                  vector<double> & colUBCore = modelCore->colUB;
-                  for(c = 0; c < n_cols; c++){
-                     diffLB = lbs[c] - colLBCore[c];
+      
+      //---
+      //--- for debugging, print column bounds that differ from original
+      //---
+      UTIL_MSG(param.msgLevel, 3,
+	       int              c;
+	       double           diffLB;
+	       double           diffUB;
+	       vector<double> & colLBCore = modelCore->colLB; 
+	       vector<double> & colUBCore = modelCore->colUB;
+	       for(c = 0; c < n_cols; c++){
+		  diffLB = lbs[c] - colLBCore[c];
                      diffUB = ubs[c] - colUBCore[c]; 
                      if(!UtilIsZero(diffLB) || !UtilIsZero(diffUB)){    
                         cout << "bound-diffs c: " << c << " -> ";
@@ -191,10 +191,10 @@ int AlpsDecompTreeNode::process(bool isRoot,
                              << colUBCore[c] << ")\t->\t(" << lbs[c]
                              << "," << ubs[c] << ")" << endl;
                      }
-                  }
-                  );   
-         decompAlgo->setMasterBounds(lbs, ubs);
-      }
+	       }
+	       );   
+      decompAlgo->setMasterBounds(lbs, ubs);
+      decompAlgo->setSubProbBounds(lbs,ubs);
    }
    else{
       //---
@@ -202,6 +202,36 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //---
       if(decompAlgo->getXhatIPBest())
          checkIncumbent(model, decompAlgo->getXhatIPBest());
+      
+      //---
+      //--- This is a first attempt at a redesign of branching rows.
+      //---  We still have all of them explicitly defined, but we
+      //---  relax them and only explicitly enforce things as we branch.
+      //---
+      //--- A more advanced attempt would treat branching rows as cuts
+      //---  and add them dynamically.
+      //---
+      //--- In root node, set all branching rows to "free" by relaxing
+      //---   lb and ub.
+      //---
+      //--- NOTE: this should also be done for all nodes except for the
+      //---   rows that represent bounds that we have branched on.
+      //---      
+      if(decompAlgo->getAlgo() == PRICE_AND_CUT){
+	 int      c;
+	 double * lbsInf = new double[n_cols];
+	 double * ubsInf = new double[n_cols];
+	 for(c = 0; c < n_cols; c++){
+	    lbsInf[c] = -DecompInf;
+	    ubsInf[c] =  DecompInf;
+	 } 
+         decompAlgo->setMasterBounds(lbsInf, ubsInf);
+	 UTIL_DELARR(lbsInf);
+	 UTIL_DELARR(ubsInf);
+	 
+	 //actually, don't need to do this - these should already be set
+	 decompAlgo->setSubProbBounds(lbs,ubs);
+      }
    }
    
       
@@ -220,8 +250,12 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //---
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
-      assert(!UtilIsZero(globalUB));
-      gap = fabs(globalUB-globalLB)/fabs(globalUB);
+      if(UtilIsZero(globalUB)){
+	 gap = fabs(globalUB-globalLB);
+      }
+      else{
+	 gap = fabs(globalUB-globalLB)/fabs(globalUB);
+      }
       if(gap <= relTolerance){	 
 	 doFathom = true;
 	 UTIL_MSG(param.msgLevel, 3,
@@ -272,8 +306,12 @@ int AlpsDecompTreeNode::process(bool isRoot,
          quality_ = thisQuality;
 
       //watch tolerance here... if quality is close enough, fathom it
-      assert(!UtilIsZero(currentUB));
-      gap = fabs(currentUB-thisQuality)/fabs(currentUB);
+      if(UtilIsZero(currentUB)){
+	 gap = fabs(currentUB-thisQuality);
+      }
+      else{
+	 gap = fabs(currentUB-thisQuality)/fabs(currentUB);
+      }
       if(gap <= relTolerance){	 
          doFathom = true;
          UTIL_DEBUG(param.msgLevel, 3,

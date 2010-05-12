@@ -26,9 +26,6 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
       // --- RC[s] = c[s] - u (A''s) - alpha
       // ---
       redCost = m_var->getOriginalCost() - m_col->dotProduct(u);
-
-      //printf("\nHERE DecompWaitingCol::setReducedCost redCost: %g",
-      //       redCost);
       m_var->setReducedCost(redCost);
       return redCost <= -0.0000000001;//m_app->m_param.dualTol;
    }
@@ -36,7 +33,6 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
       // ---
       // --- RC[s] = u (A''s) + alpha -> dual ray
       // ---
-      //redCost = m_col->dotProduct(u);
       redCost = -m_col->dotProduct(u);
       return redCost <= -0.0000000001;//m_app->m_param.dualTol;
    }
@@ -45,29 +41,108 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
 
 // --------------------------------------------------------------------- //
 //use hash!
-bool DecompVarPool::isDuplicate(const DecompWaitingCol & wcol){
+/*bool DecompVarPool::isDuplicate(const DecompWaitingCol & wcol){
    vector<DecompWaitingCol>::const_iterator vi;
    for(vi = begin(); vi != end(); vi++){
       //TODO: this is very expensive
       //TODO: override DecompWaitingCol operator==
-      //printf("\nHERE isDup");
       if((*vi).getColPtr()->isEquivalent(*wcol.getColPtr()))
          return true;
    }
    return false;
+   }*/
+
+
+// --------------------------------------------------------------------- //
+bool DecompVarPool::isParallel(const DecompVarList    & vars,
+                               const DecompWaitingCol & wcol,
+                               const double             maxCosine){
+
+   DecompVarList::const_iterator vi;
+   int            j1, j2, index1, index2;
+   double         cosine;
+   DecompVar    * var    = wcol.getVarPtr();
+   const int      block1 = var->getBlockId();
+   const int      len1   = var->m_s.getNumElements();
+   const int    * ind1   = var->m_s.getIndices();
+   const double * els1   = var->m_s.getElements();
+   const double   norm1  = var->getNorm();
+   bool           isPara = false;
+   for(vi = vars.begin(); vi != vars.end(); vi++){
+      //---
+      //--- if different blocks, it doesn't matter if rest of var
+      //---   is close to parallel
+      //---
+      if((*vi)->getBlockId() != block1){
+         continue;
+      }
+      const int      len2 = (*vi)->m_s.getNumElements();
+      const int    * ind2 = (*vi)->m_s.getIndices();
+      const double * els2 = (*vi)->m_s.getElements(); 
+      const double   norm2= (*vi)->getNorm();
+      index1              = 0;
+      index2              = 0;
+      cosine              = 0.0;
+      //---
+      //--- calculate var1*var2 (both sparse)
+      //---   var indices are assumed to be sorted increasing
+      //---
+      while(1){
+         j1 = ind1[index1];
+         j2 = ind2[index2];
+         if(j1 == j2){
+            cosine += els1[index1] * els2[index2];
+            index1++;
+            index2++;
+            if(index2 >= len2 || index1 >= len1)
+               break;
+         }
+         else if(j1 > j2){
+            index2++;
+            if(index2 >= len2)
+               break;
+         }
+         else{
+            index1++;
+            if(index1 >= len1)
+               break;
+         } 
+      }
+      cosine /= norm1;
+      cosine /= norm2;
+      cosine = fabs(cosine);
+      if(cosine > maxCosine){
+         isPara = true;
+         printf("parallel: cosine=%g\n", cosine);
+         break;
+      }
+      printf("not parallel: cosine=%g\n", cosine);
+   }
+   return isPara;
 }
 
 // --------------------------------------------------------------------- //
 bool DecompVarPool::isDuplicate(const DecompVarList    & vars,
                                 const DecompWaitingCol & wcol){
    DecompVarList::const_iterator vi;
+   DecompVar * var = wcol.getVarPtr();
    for(vi = vars.begin(); vi != vars.end(); vi++){
-      if(((*vi)->getBlockId() == wcol.getVarPtr()->getBlockId()) &&
-         ((*vi)->getStrHash() == wcol.getVarPtr()->getStrHash())) {
-	 //printf("check dup var %s vs waitingCol %s\n",
-	 //(*vi)->getStrHash().c_str(),
-	 //wcol.getVarPtr()->getStrHash().c_str());	 
-	 //printf("IS DUP HERE\n");
+      if(((*vi)->getBlockId() == var->getBlockId()) &&
+         ((*vi)->getStrHash() == var->getStrHash())) {
+	 return true;
+      }
+   }
+   return false;
+}
+
+// --------------------------------------------------------------------- //
+bool DecompVarPool::isDuplicate(const DecompWaitingCol & wcol){
+   vector<DecompWaitingCol>::const_iterator vi;
+   DecompVar * var1 = wcol.getVarPtr();
+   for(vi = begin(); vi != end(); vi++){
+      DecompVar * var2 = (*vi).getVarPtr();
+      if((var1->getBlockId() == var2->getBlockId()) &&
+         (var1->getStrHash() == var2->getStrHash())) {
 	 return true;
       }
    }

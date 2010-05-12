@@ -24,14 +24,18 @@ public:
    string Instance;
    string BlockFile;
    string BlockFileFormat;
+   string PermuteFile;
    string InitSolutionFile;
+   int    UseNames;  //col/row names for debugging
+   int    UseSparse; //create all blocks sparsely
+   int    FullModel; //create full model for CPM or direct
    double BestKnownLB;
    double BestKnownUB;
    double ColumnUB; //hack since missing extreme rays
    double ColumnLB; //hack since missing extreme rays
    //=1 if all master-only vars in one block
    //=0 if one block per master-only var
-   int    MasterOnlyOneBlock;
+   //int    MasterOnlyOneBlock;
 
 public:
    void getSettings(UtilParameters & utilParam){
@@ -40,16 +44,20 @@ public:
       DataDir      = utilParam.GetSetting("DataDir",      "",    common);
       Instance     = utilParam.GetSetting("Instance",     "",    common);    
       BlockFile    = utilParam.GetSetting("BlockFile",    "",    common);
+      PermuteFile  = utilParam.GetSetting("PermuteFile",  "",    common);
       BlockFileFormat 
          = utilParam.GetSetting("BlockFileFormat",    "",    common);    
       InitSolutionFile
          = utilParam.GetSetting("InitSolutionFile",    "",    common);    
+      UseNames     = utilParam.GetSetting("UseNames",       0, common);
+      UseSparse    = utilParam.GetSetting("UseSparse",      0, common);
+      FullModel    = utilParam.GetSetting("FullModel",      0, common);
       BestKnownLB  = utilParam.GetSetting("BestKnownLB",  -1.e100, common);
       BestKnownUB  = utilParam.GetSetting("BestKnownUB",   1.e100, common);
       ColumnUB     = utilParam.GetSetting("ColumnUB",      1.e20,  common);
       ColumnLB     = utilParam.GetSetting("ColumnLB",     -1.e20,  common);
-      MasterOnlyOneBlock = 
-         utilParam.GetSetting("MasterOnlyOneBlock",            0,  common);
+      //MasterOnlyOneBlock = 
+      // utilParam.GetSetting("MasterOnlyOneBlock",            0,  common);
    }
 
    void dumpSettings(ostream * os = &cout){
@@ -60,30 +68,38 @@ public:
       (*os) << common << ": DataDir           : " << DataDir          << endl;
       (*os) << common << ": Instance          : " << Instance         << endl;
       (*os) << common << ": BlockFile         : " << BlockFile        << endl;
+      (*os) << common << ": PermuteFile       : " << PermuteFile      << endl;
       (*os) << common << ": BlockFileFormat   : " << BlockFileFormat  << endl;
       (*os) << common << ": InitSolutionFile  : " << InitSolutionFile << endl;
+      (*os) << common << ": UseNames          : " << UseNames         << endl;
+      (*os) << common << ": UseSparse         : " << UseSparse        << endl;
+      (*os) << common << ": FullModel         : " << FullModel        << endl;
       (*os) << common << ": BestKnownLB       : " << BestKnownLB      << endl;
       (*os) << common << ": BestKnownUB       : " << BestKnownUB      << endl;
       (*os) << common << ": ColumnUB          : " << ColumnUB         << endl;
       (*os) << common << ": ColumnLB          : " << ColumnLB         << endl;
-      (*os) << common << ": MasterOnlyOneBlock: " 
-            << MasterOnlyOneBlock << endl;
+      //(*os) << common << ": MasterOnlyOneBlock: " 
+      //    << MasterOnlyOneBlock << endl;
       (*os) << "\n=====================================================\n";
    }
    
 public:
    MILPBlock_Param():    
-      LogLevel       (0 ),
-      DataDir        (""),
-      Instance       (""),
-      BlockFile      (""), 
-      BlockFileFormat(""),
+      LogLevel        (0 ),
+      DataDir         (""),
+      Instance        (""),
+      BlockFile       (""), 
+      BlockFileFormat (""),
+      PermuteFile     (""), 
       InitSolutionFile(""),
-      BestKnownLB    (-1.e100),
-      BestKnownUB    ( 1.e100),
-      ColumnUB       ( 1.e20),
-      ColumnLB       (-1.e20),
-      MasterOnlyOneBlock(0)
+      UseNames        (0),
+      UseSparse       (0),
+      FullModel       (0),
+      BestKnownLB     (-1.e100),
+      BestKnownUB     ( 1.e100),
+      ColumnUB        ( 1.e20),
+      ColumnLB        (-1.e20)
+      //MasterOnlyOneBlock(0)
 {};
    ~MILPBlock_Param() {};
 };
