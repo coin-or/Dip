@@ -217,7 +217,7 @@ public:
       PARAM_getSetting("BranchEnforceInSubProb",  BranchEnforceInSubProb);
       PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
-      PARAM_getSetting("ParllelColsLimit",        ParallelColsLimit);
+      PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
    }
 
    inline void getSettings(UtilParameters & param){

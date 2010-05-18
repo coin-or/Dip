@@ -68,46 +68,50 @@ bool DecompVarPool::isParallel(const DecompVarList    & vars,
    const double * els1   = var->m_s.getElements();
    const double   norm1  = var->getNorm();
    bool           isPara = false;
+   if(len1 == 0)
+      return false;
    for(vi = vars.begin(); vi != vars.end(); vi++){
       //---
       //--- if different blocks, it doesn't matter if rest of var
       //---   is close to parallel
       //---
-      if((*vi)->getBlockId() != block1){
+      const int      len2 = (*vi)->m_s.getNumElements();
+      if((*vi)->getBlockId() != block1 ||
+	 len2                == 0){
          continue;
       }
-      const int      len2 = (*vi)->m_s.getNumElements();
       const int    * ind2 = (*vi)->m_s.getIndices();
       const double * els2 = (*vi)->m_s.getElements(); 
       const double   norm2= (*vi)->getNorm();
       index1              = 0;
       index2              = 0;
       cosine              = 0.0;
+      
       //---
       //--- calculate var1*var2 (both sparse)
       //---   var indices are assumed to be sorted increasing
       //---
       while(1){
-         j1 = ind1[index1];
-         j2 = ind2[index2];
-         if(j1 == j2){
-            cosine += els1[index1] * els2[index2];
-            index1++;
-            index2++;
-            if(index2 >= len2 || index1 >= len1)
-               break;
-         }
-         else if(j1 > j2){
-            index2++;
-            if(index2 >= len2)
-               break;
-         }
-         else{
-            index1++;
-            if(index1 >= len1)
-               break;
-         } 
-      }
+	 j1 = ind1[index1];
+	 j2 = ind2[index2];
+	 if(j1 == j2){
+	    cosine += els1[index1] * els2[index2];
+	    index1++;
+	    index2++;
+	    if(index2 >= len2 || index1 >= len1)
+	       break;
+	 }
+	 else if(j1 > j2){
+	    index2++;
+	    if(index2 >= len2)
+	       break;
+	 }
+	 else{
+	    index1++;
+	    if(index1 >= len1)
+	       break;
+	 } 
+      }   
       cosine /= norm1;
       cosine /= norm2;
       cosine = fabs(cosine);
