@@ -19,9 +19,14 @@ Settings for all decomp algorithms.
 #############################################################################
 [DECOMP]
 LogLevel      = 3
+#LogLpLevel    = 1
 LogDebugLevel = 3
-LogDumpModel  = 2
-LimitTime     = 600
+LogDumpModel  = 0
+#DualStab      = 1
+#DualStabAlpha = 0.3
+BranchEnforceInSubProb = 1
+BranchEnforceInMaster  = 0
+#SubProbGapLimitExact   = 0.01
 
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
@@ -34,7 +39,7 @@ Settings for decomp algorithm price and cut.
   section=PRICE_AND_CUT
 #############################################################################
 [PRICE_AND_CUT]
-LogLpLevel = 3
+
 
 #############################################################################
 Settings for ALPS framework.
@@ -43,7 +48,7 @@ Settings for ALPS framework.
 [ALPS]
 nodeLogInterval = 1
 msgLevel        = 3
-timeLimit       = 600
+#timeLimit       = 600
 
 #############################################################################
 Settings for MILPBlock application.
@@ -51,17 +56,17 @@ Settings for MILPBlock application.
 #############################################################################
 [MILPBlock]
 # Log level for messages from application.
-LogLevel       = 3
+LogLevel       = 2
 
 # Path to instance data.
-DataDir        = ../../../../Dip/data/MILP/block/drugport
+DataDir        = U:\temp
 
 # {Pair,List}: Block file format. See README.txt.
 BlockFileFormat = Pair
 
 # Name of block file (assumed to be in DataDir).
-BlockFile       = drug_port_20.block
+BlockFile       = e8_blocks.txt
 
 # Name of MPS file for instance (assumed to be in DataDir).
-Instance        = drug_port_20
+Instance        = e8
 
