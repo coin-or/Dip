@@ -1016,23 +1016,29 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 }
 
 //===========================================================================//
-void DecompAlgo::masterMatrixAddArtCol(CoinPackedMatrix * masterM,
-                                       char              LorG,
-                                       int               rowIndex,
-                                       int               colIndex,
-                                       DecompColType     colType,
-                                       double          & colLB,
-                                       double          & colUB,
-                                       double          & objCoeff){
+void DecompAlgo::masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
+				       vector<int         > & colInd,
+				       vector<double      > & colVal,
+                                       char                   LorG,
+                                       int                    rowIndex,
+                                       int                    colIndex,
+                                       DecompColType          colType,
+                                       double               & colLB,
+                                       double               & colUB,
+                                       double               & objCoeff){
 
-   //////////////////////////////////// STOP
-   //TODO: this is WAY too slow... need to use appendCols
-   CoinPackedVector artCol;
+   //CoinPackedVector artCol;   
+   //if(LorG == 'L')
+   //   artCol.insert(rowIndex, -1.0);
+   //else
+   //   artCol.insert(rowIndex,  1.0);
+   //masterM->appendCol(artCol);
+   colInd.push_back(rowIndex);
    if(LorG == 'L')
-      artCol.insert(rowIndex, -1.0);
+      colVal.push_back(-1.0);
    else
-      artCol.insert(rowIndex,  1.0);
-   masterM->appendCol(artCol);
+      colVal.push_back( 1.0);
+   colBeg.push_back(static_cast<CoinBigIndex>(colBeg.size()));   
    colLB    = 0.0;
    colUB    = DecompInf;
    objCoeff = 1.0;       
@@ -1094,6 +1100,11 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
    string rowNameR;
    char   rowSenseR;
    colIndex = masterM->getNumCols();
+
+   vector<CoinBigIndex> colBeg;
+   vector<int         > colInd;
+   vector<double      > colVal;
+   colBeg.push_back(0);
    for(r = startRow; r < endRow; r++){
       if(hasNames)
 	 strIndex = UtilIntToStr(colIndex);
@@ -1109,7 +1120,8 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
       
       switch(rowSenseR){
       case 'L':
-	 masterMatrixAddArtCol(masterM, 'L', r, colIndex, colTypeL,
+	 masterMatrixAddArtCol(colBeg, colInd, colVal,
+			       'L', r, colIndex, colTypeL,
 			       colLB[colIndex], colUB[colIndex], 
 			       objCoeff[colIndex]);
 	 if(hasNames){
@@ -1120,7 +1132,8 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 	 colIndex++;
 	 break;
       case 'G':
-	 masterMatrixAddArtCol(masterM, 'G', r, colIndex, colTypeG,
+	 masterMatrixAddArtCol(colBeg, colInd, colVal,
+			       'G', r, colIndex, colTypeG,
 			       colLB[colIndex], colUB[colIndex],
 			       objCoeff[colIndex]);
 	 if(hasNames){
@@ -1131,7 +1144,8 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 	 colIndex++;
 	 break;
       case 'E':
-	 masterMatrixAddArtCol(masterM, 'L', r, colIndex, colTypeL,
+	 masterMatrixAddArtCol(colBeg, colInd, colVal,
+			       'L', r, colIndex, colTypeL,
 			       colLB[colIndex], colUB[colIndex], 
 			       objCoeff[colIndex]);
 	 if(hasNames){
@@ -1140,7 +1154,8 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 	 }
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
 	 colIndex++;
-	 masterMatrixAddArtCol(masterM, 'G', r, colIndex, colTypeG,
+	 masterMatrixAddArtCol(colBeg, colInd, colVal,
+			       'G', r, colIndex, colTypeG,
 			       colLB[colIndex], colUB[colIndex],
 			       objCoeff[colIndex]);
 	 if(hasNames){
@@ -1154,7 +1169,11 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
          throw UtilException("Range constraints are not yet supported. Please break up your range constraints into two constraints.", 
                              "masterMatrixAddArtCols", "DecompAlgo");
       }
-   }   
+   }
+   masterM->appendCols(colBeg.size()-1,
+		       &colBeg[0], 
+		       &colInd[0], 
+		       &colVal[0]);
 }
 
 //===========================================================================//
