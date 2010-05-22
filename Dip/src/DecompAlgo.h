@@ -584,6 +584,10 @@ public:
    inline const int getAlgo() const {
       return m_algo;}
 
+   inline OsiSolverInterface * getMasterOSI() {
+      return m_masterSI;
+   }
+
    inline DecompAlgoModel & getModelRelax(const int blockId){
       map<int,DecompAlgoModel>::iterator mit;
       mit = m_modelRelax.find(blockId);

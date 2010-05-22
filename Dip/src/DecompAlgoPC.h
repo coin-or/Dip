@@ -69,6 +69,8 @@ private:
    virtual void phaseInit(DecompPhase & phase);
 
 
+
+
    virtual const double * getMasterDualSolution()  {
       //---
       //--- return the duals to be used in pricing step
@@ -208,6 +210,15 @@ private:
     */
    //-----------------------------------------------------------------------//
 public:
+
+   vector<double> & getDualBest(){
+      return m_dual;
+   }
+   vector<double> & getDualRMP(){
+      return m_dualRM;
+   }
+
+
    /**
     * Default constructors.
     */   

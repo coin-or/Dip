@@ -4429,7 +4429,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	      );
    int doAllBlocks = false;
    if(m_phase          == PHASE_PRICE1 ||
-      m_rrIterSinceAll >= (m_param.RoundRobinInterval * m_numConvexCon)){
+      m_rrIterSinceAll >= m_param.RoundRobinInterval){
+      //m_rrIterSinceAll >= (m_param.RoundRobinInterval * m_numConvexCon)){
       doAllBlocks      = true;
       m_rrIterSinceAll = 0;
    }
@@ -4606,20 +4607,24 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- ask the user which blocks should be solved
       //---    
       vector<int> blocksToSolve;
-      //m_app->solveRelaxedWhich(blocksToSolve);
+      m_app->solveRelaxedWhich(blocksToSolve);
       UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                (*m_osLog) << "Blocks to solve: ";
                UtilPrintVector(blocksToSolve, m_osLog);
                );
+      int nBlocks = static_cast<int>(blocksToSolve.size());
 
 
       //---
       //--- keep trying until find a block with candidate variable
       //---
       bool foundNegRC = false;
-      for(i = 0; i < m_numConvexCon; i++){
-	 b = (m_rrLastBlock + 1) % m_numConvexCon;
-
+      for(i = 0; i < nBlocks; i++){
+	 //for(i = 0; i < m_numConvexCon; i++){
+	 // b = (m_rrLastBlock + 1) % m_numConvexCon;
+	 
+	 b = blocksToSolve[i];
+	 
          map<int, DecompAlgoModel>::iterator mit; 
          mit = m_modelRelax.find(b);
          assert(mit != m_modelRelax.end());
@@ -4660,11 +4665,11 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    varRedCost = (*it)->getReducedCost();
 	    if(varRedCost < -epsilonRedCost){ //TODO: strict, -dualTOL?
 	       foundNegRC = true;
-	       break;
+	       //break;
 	    }
 	 }
-	 if(foundNegRC)
-	    break;
+	 //if(foundNegRC)
+	 //   break;
       }
 
       //---
@@ -4672,8 +4677,84 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //---  find any columns with negative reduced cost, then we CAN
       //---  update the LB and should - as we have priced out
       //---
-      if(!foundNegRC)
-         m_rrIterSinceAll = 0;
+      //if(!foundNegRC)
+      // m_rrIterSinceAll = 0;
+
+
+      //---
+      //--- if user provided blocks found no negRC, solve all blocks
+      //---
+      if(!foundNegRC){
+	 printf("no neg rc from user blocks, solve all blocks\n");
+	 bool useCutoff = false;
+	 bool useExact  = true;
+	 if(m_phase == PHASE_PRICE2)
+	    useCutoff = m_param.SubProbUseCutoff ? true : false;
+
+	 //TODO: make this a function (to solve all blocks)	 
+	 map<int, DecompAlgoModel>::iterator mit; 
+	 for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
+	    DecompAlgoModel & algoModel = (*mit).second;
+	    subprobSI = algoModel.getOsi();
+	    b         = algoModel.getBlockId();
+	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+		       (*m_osLog) << "solve relaxed model = "
+		       << algoModel.getModelName() << endl;);         
+	    //---
+	    //--- PC: get dual vector
+	    //---   alpha --> sum{s} lam[s]   = 1 - convexity constraint
+	    //---
+	    alpha = u[nBaseCoreRows + b];
+	    
+	    //TODO: stat return, restrict how many? pass that in to user?
+	    //---
+	    //--- NOTE: the variables coming back include alpha in 
+	    //---       calculation of reduced cost
+	    //---
+	    solveRelaxed(redCostX, 
+			 origObjective,
+			 alpha, 
+			 nCoreCols, 
+			 false, //isNested
+			 algoModel,
+			 &solveResult,
+			 potentialVars);
+	    //if cutoff delcares infeasible, we know subprob >= 0
+	    //  we can use 0 as valid (but possibly weaker bound)
+	    if(solveResult.m_isCutoff){
+	       mostNegRCvec[b] = min(mostNegRCvec[b],0.0);
+	    }
+	 }
+	 
+	 map<int, vector<DecompAlgoModel> >::iterator mivt;
+	 vector<DecompAlgoModel>           ::iterator vit; 
+	 useExact  = false;
+	 useCutoff = true;
+	 for(mivt  = m_modelRelaxNest.begin(); 
+	     mivt != m_modelRelaxNest.end(); mivt++){
+	    for(vit  = (*mivt).second.begin(); 
+		vit != (*mivt).second.end(); vit++){
+	       subprobSI = (*vit).getOsi();
+	       b         = (*vit).getBlockId();
+	       alpha     = u[nBaseCoreRows + b];
+	       UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+			  (*m_osLog) << "solve relaxed nested model = "
+			  << (*vit).getModelName() << endl;);
+	       solveRelaxed(redCostX,
+			    origObjective,         //original cost vector 
+			    alpha,
+			    nCoreCols,             //num core columns
+			    true,                  //isNested
+			    (*vit),
+			    &solveResult,          //results
+			    potentialVars);        //var list to populate
+	       if(solveResult.m_isCutoff){
+		  mostNegRCvec[b] = min(mostNegRCvec[b],0.0);
+	       }            
+	    }
+	 } 
+	 m_rrIterSinceAll = 0;
+      }      
    }
 
 
