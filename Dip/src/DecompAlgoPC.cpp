@@ -159,6 +159,28 @@ int DecompAlgoPC::compressColumns(){
 
    m_stats.timerOther1.reset();
 
+   //STOP
+   int nHistorySize 
+      = static_cast<int>(m_nodeStats.objHistoryLB.size());
+   if(nHistorySize > 0){		  
+      DecompObjBound & objBound 
+	 = m_nodeStats.objHistoryLB[nHistorySize-1];
+      double masterUB  = objBound.thisBoundUB;
+      double masterLB  = m_nodeStats.objBest.first;
+      double masterGap = DecompInf;
+      if(masterUB > -DecompInf && 
+	 masterUB <  DecompInf){
+	 if(masterUB != 0.0)
+	    masterGap = fabs(masterUB - masterLB) / masterUB;
+	 else
+	    masterGap = fabs(masterUB - masterLB);
+      }
+      if(masterGap > m_param.CompressColumnsMasterGapStart)
+	 return status;
+   }
+   else
+      return status;
+
    const int      CompressColsIterFreq      = m_param.CompressColumnsIterFreq; 
    const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
    const int      nMasterCols               = m_masterSI->getNumCols();

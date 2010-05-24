@@ -63,8 +63,9 @@ public:
    double MasterGapLimit;
 
    int    CompressColumns;
-   int    CompressColumnsIterFreq;     //num iters between compress
-   double CompressColumnsSizeMultLimit;//don't compress unless number of cols increased by this mult
+   int    CompressColumnsIterFreq;      //num iters between compress
+   double CompressColumnsSizeMultLimit; //don't compress unless number of cols increased by this mult
+   double CompressColumnsMasterGapStart;//do not start compression until master gap is within this limit
    int    CutDC;
    int    CutCGL;
    
@@ -180,8 +181,9 @@ public:
       PARAM_getSetting("TailoffPercent",       TailoffPercent);       
       PARAM_getSetting("MasterGapLimit",       MasterGapLimit);
       PARAM_getSetting("CompressColumns",      CompressColumns);       
-      PARAM_getSetting("CompressColumnsIterFreq",      CompressColumnsIterFreq);       
-      PARAM_getSetting("CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);       
+      PARAM_getSetting("CompressColumnsIterFreq",       CompressColumnsIterFreq);       
+      PARAM_getSetting("CompressColumnsSizeMultLimit",  CompressColumnsSizeMultLimit);       
+      PARAM_getSetting("CompressColumnsMasterGapStart", CompressColumnsMasterGapStart);
       PARAM_getSetting("CutDC",                CutDC);
       PARAM_getSetting("CutCGL",               CutCGL);
       PARAM_getSetting("CutCglKnapC",          CutCglKnapC);
@@ -265,6 +267,7 @@ public:
       UtilPrintParameter(os, sec, "CompressColumns",     CompressColumns);
       UtilPrintParameter(os, sec, "CompressColumnsIterFreq",      CompressColumnsIterFreq);
       UtilPrintParameter(os, sec, "CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);
+      UtilPrintParameter(os, sec, "CompressColumnsMasterGapStart", CompressColumnsMasterGapStart);
       UtilPrintParameter(os, sec, "CutDC",               CutDC);
       UtilPrintParameter(os, sec, "CutCGL",              CutCGL);
       UtilPrintParameter(os, sec, "CutCglKnapC",         CutCglKnapC);
@@ -336,8 +339,9 @@ public:
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
       CompressColumns      = 1;
-      CompressColumnsIterFreq      = 2;
-      CompressColumnsSizeMultLimit = 1.20;
+      CompressColumnsIterFreq       = 2;
+      CompressColumnsSizeMultLimit  = 1.20;
+      CompressColumnsMasterGapStart = 0.20;
       CutDC                = 0;
       CutCGL               = 1;
       CutCglKnapC          = 1;
