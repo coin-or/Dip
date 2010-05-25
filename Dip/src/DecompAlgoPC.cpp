@@ -159,7 +159,6 @@ int DecompAlgoPC::compressColumns(){
 
    m_stats.timerOther1.reset();
 
-   //STOP
    int nHistorySize 
       = static_cast<int>(m_nodeStats.objHistoryLB.size());
    if(nHistorySize > 0){		  

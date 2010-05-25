@@ -120,7 +120,7 @@ bool DecompVarPool::isParallel(const DecompVarList    & vars,
          printf("parallel: cosine=%g\n", cosine);
          break;
       }
-      printf("not parallel: cosine=%g\n", cosine);
+      //printf("not parallel: cosine=%g\n", cosine);
    }
    return isPara;
 }

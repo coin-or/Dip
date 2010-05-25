@@ -6455,6 +6455,34 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    //---
    if(static_cast<int>(m_nodeStats.objHistoryLB.size()) <= changeLen)
       return false;
+
+
+   //---
+   //--- don't check for tailoff until we are at least in the ballpark
+   //---   with respect to DW gap
+   //--- TODO: get its own parameter?
+   //---
+   int nHistorySize 
+      = static_cast<int>(m_nodeStats.objHistoryLB.size());
+   if(nHistorySize > 0){		  
+      DecompObjBound & objBound 
+	 = m_nodeStats.objHistoryLB[nHistorySize-1];
+      double masterUB  = objBound.thisBoundUB;
+      double masterLB  = m_nodeStats.objBest.first;
+      double masterGap = DecompInf;
+      if(masterUB > -DecompInf && 
+	 masterUB <  DecompInf){
+	 if(masterUB != 0.0)
+	    masterGap = fabs(masterUB - masterLB) / masterUB;
+	 else
+	    masterGap = fabs(masterUB - masterLB);
+      }
+      printf("Check tailoff, masterLB=%g masterUB=%g masterGap=%g\n", 
+	     masterLB, masterUB, masterGap);
+      if(masterGap > m_param.CompressColumnsMasterGapStart)
+	 return false;
+   }
+
    vector< DecompObjBound >::reverse_iterator it 
       = m_nodeStats.objHistoryLB.rbegin();
    int    len       = 0;
