@@ -82,7 +82,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #ifndef DIP_VERSION
-#define DIP_VERSION "0.8.7"
+#define DIP_VERSION "0.8"
 #endif
 
 #endif /*__DECOMPCONFIG_H__ */
