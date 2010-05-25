@@ -506,15 +506,17 @@ public:
 
 
 
+   void masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
+			      vector<int         > & colInd,
+			      vector<double      > & colVal,
+			      char                   LorG,
+			      int                    rowIndex,
+			      int                    colIndex,
+			      DecompColType          colType,
+			      double               & colLB,
+			      double               & colUB,
+			      double               & objCoeff);
 
-   void masterMatrixAddArtCol(CoinPackedMatrix * masterM,
-                              char               LorG,
-                              int                rowIndex,
-                              int                colIndex,
-                              DecompColType      colType,
-                              double           & colLB,
-                              double           & colUB,
-                              double           & objCoeff);
    virtual void masterMatrixAddArtCols(CoinPackedMatrix * masterM,
                                        double           * colLB,
                                        double           * colUB,
@@ -581,6 +583,10 @@ public:
 
    inline const int getAlgo() const {
       return m_algo;}
+
+   inline OsiSolverInterface * getMasterOSI() {
+      return m_masterSI;
+   }
 
    inline DecompAlgoModel & getModelRelax(const int blockId){
       map<int,DecompAlgoModel>::iterator mit;

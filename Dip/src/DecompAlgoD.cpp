@@ -210,10 +210,15 @@ void DecompAlgoD::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
       DecompCol_ArtForRowG : DecompCol_ArtForBranchG;
       
    colIndex = masterM->getNumCols();
+   vector<CoinBigIndex> colBeg;
+   vector<int         > colInd;
+   vector<double      > colVal;
+   colBeg.push_back(0);
    for(r = startRow; r < endRow; r++){
       if(hasNames)
 	strIndex = UtilIntToStr(colIndex);
-      masterMatrixAddArtCol(masterM, 'L', r, colIndex, colTypeL,
+      masterMatrixAddArtCol(colBeg, colInd, colVal,
+			    'L', r, colIndex, colTypeL,
                             colLB[colIndex], colUB[colIndex], 
                             objCoeff[colIndex]);
       if(hasNames){
@@ -221,7 +226,8 @@ void DecompAlgoD::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
 	colNames.push_back(colName);
       }
       colIndex++;
-      masterMatrixAddArtCol(masterM, 'G', r, colIndex, colTypeG,
+      masterMatrixAddArtCol(colBeg, colInd, colVal,
+			    'G', r, colIndex, colTypeG,
                             colLB[colIndex], colUB[colIndex],
                             objCoeff[colIndex]);
       if(hasNames){
@@ -230,6 +236,10 @@ void DecompAlgoD::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
       }
       colIndex++;
    }
+   masterM->appendCols(colBeg.size()-1,
+		       &colBeg[0], 
+		       &colInd[0], 
+		       &colVal[0]);   
 }
 
 

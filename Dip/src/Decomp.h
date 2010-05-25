@@ -56,7 +56,6 @@ typedef std::list<DecompCut*> DecompCutList;
 //---
 //--- DECOMP constants
 //---
-const string DecompVersion  = "0.8";
 const double DecompBigNum   = 1.0e21;
 const double DecompEpsilon  = 1.0e-6;
 const double DecompZero     = 1.0e-14;

@@ -77,7 +77,7 @@ public:
       return m_origToSparse.size() ? true : false; };
    inline const CoinPackedMatrix * getMatrix() const { return M; };
    inline const int getNumRows() const { 
-      return M ? M->getNumRows() : static_cast<int>(colUB.size()); }
+      return M ? M->getNumRows() : static_cast<int>(rowLB.size()); }
    inline const int getNumCols() const { 
       return M ? M->getNumCols() : static_cast<int>(colLB.size()); }
    inline const int getNumColsOrig() const { 

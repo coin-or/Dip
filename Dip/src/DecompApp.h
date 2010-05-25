@@ -115,6 +115,8 @@ public:
    
    virtual int generateCuts(const double                       * x, 
 			    DecompCutList                      & newCuts);
+
+   virtual void solveRelaxedWhich(vector<int> & blocksToSolve){};
       
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
                                            const double     * redCostX,
