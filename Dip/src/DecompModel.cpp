@@ -233,17 +233,30 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    string cbcTime      = "-seconds";
    string cbcTimeSet   = "0";
    string cbcCutoff    = "-cutoff";   
-   string cbcCutoffSet = UtilDblToStr(cutoff);
+   string cbcCutoffSet = UtilDblToStr(cutoff, -1, COIN_DBL_MAX);
    string cbcSLog      = "-slog";
    string cbcSLogSet   = "2";
+   
    if(doExact){
-      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact);
       cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitExact);
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact);
    }
    else{
-      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact);
       cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitInexact);
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact);
    }
+
+   bool   doTime       = false;
+   double cbcMaxSecUB  = 1e100;
+   if(doExact){
+      if(param.SubProbTimeLimitExact < cbcMaxSecUB)
+         doTime = true;
+   }
+   else{
+      if(param.SubProbTimeLimitInexact < cbcMaxSecUB)
+         doTime = true; 
+   }
+
    argv[argc++] = cbcExe.c_str();
    argv[argc++] = cbcLog.c_str();
    argv[argc++] = cbcLogSet.c_str();      
@@ -251,8 +264,10 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //argv[argc++] = cbcSLogSet.c_str(); //for extra debugging
    argv[argc++] = cbcGap.c_str();   
    argv[argc++] = cbcGapSet.c_str();
-   argv[argc++] = cbcTime.c_str();
-   argv[argc++] = cbcTimeSet.c_str();
+   if(doTime){
+      argv[argc++] = cbcTime.c_str();
+      argv[argc++] = cbcTimeSet.c_str();
+   }
    if(doCutoff){
       argv[argc++] = cbcCutoff.c_str();
       argv[argc++] = cbcCutoffSet.c_str();
