@@ -96,6 +96,7 @@ protected:
     */
    DecompPhase m_phase;
    DecompPhase m_phaseLast;//just before done
+   DecompPhase m_phaseForce;
    
    /**
     * Pointer to current active DECOMP application.    
@@ -791,6 +792,7 @@ public:
       m_status     (STAT_UNKNOWN),
       m_phase      (PHASE_UNKNOWN),
       m_phaseLast  (PHASE_UNKNOWN),
+      m_phaseForce (PHASE_UNKNOWN),
       m_app        (app),
       m_stats      (),
       m_nodeStats  (),

@@ -183,14 +183,19 @@ int AlpsDecompTreeNode::process(bool isRoot,
 	       vector<double> & colUBCore = modelCore->colUB;
 	       for(c = 0; c < n_cols; c++){
 		  diffLB = lbs[c] - colLBCore[c];
-                     diffUB = ubs[c] - colUBCore[c]; 
-                     if(!UtilIsZero(diffLB) || !UtilIsZero(diffUB)){    
-                        cout << "bound-diffs c: " << c << " -> ";
-                        app->printOriginalColumn(c, &cout);
-                        cout << "\t(lb,ub): (" << colLBCore[c] << ","
-                             << colUBCore[c] << ")\t->\t(" << lbs[c]
-                             << "," << ubs[c] << ")" << endl;
-                     }
+		  diffUB = ubs[c] - colUBCore[c]; 
+		  if(!UtilIsZero(diffLB) || !UtilIsZero(diffUB)){    
+		     cout << "bound-diffs c: " << c << " -> ";
+		     app->printOriginalColumn(c, &cout);
+		     cout << "\t(lb,ub): (" << colLBCore[c] << ","
+			  << colUBCore[c] << ")\t->\t(" << lbs[c]
+			  << "," << ubs[c] << ")" << endl;
+		  }
+		  //else{
+		  // cout << "\t(lb,ub): (" << colLBCore[c] << ","
+		  //  << colUBCore[c] << ")\t->\t(" << lbs[c]
+		  //  << "," << ubs[c] << ")" << endl;
+		  //}
 	       }
 	       );   
       decompAlgo->setMasterBounds(lbs, ubs);
@@ -224,6 +229,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
 	 for(c = 0; c < n_cols; c++){
 	    lbsInf[c] = -DecompInf;
 	    ubsInf[c] =  DecompInf;
+	    //printf("root c:%d lb=%g ub=%g\n",
+	    //   c, lbs[c], ubs[c]);
 	 } 
          decompAlgo->setMasterBounds(lbsInf, ubsInf);
 	 UTIL_DELARR(lbsInf);

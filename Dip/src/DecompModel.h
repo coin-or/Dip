@@ -130,6 +130,10 @@ public:
                                colLB[mcit->first]); //original-index
             m_osi->setColUpper(mcit->second,        //sparse-index
                                colUB[mcit->first]); //original-index
+	    //printf("setColBounds orig:%d sparse:%d lb:%g ub:%g\n",
+	    //   mcit->first, mcit->second, 
+	    //   colLB[mcit->first],
+	    //   colUB[mcit->first]);
          }
       }
       else{

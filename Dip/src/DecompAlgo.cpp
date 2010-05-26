@@ -1398,7 +1398,15 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    m_stats.timerDecomp.reset();   
    m_nodeStats.init();
    m_nodeStats.nodeIndex      = nodeIndex;
-   m_nodeStats.objBest.first  = globalLB;
+
+   //NOTE: changed on 5/25/2010
+   //  if we use the parent LB, then stabilized won't
+   //  move until much later
+   //does this change effect anything else? wrt to short
+   //  cutting and fathoming - check this
+   //m_nodeStats.objBest.first  = globalLB;
+   m_nodeStats.objBest.first  = -DecompInf;
+
    m_nodeStats.objBest.second = globalUB;
    m_compressColsLastPrice    = 0;
    m_compressColsLastNumCols  = m_masterSI->getNumCols();
@@ -3031,6 +3039,15 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 
 
    //---
+   //--- is there an override?
+   //---
+   if(m_phaseForce != PHASE_UNKNOWN){
+      nextPhase  = m_phaseForce;
+      nextStatus = status;
+      goto PHASE_UPDATE_FINISH;
+   }
+
+   //---
    //--- was the current model found to be infeasible?
    //---
    if(status == STAT_INFEASIBLE){
@@ -3217,7 +3234,6 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
       //---
       //--- are we suggesting another price phase but gap is tight?
       //---
-      //--- ppp, gaptight, ccppp, gaptight c
       gapTight = isGapTight();
       if(gapTight && isCutPossible)
 	 if(cutCallsTotal == 0 ||  //haven't even tried cuts yet
@@ -5292,6 +5308,25 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       foundGoodCol = true;
    } //END: for(li = newVars.begin(); li != newVars.end(); li++)
 
+
+   //---
+   //--- in the case of Wegntes, you might get all duplicate
+   //---    columns - if this is the case, you don't want to stop
+   //---    searching - rather, reduce alpha and repeat gen vars
+   //---
+   if(m_phase        == PHASE_PRICE2 && 
+      newVars.size() >  0            && 
+      !foundGoodCol && m_param.DualStab){
+      m_param.DualStabAlpha *= 0.90;
+      printf("No vars passed doing Wegntes. Reduce alpha to %g and repeat.\n",
+	     m_param.DualStabAlpha);      
+      m_phaseForce = PHASE_PRICE2;
+   }
+   else
+      m_phaseForce = PHASE_UNKNOWN;
+      
+
+
    UTIL_DELARR(denseCol);
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "addVarsToPool()", m_param.LogDebugLevel, 2);
@@ -6468,7 +6503,8 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       DecompObjBound & objBound 
 	 = m_nodeStats.objHistoryLB[nHistorySize-1];
       double masterUB  = objBound.thisBoundUB;
-      double masterLB  = m_nodeStats.objBest.first;
+      double masterLB  = objBound.thisBound; 
+      //double masterLB  = m_nodeStats.objBest.first;
       double masterGap = DecompInf;
       if(masterUB > -DecompInf && 
 	 masterUB <  DecompInf){
