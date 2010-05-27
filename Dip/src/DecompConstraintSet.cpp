@@ -40,8 +40,8 @@ void DecompConstraintSet::prepareModel(){
    int numCols     = getNumCols();
    int numColsOrig = getNumColsOrig();
    UtilPrintMemUsage(&cout, 2, 2);
-   printf("numCols=%d numColsOrig=%d numRows=%d\n",
-          numCols, numColsOrig, numRows);
+   //printf("numCols=%d numColsOrig=%d numRows=%d\n",
+   //     numCols, numColsOrig, numRows);
    
    checkSenseAndBound();    
    //printf("(1) --> "); UtilPrintMemUsage(&cout, 2, 2);

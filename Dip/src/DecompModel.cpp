@@ -553,8 +553,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       int    i;
       int    nSols = CPXgetsolnpoolnumsolns(cpxEnv, cpxLp);
       double objVal;
-      printf("Number of solutions in solution pool = %d\n",
-	     nSols);
+      //printf("Number of solutions in solution pool = %d\n",
+      //nSols);
       //TODO: currently just take up to the limit,
       //  but, should sort by objective and take n least?
       nSols = std::min<int>(nSols, param.SubProbNumSolLimit);
@@ -563,7 +563,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
 	 if(status)
 	    throw UtilException("CPXgetsolnpoolobjval", 
 				"solveOsiAsIp", "DecompAlgoModel");
-	 printf("Sol %4d: Obj: %10g\n", i, objVal);
+	 //printf("Sol %4d: Obj: %10g\n", i, objVal);
 
 	 status = CPXgetsolnpoolx(cpxEnv, cpxLp, i, 
 				  solution, 0, numCols-1);
@@ -578,7 +578,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
       result->m_nSolutions = nSols;
    }
    
-   printf("solStatus = %d\n", result->m_solStatus);
+   //printf("solStatus = %d\n", result->m_solStatus);
    if(result->m_solStatus == CPXMIP_OPTIMAL){
       result->m_isOptimal  = true;      
    }

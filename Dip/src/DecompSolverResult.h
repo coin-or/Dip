@@ -28,6 +28,7 @@
 
 //===========================================================================//
 #include "Decomp.h"
+#include "DecompSolution.h"
 
 //===========================================================================//
 class DecompSolverResult {
@@ -47,7 +48,6 @@ public :
    bool      m_isCutoff;   
    int       m_nSolutions;
    vector< vector<double> > m_solution;
-   //double ** m_solution;
    /**
     * @}
     */
@@ -61,7 +61,7 @@ public:
    /**
     * Default constructors.
     */   
-   DecompSolverResult()://const int nOrigCols):
+   DecompSolverResult():
       m_solStatus (-1),
       m_solStatus2(-1),
       m_objLB     (-DecompInf),
@@ -69,16 +69,31 @@ public:
       m_isOptimal (false),
       m_isCutoff  (false),
       m_nSolutions(0)
-      //m_solution  (0)
    {
-      //m_solution = new double[nOrigCols];
+   }
+
+   DecompSolverResult(const DecompSolution * solution):
+      m_solStatus (-1),
+      m_solStatus2(-1),
+      m_objLB     (-DecompInf),
+      m_objUB     ( DecompInf),
+      m_isOptimal (false),
+      m_isCutoff  (false),
+      m_nSolutions(0)
+   {
+      const double * values = solution->getValues();
+      if(!values)
+	 return;
+      m_nSolutions = 1;
+      m_objUB      = solution->getQuality();
+      vector<double> sol(values, values + solution->getSize());
+      m_solution.push_back(sol);
    }
    
    /**
     * Destructor.
     */
    ~DecompSolverResult(){
-      //UTIL_DELARR(m_solution);
    }
    /**
     * @}

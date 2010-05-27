@@ -500,12 +500,9 @@ public:
     *
     */
    virtual DecompSolverResult * 
-      solveDirect(int                    timeLimit = COIN_INT_MAX,
-		  const DecompSolution * startSol  = NULL){
+   solveDirect(const DecompSolution * startSol  = NULL){
       return NULL;}
    
-
-
 
    void masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
 			      vector<int         > & colInd,
@@ -584,6 +581,9 @@ public:
 
    inline const int getAlgo() const {
       return m_algo;}
+
+   inline const DecompParam & getParam() const {
+      return m_param;}
 
    inline OsiSolverInterface * getMasterOSI() {
       return m_masterSI;

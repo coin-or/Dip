@@ -51,7 +51,7 @@ public:
    int    LimitTotalPriceIters;
    int    LimitRoundCutIters;
    int    LimitRoundPriceIters;
-   double LimitTime;
+   double LimitTime;//this controls time limit on (one) node processing
 
 
    //---

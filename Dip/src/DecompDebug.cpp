@@ -561,8 +561,7 @@ void DecompAlgo::printCuts(ostream * os){
 }
 
 //===========================================================================//
-DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
-					      const DecompSolution * startSol){
+DecompSolverResult * DecompAlgoC::solveDirect(const DecompSolution * startSol){
 					       
    //---
    //--- Solve the original IP with a generic IP solver.
@@ -582,7 +581,7 @@ DecompSolverResult * DecompAlgoC::solveDirect(int                    timeLimit,
    DecompConstraintSet * modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
    int                   numCols   = m_masterSI->getNumCols();
-
+   double                timeLimit = m_param.LimitTime;
 
    //---
    //--- start timer

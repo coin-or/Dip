@@ -107,9 +107,8 @@ private:
 			 const double * ubs){};
 
 public:
-   virtual DecompSolverResult * 
-      solveDirect(int                    timeLimit = COIN_INT_MAX,
-		  const DecompSolution * startSol  = NULL);
+   virtual DecompSolverResult *
+   solveDirect(const DecompSolution * startSol  = NULL);
 
    
    /**

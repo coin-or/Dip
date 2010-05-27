@@ -35,7 +35,6 @@ int main(int argc, char ** argv){
       bool doCut        = utilParam.GetSetting("doCut",       true);
       bool doPriceCut   = utilParam.GetSetting("doPriceCut",  false);
       bool doDirect     = utilParam.GetSetting("doDirect",    false);
-      int  timeLimit    = utilParam.GetSetting("LimitTime",   60, "DECOMP");
             
       UtilTimer timer;
       double    timeSetupReal = 0.0;
@@ -80,7 +79,7 @@ int main(int argc, char ** argv){
 	 //--- solve
 	 //---
 	 timer.start();      
-	 algo->solveDirect(timeLimit);
+	 algo->solveDirect();
 	 timer.stop();
 	 timeSolveCpu  = timer.getCpuTime();
 	 timeSolveReal = timer.getRealTime();

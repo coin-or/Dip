@@ -1373,7 +1373,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    << ") gLB = "      << UtilDblToStr(globalLB) 
 	    << " gUB = "       << UtilDblToStr(globalUB) 
 	    << " gap = "       << UtilDblToStr(gap,5) 
-            << " time = "      << UtilDblToStr(globalTimer.getCpuTime(), 3)
+            << " time = "      << UtilDblToStr(globalTimer.getRealTime(), 3)
             << endl;
 	    );
    
@@ -2656,7 +2656,11 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
       printf("======= BEGIN Gen Init Vars - call Direct IP solver\n");
       DecompAlgoC          direct(m_app, m_utilParam);
       DecompSolverResult * result = NULL;
-      result = direct.solveDirect(m_param.InitVarsWithIPLimitTime);
+      
+      double oldSetting = m_param.LimitTime;
+      m_param.LimitTime = m_param.InitVarsWithIPLimitTime;      
+      result = direct.solveDirect();
+      m_param.LimitTime = oldSetting;
       if(result->m_nSolutions){
 	 //---
 	 //--- if an incumbent was found, create a var(s) from it
@@ -2666,7 +2670,6 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	 if(m_numConvexCon == 1){	
 	    DecompVar * directVar = new DecompVar(nCoreCols,
 						  solution,
-						  //result->m_solution,
 						  0.0, result->m_objUB);
 	    initVars.push_back(directVar);
 	 }
@@ -2736,8 +2739,8 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 				       (*vli)->getOriginalCost());
 	       m_xhatIPBest = decompSol;
 	       m_xhatIPFeas.push_back(decompSol);
-	       printf("var is ip feas with obj = %g\n",
-		      (*vli)->getOriginalCost());
+	       //printf("var is ip feas with obj = %g\n",
+	       //     (*vli)->getOriginalCost());
 	       setObjBoundUB((*vli)->getOriginalCost());
 	    }
 	 }

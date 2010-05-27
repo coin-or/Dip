@@ -325,6 +325,26 @@ inline double UtilAve(const double * x,
 // =========================================================================
 
 // ------------------------------------------------------------------------- //
+inline void UtilStringTokenize(string const   & input,
+			       string const   & delimiters,
+			       vector<string> & tokens) {
+   using namespace std;
+   string::size_type last_pos = 0;
+   string::size_type pos = 0;
+   while(true){
+      pos = input.find_first_of(delimiters, last_pos);
+      if( pos == string::npos ){
+	 tokens.push_back(input.substr(last_pos));
+	 break;
+      }
+      else{
+	 tokens.push_back(input.substr(last_pos, pos - last_pos));
+	 last_pos = pos + 1;
+      }
+   }
+}
+
+// ------------------------------------------------------------------------- //
 inline string UtilStringRandom(int iLength) {
    string strReturn;
    srand( (unsigned int)time(NULL) );

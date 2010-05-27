@@ -80,8 +80,9 @@ public:
 
    /**
     * The time limit (in seconds) of search. Default: ALPS_DBL_MAX
+    *    This is populated by DecompParam:LimitTime
     */
-   double timeLimit;
+   //double timeLimit;
    /**
     * @}
     */
@@ -102,7 +103,7 @@ public:
       msgLevel        = param.GetSetting("msgLevel",        2,            sec);
       nodeLimit       = param.GetSetting("nodeLimit",       ALPS_INT_MAX, sec);
       nodeLogInterval = param.GetSetting("nodeLogInterval", 10,           sec);
-      timeLimit       = param.GetSetting("timeLimit",       ALPS_DBL_MAX, sec);
+      //timeLimit       = param.GetSetting("timeLimit",       ALPS_DBL_MAX, sec);
    }
    
    void dumpSettings(ostream * os = &cout){
@@ -115,7 +116,7 @@ public:
       (*os) << sec << ": msgLevel        = " << msgLevel        << endl;
       (*os) << sec << ": nodeLimit       = " << nodeLimit       << endl;
       (*os) << sec << ": nodeLogInterval = " << nodeLogInterval << endl;
-      (*os) << sec << ": timeLimit       = " << timeLimit       << endl;
+      //(*os) << sec << ": timeLimit       = " << timeLimit       << endl;
    }
    /**
     * @}
@@ -127,13 +128,6 @@ public:
     * @{
     */
    //-----------------------------------------------------------------------//
-   /**
-    * Disable copy constructors.
-    */
-private:
-   AlpsDecompParam(const AlpsDecompParam &);
-   AlpsDecompParam & operator=(const AlpsDecompParam &);
-
 public:   
    /**
     * Default constructors.
