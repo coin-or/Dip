@@ -34,12 +34,8 @@
 #include <cmath>
 #include <cstring>
 #include <ctime>
+#include <memory>
 using namespace std;
-
-// =========================================================================
-#if not defined(_MSC_VER)
-#include <malloc.h>
-#endif
 
 // =========================================================================
 const string UtilSpaces   = " \t\r\n";
