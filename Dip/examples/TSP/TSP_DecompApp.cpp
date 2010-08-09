@@ -120,23 +120,27 @@ void TSP_DecompApp::createModels(){
    //---  relax = { one-tree TODO write algebra } => 1-tree relaxation
    //---   NOTE: for validity, must generate rest of (2)
    //---
-   if(m_appParam.ModelNameRelax == "2MATCH" ||
-      m_appParam.ModelNameCore  == "2MATCH"){
-      DecompConstraintSet * model = new DecompConstraintSet();  
-      createModel2Match(model);
-      m_models.push_back(model);
-      if(m_appParam.ModelNameRelax == "2MATCH")
-         setModelRelax(model, m_appParam.ModelNameRelax);
-      else
-         setModelCore(model, m_appParam.ModelNameCore);
-   }
    if(m_appParam.ModelNameCore == "SUBTOUR"){
       DecompConstraintSet * model = new DecompConstraintSet();  
       createModelTrivialSEC(model);
       m_models.push_back(model);
       setModelCore(model, m_appParam.ModelNameCore);      
    }
-  
+   if(m_appParam.ModelNameRelax == "2MATCH" ||
+      m_appParam.ModelNameCore  == "2MATCH"){
+      DecompConstraintSet * model = new DecompConstraintSet();  
+      createModel2Match(model);
+      m_models.push_back(model);
+      if(m_appParam.ModelNameRelax == "2MATCH"){
+         assert(m_appParam.ModelNameCore == "SUBTOUR");
+	 setModelRelax(model, m_appParam.ModelNameRelax);	 
+      }
+      else{
+         assert(m_appParam.ModelNameRelax == "SUBTOUR");
+	 setModelRelax(NULL);
+         setModelCore (model, m_appParam.ModelNameCore);
+      }
+   }  
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createModels()", m_appParam.LogLevel, 2);
 }
@@ -259,7 +263,9 @@ TSP_DecompApp::solveRelaxed(const int          whichBlock,
    int                  n_vertices   = graphLib.n_vertices;
    int                  u, index;
 
-   if(m_appParam.ModelNameRelax == "1TREE"){
+   //TODO: BranchEnforceInSubProb option?
+
+   if(m_appParam.ModelNameRelax == "SUBTOUR"){
       vector< pair<int, double> > edge_cost;
       edge_cost.reserve(n_vertices);	 
       for(u = 0; u < n_vertices; u++){

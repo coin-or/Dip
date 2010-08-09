@@ -236,6 +236,7 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
           vit != (*mivt).second.end(); vit++)
          createOsiSubProblem((*vit));
    }
+   assert(m_numConvexCon >= 1);
    UTIL_DEBUG(m_param.LogDebugLevel, 1,
 	      (*m_osLog) << "Number of Convexity Constraints: " 
 	      << m_numConvexCon << endl;              
