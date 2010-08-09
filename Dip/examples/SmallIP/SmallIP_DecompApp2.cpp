@@ -15,7 +15,7 @@
 #include "SmallIP_DecompApp2.h"
 //===========================================================================//
 //parameters
-const int LogLevel   = 2;
+const int LogLevel   = 1;
 
 //===========================================================================//
 //---
@@ -157,7 +157,7 @@ void SmallIP_DecompApp::createModels(){
    //---
    //--- load the OSI object to be used in solve relaxed
    //---
-   m_osi.messageHandler()->setLogLevel(LogLevel);      
+   m_osi.messageHandler()->setLogLevel(0);      
    m_osi.loadProblem(*m_modelPart1.getMatrix(),
 		     m_modelPart1.getColLB(),
 		     m_modelPart1.getColUB(),
