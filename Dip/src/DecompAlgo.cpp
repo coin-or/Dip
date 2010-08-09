@@ -2565,8 +2565,8 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	       //  we don't correctly populate LB/UB in
 	       //  subprobResult object - so contribution is wrong
 	       sumInitLB += subprobResult.m_objLB;
-	       printf("ThisLB = %g, sumInitLB = %g\n",
-		      subprobResult.m_objLB, sumInitLB);
+	       //printf("ThisLB = %g, sumInitLB = %g\n",
+	       //     subprobResult.m_objLB, sumInitLB);
 	    }
 	 }
 
