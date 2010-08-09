@@ -111,6 +111,7 @@ public:
    void sensesToBounds();
    void boundsToSenses();
    void fixNonActiveColumns();
+   CoinPackedMatrix * sparseToOrigMatrix();
 
    inline void appendRow(CoinPackedVector & row,
 			 double             loBound,
@@ -136,6 +137,7 @@ public:
       colUB.push_back(upBound);
       if(isInteger)
 	 integerVars.push_back(index);
+      assert(!(origIndex==-1 && m_isSparse));
       if(origIndex >= 0){
 	 m_origToSparse.insert(make_pair(origIndex, index));
 	 m_sparseToOrig.insert(make_pair(index, origIndex));

@@ -10,8 +10,8 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
-#ifndef SMALLIP_DECOMPAPP2_INCLUDED
-#define SMALLIP_DECOMPAPP2_INCLUDED
+#ifndef SMALLIP_DECOMPAPP_INCLUDED
+#define SMALLIP_DECOMPAPP_INCLUDED
 
 //===========================================================================//
 #include "DecompApp.h"
@@ -38,6 +38,9 @@ private:
    DecompConstraintSet m_modelPart1;
    DecompConstraintSet m_modelPart2;
 
+   /** OSI object to use with solveRelaxed. */
+   OsiIpSolverInterface m_osi;
+
 public:
    /** @name Helper functions (public). */   
 
@@ -47,6 +50,10 @@ public:
 public:
    /* @name Inherited (from virtual) methods. */
    virtual int generateInitVars(DecompVarList & initVars);  
+   virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
+                                           const double     * redCostX,
+                                           const double       convexDual,
+                                           DecompVarList    & varList);
 
 public:
    SmallIP_DecompApp(UtilParameters & utilParam) : 

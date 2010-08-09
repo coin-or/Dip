@@ -236,7 +236,7 @@ void DecompAlgoD::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
       }
       colIndex++;
    }
-   masterM->appendCols(colBeg.size()-1,
+   masterM->appendCols(static_cast<int>(colBeg.size())-1,
 		       &colBeg[0], 
 		       &colInd[0], 
 		       &colVal[0]);   

@@ -20,18 +20,15 @@ int TSP_DecompApp::generateCutsSubtour(DecompCutList & newCuts){
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "generateCutsSubtour()", m_param.LogDebugLevel, 2);
-
    
-   //use access methods
-   UtilGraphLib     & graphLib         = m_tsp.m_graphLib;
+   //TODO: use access methods
    TSP_Concorde     & tspConcorde      = m_tsp.m_concorde;
 
    vector<ConcordeSubtourCut> subtourCuts;
 
    int c;
-   int n_vertices = graphLib.n_vertices;
    int n_subtour  = tspConcorde.generateCutsSubtour(subtourCuts);
-   int n_prevcuts = newCuts.size();
+   int n_prevcuts = static_cast<int>(newCuts.size());
    
    for(c = 0; c < n_subtour; c++){
       vector<int>  & S   = subtourCuts[c].S;
@@ -53,11 +50,12 @@ int TSP_DecompApp::generateCutsSubtour(DecompCutList & newCuts){
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "generateCutsSubtour()", m_param.LogDebugLevel, 2);
 
-   return newCuts.size() - n_prevcuts;
+   return static_cast<int>(newCuts.size()) - n_prevcuts;
 }
 
 
 #if 0
+//TODO
 /*--------------------------------------------------------------------------*/
 int TSP_DecompApp::generateCutsBlossoms(vector<int>    & edge_list,
 					vector<double> & edge_x,

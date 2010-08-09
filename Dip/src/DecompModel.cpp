@@ -26,12 +26,14 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
                                       const double   feasConTol){
                                          
    DecompConstraintSet    * model    = getModel();
+   if(!model)
+      return true;
    const CoinPackedMatrix * M        = model->getMatrix();
-   const  vector<string>  & colNames = model->getColNames();
-   const  vector<string>  & rowNames = model->getRowNames();
    if(!M)
       return true;
 
+   const  vector<string>  & colNames = model->getColNames();
+   const  vector<string>  & rowNames = model->getRowNames();
    int    c, r, i;
    int    precision   = 7;
    bool   isFeas      = true;

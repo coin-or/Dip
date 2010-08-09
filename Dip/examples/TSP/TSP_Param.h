@@ -33,8 +33,8 @@ public:
    string DataDir;
    string Instance;
    int    CutSubtoursX;
-   int    CutBlossomsX;
-   int    CutCombsX;
+   //int    CutBlossomsX;
+   //int    CutCombsX;
    string ModelNameCore;      //name of model core
    string ModelNameRelax;     //name of model relax
 
@@ -46,10 +46,12 @@ public:
       DataDir        = utilParam.GetSetting("DataDir",        "", common);
       Instance       = utilParam.GetSetting("Instance",       "", common);    
       CutSubtoursX   = utilParam.GetSetting("CutSubtoursX",    1, common);    
-      CutBlossomsX   = utilParam.GetSetting("CutBlossomsX",    1, common);    
-      CutCombsX      = utilParam.GetSetting("CutCombsX",       1, common);    
-      ModelNameCore  = utilParam.GetSetting("ModelNameCore",  "", common);
-      ModelNameRelax = utilParam.GetSetting("ModelNameRelax", "", common);
+      //CutBlossomsX   = utilParam.GetSetting("CutBlossomsX",    1, common); 
+      //CutCombsX      = utilParam.GetSetting("CutCombsX",       1, common);
+      ModelNameCore  = utilParam.GetSetting("ModelNameCore",  "2MATCH", 
+					    common);
+      ModelNameRelax = utilParam.GetSetting("ModelNameRelax", "SUBTOUR", 
+					    common);
    }
 
    void dumpSettings(ostream * os = &cout){
@@ -60,8 +62,8 @@ public:
       (*os) << common << ": DataDir       : " << DataDir        << endl;
       (*os) << common << ": Instance      : " << Instance       << endl;
       (*os) << common << ": CutSubtoursX  : " << CutSubtoursX   << endl;
-      (*os) << common << ": CutBlossomsX  : " << CutBlossomsX   << endl;
-      (*os) << common << ": CutCombsX     : " << CutCombsX      << endl;
+      //(*os) << common << ": CutBlossomsX  : " << CutBlossomsX   << endl;
+      //(*os) << common << ": CutCombsX     : " << CutCombsX      << endl;
       (*os) << common << ": ModelNameCore : " << ModelNameCore  << endl;
       (*os) << common << ": ModelNameRelax: " << ModelNameRelax << endl;
       (*os) <<   "=====================================================\n";
@@ -73,10 +75,10 @@ public:
       DataDir       ("."),
       Instance      ("" ),
       CutSubtoursX  (1  ),
-      CutBlossomsX  (0  ),
-      CutCombsX     (0  ),   
-      ModelNameCore ("MDKP0"),
-      ModelNameRelax("MCKP0")
+      //CutBlossomsX  (0  ),
+      //CutCombsX     (0  ),   
+      ModelNameCore ("2MATCH"),
+      ModelNameRelax("SUBTOUR")
 
    {}
    ~TSP_Param() {};

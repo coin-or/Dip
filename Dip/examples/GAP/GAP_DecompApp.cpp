@@ -37,33 +37,13 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
       + UtilDirSlash() + m_appParam.Instance;
    m_instance.readInstance(instanceFile);
 
-#if 0 
    //---
    //--- read best known lb/ub
-   //--
-   string bestKnownFile  = m_appParam.DataDir + UtilDirSlash() + "gap.opt";
-   {
-      ifstream is;
-      string   instanceName;
-      double   bestUpperBound;
-      bool     isProvenOptimal;
-      UtilOpenFile(is, bestKnownFile);
-      while(!is.eof()){
-         is >> instanceName >> bestUpperBound >> isProvenOptimal;
-         instanceName = UtilStrTrim(instanceName);
-         if(instanceName == m_appParam.Instance){
-	    if(isProvenOptimal){
-	       m_bestKnownLB = bestUpperBound;
-	    }
-	    else{
-	       m_bestKnownLB = -DecompInf;
-	    }
-            m_bestKnownUB = bestUpperBound;
-            break;
-         }
-      }
-   }
-#endif
+   //---
+   string bestKnownFile = m_appParam.DataDir + UtilDirSlash() + "mmkp.opt";
+   m_instance.readBestKnown(bestKnownFile, m_appParam.Instance);
+   setBestKnownLB(m_instance.getBestKnownLB());
+   setBestKnownUB(m_instance.getBestKnownUB());
 
    //---
    //--- open space for GAP_Knapsack objects

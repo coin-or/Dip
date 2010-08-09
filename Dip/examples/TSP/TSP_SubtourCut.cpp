@@ -28,7 +28,7 @@ void TSP_SubtourCut::init(){
       break;
    default:
       //throw exception
-      m_storage = NONE;
+      assert(0);
       return;
    }
 }
@@ -89,7 +89,7 @@ void TSP_SubtourCut::setBounds(){
       break;
    case SIDE:
       setLowerBound(-DecompInf);
-      setUpperBound(m_S.size() - 1.0);
+      setUpperBound(static_cast<int>(m_S.size()) - 1.0);
       break;
    default:
       assert(0);
@@ -127,7 +127,8 @@ void TSP_SubtourCut::expandCutToRow(CoinPackedVector * row){
       cerr << "ERROR expandCutToRow sec_type" << endl;
       abort();
    }  
-   row->setVector(indices.size(), &indices[0], &elements[0], false);
+   row->setVector(static_cast<int>(indices.size()), 
+		  &indices[0], &elements[0], false);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -155,7 +156,7 @@ void TSP_SubtourCut::print(ostream * os) const{
    case BOTH:
       {
 	 (*os) << "S: ";
-	 for(unsigned int i = 0; i < m_nverts; i++)
+	 for(int i = 0; i < m_nverts; i++)
 	    if(m_inS[i])
 	       (*os) << i << " ";
       }

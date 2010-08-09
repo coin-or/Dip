@@ -68,3 +68,31 @@ void GAP_Instance::readInstance(string & fileName){
    
    is.close();
 }
+
+//===========================================================================//
+void GAP_Instance::readBestKnown(string & fileName,
+				 string & instanceName){
+
+   ifstream is;
+   string   instance;
+   double   bestUpperBound;
+   bool     isProvenOptimal;
+   int      status  = 0;
+   status = UtilOpenFile(is, fileName);
+   if(status)
+      throw UtilException("Failed to best-known file",
+                          "readBestKnown", "GAP_Instance");
+   while(!is.eof()){
+      is >> instance >> bestUpperBound >> isProvenOptimal;
+      instance = UtilStrTrim(instance);
+      if(instance == instanceName){
+         if(isProvenOptimal)
+            m_bestKnownLB = bestUpperBound;
+         else
+            m_bestKnownLB = -DecompInf;
+         m_bestKnownUB     = bestUpperBound;
+         m_isProvenOptimal = isProvenOptimal;
+         break;
+      }
+   }   
+}

@@ -1,2 +1,2 @@
-wget http://sourceforge.net/projects/boost/files/boost/1.40.0/boost_1_40_0.tar.gz/download
-tar -zxvf boost_1_40_0.tar.gz
+wget http://sourceforge.net/projects/boost/files/boost/1.43.0/boost_1_43_0.tar.gz/download
+tar -zxvf boost_1_43_0.tar.gz

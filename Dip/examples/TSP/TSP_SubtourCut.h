@@ -29,7 +29,7 @@ using namespace std;
 /*---------------------------------------------------------------------------*/
 class TSP_SubtourCut : public DecompCut {
 public:
-   enum storageType {VECTOR, BITSET, BOTH, NONE};
+   enum storageType {VECTOR, BITSET, BOTH};
    enum cutType     {ACROSS, SIDE};
 
 private:
@@ -41,13 +41,12 @@ private:
 
 public:
    //these (pure virutal) methods are inherited from DecompCut
-   void expandCutToRow(CoinPackedVector * row);
-   //void expandCutToRow(DecompRow * row);
-   void setBounds();
+   virtual void expandCutToRow(CoinPackedVector * row);
+   virtual void setBounds();
 
    //these (virutal) methods are inherited from DecompCut
-   void print(ostream * os = &cout) const;
-   bool isSame(const DecompCut * cut) const;
+   virtual void print(ostream * os = &cout) const;
+   virtual bool isSame(const DecompCut * cut) const;
 
 public:
    void init();
@@ -58,11 +57,9 @@ public:
 public:
    TSP_SubtourCut(const vector<bool> & inS, 
 		  const cutType        type = ACROSS){
-      //assert(inS.count() < inS.size());
-      //assert(inS.count() > 1);
       m_inS     = inS;
       m_storage = BITSET;
-      m_nverts  = m_inS.size();
+      m_nverts  = static_cast<int>(m_inS.size());
       m_type    = type;
       setBounds();
       init();
@@ -71,12 +68,10 @@ public:
    TSP_SubtourCut(const vector<bool> & inS, 
 		  const vector<int>  & S,
 		  const cutType        type){
-      //assert(inS.count() < inS.size());
-      //assert(inS.count() > 1);
       m_inS     = inS;
       m_S       = S;
       m_storage = BOTH;
-      m_nverts  = m_inS.size();
+      m_nverts  = static_cast<int>(m_inS.size());
       m_type    = type;
       setBounds();
       init();
@@ -84,12 +79,10 @@ public:
 
    TSP_SubtourCut(const vector<bool> & inS, 
 		  const vector<int>  & S){
-      //assert(inS.count() < inS.size());
-      //assert(inS.count() > 1);
       m_inS     = inS;
       m_S       = S;
       m_storage = BOTH;
-      m_nverts  = m_inS.size();
+      m_nverts  = static_cast<int>(m_inS.size());
       setCutType();
       setBounds();
       init();

@@ -113,8 +113,8 @@ public:
   
    virtual int generateInitVars(DecompVarList & initVars);
    
-   virtual int generateCuts(const double                       * x, 
-			    DecompCutList                      & newCuts);
+   virtual int generateCuts(const double  * x, 
+			    DecompCutList & newCuts);
 
    virtual void solveRelaxedWhich(vector<int> & blocksToSolve){};
       
@@ -168,30 +168,26 @@ public:
    }
 
    inline void setModelRelax(DecompConstraintSet * model,
-                             const string          modelName,
-                             const int             blockId = 0){
-      //assuming blocks are disjoint in variables - if not, bug
-      //   can check that with active columns
-      assert(model);
-      if(!model->hasPrepRun())
-         model->prepareModel();      
+                             const string          modelName = "",
+                             const int             blockId   = 0){
+      if(model && !model->hasPrepRun())
+	 model->prepareModel();      
       
       //---
       //--- make sure this block has not been set yet
       //---
       map<int, DecompAppModel>::iterator mit = m_modelRelax.find(blockId);
       if(mit != m_modelRelax.end()){
-         cerr << "Block " << blockId << " relaxation has already been set. "
-              << "Only one relaxation definition can be used at one time." 
-              << endl;
-         throw UtilException("Multiple relaxation definitions",
-                             "setModelRelax", "DecompApp");
-      }
-
+	 cerr << "Block " << blockId << " relaxation has already been set. "
+	      << "Only one relaxation definition can be used at one time." 
+	      << endl;
+	 throw UtilException("Multiple relaxation definitions",
+			     "setModelRelax", "DecompApp");
+      }	 
       DecompAppModel appModel(model, modelName, blockId);
       m_modelRelax.insert(make_pair(blockId, appModel));
    }
-
+   
    inline void setModelRelaxNest(DecompConstraintSet * model,
                                  const string          modelName,
                                  const int             blockId = 0){

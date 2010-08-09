@@ -13,7 +13,9 @@
 //===========================================================================//
 #include "UtilParameters.h"
 //===========================================================================//
-#include "GAP_DecompApp.h"
+#ifdef VERSION3
+#include "GAP_DecompApp3.h"
+#endif
 //===========================================================================//
 #include "AlpsDecompModel.h"
 //===========================================================================//
@@ -123,7 +125,21 @@ int main(int argc, char ** argv){
               << " SetupReal= " << timeSolveReal
               << " TotalReal= " << timeSetupReal + timeSetupReal
               << endl;      
-      
+
+         if(status == AlpsExitStatusOptimal && gap.getBestKnownUB() < 1.0e50){
+            //---
+            //--- the assumption here is that the BestKnownLB/UB is optimal
+            //---
+            double diff 
+               = fabs(gap.getBestKnownUB() - alpsModel.getGlobalUB());
+            if(diff > 1.0e-4){
+               cerr << "ERROR. BestKnownUB= " << gap.getBestKnownUB()
+                    << " but DECOMP claims GlobalUB= " 
+                    << alpsModel.getGlobalUB() << endl;
+               throw UtilException("Invalid claim of optimal.", 
+                                   "main", "DECOMP");
+            }
+         }
       }	 
       //---
       //--- free local memory

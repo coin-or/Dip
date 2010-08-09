@@ -12,11 +12,16 @@
 
 //===========================================================================//
 #include "DecompVar.h"
-#include "SmallIP_DecompApp.h"
+#include "SmallIP_DecompApp2.h"
 //===========================================================================//
 //parameters
-const int LogLevel   = 1;
-const int whichRelax = 1; //1 matches book chapter and thesis
+const int LogLevel   = 2;
+
+//===========================================================================//
+//---
+//--- Version 2: To illustrate use of solveRelaxed function for a user-defined
+//---   solver for the relaxation. Rather than using the built-in MILP solver.
+//---
 
 //===========================================================================//
 void SmallIP_DecompApp::createModels(){
@@ -136,34 +141,36 @@ void SmallIP_DecompApp::createModels(){
    m_modelPart2.integerVars.push_back(0);
    m_modelPart2.integerVars.push_back(1);
    
-   switch(whichRelax){
-   case 1:
-      {
-	 //---
-	 //--- Set Model 1
-	 //---  Q'  = { x in R^2 | x satisfies (4.5-10, 16, 17} modelRelax
-	 //---  Q'' = { x in R^2 | x satisfies (4.11-16       } modelCore
-	 //---
-	 setModelRelax(&m_modelPart1, "RELAX1");
-	 setModelCore (&m_modelPart2, "CORE2");
-      }
-      break;
-   case 2:
-      {	 
-	 //---
-	 //--- Set Model 2
-	 //---  Q'  = { x in R^2 | x satisfies (4.11-17)      } modelRelax
-	 //---  Q'' = { x in R^2 | x satisfies (4.5-10, 16)   } modelCore
-	 //---
-	 setModelRelax(&m_modelPart2, "RELAX2");
-	 setModelCore (&m_modelPart1, "CORE1");
-      }
-      break;
-   }
+   //---
+   //--- set the model core   
+   //---  Q'  = { x in R^2 | x satisfies (4.5-10, 16, 17} modelRelax
+   //---  Q'' = { x in R^2 | x satisfies (4.11-16       } modelCore
+   //---
+   setModelCore (&m_modelPart2, "CORE2");
+
+   //---
+   //--- set the model relax to NULL, in this case
+   //---   solveRelaxed must be defined (for pricing algos)
+   //---
+   setModelRelax(NULL);
+
+   //---
+   //--- load the OSI object to be used in solve relaxed
+   //---
+   m_osi.messageHandler()->setLogLevel(LogLevel);      
+   m_osi.loadProblem(*m_modelPart1.getMatrix(),
+		     m_modelPart1.getColLB(),
+		     m_modelPart1.getColUB(),
+		     NULL,
+		     m_modelPart1.getRowLB(),
+		     m_modelPart1.getRowUB());
+   m_osi.setInteger(m_modelPart1.getIntegerVars(), 
+		     m_modelPart1.getNumInts());
+
    UtilPrintFuncEnd(m_osLog, m_classTag, "createModels()", LogLevel, 2);
 }
 
-//--------------------------------------------------------------------- //
+//===========================================================================//
 int SmallIP_DecompApp::generateInitVars(DecompVarList & initVars){
 
    //---
@@ -187,67 +194,65 @@ int SmallIP_DecompApp::generateInitVars(DecompVarList & initVars){
    return static_cast<int>(initVars.size());
 }
 
-#if 0
-//--------------------------------------------------------------------- //
-int SmallIP_DecompApp::generateCuts(const double              * x, 
-                                    const DecompConstraintSet & modelCore,
-                                    const DecompConstraintSet & modelRelax,
-                                    DecompCutList             & newCuts){
-
-
-   //
+//===========================================================================//
+DecompSolverStatus 
+SmallIP_DecompApp::solveRelaxed(const int          whichBlock,
+				const double     * redCostX,
+				const double       convexDual,
+				DecompVarList    & varList){
+   
    //---
-   //--- For the sake of illustration, store the facets of P,
-   //---   and send back any violated cuts.
+   //--- solveRelaxed is a virtual method and can be overriden
+   //---   if the user wants to solve the subproblem using their own
+   //---   solver, rather than the built-in solver
    //---
-   //--- Integer Hull = {(3,2),(3,3),(4,2),(4,),(5,3)}
-   //---    0 +  1 x[0] - 1 x[1] >= 0
-   //---   -3 +  1 x[0] + 0 x[1] >= 0
-   //---   -2 +  0 x[0] + 1 x[1] >= 0
-   //---    2 + -1 x[0] + 1 x[1] >= 0
-   //---    8 + -1 x[0] - 1 x[1] >= 0
+   //--- if the user does not define and set the the relaxation model
+   //---   then this method must be defined
    //---
+   UtilPrintFuncBegin(m_osLog, m_classTag, "solveRelaxed()", LogLevel, 2);
 
-   const static double cuts[5][2] = {{ 1, -1},
-				     { 1,  0},
-				     { 0,  1},
-				     {-1,  1},
-				     {-1, -1}};
-   const static double rhs[5]     = {0,3,2,-2,-8};
+   DecompSolverStatus status = DecompSolStatNoSolution;
 
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "generateCuts()", m_param.LogDebugLevel, 2);
+   //---
+   //--- set the objective function of the subproblem to the current
+   //---   reduced cost vector
+   //---
+   m_osi.setObjective(redCostX);
 
+   //---
+   //--- solve with OSI milp solver
+   //---
+   m_osi.branchAndBound();
 
-   int r;
-   for(r = 0; r < 5; r++){
-      if( ((x[0] * cuts[r][0]) + (x[1] * cuts[r][1])) < (rhs[r] - 0.00001)){
-	 CoinPackedVector cut;
-	 cut.insert(0, cuts[r][0]);
-	 cut.insert(1, cuts[r][1]);
-    
-	 OsiRowCut rc;
-	 rc.setRow(cut);      
-	 rc.setLb(rhs[r]);
-	 rc.setUb(DecompInf);
-      
-	 DecompCutOsi * decompCut = new DecompCutOsi(rc);
-	 //the user should not have to do this hash - decompalgo should be doing this
-	 decompCut->setStringHash();//TEST
+   //---
+   //--- check that found optimal
+   //---
+   assert(m_osi.isProvenOptimal());
+   if(!m_osi.isProvenOptimal())
+      return DecompSolStatNoSolution;
+   else
+      status = DecompSolStatOptimal;
+   
+   //TODO:
+   //this is way too confusing for user to remember they need -alpha!
+   //  let framework do that - also setting the block id - framework!
 
-	 UTIL_DEBUG(m_param.LogDebugLevel, 3,
-		    (*m_osLog) << "Found violated cut:";
-		    decompCut->print(m_osLog);
-		    );
+   //---
+   //--- create a variable object from the optimal solution
+   //---
+   int            i;
+   int            nOrigCols   = m_osi.getNumCols();
+   double         varRedCost  = m_osi.getObjValue() - convexDual;
+   double         varOrigCost = 0.0;
+   const double * colSolution = m_osi.getColSolution(); 
+   for(i = 0; i < m_osi.getNumCols(); i++)
+      varOrigCost += colSolution[i] * m_objective[i];
+   DecompVar * var = new DecompVar(nOrigCols,
+				   colSolution,
+				   varRedCost,
+				   varOrigCost);   
+   varList.push_back(var);      
 
-	 newCuts.push_back(decompCut);
-      }
-   }
-
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "generateCuts()", m_param.LogDebugLevel, 2);
-
-  
-   return static_cast<int>(newCuts.size());
+   UtilPrintFuncEnd(m_osLog, m_classTag, "solveRelaxed()", LogLevel, 2);
+   return status;
 }
-#endif

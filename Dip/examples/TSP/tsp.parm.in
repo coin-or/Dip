@@ -47,6 +47,6 @@ nodeLogInterval = 1
 msgLevel        = 10
 
 [TSP]
-DataDir  = ../../../../Decomp/data/TSP/TSPLIB
+DataDir  = ../../../../Dip/data/TSP/tsplib
 #Instance = att48
 Instance = eil76

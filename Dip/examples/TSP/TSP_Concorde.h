@@ -94,10 +94,11 @@ public:
       
       int i, c, tmp;
       int n_subtour  = 0;
+      int n_edgeList = static_cast<int>(m_edgeValue.size());
       int retCode    = CCtsp_exact_subtours(&tsp_cuts, 
 					    &n_subtour, 
 					    m_nVerts,
-					    m_edgeValue.size(), 
+					    n_edgeList,
 					    &m_edgeList[0], 
 					    &m_edgeValue[0]);
       assert(!retCode);
@@ -123,7 +124,7 @@ public:
 	 free(tsp_cut); //need UtilFree? for C style alloc/free?
       }
       tsp_cuts = NULL;
-      return subtourCuts.size();
+      return static_cast<int>(subtourCuts.size());
    }
    
 public:

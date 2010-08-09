@@ -22,9 +22,6 @@
  * Storage for parameters for the 
  *   Generalized Assignment Problem (GAP).
  * 
- * \todo think about this design, register parameters, isoptional
- *       combos that violate, throw exceptions
- *
  */
 
 //===========================================================================//

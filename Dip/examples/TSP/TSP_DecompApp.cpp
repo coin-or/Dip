@@ -103,7 +103,7 @@ void TSP_DecompApp::createModels(){
    //---
    m_objective = new double[numCols];
    if(!m_objective)
-      throw UtilExceptionMemory("createModels", "MMKP_DecompApp");
+      throw UtilExceptionMemory("createModels", "TSP_DecompApp");
    copy(graphLib.edge_wt, graphLib.edge_wt + numCols, m_objective);
    setModelObjective(m_objective);
 
@@ -223,8 +223,6 @@ void TSP_DecompApp::createModelTrivialSEC(DecompConstraintSet * modelCS){
 
 //===========================================================================//
 int TSP_DecompApp::generateCuts(const double              * x, 
-                                const DecompConstraintSet & modelCore,
-                                const DecompConstraintSet & modelRelax,
                                 DecompCutList             & newCuts){
   
 
@@ -298,7 +296,7 @@ void TSP_DecompApp::solveOneTree(const double               * cost,
    //---
    //--- (partial) sort in increasing order
    //---
-   int sort_size = std::min<int>(edge_cost.size(), 
+   int sort_size = std::min<int>(static_cast<int>(edge_cost.size()), 
 				 2 + max_exchanges);
    partial_sort(edge_cost.begin(), 
 		edge_cost.begin() + sort_size,
@@ -327,7 +325,8 @@ void TSP_DecompApp::solveOneTree(const double               * cost,
          (*m_osLog) << "cost edge( " 
                     << source(*ei,g) << "," << target(*ei,g) << "): " 
                     << cost[index];
-      assert(index == UtilIndexU(source(*ei,g),target(*ei,g)));
+      assert(index == UtilIndexU(static_cast<int>(source(*ei,g)),
+				 static_cast<int>(target(*ei,g))));
    }
    
 

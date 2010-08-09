@@ -33,6 +33,8 @@
  *
  *    x[i,j]=1 means assign task j to agent i
  *
+ * Note: DIP does min, so, we solve for min sum{ij} -p[i,j] x[i,j].
+ *
  */
 
 //===========================================================================//

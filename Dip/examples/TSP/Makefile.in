@@ -27,14 +27,14 @@ CONCORDE_LIB = concorde
 CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
 
 # boost
-#BOOST_DIR = ../ExternalSolvers/Graph/boost_1_33_1
+BOOST_DIR = ../ExternalSolvers/Graph/boost_1_43_0
 
 #===========================================================================#
 # additional include and linnk flags
 ADDLIBS      += $(CONCORDE_DIR)/$(CONCORDE_LIB).a
 ADDLIBS      += $(CONCORDE_DIR)/../qsopt.a
 ADDINCFLAGS  += -I$(CONCORDE_DIR)/INCLUDE
-#ADDINCFLAGS  += -I$(BOOST_DIR)
+ADDINCFLAGS  += -I$(BOOST_DIR)
 
 #===========================================================================#
 # directory to the source files
@@ -77,13 +77,15 @@ $(EXEDECOMP): $(CONCORDE_DIR)/$(CONCORDE_LIB).a $(OBJS)
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
 
 $(CONCORDE_DIR)/$(CONCORDE_LIB).a:
-	(cd $(CONCORDE_DIR)        && \
-	chmod +x ../build.concorde && \
-	../build.concorde          &&\
+	(cd $(CONCORDE_DIR)   && \
+	./configure           && \
 	${MAKE})
 
-clean:
+cleanall:
 	(cd $(CONCORDE_DIR) && ${MAKE} clean)
+	rm -rf $(EXE) $(OBJS)
+
+clean:
 	rm -rf $(EXE) $(OBJS)
 
 .cpp.o:

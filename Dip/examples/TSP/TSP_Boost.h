@@ -94,7 +94,7 @@ public:
    }
 
    inline int getDegree(const int nodeIndex){
-      return degree(nodeIndex, m_sg);
+      return static_cast<int>(degree(nodeIndex, m_sg));
    }
    
 };

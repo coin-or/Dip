@@ -205,3 +205,57 @@ void DecompConstraintSet::fixNonActiveColumns(){
 
    UTIL_DELARR(marker);
 }
+
+//===========================================================================//
+CoinPackedMatrix * DecompConstraintSet::sparseToOrigMatrix(){
+   assert(m_isSparse);
+
+   //---
+   //--- create a dense row-majored version of the sparse matrix M
+   //---
+   bool                 colOrdered = M->isColOrdered();
+   int                  nCols      = m_numColsOrig;
+   int                  nRows      = M->getNumRows();
+
+   CoinPackedMatrix * MRow = NULL;
+   if(colOrdered){
+      //---
+      //--- first create a row-ordered version 
+      //---
+      MRow = new CoinPackedMatrix();
+      CoinAssertHint(MRow, "Error: Out of Memory");
+      MRow->reverseOrderedCopyOf(*M);      
+   }
+   else{
+      MRow = M;
+   }
+   
+   int                  i;
+   int                  nElems     = MRow->getNumElements();
+   const int          * matInd     = MRow->getIndices();
+   const int          * matLen     = MRow->getVectorLengths();
+   const double       * matVal     = MRow->getElements();
+   const CoinBigIndex * matBeg     = MRow->getVectorStarts();
+
+   int * matIndOrig = new int[nElems];
+   CoinAssertHint(matIndOrig, "Error: Out of Memory");
+   for(i = 0; i < nElems; i++){
+      matIndOrig[i] = m_sparseToOrig[matInd[i]];
+   }
+   
+   CoinPackedMatrix * MOrig 
+      = new CoinPackedMatrix(false, 
+			     nCols,
+			     nRows,
+			     nElems,
+			     matVal,
+			     matIndOrig,
+			     matBeg,
+			     matLen,			     
+			     0.0, 0.0);
+   CoinAssertHint(MOrig, "Error: Out of Memory");
+
+   UTIL_DELPTR(MRow);
+   UTIL_DELARR(matIndOrig);
+   return MOrig;
+}

@@ -72,8 +72,11 @@ void DecompAlgo::checkBlocksColumns(){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "checkBlocksColumns()", m_param.LogDebugLevel, 2);
 
-   if(m_modelRelax.size() == 0)
+   if(m_modelRelax.size() == 0){
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "checkBlocksColumns()", m_param.LogDebugLevel, 2);
       return; 
+   }
 
    //---
    //--- sanity check that the blocks are column disjoint
@@ -84,8 +87,11 @@ void DecompAlgo::checkBlocksColumns(){
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
       DecompAlgoModel     & modelRelax1 = (*mid1).second;
       DecompConstraintSet * model       = modelRelax1.getModel();
-      if(!model->getMatrix())
+      if(!model || !model->getMatrix()){
+	 UtilPrintFuncEnd(m_osLog, m_classTag,
+			  "checkBlocksColumns()", m_param.LogDebugLevel, 2);
          return;
+      }
       set<int>            & activeCols1 
          = modelRelax1.getModel()->activeColumnsS;
       for(mid2 = m_modelRelax.begin(); mid2 != m_modelRelax.end(); mid2++){
@@ -130,9 +136,10 @@ void DecompAlgo::checkBlocksColumns(){
    set<int> activeColsUnion;
    set<int>::iterator sit;
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
-      DecompAlgoModel & modelRelax = (*mid1).second;
-      set<int>        & activeCols 
-         = modelRelax.getModel()->activeColumnsS;
+      DecompAlgoModel     & modelRelax = (*mid1).second;
+      DecompConstraintSet * model      = modelRelax.getModel();
+      assert(model);
+      set<int>            & activeCols = model->activeColumnsS;
       set_union(activeCols.begin(),       activeCols.end(),
                 activeColsUnion.begin(),  activeColsUnion.end(),
                 inserter(activeColsUnion, activeColsUnion.begin()));
@@ -235,7 +242,7 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
 	      for(mit  = m_modelRelax.begin(); 
                   mit != m_modelRelax.end(); mit++){
 		 DecompConstraintSet * model = (*mit).second.getModel();
-                 if(model->M){
+                 if(model && model->M){
 		    (*m_osLog)
 		       << "ModelRelax  cols: " << model->getNumCols()
 		       << " rows: "            << model->getNumRows()
@@ -395,8 +402,20 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
 
    OsiSolverInterface  * subprobSI = NULL;
    DecompConstraintSet * model     = algoModel.getModel();
-   if(!model || !model->M)
+   if(!model || !model->M){
+      //---
+      //--- if not using built-in solver, make sure user has
+      //---   provided a solver function
+      //---
+      const DecompApp * app = getDecompApp();
+      
+      //TODO - check if derived... 
+      //if(!(&(app->Decomp::solveRelaxed)){
+      // throw UtilException("User must provide either the subproblem model or the application function solveRelaxed. Both are undefined.",
+      //		     "createOsiSubProblem", "DecompAlgo");	 
+      //}
       return;
+   }
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createOsiSubProblem()", m_param.LogDebugLevel, 2);
@@ -463,6 +482,9 @@ void DecompAlgo::getModelsFromApp(){
    vector<DecompAppModel>           ::iterator vit;
    for(mit  = m_app->m_modelRelax.begin(); 
        mit != m_app->m_modelRelax.end(); mit++){
+      //---
+      //--- this constructs a DecompAlgoModel from a DecompAppModel
+      //---
       DecompAlgoModel algoModel = (*mit).second;
       m_modelRelax.insert(make_pair((*mit).first, algoModel));
    }                   
@@ -512,7 +534,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //--- append to bottom the relax matrix/matrices
    //---  create block file (for use in MILPBlock app)
    //---
-#define CREATE_BLOCKFILE
+   //#define CREATE_BLOCKFILE
 #ifdef CREATE_BLOCKFILE
    ofstream os("blockFile.txt");
 #endif
@@ -521,26 +543,24 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
       relax = (*mit).second.getModel();
       //TODO: for cut gen do we really want this model explicit??
       //   currently cannot do if sparse without alot of work
-      if(relax->isSparse())
+      if(!relax || !relax->M || relax->isSparse())
          continue;
-      if(relax->M){
-	 nRowsR  = relax->getNumRows();
-
+      nRowsR  = relax->getNumRows();
+      
 #ifdef CREATE_BLOCKFILE         
-         {
-            int r;
-            os << (*mit).second.getBlockId();
-            os << " " << nRowsR << endl;
-            for(r = 0; r < nRowsR; r++){
-               os << nRows + r << " ";
-            }
-            os << endl;
-         }
-#endif
-
-	 nRows  += nRowsR;
-         M->bottomAppendPackedMatrix(*relax->M);
+      {
+	 int r;
+	 os << (*mit).second.getBlockId();
+	 os << " " << nRowsR << endl;
+	 for(r = 0; r < nRowsR; r++){
+	    os << nRows + r << " ";
+	 }
+	 os << endl;
       }
+#endif
+      
+      nRows  += nRowsR;
+      M->bottomAppendPackedMatrix(*relax->M);      
    }
 #ifdef CREATE_BLOCKFILE         
    os.close();
@@ -564,16 +584,12 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    int rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
-      if(relax->isSparse())
+      if(!relax || !relax->M || relax->isSparse())
          continue;
-      if(relax->M){
-	 nRowsR  = relax->getNumRows();
-	 memcpy(rowLB + rowIndex, relax->getRowLB(),
-		nRowsR * sizeof(double));
-	 memcpy(rowUB + rowIndex, relax->getRowUB(), 
-		nRowsR * sizeof(double));
-	 rowIndex += nRowsR;
-      }
+      nRowsR = relax->getNumRows();
+      memcpy(rowLB + rowIndex, relax->getRowLB(), nRowsR * sizeof(double));
+      memcpy(rowUB + rowIndex, relax->getRowUB(), nRowsR * sizeof(double));
+      rowIndex += nRowsR;
    }
 
    //---
@@ -621,15 +637,13 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
-      if(relax->isSparse())
+      if(!relax || !relax->M || relax->isSparse())
          continue;
-      if(relax->M){
-         vector<string> & rowNamesR = relax->rowNames;
-	 nRowsR = relax->getNumRows();
-	 if(rowNamesR.size())
-	    si->setRowNames(rowNamesR, 0, nRowsR, rowIndex);
-         rowIndex += nRowsR;    
-      }
+      vector<string> & rowNamesR = relax->rowNames;
+      nRowsR = relax->getNumRows();
+      if(rowNamesR.size())
+	 si->setRowNames(rowNamesR, 0, nRowsR, rowIndex);
+      rowIndex += nRowsR;    
    }
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -1170,7 +1184,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix * masterM,
                              "masterMatrixAddArtCols", "DecompAlgo");
       }
    }
-   masterM->appendCols(colBeg.size()-1,
+   masterM->appendCols(static_cast<int>(colBeg.size())-1,
 		       &colBeg[0], 
 		       &colInd[0], 
 		       &colVal[0]);
@@ -2799,7 +2813,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
       (*m_osLog) << "MasterObj [dual]   = " << UtilDblToStr(zDW_UBDual) 
                  << endl;
       throw UtilException("Primal and Dual Master Obj Not Matching.",
-                          "checkBlocksColumns", "DecompAlgo");
+                          "updateObjBoundLB", "DecompAlgo");
    }
 
    //TODO: stats - we want to play zDW_LB vs UB... 
@@ -6051,7 +6065,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //---
    //--- deal with the special case of master-only variables
    //---   
-   if(model->isMasterOnly()){
+   if(model && model->isMasterOnly()){
       //---
       //--- In this case, we simply have a one-variable problem with 
       //---  uppper and lower column bounds. Just check to see if the
@@ -6324,7 +6338,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //---  solver are valid
    //---
    //TODO: make this check work for sparse as well
-   if(!model->isSparse() && vars.size() > 0) {
+   if(model && !model->isSparse() && vars.size() > 0) {
       //---
       //--- get a pointer to the relaxed model for this block
       //---   even if this check is for a nested model, it should

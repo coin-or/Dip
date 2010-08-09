@@ -51,26 +51,20 @@ public:
    /* @name Inherited (from virtual) methods. */
 
    /** Solve the relaxed problem. */
-   DecompSolverStatus solveRelaxed(const int          whichBlock,
-                                   const double     * redCostX,
-                                   const double       convexDual,
-                                   DecompVarList    & varList);
-      
-   int generateCuts(const double              * x, 
-		    const DecompConstraintSet & modelCore,
-		    const DecompConstraintSet & modelRelax,
-		    DecompCutList             & newCuts);
+   virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
+					   const double     * redCostX,
+					   const double       convexDual,
+					   DecompVarList    & varList);
    
-   bool APPisUserFeasible(const double * x, 
-			  const int      n_cols,
-			  const double   tolZero);
-   void printOriginalColumn(const int   index, 
-			    ostream   * os) const;
-
-      
+   virtual int generateCuts(const double  * x, 
+			    DecompCutList & newCuts);
    
-public:
-   /** @name Helper functions (public). */   
+   virtual bool APPisUserFeasible(const double * x, 
+				  const int      n_cols,
+				  const double   tolZero);
+   virtual void printOriginalColumn(const int   index, 
+				    ostream   * os) const;
+   
       
 private: 
    /** @name Helper functions (private). */   

@@ -228,6 +228,8 @@ Dip/examples/SmallIP/Makefile.in -text
 Dip/examples/SmallIP/README.txt.in -text
 Dip/examples/SmallIP/SmallIP_DecompApp.cpp -text
 Dip/examples/SmallIP/SmallIP_DecompApp.h -text
+Dip/examples/SmallIP/SmallIP_DecompApp2.cpp -text
+Dip/examples/SmallIP/SmallIP_DecompApp2.h -text
 Dip/examples/SmallIP/SmallIP_Main.cpp -text
 Dip/examples/SmallIP/smallip.parm.in -text
 Dip/examples/SmallIP/test.sh.in -text
@@ -244,6 +246,7 @@ Dip/examples/TSP/TSP_Param.h -text
 Dip/examples/TSP/TSP_SubtourCut.cpp -text
 Dip/examples/TSP/TSP_SubtourCut.h -text
 Dip/examples/TSP/data_extract.sh.in -text
+Dip/examples/TSP/get_boost.sh.in -text
 Dip/examples/TSP/get_concorde.sh.in -text
 Dip/examples/TSP/tsp.parm.in -text
 Dip/examples/VRP/Makefile.in -text
