@@ -59,8 +59,8 @@ nodeLogInterval = 1
 msgLevel        = 2
 
 #############################################################################
-Settings for MMKP application.
-  section=MMKP
+Settings for ATM application.
+  section=ATM
 #############################################################################
 [ATM]
 # Path to instance data.

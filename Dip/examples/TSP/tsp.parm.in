@@ -1,52 +1,53 @@
+#############################################################################
+Settings for main.
+#############################################################################
+#{0,1}: use DECOMP for cutting plane method
 doCut         = 0
-doPriceCut    = 1
-doRelaxCut    = 0
-doModelOneTree  = 1
-doModelTwoMatch = 0
 
+#{0,1}: use DECOMP for price and cut
+doPriceCut    = 1
+
+#############################################################################
+Settings for all decomp algorithms.
+  section=DECOMP
+#############################################################################
 [DECOMP]
-LogLevel      = 3
+LogLevel      = 2
 LogAppLevel   = 0
 LogLpLevel    = 0
-LogDebugLevel = 1
-#CutCGL        = 0
-#CutCglKnapC   = 1
-#CutCglFlowC   = 1
-#CutCglMir     = 1
-#CutCglClique  = 1
+LogDebugLevel = 2
 
-
+#############################################################################
+Settings for decomp algorithm cutting plane method. 
+  section=CUT
+#############################################################################
 [CUT]
-#TODO: should be able to turn on gomory, etc
-#CutCGL        = 1
-#CutCglKnapC   = 1
-#CutCglFlowC   = 1
-#CutCglMir     = 1
-#CutCglClique  = 1
-#LimitRoundCutIters      = 100
-#LogDebugLevel = 5
 
-[PRICE]
-LimitTotalCutIters      = 0
-LimitRoundPriceIters    = 100
-LimitInitVars           = 2
-
-[PRICE_AND_CUT]
-LimitRoundCutIters      = 1
-LimitRoundPriceIters    = 1
-LimitInitVars           = 2
-
-[RELAX_AND_CUT]
-LimitRoundCutIters      = 0
-LimitRoundPriceIters    = 50
-LimitInitVars           = 2
-
-#what if i want to run price and then price and cut?
+#############################################################################
+Settings for ALPS framework.
+  section=ALPS
+#############################################################################
 [ALPS]
 nodeLogInterval = 1
-msgLevel        = 10
+msgLevel        = 3
 
+
+#############################################################################
+Settings for TSP application.
+  section=TSP
+#############################################################################
 [TSP]
-DataDir  = ../../../../Dip/data/TSP/tsplib
-#Instance = att48
-Instance = eil76
+# Path to instance data.
+DataDir  = @srcdir@/../../data/TSP/tsplib
+
+# Name of files for instance (assumed to be in DataDir).
+Instance = att48
+#Instance = eil76
+
+# Definition of model core and relaxation.
+ModelNameCore  = SUBTOUR
+ModelNameRelax = 2MATCH
+
+#ModelNameCore  = 2MATCH
+#ModelNameRelax = SUBTOUR
+
