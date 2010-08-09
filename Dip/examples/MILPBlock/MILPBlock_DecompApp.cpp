@@ -917,9 +917,10 @@ void MILPBlock_DecompApp::createModels(){
    for(i = 0; i < nCols; i++){
       if(!colMarker[i]){
          if(m_appParam.LogLevel >= 3){
-            (*m_osLog) << "Column " << setw(5) << i << " -> "
-                       << setw(25) << modelCore->colNames[i]
-                       << " is not in union of blocks." << endl;
+            if(modelCore->getColNames().size() > 0)
+               (*m_osLog) << "Column " << setw(5) << i << " -> "
+                          << setw(25) << modelCore->colNames[i]
+                          << " is not in union of blocks." << endl;
          }
 	 modelCore->masterOnlyCols.push_back(i);
       }
