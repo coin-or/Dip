@@ -760,7 +760,8 @@ DecompSolverResult * DecompAlgoC::solveDirect(const DecompSolution * startSol){
          const double * solDbl = cbc.getColSolution();
 	 vector<double> solVec(solDbl, solDbl + numCols);
 	 result->m_solution.push_back(solVec);
-	 assert(result->m_nSolutions == 
+	 result->m_nSolutions++;
+         assert(result->m_nSolutions == 
 		static_cast<int>(result->m_solution.size()));
 	 //copy(solution, solution+numCols, result->m_solution);
       }
