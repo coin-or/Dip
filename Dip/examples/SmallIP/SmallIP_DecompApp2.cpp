@@ -217,27 +217,38 @@ SmallIP_DecompApp::solveRelaxed(const int          whichBlock,
    //--- set the objective function of the subproblem to the current
    //---   reduced cost vector
    //---
-   const double * colLB = m_osi.getColLower();
-   const double * colUB = m_osi.getColUpper();
-   for(int i = 0; i < m_osi.getNumCols(); i++)
-      printf("1 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
-
    m_osi.setObjective(redCostX);
+   
+#ifdef __DECOMP_IP_CBC__
+   //---
+   //--- because OsiCbc does not keep original column bounds
+   //---  we must reset each time
+   //--- inside DIP, we avoid this by using Cbc directly, not OsiCbc
+   //---
+   m_osi.setColLower(0, 0.0);
+   m_osi.setColLower(1, 0.0);
+   m_osi.setColUpper(0, 6.0);
+   m_osi.setColUpper(1, 6.0);   
+#endif
 
-   for(int i = 0; i < m_osi.getNumCols(); i++)
-      printf("2 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
+   //const double * colLB = m_osi.getColLower();
+   //const double * colUB = m_osi.getColUpper();
+   //for(int i = 0; i < m_osi.getNumCols(); i++)
+   // printf("2 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
 
    //---
    //--- solve with OSI milp solver
    //---
+   //m_osi.writeLp("tmp.txt");
    m_osi.branchAndBound();
 
-   for(int i = 0; i < m_osi.getNumCols(); i++)
-      printf("3 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
+   //for(int i = 0; i < m_osi.getNumCols(); i++)
+   // printf("3 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
 
    //---
    //--- check that found optimal
    //---
+   assert(!m_osi.isProvenPrimalInfeasible());
    assert(m_osi.isProvenOptimal());
    if(!m_osi.isProvenOptimal())
       return DecompSolStatNoSolution;

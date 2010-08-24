@@ -187,7 +187,7 @@ int SmallIP_DecompApp::generateInitVars(DecompVarList & initVars){
    return static_cast<int>(initVars.size());
 }
 
-#if 0
+/*
 //--------------------------------------------------------------------- //
 int SmallIP_DecompApp::generateCuts(const double              * x, 
                                     const DecompConstraintSet & modelCore,
@@ -250,4 +250,4 @@ int SmallIP_DecompApp::generateCuts(const double              * x,
   
    return static_cast<int>(newCuts.size());
 }
-#endif
+*/
