@@ -217,12 +217,23 @@ SmallIP_DecompApp::solveRelaxed(const int          whichBlock,
    //--- set the objective function of the subproblem to the current
    //---   reduced cost vector
    //---
+   const double * colLB = m_osi.getColLower();
+   const double * colUB = m_osi.getColUpper();
+   for(int i = 0; i < m_osi.getNumCols(); i++)
+      printf("1 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
+
    m_osi.setObjective(redCostX);
+
+   for(int i = 0; i < m_osi.getNumCols(); i++)
+      printf("2 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
 
    //---
    //--- solve with OSI milp solver
    //---
    m_osi.branchAndBound();
+
+   for(int i = 0; i < m_osi.getNumCols(); i++)
+      printf("3 i:%d lb:%g ub:%g\n", i, colLB[i], colUB[i]);
 
    //---
    //--- check that found optimal
