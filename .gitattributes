@@ -31,6 +31,8 @@ Dip/MSVisualStudio/v9/DecompExamples/VRP/vrp.parm -text
 Dip/Makefile.am -text
 Dip/Makefile.in -text
 Dip/README -text
+Dip/bugs/OsiCbc/main.cpp -text
+Dip/bugs/OsiCbc/tmp.mps -text
 Dip/bugs/PRICE_AND_CUT_subProb_relax0.n0.c0.p0.b0.lp -text
 Dip/bugs/main.cpp -text
 Dip/configure -text
