@@ -867,26 +867,24 @@ void MILPBlock_DecompApp::createModels(){
       DecompConstraintSet * modelRelax = new DecompConstraintSet();
       CoinAssertHint(modelRelax, "Error: Out of Memory");
       
-      //---
-      //--- find and set active columns
-      //---
-      set<int>::iterator sit;
-      set<int> activeColsSet;
-      findActiveColumns(rowsRelax, activeColsSet);
-      for(sit = activeColsSet.begin(); sit != activeColsSet.end(); sit++)
-	 modelRelax->activeColumns.push_back(*sit);
-      if(m_appParam.LogLevel >= 3){
-	 (*m_osLog) << "Active Columns:" << endl;
-	 UtilPrintVector(modelRelax->activeColumns, m_osLog);
-	 if(modelCore->getColNames().size() > 0)
-	    UtilPrintVector(modelRelax->activeColumns, 
-			    modelCore->getColNames(), m_osLog);
-      }
-      
       if(m_appParam.UseSparse){
+         //---
+         //--- create model part (using sparse API)
+         //---         
 	 createModelPartSparse(modelRelax, nRowsRelax, &rowsRelax[0]);
       }
-      else{	 
+      else{
+         //---
+         //--- find and set active columns
+         //---
+         set<int>::iterator sit;
+         set<int> activeColsSet;
+         findActiveColumns(rowsRelax, activeColsSet);
+         for(sit = activeColsSet.begin(); sit != activeColsSet.end(); sit++)
+            modelRelax->activeColumns.push_back(*sit);      	 
+         //---
+         //--- create model part (using dense API)
+         //---         
 	 createModelPart(modelRelax, nRowsRelax, &rowsRelax[0]);
       }
 
@@ -951,6 +949,14 @@ void MILPBlock_DecompApp::createModels(){
       setModelRelax((*mdi).second,
                     "relax" + UtilIntToStr((*mdi).first),
                     (*mdi).first);
+
+      if(m_appParam.LogLevel >= 3){
+	 (*m_osLog) << "Active Columns:" << endl;
+	 UtilPrintVector(modelRelax->activeColumns, m_osLog);
+	 if(modelCore->getColNames().size() > 0)
+	    UtilPrintVector(modelRelax->activeColumns, 
+			    modelCore->getColNames(), m_osLog);
+      }
    }
 
    //---
