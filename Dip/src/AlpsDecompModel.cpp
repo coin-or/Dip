@@ -33,7 +33,7 @@ void AlpsDecompModel::setAlpsSettings(){
    AlpsPar()->setEntry(AlpsParams::nodeLogInterval, m_param.nodeLogInterval);
 
    double timeLimit = m_decompAlgo->getParam().LimitTime;
-   printf("Set timeLimit to %g\n", timeLimit);
+   //printf("Set timeLimit to %g\n", timeLimit);
    AlpsPar()->setEntry(AlpsParams::timeLimit,       timeLimit);
 
    UtilPrintFuncEnd(&cout, m_classTag,
@@ -147,7 +147,7 @@ AlpsExitStatus AlpsDecompModel::solve(){
    DecompStats & decompStats = decompAlgo->getStats();
    double timeLimit = m_decompAlgo->getParam().LimitTime;
    double timeLeft  = timeLimit - decompStats.timerOverall.getRealTime();   
-   printf("Set timeLimit to %g\n", timeLeft);
+   //printf("Set timeLimit to %g\n", timeLeft);
    AlpsPar()->setEntry(AlpsParams::timeLimit, timeLeft);
    
    //---

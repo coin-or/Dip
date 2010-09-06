@@ -250,13 +250,7 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model,
          }
       }
    }
-   model->fixNonActiveColumns();
-   
-   //---
-   //--- fix all non-active columns to 0.0
-   //---   TODO: user should not be forced to remember to do this
-   //---
-   
+
    //---
    //--- set column names for debugging
    //---

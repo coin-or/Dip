@@ -304,8 +304,6 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
 			 m_param.CutCglKnapC,
 			 m_param.CutCglMir,
 			 m_param.CutCglGomory);
-   //(m_algo == CUT) ? 
-   //                    m_param.CutCglGomory : 0);
       
    //---
    //--- create master problem
@@ -407,14 +405,9 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
       //---
       //--- if not using built-in solver, make sure user has
       //---   provided a solver function
+      //--- TODO: how?
       //---
-      const DecompApp * app = getDecompApp();
-      
-      //TODO - check if derived... 
-      //if(!(&(app->Decomp::solveRelaxed)){
-      // throw UtilException("User must provide either the subproblem model or the application function solveRelaxed. Both are undefined.",
-      //		     "createOsiSubProblem", "DecompAlgo");	 
-      //}
+      //const DecompApp * app = getDecompApp();      
       return;
    }
 
@@ -544,8 +537,10 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
       relax = (*mit).second.getModel();
       //TODO: for cut gen do we really want this model explicit??
       //   currently cannot do if sparse without alot of work
-      if(!relax || !relax->M || relax->isSparse())
+      if(!relax || !relax->M)
          continue;
+      //printf("DUMP relax matrix\n");
+      //relax->M->dumpMatrix();
       nRowsR  = relax->getNumRows();
       
 #ifdef CREATE_BLOCKFILE         
@@ -561,7 +556,22 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
 #endif
       
       nRows  += nRowsR;
-      M->bottomAppendPackedMatrix(*relax->M);      
+
+      if(relax->isSparse()){
+         //printf("DUMP before relax append\n");
+         //M->dumpMatrix();
+         CoinPackedMatrix * MDense = relax->sparseToOrigMatrix();
+         assert(MDense);
+         //printf("DUMP dense before relax append\n");
+         //MDense->dumpMatrix();
+         M->bottomAppendPackedMatrix(*MDense);
+         UTIL_DELPTR(MDense);
+         //printf("DUMP after relax append\n");
+         //M->dumpMatrix();
+      }
+      else{
+         M->bottomAppendPackedMatrix(*relax->M);
+      }
    }
 #ifdef CREATE_BLOCKFILE         
    os.close();
@@ -585,19 +595,21 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    int rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
-      if(!relax || !relax->M || relax->isSparse())
+      if(!relax || !relax->M)
          continue;
       nRowsR = relax->getNumRows();
       memcpy(rowLB + rowIndex, relax->getRowLB(), nRowsR * sizeof(double));
       memcpy(rowUB + rowIndex, relax->getRowUB(), nRowsR * sizeof(double));
       rowIndex += nRowsR;
    }
-
+   
    //---
    //--- assign problem pointers to OSI object (OSI will delete this memory)
    //---
+   assert(M->getNumRows() == nRows);
+   assert(M->getNumCols() == nCols);
    si->assignProblem(M, colLB, colUB, objCoeff, rowLB, rowUB);
-
+   
    //---
    //--- set integer variables
    //---
@@ -638,6 +650,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
+      //TODO: names not working in sparse relax case (for CPM)
       if(!relax || !relax->M || relax->isSparse())
          continue;
       vector<string> & rowNamesR = relax->rowNames;
@@ -1493,7 +1506,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    }
 	    
 	    if(isDup){
-	       printf("IS DUP, not pushing\n");
+	       //printf("IS DUP, not pushing\n");
 	    }
 	    else{
 	       DecompSolution * decompSol
@@ -1863,7 +1876,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		  }
 
 		  if(isDup){
-		     printf("IS DUP, not pushing\n");
+		     //printf("IS DUP, not pushing\n");
 		  }
 		  else{
 		     DecompSolution * decompSol
@@ -6531,8 +6544,8 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
 	 else
 	    masterGap = fabs(masterUB - masterLB);
       }
-      printf("Check tailoff, masterLB=%g masterUB=%g masterGap=%g\n", 
-	     masterLB, masterUB, masterGap);
+      //printf("Check tailoff, masterLB=%g masterUB=%g masterGap=%g\n", 
+      //     masterLB, masterUB, masterGap);
       if(masterGap > m_param.CompressColumnsMasterGapStart)
 	 return false;
    }
