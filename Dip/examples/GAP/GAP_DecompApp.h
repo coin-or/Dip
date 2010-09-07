@@ -90,13 +90,6 @@ public:
    /** TODO comment */
    int createModels();
    int createModelPartAP(DecompConstraintSet * model);
-   int createModelPartKP(DecompConstraintSet * model);
-   int createModelPartKP(DecompConstraintSet * model, 
-                         int                   whichKnap);
-   int createModelPartKP(DecompConstraintSet * model, 
-                         vector<int>         & whichKnaps);
-
-
 
 public:
    inline const GAP_Instance & getInstance() const {

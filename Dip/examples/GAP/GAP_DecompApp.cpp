@@ -145,118 +145,6 @@ int GAP_DecompApp::createModelPartAP(DecompConstraintSet * model){
    return status;
 }
 
-//===========================================================================//
-int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model){
-   vector<int> whichKnaps;
-   int         nMachines = m_instance.getNMachines();
-   UtilIotaN(whichKnaps, nMachines, 0);
-   return createModelPartKP(model, whichKnaps);
-}
-
-//===========================================================================//
-int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model, 
-                                     int                   whichKnap){
-   vector<int> whichKnaps;
-   whichKnaps.push_back(whichKnap);
-   return createModelPartKP(model, whichKnaps);
-}
-
-//===========================================================================//
-int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model, 
-                                     vector<int>         & whichKnaps){
-   
-   int          i, j, b, colIndex;
-   int          status     = GAPStatusOk;
-   int          nTasks     = m_instance.getNTasks();    //n
-   int          nMachines  = m_instance.getNMachines(); //m
-   int          nKnaps     = static_cast<int>(whichKnaps.size());
-   const int *  weight     = m_instance.getWeight();   
-   const int *  capacity   = m_instance.getCapacity();
-   int          nCols      = nTasks * nMachines;
-   int          nRows      = nKnaps;
-
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModelPartKP()", m_appParam.LogLevel, 2);
-
-   
-   model->M = new CoinPackedMatrix(false, 0.0, 0.0);
-   CoinAssertHint(model->M, "Error: Out of Memory");
-   model->M->setDimensions(0, nCols);
-   model->reserve(nRows, nCols);
-
-   //---
-   //--- Generalized Assignment Problem (GAP)
-   //---   m is number of machines (index i)
-   //---   n is number of tasks    (index j)
-   //---
-   //--- sum{j in 1..n} w[i,j] x[i,j] <= b[i], i in 1..m
-   //--- x[i,j] in {0,1}, i in 1..m, j in 1..n
-   //---
-   //--- Example structure: m=3, n=4
-   //---  xxxx         <= b[i=1]
-   //---      xxxx     <= b[i=2]
-   //---          xxxx <= b[i=3]
-   //---
-   vector<int>::iterator it;
-   for(it = whichKnaps.begin(); it != whichKnaps.end(); it++){
-      i = *it;
-      CoinPackedVector row;
-      string           rowName = "k(i_" + UtilIntToStr(i) + ")";
-      for(j = 0; j < nTasks; j++){
-         colIndex = getIndexIJ(i,j);
-         row.insert(colIndex, weight[colIndex]);
-      }      
-      model->appendRow(row, -DecompInf, capacity[i], rowName);
-   }
-   
-   //---   
-   //--- set the col upper and lower bounds
-   //---
-   UtilFillN(model->colLB, nCols,  0.0);
-   UtilFillN(model->colUB, nCols,  1.0);
-
-   //---
-   //--- if generating one of many blocks, fix the vars for all other blocks
-   //---    at the same time push the non-fixed vars into activeColumns set
-   //---
-   if(whichKnaps.size() == 1){
-      b = whichKnaps[0];
-      for(i = 0; i < nMachines; i++){
-         for(j = 0; j < nTasks; j++){
-            colIndex = getIndexIJ(i,j);
-            if(i == b)
-               model->activeColumns.push_back(colIndex);
-            else
-               model->colUB[colIndex] = 0.0;
-         }
-      }
-   }
-   
-   //---
-   //--- set column names for debugging
-   //---
-   colIndex = 0;
-   for(i = 0; i < nMachines; i++){
-      for(j = 0; j < nTasks; j++){
-         string colName = "x("
-            + UtilIntToStr(colIndex) + "_"
-            + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
-         model->colNames.push_back(colName);
-         colIndex++;
-      }      
-   }
-
-   //---
-   //--- set the indices of the integer variables of model
-   //---
-   UtilIotaN(model->integerVars, nCols, 0);
-
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "createModelPartKP()", m_appParam.LogLevel, 2);
-
-   return status;
-}
-
 // --------------------------------------------------------------------- //
 int GAP_DecompApp::createModels(){
 
@@ -312,49 +200,41 @@ int GAP_DecompApp::createModels(){
    for(i = 0; i < nCols; i++)
       m_objective[i] = profit[i];
 
-   {
-      //---
-      //--- A'[i] for i=1..m: m independent knapsacks
-      //---  sum{j in 1..n}  w[i,j] x[i,j] <= b[i]
-      //---  x[i,j] in {0,1}, i in 1..m, j in 1..n
-      //---
-      //--- A'':
-      //---  sum{i in 1..m} x[i,j] = 1, j in 1..n
-      //---
-      //--- Example structure: m=3, n=4
-      //--- A'[i=1]:
-      //---  xxxx         <= b[i=1]
-      //--- A'[i=2]:
-      //---      xxxx     <= b[i=2]
-      //--- A'[i=3]:
-      //---          xxxx <= b[i=3]
-      //---
-      //--- A'':
-      //---  x   x   x     = 1 [j=1]
-      //---   x   x   x    = 1 [j=2]
-      //---    x   x   x   = 1 [j=3]
-      //---     x   x   x  = 1 [j=4]
-      //---
-      setModelObjective(m_objective);
-
-      DecompConstraintSet * modelCore = new DecompConstraintSet();
-      status = createModelPartAP(modelCore);
-      if(status) return status;
-      
-      setModelCore(modelCore, "AP");
-      m_models.insert(make_pair("AP", modelCore));
-
-
-      for(i = 0; i < nMachines; i++){
-         //DecompConstraintSet * modelRelax = new DecompConstraintSet();
-         //status = createModelPartKP(modelRelax, i);
-         
-         modelName = "KP" + UtilIntToStr(i);
-         //setModelRelax(modelRelax, modelName, i);
-         //m_models.insert(make_pair(modelName, modelRelax));
-         setModelRelax(NULL, modelName, i);
-      }
-
+   //---
+   //--- A'[i] for i=1..m: m independent knapsacks
+   //---  sum{j in 1..n}  w[i,j] x[i,j] <= b[i]
+   //---  x[i,j] in {0,1}, i in 1..m, j in 1..n
+   //---
+   //--- A'':
+   //---  sum{i in 1..m} x[i,j] = 1, j in 1..n
+   //---
+   //--- Example structure: m=3, n=4
+   //--- A'[i=1]:
+   //---  xxxx         <= b[i=1]
+   //--- A'[i=2]:
+   //---      xxxx     <= b[i=2]
+   //--- A'[i=3]:
+   //---          xxxx <= b[i=3]
+   //---
+   //--- A'':
+   //---  x   x   x     = 1 [j=1]
+   //---   x   x   x    = 1 [j=2]
+   //---    x   x   x   = 1 [j=3]
+   //---     x   x   x  = 1 [j=4]
+   //---
+   setModelObjective(m_objective);
+   
+   DecompConstraintSet * modelCore = new DecompConstraintSet();
+   status = createModelPartAP(modelCore);
+   if(status) return status;
+   
+   setModelCore(modelCore, "AP");
+   m_models.insert(make_pair("AP", modelCore));
+   
+   
+   for(i = 0; i < nMachines; i++){
+      modelName = "KP" + UtilIntToStr(i);
+      setModelRelax(NULL, modelName, i);
    }
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
