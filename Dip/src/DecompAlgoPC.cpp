@@ -510,7 +510,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       assert(mit != m_modelRelax.end());      
       DecompAlgoModel     & algoModel = (*mit).second;
       DecompConstraintSet * model     = algoModel.getModel();
-      //if(( model->m_masterOnly && model->m_masterOnlyIsInt) ||
+      if(!model)
+         continue;
       if(( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
          (!model->m_masterOnly && model->getNumInts() == 0)){
          m_masterSI->setContinuous((*li)->getColMasterIndex());

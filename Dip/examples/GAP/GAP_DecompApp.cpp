@@ -40,7 +40,7 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
    //---
    //--- read best known lb/ub
    //---
-   string bestKnownFile = m_appParam.DataDir + UtilDirSlash() + "mmkp.opt";
+   string bestKnownFile = m_appParam.DataDir + UtilDirSlash() + "gap.opt";
    m_instance.readBestKnown(bestKnownFile, m_appParam.Instance);
    setBestKnownLB(m_instance.getBestKnownLB());
    setBestKnownUB(m_instance.getBestKnownUB());
@@ -343,15 +343,18 @@ int GAP_DecompApp::createModels(){
       
       setModelCore(modelCore, "AP");
       m_models.insert(make_pair("AP", modelCore));
-      
-      for(i = 0; i < nMachines; i++){
-         DecompConstraintSet * modelRelax = new DecompConstraintSet();
-         status = createModelPartKP(modelRelax, i);
 
+
+      for(i = 0; i < nMachines; i++){
+         //DecompConstraintSet * modelRelax = new DecompConstraintSet();
+         //status = createModelPartKP(modelRelax, i);
+         
          modelName = "KP" + UtilIntToStr(i);
-         setModelRelax(modelRelax, modelName, i);
-         m_models.insert(make_pair(modelName, modelRelax));
+         //setModelRelax(modelRelax, modelName, i);
+         //m_models.insert(make_pair(modelName, modelRelax));
+         setModelRelax(NULL, modelName, i);
       }
+
    }
 
    UtilPrintFuncEnd(m_osLog, m_classTag,

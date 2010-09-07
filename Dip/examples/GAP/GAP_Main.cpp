@@ -13,7 +13,9 @@
 //===========================================================================//
 #include "UtilParameters.h"
 //===========================================================================//
-#if defined(VERSION3) or defined(VERSION4)
+#if defined(VERSION1)
+#include "GAP_DecompApp.h"
+#elif defined(VERSION3) or defined(VERSION4)
 #include "GAP_DecompApp3.h"
 #endif
 //===========================================================================//

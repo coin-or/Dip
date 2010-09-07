@@ -7,9 +7,6 @@ doCut         = 0
 #{0,1}: use DECOMP for price and cut
 doPriceCut    = 1 
 
-#{0,1}: use DECOMP for relax and cut (BROKEN)
-doRelaxCut    = 0 
-
 #{0,1}: use DECOMP to build compact formulation then call direct IP solver
 doDirect      = 0 
 
