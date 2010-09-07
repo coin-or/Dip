@@ -866,6 +866,15 @@ void MILPBlock_DecompApp::createModels(){
 
       DecompConstraintSet * modelRelax = new DecompConstraintSet();
       CoinAssertHint(modelRelax, "Error: Out of Memory");
+
+      //---
+      //--- find and set active columns
+      //---
+      set<int>::iterator sit;
+      set<int> activeColsSet;
+      findActiveColumns(rowsRelax, activeColsSet);
+      for(sit = activeColsSet.begin(); sit != activeColsSet.end(); sit++)
+         modelRelax->activeColumns.push_back(*sit);      	 
       
       if(m_appParam.UseSparse){
          //---
@@ -874,14 +883,6 @@ void MILPBlock_DecompApp::createModels(){
 	 createModelPartSparse(modelRelax, nRowsRelax, &rowsRelax[0]);
       }
       else{
-         //---
-         //--- find and set active columns
-         //---
-         set<int>::iterator sit;
-         set<int> activeColsSet;
-         findActiveColumns(rowsRelax, activeColsSet);
-         for(sit = activeColsSet.begin(); sit != activeColsSet.end(); sit++)
-            modelRelax->activeColumns.push_back(*sit);      	 
          //---
          //--- create model part (using dense API)
          //---         
@@ -937,12 +938,13 @@ void MILPBlock_DecompApp::createModels(){
    setModelCore(modelCore, "core");
    
    for(mdi = m_modelR.begin(); mdi != m_modelR.end(); mdi++){
-      if(!m_appParam.UseSparse){
-	 //---
-	 //--- fix column bounds on non-active columns
-	 //---
-	 (*mdi).second->fixNonActiveColumns();
-      }
+      DecompConstraintSet * modelRelax = (*mdi).second;
+      //if(!m_appParam.UseSparse){
+      //---
+      //--- fix column bounds on non-active columns
+      //---
+      // (*mdi).second->fixNonActiveColumns();
+      //}
       //---
       //--- set system in framework
       //---

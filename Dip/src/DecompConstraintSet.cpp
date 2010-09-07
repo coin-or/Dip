@@ -67,11 +67,25 @@ void DecompConstraintSet::prepareModel(){
    //---   note: this is in terms of the original indices (not sparse)
    //---
    if(isSparse()){
+      //---
+      //--- is this case, the user might have set this
+      //---   or might not have, so we want to find the
+      //---   set based on the mapping, but need to check
+      //---   for duplicates, in case the user already 
+      //---   provided this set
+      //---
+      set<int> activeColumnsSet(activeColumns.begin(), activeColumns.end());
       map<int,int>::const_iterator mcit;
       activeColumns.reserve(m_sparseToOrig.size());
       for(mcit  = m_sparseToOrig.begin(); 
           mcit != m_sparseToOrig.end(); mcit++){
-         activeColumns.push_back(mcit->second);
+         activeColumnsSet.insert(mcit->second);
+      }
+      set<int>::iterator sit;
+      activeColumns.clear();
+      for(sit  = activeColumnsSet.begin();
+          sit != activeColumnsSet.end(); sit++){
+         activeColumns.push_back(*sit);
       }
    }
    else{
