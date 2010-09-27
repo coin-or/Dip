@@ -200,10 +200,12 @@ void MILP_DecompApp::createModels(){
    //--- set the indices of the integer variables of modelRelax
    //---
    const char * integerVars = m_mpsIO.integerColumns();
-   for(c = 0; c < nCols; c++){
-      if(integerVars[c]){
-         m_modelRandCore.integerVars.push_back(c);
-         m_modelRandRelax.integerVars.push_back(c);         
+   if(integerVars){
+      for(c = 0; c < nCols; c++){
+         if(integerVars[c]){
+            m_modelRandCore.integerVars.push_back(c);
+            m_modelRandRelax.integerVars.push_back(c);         
+         }
       }
    }
 
