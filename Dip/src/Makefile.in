@@ -53,27 +53,58 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@CLP_LP_SOLVER_TRUE@am__append_1 = -D__DECOMP_LP_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_2 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
-@CPLEX_LP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
-@CPLEX_LP_SOLVER_TRUE@	-D__DECOMP_LP_CPX__
-@CPLEX_LP_SOLVER_TRUE@am__append_3 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+
+# CGL
+@COIN_HAS_CGL_TRUE@am__append_1 = $(CGL_CFLAGS) 
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir`
+@COIN_HAS_CGL_TRUE@am__append_2 = $(CGL_LIBS)
+#can't se just include <build-dir>/include/coin?
+
+########################################################################
+#                     Includes for LP Solver                           #
+########################################################################
+#because CGL depends on CLP, we need this in any case
+@COIN_HAS_CLP_TRUE@am__append_3 = $(CLP_CFLABS)
+#	  -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+#	  -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`   \
+#	  -I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+#LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la    \
+#	  $(CLPOBJDIR)/src/libClp.la
+#ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+@COIN_HAS_CLP_TRUE@am__append_4 = $(CLP_LIBS)
+@CLP_LP_SOLVER_TRUE@am__append_5 = -D__DECOMP_LP_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_6 = $(CPX_CFLAGS) -D__DECOMP_LP_CPX__
+#	-I`$(CYGPATH_W) $(CPXINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+@CPLEX_LP_SOLVER_TRUE@am__append_7 = (CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@am__append_4 = -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-@CBC_IP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc` \
-@CBC_IP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc` \
-@CBC_IP_SOLVER_TRUE@	-D__DECOMP_IP_CBC__
-@CBC_IP_SOLVER_TRUE@am__append_5 = $(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
-@CBC_IP_SOLVER_TRUE@	$(CBCOBJDIR)/src/libCbc.la
-
-@CBC_IP_SOLVER_TRUE@am__append_6 = `cat $(CBCOBJDIR)/cbc_addlibs.txt`
-@CPLEX_IP_SOLVER_TRUE@am__append_7 = -I`$(CYGPATH_W) $(CPXINCDIR)` \
-@CPLEX_IP_SOLVER_TRUE@	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx` \
+#	$(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
+#	$(CBCOBJDIR)/src/libCbc.la
+#  ADDLIBS  += `cat $(CBCOBJDIR)/cbc_addlibs.txt`
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_8 =  \
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	$(CBCLIB_CFLAGS) \
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	-D__DECOMP_IP_CBC__
+#	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`   \
+#	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_9 = $(CBCLIB_LIBS)
+@CPLEX_IP_SOLVER_TRUE@am__append_10 = $(CPX_CFLAGS) \
 @CPLEX_IP_SOLVER_TRUE@	-D__DECOMP_IP_CPX__
-@CPLEX_IP_SOLVER_TRUE@am__append_8 = $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+#	-I`$(CYGPATH_W) $(CPXINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+@CPLEX_IP_SOLVER_TRUE@am__append_11 = $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in TODO
@@ -129,13 +160,11 @@ HEADERS = $(includecoin_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ABSBUILDDIR = @ABSBUILDDIR@
 ACLOCAL = @ACLOCAL@
-ADDLIBS = `cat $(CLPOBJDIR)/clp_addlibs.txt` $(am__append_6)
+ADDLIBS = @ADDLIBS@
 ADD_CFLAGS = @ADD_CFLAGS@
 ADD_CXXFLAGS = @ADD_CXXFLAGS@
-ALPSDOCDIR = @ALPSDOCDIR@
-ALPSOBJDIR = @ALPSOBJDIR@
-ALPSSRCDIR = @ALPSSRCDIR@
 ALWAYS_FALSE_FALSE = @ALWAYS_FALSE_FALSE@
 ALWAYS_FALSE_TRUE = @ALWAYS_FALSE_TRUE@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -154,26 +183,30 @@ BUILDTOOLSDIR = @BUILDTOOLSDIR@
 CBCDOCDIR = @CBCDOCDIR@
 CBCOBJDIR = @CBCOBJDIR@
 CBCSRCDIR = @CBCSRCDIR@
+CBC_CFLAGS = @CBC_CFLAGS@
+CBC_DATA = @CBC_DATA@
 CBC_IP_SOLVER_FALSE = @CBC_IP_SOLVER_FALSE@
 CBC_IP_SOLVER_TRUE = @CBC_IP_SOLVER_TRUE@
+CBC_LIBS = @CBC_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
-CGLDOCDIR = @CGLDOCDIR@
-CGLOBJDIR = @CGLOBJDIR@
-CGLSRCDIR = @CGLSRCDIR@
+CGL_CFLAGS = @CGL_CFLAGS@
+CGL_DATA = @CGL_DATA@
+CGL_LIBS = @CGL_LIBS@
 CLLCFLAGS = @CLLCFLAGS@
 CLPDOCDIR = @CLPDOCDIR@
 CLPOBJDIR = @CLPOBJDIR@
 CLPSRCDIR = @CLPSRCDIR@
+CLP_CFLAGS = @CLP_CFLAGS@
+CLP_DATA = @CLP_DATA@
+CLP_LIBS = @CLP_LIBS@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
-COINUTILSDOCDIR = @COINUTILSDOCDIR@
-COINUTILSOBJDIR = @COINUTILSOBJDIR@
-COINUTILSSRCDIR = @COINUTILSSRCDIR@
-COIN_HAS_ALPS_FALSE = @COIN_HAS_ALPS_FALSE@
-COIN_HAS_ALPS_TRUE = @COIN_HAS_ALPS_TRUE@
+COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
+COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_LIBS = @COINDEPEND_LIBS@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_CBC_FALSE = @COIN_HAS_CBC_FALSE@
@@ -183,44 +216,41 @@ COIN_HAS_CGL_TRUE = @COIN_HAS_CGL_TRUE@
 COIN_HAS_CLP = @COIN_HAS_CLP@
 COIN_HAS_CLP_FALSE = @COIN_HAS_CLP_FALSE@
 COIN_HAS_CLP_TRUE = @COIN_HAS_CLP_TRUE@
-COIN_HAS_COINUTILS_FALSE = @COIN_HAS_COINUTILS_FALSE@
-COIN_HAS_COINUTILS_TRUE = @COIN_HAS_COINUTILS_TRUE@
-COIN_HAS_CPLEX_FALSE = @COIN_HAS_CPLEX_FALSE@
-COIN_HAS_CPLEX_TRUE = @COIN_HAS_CPLEX_TRUE@
+COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
+COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
-COIN_HAS_DATA_FALSE = @COIN_HAS_DATA_FALSE@
-COIN_HAS_DATA_TRUE = @COIN_HAS_DATA_TRUE@
-COIN_HAS_DIP_FALSE = @COIN_HAS_DIP_FALSE@
-COIN_HAS_DIP_TRUE = @COIN_HAS_DIP_TRUE@
-COIN_HAS_OSI_FALSE = @COIN_HAS_OSI_FALSE@
-COIN_HAS_OSI_TRUE = @COIN_HAS_OSI_TRUE@
+COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
+COIN_HAS_PKGCONFIG_TRUE = @COIN_HAS_PKGCONFIG_TRUE@
 COIN_HAS_READLINE_FALSE = @COIN_HAS_READLINE_FALSE@
 COIN_HAS_READLINE_TRUE = @COIN_HAS_READLINE_TRUE@
+COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
+COIN_HAS_SAMPLE_TRUE = @COIN_HAS_SAMPLE_TRUE@
+COIN_PKG_CONFIG_PATH = @COIN_PKG_CONFIG_PATH@
+COIN_PKG_CONFIG_PATH_UNINSTALLED = @COIN_PKG_CONFIG_PATH_UNINSTALLED@
 CPLEX_IP_SOLVER_FALSE = @CPLEX_IP_SOLVER_FALSE@
 CPLEX_IP_SOLVER_TRUE = @CPLEX_IP_SOLVER_TRUE@
 CPLEX_LP_SOLVER_FALSE = @CPLEX_LP_SOLVER_FALSE@
 CPLEX_LP_SOLVER_TRUE = @CPLEX_LP_SOLVER_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CPXINCDIR = @CPXINCDIR@
-CPXLIB = @CPXLIB@
+CPX_CFLAGS = @CPX_CFLAGS@
+CPX_DATA = @CPX_DATA@
+CPX_LIBS = @CPX_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEFS = @CXXDEFS@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DATADOCDIR = @DATADOCDIR@
-DATAOBJDIR = @DATAOBJDIR@
-DATASRCDIR = @DATASRCDIR@
 DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DIPDOCDIR = @DIPDOCDIR@
-DIPOBJDIR = @DIPOBJDIR@
-DIPSRCDIR = @DIPSRCDIR@
+DIPLIB_LIBS = @DIPLIB_LIBS@
+DIPLIB_PCLIBS = @DIPLIB_PCLIBS@
+DIPLIB_PCREQUIRES = @DIPLIB_PCREQUIRES@
+DIP_SVN_REV = @DIP_SVN_REV@
 DipDEFS = @DipDEFS@
 DipINCDIR = @DipINCDIR@
 DipSRCDIR = @DipSRCDIR@
@@ -257,9 +287,6 @@ MPICXX = @MPICXX@
 OBJEXT = @OBJEXT@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
-OSIDOCDIR = @OSIDOCDIR@
-OSIOBJDIR = @OSIOBJDIR@
-OSISRCDIR = @OSISRCDIR@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -267,8 +294,13 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PCADDLIBS = @PCADDLIBS@
+PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
+SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
+SAMPLE_DATA = @SAMPLE_DATA@
+SAMPLE_LIBS = @SAMPLE_LIBS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -286,6 +318,7 @@ ac_ct_F77 = @ac_ct_F77@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
+ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -306,6 +339,7 @@ exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
 have_automake = @have_automake@
 have_svn = @have_svn@
+have_svnversion = @have_svnversion@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -370,38 +404,23 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-LDADD = $(OSIOBJDIR)/src/OsiClp/libOsiClp.la \
-	$(CLPOBJDIR)/src/libClp.la $(am__append_3) $(am__append_5) \
-	$(am__append_8)
-
-# CGL
+#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src`       \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/inc`       \
+#	-DCOIN_ASSERT
+LDADD = $(COINDEPEND_LIBS) $(am__append_2) $(am__append_4) \
+	$(am__append_7) $(am__append_9) $(am__append_11)
+AM_CPPFLAGS = $(COINDEPEND_CFLAGS) $(am__append_1) $(am__append_3) \
+	$(am__append_5) $(am__append_6) $(am__append_8) \
+	$(am__append_10)
 
 # ALPS/BCPS
-#can't se just include <build-dir>/include/coin?
-
-########################################################################
-#                     Includes for LP Solver                           #
-########################################################################
-#because CGL depends on CLP, we need this in any case
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(COINUTILSOBJDIR)/inc` -I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/inc` -DCOIN_ASSERT \
-	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglClique` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglFlowCover` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglGomory` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglKnapsackCover` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglMixedIntegerRounding` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglMixedIntegerRounding2` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglOddHole` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglProbing` -I`$(CYGPATH_W) \
-	$(CGLSRCDIR)/src/CglTwomir` -I`$(CYGPATH_W) $(ALPSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(ALPSOBJDIR)/inc` -I`$(CYGPATH_W) \
-	$(BCPSSRCDIR)/src` -I`$(CYGPATH_W) $(BCPSOBJDIR)/inc` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` -I`$(CYGPATH_W) \
-	$(OSISRCDIR)/src/OsiClp` -I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-	$(am__append_1) $(am__append_2) $(am__append_4) \
-	$(am__append_7)
+#AM_CPPFLAGS += \
+#	-I`$(CYGPATH_W) $(ALPSSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(ALPSOBJDIR)/inc` \
+#	-I`$(CYGPATH_W) $(BCPSSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(BCPSOBJDIR)/inc`
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
