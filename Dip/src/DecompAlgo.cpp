@@ -1419,6 +1419,18 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //---
    if(m_numConvexCon == 1)
       m_param.SolveMasterAsIp = 0;
+
+   //---
+   //--- if problem is a pure LP, set MasterGapLimit = 1.e-8
+   //---
+   if(modelCore->integerVars.size() == 0){
+      m_param.MasterGapLimit = 1.0e-8;
+      UTIL_MSG(m_param.LogLevel, 1,
+               (*m_osLog)
+               << "Problem is an LP. Reset param MasterGapLimit = "
+               << m_param.MasterGapLimit << endl;
+               );      
+   }
    
    //---
    //--- init stats and timer

@@ -24,12 +24,10 @@ int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
    int    j;
    double x, dist, maxDist;
    
-   //weird - integerVars are defined in Relax, not Core - ugh
-   //should be for overall problem
   
-   double obj = 0.0;
+   double obj              = 0.0;
    const double * objCoeff = getOrigObjective();
-   DecompConstraintSet          * modelCore   = m_modelCore.getModel();
+   DecompConstraintSet * modelCore = m_modelCore.getModel();
   
    maxDist         = DecompEpsilon;//TODO: parameter
    branchedOnIndex = -1;
@@ -42,9 +40,6 @@ int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
       x   = m_xhat[j];
       obj += m_xhat[j] * objCoeff[j];
       dist = fabs(x - floor(x+0.5));
-      //printf("\nx[%d]: %g, dist: %g", j, x, dist);
-      //if(dist > 1.0e-10)
-      // printf("x[%d]: %g, dist: %g\n", j, x, dist);
       if(dist > maxDist){
 	 maxDist         = dist;
 	 branchedOnIndex = j;
