@@ -515,8 +515,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       if(( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
          (!model->m_masterOnly && model->getNumInts() == 0)){
          m_masterSI->setContinuous((*li)->getColMasterIndex());
-         printf("set back to continuous index=%d block=%d\n",
-                b, (*li)->getColMasterIndex());
+         //printf("set back to continuous index=%d block=%d\n",
+         //       b, (*li)->getColMasterIndex());
       }
    }
 
