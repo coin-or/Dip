@@ -57,16 +57,20 @@ distclean-local:
 #                  Installation of the addlibs file                    #
 ########################################################################
 
-addlibsfile = dip_addlibs.txt
-addlibsdir = $(prefix)/share/doc/coin/$(PACKAGE_NAME)
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = dip.pc
 
-install-exec-local: install-doc
-	$(install_sh_DATA) $(addlibsfile) $(DESTDIR)$(addlibsdir)/$(addlibsfile)
+if COIN_HAS_PKGCONFIG
+addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Dip
 
+install-data-hook:
+	@$(mkdir_p) "$(addlibsdir)"
+	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
+	$(PKG_CONFIG) --libs dip > $(addlibsdir)/dip_addlibs.txt
 
-uninstall-local: uninstall-doc
-	rm -f $(addlibsdir)/$(addlibsfile)
-
+uninstall-hook:
+	rm -f $(addlibsdir)/dip_addlibs.txt
+endif
 
 ########################################################################
 #                         Maintainer Stuff                             #

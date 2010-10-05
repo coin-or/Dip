@@ -177,17 +177,18 @@ endif
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
+
 if CBC_IP_SOLVER 
 if COIN_HAS_CBC
   AM_CPPFLAGS += $(CBCLIB_CFLAGS)
 #	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`   \
 #	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
-  LDADD += $(CBCLIB_LIBS)
+  LDADD += $(CBC_LIBS)
 #	$(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
 #	$(CBCOBJDIR)/src/libCbc.la
 #  ADDLIBS  += `cat $(CBCOBJDIR)/cbc_addlibs.txt`
-  AM_CPPFLAGS += -D__DECOMP_IP_CBC__
+  AM_CPPFLAGS += $(CBC_CFLAGS) -D__DECOMP_IP_CBC__
 endif
 endif
 

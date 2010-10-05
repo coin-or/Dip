@@ -95,7 +95,7 @@ fi
 AC_COIN_HAS_PACKAGE(Clp,  [osi-clp],  [DipLib])
 AC_COIN_HAS_PACKAGE(Sample,   [coindatasample])
 AC_COIN_HAS_PACKAGE(Cgl,  [cgl],      [DipLib])
-AC_COIN_HAS_PACKAGE(Cbc,  [cbc],      [DipLib])
+AC_COIN_HAS_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
 
 #############################################################################
 #                            Third party solvers                            #
@@ -287,7 +287,8 @@ AC_CONFIG_FILES([Makefile
                  examples/ExternalSolvers/Graph/get.boost
                  examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
-                 dip_addlibs.txt])
+                 dip.pc
+		 dip-uninstalled.pc])
 
 
 # Here put the location and name of the configuration header file

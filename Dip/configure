@@ -22366,9 +22366,9 @@ if test $coin_has_cbc = notGiven; then
 
 
 if test -n "$PKG_CONFIG" ; then
-  if $PKG_CONFIG --exists "cbc"; then
-    CBC_VERSIONS="`$PKG_CONFIG --modversion cbc 2>/dev/null`"
-     cflags=`$PKG_CONFIG --cflags "cbc" 2>/dev/null`
+  if $PKG_CONFIG --exists "osi-cbc"; then
+    CBC_VERSIONS="`$PKG_CONFIG --modversion osi-cbc 2>/dev/null`"
+     cflags=`$PKG_CONFIG --cflags "osi-cbc" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
 	# but only do this if is not trivial
@@ -22377,17 +22377,17 @@ if test -n "$PKG_CONFIG" ; then
 	  cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
 	fi
     CBC_CFLAGS="$cflags"
-    CBC_LIBS=`$PKG_CONFIG --libs "cbc" 2>/dev/null`
-    CBC_DATA=`$PKG_CONFIG --variable=datadir "cbc" 2>/dev/null`
+    CBC_LIBS=`$PKG_CONFIG --libs "osi-cbc" 2>/dev/null`
+    CBC_DATA=`$PKG_CONFIG --variable=datadir "osi-cbc" 2>/dev/null`
      coin_has_cbc=yes
         echo "$as_me:$LINENO: result: yes: $CBC_VERSIONS" >&5
 echo "${ECHO_T}yes: $CBC_VERSIONS" >&6
-        DIPLIB_PCREQUIRES="cbc $DIPLIB_PCREQUIRES"
+        DIPLIB_PCREQUIRES="osi-cbc $DIPLIB_PCREQUIRES"
 
 
 
   else
-    CBC_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors cbc`
+    CBC_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors osi-cbc`
       coin_has_cbc=notGiven
         echo "$as_me:$LINENO: result: not given: $CBC_PKG_ERRORS" >&5
 echo "${ECHO_T}not given: $CBC_PKG_ERRORS" >&6
@@ -22423,8 +22423,8 @@ CBC_LIBS=
 CBC_CFLAGS=
 CBC_DATA=
 
-# initial list of dependencies is "cbc", but we need to filter out version number specifications (= x, <= x, >= x)
-projtoprocess="cbc"
+# initial list of dependencies is "osi-cbc", but we need to filter out version number specifications (= x, <= x, >= x)
+projtoprocess="osi-cbc"
 projprocessed=""
 
 while test $coin_has_cbc = notGiven ; do
@@ -22509,7 +22509,7 @@ _ACEOF
 
 
 
-      DIPLIB_PCREQUIRES="cbc $DIPLIB_PCREQUIRES"
+      DIPLIB_PCREQUIRES="osi-cbc $DIPLIB_PCREQUIRES"
       DIPLIB_CFLAGS="$CBC_CFLAGS $DIPLIB_CFLAGS"
       DIPLIB_LIBS="$CBC_LIBS $DIPLIB_LIBS"
 
@@ -23430,7 +23430,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip_addlibs.txt"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc"
 
 
 
@@ -24278,7 +24278,8 @@ do
   "examples/ExternalSolvers/Graph/get.boost" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Graph/get.boost" ;;
   "examples/ExternalSolvers/TSP/get.concorde" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/TSP/get.concorde" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
-  "dip_addlibs.txt" ) CONFIG_FILES="$CONFIG_FILES dip_addlibs.txt" ;;
+  "dip.pc" ) CONFIG_FILES="$CONFIG_FILES dip.pc" ;;
+  "dip-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES dip-uninstalled.pc" ;;
   "test/MILP_DecompApp.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MILP_DecompApp.cpp:examples/MILP/MILP_DecompApp.cpp" ;;
   "test/MILP_DecompApp.h" ) CONFIG_LINKS="$CONFIG_LINKS test/MILP_DecompApp.h:examples/MILP/MILP_DecompApp.h" ;;
   "test/MILP_Main.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MILP_Main.cpp:examples/MILP/MILP_Main.cpp" ;;
