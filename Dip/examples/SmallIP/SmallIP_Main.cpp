@@ -89,8 +89,7 @@ int main(int argc, char ** argv){
 
       //---
       //--- get optimal solution
-      //---
-      
+      //---      
       const DecompSolution * solution = alpsModel.getBestSolution();
       cout << "Optimal Solution" << endl;
       solution->print();
