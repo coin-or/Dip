@@ -488,8 +488,8 @@ ac_subdirs_all="$ac_subdirs_all ThirdParty/Blas"
 ac_subdirs_all="$ac_subdirs_all ThirdParty/Lapack"
 ac_subdirs_all="$ac_subdirs_all Data/Sample"
 ac_subdirs_all="$ac_subdirs_all CoinUtils"
-ac_subdirs_all="$ac_subdirs_all Clp"
 ac_subdirs_all="$ac_subdirs_all Osi"
+ac_subdirs_all="$ac_subdirs_all Clp"
 ac_subdirs_all="$ac_subdirs_all Cgl"
 ac_subdirs_all="$ac_subdirs_all Cbc"
 ac_subdirs_all="$ac_subdirs_all Alps"
@@ -1166,12 +1166,12 @@ Optional Packages:
   --with-coinutils-datadir
                           directory with data files for using project
                           CoinUtils
-  --with-clp-lib linker flags for using project Clp
-  --with-clp-incdir directory with header files for using project Clp
-  --with-clp-datadir directory with data files for using project Clp
   --with-osi-lib linker flags for using project Osi
   --with-osi-incdir directory with header files for using project Osi
   --with-osi-datadir directory with data files for using project Osi
+  --with-clp-lib linker flags for using project Clp
+  --with-clp-incdir directory with header files for using project Clp
+  --with-clp-datadir directory with data files for using project Clp
   --with-cgl-lib linker flags for using project Cgl
   --with-cgl-incdir directory with header files for using project Cgl
   --with-cgl-datadir directory with data files for using project Cgl
@@ -21566,123 +21566,6 @@ echo "${ECHO_T}no" >&6
 fi
 
 
-echo "$as_me:$LINENO: checking whether project Clp is available" >&5
-echo $ECHO_N "checking whether project Clp is available... $ECHO_C" >&6
-
-coin_has_clp=notGiven
-coin_have_project_dir=no
-
-# check if user wants to skip project in any case
-
-if test x"$COIN_SKIP_PROJECTS" != x; then
-  for dir in $COIN_SKIP_PROJECTS; do
-    if test $dir = "Clp"; then
-      coin_has_clp=skipping
-    fi
-    if test $dir = "/Clp"; then
-      coin_has_clp=skipping
-    fi
-  done
-fi
-
-if test $coin_has_clp != skipping; then
-  if test $PACKAGE_TARNAME = clp; then
-    coin_has_clp=.
-    coin_have_project_dir=yes
-  fi
-
-
-# Check whether --with-m4_tolower(Clp)-lib or --without-m4_tolower(Clp)-lib was given.
-if test "${with_clp_lib+set}" = set; then
-  withval="$with_clp_lib"
-  coin_has_clp=installed
-fi;
-
-
-# Check whether --with-m4_tolower(Clp)-incdir or --without-m4_tolower(Clp)-incdir was given.
-if test "${with_clp_incdir+set}" = set; then
-  withval="$with_clp_incdir"
-  coin_has_clp=installed
-fi;
-
-
-# Check whether --with-m4_tolower(Clp)-datadir or --without-m4_tolower(Clp)-datadir was given.
-if test "${with_clp_datadir+set}" = set; then
-  withval="$with_clp_datadir"
-  coin_has_clp=installed
-fi;
-
-
-
-
-
-fi
-
-if test $coin_has_clp = notGiven; then
-  #check for project by using pkg-config, if pkg-config is available
-  #we are only interested in installed packages here, so we do not search in $COIN_PKG_CONFIG_PATH_UNINSTALLED
-  if test -n "$PKG_CONFIG" ; then
-    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
-    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" ; export PKG_CONFIG_PATH
-
-if test -n "$PKG_CONFIG" ; then
-  if $PKG_CONFIG --exists "clp"; then
-    CLP_VERSION=`$PKG_CONFIG --modversion "clp" 2>/dev/null`
-    coin_has_clp="$CLP_VERSION"
-  else
-    CLP_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "clp"`
-
-  fi
-else
-  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module Clp without pkg-config\"" >&5
-echo "$as_me: error: \"Cannot check for existance of module Clp without pkg-config\"" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
-    export PKG_CONFIG_PATH
-  fi
-fi
-
-# if not found yet, check if project is available in present directory
-if test "$coin_has_clp" = notGiven; then
-  if test -d $srcdir//Clp; then
-    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
-    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
-    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
-     coin_have_project_dir=yes
-
-    if test $coin_have_project_dir = yes; then
-      coin_has_clp=Clp
-    fi
-  fi
-fi
-
-echo "$as_me:$LINENO: result: $coin_has_clp" >&5
-echo "${ECHO_T}$coin_has_clp" >&6
-
-echo "$as_me:$LINENO: checking whether project Clp need to be configured" >&5
-echo $ECHO_N "checking whether project Clp need to be configured... $ECHO_C" >&6
-if test "$coin_have_project_dir" = yes ; then
-
-  if test -r $srcdir/Clp/configure; then
-    coin_subdirs="$coin_subdirs Clp"
-    echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-
-subdirs="$subdirs Clp"
-
-  else
-    echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-  fi
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-
 echo "$as_me:$LINENO: checking whether project Osi is available" >&5
 echo $ECHO_N "checking whether project Osi is available... $ECHO_C" >&6
 
@@ -21789,6 +21672,123 @@ echo "${ECHO_T}yes" >&6
 
 
 subdirs="$subdirs Osi"
+
+  else
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+  fi
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
+echo "$as_me:$LINENO: checking whether project Clp is available" >&5
+echo $ECHO_N "checking whether project Clp is available... $ECHO_C" >&6
+
+coin_has_clp=notGiven
+coin_have_project_dir=no
+
+# check if user wants to skip project in any case
+
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "Clp"; then
+      coin_has_clp=skipping
+    fi
+    if test $dir = "/Clp"; then
+      coin_has_clp=skipping
+    fi
+  done
+fi
+
+if test $coin_has_clp != skipping; then
+  if test $PACKAGE_TARNAME = clp; then
+    coin_has_clp=.
+    coin_have_project_dir=yes
+  fi
+
+
+# Check whether --with-m4_tolower(Clp)-lib or --without-m4_tolower(Clp)-lib was given.
+if test "${with_clp_lib+set}" = set; then
+  withval="$with_clp_lib"
+  coin_has_clp=installed
+fi;
+
+
+# Check whether --with-m4_tolower(Clp)-incdir or --without-m4_tolower(Clp)-incdir was given.
+if test "${with_clp_incdir+set}" = set; then
+  withval="$with_clp_incdir"
+  coin_has_clp=installed
+fi;
+
+
+# Check whether --with-m4_tolower(Clp)-datadir or --without-m4_tolower(Clp)-datadir was given.
+if test "${with_clp_datadir+set}" = set; then
+  withval="$with_clp_datadir"
+  coin_has_clp=installed
+fi;
+
+
+
+
+
+fi
+
+if test $coin_has_clp = notGiven; then
+  #check for project by using pkg-config, if pkg-config is available
+  #we are only interested in installed packages here, so we do not search in $COIN_PKG_CONFIG_PATH_UNINSTALLED
+  if test -n "$PKG_CONFIG" ; then
+    coin_save_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" ; export PKG_CONFIG_PATH
+
+if test -n "$PKG_CONFIG" ; then
+  if $PKG_CONFIG --exists "clp"; then
+    CLP_VERSION=`$PKG_CONFIG --modversion "clp" 2>/dev/null`
+    coin_has_clp="$CLP_VERSION"
+  else
+    CLP_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "clp"`
+
+  fi
+else
+  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module Clp without pkg-config\"" >&5
+echo "$as_me: error: \"Cannot check for existance of module Clp without pkg-config\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+    PKG_CONFIG_PATH="$coin_save_PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+  fi
+fi
+
+# if not found yet, check if project is available in present directory
+if test "$coin_has_clp" = notGiven; then
+  if test -d $srcdir//Clp; then
+    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
+    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
+    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
+     coin_have_project_dir=yes
+
+    if test $coin_have_project_dir = yes; then
+      coin_has_clp=Clp
+    fi
+  fi
+fi
+
+echo "$as_me:$LINENO: result: $coin_has_clp" >&5
+echo "${ECHO_T}$coin_has_clp" >&6
+
+echo "$as_me:$LINENO: checking whether project Clp need to be configured" >&5
+echo $ECHO_N "checking whether project Clp need to be configured... $ECHO_C" >&6
+if test "$coin_have_project_dir" = yes ; then
+
+  if test -r $srcdir/Clp/configure; then
+    coin_subdirs="$coin_subdirs Clp"
+    echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+
+subdirs="$subdirs Clp"
 
   else
     echo "$as_me:$LINENO: result: no" >&5
