@@ -19,61 +19,59 @@ nodist_unitTest_SOURCES = \
 	MILP_Main.cpp MILP_Param.h
 
 # List libraries of COIN projects
-unitTest_LDADD = \
-	$(DIPOBJDIR)/src/libDecomp.la \
-	$(ALPSOBJDIR)/src/libAlps.la \
-	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la
-if CPLEX_LP_SOLVER
-unitTest_LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS) $(COINDEPEND_LIBS)
+#	$(DIPOBJDIR)/src/libDecomp.la \
+#	$(ALPSOBJDIR)/src/libAlps.la \
+#	$(OSIOBJDIR)/src/OsiClp/libOsiClp.la
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(DipINCDIR)` $(COINDEPEND_CFLAGS)
+
+if COIN_HAS_CGL
+unitTest_LDADD += $(CGL_LIBS)
+AM_CPPFLAGS += $(CGL_CFLAGS)
 endif
-if CPLEX_IP_SOLVER
-unitTest_LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+
+if COIN_HAS_CLP
+unitTest_LDADD += $(CLP_LIBS)
+AM_CPPFLAGS += $(CLP_CFLABS)
 endif
-unitTest_LDADD += \
-	$(CBCOBJDIR)/src/libCbcSolver.la \
-	$(CBCOBJDIR)/src/libCbc.la \
-	$(CLPOBJDIR)/src/libClp.la \
-	$(CGLOBJDIR)/src/libCgl.la \
-	$(OSIOBJDIR)/src/libOsi.la \
-	$(COINUTILSOBJDIR)/src/libCoinUtils.la 
 
 # List additional libraries
-LIBS += $(ADDLIBS) \
-	`cat $(ALPSOBJDIR)/alps_addlibs.txt` \
-	`cat $(CGLOBJDIR)/cgl_addlibs.txt` \
-	`cat $(OSIOBJDIR)/osi_addlibs.txt` \
-	`cat $(CLPOBJDIR)/clp_addlibs.txt` \
-	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
-	`cat $(CBCOBJDIR)/cbc_addlibs.txt`
+#LIBS += $(ADDLIBS) \
+#	`cat $(ALPSOBJDIR)/alps_addlibs.txt` \
+#	`cat $(CGLOBJDIR)/cgl_addlibs.txt` \
+#	`cat $(OSIOBJDIR)/osi_addlibs.txt` \
+#	`cat $(CLPOBJDIR)/clp_addlibs.txt` \
+#	`cat $(COINUTILSOBJDIR)/coinutils_addlibs.txt` \
+#	`cat $(CBCOBJDIR)/cbc_addlibs.txt`
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
-AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(DIPSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(ALPSSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(ALPSOBJDIR)/inc` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
-	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
-        -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-        -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-        -I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
+# AM_CPPFLAGS = \
+#	-I`$(CYGPATH_W) $(DIPSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(ALPSSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(ALPSOBJDIR)/inc` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
+#        -I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp` \
+#	-I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(CLPOBJDIR)/inc` \
+#        -I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
+#        -I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
+#        -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+#        -I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
 
 if COIN_HAS_ASL
   AM_CPPFLAGS += $(ASL_CPPFLAGS) -DCOIN_HAS_ASL
-  unitTest_LDADD += $(ASLLIB)
+  unitTest_LDADD += $(ASLLIB_LIBS)
 endif
 
 # This line is necessary to allow VPATH compilation with MS compilers
@@ -84,52 +82,69 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 #                     Includes for LP Solver                           #
 ########################################################################
 
-LDADD=
-ADDLIBS=
-
-#because CGL depends on CLP, we need this in any case
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-	  -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`   \
-	  -I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la    \
-	  $(CLPOBJDIR)/src/libClp.la
-ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+if CPLEX_LP_SOLVER
+AM_CPPFLAGS += $(CPX_CFLAGS) -D__DECOMP_LP_CPX__
+unitTest_LDADD += $(CPX_LIBS) #$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+endif
 
 if CLP_LP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_LP_CLP__
 endif
 
-if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-  AM_CPPFLAGS += -D__DECOMP_LP_CPX__
-endif
+#LDADD=
+#ADDLIBS=
+
+#because CGL depends on CLP, we need this in any case
+#AM_CPPFLAGS += -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
+#	  -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`   \
+#	  -I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
+#LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la    \
+#	  $(CLPOBJDIR)/src/libClp.la
+#ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
+
+#if CPLEX_LP_SOLVER
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+#  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+#  AM_CPPFLAGS += -D__DECOMP_LP_CPX__
+#endif
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
 
 if CBC_IP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`   \
-	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
-  LDADD += $(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
-	$(CBCOBJDIR)/src/libCbc.la
-  ADDLIBS  += `cat $(CBCOBJDIR)/cbc_addlibs.txt`
-  AM_CPPFLAGS += -D__DECOMP_IP_CBC__
+if COIN_HAS_CBC
+AM_CPPFLAGS += $(CBC_CFLAGS) -D__DECOMP_IP_CBC__
+unitTest_LDADD += $(CBC_LIBS)
+endif
 endif
 
 if CPLEX_IP_SOLVER
-  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
-	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
-  AM_CPPFLAGS += -D__DECOMP_IP_CPX__
+AM_CPPFLAGS += $(CPX_CFLAGS) -D__DECOMP_IP_CPX__
+unitTest_LDADD += $(CPX_LIBS) #$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 endif
+
+#if CBC_IP_SOLVER
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`   \
+#	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
+#  LDADD += $(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
+#	$(CBCOBJDIR)/src/libCbc.la
+#  ADDLIBS  += `cat $(CBCOBJDIR)/cbc_addlibs.txt`
+#  AM_CPPFLAGS += -D__DECOMP_IP_CBC__
+#endif
+
+#if CPLEX_IP_SOLVER
+#  AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)` \
+#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
+#  LDADD += $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+#  AM_CPPFLAGS += -D__DECOMP_IP_CPX__
+#endif
 
 test: unitTest$(EXEEXT)
 
-	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir $(DATASRCDIR)/Sample --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir $(SAMPLE_DATA) --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
 
 .PHONY: test
 

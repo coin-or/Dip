@@ -170,7 +170,7 @@ if CPLEX_LP_SOLVER
   AM_CPPFLAGS += $(CPX_CFLAGS)
 #	-I`$(CYGPATH_W) $(CPXINCDIR)` \
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += (CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+  LDADD += $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
   AM_CPPFLAGS += -D__DECOMP_LP_CPX__
 endif
 

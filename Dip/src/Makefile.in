@@ -85,7 +85,7 @@ host_triplet = @host@
 @CPLEX_LP_SOLVER_TRUE@am__append_6 = $(CPX_CFLAGS) -D__DECOMP_LP_CPX__
 #	-I`$(CYGPATH_W) $(CPXINCDIR)` \
 #	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-@CPLEX_LP_SOLVER_TRUE@am__append_7 = (CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@CPLEX_LP_SOLVER_TRUE@am__append_7 = $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
 
 ########################################################################
 #                     Includes for IP Solver                           #
