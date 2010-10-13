@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@/coin
+includedir=@includedir@/coin
+
+Name: DIP
+Description: Decomposition for Integer Programs
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lSym @DIPLIB_PCLIBS@
+Cflags: -I${includedir}
+Requires: @DIPLIB_PCREQUIRES@

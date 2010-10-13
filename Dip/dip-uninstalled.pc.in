@@ -1,0 +1,10 @@
+prefix=@prefix@
+libdir=@ABSBUILDDIR@/src
+includedir=@abs_source_dir@/src
+
+Name: DIP
+Description: Decomposition for Integer Programs
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lDecomp @DIPLIB_PCLIBS@
+Cflags: -I${includedir} -I@ABSBUILDDIR@/inc
+Requires: @DIPLIB_PCREQUIRES@
