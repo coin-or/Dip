@@ -6,6 +6,6 @@ includedir=@includedir@/coin
 Name: DIP
 Description: Decomposition for Integer Programs
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lSym @DIPLIB_PCLIBS@
+Libs: -L${libdir} -lDecomp @DIPLIB_PCLIBS@
 Cflags: -I${includedir}
 Requires: @DIPLIB_PCREQUIRES@

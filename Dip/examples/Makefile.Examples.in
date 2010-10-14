@@ -13,7 +13,12 @@
 ###########################################################################
 # define DECOMP libs
 ###########################################################################
-LIBS = -L$(COINLIBDIR) @DIPLIB_LIBS@
+
+#if COIN_HAS_PKGCONFIG
+#LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ $(PKG_CONFIG) --libs dip`
+#else
+LIBS = -L@abs_lib_dir@/coin -lDecomp @DIPLIB_LIBS@
+#endif
 
 ADDINCFLAGS += -DCOIN_ASSERT
 
@@ -50,7 +55,7 @@ endif
 ###########################################################################
 # define COIN libs
 ###########################################################################
-INCL += -I@abs_include_dir@
+INCL += -I@abs_include_dir@/coin
 
 # Directory with COIN header files
 COININCDIR = @abs_include_dir@/coin

@@ -18,7 +18,8 @@
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-lib_LTLIBRARIES = libDecomp.la
+coinlibdir = ${libdir}/coin
+coinlib_LTLIBRARIES = libDecomp.la
 
 # List all source files for this library, including headers
 libDecomp_la_SOURCES =
@@ -205,6 +206,7 @@ endif
 ########################################################################
 # Here list all the header files that are required by a user of the library,
 # and that therefore should be installed in 'install'
+
 includecoindir = $(includedir)/coin
 
 #DecompAlgo
