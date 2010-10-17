@@ -657,6 +657,8 @@ public:
    }
 
    inline double getMasterObjValue() const {
+      if(!m_masterSI)
+         return -DecompInf;
       //NOTE: be careful that this is always using the PhaseII obj
       int nc = static_cast<int>(m_primSolution.size());
       const double * objCoef = m_masterSI->getObjCoefficients();
