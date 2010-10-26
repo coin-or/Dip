@@ -9,7 +9,7 @@
 # Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
 #                    Ted Ralphs, Lehigh University                           #
 #                                                                            #
-# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, Ted Ralphs     #
+# Copyright (C) 2002-2010, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
@@ -20,7 +20,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.8],[ted@lehigh.edu])
+AC_INIT([Dip],[trunk],[dip@lists.coin-or.org])
 
 # copyright for configure script
 AC_COPYRIGHT([
@@ -35,7 +35,7 @@ AC_COPYRIGHT([
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2009, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2010, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 ])
@@ -60,7 +60,7 @@ AC_CANONICAL_BUILD
 # the source root directory contains definition of where to find those
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT
+AC_COIN_PROJECTDIR_INIT(Dip)
 
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE(Dip)
@@ -86,14 +86,16 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_HAS_PROJECT(CoinUtils)
-AC_COIN_HAS_PROJECT(Data)
-AC_COIN_HAS_PROJECT(Osi)
-AC_COIN_HAS_PROJECT(Clp)
-AC_COIN_HAS_PROJECT(Cgl)
-AC_COIN_HAS_PROJECT(Cbc)
-AC_COIN_HAS_PROJECT(Alps)
-AC_COIN_HAS_PROJECT(Dip)
+AC_COIN_HAS_PACKAGE(CoinDepend, [coinutils = trunk osi = trunk alps = trunk], 
+		    [DipLib])
+if test $coin_has_coindepend != yes ; then
+  AC_MSG_ERROR([Required package CoinUtils, Osi, or Alps not available.])
+fi
+
+AC_COIN_HAS_PACKAGE(Clp,  [osi-clp],  [DipLib])
+AC_COIN_HAS_PACKAGE(Sample,   [coindatasample])
+AC_COIN_HAS_PACKAGE(Cgl,  [cgl],      [DipLib])
+AC_COIN_HAS_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
 
 #############################################################################
 #                            Third party solvers                            #
@@ -101,7 +103,7 @@ AC_COIN_HAS_PROJECT(Dip)
 
 # Check which third party solvers are available 
 
-AC_COIN_HAS_USER_LIBRARY([Cplex],[CPX],[cplex.h],[CPXgetstat])
+AC_COIN_HAS_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 
 #############################################################################
 #                       Other third party software                          #
@@ -114,10 +116,6 @@ AC_COIN_HAS_ASL
 #############################################################################
 #                      Check for the LP solver                              #
 #############################################################################
-AM_CONDITIONAL(COIN_HAS_CLP,
-               false)
-AM_CONDITIONAL(COIN_HAS_CPLEX,
-               false)
 
 AC_MSG_CHECKING([for Dip default lp solver])
 AC_ARG_WITH([lp-solver],
@@ -289,7 +287,8 @@ AC_CONFIG_FILES([Makefile
                  examples/ExternalSolvers/Graph/get.boost
                  examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
-                 dip_addlibs.txt])
+                 dip.pc
+		 dip-uninstalled.pc])
 
 
 # Here put the location and name of the configuration header file

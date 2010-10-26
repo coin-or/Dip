@@ -120,6 +120,8 @@ Dip/data/TSP/get.data -text
 Dip/data/TSP/tsplib.list -text
 Dip/data/TSP/tsplib2.list -text
 Dip/data/VRP/vrplib.tgz -text
+Dip/dip-uninstalled.pc.in -text
+Dip/dip.pc.in -text
 Dip/dip_addlibs.txt.in -text
 Dip/examples/AP3/AP3_DecompApp.cpp -text
 Dip/examples/AP3/AP3_DecompApp.h -text

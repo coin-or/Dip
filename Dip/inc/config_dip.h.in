@@ -6,38 +6,35 @@
 /* Define to the debug verbosity level (0 is no output) */
 #undef COIN_DIP_VERBOSITY
 
-/* Define to 1 if the Alps package is used */
-#undef COIN_HAS_ALPS
-
 /* If defined, the Ampl Solver Library is available. */
 #undef COIN_HAS_ASL
 
 /* Define to 1 if the Cbc package is used */
 #undef COIN_HAS_CBC
 
-/* Define to 1 if the Cgl package is used */
+/* Define to 1 if the Cgl package is available */
 #undef COIN_HAS_CGL
 
 /* Define to 1 if the Clp package is used */
 #undef COIN_HAS_CLP
 
-/* Define to 1 if the CoinUtils package is used */
-#undef COIN_HAS_COINUTILS
+/* Define to 1 if the CoinDepend package is available */
+#undef COIN_HAS_COINDEPEND
 
-/* Define to 1 if the Cplex package is available */
+/* Define to 1 if the Cpx package is available */
 #undef COIN_HAS_CPX
-
-/* Define to 1 if the Data package is used */
-#undef COIN_HAS_DATA
-
-/* Define to 1 if the Dip package is used */
-#undef COIN_HAS_DIP
-
-/* Define to 1 if the Osi package is used */
-#undef COIN_HAS_OSI
 
 /* Define to 1 if readline is available */
 #undef COIN_HAS_READLINE
+
+/* Define to 1 if the Sample package is available */
+#undef COIN_HAS_SAMPLE
+
+/* SVN revision number of project */
+#undef DIP_SVN_REV
+
+/* Version number of project */
+#undef DIP_VERSION
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H

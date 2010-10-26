@@ -27,7 +27,7 @@ EXTRA_DIST = doxydoc/all/doxygen.conf  \
 #                          Subdirectories                              #
 ########################################################################
 # subdirs is set by configure as the list of all subdirectories to recurse
-SUBDIRS = Dip CoinUtils Osi Clp Cgl Cbc Alps
+SUBDIRS = $(subdirs)
 SUBDIRS_DOXY = $(SUBDIRS) all
 
 ########################################################################
@@ -63,6 +63,6 @@ unitTests: tests
 ########################################################################
 
 # Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES =
+DISTCLEANFILES = coin_subdirs.txt
 
 include BuildTools/Makemain.inc
