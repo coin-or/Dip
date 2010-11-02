@@ -86,16 +86,16 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_HAS_PACKAGE(CoinDepend, [coinutils = trunk osi = trunk alps = trunk], 
+AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils = trunk osi = trunk alps = trunk], 
 		    [DipLib])
 if test $coin_has_coindepend != yes ; then
   AC_MSG_ERROR([Required package CoinUtils, Osi, or Alps not available.])
 fi
 
-AC_COIN_HAS_PACKAGE(Clp,  [osi-clp],  [DipLib])
-AC_COIN_HAS_PACKAGE(Sample,   [coindatasample])
-AC_COIN_HAS_PACKAGE(Cgl,  [cgl],      [DipLib])
-AC_COIN_HAS_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Sample,   [coindatasample])
+AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [DipLib])
+AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
 
 #############################################################################
 #                            Third party solvers                            #
@@ -103,7 +103,7 @@ AC_COIN_HAS_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
 
 # Check which third party solvers are available 
 
-AC_COIN_HAS_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 
 #############################################################################
 #                       Other third party software                          #
