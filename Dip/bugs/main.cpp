@@ -28,5 +28,6 @@ int main(int argc, char ** argv){
    cbcArgv[cbcArgc++]  = cbcSolve.c_str();
    cbcArgv[cbcArgc++]  = cbcQuit.c_str();
    CbcMain1(cbcArgc, cbcArgv, cbc);
+   printf("cbc.status() = %d\n", cbc.status());
    printf("cbc.isProveOptimal() = %d\n", cbc.isProvenOptimal());
 }

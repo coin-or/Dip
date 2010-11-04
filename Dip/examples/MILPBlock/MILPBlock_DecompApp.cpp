@@ -469,7 +469,8 @@ MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
       model->m_masterOnlyLB    = colLB[i];
       model->m_masterOnlyUB    = colUB[i];
       //0=cont, 1=integer
-      model->m_masterOnlyIsInt = integerVars[i] ? true : false;
+      model->m_masterOnlyIsInt = 
+         (integerVars && integerVars[i]) ? true : false;
       if(m_appParam.ColumnUB <  1.0e15)
 	 if(colUB[i] >  1.0e15)
 	    model->m_masterOnlyUB = m_appParam.ColumnUB;
@@ -678,16 +679,20 @@ MILPBlock_DecompApp::createModelPartSparse(DecompConstraintSet * model,
    //---
    model->setSparse(nColsOrig);
 
+   bool                  isInteger;
    int                   nCols, origIndex, newIndex;
    vector<int>::iterator vit;
    newIndex = 0;
    for(vit  = model->activeColumns.begin();
        vit != model->activeColumns.end(); vit++){
       origIndex = *vit;
-
+      if(integerVars && integerVars[origIndex])
+         isInteger  = true;
+      else
+         isInteger  = false;      
       model->pushCol(colLB[origIndex], 
 		     colUB[origIndex],
-		     integerVars[origIndex] == 0 ? false : true,
+		     isInteger,
 		     origIndex);	     
 
       //---
