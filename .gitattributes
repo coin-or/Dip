@@ -431,7 +431,6 @@ Dip/src/old/DecompAlgoRC.h -text
 Dip/src/old/DecompApp.cpp -text
 Dip/src/old/DecompApp.h -text
 Dip/src/old/DecompBranch.cpp -text
-Dip/src/old/DecompConfig.h -text
 Dip/src/old/DecompConstants.h -text
 Dip/src/old/DecompConstraintSet.cpp -text
 Dip/src/old/DecompConstraintSet.h -text
