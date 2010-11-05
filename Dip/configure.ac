@@ -86,8 +86,7 @@ AM_CONDITIONAL(COIN_HAS_READLINE,
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils = trunk osi = trunk alps = trunk], 
-		    [DipLib])
+AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils osi alps], [DipLib])
 if test $coin_has_coindepend != yes ; then
   AC_MSG_ERROR([Required package CoinUtils, Osi, or Alps not available.])
 fi
