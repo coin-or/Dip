@@ -17,7 +17,7 @@
 #if COIN_HAS_PKGCONFIG
 #LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ $(PKG_CONFIG) --libs dip`
 #else
-LIBS = -L@abs_lib_dir@/coin -lDecomp @DIPLIB_LIBS@
+LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS@
 #endif
 
 ADDINCFLAGS += -DCOIN_ASSERT
