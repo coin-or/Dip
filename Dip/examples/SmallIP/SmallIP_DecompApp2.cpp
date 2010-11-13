@@ -158,6 +158,10 @@ void SmallIP_DecompApp::createModels(){
    //--- load the OSI object to be used in solve relaxed
    //---
    m_osi.messageHandler()->setLogLevel(0);      
+   //m_osi.setHintParam(OsiDoReducePrint, true, OsiHintDo);
+#ifdef __DECOMP_IP_CBC__   
+   m_osi.getModelPtr()->setLogLevel(0);
+#endif
    m_osi.loadProblem(*m_modelPart1.getMatrix(),
 		     m_modelPart1.getColLB(),
 		     m_modelPart1.getColUB(),
