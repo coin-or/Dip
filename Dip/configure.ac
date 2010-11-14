@@ -151,8 +151,7 @@ fi
 AM_CONDITIONAL(CLP_LP_SOLVER,[test $dip_lp_solver = clp &&
 test $coin_has_clp != unavailable &&
 test $coin_has_clp != skipping])
-AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex &&
-test $coin_has_cpx = true])
+AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex])
 
 #############################################################################
 #                      Check for the IP solver                              #
