@@ -23380,8 +23380,7 @@ fi
 
 
 
-if test $dip_ip_solver = cplex &&
-test $coin_has_cpx = true; then
+if test $dip_ip_solver = cplex; then
   CPLEX_IP_SOLVER_TRUE=
   CPLEX_IP_SOLVER_FALSE='#'
 else

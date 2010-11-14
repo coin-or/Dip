@@ -194,8 +194,7 @@ fi
 AM_CONDITIONAL(CBC_IP_SOLVER,[test $dip_ip_solver = cbc &&
 test $coin_has_cbc != unavailable &&
 test $coin_has_cbc != skipping])
-AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex &&
-test $coin_has_cpx = true])
+AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex])
 
 ##############################################################################
 #                   VPATH links for unit test                                #
