@@ -4150,6 +4150,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int            nBaseCoreRows = modelCore->nBaseRows;
    const int      nCoreCols     = modelCore->getNumCols();
    const double * u             = NULL;
+   const double * userU         = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
    const double * origObjective = getOrigObjective();
    double       * redCostX      = NULL;   
@@ -4162,8 +4163,15 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       nBaseCoreRows = nCoreCols;
    
    assert(!m_masterSI->isProvenPrimalInfeasible());
-   u = getMasterDualSolution();
 
+   //---
+   //--- get the master dual solution
+   //---   the user can override this 
+   //---
+   u     = getMasterDualSolution();
+   userU = m_app->getDualForGenerateVars(u); //STOP - for Alper
+   if(userU)
+      u = userU;
 
    
    //THINK: includes artificials now

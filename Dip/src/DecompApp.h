@@ -129,6 +129,18 @@ public:
 			     vector<DecompSolution*> & xhatIPFeas){
       return 0;
    }
+
+   /**
+    * This function allows the user to return their own dual vector
+    * to be used in the generation of new variables (in the reduced-cost
+    * calculation).
+    *
+    * For reference, the user is given the dual vector from the restricted
+    * master (or the stabilized dual, if using m_param.DualStab).
+    */
+   virtual const double * getDualForGenerateVars(const double * dual){
+      return 0;
+   }
   
    virtual int generateInitVars(DecompVarList & initVars);
    
