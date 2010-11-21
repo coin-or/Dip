@@ -1446,7 +1446,6 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //  cutting and fathoming - check this
    //m_nodeStats.objBest.first  = globalLB;
    m_nodeStats.objBest.first  = -DecompInf;
-
    m_nodeStats.objBest.second = globalUB;
    m_compressColsLastPrice    = 0;
    m_compressColsLastNumCols  = m_masterSI->getNumCols();
@@ -2438,6 +2437,13 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
 
       //---
+      //--- adjust dual solution
+      //---    DecompAlgo call adjusts based on dual stabilization method
+      //---
+      adjustMasterDualSolution();
+
+
+      //---
       //--- HACK: there is some bug in CLP where infeasible is declared optimal
       //---   but then we get back solution at state when it internally gave up
       //---   
@@ -3085,8 +3091,9 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
    //--- is there an override?
    //---
    if(m_phaseForce != PHASE_UNKNOWN){
-      nextPhase  = m_phaseForce;
-      nextStatus = status;
+      nextPhase    = m_phaseForce;
+      m_phaseForce = PHASE_UNKNOWN;
+      nextStatus   = status;
       goto PHASE_UPDATE_FINISH;
    }
 
@@ -3204,7 +3211,12 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	 //---
 	 if(priceCallsRound >= m_param.LimitRoundPriceIters)
 	    considerSwitch = true;
-	 
+
+	 printf("mustSwitch=%d\n", mustSwitch);
+	 printf("considerSwitch=%d\n", considerSwitch);
+	 printf("isCutPossible=%d\n", isCutPossible);
+	 printf("isPricePossible=%d\n", isPricePossible);
+ 
 	 if(mustSwitch){
 	    //---
 	    //--- we must switch from pricing
@@ -5360,10 +5372,17 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    if(m_phase        == PHASE_PRICE2 && 
       newVars.size() >  0            && 
       !foundGoodCol && m_param.DualStab){
+      m_phaseForce           = PHASE_PRICE2;
       m_param.DualStabAlpha *= 0.90;
-      printf("No vars passed doing Wegntes. Reduce alpha to %g and repeat.\n",
-	     m_param.DualStabAlpha);      
-      m_phaseForce = PHASE_PRICE2;
+      if(m_param.LogDebugLevel >= 2)
+	 (*m_osLog) << "No vars passed doing Wegntes. Reduce alpha to " 
+		    << m_param.DualStabAlpha << " and repeat." << endl;
+
+
+      //---
+      //--- adjust dual solution with updated stability parameter
+      //---
+      adjustMasterDualSolution();
    }
    else
       m_phaseForce = PHASE_UNKNOWN;

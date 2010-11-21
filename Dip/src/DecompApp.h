@@ -99,6 +99,25 @@ public:
    //gets called and checked that it returns good information
    int createModel();  
 
+
+   /**
+      Initialize the dual vector for PhaseII of PC. 
+      
+      This is only called when dual stabilization is used, i.e.,
+      when m_param.DualStab > 0.      
+   */
+   //virtual void initDualVector(vector<double> & dualVector){
+   //}
+
+   /**
+    * Get the dual vector for PhaseII of PC. 
+    *
+    * This is only called when dual stabilization is used, i.e.,
+    * when m_param.DualStab > 0.      
+   */
+   //virtual void getDualVectorMutable(vector<double> & dualVector){
+   //}
+
    virtual bool APPisUserFeasible(const double * x,
                                   const int      n_cols,
                                   const double   tolZero){

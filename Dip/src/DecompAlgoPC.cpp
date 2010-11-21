@@ -115,6 +115,86 @@ void DecompAlgoPC::phaseInit(DecompPhase & phase){
 }
 
 //===========================================================================//
+void DecompAlgoPC::adjustMasterDualSolution(){
+  if(!m_param.DualStab)
+    return;
+
+  UtilPrintFuncBegin(m_osLog, m_classTag,
+		     "adjustMasterDualSolution()", m_param.LogDebugLevel, 1);
+
+
+  //---
+  //--- resize dual vectors
+  //---
+  int nRows = static_cast<int>(m_masterSI->getNumRows());
+  m_dual.resize(nRows);
+  m_dualRM.resize(nRows);
+  m_dualST.resize(nRows);
+  
+  //---
+  //--- calculate smoothed dual
+  //---    pi_ST = alpha * pi_Bar + (1-alpha) * pi_RM
+  //--- this is dual feasible because it is taking
+  //---    a convex combination of previously dual feasible vectors
+  //--- need to be careful here, as the init dual is 0, which might not
+  //---    be dual feasible, therefore, in the first iteration, we need 
+  //---    to skip the smoothing and enforce that the first dual be set 
+  //---    to dualRM
+  //---
+  int            r;
+  const double * u      = &m_dualSolution[0];
+  double         alpha  = m_param.DualStabAlpha;
+  double         alpha1 = 1.0 - alpha; 
+  copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+
+  //---
+  //--- for both the first PhaseI and first PhaseII calls,
+  //---   be sure to set the dual vector to dualRM as dual=0
+  //---   might not be feasible
+  //---
+  if(((m_nodeStats.cutCallsTotal + 
+       m_nodeStats.priceCallsTotal) == 1) || m_firstPhase2Call){
+    if(m_param.LogDebugLevel >= 2)
+      (*m_osLog) << "Init dual to dualRM" << endl;
+    copy(m_dualRM.begin(), m_dualRM.end(), m_dual.begin());
+  }  
+  for(r = 0; r < nRows; r++){
+    m_dualST[r] = (alpha * m_dual[r]) + (alpha1 * m_dualRM[r]);
+  }      
+
+  //---
+  //--- log for debugging
+  //---
+  if(m_param.LogDebugLevel >= 3){
+    const vector<string> & rowNames = m_masterSI->getRowNames();
+    for(r = 0; r < m_masterSI->getNumRows(); r++){
+      if(!(UtilIsZero(m_dual[r]) && 
+	   UtilIsZero(m_dualRM[r]) && UtilIsZero(m_dualST[r]))){
+	if(r < static_cast<int>(rowNames.size())){
+	  (*m_osLog) << "MASTER " 
+		     << DecompRowTypeStr[m_masterRowType[r]]
+		     << " DUAL[ " << r << "->" << rowNames[r]
+		     << "] = " << m_dual[r] << " RM = " 
+		     << m_dualRM[r] << " ST = " << m_dualST[r]
+		     << endl;
+	}
+	else
+	  (*m_osLog) << "MASTER " 
+		     << DecompRowTypeStr[m_masterRowType[r]]
+		     << " DUAL[ " << r
+		     << "] = " << m_dual[r] << " RM = " 
+		     << m_dualRM[r] << " ST = " << m_dualST[r]
+		     << endl;
+      }
+    }
+  }
+  
+  UtilPrintFuncEnd(m_osLog, m_classTag,
+		   "adjustMasterDualSolution()", m_param.LogDebugLevel, 1);  
+}
+
+
+//===========================================================================//
 int DecompAlgoPC::adjustColumnsEffCnt(){
    int            status         = DecompStatOk;
    int            colMasterIndex = -1;
