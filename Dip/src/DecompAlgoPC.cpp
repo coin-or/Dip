@@ -153,7 +153,7 @@ void DecompAlgoPC::adjustMasterDualSolution(){
   //---   might not be feasible
   //---
   if(((m_nodeStats.cutCallsTotal + 
-       m_nodeStats.priceCallsTotal) == 1) || m_firstPhase2Call){
+       m_nodeStats.priceCallsTotal) == 0) || m_firstPhase2Call){
     if(m_param.LogDebugLevel >= 2)
       (*m_osLog) << "Init dual to dualRM" << endl;
     copy(m_dualRM.begin(), m_dualRM.end(), m_dual.begin());

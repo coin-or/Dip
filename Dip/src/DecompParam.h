@@ -92,7 +92,7 @@ public:
    int    SubProbSolverStartAlgo;
 
    //n = 0: do all blocks each time
-   //n > 0: do all blocks every n*numBlocks iterations
+   //n > 0: do all blocks every n iterations
    int    RoundRobinInterval;
 
    //TODO: named values in parameters?
