@@ -1581,8 +1581,12 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		     << "Processing Node "<< setw(5)  << nodeIndex
 		     << " algo = "        << setw(10) << DecompAlgoStr[m_algo] 
 		     << " phase = "       << setw(10) << DecompPhaseStr[m_phase]
-		     << " cutpass = "     << setw(5)  << objBound.cutPass
-		     << " pricepass = "   << setw(5)  << objBound.pricePass
+		     << " cutpass = "     << setw(5)  
+		     << m_nodeStats.cutCallsTotal
+		     << " pricepass = "   << setw(5)  
+		     << m_nodeStats.priceCallsTotal
+		     //<< " cutpass = "     << setw(5)  << objBound.cutPass
+		     //<< " pricepass = "   << setw(5)  << objBound.pricePass
 		     << " thisLB = "      << setw(10) 
 		     << UtilDblToStr(objBound.thisBound,6)
 		     << " thisUB = "      << setw(10) 
