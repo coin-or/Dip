@@ -218,8 +218,8 @@ AC_COIN_LINK_INPUT_CMD
 ##############################################################################
 
 # Location of DIP for later use
-AC_SUBST(DipINCDIR)
-AC_SUBST(DipSRCDIR)
+AC_SUBST(DIPINCDIR)
+AC_SUBST(DIPSRCDIR)
 DipINCDIR=`cd $srcdir; pwd`/src
 DipSRCDIR=`cd $srcdir; pwd`/src
 

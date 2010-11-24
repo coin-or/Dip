@@ -98,7 +98,7 @@ libDecomp_la_SOURCES +=        \
 	UtilMacrosAlps.cpp     \
 	UtilMacrosAlps.h       
 
-# This is for libtool (on Windows)
+# This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
@@ -110,18 +110,13 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 LDADD=
 
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) 
-LDADD += $(COINDEPEND_LIBS)
-
-# CGL
-if COIN_HAS_CGL
-AM_CPPFLAGS += $(CGL_CFLAGS) 
-LDADD += $(CGL_LIBS)
-endif
+AM_CPPFLAGS = $(DIPLIB_CFLAGS) 
+LDADD += $(DIPLIB_LIBS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(abs_source_dir)/src` \
+                   -I$(top_builddir)/inc
 #can't se just include <build-dir>/include/coin?
 
 ########################################################################
@@ -129,18 +124,11 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 #because CGL depends on CLP, we need this in any case
 
-if COIN_HAS_CLP
-AM_CPPFLAGS += $(CLP_CFLABS)
-LDADD += $(CLP_LIBS)
-endif
-
 if CLP_LP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_LP_CLP__
 endif
 
 if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += $(CPX_CFLAGS)
-  LDADD += $(CPX_LIBS) 
   AM_CPPFLAGS += -D__DECOMP_LP_CPX__
 endif
 
@@ -150,15 +138,11 @@ endif
 
 if CBC_IP_SOLVER 
 if COIN_HAS_CBC
-  AM_CPPFLAGS += $(CBCLIB_CFLAGS)
-  LDADD += $(CBC_LIBS)
-  AM_CPPFLAGS += $(CBC_CFLAGS) -D__DECOMP_IP_CBC__
+  AM_CPPFLAGS += -D__DECOMP_IP_CBC__
 endif
 endif
 
 if CPLEX_IP_SOLVER
-  AM_CPPFLAGS += $(CPX_CFLAGS)
-  LDADD += $(CPX_LIBS) 
   AM_CPPFLAGS += -D__DECOMP_IP_CPX__
 endif
 

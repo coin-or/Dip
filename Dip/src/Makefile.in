@@ -53,33 +53,20 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-
-# CGL
-@COIN_HAS_CGL_TRUE@am__append_1 = $(CGL_CFLAGS) 
-@COIN_HAS_CGL_TRUE@am__append_2 = $(CGL_LIBS)
 #can't se just include <build-dir>/include/coin?
 
 ########################################################################
 #                     Includes for LP Solver                           #
 ########################################################################
 #because CGL depends on CLP, we need this in any case
-@COIN_HAS_CLP_TRUE@am__append_3 = $(CLP_CFLABS)
-@COIN_HAS_CLP_TRUE@am__append_4 = $(CLP_LIBS)
-@CLP_LP_SOLVER_TRUE@am__append_5 = -D__DECOMP_LP_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_6 = $(CPX_CFLAGS) -D__DECOMP_LP_CPX__
-@CPLEX_LP_SOLVER_TRUE@am__append_7 = $(CPX_LIBS) 
+@CLP_LP_SOLVER_TRUE@am__append_1 = -D__DECOMP_LP_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_2 = -D__DECOMP_LP_CPX__
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_8 =  \
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	$(CBCLIB_CFLAGS) \
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	$(CBC_CFLAGS) \
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	-D__DECOMP_IP_CBC__
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_9 = $(CBC_LIBS)
-@CPLEX_IP_SOLVER_TRUE@am__append_10 = $(CPX_CFLAGS) \
-@CPLEX_IP_SOLVER_TRUE@	-D__DECOMP_IP_CPX__
-@CPLEX_IP_SOLVER_TRUE@am__append_11 = $(CPX_LIBS) 
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_3 = -D__DECOMP_IP_CBC__
+@CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in TODO
@@ -223,14 +210,14 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DIPINCDIR = @DIPINCDIR@
 DIPLIB_CFLAGS = @DIPLIB_CFLAGS@
 DIPLIB_LIBS = @DIPLIB_LIBS@
 DIPLIB_PCLIBS = @DIPLIB_PCLIBS@
 DIPLIB_PCREQUIRES = @DIPLIB_PCREQUIRES@
+DIPSRCDIR = @DIPSRCDIR@
 DIP_SVN_REV = @DIP_SVN_REV@
 DipDEFS = @DipDEFS@
-DipINCDIR = @DipINCDIR@
-DipSRCDIR = @DipSRCDIR@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -373,7 +360,7 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
 	UtilMacrosAlps.h
 
-# This is for libtool (on Windows)
+# This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
@@ -382,15 +369,15 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-LDADD = $(COINDEPEND_LIBS) $(am__append_2) $(am__append_4) \
-	$(am__append_7) $(am__append_9) $(am__append_11)
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) $(am__append_1) $(am__append_3) \
-	$(am__append_5) $(am__append_6) $(am__append_8) \
-	$(am__append_10)
+LDADD = $(DIPLIB_LIBS)
+AM_CPPFLAGS = $(DIPLIB_CFLAGS) $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(abs_source_dir)/src` \
+                   -I$(top_builddir)/inc
+
 
 ########################################################################
 #                Headers that need to be installed                     #
