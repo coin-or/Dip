@@ -4736,7 +4736,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 }
 
 	 
-	 m_rrIterSinceAll++;
+	 //m_rrIterSinceAll++;
 	 m_rrLastBlock = b;
 
          foundNegRC = false;
@@ -4750,6 +4750,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 //if(foundNegRC)
 	 //   break;
       }
+      m_rrIterSinceAll++;
 
       //---
       //--- if we searched through all the blocks but still didn't

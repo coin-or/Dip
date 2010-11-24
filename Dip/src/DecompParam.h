@@ -96,6 +96,7 @@ public:
    int    RoundRobinInterval;
 
    //TODO: named values in parameters?
+   //NOT working
    //0:RoundRobinRotate:    rotate through blocks in order 0...numBlocks-1
    //1:RoundRobinMostNegRC: choose the block with most neg reduced cost (in last iter)
    int    RoundRobinStrategy;
