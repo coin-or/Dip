@@ -14,11 +14,13 @@
 # define DECOMP libs
 ###########################################################################
 
-#if COIN_HAS_PKGCONFIG
-#LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ $(PKG_CONFIG) --libs dip`
-#else
+COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
+
+ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
+LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip`
+else
 LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS@
-#endif
+endif
 
 ADDINCFLAGS += -DCOIN_ASSERT
 
