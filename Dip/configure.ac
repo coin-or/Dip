@@ -135,7 +135,8 @@ case $dip_lp_solver in
    ;;
    cplex)
      AC_MSG_RESULT(Cplex)
-     if test $coin_has_cpx = false; then 
+     if [test $coin_has_cpx = unavailable ||
+         test $coin_has_cpx = skipping]; then 
          found_package=false
      fi
    ;; 
@@ -151,7 +152,9 @@ fi
 AM_CONDITIONAL(CLP_LP_SOLVER,[test $dip_lp_solver = clp &&
 test $coin_has_clp != unavailable &&
 test $coin_has_clp != skipping])
-AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex])
+AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex &&
+test $coin_has_cpx != unavailable &&
+test $coin_has_cpx != skipping])
 
 #############################################################################
 #                      Check for the IP solver                              #
@@ -178,7 +181,8 @@ case $dip_ip_solver in
    ;;
    cplex)
      AC_MSG_RESULT(Cplex)
-     if test $coin_has_cpx = false; then 
+     if [test $coin_has_cpx = unavailable ||
+         test $coin_has_cpx = skipping]; then
          found_package=false
      fi
    ;; 
@@ -194,7 +198,9 @@ fi
 AM_CONDITIONAL(CBC_IP_SOLVER,[test $dip_ip_solver = cbc &&
 test $coin_has_cbc != unavailable &&
 test $coin_has_cbc != skipping])
-AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex])
+AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex &&
+test $coin_has_cpx != unavailable &&
+test $coin_has_cpx != skipping])
 
 ##############################################################################
 #                   VPATH links for unit test                                #

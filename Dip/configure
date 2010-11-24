@@ -23213,7 +23213,8 @@ echo "${ECHO_T}$coin_has_clp" >&6
    cplex)
      echo "$as_me:$LINENO: result: Cplex" >&5
 echo "${ECHO_T}Cplex" >&6
-     if test $coin_has_cpx = false; then
+     if test $coin_has_cpx = unavailable ||
+         test $coin_has_cpx = skipping; then
          found_package=false
      fi
    ;;
@@ -23244,7 +23245,9 @@ fi
 
 
 
-if test $dip_lp_solver = cplex; then
+if test $dip_lp_solver = cplex &&
+test $coin_has_cpx != unavailable &&
+test $coin_has_cpx != skipping; then
   CPLEX_LP_SOLVER_TRUE=
   CPLEX_LP_SOLVER_FALSE='#'
 else
@@ -23349,7 +23352,8 @@ echo "${ECHO_T}$coin_has_cbc" >&6
    cplex)
      echo "$as_me:$LINENO: result: Cplex" >&5
 echo "${ECHO_T}Cplex" >&6
-     if test $coin_has_cpx = false; then
+     if test $coin_has_cpx = unavailable ||
+         test $coin_has_cpx = skipping; then
          found_package=false
      fi
    ;;
@@ -23380,7 +23384,9 @@ fi
 
 
 
-if test $dip_ip_solver = cplex; then
+if test $dip_ip_solver = cplex &&
+test $coin_has_cpx != unavailable &&
+test $coin_has_cpx != skipping; then
   CPLEX_IP_SOLVER_TRUE=
   CPLEX_IP_SOLVER_FALSE='#'
 else
