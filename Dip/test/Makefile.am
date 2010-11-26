@@ -24,7 +24,7 @@ AM_CPPFLAGS = $(DIPLIB_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(abs_source_dir)/src` \
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` \
                    -I`$(CYGPATH_W) $(top_builddir)/inc`
 
 ########################################################################

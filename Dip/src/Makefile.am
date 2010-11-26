@@ -115,9 +115,8 @@ LDADD += $(DIPLIB_LIBS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(abs_source_dir)/src` \
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` \
                    -I`$(CYGPATH_W) $(top_builddir)/inc`
-#can't se just include <build-dir>/include/coin?
 
 ########################################################################
 #                     Includes for LP Solver                           #
