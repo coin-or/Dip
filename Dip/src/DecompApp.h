@@ -120,11 +120,24 @@ public:
    }
 
 
-   //should run some sanity checks here!
+   /**
+    * Set the model objective function.
+    *
+    * NOTE: The user application MUST call this method.
+    */
    inline void setModelObjective(const double * objective){
       assert(objective);
       m_objective = objective;
    }
+
+   /**
+    * Set the model core constraint matrix.
+    *
+    * NOTE: The user application MUST call this method.
+    */
+   //TODO: having these implementations in the header makes
+   // it harder to view this as an interface class - it is unclear
+   // what the user must do vs can do
    inline void setModelCore(DecompConstraintSet * model,
                             const string          modelName){
       assert(model);
@@ -134,6 +147,12 @@ public:
       m_modelCore.setModelName(modelName);
    }
 
+   /**
+    * Set the model relaxed constraint matrix (for a particular block).
+    *
+    * NOTE: The user application MUST call this method IF they are 
+    * not deriving the function DecompApp::solveRelaxed.
+    */
    inline void setModelRelax(DecompConstraintSet * model,
                              const string          modelName = "",
                              const int             blockId   = 0){
@@ -154,12 +173,14 @@ public:
       DecompAppModel appModel(model, modelName, blockId);
       m_modelRelax.insert(make_pair(blockId, appModel));
    }
-   
+
+   /**
+    * Set the model relaxed (nested) constraint matrix 
+    *  (for a particular block).
+    */   
    inline void setModelRelaxNest(DecompConstraintSet * model,
                                  const string          modelName,
                                  const int             blockId = 0){
-      //assuming blocks are disjoint in variables - if not, bug
-      //   can check that with active columns
       assert(model);
       if(!model->hasPrepRun())
          model->prepareModel();
@@ -199,12 +220,35 @@ public:
    virtual void initDualVector(vector<double> & dualVector){}
 
 
+   //TODO: change name - no other one is using APP, why here?
+   /**
+    * Method to determine if the solution (x) is feasible to the original 
+    * model. For explicitly defined model components, like the model core
+    * constraints (A''), the feasibility of the solution is automatically 
+    * checked against the constraints. In the case when the relaxed problem
+    * constraints (A') are explicitly defined - these are also checked 
+    * automatically. 
+    * 
+    * However, for some applications, a valid feasible constraint system
+    * cannot be explicitly defined (even for the core set of constraints).
+    * For example, think of the case of TSP, where A'' is defined as the 
+    * subtour elimination constraints. These constraints are implicitly 
+    * defined by deriving the method DecompApp::generateCuts. Therefore, 
+    * the framework cannot automatically tell if a solution is feasible
+    * by checking against the constraint system. In this case, the user must 
+    * provide this method.
+    *
+    * @param[in] x The solution point to check.
+    * @return True, if x is feasible; otherwise, false.
+    */
+   //TODO: what is doxy tag for function return
+   //TOOD: don't need numCols and tolZero should not be user overidable
    virtual bool APPisUserFeasible(const double * x,
-                                  const int      n_cols,
+                                  const int      numCols,
                                   const double   tolZero){
       return true;
    };
-
+   
    virtual int APPheuristics(const double            * xhat,
 			     const double            * origCost,
 			     vector<DecompSolution*> & xhatIPFeas){
