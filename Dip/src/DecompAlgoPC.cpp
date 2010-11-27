@@ -158,6 +158,9 @@ void DecompAlgoPC::adjustMasterDualSolution(){
       (*m_osLog) << "Init dual to dualRM" << endl;
     copy(m_dualRM.begin(), m_dualRM.end(), m_dual.begin());
   }  
+  if(m_firstPhase2Call){
+     m_app->initDualVector(m_dual);
+  }
   for(r = 0; r < nRows; r++){
     m_dualST[r] = (alpha * m_dual[r]) + (alpha1 * m_dualRM[r]);
   }      

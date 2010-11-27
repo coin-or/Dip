@@ -187,13 +187,16 @@ public:
     */
 
    /**
-      Initialize the dual vector for PhaseII of PC. 
-      
-      This is only called when dual stabilization is used, i.e.,
-      when m_param.DualStab > 0.      
+    * Initialize the dual vector for PhaseII of PC. The user is passed
+    * a reference to the internal data and can manipulate it directly.
+    *
+    * This is only called when dual stabilization is used, i.e.,
+    * when m_param.DualStab > 0, at the first iteration of PhaseII of PC.
+    * The vector is immediately smoothed with the initial restricted master
+    * duals. By default, the restricted mater is used as the initial dual
+    * and, therefore, no smoothing occurs in the first iteration.
    */
-   //virtual void initDualVector(vector<double> & dualVector){
-   //}
+   virtual void initDualVector(vector<double> & dualVector){}
 
 
    virtual bool APPisUserFeasible(const double * x,
