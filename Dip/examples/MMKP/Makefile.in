@@ -10,76 +10,55 @@
 # All Rights Reserved.                                                      #
 #===========================================================================#
 
-#===========================================================================#
-EXEDECOMP = decomp_mmkp@EXEEXT@
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
 
-#source files
+EXE = decomp_mmkp@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
 OBJS          = MMKP_Main.@OBJEXT@
 OBJS         += MMKP_Instance.@OBJEXT@
 OBJS         += MMKP_DecompApp.@OBJEXT@
 OBJS         += MMKP_MCKnap.@OBJEXT@
 
-#===========================================================================#
-# additional libraries needed (libKnapPisinger)
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = @srcdir@
+VPATH  = @srcdir@
+
+###########################################################################
+# Additional variables for the knapsack solver
+###########################################################################
+
 KNAP_DIR = ../ExternalSolvers/Knapsack/Pisinger
 KNAP_LIB  = KnapPisinger
 KNAP_INC  = $(KNAP_DIR)
 
-#===========================================================================#
-# additional include and link flags
-ADDLIBS      += -L$(KNAP_DIR) -l$(KNAP_LIB)
-ADDINCFLAGS  += -I$(KNAP_INC)
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
 
-#===========================================================================#
-# directory to the source files
-SRCDIR = @srcdir@
-VPATH  = @srcdir@
+LIBS      = -L$(KNAP_DIR) -l$(KNAP_LIB)
 
-#===========================================================================#
-# C++ Compiler command
-CXX = @CXX@
-# C++ Compiler options
-CXXFLAGS = @CXXFLAGS@
-# C++ compiler options for linking
-CXXLINKFLAGS = @RPATH_FLAGS@
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
 
-#===========================================================================#
-# directory with COIN header files
-COININCDIR = @abs_include_dir@
-# directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
+CFLAGS    += -I$(KNAP_INC)
 
-# includes, use the CYGPATH_W variables to allow compilation with win
-INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
 
-#===========================================================================#
-# include COIN flags and library options
-include ../Makefile.Examples
-
-#===========================================================================#
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
-
-#===========================================================================#
-all: $(EXEDECOMP)
-
-.SUFFIXES: .cpp .c .o .obj
-
-$(EXEDECOMP): $(KNAP_DIR)/libKnapPisinger.a $(OBJS)
-	bla=;\
-	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
-
-clean:
-	(cd ${KNAP_DIR} && ${MAKE} clean)
-	rm -rf $(EXE) $(OBJS)
+DEPS = $(KNAP_DIR)/libKnapPisinger.a
 
 $(KNAP_DIR)/libKnapPisinger.a:
-	(cd ${KNAP_DIR} && ${MAKE})
+        (cd ${KNAP_DIR} && ${MAKE})
 
-.cpp.o:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
-
-
-.cpp.obj:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

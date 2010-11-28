@@ -10,18 +10,22 @@
 # All Rights Reserved.                                                      #
 #===========================================================================#
 
-#===========================================================================#
-# C++ Compiler command
+###########################################################################
+# C++ Compiler command and flags
+###########################################################################
+
 CXX = @CXX@
-# C++ Compiler options
+
 CXXFLAGS = @CXXFLAGS@
-# C++ compiler options for linking
+
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-#===========================================================================#
-# directory with COIN header files
+###########################################################################
+# directories for finding COIN packages
+###########################################################################
+
 COININCDIR = @abs_include_dir@/coin
-# directory with COIN libraries
+
 COINLIBDIR = @abs_lib_dir@
 
 ###########################################################################
@@ -39,7 +43,7 @@ COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip`
 else
-LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS@
+LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@
 endif
 
 CFLAGS = -DCOIN_ASSERT
@@ -83,7 +87,28 @@ CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags dip`
 else
-CFLAGS = @DIPLIB_CFLAGS@
+CFLAGS = @DIPLIB_CFLAGS_INSTALLED@
 endif
 
+###########################################################################
+# default targets
+###########################################################################
 
+all: $(EXE)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXE): $(OBJS)
+	bla=;\
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS)
+
+clean:
+	rm -rf $(EXE) $(OBJS)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

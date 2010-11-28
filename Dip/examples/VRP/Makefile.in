@@ -11,17 +11,24 @@
 # All Rights Reserved.                                                      #
 #===========================================================================#
 
-#===========================================================================#
-EXEDECOMP = decomp_vrp@EXEEXT@
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
 
-# sources files
+EXE = decomp_vrp@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
 OBJS         = VRP_DecompApp.@OBJEXT@
 OBJS        += VRP_GSECCut.@OBJEXT@
 OBJS        += VRP_SPPRC.@OBJEXT@
 OBJS        += VRP_Main.@OBJEXT@
 
-#===========================================================================#
-# additional libraries needed
+###########################################################################
+# Additional variables for libraries
+###########################################################################
 
 # Concorde
 CONCORDE_LIB = concorde.a
@@ -37,55 +44,45 @@ BOOST_DIR = ../ExternalSolvers/Graph/boost_1_40_0
 CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP
 CVRPSEP_LIB = cvrpsep
 
-#===========================================================================#
-# additional include and link flags
-ADDLIBS      += $(CONCORDE_DIR)/$(CONCORDE_LIB)
-ADDLIBS      += $(CONCORDE_DIR)/$(QSOPT_LIB) 
-ADDINCFLAGS  += -I$(CONCORDE_INC)
-ADDLIBS      += -L$(CVRPSEP_DIR)/obj -l$(CVRPSEP_LIB)
-ADDINCFLAGS  += -I$(CVRPSEP_DIR)
-#ADDINCFLAGS  += -I${BOOST_DIR}
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
 
-#===========================================================================#
-# directory to the source files
 SRCDIR = @srcdir@
-VPATH  = @srcdir@
+VPATH = @srcdir@
 
-#===========================================================================#
-# C++ Compiler command
-CXX = @CXX@
-# C++ Compiler options
-CXXFLAGS = @CXXFLAGS@
-# additional C++ Compiler options for linking
-CXXLINKFLAGS = @RPATH_FLAGS@
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
 
+CFLAGS     = -I$(CONCORDE_INC)
+CFLAGS    += -I$(BOOST_DIR)
+CFLAGS    += -I$(CVRPSEP_DIR)
 
-#===========================================================================#
-# directory with COIN header files
-COININCDIR = @abs_include_dir@
-# directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
 
-# includes, use the CYGPATH_W variables to allow compilation with win
-INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+LIBS       = $(CONCORDE_DIR)/$(CONCORDE_LIB)
+LIBS      += $(CONCORDE_DIR)/$(QSOPT_LIB)
+LIBS      += -L$(CVRPSEP_DIR)/obj -l$(CVRPSEP_LIB)
 
-#===========================================================================#
-# include COIN flags and library options
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS = $(CONCORDE_DIR)/$(CONCORDE_LIB)
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
 include ../Makefile.Examples
 
-#===========================================================================#
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
-
-#===========================================================================#
-all: $(EXEDECOMP)
-
-.SUFFIXES: .cpp .c .o .obj
-
-$(EXEDECOMP): $(CONCORDE_DIR)/$(CONCORDE_LIB) $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a $(OBJS)
-	bla=;\
-	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################
 
 $(CONCORDE_DIR)/$(CONCORDE_LIB):
 	(cd ${CONCORDE_DIR} \
@@ -95,13 +92,3 @@ $(CONCORDE_DIR)/$(CONCORDE_LIB):
 $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a:
 	(cd $(CVRPSEP_DIR) && make)
 
-
-clean:
-	rm -rf $(EXE) $(OBJS)
-
-.cpp.o:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
-
-
-.cpp.obj:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

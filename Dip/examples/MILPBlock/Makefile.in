@@ -10,46 +10,59 @@
 # All Rights Reserved.                                                      #
 #===========================================================================#
 
-#===========================================================================#
-EXEDECOMP = decomp_milpblock@EXEEXT@
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
 
-#source files
+EXE = decomp_milpblock@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
 OBJS        = MILPBlock_Main.@OBJEXT@
 OBJS       += MILPBlock_DecompApp.@OBJEXT@
 
-#===========================================================================#
-# directory to the source files
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
 SRCDIR = @srcdir@
 VPATH = @srcdir@
+DATADIR = @srcdir@/../../data/MILP/block
 
-#===========================================================================#
-# include COIN flags and library options
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+CFLAGS = 
+
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+LIBS = 
+
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS =
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
 
 include ../Makefile.Examples
 
-#===========================================================================#
-
-all: $(EXEDECOMP)
-
-.SUFFIXES: .cpp .c .o .obj
-
-$(EXEDECOMP): $(OBJS)
-	bla=;\
-	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS)
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################
 
 data:
-	cd @srcdir@/../../data/MILP/block; \
+	cd $(DATADIR); \
 	tar -zxvf retail.tgz; \
 	tar -zxvf atm.tgz;
 
 
-clean:
-	rm -rf $(EXE) $(OBJS)
-
-.cpp.o:
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
-
-
-.cpp.obj:
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
