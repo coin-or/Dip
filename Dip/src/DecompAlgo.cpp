@@ -23,7 +23,7 @@
 #include "DecompSolverResult.h"
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
-#define   RELAXED_THREADED
+//#define   RELAXED_THREADED
 #define   NTHREADS   2
 //#define   DO_INTERIOR //also in DecompAlgoPC
 
