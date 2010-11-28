@@ -146,6 +146,24 @@ public:
       m_modelCore.setModel(model);
       m_modelCore.setModelName(modelName);
    }
+   ////////////STOP thoughts on redesign
+   //TODO: change to setModelCore( ... )
+   //  to long set of args of basic types - more like how Osi
+   //  does loadProblem, etc... or juse use Osi as shell and accept
+   //  an OsiSolverInterface?? or an OsiModel... is there one?
+   //   maybe use CoinModel?? much cleaner?
+   //at least set up an alternative to do it that way
+   //still, this is still a function the user must call versus
+   // a method they MUST override -which would fit more into the
+   // framework concept - for e.g.,
+   //virtual CoinModel * createModelCore() - the use must create a CoinModel
+   //  or maybe a DecompModel which is derived from a CoinModel with 
+   //  whatever extra stuff might be needed - but I would try to avoid that
+   //is it best to have it returned as return of function - forcing the 
+   //user to do it? or as arguments? and copy or assign pointers like
+   //in SAS load problem design
+
+
 
    /**
     * Set the model relaxed constraint matrix (for a particular block).
