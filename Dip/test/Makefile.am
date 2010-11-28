@@ -20,7 +20,7 @@ nodist_unitTest_SOURCES = \
 
 # List libraries of COIN projects
 unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS) 
-AM_CPPFLAGS = $(DIPLIB_CFLAGS)
+AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin

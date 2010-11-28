@@ -228,6 +228,7 @@ CBCOBJDIR = @CBCOBJDIR@
 CBCSRCDIR = @CBCSRCDIR@
 CBC_CFLAGS = @CBC_CFLAGS@
 CBC_DATA = @CBC_DATA@
+CBC_DATA_INSTALLED = @CBC_DATA_INSTALLED@
 CBC_IP_SOLVER_FALSE = @CBC_IP_SOLVER_FALSE@
 CBC_IP_SOLVER_TRUE = @CBC_IP_SOLVER_TRUE@
 CBC_LIBS = @CBC_LIBS@
@@ -237,6 +238,7 @@ CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
 CGL_CFLAGS = @CGL_CFLAGS@
 CGL_DATA = @CGL_DATA@
+CGL_DATA_INSTALLED = @CGL_DATA_INSTALLED@
 CGL_LIBS = @CGL_LIBS@
 CLLCFLAGS = @CLLCFLAGS@
 CLPDOCDIR = @CLPDOCDIR@
@@ -244,12 +246,18 @@ CLPOBJDIR = @CLPOBJDIR@
 CLPSRCDIR = @CLPSRCDIR@
 CLP_CFLAGS = @CLP_CFLAGS@
 CLP_DATA = @CLP_DATA@
+CLP_DATA_INSTALLED = @CLP_DATA_INSTALLED@
 CLP_LIBS = @CLP_LIBS@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
 COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_DATA_INSTALLED = @COINDEPEND_DATA_INSTALLED@
 COINDEPEND_LIBS = @COINDEPEND_LIBS@
+COIN_CC_IS_CL_FALSE = @COIN_CC_IS_CL_FALSE@
+COIN_CC_IS_CL_TRUE = @COIN_CC_IS_CL_TRUE@
+COIN_CXX_IS_CL_FALSE = @COIN_CXX_IS_CL_FALSE@
+COIN_CXX_IS_CL_TRUE = @COIN_CXX_IS_CL_TRUE@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_CBC_FALSE = @COIN_HAS_CBC_FALSE@
@@ -279,6 +287,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPX_CFLAGS = @CPX_CFLAGS@
 CPX_DATA = @CPX_DATA@
+CPX_DATA_INSTALLED = @CPX_DATA_INSTALLED@
 CPX_LIBS = @CPX_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
@@ -292,7 +301,9 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DIPINCDIR = @DIPINCDIR@
 DIPLIB_CFLAGS = @DIPLIB_CFLAGS@
+DIPLIB_CFLAGS_INSTALLED = @DIPLIB_CFLAGS_INSTALLED@
 DIPLIB_LIBS = @DIPLIB_LIBS@
+DIPLIB_LIBS_INSTALLED = @DIPLIB_LIBS_INSTALLED@
 DIPLIB_PCLIBS = @DIPLIB_PCLIBS@
 DIPLIB_PCREQUIRES = @DIPLIB_PCREQUIRES@
 DIPSRCDIR = @DIPSRCDIR@
@@ -344,6 +355,7 @@ RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
 SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
 SAMPLE_DATA = @SAMPLE_DATA@
+SAMPLE_DATA_INSTALLED = @SAMPLE_DATA_INSTALLED@
 SAMPLE_LIBS = @SAMPLE_LIBS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -424,7 +436,7 @@ EXTRA_DIST = $(am__append_2)
 ########################################################################
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = dip.pc
-@COIN_HAS_PKGCONFIG_TRUE@addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Dip
+addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Dip
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -928,8 +940,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@COIN_HAS_PKGCONFIG_FALSE@install-data-hook:
-@COIN_HAS_PKGCONFIG_FALSE@uninstall-hook:
 clean: clean-recursive
 
 clean-am: clean-generic clean-libtool clean-local mostlyclean-am
@@ -1022,13 +1032,14 @@ distclean-local:
 
 .PHONY: test unitTest 
 
-@COIN_HAS_PKGCONFIG_TRUE@install-data-hook:
-@COIN_HAS_PKGCONFIG_TRUE@	@$(mkdir_p) "$(addlibsdir)"
+install-data-hook:
+	@$(mkdir_p) "$(addlibsdir)"
 @COIN_HAS_PKGCONFIG_TRUE@	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
 @COIN_HAS_PKGCONFIG_TRUE@	$(PKG_CONFIG) --libs dip > $(addlibsdir)/dip_addlibs.txt
+@COIN_HAS_PKGCONFIG_FALSE@	echo -L@abs_lib_dir@ -lDip @DIPLIB_LIBS_INSTALLED@ > $(addlibsdir)/dip_addlibs.txt
 
-@COIN_HAS_PKGCONFIG_TRUE@uninstall-hook:
-@COIN_HAS_PKGCONFIG_TRUE@	rm -f $(addlibsdir)/dip_addlibs.txt
+uninstall-hook:
+	rm -f $(addlibsdir)/dip_addlibs.txt
 
 install-doc: $(DocFiles)
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
