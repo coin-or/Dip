@@ -24,7 +24,7 @@
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
 //#define   RELAXED_THREADED
-#define   NTHREADS   2
+#define   NTHREADS   4
 //#define   DO_INTERIOR //also in DecompAlgoPC
 
 //===========================================================================//
@@ -46,7 +46,7 @@
 
 //===========================================================================//
 #ifdef RELAXED_THREADED
-#include "pfunc/pfunc.hpp"
+//#include "pfunc/pfunc.hpp"
 static void * solveRelaxedThread(void * args);
 #endif
 typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
@@ -3217,10 +3217,10 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	 if(priceCallsRound >= m_param.LimitRoundPriceIters)
 	    considerSwitch = true;
 
-	 printf("mustSwitch=%d\n", mustSwitch);
-	 printf("considerSwitch=%d\n", considerSwitch);
-	 printf("isCutPossible=%d\n", isCutPossible);
-	 printf("isPricePossible=%d\n", isPricePossible);
+	 //printf("mustSwitch=%d\n", mustSwitch);
+	 //printf("considerSwitch=%d\n", considerSwitch);
+	 //printf("isCutPossible=%d\n", isCutPossible);
+	 //printf("isPricePossible=%d\n", isPricePossible);
  
 	 if(mustSwitch){
 	    //---
@@ -4514,7 +4514,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int doAllBlocks = false;
    if(m_phase          == PHASE_PRICE1 ||
       m_rrIterSinceAll >= m_param.RoundRobinInterval){
-      //m_rrIterSinceAll >= (m_param.RoundRobinInterval * m_numConvexCon)){
       doAllBlocks      = true;
       m_rrIterSinceAll = 0;
    }
@@ -4532,14 +4531,13 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- here is where you would thread it
       //---
 #ifdef RELAXED_THREADED
-      /*
       //round-robin assign blocks to threads
       printf("===== START Threaded solve of subproblems. =====\n");
       pthread_t                  threads[NTHREADS];
       pthread_attr_t             pthread_custom_attr;
       SolveRelaxedThreadArgs     arg[NTHREADS];
-      DecompSolverResult      ** solverResultT 
-         = new DecompSolverResult*[NTHREADS]; 
+      //DecompSolverResult      ** solverResultT 
+      // = new DecompSolverResult*[NTHREADS]; 
       DecompVarList              potentialVarsT[NTHREADS];
       int * batch[NTHREADS];
       int   batchSize[NTHREADS];
@@ -4548,7 +4546,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       for(t = 0; t < NTHREADS; t++){
 	 batch[t]         = new int[m_numConvexCon];
 	 batchSize[t]     = 0;
-	 solverResultT[t] = new DecompSolverResult(nCoreCols);
+	 //solverResultT[t] = new DecompSolverResult(nCoreCols);
       }
 
       t = 0;
@@ -4614,7 +4612,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 }
       }
       //put the vars from all threads into one vector
-      */
 #else
       bool useCutoff = false;
       bool useExact  = true;
@@ -6020,7 +6017,7 @@ static void * solveRelaxedThread(void * args){
    int                   nBaseCoreRows= targs->nBaseCoreRows;   
    double              * u            = targs->u;
    double              * redCostX     = targs->redCostX; //read-only
-   const double              * origObjective= targs->origCost; //read-only
+   const double        * origObjective= targs->origCost; //read-only
    int                   nCoreCols    = targs->n_origCols;  
    list<DecompVar*>    * vars         = targs->vars;
    //vector<DecompAlgoModel*> * algoModelV = targs->algoModel;
@@ -6048,28 +6045,24 @@ static void * solveRelaxedThread(void * args){
       printf("THREAD %d solving b %d\n", threadId, b); fflush(stdout);
 
       //is this thread safe??
-      DecompAlgoModel & algoModel = algo->getAlgoModelRelax(b);
+      DecompAlgoModel & algoModel = algo->getModelRelax(b);
 
       int    isExact  = 0;
-      int    nVars    = vars->size();
+      int    nVars    = static_cast<int>(vars->size());
       int    nNewVars = 0;
       double             alpha        = u[nBaseCoreRows + b];
       DecompSolverStatus solverStatus = DecompSolStatNoSolution;
       
       bool useExact  = true;
       bool useCutoff = false;
-      DecompSolverResult solveResult();
+      DecompSolverResult solveResult;
 
       //too many cases where ned locks - make threaded version
       algo->solveRelaxed(redCostX,
 			 origObjective,
 			 alpha,
 			 nCoreCols,
-			 true,
-			 true,
-			 useExact,
-			 useCutoff,
-			 false,
+			 false,//isNested
 			 algoModel,
 			 &solveResult,
 			 *vars);
@@ -6102,22 +6095,23 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //--- NOTE, redCost does not include alpha as sent in
    //---
 
-#ifndef RELAXED_THREADED
+   //#ifndef RELAXED_THREADED
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solveRelaxed()", m_param.LogDebugLevel, 2);
-#endif
+   //#endif
 
    OsiSolverInterface  * subprobSI  = algoModel.getOsi();
    int                   whichBlock = algoModel.getBlockId();
    bool                  isRoot     = getNodeIndex() ? false : true;
    DecompConstraintSet * model      = algoModel.getModel();
 
-#ifndef RELAXED_THREADED
+   //#ifndef RELAXED_THREADED
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 	      (*m_osLog) << "solve block b = " << whichBlock << endl;
 	      (*m_osLog) << "alpha         = " << alpha      << endl;
 	      (*m_osLog) << "isNested      = " << isNested   << endl;
 	      );
+#ifndef RELAXED_THREADED
    m_stats.timerOther1.reset();
 #endif
 
@@ -6161,9 +6155,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       
 #ifndef RELAXED_THREADED   
       m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+#endif
       UtilPrintFuncEnd(m_osLog, m_classTag,
                        "solveRelaxed()", m_param.LogDebugLevel, 2);
-#endif
       return STAT_UNKNOWN;
    }
 
@@ -6193,7 +6187,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //--- against built-in oracle
    //---
    DecompSolverStatus solverStatus = DecompSolStatNoSolution;
-#ifndef RELAXED_THREADED
+   //#ifndef RELAXED_THREADED
    if(m_param.SolveRelaxAsIp == 2){
       list<DecompVar*> varsDebug;
       if(isNested)
@@ -6212,14 +6206,16 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       else
          solverStatus 
             = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
+#ifndef RELAXED_THREADED
       m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
+#endif
       nNewVars        = static_cast<int>(vars.size()) - nVars;
    }
    m_isColGenExact = (solverStatus == DecompSolStatOptimal);
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 	      (*m_osLog) << "m_isColGenExact = " << m_isColGenExact << endl;
 	      );
-#endif
+   //#endif
 
 
 
@@ -6427,9 +6423,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    
 #ifndef RELAXED_THREADED   
    m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+#endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveRelaxed()", m_param.LogDebugLevel, 2);
-#endif
+
    return STAT_UNKNOWN;
 }
 

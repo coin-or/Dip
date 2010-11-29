@@ -337,7 +337,7 @@ public:
    bool isGapTight(){
       //TODO: make param
       double tightGap = m_param.MasterGapLimit;
-      printf("isGapTight m_relGap = %g\n", m_relGap);
+      //printf("isGapTight m_relGap = %g\n", m_relGap);
       if(m_param.LogDebugLevel >= 2){
 	 (*m_osLog) << "DW GAP = " << UtilDblToStr(m_relGap) 
 		    << " isTight = " << (m_relGap <= tightGap) 
