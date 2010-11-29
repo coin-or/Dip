@@ -151,6 +151,14 @@ public:
    double ParallelColsLimit;       //cosine of angle >, then consider parallel
 
    /**
+    * Number of threads to use in DIP. 
+    *
+    * Currently, only used for solving the pricing problem for block angular models.
+    * The subproblems (each block) are independent and can be solved in parallel.
+    */
+   int    NumThreads;
+
+   /**
     * @}
     */
 
@@ -221,6 +229,7 @@ public:
       PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
+      PARAM_getSetting("NumThreads",              NumThreads);
    }
 
    inline void getSettings(UtilParameters & param){
@@ -318,8 +327,8 @@ public:
                          BranchEnforceInMaster);
       UtilPrintParameter(os, sec, "MasterConvexityLessThan", 
                          MasterConvexityLessThan);
-      UtilPrintParameter(os, sec, "ParallelColsLimit", 
-                         ParallelColsLimit);
+      UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
+      UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       (*os) << "========================================================\n";
    }
    
@@ -335,7 +344,7 @@ public:
       LimitTotalPriceIters = COIN_INT_MAX;
       LimitRoundCutIters   = COIN_INT_MAX;
       LimitRoundPriceIters = COIN_INT_MAX;
-      LimitTime            = COIN_DBL_MAX;     
+      LimitTime            = DecompBigNum;     
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
@@ -354,8 +363,8 @@ public:
       SubProbUseCutoff     = 0;
       SubProbGapLimitExact   = 0.0001; // 0.01% gap
       SubProbGapLimitInexact = 0.1;    //10.00% gap
-      SubProbTimeLimitExact   = COIN_DBL_MAX;
-      SubProbTimeLimitInexact = COIN_DBL_MAX;
+      SubProbTimeLimitExact   = DecompBigNum;
+      SubProbTimeLimitInexact = DecompBigNum;
       SubProbNumThreads       = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
@@ -379,6 +388,7 @@ public:
       BranchEnforceInMaster    = 1;
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
+      NumThreads               = 1;
    }
    
    void dumpSettings(ostream * os = &cout){
