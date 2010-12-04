@@ -18,8 +18,9 @@ nodist_unitTest_SOURCES = \
 	MILP_DecompApp.cpp MILP_DecompApp.h \
 	MILP_Main.cpp MILP_Param.h
 
-# List libraries of COIN projects
-unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS) 
+# List libraries that need to be linked in
+unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS)
+unitTest_DEPENDENCIES = ../src/libDecomp.la $(DIPLIB_DEPENDENCIES)
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
