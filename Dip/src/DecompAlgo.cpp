@@ -2844,7 +2844,15 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    double zDW_LB = zDW_UBDual + mostNegRC;
    setObjBoundLB(zDW_LB, zDW_UBDual);
 
-   if(!m_param.DualStab && !UtilIsZero(zDW_UBDual-zDW_UBPrimal, 1.0e-3)){
+   double actDiff = fabs(zDW_UBDual-zDW_UBPrimal);
+   double relDiff = actDiff;
+   if(UtilIsZero(zDW_UBPrimal)){
+      relDiff = actDiff;
+   }
+   else{
+      relDiff = fabs(actDiff) / fabs(zDW_UBPrimal);
+   }
+   if(!m_param.DualStab && !UtilIsZero(relDiff, 1.0e-4)){
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal) 
                  << endl;
       (*m_osLog) << "MasterObj [dual]   = " << UtilDblToStr(zDW_UBDual) 
@@ -2852,7 +2860,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
       throw UtilException("Primal and Dual Master Obj Not Matching.",
                           "updateObjBoundLB", "DecompAlgo");
    }
-
+   
    //TODO: stats - we want to play zDW_LB vs UB... 
    UTIL_MSG(m_param.LogDebugLevel, 3,
 	    (*m_osLog)
@@ -3326,10 +3334,17 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
          //---
          UTIL_DEBUG(m_param.LogDebugLevel, 3,
                     (*m_osLog) << "Gap is tight" << endl;);
-         int    branchedOnIndex = -1;
-         double branchedOnValue =  0;
-         chooseBranchVar(branchedOnIndex, branchedOnValue);
-         if(branchedOnIndex != -1){
+         //int    branchedOnIndex = -1;
+         //double branchedOnValue =  0;
+         //chooseBranchVar(branchedOnIndex, branchedOnValue);
+         std::vector< std::pair<int, double> > downBranchLB, 
+            downBranchUB, upBranchLB, upBranchUB;
+         bool gotBranch = chooseBranchSet(downBranchLB, 
+                                          downBranchUB, 
+                                          upBranchLB, 
+                                          upBranchUB);
+         if(gotBranch){
+            //if(branchedOnIndex != -1){
             UTIL_DEBUG(m_param.LogDebugLevel, 3,
                        (*m_osLog) << "Gap is tight and we have a " 
                        << "branch candidate" << endl;);
@@ -3375,10 +3390,17 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    //---
 	    UTIL_DEBUG(m_param.LogDebugLevel, 3,
 		       (*m_osLog) << "Gap is tight" << endl;);
-	    int    branchedOnIndex = -1;
-	    double branchedOnValue =  0;
-	    chooseBranchVar(branchedOnIndex, branchedOnValue);
-	    if(branchedOnIndex != -1){
+	    //int    branchedOnIndex = -1;
+	    //double branchedOnValue =  0;
+	    //chooseBranchVar(branchedOnIndex, branchedOnValue);
+ 	    std::vector< std::pair<int, double> > downBranchLB, 
+               downBranchUB, upBranchLB, upBranchUB;
+            bool gotBranch = chooseBranchSet(downBranchLB, 
+                                             downBranchUB, 
+                                             upBranchLB, 
+                                             upBranchUB);
+            if(gotBranch){
+               //if(branchedOnIndex != -1){
 	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
 			  (*m_osLog) << "Gap is tight and we have a " 
 			  << "branch candidate" << endl;);
@@ -6669,10 +6691,17 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       //---    better to just price it out since we cannot branch on it in 
       //---    this state.
       //---
-      int    branchedOnIndex = -1;
-      double branchedOnValue =  0;
-      chooseBranchVar(branchedOnIndex, branchedOnValue);
-      if(branchedOnIndex == -1)
+      //int    branchedOnIndex = -1;
+      //double branchedOnValue =  0;
+      //chooseBranchVar(branchedOnIndex, branchedOnValue);
+      //if(branchedOnIndex == -1)
+      std::vector< std::pair<int, double> > downBranchLB, 
+         downBranchUB, upBranchLB, upBranchUB;
+      bool gotBranch = chooseBranchSet(downBranchLB, 
+                                       downBranchUB, 
+                                       upBranchLB, 
+                                       upBranchUB);
+      if(gotBranch)
 	 return false;
       else return true;   
    }

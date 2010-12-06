@@ -19,6 +19,8 @@
 #include "DecompAlgoD.h"
 #include "DecompConstraintSet.h"
 
+//TODO: OsiDualObjLimit = gUB? if LB is higher, then can stop early
+
 //===========================================================================//
 void DecompAlgoC::createMasterProblem(DecompVarList & initVars){
   

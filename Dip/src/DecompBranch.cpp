@@ -17,13 +17,22 @@
 #include "DecompAlgo.h"
 #include "DecompApp.h"
 // --------------------------------------------------------------------- //
-int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
-				 double & branchedOnValue){
+bool DecompAlgo::
+chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
+                std::vector< std::pair<int, double> > & downBranchUB,
+                std::vector< std::pair<int, double> > & upBranchLB,
+                std::vector< std::pair<int, double> > & upBranchUB) {
+
+   //int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
+   //double & branchedOnValue){
+   
    //choose variables farthest from integer - based on x formulation
    vector<int>::iterator intIt;
-   int    j;
-   double x, dist, maxDist;
-   
+   //int    j;
+   //double x, dist, maxDist;
+   int    branchedOnIndex, j;
+   double branchedOnValue, x, dist, maxDist;
+
   
    double obj              = 0.0;
    const double * objCoeff = getOrigObjective();
@@ -46,18 +55,26 @@ int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
 	 branchedOnValue = x;
       }
    }
-   
-   //CoinAssert(branchedOnIndex >= 0);
-   UTIL_MSG(m_param.LogDebugLevel, 3,
-	    int nColNames = static_cast<int>(modelCore->colNames.size());
-	    (*m_osLog) << "branchOnInd = " << branchedOnIndex << " -> ";
-	    if( branchedOnIndex  < nColNames && 
-		branchedOnIndex >= 0)
-		(*m_osLog) << modelCore->colNames[branchedOnIndex];
-	    else
-	       m_app->printOriginalColumn(branchedOnIndex, m_osLog);
-	    (*m_osLog) << "\tbranchOnVal = " << branchedOnValue  << "\n";
-	    );
-   return 0;  
+
+   if (branchedOnIndex != -1) {
+      downBranchUB.push_back(std::pair<int, double>(branchedOnIndex, 
+                                                    floor(branchedOnValue)));
+      upBranchLB.push_back(std::pair<int, double>(branchedOnIndex, 
+                                                  ceil(branchedOnValue)));
+      UTIL_MSG(m_param.LogDebugLevel, 3,
+               int nColNames = static_cast<int>(modelCore->colNames.size());
+               (*m_osLog) << "branchOnInd = " << branchedOnIndex << " -> ";
+               if( branchedOnIndex  < nColNames && 
+                   branchedOnIndex >= 0)
+                  (*m_osLog) << modelCore->colNames[branchedOnIndex];
+               else
+                  m_app->printOriginalColumn(branchedOnIndex, m_osLog);
+               (*m_osLog) << "\tbranchOnVal = " << branchedOnValue  << "\n";
+               );
+      return true;
+   }
+   else{
+      return false;
+   }  
 }
 

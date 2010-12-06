@@ -419,8 +419,15 @@ public:
    virtual void setSubProbBounds(const double * lbs,
 				 const double * ubs);
 
-   int chooseBranchVar(int    & branchedOnIndex,
-		       double & branchedOnValue);
+   //int chooseBranchVar(int    & branchedOnIndex,
+   //	       double & branchedOnValue);
+   virtual bool 
+   chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLb,
+                   std::vector< std::pair<int, double> > & downBranchUb,
+                   std::vector< std::pair<int, double> > & upBranchLb,
+                   std::vector< std::pair<int, double> > & upBranchUb);
+
+
 
 
    //-----------------------------------------------------------------------//
