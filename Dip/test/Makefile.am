@@ -56,7 +56,7 @@ endif
 
 test: unitTest$(EXEEXT)
 
-	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir $(SAMPLE_DATA) --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir `$(CYGPATH_W) $(SAMPLE_DATA)` --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
 
 .PHONY: test
 
