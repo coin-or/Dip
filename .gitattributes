@@ -35,6 +35,8 @@ Dip/bugs/OsiCbc/main.cpp -text
 Dip/bugs/OsiCbc/tmp.mps -text
 Dip/bugs/PRICE_AND_CUT_subProb_relax0.n0.c0.p0.b0.lp -text
 Dip/bugs/main.cpp -text
+Dip/config.guess -text
+Dip/config.sub -text
 Dip/configure -text
 Dip/configure.ac -text
 Dip/data/AP3/ReadMe.txt -text
@@ -120,6 +122,7 @@ Dip/data/TSP/get.data -text
 Dip/data/TSP/tsplib.list -text
 Dip/data/TSP/tsplib2.list -text
 Dip/data/VRP/vrplib.tgz -text
+Dip/depcomp -text
 Dip/dip-uninstalled.pc.in -text
 Dip/dip.pc.in -text
 Dip/examples/AP3/AP3_DecompApp.cpp -text
@@ -334,6 +337,9 @@ Dip/examples/scripts/random/forestry/run240.sh -text
 Dip/examples/scripts/random/forestry/run40.sh -text
 Dip/examples/scripts/report_decomp.py -text
 Dip/inc/config_dip.h.in -text
+Dip/install-sh -text
+Dip/ltmain.sh -text
+Dip/missing -text
 Dip/scripts/Copyright -text
 Dip/scripts/average.awk -text
 Dip/scripts/copyright_add.sh -text

@@ -60,17 +60,19 @@ distclean-local:
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = dip.pc
 
-if COIN_HAS_PKGCONFIG
 addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Dip
 
 install-data-hook:
 	@$(mkdir_p) "$(addlibsdir)"
+if COIN_HAS_PKGCONFIG
 	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
 	$(PKG_CONFIG) --libs dip > $(addlibsdir)/dip_addlibs.txt
+else
+	echo -L@abs_lib_dir@ -lDip @DIPLIB_LIBS_INSTALLED@ > $(addlibsdir)/dip_addlibs.txt
+endif
 
 uninstall-hook:
 	rm -f $(addlibsdir)/dip_addlibs.txt
-endif
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -79,4 +81,4 @@ endif
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES =
 
-include ../BuildTools/Makemain.inc
+include BuildTools/Makemain.inc

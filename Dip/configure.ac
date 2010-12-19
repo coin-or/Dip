@@ -126,17 +126,14 @@ AC_ARG_WITH([lp-solver],
 found_package=true
 case $dip_lp_solver in 
    clp)
-     AC_MSG_RESULT(Clp) 
-     AC_COIN_HAS_PROJECT(Clp)
-     if [test $coin_has_clp = unavailable ||
-         test $coin_has_clp = skipping]; then
+     AC_MSG_RESULT(Clp)
+     if test $coin_has_clp != yes; then
          found_package=false
      fi
    ;;
    cplex)
      AC_MSG_RESULT(Cplex)
-     if [test $coin_has_cpx = unavailable ||
-         test $coin_has_cpx = skipping]; then 
+     if test $coin_has_cpx != yes; then 
          found_package=false
      fi
    ;; 
@@ -173,16 +170,13 @@ found_package=true
 case $dip_ip_solver in 
    cbc)
      AC_MSG_RESULT(Cbc) 
-     AC_COIN_HAS_PROJECT(Cbc)
-     if [test $coin_has_cbc = unavailable ||
-         test $coin_has_cbc = skipping]; then
+     if test $coin_has_cbc != yes; then
          found_package=false
      fi
    ;;
    cplex)
      AC_MSG_RESULT(Cplex)
-     if [test $coin_has_cpx = unavailable ||
-         test $coin_has_cpx = skipping]; then
+     if test $coin_has_cpx != yes; then
          found_package=false
      fi
    ;; 
@@ -218,8 +212,8 @@ AC_COIN_LINK_INPUT_CMD
 ##############################################################################
 
 # Location of DIP for later use
-AC_SUBST(DipINCDIR)
-AC_SUBST(DipSRCDIR)
+AC_SUBST(DIPINCDIR)
+AC_SUBST(DIPSRCDIR)
 DipINCDIR=`cd $srcdir; pwd`/src
 DipSRCDIR=`cd $srcdir; pwd`/src
 

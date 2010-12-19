@@ -98,7 +98,7 @@ libDecomp_la_SOURCES +=        \
 	UtilMacrosAlps.cpp     \
 	UtilMacrosAlps.h       
 
-# This is for libtool (on Windows)
+# This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
@@ -108,70 +108,23 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 
-LDADD=
-
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) 
-#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src`       \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/inc`       \
-	-DCOIN_ASSERT
-LDADD += $(COINDEPEND_LIBS)
-
-# CGL
-if COIN_HAS_CGL
-AM_CPPFLAGS += $(CGL_CFLAGS) 
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir`
-LDADD += $(CGL_LIBS)
-endif
-
-# ALPS/BCPS
-#AM_CPPFLAGS += \
-#	-I`$(CYGPATH_W) $(ALPSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(ALPSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(BCPSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(BCPSOBJDIR)/inc`
-
+AM_CPPFLAGS = $(DIPLIB_CFLAGS)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
-#can't se just include <build-dir>/include/coin?
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` \
+                   -I`$(CYGPATH_W) $(top_builddir)/inc`
 
 ########################################################################
 #                     Includes for LP Solver                           #
 ########################################################################
 #because CGL depends on CLP, we need this in any case
 
-if COIN_HAS_CLP
-AM_CPPFLAGS += $(CLP_CFLABS)
-#	  -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-#	  -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`   \
-#	  -I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-#LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la    \
-#	  $(CLPOBJDIR)/src/libClp.la
-#ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-LDADD += $(CLP_LIBS)
-endif
-
 if CLP_LP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_LP_CLP__
 endif
 
 if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += $(CPX_CFLAGS)
-#	-I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
   AM_CPPFLAGS += -D__DECOMP_LP_CPX__
 endif
 
@@ -181,23 +134,11 @@ endif
 
 if CBC_IP_SOLVER 
 if COIN_HAS_CBC
-  AM_CPPFLAGS += $(CBCLIB_CFLAGS)
-#	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`   \
-#	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
-  LDADD += $(CBC_LIBS)
-#	$(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
-#	$(CBCOBJDIR)/src/libCbc.la
-#  ADDLIBS  += `cat $(CBCOBJDIR)/cbc_addlibs.txt`
-  AM_CPPFLAGS += $(CBC_CFLAGS) -D__DECOMP_IP_CBC__
+  AM_CPPFLAGS += -D__DECOMP_IP_CBC__
 endif
 endif
 
 if CPLEX_IP_SOLVER
-  AM_CPPFLAGS += $(CPX_CFLAGS)
-#	-I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-  LDADD += $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
   AM_CPPFLAGS += -D__DECOMP_IP_CPX__
 endif
 

@@ -54,58 +54,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 
-# CGL
-@COIN_HAS_CGL_TRUE@am__append_1 = $(CGL_CFLAGS) 
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglClique` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglFlowCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglGomory` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglKnapsackCover` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglMixedIntegerRounding2` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglOddHole` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglProbing` \
-#	-I`$(CYGPATH_W) $(CGLSRCDIR)/src/CglTwomir`
-@COIN_HAS_CGL_TRUE@am__append_2 = $(CGL_LIBS)
-#can't se just include <build-dir>/include/coin?
-
 ########################################################################
 #                     Includes for LP Solver                           #
 ########################################################################
 #because CGL depends on CLP, we need this in any case
-@COIN_HAS_CLP_TRUE@am__append_3 = $(CLP_CFLABS)
-#	  -I`$(CYGPATH_W) $(CLPSRCDIR)/src` \
-#	  -I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiClp`   \
-#	  -I`$(CYGPATH_W) $(CLPOBJDIR)/inc`
-#LDADD += $(OSIOBJDIR)/src/OsiClp/libOsiClp.la    \
-#	  $(CLPOBJDIR)/src/libClp.la
-#ADDLIBS  += `cat $(CLPOBJDIR)/clp_addlibs.txt`
-@COIN_HAS_CLP_TRUE@am__append_4 = $(CLP_LIBS)
-@CLP_LP_SOLVER_TRUE@am__append_5 = -D__DECOMP_LP_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_6 = $(CPX_CFLAGS) -D__DECOMP_LP_CPX__
-#	-I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-@CPLEX_LP_SOLVER_TRUE@am__append_7 = $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@CLP_LP_SOLVER_TRUE@am__append_1 = -D__DECOMP_LP_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_2 = -D__DECOMP_LP_CPX__
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-#	$(OSIOBJDIR)/src/OsiCbc/libOsiCbc.la    \
-#	$(CBCOBJDIR)/src/libCbc.la
-#  ADDLIBS  += `cat $(CBCOBJDIR)/cbc_addlibs.txt`
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_8 =  \
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	$(CBCLIB_CFLAGS) \
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	$(CBC_CFLAGS) \
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@	-D__DECOMP_IP_CBC__
-#	-I`$(CYGPATH_W) $(CBCSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCbc`   \
-#	-I`$(CYGPATH_W) $(CBCOBJDIR)/inc`
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_9 = $(CBC_LIBS)
-@CPLEX_IP_SOLVER_TRUE@am__append_10 = $(CPX_CFLAGS) \
-@CPLEX_IP_SOLVER_TRUE@	-D__DECOMP_IP_CPX__
-#	-I`$(CYGPATH_W) $(CPXINCDIR)` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src/OsiCpx`
-@CPLEX_IP_SOLVER_TRUE@am__append_11 = $(CPX_LIBS) # $(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_3 = -D__DECOMP_IP_CBC__
+@CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in TODO
@@ -137,7 +97,7 @@ am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	UtilKnapsack.lo AlpsDecompModel.lo AlpsDecompTreeNode.lo \
 	UtilMacrosAlps.lo
 libDecomp_la_OBJECTS = $(am_libDecomp_la_OBJECTS)
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -182,33 +142,47 @@ AUTOMAKE = @AUTOMAKE@
 AUX_DIR = @AUX_DIR@
 AWK = @AWK@
 BUILDTOOLSDIR = @BUILDTOOLSDIR@
-CBCDOCDIR = @CBCDOCDIR@
-CBCOBJDIR = @CBCOBJDIR@
-CBCSRCDIR = @CBCSRCDIR@
 CBC_CFLAGS = @CBC_CFLAGS@
+CBC_CFLAGS_INSTALLED = @CBC_CFLAGS_INSTALLED@
 CBC_DATA = @CBC_DATA@
+CBC_DATA_INSTALLED = @CBC_DATA_INSTALLED@
+CBC_DEPENDENCIES = @CBC_DEPENDENCIES@
 CBC_IP_SOLVER_FALSE = @CBC_IP_SOLVER_FALSE@
 CBC_IP_SOLVER_TRUE = @CBC_IP_SOLVER_TRUE@
 CBC_LIBS = @CBC_LIBS@
+CBC_LIBS_INSTALLED = @CBC_LIBS_INSTALLED@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CDEFS = @CDEFS@
 CFLAGS = @CFLAGS@
 CGL_CFLAGS = @CGL_CFLAGS@
+CGL_CFLAGS_INSTALLED = @CGL_CFLAGS_INSTALLED@
 CGL_DATA = @CGL_DATA@
+CGL_DATA_INSTALLED = @CGL_DATA_INSTALLED@
+CGL_DEPENDENCIES = @CGL_DEPENDENCIES@
 CGL_LIBS = @CGL_LIBS@
+CGL_LIBS_INSTALLED = @CGL_LIBS_INSTALLED@
 CLLCFLAGS = @CLLCFLAGS@
-CLPDOCDIR = @CLPDOCDIR@
-CLPOBJDIR = @CLPOBJDIR@
-CLPSRCDIR = @CLPSRCDIR@
 CLP_CFLAGS = @CLP_CFLAGS@
+CLP_CFLAGS_INSTALLED = @CLP_CFLAGS_INSTALLED@
 CLP_DATA = @CLP_DATA@
+CLP_DATA_INSTALLED = @CLP_DATA_INSTALLED@
+CLP_DEPENDENCIES = @CLP_DEPENDENCIES@
 CLP_LIBS = @CLP_LIBS@
+CLP_LIBS_INSTALLED = @CLP_LIBS_INSTALLED@
 CLP_LP_SOLVER_FALSE = @CLP_LP_SOLVER_FALSE@
 CLP_LP_SOLVER_TRUE = @CLP_LP_SOLVER_TRUE@
 COINDEPEND_CFLAGS = @COINDEPEND_CFLAGS@
+COINDEPEND_CFLAGS_INSTALLED = @COINDEPEND_CFLAGS_INSTALLED@
 COINDEPEND_DATA = @COINDEPEND_DATA@
+COINDEPEND_DATA_INSTALLED = @COINDEPEND_DATA_INSTALLED@
+COINDEPEND_DEPENDENCIES = @COINDEPEND_DEPENDENCIES@
 COINDEPEND_LIBS = @COINDEPEND_LIBS@
+COINDEPEND_LIBS_INSTALLED = @COINDEPEND_LIBS_INSTALLED@
+COIN_CC_IS_CL_FALSE = @COIN_CC_IS_CL_FALSE@
+COIN_CC_IS_CL_TRUE = @COIN_CC_IS_CL_TRUE@
+COIN_CXX_IS_CL_FALSE = @COIN_CXX_IS_CL_FALSE@
+COIN_CXX_IS_CL_TRUE = @COIN_CXX_IS_CL_TRUE@
 COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
 COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_CBC_FALSE = @COIN_HAS_CBC_FALSE@
@@ -237,8 +211,12 @@ CPLEX_LP_SOLVER_TRUE = @CPLEX_LP_SOLVER_TRUE@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPX_CFLAGS = @CPX_CFLAGS@
+CPX_CFLAGS_INSTALLED = @CPX_CFLAGS_INSTALLED@
 CPX_DATA = @CPX_DATA@
+CPX_DATA_INSTALLED = @CPX_DATA_INSTALLED@
+CPX_DEPENDENCIES = @CPX_DEPENDENCIES@
 CPX_LIBS = @CPX_LIBS@
+CPX_LIBS_INSTALLED = @CPX_LIBS_INSTALLED@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEFS = @CXXDEFS@
@@ -249,14 +227,17 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DIPINCDIR = @DIPINCDIR@
 DIPLIB_CFLAGS = @DIPLIB_CFLAGS@
+DIPLIB_CFLAGS_INSTALLED = @DIPLIB_CFLAGS_INSTALLED@
+DIPLIB_DEPENDENCIES = @DIPLIB_DEPENDENCIES@
 DIPLIB_LIBS = @DIPLIB_LIBS@
+DIPLIB_LIBS_INSTALLED = @DIPLIB_LIBS_INSTALLED@
 DIPLIB_PCLIBS = @DIPLIB_PCLIBS@
 DIPLIB_PCREQUIRES = @DIPLIB_PCREQUIRES@
+DIPSRCDIR = @DIPSRCDIR@
 DIP_SVN_REV = @DIP_SVN_REV@
 DipDEFS = @DipDEFS@
-DipINCDIR = @DipINCDIR@
-DipSRCDIR = @DipSRCDIR@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -302,8 +283,12 @@ PKG_CONFIG = @PKG_CONFIG@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
 SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
+SAMPLE_CFLAGS_INSTALLED = @SAMPLE_CFLAGS_INSTALLED@
 SAMPLE_DATA = @SAMPLE_DATA@
+SAMPLE_DATA_INSTALLED = @SAMPLE_DATA_INSTALLED@
+SAMPLE_DEPENDENCIES = @SAMPLE_DEPENDENCIES@
 SAMPLE_LIBS = @SAMPLE_LIBS@
+SAMPLE_LIBS_INSTALLED = @SAMPLE_LIBS_INSTALLED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -399,7 +384,7 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
 	UtilMacrosAlps.h
 
-# This is for libtool (on Windows)
+# This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
@@ -408,27 +393,14 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
-#	-I`$(CYGPATH_W) $(COINUTILSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(COINUTILSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/src`       \
-#	-I`$(CYGPATH_W) $(OSISRCDIR)/inc`       \
-#	-DCOIN_ASSERT
-LDADD = $(COINDEPEND_LIBS) $(am__append_2) $(am__append_4) \
-	$(am__append_7) $(am__append_9) $(am__append_11)
-AM_CPPFLAGS = $(COINDEPEND_CFLAGS) $(am__append_1) $(am__append_3) \
-	$(am__append_5) $(am__append_6) $(am__append_8) \
-	$(am__append_10)
-
-# ALPS/BCPS
-#AM_CPPFLAGS += \
-#	-I`$(CYGPATH_W) $(ALPSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(ALPSOBJDIR)/inc` \
-#	-I`$(CYGPATH_W) $(BCPSSRCDIR)/src` \
-#	-I`$(CYGPATH_W) $(BCPSOBJDIR)/inc`
+AM_CPPFLAGS = $(DIPLIB_CFLAGS) $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4)
 
 # This line is necessary to allow VPATH compilation with MS compilers
 # on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` \
+                   -I`$(CYGPATH_W) $(top_builddir)/inc`
+
 
 ########################################################################
 #                Headers that need to be installed                     #

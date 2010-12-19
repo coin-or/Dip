@@ -11,6 +11,30 @@
 #===========================================================================#
 
 ###########################################################################
+# C++ Compiler command and flags
+###########################################################################
+
+CXX = @CXX@
+
+CXXFLAGS = @CXXFLAGS@
+
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+###########################################################################
+# directories for finding COIN packages
+###########################################################################
+
+COININCDIR = @abs_include_dir@/coin
+
+COINLIBDIR = @abs_lib_dir@
+
+###########################################################################
+# The following is necessary under cygwin, if native compilers are used
+###########################################################################
+
+CYGPATH_W = @CYGPATH_W@
+
+###########################################################################
 # define DECOMP libs
 ###########################################################################
 
@@ -19,46 +43,72 @@ COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip`
 else
-LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS@
+LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@
 endif
 
-ADDINCFLAGS += -DCOIN_ASSERT
+CFLAGS = -DCOIN_ASSERT
 
 ###########################################################################
 # define vars for which IP solver was chosen in configure
 ###########################################################################
+
 CBC_IP_SOLVER    = @CBC_IP_SOLVER_TRUE@TRUE
 CPLEX_IP_SOLVER  = @CPLEX_IP_SOLVER_TRUE@TRUE
 
 ifeq ($(CBC_IP_SOLVER),TRUE)
-ADDINCFLAGS += -D__DECOMP_IP_CBC__
+CFLAGS += -D__DECOMP_IP_CBC__
 endif
 
 ifeq ($(CPLEX_IP_SOLVER),TRUE)
-INCL += @CPX_CFLAGS@
-ADDINCFLAGS += -D__DECOMP_IP_CPX__
+CFLAGS += -D__DECOMP_IP_CPX__
 endif
 
 ###########################################################################
 # define vars for which LP solver was chosen in configure
 ###########################################################################
+
 CLP_LP_SOLVER    = @CLP_LP_SOLVER_TRUE@TRUE
 CPLEX_LP_SOLVER  = @CPLEX_LP_SOLVER_TRUE@TRUE
 
 ifeq ($(CLP_LP_SOLVER),TRUE)
-ADDINCFLAGS += -D__DECOMP_LP_CLP__
+CFLAGS += -D__DECOMP_LP_CLP__
 endif
 
 ifeq ($(CPLEX_LP_SOLVER),TRUE)
-INCL += @CPX_CFLAGS@
-ADDINCFLAGS += -D__DECOMP_LP_CPX__
+CFLAGS += -D__DECOMP_LP_CPX__
 endif
 
 ###########################################################################
 # define COIN libs
 ###########################################################################
-INCL += -I@abs_include_dir@/coin
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@/coin
+CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
 
+ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
+CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags dip`
+else
+CFLAGS = @DIPLIB_CFLAGS_INSTALLED@
+endif
+
+###########################################################################
+# default targets
+###########################################################################
+
+all: $(EXE)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXE): $(OBJS)
+	bla=;\
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS)
+
+clean:
+	rm -rf $(EXE) $(OBJS)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`
