@@ -70,7 +70,7 @@ PROGRAMS = $(noinst_PROGRAMS)
 nodist_unitTest_OBJECTS = MILP_DecompApp.$(OBJEXT) MILP_Main.$(OBJEXT)
 unitTest_OBJECTS = $(nodist_unitTest_OBJECTS)
 am__DEPENDENCIES_1 =
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
