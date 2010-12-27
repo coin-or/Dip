@@ -4133,6 +4133,118 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
 #endif
 
 //------------------------------------------------------------------------ //
+void DecompAlgo::generateVarsCalcRedCost(const double * u,
+					 double       * redCostX){
+
+
+   int                   i;
+   int                   nMasterRows   = m_masterSI->getNumRows();
+   DecompConstraintSet * modelCore     = m_modelCore.getModel();
+   int                   nCoreCols     = modelCore->getNumCols();
+   const double        * origObjective = getOrigObjective();
+
+   //---
+   //--- Calculate reduced costs for a given dual vector.
+   //---
+   //--- in DW, we use (c-uA'')x, where A'' is the core matrix
+   //---    u, in this case has dimension = #core rows
+   //--- in D , we use (c-u   )x, we don't use the core matrix
+   //---    u, in this case has dimension = #core cols
+   //---
+   if(m_algo == DECOMP){
+      assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumCols());
+      for(i = 0; i < nCoreCols; i++)
+	 redCostX[i] = u[i];
+   }
+   else{
+      assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumRows());
+      modelCore->M->transposeTimes(u, redCostX);
+   }
+
+   //--- 
+   //--- if in Phase I, c=0
+   //---   
+   if(m_phase == PHASE_PRICE1){
+      for(i = 0; i < nCoreCols; i++)
+	 redCostX[i] = -redCostX[i];
+   }
+   else{
+      for(i = 0; i < nCoreCols; i++)
+	 redCostX[i] = origObjective[i] - redCostX[i];
+   }
+}
+
+//------------------------------------------------------------------------ //
+void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
+					 double       * uNew){
+
+   int                   i, r;
+   int                   nMasterRows   = m_masterSI->getNumRows();
+   DecompConstraintSet * modelCore     = m_modelCore.getModel();
+   int                   nBaseCoreRows = modelCore->nBaseRows;
+   int                   nCoreCols     = modelCore->getNumCols();
+
+   if(m_algo == DECOMP)
+      nBaseCoreRows = nCoreCols;
+   
+   //---
+   //--- copy the dual vector for original core rows
+   //---
+   CoinDisjointCopyN(uOld, nBaseCoreRows, uNew);
+
+   //---
+   //--- sanity check - make sure we are only skipping convexity rows
+   //---    everything else has a dual we want to use
+   //---
+   if(m_param.DebugLevel >= 1){
+      for(r = 0; r < nBaseCoreRows; r++){
+	 assert(m_masterRowType[r] == DecompRow_Original ||
+		m_masterRowType[r] == DecompRow_Branch);
+      }
+      for(r = nBaseCoreRows; r < nBaseCoreRows + m_numConvexCon; r++){
+	 assert(m_masterRowType[r] == DecompRow_Convex);
+      }
+      for(r = nBaseCoreRows + m_numConvexCon; r < nMasterRows; r++){
+	 assert(m_masterRowType[r] == DecompRow_Cut);
+      }
+   }
+
+   //NOTE: if no cuts, don't need to do any of this
+   //      if DECOMP,  don't need to do any of this?
+
+   //---
+   //--- append dual vector for any added cuts 
+   //---    skip over convexity constraints
+   //---
+   assert((nMasterRows - nBaseCoreRows - m_numConvexCon) == 
+	  getNumRowType(DecompRow_Cut));
+   CoinDisjointCopyN(uOld        + nBaseCoreRows + m_numConvexCon,  //from
+		     nMasterRows - nBaseCoreRows - m_numConvexCon,  //size
+		     uNew        + nBaseCoreRows);                  //to
+   
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      for(i = 0; i < nMasterRows; i++){
+		 if(!UtilIsZero(uOld[i], DecompEpsilon)){
+		    (*m_osLog) << "uOld[" << setw(5) << i << " ]: " 
+			       << setw(12) << UtilDblToStr(uOld[i],3)
+			       << " --> " 
+			       << DecompRowTypeStr[m_masterRowType[i]] << "\n";
+		 }
+	      }
+	      );
+   
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      for(i = 0; i < (nMasterRows - m_numConvexCon); i++){
+		 if(!UtilIsZero(uNew[i], DecompEpsilon)){
+		    (*m_osLog) << "uNew[" << setw(5) << i << " ]: " 
+			       << setw(12) << UtilDblToStr(uNew[i],3) 
+			       << endl;	
+		 }
+	      }
+	      );
+}
+
+//------------------------------------------------------------------------ //
 int DecompAlgo::generateVarsFea(DecompVarList    & newVars, 
                                 double           & mostNegReducedCost){
    //---
@@ -4170,7 +4282,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //--- every block every time (default for now).
    //---
 
-   int                   i, b, r;
+   int                   i, b;
    DecompVarList         potentialVars;
    DecompConstraintSet * modelCore   = m_modelCore.getModel();
    const int      m             = m_masterSI->getNumRows();
@@ -4180,31 +4292,17 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    const double * userU         = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
    const double * origObjective = getOrigObjective();
-   int            numThreads    = m_param.NumThreads;
+   //int            numThreads    = m_param.NumThreads;
    double       * redCostX      = NULL;   
    double         alpha         = 0.0;
    int            whichBlock;
    double         varRedCost;
    DecompVarList::iterator it;
 
-   if(m_algo == DECOMP)
-      nBaseCoreRows = nCoreCols;
-   
    assert(!m_masterSI->isProvenPrimalInfeasible());
 
-   //---
-   //--- get the master dual solution
-   //---   the user can override this 
-   //---
-   u     = getMasterDualSolution();
-   userU = m_app->getDualForGenerateVars(u); //STOP - for Alper
-   if(userU)
-      u = userU;
-
-   
-   //THINK: includes artificials now
-   redCostX = new double[nCoreCols]; // (c - uhat.A") in x-space
-   assert(redCostX);
+   if(m_algo == DECOMP)
+      nBaseCoreRows = nCoreCols;
 
    //---
    //--- PC: get dual vector
@@ -4216,7 +4314,33 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //---
    //---       We flip the sign here.
    //---
+
+   //---
+   //--- get the master dual solution
+   //---   the user can override this 
+   //---
+   u     = getMasterDualSolution();
+   userU = m_app->getDualForGenerateVars(u); 
+   if(userU)
+      u = userU;
+
+   
+   //THINK: includes artificials now
+   redCostX = new double[nCoreCols]; // (c - uhat.A") in x-space
+   CoinAssertHint(redCostX, "Error: Out of Memory");
+
       
+
+   //THINK: we should be checked col-type to make sure we get the
+   //  right rows for the convexity constraints
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+	      (*m_osLog) << "m            =" << m << endl;
+	      (*m_osLog) << "numConvexCon =" << m_numConvexCon << endl;
+	      (*m_osLog) << "nBaseCoreRows=" << nBaseCoreRows  << endl;
+	      );
+
+
+
    //---
    //--- remove the convexity constraint(s) from the dual vector
    //---   TODO/THINK: this is fugly
@@ -4225,104 +4349,25 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //--- it as an offset and just check for < 0 directly, rather than
    //--- less than alpha -- sign switches are a little messy
    //---
-
-   //THINK: we should be checked col-type to make sure we get the
-   //  right rows for the convexity constraints
-
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
-	      (*m_osLog) << "m            =" << m << endl;
-	      (*m_osLog) << "numConvexCon =" << m_numConvexCon << endl;
-	      (*m_osLog) << "nBaseCoreRows=" << nBaseCoreRows  << endl;
-	      );
-
    double * u_adjusted = new double[m - m_numConvexCon];
-   assert(u_adjusted);
-
-   //copy the dual vector for original core rows
-   CoinDisjointCopyN(u, nBaseCoreRows, u_adjusted);
+   CoinAssertHint(u_adjusted, "Error: Out of Memory");
 
    //---
-   //--- sanity check - make sure we are only skipping convexity rows
-   //---    everything else has a dual we want to use
+   //--- remove the convexity constraints from the dual vector
    //---
-   if(m_param.DebugLevel >= 1){
-      for(r = 0; r < nBaseCoreRows; r++){
-	 assert(m_masterRowType[r] == DecompRow_Original ||
-		m_masterRowType[r] == DecompRow_Branch);
-      }
-      for(r = nBaseCoreRows; r < nBaseCoreRows + m_numConvexCon; r++){
-	 assert(m_masterRowType[r] == DecompRow_Convex);
-      }
-      for(r = nBaseCoreRows + m_numConvexCon; r < m; r++){
-	 assert(m_masterRowType[r] == DecompRow_Cut);
-      }
-   }
-
-   // if no cuts, don't need to do any of this
-   // if DECOMP, don't need to do any of this
-   //append dual vector for any added cuts (skip over convexity constraints)
-   assert((m - nBaseCoreRows - m_numConvexCon) == 
-	  getNumRowType(DecompRow_Cut));
-   CoinDisjointCopyN(u + nBaseCoreRows + m_numConvexCon,  //from
-		     m - nBaseCoreRows - m_numConvexCon,  //size
-		     u_adjusted + nBaseCoreRows);         //to
-   
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-	      for(i = 0; i < m; i++){
-		 if(!UtilIsZero(u[i], DecompEpsilon)){
-		    (*m_osLog) << "u[" << setw(5) << i << " ]: " 
-			       << setw(12) << UtilDblToStr(u[i],3) << " --> " 
-			       << DecompRowTypeStr[m_masterRowType[i]] << "\n";
-		 }
-	      }
-	      );
-
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-	      for(i = 0; i < (m-m_numConvexCon); i++){
-		 if(!UtilIsZero(u_adjusted[i], DecompEpsilon)){
-		    (*m_osLog) << "uAdj[" << setw(5) << i << " ]: " 
-			       << setw(12) << UtilDblToStr(u_adjusted[i],3) 
-			       << endl;	
-		 }
-	      }
-	      );
+   generateVarsAdjustDuals(u, u_adjusted);
 
    //---
    //--- calculate reduced costs
-   
-   if(m_algo == DECOMP){
-      //---
-      //--- in DW, we use (c-uA'')x, where A'' is the core matrix
-      //---    u, in this case has dimension = #core rows
-      //--- in D , we use (c-u   )x, we don't use the core matrix
-      //---    u, in this case has dimension = #core cols
-      //---
-      assert((m - m_numConvexCon) == modelCore->M->getNumCols());
-      for(i = 0; i < nCoreCols; i++)
-	 redCostX[i] = u_adjusted[i];
-   }
-   else{
-      assert((m - m_numConvexCon) == modelCore->M->getNumRows());
-      modelCore->M->transposeTimes(u_adjusted, redCostX);
-   }
-   
-   //--- 
-   //--- if in Phase I, c=0
-   //---   
-   if(m_phase == PHASE_PRICE1){
-      for(i = 0; i < nCoreCols; i++)
-	 redCostX[i] = -redCostX[i];
-   }
-   else{
-      for(i = 0; i < nCoreCols; i++)
-	 redCostX[i] = origObjective[i] - redCostX[i];
-   }
+   //---
+   generateVarsCalcRedCost(u_adjusted, redCostX);
    
 
    int var_index = 0;   
    const double * objC = m_masterSI->getObjCoefficients();
    const double * rcLP = m_masterSI->getReducedCost();
 
+   //TODO: move this all to debug utility file
    if(m_param.DebugLevel >= 1){   
       //---
       //--- sanity check on duals returned
@@ -4333,7 +4378,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       const double           * x     = m_masterSI->getColSolution();
       const double           * pi    = m_masterSI->getRowPrice();
       const int                nCols = m_masterSI->getNumCols();
-      //const int                nRows = m_masterSI->getNumRows();
       const CoinPackedMatrix * M     = m_masterSI->getMatrixByRow();
       double                 * uA    = new double[nCols];
       M->transposeTimes(pi, uA);
@@ -4663,6 +4707,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
 
 #else
+
       bool useCutoff = false;
       bool useExact  = true;
       if(m_phase == PHASE_PRICE2)
@@ -4731,14 +4776,19 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
          }
       } 
 #endif
-   }
+   } //END: if(doAllBlocks)
    else{
 
       //---
-      //--- ask the user which blocks should be solved
-      //---    
-      vector<int> blocksToSolve;
-      m_app->solveRelaxedWhich(blocksToSolve);
+      //--- Ask the user which blocks should be solved.
+      //---   The user might also provide a different set of duals for 
+      //---   each block. If so, use that to calculate reduced cost for 
+      //---   that block.
+      //--- 
+      vector<int>               blocksToSolve;
+      map<int, vector<double> > userDualsByBlock;
+      m_app->solveRelaxedWhich(blocksToSolve,
+			       userDualsByBlock);
       UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                (*m_osLog) << "Blocks to solve: ";
                UtilPrintVector(blocksToSolve, m_osLog);
@@ -4750,60 +4800,94 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- keep trying until find a block with candidate variable
       //---
       bool foundNegRC = false;
-      for(i = 0; i < nBlocks; i++){
-	 //for(i = 0; i < m_numConvexCon; i++){
-	 // b = (m_rrLastBlock + 1) % m_numConvexCon;
-	 
+      for(i = 0; i < nBlocks; i++){	 
 	 b = blocksToSolve[i];
 	 
+	 //---
+	 //--- make sure the model for this block can be found
+	 //---
          map<int, DecompAlgoModel>::iterator mit; 
          mit = m_modelRelax.find(b);
          assert(mit != m_modelRelax.end());
 
+	 //---
+	 //--- get the OSI objet
+	 //---
          DecompAlgoModel & algoModel = (*mit).second;
          subprobSI = algoModel.getOsi();
 
+	 //--- 
+	 //--- did the user provide a specific dual for this block
 	 //---
-	 //--- PC: get dual vector
-	 //---   alpha --> sum{s} lam[s]   = 1 - convexity constraint
-	 //---
-	 alpha = u[nBaseCoreRows + b];
-	 
-	 //TODO: stat return, restrict how many? pass that in to user?	 
-	 //---
-	 //--- NOTE: the variables coming back include alpha in 
-	 //---       calculation of reduced cost
-	 //---
-	 solveRelaxed(redCostX, 
-                      origObjective,
-		      alpha, 
-		      nCoreCols, 
-		      false,//isNested
-                      algoModel,
-		      &solveResult,
-		      potentialVars);
+	 map<int, vector<double> >::iterator mitv;
+	 mitv = userDualsByBlock.find(b);
+	 if(mitv == userDualsByBlock.end()){
+	    //---
+	    //--- NOTE: the variables coming back include alpha in 
+	    //---       calculation of reduced cost
+	    //---
+	    alpha = u[nBaseCoreRows + b];
+	    solveRelaxed(redCostX, 
+			 origObjective,
+			 alpha, 
+			 nCoreCols, 
+			 false,//isNested
+			 algoModel,
+			 &solveResult,
+			 potentialVars);
+	 }
+	 else{
+	    vector<double> & uBlockV   = mitv->second;
+	    double         * uBlock    = &uBlockV[0];
+	    double         * redCostXb = 0;
+	    double         * uBlockAdj = 0;
 
+	    redCostXb = new double[nCoreCols]; // (c - uhat.A") in x-space
+	    CoinAssertHint(redCostXb, "Error: Out of Memory");
+	    
+	    uBlockAdj = new double[m - m_numConvexCon];
+	    CoinAssertHint(uBlockAdj, "Error: Out of Memory");
+
+	    //---
+	    //--- remove the convexity constraints from the dual vector
+	    //---
+	    generateVarsAdjustDuals(uBlock, uBlockAdj);
+
+	    //---
+	    //--- calculate reduced costs
+	    //---
+	    generateVarsCalcRedCost(uBlockAdj, redCostXb);
+	    
+	    //---
+	    //--- solve relaxed problem
+	    //---
+	    alpha = uBlockAdj[nBaseCoreRows + b];
+	    solveRelaxed(redCostXb, 
+			 origObjective,
+			 alpha, 
+			 nCoreCols, 
+			 false,//isNested
+			 algoModel,
+			 &solveResult,
+			 potentialVars);
+
+	    UTIL_DELARR(redCostXb);
+	    UTIL_DELARR(uBlockAdj);
+	 }	    
 	 if(solveResult.m_isCutoff){
 	    mostNegRCvec[b] = min(mostNegRCvec[b],0.0);
 	 }
-
-	 
-	 //m_rrIterSinceAll++;
 	 m_rrLastBlock = b;
-
-         foundNegRC = false;
+	 foundNegRC    = false;
 	 for(it = potentialVars.begin(); it != potentialVars.end(); it++){
 	    varRedCost = (*it)->getReducedCost();
 	    if(varRedCost < -epsilonRedCost){ //TODO: strict, -dualTOL?
 	       foundNegRC = true;
-	       //break;
 	    }
 	 }
-	 //if(foundNegRC)
-	 //   break;
-      }
+      }//END:for(i = 0; i < nBlocks; i++)
       m_rrIterSinceAll++;
-
+      
       //---
       //--- if we searched through all the blocks but still didn't
       //---  find any columns with negative reduced cost, then we CAN
@@ -4815,7 +4899,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
       //---
       //--- if user provided blocks found no negRC, solve all blocks
-      //---
+      //---   
       if(!foundNegRC){
 	 printf("no neg rc from user blocks, solve all blocks\n");
 	 bool useCutoff = false;
@@ -4887,7 +4971,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 } 
 	 m_rrIterSinceAll = 0;
       }      
-   }
+   }//END: else(doAllBlocks)
 
 
    for(it = potentialVars.begin(); it != potentialVars.end(); it++){

@@ -368,8 +368,6 @@ public:
    //TODO: should move out to PC
    //THINK - helper func?, or specific to PC - right? as is genInit
    vector<double*> getDualRays(int maxNumRays);
-   //virtual int generateVarsInf(DecompVarList    & newVars, 
-   //		       double           & mostNegReducedCost);
    virtual int generateVarsFea(DecompVarList    & newVars, 
 			       double           & mostNegReducedCost);
 
@@ -553,6 +551,19 @@ public:
                         DecompVarList & newVars,
                         const double    intTol = 1.0e-5);
       
+   /**
+    * Create an adjusted dual vector with the duals from the 
+    * convexity constraints removed.
+    */
+   void generateVarsAdjustDuals(const double * uOld,
+				double       * uNew);
+   /**
+    * Calculated reduced cost vector (over vars in compact space) 
+    * for a given dual vector.
+    */
+   void generateVarsCalcRedCost(const double * u,
+				double       * redCostX);
+
    
 
 
