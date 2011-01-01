@@ -110,7 +110,7 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 
 # Ampl Solver library
 
-AC_COIN_HAS_ASL
+AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 
 #############################################################################
 #                      Check for the LP solver                              #

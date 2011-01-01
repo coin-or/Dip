@@ -5,6 +5,7 @@ includedir=@includedir@/coin
 
 Name: DIP
 Description: Decomposition for Integer Programs
+URL: https://projects.coin-or.org/Dip
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lDecomp @DIPLIB_PCLIBS@
 Cflags: -I${includedir}
