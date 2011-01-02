@@ -2846,7 +2846,8 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    //if dual stab - use Dual?
    //double zDW_LB = zDW_UBPrimal + mostNegRC;
    double zDW_LB = zDW_UBDual + mostNegRC;
-   setObjBoundLB(zDW_LB, zDW_UBDual);
+   //setObjBoundLB(zDW_LB, zDW_UBDual);
+   setObjBoundLB(zDW_LB, zDW_UBPrimal);
 
    double actDiff = fabs(zDW_UBDual-zDW_UBPrimal);
    double relDiff = actDiff;
