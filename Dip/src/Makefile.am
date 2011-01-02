@@ -18,8 +18,7 @@
 
 # Name of the library compiled in this directory.  We want it to be installed
 # in the 'lib' directory
-coinlibdir = ${libdir}/coin
-coinlib_LTLIBRARIES = libDecomp.la
+lib_LTLIBRARIES = libDecomp.la
 
 # List all source files for this library, including headers
 libDecomp_la_SOURCES =
