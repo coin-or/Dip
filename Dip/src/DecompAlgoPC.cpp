@@ -152,6 +152,8 @@ void DecompAlgoPC::adjustMasterDualSolution(){
   //---   be sure to set the dual vector to dualRM as dual=0
   //---   might not be feasible
   //---
+  if(m_param.LogDebugLevel >= 3)
+     (*m_osLog) << "m_firstPhase2Call = " << m_firstPhase2Call << endl;
   if(((m_nodeStats.cutCallsTotal + 
        m_nodeStats.priceCallsTotal) == 0) || m_firstPhase2Call){
     if(m_param.LogDebugLevel >= 2)

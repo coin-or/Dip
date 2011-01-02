@@ -2290,8 +2290,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
                m_nodeStats.priceCallsTotal 
                << endl;);
       solutionUpdateAsIP();
-      if(m_firstPhase2Call) m_firstPhase2Call = false;
+      //if(m_firstPhase2Call) m_firstPhase2Call = false;
    }
+
+   if(m_phase == PHASE_PRICE2)
+      if(m_firstPhase2Call) 
+	 m_firstPhase2Call = false;
    
 
    //---
@@ -4822,6 +4826,10 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 map<int, vector<double> >::iterator mitv;
 	 mitv = userDualsByBlock.find(b);
 	 if(mitv == userDualsByBlock.end()){
+	    if(m_param.LogDebugLevel >= 3)
+	       (*m_osLog) << "Block b: " << b 
+			  << " using standard duals" << endl;
+
 	    //---
 	    //--- NOTE: the variables coming back include alpha in 
 	    //---       calculation of reduced cost
@@ -4841,6 +4849,10 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    double         * uBlock    = &uBlockV[0];
 	    double         * redCostXb = 0;
 	    double         * uBlockAdj = 0;
+
+	    if(m_param.LogDebugLevel >= 3)
+	       (*m_osLog) << "Block b: " << b 
+			  << " using user manipulated duals" << endl;
 
 	    redCostXb = new double[nCoreCols]; // (c - uhat.A") in x-space
 	    CoinAssertHint(redCostXb, "Error: Out of Memory");
