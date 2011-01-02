@@ -4830,6 +4830,12 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    if(m_param.LogDebugLevel >= 3)
 	       (*m_osLog) << "Block b: " << b 
 			  << " using standard duals" << endl;
+	    if(m_param.LogDebugLevel >= 4){
+	       for(int i = 0; i < m; i++){
+		  (*m_osLog) << "r:" << i << "dual: " << u[i] << endl;
+	       }
+	    }
+
 
 	    //---
 	    //--- NOTE: the variables coming back include alpha in 
@@ -4851,9 +4857,20 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    double         * redCostXb = 0;
 	    double         * uBlockAdj = 0;
 
-	    if(m_param.LogDebugLevel >= 3)
+	    if(uBlockV.size() != m){
+	       throw UtilException("The size of the user dual vector is not the same as the number of master rows", 
+				   "generateVarsFea", "DecompAlgo");
+	    }
+
+	    if(m_param.LogDebugLevel >= 3){
 	       (*m_osLog) << "Block b: " << b 
 			  << " using user manipulated duals" << endl;
+	    }
+	    if(m_param.LogDebugLevel >= 4){
+	       for(int i = 0; i < m; i++){
+		  (*m_osLog) << "r:" << i << "dual: " << uBlock[i] << endl;
+	       }
+	    }
 
 	    redCostXb = new double[nCoreCols]; // (c - uhat.A") in x-space
 	    CoinAssertHint(redCostXb, "Error: Out of Memory");
