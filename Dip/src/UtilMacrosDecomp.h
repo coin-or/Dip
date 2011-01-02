@@ -142,6 +142,25 @@ inline void UtilPrintFuncEnd(ostream      * os,
 // COIN Macros       
 // TODO: anything that depends on COIN should probably not be in util lib
 // =========================================================================
+
+// ------------------------------------------------------------------------- //
+/**
+ * Calculate gap: |(ub-lb)|/|lb|
+ */
+inline double UtilCalculateGap(const double boundLB, 
+			       const double boundUB) {
+   double gap = DecompInf;
+   if(boundLB > -DecompInf && boundUB < DecompInf){
+      if(boundLB != 0.0)
+	 gap = fabs(boundUB-boundLB)/fabs(boundLB);
+      else
+	 gap = fabs(boundUB);
+   }
+   return gap;
+}
+
+
+// ------------------------------------------------------------------------- //
 CoinPackedVector * UtilPackedVectorFromDense(const int      len,
                                              const double * dense,
                                              const double   etol);
@@ -157,5 +176,7 @@ void UtilPrintPackedVector(const CoinPackedVector & v,
                            ostream                * os,
                            const vector<string>         & colNames,
 			   const double           * value = NULL);
+
+
 
 #endif

@@ -257,12 +257,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //---
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
-      if(UtilIsZero(globalUB)){
-	 gap = fabs(globalUB-globalLB);
-      }
-      else{
-	 gap = fabs(globalUB-globalLB)/fabs(globalUB);
-      }
+      gap = UtilCalculateGap(globalLB, globalUB);
       if(gap <= relTolerance){	 
 	 doFathom = true;
 	 UTIL_MSG(param.msgLevel, 3,
@@ -313,12 +308,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
          quality_ = thisQuality;
 
       //watch tolerance here... if quality is close enough, fathom it
-      if(UtilIsZero(currentUB)){
-	 gap = fabs(currentUB-thisQuality);
-      }
-      else{
-	 gap = fabs(currentUB-thisQuality)/fabs(currentUB);
-      }
+      gap = UtilCalculateGap(thisQuality, currentUB);
       if(gap <= relTolerance){	 
          doFathom = true;
          UTIL_DEBUG(param.msgLevel, 3,

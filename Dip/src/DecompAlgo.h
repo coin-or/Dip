@@ -221,7 +221,11 @@ protected:
    int      m_compressColsLastPrice;
    int      m_compressColsLastNumCols;
 
+   /**
+    * Current node gap (bestUB-bestLB)/bestLB.
+    */
    double         m_relGap;
+
    DecompAlgoStop m_stopCriteria;
    int            m_colIndexUnique;
    double         m_masterObjLast;//last master obj
@@ -441,6 +445,22 @@ public:
 		  string         & sectionParam);
    void getModelsFromApp();
    void createOsiSubProblem(DecompAlgoModel & algoModel);
+
+   /**
+    * Calculate gap: |(ub-lb)|/|lb|
+    */
+   /*double calculateGap(double boundLB, 
+		       double boundUB) const {
+      double gap = DecompInf;
+      if(boundLB > -DecompInf && boundUB < DecompInf){
+	 if(boundLB != 0.0)
+	    gap = fabs(boundUB-boundLB)/fabs(boundLB);
+	 else
+	    gap = fabs(boundUB);
+      }
+      return gap;
+      }*/
+
    
    /**
     *
@@ -704,6 +724,20 @@ public:
 
    inline const int getStopCriteria() const {
       return m_stopCriteria;
+   }
+
+   /**
+    * Get the current global (integrality) gap.
+    */
+   inline const double getGlobalGap() const {
+      return UtilCalculateGap(m_globalLB, m_globalUB);
+   }
+   
+   /**
+    * Get the current node bound gap.
+    */
+   inline const double getNodeBoundGap() const {
+      return UtilCalculateGap(getObjBestBoundLB(), getObjBestBoundUB());
    }
 
    /** 

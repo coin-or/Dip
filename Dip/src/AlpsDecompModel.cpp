@@ -106,7 +106,7 @@ bool AlpsDecompModel::fathomAllNodes() {
    else if (feasBound < ALPS_OBJ_MAX_LESS) {
       gapVal      = ALPS_MAX(0, feasBound - relBound);
       currAbsGap_ = ALPS_MAX(0, gapVal);
-      currRelGap_ = 100.0 * gapVal / (ALPS_FABS(feasBound) + 1.0e-10);
+      currRelGap_ = 100.0 * UtilCalculateGap(relBound, feasBound);
    }
    //printf("+++ Process %d: currAbsGap_ %g, currRelGap_%g\n",
    //     broker_->getProcRank(), currAbsGap_,  currRelGap_);

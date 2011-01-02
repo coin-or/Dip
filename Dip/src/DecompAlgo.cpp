@@ -1387,14 +1387,11 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
       throw UtilException("In this version of DIP, Relax and Cut is currently disabled.", "processNode", "DecompAlgo");
    }
    
+   //---
+   //--- print the global gap
+   //---
    UTIL_MSG(m_param.LogLevel, 2,
-	    double gap = DecompInf;
-	    if(globalLB > -DecompInf && globalUB < DecompInf){
-	       if(globalUB != 0.0)
-		  gap = fabs(globalUB-globalLB)/fabs(globalUB);
-	       else
-		  gap = fabs(globalUB-globalLB);
-	    }
+	    double gap = UtilCalculateGap(globalLB, globalUB);
             (*m_osLog)
             << "Process Node " << nodeIndex
             << " (algo = "     << DecompAlgoStr[m_algo] 
@@ -1562,17 +1559,8 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    while(m_phase != PHASE_DONE){
 
       UTIL_MSG(m_param.LogLevel, 2,
-               double gap = DecompInf;               
-               if(m_nodeStats.objBest.second > -DecompInf && 
-                  m_nodeStats.objBest.second < DecompInf){
-                  if(m_nodeStats.objBest.second != 0.0)
-                     gap = fabs(m_nodeStats.objBest.second-
-                                m_nodeStats.objBest.first)/
-                        fabs(m_nodeStats.objBest.second);
-                  else
-                     gap = fabs(m_nodeStats.objBest.second-
-                                m_nodeStats.objBest.first);
-               }
+               double gap = UtilCalculateGap(m_nodeStats.objBest.first,
+					 m_nodeStats.objBest.second);
 	       int nHistorySize 
 	       = static_cast<int>(m_nodeStats.objHistoryLB.size());
 	       if(nHistorySize > 0){		  
@@ -1586,8 +1574,6 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		     << m_nodeStats.cutCallsTotal
 		     << " pricepass = "   << setw(5)  
 		     << m_nodeStats.priceCallsTotal
-		     //<< " cutpass = "     << setw(5)  << objBound.cutPass
-		     //<< " pricepass = "   << setw(5)  << objBound.pricePass
 		     << " thisLB = "      << setw(10) 
 		     << UtilDblToStr(objBound.thisBound,6)
 		     << " thisUB = "      << setw(10) 
@@ -2839,14 +2825,11 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    double         zDW_UBPrimal = getMasterObjValue();
    double         zDW_UBDual   = 0.0;
    double         zDW_UB       = 0.0;
+   double         zDW_LB       = 0.0;
+
    for(r = 0; r < m_masterSI->getNumRows(); r++)
       zDW_UBDual += dualSol[r] * rowRhs[r];
-
-
-   //if dual stab - use Dual?
-   //double zDW_LB = zDW_UBPrimal + mostNegRC;
-   double zDW_LB = zDW_UBDual + mostNegRC;
-   //setObjBoundLB(zDW_LB, zDW_UBDual);
+   zDW_LB = zDW_UBDual + mostNegRC;
    setObjBoundLB(zDW_LB, zDW_UBPrimal);
 
    double actDiff = fabs(zDW_UBDual-zDW_UBPrimal);
@@ -2869,12 +2852,11 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    //TODO: stats - we want to play zDW_LB vs UB... 
    UTIL_MSG(m_param.LogDebugLevel, 3,
 	    (*m_osLog)
-	    << "MasterObj[primal] = " << UtilDblToStr(zDW_UBPrimal)
-            << "\t[dual] = "          << UtilDblToStr(zDW_UBDual)
-	    << "\tmostNegRC = "       << UtilDblToStr(mostNegRC) << "\n"
-	    << "ThisLB = "      << UtilDblToStr(zDW_LB) << "\t"
-	    << "BestLB = "      << UtilDblToStr(m_nodeStats.objBest.first)
-	    << "\n";
+	    << "MasterObj[primal] = " << UtilDblToStr(zDW_UBPrimal)   << "\t"
+            << "[dual] = "            << UtilDblToStr(zDW_UBDual)     << "\t"
+	    << "mostNegRC = "         << UtilDblToStr(mostNegRC)      << "\n"
+	    << "ThisLB = "            << UtilDblToStr(zDW_LB)         << "\t"
+	    << "BestLB = " << UtilDblToStr(m_nodeStats.objBest.first) << "\n";
 	    );
 
    UTIL_DEBUG(m_param.LogDebugLevel, 1,
@@ -2899,19 +2881,11 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    }
 	      
    //---
-   //--- if RC* is relatively small (i.e., zDW_LB-zDW_UB is small)
-   //---  then consider it converged - stop and move on to branching
-   //--- TODO: make this an option
+   //--- check if the gap is tight (use the best bound)
    //---
    bool   isGapTight = false;
    double tightGap   = m_param.MasterGapLimit;
-   double relGap     = 0.00;
-   if(UtilIsZero(zDW_UB)){
-      relGap = fabs(mostNegRC);
-   }
-   else{
-      relGap = fabs(mostNegRC) / fabs(zDW_UB);
-   }
+   double relGap     = getNodeBoundGap();
    if(relGap <= tightGap)
       isGapTight = true;
    if(m_param.LogDebugLevel >= 2){
@@ -2919,7 +2893,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 		 << " isTight = " << isGapTight << "\n";
    }
    m_relGap = relGap;
-
+   
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "updateObjBoundLB()", m_param.LogDebugLevel, 2);
    return isGapTight;
@@ -6738,14 +6712,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = objBound.thisBound; 
       //double masterLB  = m_nodeStats.objBest.first;
-      double masterGap = DecompInf;
-      if(masterUB > -DecompInf && 
-	 masterUB <  DecompInf){
-	 if(masterUB != 0.0)
-	    masterGap = fabs(masterUB - masterLB) / masterUB;
-	 else
-	    masterGap = fabs(masterUB - masterLB);
-      }
+      double masterGap = UtilCalculateGap(masterLB,masterUB);
       //printf("Check tailoff, masterLB=%g masterUB=%g masterGap=%g\n", 
       //     masterLB, masterUB, masterGap);
       if(masterGap > m_param.CompressColumnsMasterGapStart)
