@@ -5527,7 +5527,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 
 
    //---
-   //--- in the case of Wegntes, you might get all duplicate
+   //--- in the case of Wengtes, you might get all duplicate
    //---    columns - if this is the case, you don't want to stop
    //---    searching - rather, reduce alpha and repeat gen vars
    //---
@@ -5537,7 +5537,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       m_phaseForce           = PHASE_PRICE2;
       m_param.DualStabAlpha *= 0.90;
       if(m_param.LogDebugLevel >= 2)
-	 (*m_osLog) << "No vars passed doing Wegntes. Reduce alpha to " 
+	 (*m_osLog) << "No vars passed doing Wengtes. Reduce alpha to " 
 		    << m_param.DualStabAlpha << " and repeat." << endl;
 
 
@@ -5549,20 +5549,16 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    else
       m_phaseForce = PHASE_UNKNOWN;
 
-   /*
    //---
    //--- if Wengtes parameter has been reduced, set it back to original 
    //---
-   if(foundGoodCol && m_param.DualStab < m_param.DualStabAlphaOrig){
+   if(foundGoodCol && m_param.DualStabAlpha < m_param.DualStabAlphaOrig){
       m_param.DualStabAlpha = m_param.DualStabAlphaOrig;
       if(m_param.LogDebugLevel >= 2)
-	 (*m_osLog) << "Good column found doing Wegntes. Setting alpha back "
+	 (*m_osLog) << "Good column found doing Wengtes. Setting alpha back "
 		    << "to its original setting "
 		    << m_param.DualStabAlpha << "." << endl;
    }
-   */
-      
-
 
    UTIL_DELARR(denseCol);
    UtilPrintFuncEnd(m_osLog, m_classTag,
