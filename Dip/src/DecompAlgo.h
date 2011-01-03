@@ -624,6 +624,9 @@ public:
    inline const DecompParam & getParam() const {
       return m_param;}
 
+   inline DecompParam & getMutableParam() {
+      return m_param;}
+
    inline OsiSolverInterface * getMasterOSI() {
       return m_masterSI;
    }

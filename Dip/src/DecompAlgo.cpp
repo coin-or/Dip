@@ -3321,9 +3321,15 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
          bool gotBranch = chooseBranchSet(downBranchLB, 
                                           downBranchUB, 
                                           upBranchLB, 
-                                          upBranchUB);
-         if(gotBranch){
-            //if(branchedOnIndex != -1){
+                                          upBranchUB);	 
+	 if(m_param.LimitNodes == 0){
+            UTIL_DEBUG(m_param.LogDebugLevel, 3,
+                       (*m_osLog) << "Gap is tight and LimitNodes=0."
+                       << endl;);
+            nextPhase = PHASE_DONE;
+            break;
+	 }
+         else if(gotBranch){
             UTIL_DEBUG(m_param.LogDebugLevel, 3,
                        (*m_osLog) << "Gap is tight and we have a " 
                        << "branch candidate" << endl;);
@@ -3378,7 +3384,14 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
                                              downBranchUB, 
                                              upBranchLB, 
                                              upBranchUB);
-            if(gotBranch){
+	    if(m_param.LimitNodes == 0){
+	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
+			  (*m_osLog) << "Gap is tight and LimitNodes=0."
+			  << endl;);
+	       nextPhase = PHASE_DONE;
+	       goto PHASE_UPDATE_FINISH;
+	    }
+            else if(gotBranch){
                //if(branchedOnIndex != -1){
 	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
 			  (*m_osLog) << "Gap is tight and we have a " 
@@ -5535,6 +5548,19 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    }
    else
       m_phaseForce = PHASE_UNKNOWN;
+
+   /*
+   //---
+   //--- if Wengtes parameter has been reduced, set it back to original 
+   //---
+   if(foundGoodCol && m_param.DualStab < m_param.DualStabAlphaOrig){
+      m_param.DualStabAlpha = m_param.DualStabAlphaOrig;
+      if(m_param.LogDebugLevel >= 2)
+	 (*m_osLog) << "Good column found doing Wegntes. Setting alpha back "
+		    << "to its original setting "
+		    << m_param.DualStabAlpha << "." << endl;
+   }
+   */
       
 
 

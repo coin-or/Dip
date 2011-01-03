@@ -53,6 +53,11 @@ public:
    int    LimitRoundPriceIters;
    double LimitTime;//this controls time limit on (one) node processing
 
+   /**
+    * Max number of nodes (copied from Alps parameters)
+    */
+   int    LimitNodes;
+
 
    //---
    //--- tailing off when average bound over TailoffLength iterations 
@@ -136,6 +141,7 @@ public:
 
    int    DualStab;
    double DualStabAlpha;
+   double DualStabAlphaOrig;
 
    int    BreakOutPartial;
    
@@ -153,8 +159,9 @@ public:
    /**
     * Number of threads to use in DIP. 
     *
-    * Currently, only used for solving the pricing problem for block angular models.
-    * The subproblems (each block) are independent and can be solved in parallel.
+    * Currently, only used for solving the pricing problem for block 
+    * angular models. The subproblems (each block) are independent and 
+    * can be solved in parallel.
     */
    int    NumThreads;
 
@@ -185,6 +192,7 @@ public:
       PARAM_getSetting("LimitRoundCutIters",   LimitRoundCutIters);
       PARAM_getSetting("LimitRoundPriceIters", LimitRoundPriceIters);
       PARAM_getSetting("LimitTime",            LimitTime);
+      PARAM_getSetting("LimitNodes",           LimitNodes);
       
       PARAM_getSetting("TailoffLength",        TailoffLength);
       PARAM_getSetting("TailoffPercent",       TailoffPercent);       
@@ -230,6 +238,11 @@ public:
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("NumThreads",              NumThreads);
+
+      //---
+      //--- store the original setting for DualStabAlpha
+      //---
+      DualStabAlphaOrig = DualStabAlpha;
    }
 
    inline void getSettings(UtilParameters & param){
@@ -270,6 +283,7 @@ public:
       UtilPrintParameter(os, sec, "LimitRoundCutIters",  LimitRoundCutIters);
       UtilPrintParameter(os, sec, "LimitRoundPriceIters",LimitRoundPriceIters);
       UtilPrintParameter(os, sec, "LimitTime",           LimitTime);
+      UtilPrintParameter(os, sec, "LimitNodes",          LimitNodes);
       
       UtilPrintParameter(os, sec, "TailoffLength",       TailoffLength);
       UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);      
@@ -345,6 +359,7 @@ public:
       LimitRoundCutIters   = COIN_INT_MAX;
       LimitRoundPriceIters = COIN_INT_MAX;
       LimitTime            = DecompBigNum;     
+      LimitNodes           = COIN_INT_MAX;
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
