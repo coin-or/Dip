@@ -421,8 +421,10 @@ int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel * model) {
 std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > 
 AlpsDecompTreeNode::branch()  { 
 
-   AlpsDecompNodeDesc * desc  = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   AlpsDecompModel    * m     = dynamic_cast<AlpsDecompModel*>(desc->getModel());
+   AlpsDecompNodeDesc * desc  
+      = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   AlpsDecompModel    * m     
+      = dynamic_cast<AlpsDecompModel*>(desc->getModel());
    AlpsDecompParam    & param = m->getParam();
 
    UtilPrintFuncBegin(&cout, m_classTag, "branch()", param.msgLevel, 3);
@@ -460,13 +462,23 @@ AlpsDecompTreeNode::branch()  {
    std::copy(oldLbs, oldLbs + numCols, newLbs);
    std::copy(oldUbs, oldUbs + numCols, newUbs);
    
+   //printf("Start with old bounds:\n");
+   //for(i = 0; i < numCols; i++){
+   // printf("ind:%d -> lb:%g ub:%g\n", i, newLbs[i], newUbs[i]);
+   //}
+   
    
    double objVal(getQuality());
 
    
    //newLbs[branchedOn_] = oldLbs[branchedOn_];
    //newUbs[branchedOn_] = floor(branchedOnVal_);
-   // Branch down
+
+   AlpsDecompNodeDesc* child = 0;
+
+   //---
+   //--- Branch down
+   //---
    for (unsigned i = 0; i < downBranchLB_.size(); i++) {
       if((downBranchLB_[i].first < 0) || 
          (downBranchLB_[i].first >= numCols)) {
@@ -490,10 +502,6 @@ AlpsDecompTreeNode::branch()  {
       }
       newUbs[downBranchUB_[i].first] = downBranchUB_[i].second;
    }
-   
-
-  
-   AlpsDecompNodeDesc* child;
    assert(downBranchLB_.size() +downBranchUB_.size() > 0);
    //assert(branchedOn_ >= 0);
    child = new AlpsDecompNodeDesc(m, newLbs, newUbs);
@@ -504,7 +512,13 @@ AlpsDecompTreeNode::branch()  {
                                      AlpsNodeStatusCandidate,
                                      objVal));
        
-   // Branch up
+
+   //---
+   //--- Branch up
+   //---
+   //TODO: this can be done more cheaply than a full copy
+   std::copy(oldLbs, oldLbs + numCols, newLbs);
+   std::copy(oldUbs, oldUbs + numCols, newUbs);
    //newUbs[branchedOn_] = oldUbs[branchedOn_];
    //newLbs[branchedOn_] = ceil(branchedOnVal_);
    for (unsigned i = 0; i < upBranchLB_.size(); i++) {

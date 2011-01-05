@@ -23,10 +23,14 @@ chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
                 std::vector< std::pair<int, double> > & upBranchLB,
                 std::vector< std::pair<int, double> > & upBranchUB) {
 
-   //int DecompAlgo::chooseBranchVar(int    & branchedOnIndex,
-   //double & branchedOnValue){
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+                      "processNode()", m_param.LogDebugLevel, 1);
+
    
-   //choose variables farthest from integer - based on x formulation
+   //---
+   //--- Default branching in DIP is the most simple approach possible.
+   //---   Choose variables farthest from integer - based on x formulation.
+   //---
    vector<int>::iterator intIt;
    //int    j;
    //double x, dist, maxDist;
@@ -57,6 +61,11 @@ chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
    }
 
    if (branchedOnIndex != -1) {
+      //---
+      //--- Example x[0]=2.5:
+      //---    x[0] <= 2 (down)
+      //---    x[0] >= 3 (up  )
+      //---
       downBranchUB.push_back(std::pair<int, double>(branchedOnIndex, 
                                                     floor(branchedOnValue)));
       upBranchLB.push_back(std::pair<int, double>(branchedOnIndex, 
@@ -76,5 +85,9 @@ chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
    else{
       return false;
    }  
+
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+                      "processNode()", m_param.LogDebugLevel, 1);
+
 }
 

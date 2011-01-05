@@ -666,8 +666,6 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
 }
 
 //===========================================================================//
-//think - if need for RC?
-//especially with Phase I this is very PC specific
 void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 
    //---
@@ -743,7 +741,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    int nRowsCore = modelCore->getNumRows();
    int nIntVars  = modelCore->getNumInts();
    int nInitVars = static_cast<int>(initVars.size());
-   assert(initVars.size() > 0);
+   assert(initVars.size() > 0);//TODO: this should be OK
    
    double * dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
@@ -2300,10 +2298,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
+   int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-   //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+   CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
@@ -2324,13 +2323,14 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 	 m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
       else
 	 m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-
       //TODO: interior
 
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
-#ifdef DO_INTERIOR //TODO: option, not compile time
-      int cpxStat=0, cpxMethod=0;
+
+#if defined(DO_INTERIOR) and defined(__DECOMP_LP_CPX__) 
+      //TODO: option, not compile time
+
       //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
       CPXbaropt(env, lp);
       cpxMethod = CPXgetmethod(env, lp);
@@ -2527,6 +2527,10 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
    //TODO: think - if user gives a partial feasible solution
    //   and this part is not run then PI master can be infeasible
    //   which will cause an issue
+   //TODO: PI master cannot be infeasible if we use artificials on 
+   //   convexity constraints - which we already have - so how is
+   //   that possible?
+
    //Should probably have this on irregardless of what we get from user.
    //Another reason this has to run is because if user gives a solution
    //  with some master-only vars set to their LB=0. This will not be
@@ -2539,7 +2543,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	      << " userLimit = " << limit << endl;
 	      );
 
-   nInitVars = 0;//THINK
+   //nInitVars = 0;//THINK
    if(nInitVars < limit){      
       //---
       //--- create an initial set of points F'[0] subseteq F'
@@ -2586,7 +2590,6 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 			 &subprobResult,        //results
 			 initVars);             //var list to populate
 	    if(attempts == 0){
-	       /////////////////////////////////////////STOP
 	       //TODO: have to treat masterOnly differently
 	       //  we don't correctly populate LB/UB in
 	       //  subprobResult object - so contribution is wrong

@@ -25,29 +25,6 @@ class AlpsNodeDesc;
 class AlpsDecompModel;
 
 //===========================================================================//
-//---
-//--- BcpsDecompTreeNode is derived from BcpsTreeNode
-//---   BcpsTreeNode virtual methods that must be derived:
-//---      (1) chooseBranchingObject (pure virtual)
-//---      (2) installSubProblem     (pure virtual)
-//---      (3) bound                 (pure virtual)
-//---      (4) branch                (pure virtual)
-//---   BcpsTreeNode virtual methods that should be derived:
-//---      (1) generateConstraints   (does nothing)
-//---      (2) generateVariables     (does nothing)
-//---      (3) handleBoundingStatus  (does nothing)
-//---      (4) process               (the meat of the algo?)
-//--- BcpsTreeNode       is derived from AlpsTreeNode
-//---   AlpsTreeNode virtual methods that must be derived:
-//---      (1) createNewTreeNode     (pure virtual)
-//---      (2) process               (pure virtual)
-//---      (3) branch                (pure virtual)
-//---   AlpsTreeNode virtual methods that should be derived:
-//---      (1) convertToExplicit()   (does nothing)
-//---      (2) convertToRelative()   (does nothing)
-//---      
-
-//===========================================================================//
 class AlpsDecompTreeNode : public AlpsTreeNode {
 private:
    /** class tag for debugging */

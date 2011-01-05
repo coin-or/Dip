@@ -154,7 +154,6 @@ AlpsExitStatus AlpsDecompModel::solve(){
    //--- copy relevant parameters to DecompParam from AlpsParam
    //---
    decompParam.LimitNodes = m_param.nodeLimit;
-   printf("m_param.nodeLimit=%d\n", m_param.nodeLimit);
    
    //---
    //--- declare an AlpsKnowledgeBroker for serial application
