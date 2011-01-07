@@ -22,8 +22,32 @@ public:
    int    LogLevel;   
    string DataDir;
    string Instance;
+
+   /*
+    * The file defining which rows are in which blocks.
+    */
    string BlockFile;
+   
+   /**
+    * The format of BlockFile.
+    *
+    * (1) "List" or "LIST"
+    * The block file defines those rows in each block.
+    *   <block id>  <num rows in block>
+    *   <row ids...>
+    *   <block id>  <num rows in block>
+    *   <row ids...>
+    *
+    * (2) "Pair" or "PAIR"
+    * Each line is a block id to row id pair.
+    *   <block id> <row id> 
+    *
+    * (3) "PairName" or "PAIRNAME"
+    * Each line is a block id to row name (matching mps) pair.
+    *   <block id> <row name>     
+    */
    string BlockFileFormat;
+
    string PermuteFile;
    string InitSolutionFile;
    int    UseNames;  //col/row names for debugging
@@ -33,9 +57,13 @@ public:
    double BestKnownUB;
    double ColumnUB; //hack since missing extreme rays
    double ColumnLB; //hack since missing extreme rays
+
    //=1 if all master-only vars in one block
    //=0 if one block per master-only var
    //int    MasterOnlyOneBlock;
+
+   //TOOD: better solution for this
+   int ObjectiveSense;   //1=min, -1=max
 
 public:
    void getSettings(UtilParameters & utilParam){
@@ -50,14 +78,13 @@ public:
       InitSolutionFile
          = utilParam.GetSetting("InitSolutionFile",    "",    common);    
       UseNames     = utilParam.GetSetting("UseNames",       0, common);
-      UseSparse    = utilParam.GetSetting("UseSparse",      0, common);
+      UseSparse    = utilParam.GetSetting("UseSparse",      1, common);
       FullModel    = utilParam.GetSetting("FullModel",      0, common);
       BestKnownLB  = utilParam.GetSetting("BestKnownLB",  -1.e100, common);
       BestKnownUB  = utilParam.GetSetting("BestKnownUB",   1.e100, common);
       ColumnUB     = utilParam.GetSetting("ColumnUB",      1.e20,  common);
       ColumnLB     = utilParam.GetSetting("ColumnLB",     -1.e20,  common);
-      //MasterOnlyOneBlock = 
-      // utilParam.GetSetting("MasterOnlyOneBlock",            0,  common);
+      ObjectiveSense= utilParam.GetSetting("ObjectiveSense",   1,  common);
    }
 
    void dumpSettings(ostream * os = &cout){
@@ -78,8 +105,7 @@ public:
       (*os) << common << ": BestKnownUB       : " << BestKnownUB      << endl;
       (*os) << common << ": ColumnUB          : " << ColumnUB         << endl;
       (*os) << common << ": ColumnLB          : " << ColumnLB         << endl;
-      //(*os) << common << ": MasterOnlyOneBlock: " 
-      //    << MasterOnlyOneBlock << endl;
+      (*os) << common << ": ObjectiveSense    : " << ObjectiveSense   << endl;
       (*os) << "\n=====================================================\n";
    }
    
@@ -93,13 +119,13 @@ public:
       PermuteFile     (""), 
       InitSolutionFile(""),
       UseNames        (0),
-      UseSparse       (0),
+      UseSparse       (1),
       FullModel       (0),
       BestKnownLB     (-1.e100),
       BestKnownUB     ( 1.e100),
       ColumnUB        ( 1.e20),
-      ColumnLB        (-1.e20)
-      //MasterOnlyOneBlock(0)
+      ColumnLB        (-1.e20),
+      ObjectiveSense  (1)
 {};
    ~MILPBlock_Param() {};
 };
