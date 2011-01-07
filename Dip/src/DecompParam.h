@@ -51,7 +51,7 @@ public:
    int    LimitTotalPriceIters;
    int    LimitRoundCutIters;
    int    LimitRoundPriceIters;
-   double LimitTime;//this controls time limit on (one) node processing
+   double LimitTime;
 
    /**
     * Max number of nodes (copied from Alps parameters)
