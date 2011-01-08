@@ -92,10 +92,11 @@ public:
    int    SubProbSolverStartAlgo;
 
    //n = 0: do all blocks each time
-   //n > 0: do all blocks every n*numBlocks iterations
+   //n > 0: do all blocks every n iterations
    int    RoundRobinInterval;
 
    //TODO: named values in parameters?
+   //NOT working
    //0:RoundRobinRotate:    rotate through blocks in order 0...numBlocks-1
    //1:RoundRobinMostNegRC: choose the block with most neg reduced cost (in last iter)
    int    RoundRobinStrategy;

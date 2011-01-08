@@ -46,6 +46,7 @@
 
 //===========================================================================//
 #ifdef RELAXED_THREADED
+#include "pfunc/pfunc.hpp"
 static void * solveRelaxedThread(void * args);
 #endif
 typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
@@ -1446,7 +1447,6 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //  cutting and fathoming - check this
    //m_nodeStats.objBest.first  = globalLB;
    m_nodeStats.objBest.first  = -DecompInf;
-
    m_nodeStats.objBest.second = globalUB;
    m_compressColsLastPrice    = 0;
    m_compressColsLastNumCols  = m_masterSI->getNumCols();
@@ -1582,8 +1582,12 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		     << "Processing Node "<< setw(5)  << nodeIndex
 		     << " algo = "        << setw(10) << DecompAlgoStr[m_algo] 
 		     << " phase = "       << setw(10) << DecompPhaseStr[m_phase]
-		     << " cutpass = "     << setw(5)  << objBound.cutPass
-		     << " pricepass = "   << setw(5)  << objBound.pricePass
+		     << " cutpass = "     << setw(5)  
+		     << m_nodeStats.cutCallsTotal
+		     << " pricepass = "   << setw(5)  
+		     << m_nodeStats.priceCallsTotal
+		     //<< " cutpass = "     << setw(5)  << objBound.cutPass
+		     //<< " pricepass = "   << setw(5)  << objBound.pricePass
 		     << " thisLB = "      << setw(10) 
 		     << UtilDblToStr(objBound.thisBound,6)
 		     << " thisUB = "      << setw(10) 
@@ -2438,6 +2442,13 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
 
       //---
+      //--- adjust dual solution
+      //---    DecompAlgo call adjusts based on dual stabilization method
+      //---
+      adjustMasterDualSolution();
+
+
+      //---
       //--- HACK: there is some bug in CLP where infeasible is declared optimal
       //---   but then we get back solution at state when it internally gave up
       //---   
@@ -3085,8 +3096,9 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
    //--- is there an override?
    //---
    if(m_phaseForce != PHASE_UNKNOWN){
-      nextPhase  = m_phaseForce;
-      nextStatus = status;
+      nextPhase    = m_phaseForce;
+      m_phaseForce = PHASE_UNKNOWN;
+      nextStatus   = status;
       goto PHASE_UPDATE_FINISH;
    }
 
@@ -3204,7 +3216,12 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	 //---
 	 if(priceCallsRound >= m_param.LimitRoundPriceIters)
 	    considerSwitch = true;
-	 
+
+	 printf("mustSwitch=%d\n", mustSwitch);
+	 printf("considerSwitch=%d\n", considerSwitch);
+	 printf("isCutPossible=%d\n", isCutPossible);
+	 printf("isPricePossible=%d\n", isPricePossible);
+ 
 	 if(mustSwitch){
 	    //---
 	    //--- we must switch from pricing
@@ -4138,6 +4155,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int            nBaseCoreRows = modelCore->nBaseRows;
    const int      nCoreCols     = modelCore->getNumCols();
    const double * u             = NULL;
+   const double * userU         = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
    const double * origObjective = getOrigObjective();
    double       * redCostX      = NULL;   
@@ -4150,8 +4168,15 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       nBaseCoreRows = nCoreCols;
    
    assert(!m_masterSI->isProvenPrimalInfeasible());
-   u = getMasterDualSolution();
 
+   //---
+   //--- get the master dual solution
+   //---   the user can override this 
+   //---
+   u     = getMasterDualSolution();
+   userU = m_app->getDualForGenerateVars(u); //STOP - for Alper
+   if(userU)
+      u = userU;
 
    
    //THINK: includes artificials now
@@ -4716,7 +4741,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 }
 
 	 
-	 m_rrIterSinceAll++;
+	 //m_rrIterSinceAll++;
 	 m_rrLastBlock = b;
 
          foundNegRC = false;
@@ -4730,6 +4755,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 //if(foundNegRC)
 	 //   break;
       }
+      m_rrIterSinceAll++;
 
       //---
       //--- if we searched through all the blocks but still didn't
@@ -5360,10 +5386,17 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    if(m_phase        == PHASE_PRICE2 && 
       newVars.size() >  0            && 
       !foundGoodCol && m_param.DualStab){
+      m_phaseForce           = PHASE_PRICE2;
       m_param.DualStabAlpha *= 0.90;
-      printf("No vars passed doing Wegntes. Reduce alpha to %g and repeat.\n",
-	     m_param.DualStabAlpha);      
-      m_phaseForce = PHASE_PRICE2;
+      if(m_param.LogDebugLevel >= 2)
+	 (*m_osLog) << "No vars passed doing Wegntes. Reduce alpha to " 
+		    << m_param.DualStabAlpha << " and repeat." << endl;
+
+
+      //---
+      //--- adjust dual solution with updated stability parameter
+      //---
+      adjustMasterDualSolution();
    }
    else
       m_phaseForce = PHASE_UNKNOWN;

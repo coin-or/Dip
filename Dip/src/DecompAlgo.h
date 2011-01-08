@@ -337,6 +337,7 @@ public:
    bool isGapTight(){
       //TODO: make param
       double tightGap = m_param.MasterGapLimit;
+      printf("isGapTight m_relGap = %g\n", m_relGap);
       if(m_param.LogDebugLevel >= 2){
 	 (*m_osLog) << "DW GAP = " << UtilDblToStr(m_relGap) 
 		    << " isTight = " << (m_relGap <= tightGap) 
@@ -649,12 +650,25 @@ public:
       return m_nodeStats.priceCallsTotal;
    }
 
+   /**
+    * Get current primal solution for master problem.
+    */
    inline const double * getMasterPrimalSolution() const {
       return &m_primSolution[0];
    }
-   virtual const double * getMasterDualSolution() {
+
+   /**
+    * Get current dual solution for master problem.
+    */
+   virtual const double * getMasterDualSolution() const {
       return &m_dualSolution[0];
    }
+
+   /**
+    * Adjust the current dual solution for master problem.
+    */
+   virtual void adjustMasterDualSolution() {};
+
 
    inline double getMasterObjValue() const {
       if(!m_masterSI)

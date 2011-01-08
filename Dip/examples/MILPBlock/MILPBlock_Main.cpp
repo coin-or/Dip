@@ -130,22 +130,26 @@ int main(int argc, char ** argv){
          //---   if user defines bestLB==bestUB (i.e., known optimal)
          //---   and solved claims we have optimal, check that they match
          //---
-         double epsilon  = 1.0e-5;
+         double epsilon  = 0.01; //1%
          double userLB   = milp.getBestKnownLB();
          double userUB   = milp.getBestKnownUB();
          double userDiff = fabs(userUB - userLB);
          if(alpsModel.getSolStatus() == AlpsExitStatusOptimal &&
             userDiff                  < epsilon){
-            double diff = fabs(alpsModel.getGlobalUB() - userUB);
-            if(diff > epsilon){
+            double diff   = fabs(alpsModel.getGlobalUB() - userUB);
+	    double diffPer= userUB == 0 ? diff : diff / userUB;
+            if(diffPer > epsilon){
+	       cerr << setiosflags(ios::fixed|ios::showpoint);
                cerr << "ERROR. BestKnownLB/UB= " 
-                    << userUB << " but DIP claims GlobalUB= " 
-                    << alpsModel.getGlobalUB() << endl;
+                    << UtilDblToStr(userUB,5) 
+		    << " but DIP claims GlobalUB= " 
+                    << UtilDblToStr(alpsModel.getGlobalUB(),5) 
+		    << endl;
                throw UtilException("Invalid claim of optimal.",
                                    "main", "MILPBlock");
             }
          }
-
+	 
          //---
          //--- get optimal solution
          //---     

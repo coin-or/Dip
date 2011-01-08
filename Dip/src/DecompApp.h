@@ -17,16 +17,16 @@
 #ifndef DECOMP_APP_INCLUDED
 #define DECOMP_APP_INCLUDED
 
-/*-----------------------------------------------------------------------*/
+//===========================================================================//
 #include "UtilParameters.h"
 #include "DecompParam.h"
 #include "DecompModel.h"
 #include "DecompSolution.h"
 #include "DecompConstraintSet.h"
-
+//===========================================================================//
 class DecompAlgo;
 
-/*-----------------------------------------------------------------------*/
+//===========================================================================//
 /*!
  * \class DecompApp
  * \brief
@@ -35,15 +35,9 @@ class DecompAlgo;
  * The main application class where the user will define the model
  * decomposition and define any application specific methods.
  *
- * \see
- * DecompConstraintSet
- * DecompParam
- *
- * \todo
- * Clone a monkey.
  */
 
-/*-----------------------------------------------------------------------*/
+//===========================================================================//
 class DecompApp{
 
 private:
@@ -51,8 +45,6 @@ private:
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
    string m_classTag;
-
-
   
 protected:
    /**
@@ -60,54 +52,236 @@ protected:
     */
    ostream * m_osLog;
 
-   //should be in DecompApp?
-   double      m_bestKnownLB;
-   double      m_bestKnownUB;
+   /**
+    * The best known LB/UB for this application (if known, for debugging).
+    */
+   double m_bestKnownLB;
+   double m_bestKnownUB;
 
   
 public:
    /**
     *  Parameters.
     */
-   DecompParam m_param;//need?
+   DecompParam m_param;
   
    /**
-    *  Model data object.
+    *  Model data: objective function 
     */  
-   const double                    * m_objective;
-   DecompAppModel                    m_modelCore;
-   map<int, DecompAppModel>          m_modelRelax;
+   const double * m_objective;
+
+   /**
+    *  Model data: the core model (A'')
+    */  
+   DecompAppModel m_modelCore;
+
+   /**
+    *  Model data: the relaxed model(s) (A')
+    */  
+   map<int, DecompAppModel> m_modelRelax;
+
+   /**
+    *  Model data: the relaxed (nested) model(s) (A')
+    */  
    map<int, vector<DecompAppModel> > m_modelRelaxNest;   
 
    /**
-    * Pointers to the algorithm objects.
-    *   NOTE: only for the advanced user -- this allows the user 
-    *         to really mess things up.
+    * Pointer to the base algorithmic object.
+    *   NOTE: only for the advanced user
     */
-   DecompAlgo *           m_decompAlgo;
+   DecompAlgo * m_decompAlgo;
    
 public:
-   //set log file
    /**
-      Initialize the DecompApp data.
-   */
+    * @name Helper functions.
+    * @{
+    */
+
+   /**
+    * Print startup message to log.
+    */
    void startupLog();
 
+   //TODO:
    //base layer needs to do some kind of check to make sure this actually
    //got done - but also nice to have user version... so base createModel
    //and user uesrCreateModel() which is pure?, in base userCreateModel
    //gets called and checked that it returns good information
    int createModel();  
 
+   inline const double getBestKnownLB() const {return m_bestKnownLB;}
+   inline const double getBestKnownUB() const {return m_bestKnownUB;}
+
+   inline void setBestKnownLB(const double bestKnownLB) {
+      m_bestKnownLB = bestKnownLB; 
+   }
+   inline void setBestKnownUB(const double bestKnownUB) {
+      m_bestKnownUB = bestKnownUB; 
+   }
+
+
+   /**
+    * Set the model objective function.
+    *
+    * NOTE: The user application MUST call this method.
+    */
+   inline void setModelObjective(const double * objective){
+      assert(objective);
+      m_objective = objective;
+   }
+
+   /**
+    * Set the model core constraint matrix.
+    *
+    * NOTE: The user application MUST call this method.
+    */
+   //TODO: having these implementations in the header makes
+   // it harder to view this as an interface class - it is unclear
+   // what the user must do vs can do
+   inline void setModelCore(DecompConstraintSet * model,
+                            const string          modelName){
+      assert(model);
+      if(!model->hasPrepRun())
+         model->prepareModel();
+      m_modelCore.setModel(model);
+      m_modelCore.setModelName(modelName);
+   }
+   ////////////STOP thoughts on redesign
+   //TODO: change to setModelCore( ... )
+   //  to long set of args of basic types - more like how Osi
+   //  does loadProblem, etc... or juse use Osi as shell and accept
+   //  an OsiSolverInterface?? or an OsiModel... is there one?
+   //   maybe use CoinModel?? much cleaner?
+   //at least set up an alternative to do it that way
+   //still, this is still a function the user must call versus
+   // a method they MUST override -which would fit more into the
+   // framework concept - for e.g.,
+   //virtual CoinModel * createModelCore() - the use must create a CoinModel
+   //  or maybe a DecompModel which is derived from a CoinModel with 
+   //  whatever extra stuff might be needed - but I would try to avoid that
+   //is it best to have it returned as return of function - forcing the 
+   //user to do it? or as arguments? and copy or assign pointers like
+   //in SAS load problem design
+
+
+
+   /**
+    * Set the model relaxed constraint matrix (for a particular block).
+    *
+    * NOTE: The user application MUST call this method IF they are 
+    * not deriving the function DecompApp::solveRelaxed.
+    */
+   inline void setModelRelax(DecompConstraintSet * model,
+                             const string          modelName = "",
+                             const int             blockId   = 0){
+      if(model && !model->hasPrepRun())
+	 model->prepareModel();      
+      
+      //---
+      //--- make sure this block has not been set yet
+      //---
+      map<int, DecompAppModel>::iterator mit = m_modelRelax.find(blockId);
+      if(mit != m_modelRelax.end()){
+	 cerr << "Block " << blockId << " relaxation has already been set. "
+	      << "Only one relaxation definition can be used at one time." 
+	      << endl;
+	 throw UtilException("Multiple relaxation definitions",
+			     "setModelRelax", "DecompApp");
+      }	 
+      DecompAppModel appModel(model, modelName, blockId);
+      m_modelRelax.insert(make_pair(blockId, appModel));
+   }
+
+   /**
+    * Set the model relaxed (nested) constraint matrix 
+    *  (for a particular block).
+    */   
+   inline void setModelRelaxNest(DecompConstraintSet * model,
+                                 const string          modelName,
+                                 const int             blockId = 0){
+      assert(model);
+      if(!model->hasPrepRun())
+         model->prepareModel();
+      DecompAppModel appModel(model, modelName, blockId);
+      m_modelRelaxNest[blockId].push_back(appModel);
+   }
+   
+   /**
+    * Get a pointer to the base algorithm class
+    */
+   inline DecompAlgo * getDecompAlgo() const  {
+      return m_decompAlgo;
+   }
+
+
+   /**
+    * @}
+    */
+
+
+public:
+   /**
+    * @name Interface methods for user derivation (virtual).
+    * @{
+    */
+
+   /**
+    * Initialize the dual vector for PhaseII of PC. The user is passed
+    * a reference to the internal data and can manipulate it directly.
+    *
+    * This is only called when dual stabilization is used, i.e.,
+    * when m_param.DualStab > 0, at the first iteration of PhaseII of PC.
+    * The vector is immediately smoothed with the initial restricted master
+    * duals. By default, the restricted mater is used as the initial dual
+    * and, therefore, no smoothing occurs in the first iteration.
+   */
+   virtual void initDualVector(vector<double> & dualVector){}
+
+
+   //TODO: change name - no other one is using APP, why here?
+   /**
+    * Method to determine if the solution (x) is feasible to the original 
+    * model. For explicitly defined model components, like the model core
+    * constraints (A''), the feasibility of the solution is automatically 
+    * checked against the constraints. In the case when the relaxed problem
+    * constraints (A') are explicitly defined - these are also checked 
+    * automatically. 
+    * 
+    * However, for some applications, a valid feasible constraint system
+    * cannot be explicitly defined (even for the core set of constraints).
+    * For example, think of the case of TSP, where A'' is defined as the 
+    * subtour elimination constraints. These constraints are implicitly 
+    * defined by deriving the method DecompApp::generateCuts. Therefore, 
+    * the framework cannot automatically tell if a solution is feasible
+    * by checking against the constraint system. In this case, the user must 
+    * provide this method.
+    *
+    * @param[in] x The solution point to check.
+    * @return True, if x is feasible; otherwise, false.
+    */
+   //TODO: what is doxy tag for function return
+   //TOOD: don't need numCols and tolZero should not be user overidable
    virtual bool APPisUserFeasible(const double * x,
-                                  const int      n_cols,
+                                  const int      numCols,
                                   const double   tolZero){
       return true;
    };
-
+   
    virtual int APPheuristics(const double            * xhat,
 			     const double            * origCost,
 			     vector<DecompSolution*> & xhatIPFeas){
+      return 0;
+   }
+
+   /**
+    * This function allows the user to return their own dual vector
+    * to be used in the generation of new variables (in the reduced-cost
+    * calculation).
+    *
+    * For reference, the user is given the dual vector from the restricted
+    * master (or the stabilized dual, if using m_param.DualStab).
+    */
+   virtual const double * getDualForGenerateVars(const double * dual){
       return 0;
    }
   
@@ -141,81 +315,34 @@ public:
                                       const vector<string> & colNames,
                                       const double         * solution,
                                       ostream              * os = &cout) const;
+
+   /**
+    * @}
+    */
+
    
-   inline const double getBestKnownLB() const {return m_bestKnownLB;}
-   inline const double getBestKnownUB() const {return m_bestKnownUB;}
-
-   inline void setBestKnownLB(const double bestKnownLB) {
-      m_bestKnownLB = bestKnownLB; 
-   }
-   inline void setBestKnownUB(const double bestKnownUB) {
-      m_bestKnownUB = bestKnownUB; 
-   }
-
-
-   //should run some sanity checks here!
-   inline void setModelObjective(const double * objective){
-      assert(objective);
-      m_objective = objective;
-   }
-   inline void setModelCore(DecompConstraintSet * model,
-                            const string          modelName){
-      assert(model);
-      if(!model->hasPrepRun())
-         model->prepareModel();
-      m_modelCore.setModel(model);
-      m_modelCore.setModelName(modelName);
-   }
-
-   inline void setModelRelax(DecompConstraintSet * model,
-                             const string          modelName = "",
-                             const int             blockId   = 0){
-      if(model && !model->hasPrepRun())
-	 model->prepareModel();      
-      
-      //---
-      //--- make sure this block has not been set yet
-      //---
-      map<int, DecompAppModel>::iterator mit = m_modelRelax.find(blockId);
-      if(mit != m_modelRelax.end()){
-	 cerr << "Block " << blockId << " relaxation has already been set. "
-	      << "Only one relaxation definition can be used at one time." 
-	      << endl;
-	 throw UtilException("Multiple relaxation definitions",
-			     "setModelRelax", "DecompApp");
-      }	 
-      DecompAppModel appModel(model, modelName, blockId);
-      m_modelRelax.insert(make_pair(blockId, appModel));
-   }
-   
-   inline void setModelRelaxNest(DecompConstraintSet * model,
-                                 const string          modelName,
-                                 const int             blockId = 0){
-      //assuming blocks are disjoint in variables - if not, bug
-      //   can check that with active columns
-      assert(model);
-      if(!model->hasPrepRun())
-         model->prepareModel();
-      DecompAppModel appModel(model, modelName, blockId);
-      m_modelRelaxNest[blockId].push_back(appModel);
-   }
-   
-   inline DecompAlgo * getDecompAlgo() const  {
-      return m_decompAlgo;
-   }
 
 public:
+   /**
+    * Constructor for base DecompApp class. This accepts a generic parameters
+    * object (UtilParameters) and reads in the parameter settings into the 
+    * DecompApp paramter object. 
+    */
    DecompApp(UtilParameters & utilParam) :
-      m_classTag  ("D-APP"),
-      m_osLog(&cout), 
-      m_bestKnownLB(-1e75),
-      m_bestKnownUB(1e75),
-      m_objective(NULL),
-      m_decompAlgo(NULL)
+      m_classTag   ("D-APP"),
+      m_osLog      (&cout  ), 
+      m_bestKnownLB(-1e75  ),
+      m_bestKnownUB( 1e75  ),
+      m_objective  (0      ),
+      m_decompAlgo (0      )
    {    
       m_param.getSettings(utilParam);
       startupLog();    
    };
+
+   /**
+    * Destructor.
+    */
    virtual ~DecompApp() {};
 };
 
