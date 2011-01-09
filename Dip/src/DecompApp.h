@@ -142,7 +142,7 @@ public:
                             const string          modelName){
       assert(model);
       if(!model->hasPrepRun())
-         model->prepareModel();
+         model->prepareModel(true);
       m_modelCore.setModel(model);
       m_modelCore.setModelName(modelName);
    }

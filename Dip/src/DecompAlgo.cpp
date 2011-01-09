@@ -88,7 +88,7 @@ void DecompAlgo::checkBlocksColumns(){
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
       DecompAlgoModel     & modelRelax1 = (*mid1).second;
       DecompConstraintSet * model       = modelRelax1.getModel();
-      if(!model || !model->getMatrix()){
+      if(!model || model->m_masterOnly || !model->getMatrix()){
 	 UtilPrintFuncEnd(m_osLog, m_classTag,
 			  "checkBlocksColumns()", m_param.LogDebugLevel, 2);
          return;
@@ -99,10 +99,13 @@ void DecompAlgo::checkBlocksColumns(){
          if(mid1 == mid2)
             continue;
          DecompAlgoModel & modelRelax2 = (*mid2).second;
+	 if(modelRelax2.getModel()->m_masterOnly)
+	   continue;
          set<int>        & activeCols2
             = modelRelax2.getModel()->activeColumnsS;
          set<int>          activeCols1inter2;
-         set_intersection(activeCols1.begin(), activeCols1.end(),
+         //this is very expensive - can we improve?
+	 set_intersection(activeCols1.begin(), activeCols1.end(),
                           activeCols2.begin(), activeCols2.end(), 
                           inserter(activeCols1inter2,
                                    activeCols1inter2.begin()));
@@ -210,7 +213,8 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    //---
    //--- sanity checks on user input
    //---
-   checkBlocksColumns();
+   if(m_param.DebugCheckBlocksColumns)
+     checkBlocksColumns();
 
    //---
    //--- if we have a core, allocate a pool of memory for re-use
@@ -746,6 +750,15 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    double * dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
 
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //---
+   //--- TODO:
+   //--- MO vars do not need an explicit row in master even if
+   //---   BranchEnforceInMaster (these are enforced directly by
+   //---   MO column bounds)
+   //---
+#endif
+
    //---
    //--- set the row counts
    //---
@@ -836,6 +849,16 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Convex);
+
+#ifdef DECOMP_MASTERONLY_DIRECT
+   masterMatrixAddMOCols(masterM,
+			 colLB,
+			 colUB,
+			 objCoeff,
+			 colNames);   
+#endif
+
+
       
    int colIndex     = 0;
    int blockIndex   = 0;
@@ -1041,6 +1064,63 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createMasterProblem()", m_param.LogDebugLevel, 2);
 }
+
+//===========================================================================//
+#ifdef DECOMP_MASTERONLY_DIRECT
+void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix * masterM,
+				       double           * colLB,
+				       double           * colUB,
+				       double           * objCoeff,
+				       vector<string>   & colNames){
+
+  int nMOVars   = static_cast<int>(m_masterOnlyCols.size());
+  if(nMOVars <= 0)
+    return;
+
+  DecompConstraintSet * modelCore = m_modelCore.getModel();
+  assert(modelCore);
+  assert(!modelCore->isSparse());
+
+  const double         * colLBCore    = modelCore->getColLB();
+  const double         * colUBCore    = modelCore->getColUB();
+  const vector<string> & colNamesCore = modelCore->getColNames();
+  const double         * origObj      = getOrigObjective();
+
+  //---
+  //--- add the submatrix for core rows cross master-only columns
+  //---     to the master formulation (this will be a col-ordered matrix)
+  //---    
+  const CoinPackedMatrix * matrixCore = modelCore->getMatrix();
+  CoinPackedMatrix       * matrixMO(matrixCore);
+  if(!matrixMO->isColOrdered()){
+    matrixMO->reverseOrdering();
+  }
+  matrixMO->submatrixOfWithDuplicates(matrixMO,
+				      nMOVars, &m_masterOnlyCols[0]);
+  assert(matrixMO->isColOrdered());
+  assert(masterM->isColOrdered());
+  masterM->majorAppendSameOrdered(matrixMO);
+
+  //---
+  //--- set master-onlys: lb, ub, obj, names
+  //---
+  int i, j, k;
+  int nMasterCols = masterM->getNumCols();
+  for(i = 0; i < nMOVars; i++){
+    k                    = nMasterCols + i;
+    j                    = m_masterOnlyCols[i];
+    colLB[k]    = colLBCore[j];
+    colUB[k]    = colUBCore[j];
+    objCoeff[k] = origObj[j];
+    colNames.push_back(colNamesCore[j]);    
+
+    ////////STOP
+    ///// how is the type used later - check all functions
+    //m_masterColType.push_back(DecompCol_MasterOnly);
+
+  }  
+}
+#endif
 
 //===========================================================================//
 void DecompAlgo::masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
@@ -1372,8 +1452,7 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
 DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                                      const double globalLB,
                                      const double globalUB){  
-   
-   
+
    double                mostNegRC = 0.0;
    DecompConstraintSet * modelCore = m_modelCore.getModel();
    m_stabEpsilon = 0.0;
@@ -1907,6 +1986,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
             //---   add to masterLP directly - then need a resolve
             //---   to get back to current status
             //---
+	    /*
             if(m_param.BreakOutPartial){
                DecompVarList partialVars;
                breakOutPartial(m_xhat, partialVars);
@@ -1930,6 +2010,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                              << partialVars.size() << endl;
                }
             }
+	    */
         
             //TODO:
 	    m_app->APPheuristics(m_xhat, getOrigObjective(), m_xhatIPFeas);
@@ -2328,7 +2409,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 
-#if defined(DO_INTERIOR) and defined(__DECOMP_LP_CPX__) 
+#if defined(DO_INTERIOR) and defined(__DECOMP_LP_CPX__)
+
       //TODO: option, not compile time
 
       //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
@@ -2337,6 +2419,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       cpxStat = CPXgetstat(env, lp);
       //if(cpxStat)
       // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
+
 #else
       m_masterSI->resolve();
 #endif

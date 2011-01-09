@@ -143,7 +143,7 @@ public:
    double DualStabAlpha;
    double DualStabAlphaOrig;
 
-   int    BreakOutPartial;
+   int    BreakOutPartial; //DISABLED for now
    
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
@@ -163,7 +163,13 @@ public:
     * angular models. The subproblems (each block) are independent and 
     * can be solved in parallel.
     */
-   int    NumThreads;
+   int NumThreads;
+
+   /*
+    * Check user columns for overlap. The default is true, but this
+    * can be shut off to speed up the setup.
+    */
+   int DebugCheckBlocksColumns;
 
    /**
     * @}
@@ -238,6 +244,7 @@ public:
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("NumThreads",              NumThreads);
+      PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
 
       //---
       //--- store the original setting for DualStabAlpha
@@ -343,6 +350,8 @@ public:
                          MasterConvexityLessThan);
       UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
       UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
+      UtilPrintParameter(os, sec, 
+			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       (*os) << "========================================================\n";
    }
    
@@ -404,6 +413,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       NumThreads               = 1;
+      DebugCheckBlocksColumns  = true;
    }
    
    void dumpSettings(ostream * os = &cout){

@@ -244,6 +244,14 @@ protected:
    int          m_function;//calling function
    bool         m_firstPhase2Call;
 
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //NOTE:
+   // this should be found by framework
+   //   for first pass, have it set by user (MILPBlock) 
+   vector<int>  m_masterOnlyCols;
+   vector<bool> m_isColMasterOnly;
+#endif
+
 public:   
    /**
     * @}
@@ -529,6 +537,13 @@ public:
    solveDirect(const DecompSolution * startSol  = NULL){
       return NULL;}
    
+#ifdef DECOMP_MASTERONLY_DIRECT
+   void masterMatrixAddMOCols(CoinPackedMatrix * masterM,
+			      double           * colLB,
+			      double           * colUB,
+			      double           * objCoeff,
+			      vector<string>   & colNames);
+#endif
 
    void masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
 			      vector<int         > & colInd,

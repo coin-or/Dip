@@ -105,7 +105,7 @@ public:
    
 
 public:
-   void prepareModel();
+   void prepareModel(bool modelIsCore = false);
    void createRowHash();
    void checkSenseAndBound();
    void sensesToBounds();
