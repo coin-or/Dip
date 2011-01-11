@@ -156,8 +156,6 @@ test $coin_has_cpx != skipping])
 #############################################################################
 #                      Check for the IP solver                              #
 #############################################################################
-AM_CONDITIONAL(COIN_HAS_CBC,
-               false)
 
 AC_MSG_CHECKING([for DIP default ip solver])
 AC_ARG_WITH([ip-solver],

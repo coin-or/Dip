@@ -24382,16 +24382,6 @@ fi
 #                      Check for the IP solver                              #
 #############################################################################
 
-
-if false; then
-  COIN_HAS_CBC_TRUE=
-  COIN_HAS_CBC_FALSE='#'
-else
-  COIN_HAS_CBC_TRUE='#'
-  COIN_HAS_CBC_FALSE=
-fi
-
-
 echo "$as_me:$LINENO: checking for DIP default ip solver" >&5
 echo $ECHO_N "checking for DIP default ip solver... $ECHO_C" >&6
 
@@ -24829,13 +24819,6 @@ if test -z "${CPLEX_LP_SOLVER_TRUE}" && test -z "${CPLEX_LP_SOLVER_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"CPLEX_LP_SOLVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"CPLEX_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${COIN_HAS_CBC_TRUE}" && test -z "${COIN_HAS_CBC_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"COIN_HAS_CBC\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"COIN_HAS_CBC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
