@@ -182,6 +182,8 @@ void MILPBlock_DecompApp::readBlockFile(){
       is >> blockId;
       while(!is.eof()){	 
 	 is >> rowName;
+	 if(is.eof()) 
+	    break;
 	 rowNameToIdIt = rowNameToId.find(rowName);
 	 if(rowNameToIdIt != rowNameToId.end()){
 	    rowId = rowNameToIdIt->second;

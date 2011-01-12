@@ -820,7 +820,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    result.m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result.m_solStatus2 = 0;
-   cout << "CPX IP solver status = " << result.m_solStatus << endl;
+   //cout << "CPX IP solver status = " << result.m_solStatus << endl;
 
    const int statusSet[5] = {CPXMIP_OPTIMAL,
 			     CPXMIP_OPTIMAL_TOL,
