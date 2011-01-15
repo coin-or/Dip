@@ -67,7 +67,7 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet * model,
       else
 	 relViol = actViol / std::fabs(x[i]);      
       if(relViol > 0.0001){//0.01% violated
-	 (*m_osLog) << "YYPoint violates column " << i;
+	 (*m_osLog) << "Point violates column " << i;
 	 if(hasColNames)
 	    (*m_osLog) << " -> " << colNames[i];
 	 (*m_osLog) << " LB= " << UtilDblToStr(colLB[i],precision)
@@ -124,6 +124,29 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet * model,
 	 //  round off error??? not sure about that
 	 if(relViol > 0.05){
 	    isFeas = false;
+
+
+            //---
+            //--- if special case of relViol=actViol, 
+            //---   then check to see if possible round off issues
+            //--- e.g., harp2 a[j]=1.0e9, actViol=1.0e3 is OK
+            //---
+            if(UtilIsZero(ax[i],1.0e-3)            ||
+               (ax[i] < 0 && UtilIsZero(rowLB[i])) ||
+               (ax[i] > 0 && UtilIsZero(rowUB[i]))){
+               int                       k;
+               CoinShallowPackedVector   row   = M->getVector(i);
+               const int                 numNZ = row.getNumElements();
+               const double            * els   = row.getElements();
+               for(k = 0; k < numNZ; k++){
+                  if(fabs(els[k]) > 1.0e7){
+                     (*m_osLog) << "  row has a big coefficient " 
+                                << els[k] << endl;
+                     isFeas = true;
+                     break;
+                  }
+               }
+            }
 	 }
       }
    }

@@ -51,7 +51,12 @@ public:
    int    LimitTotalPriceIters;
    int    LimitRoundCutIters;
    int    LimitRoundPriceIters;
-   double LimitTime;//this controls time limit on (one) node processing
+   double LimitTime;
+
+   /**
+    * Max number of nodes (copied from Alps parameters)
+    */
+   int    LimitNodes;
 
 
    //---
@@ -136,8 +141,9 @@ public:
 
    int    DualStab;
    double DualStabAlpha;
+   double DualStabAlphaOrig;
 
-   int    BreakOutPartial;
+   int    BreakOutPartial; //DISABLED for now
    
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
@@ -149,6 +155,21 @@ public:
    int    BranchEnforceInMaster;
    int    MasterConvexityLessThan; //0='E', 1='L'
    double ParallelColsLimit;       //cosine of angle >, then consider parallel
+
+   /**
+    * Number of threads to use in DIP. 
+    *
+    * Currently, only used for solving the pricing problem for block 
+    * angular models. The subproblems (each block) are independent and 
+    * can be solved in parallel.
+    */
+   int NumThreads;
+
+   /*
+    * Check user columns for overlap. The default is true, but this
+    * can be shut off to speed up the setup.
+    */
+   int DebugCheckBlocksColumns;
 
    /**
     * @}
@@ -177,6 +198,7 @@ public:
       PARAM_getSetting("LimitRoundCutIters",   LimitRoundCutIters);
       PARAM_getSetting("LimitRoundPriceIters", LimitRoundPriceIters);
       PARAM_getSetting("LimitTime",            LimitTime);
+      PARAM_getSetting("LimitNodes",           LimitNodes);
       
       PARAM_getSetting("TailoffLength",        TailoffLength);
       PARAM_getSetting("TailoffPercent",       TailoffPercent);       
@@ -221,6 +243,13 @@ public:
       PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
+      PARAM_getSetting("NumThreads",              NumThreads);
+      PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
+
+      //---
+      //--- store the original setting for DualStabAlpha
+      //---
+      DualStabAlphaOrig = DualStabAlpha;
    }
 
    inline void getSettings(UtilParameters & param){
@@ -261,6 +290,7 @@ public:
       UtilPrintParameter(os, sec, "LimitRoundCutIters",  LimitRoundCutIters);
       UtilPrintParameter(os, sec, "LimitRoundPriceIters",LimitRoundPriceIters);
       UtilPrintParameter(os, sec, "LimitTime",           LimitTime);
+      UtilPrintParameter(os, sec, "LimitNodes",          LimitNodes);
       
       UtilPrintParameter(os, sec, "TailoffLength",       TailoffLength);
       UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);      
@@ -318,8 +348,10 @@ public:
                          BranchEnforceInMaster);
       UtilPrintParameter(os, sec, "MasterConvexityLessThan", 
                          MasterConvexityLessThan);
-      UtilPrintParameter(os, sec, "ParallelColsLimit", 
-                         ParallelColsLimit);
+      UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
+      UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
+      UtilPrintParameter(os, sec, 
+			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       (*os) << "========================================================\n";
    }
    
@@ -335,7 +367,8 @@ public:
       LimitTotalPriceIters = COIN_INT_MAX;
       LimitRoundCutIters   = COIN_INT_MAX;
       LimitRoundPriceIters = COIN_INT_MAX;
-      LimitTime            = COIN_DBL_MAX;     
+      LimitTime            = DecompBigNum;     
+      LimitNodes           = COIN_INT_MAX;
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 0.01;
@@ -354,8 +387,8 @@ public:
       SubProbUseCutoff     = 0;
       SubProbGapLimitExact   = 0.0001; // 0.01% gap
       SubProbGapLimitInexact = 0.1;    //10.00% gap
-      SubProbTimeLimitExact   = COIN_DBL_MAX;
-      SubProbTimeLimitInexact = COIN_DBL_MAX;
+      SubProbTimeLimitExact   = DecompBigNum;
+      SubProbTimeLimitInexact = DecompBigNum;
       SubProbNumThreads       = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
@@ -379,6 +412,8 @@ public:
       BranchEnforceInMaster    = 1;
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
+      NumThreads               = 1;
+      DebugCheckBlocksColumns  = true;
    }
    
    void dumpSettings(ostream * os = &cout){

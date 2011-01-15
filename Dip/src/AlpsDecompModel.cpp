@@ -33,7 +33,6 @@ void AlpsDecompModel::setAlpsSettings(){
    AlpsPar()->setEntry(AlpsParams::nodeLogInterval, m_param.nodeLogInterval);
 
    double timeLimit = m_decompAlgo->getParam().LimitTime;
-   //printf("Set timeLimit to %g\n", timeLimit);
    AlpsPar()->setEntry(AlpsParams::timeLimit,       timeLimit);
 
    UtilPrintFuncEnd(&cout, m_classTag,
@@ -106,7 +105,7 @@ bool AlpsDecompModel::fathomAllNodes() {
    else if (feasBound < ALPS_OBJ_MAX_LESS) {
       gapVal      = ALPS_MAX(0, feasBound - relBound);
       currAbsGap_ = ALPS_MAX(0, gapVal);
-      currRelGap_ = 100.0 * gapVal / (ALPS_FABS(feasBound) + 1.0e-10);
+      currRelGap_ = 100.0 * UtilCalculateGap(relBound, feasBound);
    }
    //printf("+++ Process %d: currAbsGap_ %g, currRelGap_%g\n",
    //     broker_->getProcRank(), currAbsGap_,  currRelGap_);
@@ -145,10 +144,16 @@ AlpsExitStatus AlpsDecompModel::solve(){
    //---
    DecompAlgo  * decompAlgo  = getDecompAlgo();
    DecompStats & decompStats = decompAlgo->getStats();
-   double timeLimit = m_decompAlgo->getParam().LimitTime;
+   DecompParam & decompParam = decompAlgo->getMutableParam();
+
+   double timeLimit = decompParam.LimitTime;
    double timeLeft  = timeLimit - decompStats.timerOverall.getRealTime();   
-   //printf("Set timeLimit to %g\n", timeLeft);
    AlpsPar()->setEntry(AlpsParams::timeLimit, timeLeft);
+
+   //---
+   //--- copy relevant parameters to DecompParam from AlpsParam
+   //---
+   decompParam.LimitNodes = m_param.nodeLimit;
    
    //---
    //--- declare an AlpsKnowledgeBroker for serial application

@@ -27,7 +27,7 @@ public:
    
 public:
    void allocateMemory(const int nCoreCols,
-                       const int nCoreRows) throw(CoinError) {
+                       const int nCoreRows) {
       if(nCoreCols > 0){
          dblArrNCoreCols = new double[nCoreCols];
          CoinAssertHint(dblArrNCoreCols, "Error: Out of Memory");

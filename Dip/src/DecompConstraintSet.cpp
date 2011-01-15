@@ -19,7 +19,7 @@
 #include "DecompConstraintSet.h"
 
 //===========================================================================//
-void DecompConstraintSet::prepareModel(){
+void DecompConstraintSet::prepareModel(bool modelIsCore){
    //---
    //--- For each model:
    //---   1.) set row senses and/or bounds
@@ -33,6 +33,7 @@ void DecompConstraintSet::prepareModel(){
       return;
 
    UtilPrintMemUsage(&cout, 2, 2);
+   //TODO: needed for relax?
    if(M->isColOrdered())
       M->reverseOrdering();
 
@@ -40,11 +41,10 @@ void DecompConstraintSet::prepareModel(){
    int numCols     = getNumCols();
    int numColsOrig = getNumColsOrig();
    UtilPrintMemUsage(&cout, 2, 2);
-   //printf("numCols=%d numColsOrig=%d numRows=%d\n",
-   //     numCols, numColsOrig, numRows);
    
    checkSenseAndBound();    
-   createRowHash();//TODO: don't need for relaxed
+   if(modelIsCore)
+     createRowHash();
    nBaseRows = getNumRows();
    
    //TODO: make this an option
@@ -115,15 +115,22 @@ void DecompConstraintSet::prepareModel(){
    // columnMarker[*vit] = DecompColActive;   
    //for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
    // columnMarker[*vit] = DecompColMasterOnly;   
-   //printf("(6) --> "); UtilPrintMemUsage(&cout, 2, 2);
 
    //---
    //--- mark integers (original number of cols)
    //---
-   UtilFillN(integerMark, numColsOrig, 'C');
-   for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
-      integerMark[*vit] = 'I';
-   }   
+   //---   THINK: This is expensive (memory and cpu) because
+   //---           it is based on the size of original columns.
+   //---          And, the only place it is being used is in 
+   //---           breakOutPartial - which probably doesn't relaly work.
+   //---
+   /*if(m_param.BreakOutPartial){
+       UtilFillN(integerMark, numColsOrig, 'C');
+     for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
+       integerMark[*vit] = 'I';
+     }   
+   }
+   */
 }
 
 //===========================================================================//

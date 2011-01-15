@@ -10,8 +10,8 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
-#ifndef SMALLIP_DECOMPAPP2_INCLUDED
-#define SMALLIP_DECOMPAPP2_INCLUDED
+#ifndef SMALLIP_DECOMPAPP_INCLUDED
+#define SMALLIP_DECOMPAPP_INCLUDED
 
 //===========================================================================//
 #include "DecompApp.h"

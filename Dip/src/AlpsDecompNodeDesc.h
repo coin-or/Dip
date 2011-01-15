@@ -83,15 +83,17 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    ///
    int numberCols_;
 
-
    /** Branched direction to create it. */
    int branchedDir_;
 
+   /** Branched set of indices/values to create it. */
+   std::vector< std::pair<int, double> > branched_;
+   
    /** Branched object index to create it. */
-   int branchedInd_;
+   //int branchedInd_;
 
    /** Branched value to create it. */
-   double branchedVal_;
+   //double branchedVal_;
 
    //THINK: different derivations for different algos?
    /** Warm start. */
@@ -103,8 +105,8 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    AlpsDecompNodeDesc() :
       AlpsNodeDesc(),
       branchedDir_(0),
-      branchedInd_(-1),
-      branchedVal_(0.0),
+      //branchedInd_(-1),
+      //branchedVal_(0.0),
       basis_(NULL)
       {}
 
@@ -113,8 +115,8 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
       :
       AlpsNodeDesc(m),
       branchedDir_(0),
-      branchedInd_(-1),
-      branchedVal_(0.0),
+      //branchedInd_(-1),
+      //branchedVal_(0.0),
       basis_(NULL)
       {}
 
@@ -124,8 +126,8 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
       :
       AlpsNodeDesc(m),
       branchedDir_(0),
-      branchedInd_(-1),
-      branchedVal_(0.0),
+      //branchedInd_(-1),
+      //branchedVal_(0.0),
       basis_(NULL)
       {
 	 numberRows_ = m->getNumCoreRows();
@@ -160,8 +162,8 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    /** Get warm start basis. */
    CoinWarmStartBasis * getBasis() const { return basis_; }
 
-   void setBranchedOn(int b) { branchedInd_ = b; }
-   int getBranchedOn() const { return branchedInd_; }
+   //void setBranchedOn(int b) { branchedInd_ = b; }
+   //int getBranchedOn() const { return branchedInd_; }
 
    /** Set branching direction. */
    void setBranchedDir(int d) { branchedDir_ = d; }
@@ -169,17 +171,28 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    /** Get branching direction. */
    int getBranchedDir() const { return branchedDir_; }
 
-   /** Set branching object index. */
-   void setBranchedInd(int d) { branchedInd_ = d; }
+   /** Set branching set. */
+   void setBranched(std::vector< std::pair<int, double> > b) { 
+      branched_ = b; }
 
    /** Get branching object index. */
-   int getBranchedInd() const { return branchedInd_; }
+   //int getBranchedInd() const { return branchedInd_; }
+   /** Get branching set. */
+   std::vector< std::pair<int, double> > getBranched() const { 
+      return branched_; }
+
+
+   /** Set branching object index. */
+   //void setBranchedInd(int d) { branchedInd_ = d; }
+
+   /** Get branching object index. */
+   //int getBranchedInd() const { return branchedInd_; }
 
    /** Set branching value. */
-   void setBranchedVal(double d) { branchedVal_ = d; }
+   //void setBranchedVal(double d) { branchedVal_ = d; }
 
    /** Get branching direction. */
-   double getBranchedVal() const { return branchedVal_; }
+   //double getBranchedVal() const { return branchedVal_; }
 
  protected:
 
@@ -192,8 +205,8 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
       AlpsReturnStatus status = AlpsReturnStatusOk;
 
       encoded->writeRep(branchedDir_);
-      encoded->writeRep(branchedInd_);
-      encoded->writeRep(branchedVal_);
+      //encoded->writeRep(branchedInd_);
+      //encoded->writeRep(branchedVal_);
 
       // Basis
       int ava = 0;
@@ -216,8 +229,8 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
       AlpsReturnStatus status = AlpsReturnStatusOk;
 	
       encoded.readRep(branchedDir_);
-      encoded.readRep(branchedInd_);
-      encoded.readRep(branchedVal_);
+      //encoded.readRep(branchedInd_);
+      //encoded.readRep(branchedVal_);
 	
       // Basis
       int ava;

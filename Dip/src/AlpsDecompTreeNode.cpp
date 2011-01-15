@@ -257,12 +257,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //---
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
-      if(UtilIsZero(globalUB)){
-	 gap = fabs(globalUB-globalLB);
-      }
-      else{
-	 gap = fabs(globalUB-globalLB)/fabs(globalUB);
-      }
+      gap = UtilCalculateGap(globalLB, globalUB);
       if(gap <= relTolerance){	 
 	 doFathom = true;
 	 UTIL_MSG(param.msgLevel, 3,
@@ -313,12 +308,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
          quality_ = thisQuality;
 
       //watch tolerance here... if quality is close enough, fathom it
-      if(UtilIsZero(currentUB)){
-	 gap = fabs(currentUB-thisQuality);
-      }
-      else{
-	 gap = fabs(currentUB-thisQuality)/fabs(currentUB);
-      }
+      gap = UtilCalculateGap(thisQuality, currentUB);
       if(gap <= relTolerance){	 
          doFathom = true;
          UTIL_DEBUG(param.msgLevel, 3,
@@ -358,7 +348,22 @@ int AlpsDecompTreeNode::process(bool isRoot,
 	    );
    
  TERM_PROCESS:
-   if(doFathom)
+   //STOP: if do fathom when node limit hit, then it gives wrong LB
+   //  what is the proper status setting if node limit is hit to stop
+   //  but not fathom so as to lose the proper bound
+   //if(param.nodeLimit == 0)
+   //   status = AlpsExitStatusNodeLimit;
+
+   //---
+   //--- for nodeLimit == 0, we do not want it to look for 
+   //---   branching candidates since in some cases we stop due to 
+   //---   gap without a branching candidate and do not want to have to 
+   //---   return (since we are not evaluating any more nodes anyway)
+   //--- so, we fake it by acting like a branching candidate was found
+   //---
+   if(param.nodeLimit == 0)
+      setStatus(AlpsNodeStatusPregnant);
+   else if(doFathom) // || param.nodeLimit == 0)
       setStatus(AlpsNodeStatusFathomed);
    else
       status = chooseBranchingObject(model);
@@ -375,23 +380,19 @@ int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel * model) {
 
    AlpsDecompNodeDesc * desc = 
      dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   AlpsDecompModel    * m    = dynamic_cast<AlpsDecompModel*>(desc->getModel());
-   AlpsDecompParam    & param = m->getParam();
+   AlpsDecompModel * m     = dynamic_cast<AlpsDecompModel*>(desc->getModel());
+   AlpsDecompParam & param = m->getParam();
    
    UtilPrintFuncBegin(&cout, m_classTag, "chooseBranchingObject()", 
                       param.msgLevel, 3);
 
-   m->getDecompAlgo()->chooseBranchVar(branchedOn_,
-                                       branchedOnVal_);   
-   if(branchedOn_ == -1){
-      //printf("branchedOn=-1 so set to fathom?\n");
-      //it can happen that we stop due to tailoff on an integer point
-      //  but not something that should be fathomed... 
 
-      //setStatus(AlpsNodeStatusFathomed);
+   bool gotBranch = m->getDecompAlgo()->chooseBranchSet(downBranchLB_, 
+                                                        downBranchUB_, 
+                                                        upBranchLB_, 
+                                                        upBranchUB_);
+   if(!gotBranch){
       setStatus(AlpsNodeStatusEvaluated);
-
-
       //---
       //--- but if we can't branch on this and it DID finish pricing out
       //---   that means DW_LB=DW_UB for that node, then we are done 
@@ -402,8 +403,6 @@ int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel * model) {
       //---
       //printf("BestLB at this Node = %g\n", decompAlgo->getObjBestBoundLB());
       //printf("BestLB at this Node = %g\n", decompAlgo->getObjBestBoundUB();)
-      //if(getObjBestBoundUB()
-
    }
    else{
      //---
@@ -415,15 +414,17 @@ int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel * model) {
    UtilPrintFuncEnd(&cout, m_classTag, "chooseBranchingObject()", 
                     param.msgLevel, 3);
 
-   return AlpsReturnStatusOk;//??
+   return AlpsReturnStatusOk;
 }
 
 //===========================================================================//
 std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > 
 AlpsDecompTreeNode::branch()  { 
 
-   AlpsDecompNodeDesc * desc  = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   AlpsDecompModel    * m     = dynamic_cast<AlpsDecompModel*>(desc->getModel());
+   AlpsDecompNodeDesc * desc  
+      = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   AlpsDecompModel    * m     
+      = dynamic_cast<AlpsDecompModel*>(desc->getModel());
    AlpsDecompParam    & param = m->getParam();
 
    UtilPrintFuncBegin(&cout, m_classTag, "branch()", param.msgLevel, 3);
@@ -434,14 +435,26 @@ AlpsDecompTreeNode::branch()  {
    double *  oldUbs  = desc->upperBounds_;
    const int numCols = desc->numberCols_;  
    CoinAssert(oldLbs && oldUbs && numCols);
+
+   if((downBranchLB_.size() + downBranchUB_.size() == 0) || 
+      (upBranchLB_.size()   + upBranchUB_.size()   == 0)) {
+      std::cout << "AlpsDecompError: " 
+                << "downBranch_.size() = "
+                << downBranchLB_.size() + downBranchUB_.size() 
+                << "; upBranch_.size() = "
+                << upBranchLB_.size() + upBranchUB_.size() 
+                << "; index_ = " << index_ << std::endl;
+      throw CoinError("empty branch variable set(s)",
+                      "branch", "AlpsDecompTreeNode");
+   }
    
-   if((branchedOn_ < 0) || (branchedOn_ >= numCols)) {
+   /*if((branchedOn_ < 0) || (branchedOn_ >= numCols)) {
       std::cout << "AlpsDecompError: branchedOn_ = " 
                 << branchedOn_ << "; numCols = " 
                 << numCols << "; index_ = " << index_ << std::endl;
       throw CoinError("branch index is out of range", 
                       "branch", "AlpsDecompTreeNode");
-   }
+                      }*/
   
 
    double * newLbs = new double[numCols];
@@ -449,35 +462,101 @@ AlpsDecompTreeNode::branch()  {
    std::copy(oldLbs, oldLbs + numCols, newLbs);
    std::copy(oldUbs, oldUbs + numCols, newUbs);
    
+   //printf("Start with old bounds:\n");
+   //for(i = 0; i < numCols; i++){
+   // printf("ind:%d -> lb:%g ub:%g\n", i, newLbs[i], newUbs[i]);
+   //}
+   
    
    double objVal(getQuality());
 
-   // Branch down
-   newLbs[branchedOn_] = oldLbs[branchedOn_];
-   newUbs[branchedOn_] = floor(branchedOnVal_);//floor(branchedOnVal_+1.0e-5);
-  
-   AlpsDecompNodeDesc* child;
-   assert(branchedOn_ >= 0);
+   
+   //newLbs[branchedOn_] = oldLbs[branchedOn_];
+   //newUbs[branchedOn_] = floor(branchedOnVal_);
+
+   AlpsDecompNodeDesc* child = 0;
+
+   //---
+   //--- Branch down
+   //---
+   for (unsigned i = 0; i < downBranchLB_.size(); i++) {
+      if((downBranchLB_[i].first < 0) || 
+         (downBranchLB_[i].first >= numCols)) {
+         std::cout << "AlpsDecompError: downBranchLB_[" << i << "] variable = "
+                   << downBranchLB_[i].first << "; numCols = "
+                   << numCols << "; index_ = " << index_ << std::endl;
+         throw CoinError("branch index is out of range",
+                         "branch", "AlpsDecompTreeNode");
+      }
+      newLbs[downBranchLB_[i].first] = downBranchLB_[i].second;
+   }
+   
+   for (unsigned i = 0; i < downBranchUB_.size(); i++) {
+      if((downBranchUB_[i].first < 0) || 
+         (downBranchUB_[i].first >= numCols)) {
+         std::cout << "AlpsDecompError: downBranchUB_[" << i << "] variable = "
+                   << downBranchUB_[i].first << "; numCols = "
+                   << numCols << "; index_ = " << index_ << std::endl;
+         throw CoinError("branch index is out of range",
+                         "branch", "AlpsDecompTreeNode");
+      }
+      newUbs[downBranchUB_[i].first] = downBranchUB_[i].second;
+   }
+   assert(downBranchLB_.size() +downBranchUB_.size() > 0);
+   //assert(branchedOn_ >= 0);
    child = new AlpsDecompNodeDesc(m, newLbs, newUbs);
-   child->setBranchedOn(branchedOn_);
-   child->setBranchedVal(branchedOnVal_);
+   //child->setBranchedOn(branchedOn_);
+   //child->setBranchedVal(branchedOnVal_);
    child->setBranchedDir(-1);
    newNodes.push_back(CoinMakeTriple(static_cast<AlpsNodeDesc *>(child),
                                      AlpsNodeStatusCandidate,
                                      objVal));
        
-   // Branch up
-   newUbs[branchedOn_] = oldUbs[branchedOn_];
-   newLbs[branchedOn_] = ceil(branchedOnVal_);//ceil(branchedOnVal_ - 1.0e-5);
+
+   //---
+   //--- Branch up
+   //---
+   //TODO: this can be done more cheaply than a full copy
+   std::copy(oldLbs, oldLbs + numCols, newLbs);
+   std::copy(oldUbs, oldUbs + numCols, newUbs);
+   //newUbs[branchedOn_] = oldUbs[branchedOn_];
+   //newLbs[branchedOn_] = ceil(branchedOnVal_);
+   for (unsigned i = 0; i < upBranchLB_.size(); i++) {
+      if((upBranchLB_[i].first < 0) || 
+         (upBranchLB_[i].first >= numCols)) {
+         std::cout << "AlpsDecompError: upBranchLB_[" << i << "] variable = "
+                   << upBranchLB_[i].first << "; numCols = "
+                   << numCols << "; index_ = " << index_ << std::endl;
+         throw CoinError("branch index is out of range",
+                         "branch", "AlpsDecompTreeNode");
+      }
+      newLbs[upBranchLB_[i].first] = upBranchLB_[i].second;
+   }
+
+   for (unsigned i = 0; i < upBranchUB_.size(); i++) {
+      if((upBranchUB_[i].first < 0) || 
+         (upBranchUB_[i].first >= numCols)) {
+         std::cout << "AlpsDecompError: upBranchUB_[" << i << "] variable = "
+                   << upBranchUB_[i].first << "; numCols = "
+                   << numCols << "; index_ = " << index_ << std::endl;
+         throw CoinError("branch index is out of range",
+                         "branch", "AlpsDecompTreeNode");
+      }      
+      newUbs[upBranchUB_[i].first] = upBranchUB_[i].second;
+   }
+   
    child = 0;
+   assert(upBranchLB_.size() + upBranchUB_.size() > 0);
    child = new AlpsDecompNodeDesc(m, newLbs, newUbs);
-   child->setBranchedOn(branchedOn_);
-   child->setBranchedVal(branchedOnVal_);
+   //child->setBranchedOn(branchedOn_);
+   //child->setBranchedVal(branchedOnVal_);
    child->setBranchedDir(1);
    newNodes.push_back(CoinMakeTriple(static_cast<AlpsNodeDesc *>(child),
                                      AlpsNodeStatusCandidate,
                                      objVal));
-
+   //---
+   //--- clean-up
+   //---
    if (newLbs != 0) {
       delete [] newLbs;
       newLbs = 0;

@@ -110,7 +110,7 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 
 # Ampl Solver library
 
-AC_COIN_HAS_ASL
+AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -156,8 +156,6 @@ test $coin_has_cpx != skipping])
 #############################################################################
 #                      Check for the IP solver                              #
 #############################################################################
-AM_CONDITIONAL(COIN_HAS_CBC,
-               false)
 
 AC_MSG_CHECKING([for DIP default ip solver])
 AC_ARG_WITH([ip-solver],

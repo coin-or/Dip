@@ -103,9 +103,11 @@ void MILPBlock_DecompApp::readBlockFile(){
    //---
    UtilOpenFile(is, fileName.c_str());
 
-   int i, rowId, numRowsInBlock, blockId;
+   int i, rowId, rowIdP, numRowsInBlock, blockId;
    if(m_appParam.LogLevel >= 1)
       (*m_osLog) << "Reading " << fileName << endl;
+
+   map<int, vector<int> >::iterator blocksIt;
    if(m_appParam.BlockFileFormat == "List" ||
       m_appParam.BlockFileFormat == "LIST"){
 
@@ -115,10 +117,6 @@ void MILPBlock_DecompApp::readBlockFile(){
       //---     <row ids...>
       //---   <block id>  <num rows in block>
       //---     <row ids...>
-      //---
-      
-      //---
-      //--- TODO: also allow row names (instead of row ids)
       //---      
       while(!is.eof()){
 	 is >> blockId;
@@ -143,25 +141,85 @@ void MILPBlock_DecompApp::readBlockFile(){
       //--- <block id> <row id> 
       //---  ...
       //---
-      int blockIdCurr = 0;
       is >> blockId;
       while(!is.eof()){
-	 vector<int> rowsInBlock;
-	 while(blockId == blockIdCurr && !is.eof()){
-	    is >> rowId;
-	    mit = permute.find(rowId);
-	    if(mit != permute.end())
-	       rowsInBlock.push_back(mit->second);
-	    else
-	       rowsInBlock.push_back(rowId);
-	    is >> blockId;
+	 is >> rowId;
+	 mit = permute.find(rowId);
+	 if(mit != permute.end())
+	    rowIdP = mit->second;
+	 else
+	    rowIdP = rowId;
+	 blocksIt = m_blocks.find(blockId);
+	 if(blocksIt != m_blocks.end())
+	    blocksIt->second.push_back(rowIdP);
+	 else{
+	    vector<int> rowsInBlocks;
+	    rowsInBlocks.push_back(rowIdP);
+	    m_blocks.insert(make_pair(blockId, rowsInBlocks));	 
 	 }
-	 m_blocks.insert(make_pair(blockIdCurr, rowsInBlock));	 
-	 blockIdCurr = blockId;
+	 is >> blockId;
 	 if(is.eof()) break;
+
+      }      
+   } else if(m_appParam.BlockFileFormat == "PairName" ||
+	     m_appParam.BlockFileFormat == "PAIRNAME"){
+      //---
+      //--- <block id> <row name> 
+      //---  ...
+      //---
+
+      //---
+      //--- first create a map from row name to row id from mps
+      //---   CHECK: mps to OSI guaranteed to keep order of rows?
+      //---
+      map<string, int>           rowNameToId;
+      map<string, int>::iterator rowNameToIdIt;
+      for(i = 0; i < m_mpsIO.getNumRows(); i++){
+	 rowNameToId.insert(make_pair(m_mpsIO.rowName(i), i));
+      }
+      
+      string rowName     = "";
+      is >> blockId;
+      while(!is.eof()){	 
+	 is >> rowName;
+	 if(is.eof()) 
+	    break;
+	 rowNameToIdIt = rowNameToId.find(rowName);
+	 if(rowNameToIdIt != rowNameToId.end()){
+	    rowId = rowNameToIdIt->second;
+	    //printf("rowName=%s rowId=%d\n", rowName.c_str(), rowId);
+	 }
+	 else{
+	    cerr << "Error: Row name ("
+		 << rowName << " in block file " 
+		 << "is not found in mps file" << endl;
+	    throw UtilException("Invalid Input.", 
+				"readBlockFile", "MILPBlock_DecompApp");
+	 }	    
+	 mit = permute.find(rowId);
+	 if(mit != permute.end())
+	    rowIdP = mit->second;
+	 else
+	    rowIdP = rowId;	 
+	 blocksIt = m_blocks.find(blockId);
+	 if(blocksIt != m_blocks.end())
+	    blocksIt->second.push_back(rowIdP);
+	 else{
+	    vector<int> rowsInBlocks;
+	    rowsInBlocks.push_back(rowIdP);
+	    m_blocks.insert(make_pair(blockId, rowsInBlocks));	 
+	 }
+	 is >> blockId;
+	 if(is.eof()) 
+	    break;
       }      
    } else{
-      assert(0);
+      cerr << "Error: BlockFileFormat = " 
+	   << m_appParam.BlockFileFormat 
+	   << " is an invalid type. Valid types = (List,Pair,PairName)." 
+	   << endl;
+      throw UtilException("Invalid Parameter.", 
+			  "readBlockFile", "MILPBlock_DecompApp");
    }
 
    if(m_appParam.LogLevel >= 3){
@@ -174,7 +232,7 @@ void MILPBlock_DecompApp::readBlockFile(){
          (*m_osLog) << endl;
       }
    }
-   
+   //exit(1);
    is.close();
 }
 
@@ -845,6 +903,10 @@ void MILPBlock_DecompApp::createModels(){
       throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
    memcpy(m_objective, 
           m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
+   if(m_appParam.ObjectiveSense == -1){
+      for(i = 0; i < nCols; i++)
+	 m_objective[i] *= -1;
+   }
    setModelObjective(m_objective);
 
    //---
@@ -1010,6 +1072,7 @@ void MILPBlock_DecompApp::createModels(){
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createModels()", m_appParam.LogLevel, 2);   
+   //exit(1);
 }
 
 

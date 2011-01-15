@@ -315,8 +315,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    */
    int       nSeta = 0;
    int       nSetb = 0;
-   const int statusSet2a[2] = {0,2};   nSeta=2;
-   const int statusSet2b[3] = {0,1,2}; nSetb=3;
+   const int statusSet2a[4] = {0,2,3,4};   nSeta=4;
+   const int statusSet2b[5] = {0,1,2,4,5}; nSetb=5;
    result->m_solStatus2 = cbc.secondaryStatus();
 
    //---

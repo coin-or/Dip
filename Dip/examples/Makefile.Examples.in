@@ -46,7 +46,7 @@ else
 LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@
 endif
 
-CFLAGS = -DCOIN_ASSERT
+CFLAGS += -DCOIN_ASSERT
 
 ###########################################################################
 # define vars for which IP solver was chosen in configure
@@ -87,7 +87,7 @@ CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
 CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags dip`
 else
-CFLAGS = @DIPLIB_CFLAGS_INSTALLED@
+CFLAGS += @DIPLIB_CFLAGS_INSTALLED@
 endif
 
 ###########################################################################

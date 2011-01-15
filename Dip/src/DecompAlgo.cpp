@@ -24,7 +24,7 @@
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
 //#define   RELAXED_THREADED
-#define   NTHREADS   2
+
 //#define   DO_INTERIOR //also in DecompAlgoPC
 
 //===========================================================================//
@@ -46,7 +46,7 @@
 
 //===========================================================================//
 #ifdef RELAXED_THREADED
-#include "pfunc/pfunc.hpp"
+//#include "pfunc/pfunc.hpp"
 static void * solveRelaxedThread(void * args);
 #endif
 typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
@@ -88,7 +88,7 @@ void DecompAlgo::checkBlocksColumns(){
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
       DecompAlgoModel     & modelRelax1 = (*mid1).second;
       DecompConstraintSet * model       = modelRelax1.getModel();
-      if(!model || !model->getMatrix()){
+      if(!model || model->m_masterOnly || !model->getMatrix()){
 	 UtilPrintFuncEnd(m_osLog, m_classTag,
 			  "checkBlocksColumns()", m_param.LogDebugLevel, 2);
          return;
@@ -99,10 +99,13 @@ void DecompAlgo::checkBlocksColumns(){
          if(mid1 == mid2)
             continue;
          DecompAlgoModel & modelRelax2 = (*mid2).second;
+	 if(modelRelax2.getModel()->m_masterOnly)
+	   continue;
          set<int>        & activeCols2
             = modelRelax2.getModel()->activeColumnsS;
          set<int>          activeCols1inter2;
-         set_intersection(activeCols1.begin(), activeCols1.end(),
+         //this is very expensive - can we improve?
+	 set_intersection(activeCols1.begin(), activeCols1.end(),
                           activeCols2.begin(), activeCols2.end(), 
                           inserter(activeCols1inter2,
                                    activeCols1inter2.begin()));
@@ -210,7 +213,8 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    //---
    //--- sanity checks on user input
    //---
-   checkBlocksColumns();
+   if(m_param.DebugCheckBlocksColumns)
+     checkBlocksColumns();
 
    //---
    //--- if we have a core, allocate a pool of memory for re-use
@@ -666,8 +670,6 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
 }
 
 //===========================================================================//
-//think - if need for RC?
-//especially with Phase I this is very PC specific
 void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 
    //---
@@ -743,10 +745,19 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    int nRowsCore = modelCore->getNumRows();
    int nIntVars  = modelCore->getNumInts();
    int nInitVars = static_cast<int>(initVars.size());
-   assert(initVars.size() > 0);
+   assert(initVars.size() > 0);//TODO: this should be OK
    
    double * dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
+
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //---
+   //--- TODO:
+   //--- MO vars do not need an explicit row in master even if
+   //---   BranchEnforceInMaster (these are enforced directly by
+   //---   MO column bounds)
+   //---
+#endif
 
    //---
    //--- set the row counts
@@ -838,6 +849,16 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Convex);
+
+#ifdef DECOMP_MASTERONLY_DIRECT
+   masterMatrixAddMOCols(masterM,
+			 colLB,
+			 colUB,
+			 objCoeff,
+			 colNames);   
+#endif
+
+
       
    int colIndex     = 0;
    int blockIndex   = 0;
@@ -1043,6 +1064,63 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "createMasterProblem()", m_param.LogDebugLevel, 2);
 }
+
+//===========================================================================//
+#ifdef DECOMP_MASTERONLY_DIRECT
+void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix * masterM,
+				       double           * colLB,
+				       double           * colUB,
+				       double           * objCoeff,
+				       vector<string>   & colNames){
+
+  int nMOVars   = static_cast<int>(m_masterOnlyCols.size());
+  if(nMOVars <= 0)
+    return;
+
+  DecompConstraintSet * modelCore = m_modelCore.getModel();
+  assert(modelCore);
+  assert(!modelCore->isSparse());
+
+  const double         * colLBCore    = modelCore->getColLB();
+  const double         * colUBCore    = modelCore->getColUB();
+  const vector<string> & colNamesCore = modelCore->getColNames();
+  const double         * origObj      = getOrigObjective();
+
+  //---
+  //--- add the submatrix for core rows cross master-only columns
+  //---     to the master formulation (this will be a col-ordered matrix)
+  //---    
+  const CoinPackedMatrix * matrixCore = modelCore->getMatrix();
+  CoinPackedMatrix       * matrixMO(matrixCore);
+  if(!matrixMO->isColOrdered()){
+    matrixMO->reverseOrdering();
+  }
+  matrixMO->submatrixOfWithDuplicates(matrixMO,
+				      nMOVars, &m_masterOnlyCols[0]);
+  assert(matrixMO->isColOrdered());
+  assert(masterM->isColOrdered());
+  masterM->majorAppendSameOrdered(matrixMO);
+
+  //---
+  //--- set master-onlys: lb, ub, obj, names
+  //---
+  int i, j, k;
+  int nMasterCols = masterM->getNumCols();
+  for(i = 0; i < nMOVars; i++){
+    k                    = nMasterCols + i;
+    j                    = m_masterOnlyCols[i];
+    colLB[k]    = colLBCore[j];
+    colUB[k]    = colUBCore[j];
+    objCoeff[k] = origObj[j];
+    colNames.push_back(colNamesCore[j]);    
+
+    ////////STOP
+    ///// how is the type used later - check all functions
+    //m_masterColType.push_back(DecompCol_MasterOnly);
+
+  }  
+}
+#endif
 
 //===========================================================================//
 void DecompAlgo::masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
@@ -1374,8 +1452,7 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
 DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                                      const double globalLB,
                                      const double globalUB){  
-   
-   
+
    double                mostNegRC = 0.0;
    DecompConstraintSet * modelCore = m_modelCore.getModel();
    m_stabEpsilon = 0.0;
@@ -1387,14 +1464,11 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
       throw UtilException("In this version of DIP, Relax and Cut is currently disabled.", "processNode", "DecompAlgo");
    }
    
+   //---
+   //--- print the global gap
+   //---
    UTIL_MSG(m_param.LogLevel, 2,
-	    double gap = DecompInf;
-	    if(globalLB > -DecompInf && globalUB < DecompInf){
-	       if(globalUB != 0.0)
-		  gap = fabs(globalUB-globalLB)/fabs(globalUB);
-	       else
-		  gap = fabs(globalUB-globalLB);
-	    }
+	    double gap = UtilCalculateGap(globalLB, globalUB);
             (*m_osLog)
             << "Process Node " << nodeIndex
             << " (algo = "     << DecompAlgoStr[m_algo] 
@@ -1562,17 +1636,8 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    while(m_phase != PHASE_DONE){
 
       UTIL_MSG(m_param.LogLevel, 2,
-               double gap = DecompInf;               
-               if(m_nodeStats.objBest.second > -DecompInf && 
-                  m_nodeStats.objBest.second < DecompInf){
-                  if(m_nodeStats.objBest.second != 0.0)
-                     gap = fabs(m_nodeStats.objBest.second-
-                                m_nodeStats.objBest.first)/
-                        fabs(m_nodeStats.objBest.second);
-                  else
-                     gap = fabs(m_nodeStats.objBest.second-
-                                m_nodeStats.objBest.first);
-               }
+               double gap = UtilCalculateGap(m_nodeStats.objBest.first,
+					 m_nodeStats.objBest.second);
 	       int nHistorySize 
 	       = static_cast<int>(m_nodeStats.objHistoryLB.size());
 	       if(nHistorySize > 0){		  
@@ -1586,8 +1651,6 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 		     << m_nodeStats.cutCallsTotal
 		     << " pricepass = "   << setw(5)  
 		     << m_nodeStats.priceCallsTotal
-		     //<< " cutpass = "     << setw(5)  << objBound.cutPass
-		     //<< " pricepass = "   << setw(5)  << objBound.pricePass
 		     << " thisLB = "      << setw(10) 
 		     << UtilDblToStr(objBound.thisBound,6)
 		     << " thisUB = "      << setw(10) 
@@ -1923,6 +1986,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
             //---   add to masterLP directly - then need a resolve
             //---   to get back to current status
             //---
+	    /*
             if(m_param.BreakOutPartial){
                DecompVarList partialVars;
                breakOutPartial(m_xhat, partialVars);
@@ -1946,6 +2010,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                              << partialVars.size() << endl;
                }
             }
+	    */
         
             //TODO:
 	    m_app->APPheuristics(m_xhat, getOrigObjective(), m_xhatIPFeas);
@@ -2290,8 +2355,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
                m_nodeStats.priceCallsTotal 
                << endl;);
       solutionUpdateAsIP();
-      if(m_firstPhase2Call) m_firstPhase2Call = false;
+      //if(m_firstPhase2Call) m_firstPhase2Call = false;
    }
+
+   if(m_phase == PHASE_PRICE2)
+      if(m_firstPhase2Call) 
+	 m_firstPhase2Call = false;
    
 
    //---
@@ -2310,10 +2379,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
+   int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-   //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+   CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
@@ -2334,19 +2404,22 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 	 m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
       else
 	 m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-
       //TODO: interior
 
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
-#ifdef DO_INTERIOR //TODO: option, not compile time
-      int cpxStat=0, cpxMethod=0;
+
+#if defined(DO_INTERIOR) and defined(__DECOMP_LP_CPX__)
+
+      //TODO: option, not compile time
+
       //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
       CPXbaropt(env, lp);
       cpxMethod = CPXgetmethod(env, lp);
       cpxStat = CPXgetstat(env, lp);
       //if(cpxStat)
       // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
+
 #else
       m_masterSI->resolve();
 #endif
@@ -2537,6 +2610,10 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
    //TODO: think - if user gives a partial feasible solution
    //   and this part is not run then PI master can be infeasible
    //   which will cause an issue
+   //TODO: PI master cannot be infeasible if we use artificials on 
+   //   convexity constraints - which we already have - so how is
+   //   that possible?
+
    //Should probably have this on irregardless of what we get from user.
    //Another reason this has to run is because if user gives a solution
    //  with some master-only vars set to their LB=0. This will not be
@@ -2549,7 +2626,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 	      << " userLimit = " << limit << endl;
 	      );
 
-   nInitVars = 0;//THINK
+   //nInitVars = 0;//THINK
    if(nInitVars < limit){      
       //---
       //--- create an initial set of points F'[0] subseteq F'
@@ -2596,7 +2673,6 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 			 &subprobResult,        //results
 			 initVars);             //var list to populate
 	    if(attempts == 0){
-	       /////////////////////////////////////////STOP
 	       //TODO: have to treat masterOnly differently
 	       //  we don't correctly populate LB/UB in
 	       //  subprobResult object - so contribution is wrong
@@ -2835,16 +2911,22 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    double         zDW_UBPrimal = getMasterObjValue();
    double         zDW_UBDual   = 0.0;
    double         zDW_UB       = 0.0;
+   double         zDW_LB       = 0.0;
+
    for(r = 0; r < m_masterSI->getNumRows(); r++)
       zDW_UBDual += dualSol[r] * rowRhs[r];
+   zDW_LB = zDW_UBDual + mostNegRC;
+   setObjBoundLB(zDW_LB, zDW_UBPrimal);
 
-
-   //if dual stab - use Dual?
-   //double zDW_LB = zDW_UBPrimal + mostNegRC;
-   double zDW_LB = zDW_UBDual + mostNegRC;
-   setObjBoundLB(zDW_LB, zDW_UBDual);
-
-   if(!m_param.DualStab && !UtilIsZero(zDW_UBDual-zDW_UBPrimal, 1.0e-3)){
+   double actDiff = fabs(zDW_UBDual-zDW_UBPrimal);
+   double relDiff = actDiff;
+   if(UtilIsZero(zDW_UBPrimal)){
+      relDiff = actDiff;
+   }
+   else{
+      relDiff = fabs(actDiff) / fabs(zDW_UBPrimal);
+   }
+   if(!m_param.DualStab && !UtilIsZero(relDiff, 1.0e-4)){
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal) 
                  << endl;
       (*m_osLog) << "MasterObj [dual]   = " << UtilDblToStr(zDW_UBDual) 
@@ -2852,16 +2934,15 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
       throw UtilException("Primal and Dual Master Obj Not Matching.",
                           "updateObjBoundLB", "DecompAlgo");
    }
-
+   
    //TODO: stats - we want to play zDW_LB vs UB... 
    UTIL_MSG(m_param.LogDebugLevel, 3,
 	    (*m_osLog)
-	    << "MasterObj[primal] = " << UtilDblToStr(zDW_UBPrimal)
-            << "\t[dual] = "          << UtilDblToStr(zDW_UBDual)
-	    << "\tmostNegRC = "       << UtilDblToStr(mostNegRC) << "\n"
-	    << "ThisLB = "      << UtilDblToStr(zDW_LB) << "\t"
-	    << "BestLB = "      << UtilDblToStr(m_nodeStats.objBest.first)
-	    << "\n";
+	    << "MasterObj[primal] = " << UtilDblToStr(zDW_UBPrimal)   << "\t"
+            << "[dual] = "            << UtilDblToStr(zDW_UBDual)     << "\t"
+	    << "mostNegRC = "         << UtilDblToStr(mostNegRC)      << "\n"
+	    << "ThisLB = "            << UtilDblToStr(zDW_LB)         << "\t"
+	    << "BestLB = " << UtilDblToStr(m_nodeStats.objBest.first) << "\n";
 	    );
 
    UTIL_DEBUG(m_param.LogDebugLevel, 1,
@@ -2886,19 +2967,11 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    }
 	      
    //---
-   //--- if RC* is relatively small (i.e., zDW_LB-zDW_UB is small)
-   //---  then consider it converged - stop and move on to branching
-   //--- TODO: make this an option
+   //--- check if the gap is tight (use the best bound)
    //---
    bool   isGapTight = false;
    double tightGap   = m_param.MasterGapLimit;
-   double relGap     = 0.00;
-   if(UtilIsZero(zDW_UB)){
-      relGap = fabs(mostNegRC);
-   }
-   else{
-      relGap = fabs(mostNegRC) / fabs(zDW_UB);
-   }
+   double relGap     = getNodeBoundGap();
    if(relGap <= tightGap)
       isGapTight = true;
    if(m_param.LogDebugLevel >= 2){
@@ -2906,7 +2979,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 		 << " isTight = " << isGapTight << "\n";
    }
    m_relGap = relGap;
-
+   
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "updateObjBoundLB()", m_param.LogDebugLevel, 2);
    return isGapTight;
@@ -3217,10 +3290,10 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	 if(priceCallsRound >= m_param.LimitRoundPriceIters)
 	    considerSwitch = true;
 
-	 printf("mustSwitch=%d\n", mustSwitch);
-	 printf("considerSwitch=%d\n", considerSwitch);
-	 printf("isCutPossible=%d\n", isCutPossible);
-	 printf("isPricePossible=%d\n", isPricePossible);
+	 //printf("mustSwitch=%d\n", mustSwitch);
+	 //printf("considerSwitch=%d\n", considerSwitch);
+	 //printf("isCutPossible=%d\n", isCutPossible);
+	 //printf("isPricePossible=%d\n", isPricePossible);
  
 	 if(mustSwitch){
 	    //---
@@ -3326,10 +3399,23 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
          //---
          UTIL_DEBUG(m_param.LogDebugLevel, 3,
                     (*m_osLog) << "Gap is tight" << endl;);
-         int    branchedOnIndex = -1;
-         double branchedOnValue =  0;
-         chooseBranchVar(branchedOnIndex, branchedOnValue);
-         if(branchedOnIndex != -1){
+         //int    branchedOnIndex = -1;
+         //double branchedOnValue =  0;
+         //chooseBranchVar(branchedOnIndex, branchedOnValue);
+         std::vector< std::pair<int, double> > downBranchLB, 
+            downBranchUB, upBranchLB, upBranchUB;
+         bool gotBranch = chooseBranchSet(downBranchLB, 
+                                          downBranchUB, 
+                                          upBranchLB, 
+                                          upBranchUB);	 
+	 if(m_param.LimitNodes == 0){
+            UTIL_DEBUG(m_param.LogDebugLevel, 3,
+                       (*m_osLog) << "Gap is tight and LimitNodes=0."
+                       << endl;);
+            nextPhase = PHASE_DONE;
+            break;
+	 }
+         else if(gotBranch){
             UTIL_DEBUG(m_param.LogDebugLevel, 3,
                        (*m_osLog) << "Gap is tight and we have a " 
                        << "branch candidate" << endl;);
@@ -3375,10 +3461,24 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    //---
 	    UTIL_DEBUG(m_param.LogDebugLevel, 3,
 		       (*m_osLog) << "Gap is tight" << endl;);
-	    int    branchedOnIndex = -1;
-	    double branchedOnValue =  0;
-	    chooseBranchVar(branchedOnIndex, branchedOnValue);
-	    if(branchedOnIndex != -1){
+	    //int    branchedOnIndex = -1;
+	    //double branchedOnValue =  0;
+	    //chooseBranchVar(branchedOnIndex, branchedOnValue);
+ 	    std::vector< std::pair<int, double> > downBranchLB, 
+               downBranchUB, upBranchLB, upBranchUB;
+            bool gotBranch = chooseBranchSet(downBranchLB, 
+                                             downBranchUB, 
+                                             upBranchLB, 
+                                             upBranchUB);
+	    if(m_param.LimitNodes == 0){
+	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
+			  (*m_osLog) << "Gap is tight and LimitNodes=0."
+			  << endl;);
+	       nextPhase = PHASE_DONE;
+	       goto PHASE_UPDATE_FINISH;
+	    }
+            else if(gotBranch){
+               //if(branchedOnIndex != -1){
 	       UTIL_DEBUG(m_param.LogDebugLevel, 3,
 			  (*m_osLog) << "Gap is tight and we have a " 
 			  << "branch candidate" << endl;);
@@ -4111,6 +4211,118 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
 #endif
 
 //------------------------------------------------------------------------ //
+void DecompAlgo::generateVarsCalcRedCost(const double * u,
+					 double       * redCostX){
+
+
+   int                   i;
+   int                   nMasterRows   = m_masterSI->getNumRows();
+   DecompConstraintSet * modelCore     = m_modelCore.getModel();
+   int                   nCoreCols     = modelCore->getNumCols();
+   const double        * origObjective = getOrigObjective();
+
+   //---
+   //--- Calculate reduced costs for a given dual vector.
+   //---
+   //--- in DW, we use (c-uA'')x, where A'' is the core matrix
+   //---    u, in this case has dimension = #core rows
+   //--- in D , we use (c-u   )x, we don't use the core matrix
+   //---    u, in this case has dimension = #core cols
+   //---
+   if(m_algo == DECOMP){
+      assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumCols());
+      for(i = 0; i < nCoreCols; i++)
+	 redCostX[i] = u[i];
+   }
+   else{
+      assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumRows());
+      modelCore->M->transposeTimes(u, redCostX);
+   }
+
+   //--- 
+   //--- if in Phase I, c=0
+   //---   
+   if(m_phase == PHASE_PRICE1){
+      for(i = 0; i < nCoreCols; i++)
+	 redCostX[i] = -redCostX[i];
+   }
+   else{
+      for(i = 0; i < nCoreCols; i++)
+	 redCostX[i] = origObjective[i] - redCostX[i];
+   }
+}
+
+//------------------------------------------------------------------------ //
+void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
+					 double       * uNew){
+
+   int                   i, r;
+   int                   nMasterRows   = m_masterSI->getNumRows();
+   DecompConstraintSet * modelCore     = m_modelCore.getModel();
+   int                   nBaseCoreRows = modelCore->nBaseRows;
+   int                   nCoreCols     = modelCore->getNumCols();
+
+   if(m_algo == DECOMP)
+      nBaseCoreRows = nCoreCols;
+   
+   //---
+   //--- copy the dual vector for original core rows
+   //---
+   CoinDisjointCopyN(uOld, nBaseCoreRows, uNew);
+
+   //---
+   //--- sanity check - make sure we are only skipping convexity rows
+   //---    everything else has a dual we want to use
+   //---
+   if(m_param.DebugLevel >= 1){
+      for(r = 0; r < nBaseCoreRows; r++){
+	 assert(m_masterRowType[r] == DecompRow_Original ||
+		m_masterRowType[r] == DecompRow_Branch);
+      }
+      for(r = nBaseCoreRows; r < nBaseCoreRows + m_numConvexCon; r++){
+	 assert(m_masterRowType[r] == DecompRow_Convex);
+      }
+      for(r = nBaseCoreRows + m_numConvexCon; r < nMasterRows; r++){
+	 assert(m_masterRowType[r] == DecompRow_Cut);
+      }
+   }
+
+   //NOTE: if no cuts, don't need to do any of this
+   //      if DECOMP,  don't need to do any of this?
+
+   //---
+   //--- append dual vector for any added cuts 
+   //---    skip over convexity constraints
+   //---
+   assert((nMasterRows - nBaseCoreRows - m_numConvexCon) == 
+	  getNumRowType(DecompRow_Cut));
+   CoinDisjointCopyN(uOld        + nBaseCoreRows + m_numConvexCon,  //from
+		     nMasterRows - nBaseCoreRows - m_numConvexCon,  //size
+		     uNew        + nBaseCoreRows);                  //to
+   
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      for(i = 0; i < nMasterRows; i++){
+		 if(!UtilIsZero(uOld[i], DecompEpsilon)){
+		    (*m_osLog) << "uOld[" << setw(5) << i << " ]: " 
+			       << setw(12) << UtilDblToStr(uOld[i],3)
+			       << " --> " 
+			       << DecompRowTypeStr[m_masterRowType[i]] << "\n";
+		 }
+	      }
+	      );
+   
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      for(i = 0; i < (nMasterRows - m_numConvexCon); i++){
+		 if(!UtilIsZero(uNew[i], DecompEpsilon)){
+		    (*m_osLog) << "uNew[" << setw(5) << i << " ]: " 
+			       << setw(12) << UtilDblToStr(uNew[i],3) 
+			       << endl;	
+		 }
+	      }
+	      );
+}
+
+//------------------------------------------------------------------------ //
 int DecompAlgo::generateVarsFea(DecompVarList    & newVars, 
                                 double           & mostNegReducedCost){
    //---
@@ -4148,7 +4360,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //--- every block every time (default for now).
    //---
 
-   int                   i, b, r;
+   int                   i, b;
    DecompVarList         potentialVars;
    DecompConstraintSet * modelCore   = m_modelCore.getModel();
    const int      m             = m_masterSI->getNumRows();
@@ -4158,30 +4370,17 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    const double * userU         = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
    const double * origObjective = getOrigObjective();
+   //int            numThreads    = m_param.NumThreads;
    double       * redCostX      = NULL;   
    double         alpha         = 0.0;
-   int    whichBlock;
-   double varRedCost;
+   int            whichBlock;
+   double         varRedCost;
    DecompVarList::iterator it;
+
+   assert(!m_masterSI->isProvenPrimalInfeasible());
 
    if(m_algo == DECOMP)
       nBaseCoreRows = nCoreCols;
-   
-   assert(!m_masterSI->isProvenPrimalInfeasible());
-
-   //---
-   //--- get the master dual solution
-   //---   the user can override this 
-   //---
-   u     = getMasterDualSolution();
-   userU = m_app->getDualForGenerateVars(u); //STOP - for Alper
-   if(userU)
-      u = userU;
-
-   
-   //THINK: includes artificials now
-   redCostX = new double[nCoreCols]; // (c - uhat.A") in x-space
-   assert(redCostX);
 
    //---
    //--- PC: get dual vector
@@ -4193,7 +4392,33 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //---
    //---       We flip the sign here.
    //---
+
+   //---
+   //--- get the master dual solution
+   //---   the user can override this 
+   //---
+   u     = getMasterDualSolution();
+   userU = m_app->getDualForGenerateVars(u); 
+   if(userU)
+      u = userU;
+
+   
+   //THINK: includes artificials now
+   redCostX = new double[nCoreCols]; // (c - uhat.A") in x-space
+   CoinAssertHint(redCostX, "Error: Out of Memory");
+
       
+
+   //THINK: we should be checked col-type to make sure we get the
+   //  right rows for the convexity constraints
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+	      (*m_osLog) << "m            =" << m << endl;
+	      (*m_osLog) << "numConvexCon =" << m_numConvexCon << endl;
+	      (*m_osLog) << "nBaseCoreRows=" << nBaseCoreRows  << endl;
+	      );
+
+
+
    //---
    //--- remove the convexity constraint(s) from the dual vector
    //---   TODO/THINK: this is fugly
@@ -4202,104 +4427,25 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //--- it as an offset and just check for < 0 directly, rather than
    //--- less than alpha -- sign switches are a little messy
    //---
-
-   //THINK: we should be checked col-type to make sure we get the
-   //  right rows for the convexity constraints
-
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
-	      (*m_osLog) << "m            =" << m << endl;
-	      (*m_osLog) << "numConvexCon =" << m_numConvexCon << endl;
-	      (*m_osLog) << "nBaseCoreRows=" << nBaseCoreRows  << endl;
-	      );
-
    double * u_adjusted = new double[m - m_numConvexCon];
-   assert(u_adjusted);
-
-   //copy the dual vector for original core rows
-   CoinDisjointCopyN(u, nBaseCoreRows, u_adjusted);
+   CoinAssertHint(u_adjusted, "Error: Out of Memory");
 
    //---
-   //--- sanity check - make sure we are only skipping convexity rows
-   //---    everything else has a dual we want to use
+   //--- remove the convexity constraints from the dual vector
    //---
-   if(m_param.DebugLevel >= 1){
-      for(r = 0; r < nBaseCoreRows; r++){
-	 assert(m_masterRowType[r] == DecompRow_Original ||
-		m_masterRowType[r] == DecompRow_Branch);
-      }
-      for(r = nBaseCoreRows; r < nBaseCoreRows + m_numConvexCon; r++){
-	 assert(m_masterRowType[r] == DecompRow_Convex);
-      }
-      for(r = nBaseCoreRows + m_numConvexCon; r < m; r++){
-	 assert(m_masterRowType[r] == DecompRow_Cut);
-      }
-   }
-
-   // if no cuts, don't need to do any of this
-   // if DECOMP, don't need to do any of this
-   //append dual vector for any added cuts (skip over convexity constraints)
-   assert((m - nBaseCoreRows - m_numConvexCon) == 
-	  getNumRowType(DecompRow_Cut));
-   CoinDisjointCopyN(u + nBaseCoreRows + m_numConvexCon,  //from
-		     m - nBaseCoreRows - m_numConvexCon,  //size
-		     u_adjusted + nBaseCoreRows);         //to
-   
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-	      for(i = 0; i < m; i++){
-		 if(!UtilIsZero(u[i], DecompEpsilon)){
-		    (*m_osLog) << "u[" << setw(5) << i << " ]: " 
-			       << setw(12) << UtilDblToStr(u[i],3) << " --> " 
-			       << DecompRowTypeStr[m_masterRowType[i]] << "\n";
-		 }
-	      }
-	      );
-
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-	      for(i = 0; i < (m-m_numConvexCon); i++){
-		 if(!UtilIsZero(u_adjusted[i], DecompEpsilon)){
-		    (*m_osLog) << "uAdj[" << setw(5) << i << " ]: " 
-			       << setw(12) << UtilDblToStr(u_adjusted[i],3) 
-			       << endl;	
-		 }
-	      }
-	      );
+   generateVarsAdjustDuals(u, u_adjusted);
 
    //---
    //--- calculate reduced costs
-   
-   if(m_algo == DECOMP){
-      //---
-      //--- in DW, we use (c-uA'')x, where A'' is the core matrix
-      //---    u, in this case has dimension = #core rows
-      //--- in D , we use (c-u   )x, we don't use the core matrix
-      //---    u, in this case has dimension = #core cols
-      //---
-      assert((m - m_numConvexCon) == modelCore->M->getNumCols());
-      for(i = 0; i < nCoreCols; i++)
-	 redCostX[i] = u_adjusted[i];
-   }
-   else{
-      assert((m - m_numConvexCon) == modelCore->M->getNumRows());
-      modelCore->M->transposeTimes(u_adjusted, redCostX);
-   }
-   
-   //--- 
-   //--- if in Phase I, c=0
-   //---   
-   if(m_phase == PHASE_PRICE1){
-      for(i = 0; i < nCoreCols; i++)
-	 redCostX[i] = -redCostX[i];
-   }
-   else{
-      for(i = 0; i < nCoreCols; i++)
-	 redCostX[i] = origObjective[i] - redCostX[i];
-   }
+   //---
+   generateVarsCalcRedCost(u_adjusted, redCostX);
    
 
    int var_index = 0;   
    const double * objC = m_masterSI->getObjCoefficients();
    const double * rcLP = m_masterSI->getReducedCost();
 
+   //TODO: move this all to debug utility file
    if(m_param.DebugLevel >= 1){   
       //---
       //--- sanity check on duals returned
@@ -4310,7 +4456,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       const double           * x     = m_masterSI->getColSolution();
       const double           * pi    = m_masterSI->getRowPrice();
       const int                nCols = m_masterSI->getNumCols();
-      //const int                nRows = m_masterSI->getNumRows();
       const CoinPackedMatrix * M     = m_masterSI->getMatrixByRow();
       double                 * uA    = new double[nCols];
       M->transposeTimes(pi, uA);
@@ -4514,7 +4659,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int doAllBlocks = false;
    if(m_phase          == PHASE_PRICE1 ||
       m_rrIterSinceAll >= m_param.RoundRobinInterval){
-      //m_rrIterSinceAll >= (m_param.RoundRobinInterval * m_numConvexCon)){
       doAllBlocks      = true;
       m_rrIterSinceAll = 0;
    }
@@ -4532,29 +4676,40 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- here is where you would thread it
       //---
 #ifdef RELAXED_THREADED
-      /*
       //round-robin assign blocks to threads
       printf("===== START Threaded solve of subproblems. =====\n");
-      pthread_t                  threads[NTHREADS];
       pthread_attr_t             pthread_custom_attr;
-      SolveRelaxedThreadArgs     arg[NTHREADS];
-      DecompSolverResult      ** solverResultT 
-         = new DecompSolverResult*[NTHREADS]; 
-      DecompVarList              potentialVarsT[NTHREADS];
-      int * batch[NTHREADS];
-      int   batchSize[NTHREADS];
+      pthread_t                * threads        = 0;
+      SolveRelaxedThreadArgs   * arg            = 0;
+      DecompVarList            * potentialVarsT = 0;
+      int                     ** batch          = 0;
+      int                      * batchSize      = 0;
+
+      batch     = new int*[numThreads];
+      CoinAssertHint(batch, "Error: Out of Memory");
+      
+      batchSize = new int[numThreads];
+      CoinAssertHint(batchSize, "Error: Out of Memory");
+
+      potentialVarsT = new DecompVarList[numThreads];
+      CoinAssertHint(potentialVarsT, "Error: Out of Memory");
+
+      arg = new SolveRelaxedThreadArgs[numThreads];
+      CoinAssertHint(arg, "Error: Out of Memory");
+      
+      threads = new pthread_t[numThreads];
+      CoinAssertHint(threads, "Error: Out of Memory");
 
       int t, b;
-      for(t = 0; t < NTHREADS; t++){
-	 batch[t]         = new int[m_numConvexCon];
-	 batchSize[t]     = 0;
-	 solverResultT[t] = new DecompSolverResult(nCoreCols);
+      for(t = 0; t < numThreads; t++){
+	 batchSize[t] = 0;
+	 batch[t]     = new int[m_numConvexCon];
+	 CoinAssertHint(batch[t], "Error: Out of Memory");
       }
-
       t = 0;
       for(b = 0; b < m_numConvexCon; b++){
 	 batch[t][batchSize[t]++] = b;
-	 if((++t) % NTHREADS == 0)
+	 if((++t) % numThreads == 0)
 	    t = 0;
       }
 
@@ -4565,7 +4720,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 useCutoff = m_param.SubProbUseCutoff;
       m_isColGenExact = false; //so it goes to IP solver - ugh
 
-      for(t = 0; t < NTHREADS; t++){
+      for(t = 0; t < numThreads; t++){
 
 	 arg[t].algo          = this;
 	 arg[t].threadId      = t;
@@ -4582,13 +4737,13 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			&pthread_custom_attr,
 			solveRelaxedThread, (void*)&arg[t]);
       }
-      for(t = 0; t < NTHREADS; t++){
+      for(t = 0; t < numThreads; t++){
 	 pthread_join(threads[t], NULL);
       }
       m_isColGenExact = true;
 
       //clean-up memory
-      for(t = 0; t < NTHREADS; t++){
+      for(t = 0; t < numThreads; t++){
 	 printf("arg[%d].vars size=%d\n", 
 		t, static_cast<int>(arg[t].vars->size()));
 	 for(it  = arg[t].vars->begin();
@@ -4606,7 +4761,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 }
       }
       printf("===== END   Threaded solve of subproblems. =====\n");
-      for(t = 0; t < NTHREADS; t++){
+      for(t = 0; t < numThreads; t++){
 	 //one function to do this?
 	 for(it  = arg[t].vars->begin();
 	     it != arg[t].vars->end(); it++){	    
@@ -4614,8 +4769,23 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 }
       }
       //put the vars from all threads into one vector
-      */
+
+
+      //---
+      //--- clean-up local memory
+      //---
+      for(t = 0; t < numThreads; t++){
+	 UTIL_DELARR(batch[t]);
+      }
+      UTIL_DELARR(batch);
+      UTIL_DELARR(batchSize);
+      UTIL_DELARR(potentialVarsT);
+      UTIL_DELARR(arg);
+      UTIL_DELARR(threads);
+
+
 #else
+
       bool useCutoff = false;
       bool useExact  = true;
       if(m_phase == PHASE_PRICE2)
@@ -4684,14 +4854,19 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
          }
       } 
 #endif
-   }
+   } //END: if(doAllBlocks)
    else{
 
       //---
-      //--- ask the user which blocks should be solved
-      //---    
-      vector<int> blocksToSolve;
-      m_app->solveRelaxedWhich(blocksToSolve);
+      //--- Ask the user which blocks should be solved.
+      //---   The user might also provide a different set of duals for 
+      //---   each block. If so, use that to calculate reduced cost for 
+      //---   that block.
+      //--- 
+      vector<int>               blocksToSolve;
+      map<int, vector<double> > userDualsByBlock;
+      m_app->solveRelaxedWhich(blocksToSolve,
+			       userDualsByBlock);
       UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                (*m_osLog) << "Blocks to solve: ";
                UtilPrintVector(blocksToSolve, m_osLog);
@@ -4703,60 +4878,119 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- keep trying until find a block with candidate variable
       //---
       bool foundNegRC = false;
-      for(i = 0; i < nBlocks; i++){
-	 //for(i = 0; i < m_numConvexCon; i++){
-	 // b = (m_rrLastBlock + 1) % m_numConvexCon;
-	 
+      for(i = 0; i < nBlocks; i++){	 
 	 b = blocksToSolve[i];
 	 
+	 //---
+	 //--- make sure the model for this block can be found
+	 //---
          map<int, DecompAlgoModel>::iterator mit; 
          mit = m_modelRelax.find(b);
          assert(mit != m_modelRelax.end());
 
+	 //---
+	 //--- get the OSI objet
+	 //---
          DecompAlgoModel & algoModel = (*mit).second;
          subprobSI = algoModel.getOsi();
 
+	 //--- 
+	 //--- did the user provide a specific dual for this block
 	 //---
-	 //--- PC: get dual vector
-	 //---   alpha --> sum{s} lam[s]   = 1 - convexity constraint
-	 //---
-	 alpha = u[nBaseCoreRows + b];
-	 
-	 //TODO: stat return, restrict how many? pass that in to user?	 
-	 //---
-	 //--- NOTE: the variables coming back include alpha in 
-	 //---       calculation of reduced cost
-	 //---
-	 solveRelaxed(redCostX, 
-                      origObjective,
-		      alpha, 
-		      nCoreCols, 
-		      false,//isNested
-                      algoModel,
-		      &solveResult,
-		      potentialVars);
+	 map<int, vector<double> >::iterator mitv;
+	 mitv = userDualsByBlock.find(b);
+	 if(mitv == userDualsByBlock.end()){
+	    if(m_param.LogDebugLevel >= 3)
+	       (*m_osLog) << "Block b: " << b 
+			  << " using standard duals" << endl;
+	    if(m_param.LogDebugLevel >= 4){
+	       for(int i = 0; i < m; i++){
+		  (*m_osLog) << "r:" << i << "dual: " << u[i] << endl;
+	       }
+	    }
 
+
+	    //---
+	    //--- NOTE: the variables coming back include alpha in 
+	    //---       calculation of reduced cost
+	    //---
+	    alpha = u[nBaseCoreRows + b];
+	    solveRelaxed(redCostX, 
+			 origObjective,
+			 alpha, 
+			 nCoreCols, 
+			 false,//isNested
+			 algoModel,
+			 &solveResult,
+			 potentialVars);
+	 }
+	 else{
+	    vector<double> & uBlockV   = mitv->second;
+	    double         * uBlock    = &uBlockV[0];
+	    double         * redCostXb = 0;
+	    double         * uBlockAdj = 0;
+
+	    if(uBlockV.size() != m){
+	       throw UtilException("The size of the user dual vector is not the same as the number of master rows", 
+				   "generateVarsFea", "DecompAlgo");
+	    }
+
+	    if(m_param.LogDebugLevel >= 3){
+	       (*m_osLog) << "Block b: " << b 
+			  << " using user manipulated duals" << endl;
+	    }
+	    if(m_param.LogDebugLevel >= 4){
+	       for(int i = 0; i < m; i++){
+		  (*m_osLog) << "r:" << i << "dual: " << uBlock[i] << endl;
+	       }
+	    }
+
+	    redCostXb = new double[nCoreCols]; // (c - uhat.A") in x-space
+	    CoinAssertHint(redCostXb, "Error: Out of Memory");
+	    
+	    uBlockAdj = new double[m - m_numConvexCon];
+	    CoinAssertHint(uBlockAdj, "Error: Out of Memory");
+
+	    //---
+	    //--- remove the convexity constraints from the dual vector
+	    //---
+	    generateVarsAdjustDuals(uBlock, uBlockAdj);
+
+	    //---
+	    //--- calculate reduced costs
+	    //---
+	    generateVarsCalcRedCost(uBlockAdj, redCostXb);
+	    
+	    //---
+	    //--- solve relaxed problem
+	    //---
+	    alpha = uBlockAdj[nBaseCoreRows + b];
+	    solveRelaxed(redCostXb, 
+			 origObjective,
+			 alpha, 
+			 nCoreCols, 
+			 false,//isNested
+			 algoModel,
+			 &solveResult,
+			 potentialVars);
+
+	    UTIL_DELARR(redCostXb);
+	    UTIL_DELARR(uBlockAdj);
+	 }	    
 	 if(solveResult.m_isCutoff){
 	    mostNegRCvec[b] = min(mostNegRCvec[b],0.0);
 	 }
-
-	 
-	 //m_rrIterSinceAll++;
 	 m_rrLastBlock = b;
-
-         foundNegRC = false;
+	 foundNegRC    = false;
 	 for(it = potentialVars.begin(); it != potentialVars.end(); it++){
 	    varRedCost = (*it)->getReducedCost();
 	    if(varRedCost < -epsilonRedCost){ //TODO: strict, -dualTOL?
 	       foundNegRC = true;
-	       //break;
 	    }
 	 }
-	 //if(foundNegRC)
-	 //   break;
-      }
+      }//END:for(i = 0; i < nBlocks; i++)
       m_rrIterSinceAll++;
-
+      
       //---
       //--- if we searched through all the blocks but still didn't
       //---  find any columns with negative reduced cost, then we CAN
@@ -4768,7 +5002,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
       //---
       //--- if user provided blocks found no negRC, solve all blocks
-      //---
+      //---   
       if(!foundNegRC){
 	 printf("no neg rc from user blocks, solve all blocks\n");
 	 bool useCutoff = false;
@@ -4840,7 +5074,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 } 
 	 m_rrIterSinceAll = 0;
       }      
-   }
+   }//END: else(doAllBlocks)
 
 
    for(it = potentialVars.begin(); it != potentialVars.end(); it++){
@@ -5379,7 +5613,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 
 
    //---
-   //--- in the case of Wegntes, you might get all duplicate
+   //--- in the case of Wengtes, you might get all duplicate
    //---    columns - if this is the case, you don't want to stop
    //---    searching - rather, reduce alpha and repeat gen vars
    //---
@@ -5389,7 +5623,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
       m_phaseForce           = PHASE_PRICE2;
       m_param.DualStabAlpha *= 0.90;
       if(m_param.LogDebugLevel >= 2)
-	 (*m_osLog) << "No vars passed doing Wegntes. Reduce alpha to " 
+	 (*m_osLog) << "No vars passed doing Wengtes. Reduce alpha to " 
 		    << m_param.DualStabAlpha << " and repeat." << endl;
 
 
@@ -5400,8 +5634,17 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
    }
    else
       m_phaseForce = PHASE_UNKNOWN;
-      
 
+   //---
+   //--- if Wengtes parameter has been reduced, set it back to original 
+   //---
+   if(foundGoodCol && m_param.DualStabAlpha < m_param.DualStabAlphaOrig){
+      m_param.DualStabAlpha = m_param.DualStabAlphaOrig;
+      if(m_param.LogDebugLevel >= 2)
+	 (*m_osLog) << "Good column found doing Wengtes. Setting alpha back "
+		    << "to its original setting "
+		    << m_param.DualStabAlpha << "." << endl;
+   }
 
    UTIL_DELARR(denseCol);
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -6020,11 +6263,9 @@ static void * solveRelaxedThread(void * args){
    int                   nBaseCoreRows= targs->nBaseCoreRows;   
    double              * u            = targs->u;
    double              * redCostX     = targs->redCostX; //read-only
-   const double              * origObjective= targs->origCost; //read-only
+   const double        * origObjective= targs->origCost; //read-only
    int                   nCoreCols    = targs->n_origCols;  
    list<DecompVar*>    * vars         = targs->vars;
-   //vector<DecompAlgoModel*> * algoModelV = targs->algoModel;
-   
    
    //---
    //--- For pricing,
@@ -6039,37 +6280,31 @@ static void * solveRelaxedThread(void * args){
    //---
    //--- NOTE, redCost does not include alpha as sent in
    //---
-
+   int         i, b;
    DecompApp * app = algo->getDecompAppMutable();
-
-   int i, b;
    for(i = 0; i < batchSz; i++){
       b = batch[i];
       printf("THREAD %d solving b %d\n", threadId, b); fflush(stdout);
 
       //is this thread safe??
-      DecompAlgoModel & algoModel = algo->getAlgoModelRelax(b);
+      DecompAlgoModel & algoModel = algo->getModelRelax(b);
 
       int    isExact  = 0;
-      int    nVars    = vars->size();
+      int    nVars    = static_cast<int>(vars->size());
       int    nNewVars = 0;
       double             alpha        = u[nBaseCoreRows + b];
       DecompSolverStatus solverStatus = DecompSolStatNoSolution;
       
       bool useExact  = true;
       bool useCutoff = false;
-      DecompSolverResult solveResult();
+      DecompSolverResult solveResult;
 
       //too many cases where ned locks - make threaded version
       algo->solveRelaxed(redCostX,
 			 origObjective,
 			 alpha,
 			 nCoreCols,
-			 true,
-			 true,
-			 useExact,
-			 useCutoff,
-			 false,
+			 false,//isNested
 			 algoModel,
 			 &solveResult,
 			 *vars);
@@ -6102,22 +6337,23 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //--- NOTE, redCost does not include alpha as sent in
    //---
 
-#ifndef RELAXED_THREADED
+   //#ifndef RELAXED_THREADED
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solveRelaxed()", m_param.LogDebugLevel, 2);
-#endif
+   //#endif
 
    OsiSolverInterface  * subprobSI  = algoModel.getOsi();
    int                   whichBlock = algoModel.getBlockId();
    bool                  isRoot     = getNodeIndex() ? false : true;
    DecompConstraintSet * model      = algoModel.getModel();
 
-#ifndef RELAXED_THREADED
+   //#ifndef RELAXED_THREADED
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 	      (*m_osLog) << "solve block b = " << whichBlock << endl;
 	      (*m_osLog) << "alpha         = " << alpha      << endl;
 	      (*m_osLog) << "isNested      = " << isNested   << endl;
 	      );
+#ifndef RELAXED_THREADED
    m_stats.timerOther1.reset();
 #endif
 
@@ -6161,9 +6397,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       
 #ifndef RELAXED_THREADED   
       m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+#endif
       UtilPrintFuncEnd(m_osLog, m_classTag,
                        "solveRelaxed()", m_param.LogDebugLevel, 2);
-#endif
       return STAT_UNKNOWN;
    }
 
@@ -6193,7 +6429,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //--- against built-in oracle
    //---
    DecompSolverStatus solverStatus = DecompSolStatNoSolution;
-#ifndef RELAXED_THREADED
+   //#ifndef RELAXED_THREADED
    if(m_param.SolveRelaxAsIp == 2){
       list<DecompVar*> varsDebug;
       if(isNested)
@@ -6212,14 +6448,16 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       else
          solverStatus 
             = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
+#ifndef RELAXED_THREADED
       m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
+#endif
       nNewVars        = static_cast<int>(vars.size()) - nVars;
    }
    m_isColGenExact = (solverStatus == DecompSolStatOptimal);
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 	      (*m_osLog) << "m_isColGenExact = " << m_isColGenExact << endl;
 	      );
-#endif
+   //#endif
 
 
 
@@ -6352,7 +6590,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 				(*m_osLog) << "c: " << c 
 				<< " varOrigCost = " << varOrigCost
 				<< " origCost = " << origCost[c]
-			     << " solution = " << milpSolution[i] << endl;
+				<< " solution = " << milpSolution[i] << endl;
 				);
 		  }
 	       }
@@ -6427,9 +6665,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    
 #ifndef RELAXED_THREADED   
    m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+#endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveRelaxed()", m_param.LogDebugLevel, 2);
-#endif
+
    return STAT_UNKNOWN;
 }
 
@@ -6581,14 +6820,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = objBound.thisBound; 
       //double masterLB  = m_nodeStats.objBest.first;
-      double masterGap = DecompInf;
-      if(masterUB > -DecompInf && 
-	 masterUB <  DecompInf){
-	 if(masterUB != 0.0)
-	    masterGap = fabs(masterUB - masterLB) / masterUB;
-	 else
-	    masterGap = fabs(masterUB - masterLB);
-      }
+      double masterGap = UtilCalculateGap(masterLB,masterUB);
       //printf("Check tailoff, masterLB=%g masterUB=%g masterGap=%g\n", 
       //     masterLB, masterUB, masterGap);
       if(masterGap > m_param.CompressColumnsMasterGapStart)
@@ -6648,10 +6880,17 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       //---    better to just price it out since we cannot branch on it in 
       //---    this state.
       //---
-      int    branchedOnIndex = -1;
-      double branchedOnValue =  0;
-      chooseBranchVar(branchedOnIndex, branchedOnValue);
-      if(branchedOnIndex == -1)
+      //int    branchedOnIndex = -1;
+      //double branchedOnValue =  0;
+      //chooseBranchVar(branchedOnIndex, branchedOnValue);
+      //if(branchedOnIndex == -1)
+      std::vector< std::pair<int, double> > downBranchLB, 
+         downBranchUB, upBranchLB, upBranchUB;
+      bool gotBranch = chooseBranchSet(downBranchLB, 
+                                       downBranchUB, 
+                                       upBranchLB, 
+                                       upBranchUB);
+      if(gotBranch)
 	 return false;
       else return true;   
    }

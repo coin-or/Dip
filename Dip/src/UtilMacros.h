@@ -297,20 +297,20 @@ inline double UtilNormRand(const double mean,
 // =========================================================================
 // Statistics                                                               
 // =========================================================================
-//?? make templates?
-/*-----------------------------------------------------------------------*/
+
+// ------------------------------------------------------------------------- //
 inline double UtilAve(const vector<double> & x){
    return std::accumulate(x.begin(), x.end(), 0.0) / 
       static_cast<double>(x.size());
 }
 
-/*-----------------------------------------------------------------------*/
+// ------------------------------------------------------------------------- //
 inline double UtilAve(const vector<int> & x){
    return std::accumulate(x.begin(), x.end(), 0.0) / 
       static_cast<double>(x.size());
 }
 
-/*-----------------------------------------------------------------------*/
+// ------------------------------------------------------------------------- //
 inline double UtilAve(const double * x,
                       const int      len){
    return std::accumulate(x, x+len, 0.0) / static_cast<double>(len);

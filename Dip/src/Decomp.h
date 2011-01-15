@@ -191,6 +191,8 @@ enum DecompColType {
    DecompCol_Structural,
    //structural column (which should never be deleted)
    DecompCol_Structural_NoDelete,
+   //master-only column
+   DecompCol_MasterOnly,
    //artifical column for original row (L for <=)
    DecompCol_ArtForRowL,
    //artifical column for original row (G for >=)

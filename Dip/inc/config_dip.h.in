@@ -6,7 +6,7 @@
 /* Define to the debug verbosity level (0 is no output) */
 #undef COIN_DIP_VERBOSITY
 
-/* If defined, the Ampl Solver Library is available. */
+/* Define to 1 if the ASL package is available */
 #undef COIN_HAS_ASL
 
 /* Define to 1 if the Cbc package is available */

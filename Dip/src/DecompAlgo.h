@@ -221,7 +221,11 @@ protected:
    int      m_compressColsLastPrice;
    int      m_compressColsLastNumCols;
 
+   /**
+    * Current node gap (bestUB-bestLB)/bestLB.
+    */
    double         m_relGap;
+
    DecompAlgoStop m_stopCriteria;
    int            m_colIndexUnique;
    double         m_masterObjLast;//last master obj
@@ -239,6 +243,14 @@ protected:
 
    int          m_function;//calling function
    bool         m_firstPhase2Call;
+
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //NOTE:
+   // this should be found by framework
+   //   for first pass, have it set by user (MILPBlock) 
+   vector<int>  m_masterOnlyCols;
+   vector<bool> m_isColMasterOnly;
+#endif
 
 public:   
    /**
@@ -337,7 +349,7 @@ public:
    bool isGapTight(){
       //TODO: make param
       double tightGap = m_param.MasterGapLimit;
-      printf("isGapTight m_relGap = %g\n", m_relGap);
+      //printf("isGapTight m_relGap = %g\n", m_relGap);
       if(m_param.LogDebugLevel >= 2){
 	 (*m_osLog) << "DW GAP = " << UtilDblToStr(m_relGap) 
 		    << " isTight = " << (m_relGap <= tightGap) 
@@ -368,8 +380,6 @@ public:
    //TODO: should move out to PC
    //THINK - helper func?, or specific to PC - right? as is genInit
    vector<double*> getDualRays(int maxNumRays);
-   //virtual int generateVarsInf(DecompVarList    & newVars, 
-   //		       double           & mostNegReducedCost);
    virtual int generateVarsFea(DecompVarList    & newVars, 
 			       double           & mostNegReducedCost);
 
@@ -419,8 +429,15 @@ public:
    virtual void setSubProbBounds(const double * lbs,
 				 const double * ubs);
 
-   int chooseBranchVar(int    & branchedOnIndex,
-		       double & branchedOnValue);
+   //int chooseBranchVar(int    & branchedOnIndex,
+   //	       double & branchedOnValue);
+   virtual bool 
+   chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLb,
+                   std::vector< std::pair<int, double> > & downBranchUb,
+                   std::vector< std::pair<int, double> > & upBranchLb,
+                   std::vector< std::pair<int, double> > & upBranchUb);
+
+
 
 
    //-----------------------------------------------------------------------//
@@ -436,6 +453,22 @@ public:
 		  string         & sectionParam);
    void getModelsFromApp();
    void createOsiSubProblem(DecompAlgoModel & algoModel);
+
+   /**
+    * Calculate gap: |(ub-lb)|/|lb|
+    */
+   /*double calculateGap(double boundLB, 
+		       double boundUB) const {
+      double gap = DecompInf;
+      if(boundLB > -DecompInf && boundUB < DecompInf){
+	 if(boundLB != 0.0)
+	    gap = fabs(boundUB-boundLB)/fabs(boundLB);
+	 else
+	    gap = fabs(boundUB);
+      }
+      return gap;
+      }*/
+
    
    /**
     *
@@ -504,6 +537,13 @@ public:
    solveDirect(const DecompSolution * startSol  = NULL){
       return NULL;}
    
+#ifdef DECOMP_MASTERONLY_DIRECT
+   void masterMatrixAddMOCols(CoinPackedMatrix * masterM,
+			      double           * colLB,
+			      double           * colUB,
+			      double           * objCoeff,
+			      vector<string>   & colNames);
+#endif
 
    void masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
 			      vector<int         > & colInd,
@@ -546,6 +586,19 @@ public:
                         DecompVarList & newVars,
                         const double    intTol = 1.0e-5);
       
+   /**
+    * Create an adjusted dual vector with the duals from the 
+    * convexity constraints removed.
+    */
+   void generateVarsAdjustDuals(const double * uOld,
+				double       * uNew);
+   /**
+    * Calculated reduced cost vector (over vars in compact space) 
+    * for a given dual vector.
+    */
+   void generateVarsCalcRedCost(const double * u,
+				double       * redCostX);
+
    
 
 
@@ -584,6 +637,9 @@ public:
       return m_algo;}
 
    inline const DecompParam & getParam() const {
+      return m_param;}
+
+   inline DecompParam & getMutableParam() {
       return m_param;}
 
    inline OsiSolverInterface * getMasterOSI() {
@@ -686,6 +742,20 @@ public:
 
    inline const int getStopCriteria() const {
       return m_stopCriteria;
+   }
+
+   /**
+    * Get the current global (integrality) gap.
+    */
+   inline const double getGlobalGap() const {
+      return UtilCalculateGap(m_globalLB, m_globalUB);
+   }
+   
+   /**
+    * Get the current node bound gap.
+    */
+   inline const double getNodeBoundGap() const {
+      return UtilCalculateGap(getObjBestBoundLB(), getObjBestBoundUB());
    }
 
    /** 

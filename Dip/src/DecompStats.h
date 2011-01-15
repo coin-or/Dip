@@ -119,6 +119,7 @@ class DecompStats{
    double totalSolveRelaxApp;
    double totalSolUpdate;
    double totalGenCuts;
+   double totalGenCutsApp;
    double totalGenVars;
    double totalCompressCols;
    
@@ -136,6 +137,7 @@ class DecompStats{
    vector<double> thisSolveRelaxApp;
    vector<double> thisSolUpdate;
    vector<double> thisGenCuts;
+   vector<double> thisGenCutsApp;
    vector<double> thisGenVars;
    vector<double> thisCompressCols;
 
@@ -154,6 +156,7 @@ class DecompStats{
       totalSolveRelaxApp(0.0),
       totalSolUpdate    (0.0),
       totalGenCuts      (0.0),
+      totalGenCutsApp   (0.0),
       totalGenVars      (0.0),
       totalCompressCols (0.0),
 
