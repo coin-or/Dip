@@ -82,7 +82,6 @@ void DecompAlgo::checkBlocksColumns(){
    //---
    //--- sanity check that the blocks are column disjoint
    //---
-   ///STOP - how to do this for sparse case?
    map<int, DecompAlgoModel>::iterator mid1;
    map<int, DecompAlgoModel>::iterator mid2;
    for(mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++){
@@ -161,9 +160,11 @@ void DecompAlgo::checkBlocksColumns(){
          allColsCovered = false;
       }
    }
+#ifndef DECOMP_MASTERONLY_DIRECT
    if(!allColsCovered)
       throw UtilException("Some columns not covered in blocks",
                           "checkBlocksColumns", "DecompAlgo");
+#endif
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "checkBlocksColumns()", m_param.LogDebugLevel, 2);
@@ -209,6 +210,20 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
                  (*m_osLog) << "ModelCore is Empty.\n";
 	      }
 	      );
+
+   //---
+   //--- copy master-only columns from modelCore
+   //---
+#ifdef DECOMP_MASTERONLY_DIRECT
+   int i;
+   const vector<int> & masterOnlyCols = modelCore->getMasterOnlyCols();
+   m_masterOnlyCols.clear();
+   m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
+   for(i = 0; i < UtilGetSize<int>(masterOnlyCols); i++)
+	   m_masterOnlyCols.push_back(masterOnlyCols[i]);
+   //m_masterOnlyCols.resize(masterOnlyCols.size());   
+   //std::copy(masterOnlyCols.begin(), masterOnlyCols.end(), m_masterOnlyCols.begin());
+#endif
 
    //---
    //--- sanity checks on user input
@@ -1091,34 +1106,57 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix * masterM,
   //---     to the master formulation (this will be a col-ordered matrix)
   //---    
   const CoinPackedMatrix * matrixCore = modelCore->getMatrix();
-  CoinPackedMatrix       * matrixMO(matrixCore);
-  if(!matrixMO->isColOrdered()){
-    matrixMO->reverseOrdering();
+  CoinPackedMatrix         matrixCoreTmp(*matrixCore);
+  if(!matrixCoreTmp.isColOrdered()){
+    matrixCoreTmp.reverseOrdering();
   }
-  matrixMO->submatrixOfWithDuplicates(matrixMO,
-				      nMOVars, &m_masterOnlyCols[0]);
-  assert(matrixMO->isColOrdered());
-  assert(masterM->isColOrdered());
-  masterM->majorAppendSameOrdered(matrixMO);
+
+  //////STOP
+  int i;
+  const CoinPackedVectorBase ** colBlock =
+    new const CoinPackedVectorBase*[nMOVars];  
+  for(i = 0; i < nMOVars; i++){
+	  CoinShallowPackedVector colS = matrixCoreTmp.getVector(i);
+	  CoinPackedVector        * col = new CoinPackedVector(colS.getNumElements(),
+		  colS.getIndices(),
+		  colS.getElements());
+    colBlock[i] = col;
+  }
+  
+
+  //todo - use ptrs, allocate only if need transpose
+  //CoinPackedMatrix         matrixMO(matrixCoreTmp);
+  //matrixMO.setDimensions(matrixCore->getNumRows(), 0);
+  //this won't work - wind up with 3x3 vs 3cols x all rows in core
+  //  need to construct manually
+  //use appendRows
+  //matrixMO.submatrixOfWithDuplicates(matrixCoreTmp,
+  //			      nMOVars, &m_masterOnlyCols[0]);
+  //assert(matrixMO.isColOrdered());
+  // assert(masterM->isColOrdered());
+  //masterM->majorAppendSameOrdered(matrixMO);
+  masterM->appendCols(nMOVars, colBlock);
 
   //---
   //--- set master-onlys: lb, ub, obj, names
   //---
-  int i, j, k;
+  int j, k;
   int nMasterCols = masterM->getNumCols();
   for(i = 0; i < nMOVars; i++){
-    k                    = nMasterCols + i;
-    j                    = m_masterOnlyCols[i];
+    k           = nMasterCols + i;
+    j           = m_masterOnlyCols[i];
     colLB[k]    = colLBCore[j];
     colUB[k]    = colUBCore[j];
     objCoeff[k] = origObj[j];
     colNames.push_back(colNamesCore[j]);    
+    m_masterColType.push_back(DecompCol_MasterOnly);
+    m_masterOnlyColsMap.insert(make_pair(j, k));
+  }
 
-    ////////STOP
-    ///// how is the type used later - check all functions
-    //m_masterColType.push_back(DecompCol_MasterOnly);
-
-  }  
+  //free local memory
+  for(i = 0; i < nMOVars; i++)
+	  UTIL_DELPTR(colBlock[i]);
+  UTIL_DELARR(colBlock);
 }
 #endif
 
@@ -2409,7 +2447,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 
-#if defined(DO_INTERIOR) and defined(__DECOMP_LP_CPX__)
+#if defined(DO_INTERIOR) && defined(__DECOMP_LP_CPX__)
 
       //TODO: option, not compile time
 
@@ -6336,18 +6374,14 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    //---
    //--- NOTE, redCost does not include alpha as sent in
    //---
-
-   //#ifndef RELAXED_THREADED
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solveRelaxed()", m_param.LogDebugLevel, 2);
-   //#endif
-
+ 
    OsiSolverInterface  * subprobSI  = algoModel.getOsi();
    int                   whichBlock = algoModel.getBlockId();
    bool                  isRoot     = getNodeIndex() ? false : true;
    DecompConstraintSet * model      = algoModel.getModel();
 
-   //#ifndef RELAXED_THREADED
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 	      (*m_osLog) << "solve block b = " << whichBlock << endl;
 	      (*m_osLog) << "alpha         = " << alpha      << endl;
@@ -6357,6 +6391,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    m_stats.timerOther1.reset();
 #endif
 
+#ifdef DECOMP_MASTERONLY_DIRECT
    //---
    //--- deal with the special case of master-only variables
    //---   
@@ -6402,6 +6437,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
                        "solveRelaxed()", m_param.LogDebugLevel, 2);
       return STAT_UNKNOWN;
    }
+#endif
+
+
 
 #ifndef RELAXED_THREADED
    m_stats.timerOther2.reset();
@@ -6746,21 +6784,36 @@ void DecompAlgo::recomposeSolution(const double * solution,
       assert(colIndex < m_masterSI->getNumCols());
       assert(isMasterColStructural(colIndex));
       if(lamSol > m_param.TolZero){
-	 UTIL_DEBUG(m_param.LogDebugLevel, 4,
-		    (*m_osLog) << "LAMBDA[" << colIndex << "]: " << lamSol;
-		    if(nColNames)
-		       (*li)->print(m_osLog, colNames);
-		    else
-		       (*li)->print(m_osLog);
-		    );
-	 CoinPackedVector & v = (*li)->m_s;
-	 const int    * inds  = v.getIndices();
-	 const double * els   = v.getElements();
-	 for(i = 0; i < v.getNumElements(); i++){
-	    rsolution[inds[i]] += els[i] * lamSol;
-	 }
+	UTIL_DEBUG(m_param.LogDebugLevel, 4,
+		   (*m_osLog) << "LAMBDA[" << colIndex << "]: " << lamSol;
+		   if(nColNames)
+		     (*li)->print(m_osLog, colNames);
+		   else
+		     (*li)->print(m_osLog);
+		   );
+	CoinPackedVector & v = (*li)->m_s;
+	const int    * inds  = v.getIndices();
+	const double * els   = v.getElements();
+	for(i = 0; i < v.getNumElements(); i++){
+	  rsolution[inds[i]] += els[i] * lamSol;
+	}
       }
    }
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //---
+   //--- now set the master-only variable assignments
+   //---
+   map<int,int>::iterator mit;
+   int nMOVars = static_cast<int>(m_masterOnlyCols.size());
+   for(i = 0; i < nMOVars; i++){
+     j        = m_masterOnlyCols[i];
+     mit      = m_masterOnlyColsMap.find(j);
+     assert(mit != m_masterOnlyColsMap.end());
+     colIndex = mit->second;
+     assert(isMasterColMasterOnly(colIndex));
+     rsolution[j] = solution[colIndex];
+   }
+#endif
 
    UTIL_MSG(m_param.LogDebugLevel, 4,
 	    const double * cLB = modelCore->getColLB();

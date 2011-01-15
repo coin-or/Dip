@@ -407,6 +407,11 @@ inline string & UtilStrToUpper(string & s) {
 // =========================================================================
 
 // ------------------------------------------------------------------------- //
+template <class T> inline int UtilGetSize(const vector<T> & vec){
+  return static_cast<int>(vec.size());
+}
+
+// ------------------------------------------------------------------------- //
 inline bool UtilIsInSet(const int   value,
                         const int * set,
                         const int   setSize){

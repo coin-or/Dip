@@ -102,6 +102,7 @@ public:
       return m_origToSparse;};
    inline const map<int,int> & getMapSparseToOrig() const {
       return m_sparseToOrig;};
+   inline const vector<int> & getMasterOnlyCols() const {return masterOnlyCols;}
    
 
 public:

@@ -568,9 +568,33 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    assert(m_numConvexCon > 1);   
 
-   int  i, b;
+   int  i, j, b, colIndex;
    int  nMasterCols = m_masterSI->getNumCols();//lambda 
    int  logIpLevel  = m_param.LogLpLevel;
+   DecompConstraintSet * modelCore = m_modelCore.getModel();
+
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //---
+   //--- set the master (generated) columns (lambda) to integer
+   //--- set the master-onlys (that are integral) to integer
+   //---
+   int                     numMOs         = UtilGetSize(m_masterOnlyCols);
+   const char            * intMarkerCore  = modelCore->getIntegerMark();
+
+   for(colIndex = 0; colIndex < nMasterCols; colIndex++){
+     if(isMasterColStructural(colIndex))
+       m_masterSI->setInteger(colIndex);
+   }
+   for(i = 0; i < numMOs; i++){
+     j        = m_masterOnlyCols[i];
+     if(intMarkerCore[j] != 'C'){
+       colIndex = m_masterOnlyColsMap[j];
+       assert(isMasterColMasterOnly(colIndex));
+       m_masterSI->setInteger(colIndex);
+     }
+   }
+
+#else
 
    //---
    //--- set master columns (lambda) to integer
@@ -604,6 +628,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
          //       b, (*li)->getColMasterIndex());
       }
    }
+#endif
 
    if(m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
@@ -612,10 +637,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 			  m_nodeStats.cutCallsTotal,
 			  m_nodeStats.priceCallsTotal);
 
-   DecompConstraintSet * modelCore = m_modelCore.getModel();
-   //DecompSolverResult    result(m_masterSI->getNumCols());
-   DecompSolverResult    result;
 
+   DecompSolverResult    result;
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_masterSI);
@@ -967,7 +990,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       UTIL_DELARR(rsolution);
    }
    
-   
+
+#ifdef DECOMP_MASTERONLY_DIRECT
+   //---
+   //--- set the master columns back to continuous
+   //---
+   for(colIndex = 0; colIndex < nMasterCols; colIndex++){
+     if(isMasterColStructural(colIndex) ||
+	isMasterColMasterOnly(colIndex))
+       m_masterSI->setContinuous(colIndex);
+   }
+#else   
    //---
    //--- set master columns (lambda) to continuous
    //---
@@ -975,6 +1008,8 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       if(isMasterColStructural(i))
 	 m_masterSI->setContinuous(i);
    }
+#endif
+
 
 #ifdef __DECOMP_IP_CPX__
    //---

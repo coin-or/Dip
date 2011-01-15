@@ -212,9 +212,10 @@ enum DecompColType {
    //marker used for deletion
    DecompCol_ToBeDeleted
 };
-const string DecompColTypeStr[11] = {
+const string DecompColTypeStr[12] = {
    "DecompCol_Structural",
    "DecompCol_Structural_NoDelete",
+   "DecompCol_MasterOnly",
    "DecompCol_ArtForRowL",
    "DecompCol_ArtForRowG",
    "DecompCol_ArtForBranchL",

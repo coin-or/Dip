@@ -31,7 +31,7 @@
 //  DecompNull : public DecompInterface -->
 //     wrapper for all OSI methods in RC (no OSI)
 
-
+//#define DECOMP_MASTERONLY_DIRECT
 
 //===========================================================================//
 #ifndef DecompAlgo_h_
@@ -249,7 +249,11 @@ protected:
    // this should be found by framework
    //   for first pass, have it set by user (MILPBlock) 
    vector<int>  m_masterOnlyCols;
-   vector<bool> m_isColMasterOnly;
+   //vector<bool> m_isColMasterOnly;
+   /**
+    *  Map from original index to master index for master-only vars.
+    */
+   map<int,int> m_masterOnlyColsMap;
 #endif
 
 public:   
@@ -567,6 +571,9 @@ public:
    void masterPhaseItoII();
    void masterPhaseIItoI();
 
+   bool isMasterColMasterOnly(const int index) const {
+     return (m_masterColType[index] == DecompCol_MasterOnly);
+   }
    bool isMasterColStructural(const int index) const {
       return (m_masterColType[index] == DecompCol_Structural ||
               m_masterColType[index] == DecompCol_Structural_NoDelete);
@@ -910,7 +917,11 @@ public:
       m_relGap(DecompInf),
       m_stopCriteria(DecompStopNo),
       m_masterObjLast(DecompInf),
-      m_firstPhase2Call(false)
+     m_firstPhase2Call(false)
+#ifdef DECOMP_MASTERONLY_DIRECT
+	 ,
+     m_masterOnlyCols()
+#endif
    {
       m_app->m_decompAlgo = this;
    }

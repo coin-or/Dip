@@ -59,14 +59,14 @@ Settings for MILPBlock application.
 LogLevel       = 2
 
 # Path to instance data.
-DataDir        = U:\temp
+DataDir        = C:\cygwin\home\magala\COIN\coin-Dip\Dip\data\MILP\block\retail
 
 # {Pair,List}: Block file format. See README.txt.
 BlockFileFormat = Pair
 
 # Name of block file (assumed to be in DataDir).
-BlockFile       = e8_blocks.txt
+BlockFile       = retail3.block
 
 # Name of MPS file for instance (assumed to be in DataDir).
-Instance        = e8
+Instance        = retail3
 

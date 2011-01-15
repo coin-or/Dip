@@ -58,10 +58,6 @@ public:
    double ColumnUB; //hack since missing extreme rays
    double ColumnLB; //hack since missing extreme rays
 
-   //=1 if all master-only vars in one block
-   //=0 if one block per master-only var
-   //int    MasterOnlyOneBlock;
-
    //TOOD: better solution for this
    int ObjectiveSense;   //1=min, -1=max
 

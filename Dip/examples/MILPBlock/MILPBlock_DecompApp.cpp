@@ -389,112 +389,8 @@ MILPBlock_DecompApp::findActiveColumns(const vector<int> & rowsPart,
 }
 
 //===========================================================================//
-/*void
-MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
-
-   int            nBlocks     = static_cast<int>(m_blocks.size());
-   const int      nCols       = m_mpsIO.getNumCols();
-   const double * colLB       = m_mpsIO.getColLower();
-   const double * colUB       = m_mpsIO.getColUpper();
-   const char   * integerVars = m_mpsIO.integerColumns();
-   int            nMasterOnlyCols =
-      static_cast<int>(masterOnlyCols.size());
-
-   if(m_appParam.LogLevel >= 1){
-      (*m_osLog) << "nCols           = " << nCols << endl;
-      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
-   }
-
-   if(nMasterOnlyCols == 0)
-      return;
-
-
-   int i, j;
-   vector<int>::iterator vit;
-   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
-      i = *vit;
-            
-      DecompConstraintSet * model = new DecompConstraintSet();
-      model->M = new CoinPackedMatrix(false, 0.0, 0.0);
-      if(!model->M)
-         throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
-      //TODO: Ouch - memory wise - this creates a block per
-      //  master-only var of size nCols! that is dense space??
-      //similar issue for SSR... when size of nCols is big
-      //need to treat these special and not create the explicit
-      //block or constraint system at all
-      model->M->setDimensions(0, nCols);
-      model->reserve(1, nCols);
-      
-      //---
-      //--- fix all non-active columns to 0, this is everything
-      //---  except the master-only columns
-      //---
-      UtilFillN(model->colLB, nCols, 0.0);
-      UtilFillN(model->colUB, nCols, 0.0);
-      
-      //---
-      //--- set the master-only vars but watch for unbounded
-      //---
-      model->colLB[i] = colLB[*vit];
-      model->colUB[i] = colUB[*vit];
-      if(m_appParam.ColumnUB <  1.0e15)
-	 if(colUB[i] >  1.0e15)
-	    model->colUB[i] = m_appParam.ColumnUB;
-      if(m_appParam.ColumnLB > -1.0e15)
-	 if(colLB[i] < -1.0e15)
-	    model->colLB[i] = m_appParam.ColumnLB;
-
-      //---
-      //--- the master-only columns are the only active columns
-      //---
-      model->activeColumns.push_back(i);
-      
-      //---
-      //--- set the indices of the integer variables of modelRelax
-      //---  also set the column names, if they exist
-      //---
-      for(j = 0; j < nCols; j++){
-         const char * colName = m_mpsIO.columnName(j);
-         if(colName)
-            model->colNames.push_back(colName);
-         if(integerVars && integerVars[j]){
-            model->integerVars.push_back(j);            
-         }
-      }   
-
-      //---
-      //--- to avoid any issues with an empty constraint matrix
-      //---   just add one column bound as an explicity row
-      //---
-      CoinPackedVector row;
-      string           rowName  = "fake_row";
-      int              colIndex = i;
-      if(m_appParam.LogLevel >= 2){
-         (*m_osLog) << "Masteronly colindex = " << colIndex << endl;
-         (*m_osLog) << "  colUB now rowUB   = " << model->colUB[colIndex] 
-                    << endl;
-      }
-      row.insert(colIndex, 1.0);
-      model->appendRow(row, -DecompInf, model->colUB[colIndex], rowName);
-
-      if(m_appParam.LogLevel >= 2){
-         (*m_osLog) << "model numcols= " << model->getNumCols() << endl;
-         (*m_osLog) << "model numrows= " << model->getNumRows() << endl;
-      }
-
-      m_modelR.insert(make_pair(nBlocks, model));
-      setModelRelax(model, 
-                    "master_only" + UtilIntToStr(i), nBlocks);
-      nBlocks++;
-   }
-
-   return;   
-   }*/
-
-//===========================================================================//
 void
-MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
+MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
 
    int            nBlocks     = static_cast<int>(m_blocks.size());
    const int      nCols       = m_mpsIO.getNumCols();
@@ -544,100 +440,6 @@ MILPBlock_DecompApp::createModelMasterOnlys2(vector<int> & masterOnlyCols){
 
    return;   
 }
-
-//===========================================================================//
-/*DecompConstraintSet * 
-MILPBlock_DecompApp::createModelMasterOnly(vector<int> & masterOnlyCols){
-					  
-   const int      nCols       = m_mpsIO.getNumCols();
-   const double * colLB       = m_mpsIO.getColLower();
-   const double * colUB       = m_mpsIO.getColUpper();
-   const char   * integerVars = m_mpsIO.integerColumns();
-   int            nMasterOnlyCols =
-      static_cast<int>(masterOnlyCols.size());
-
-   if(m_appParam.LogLevel >= 1){
-      (*m_osLog) << "nCols           = " << nCols << endl;
-      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
-   }
-
-   if(nMasterOnlyCols == 0)
-      return NULL;
-   
-   DecompConstraintSet * model = new DecompConstraintSet();
-   model->M = new CoinPackedMatrix(false, 0.0, 0.0);
-   if(!model->M)
-      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
-   model->M->setDimensions(0, nCols);
-   model->reserve(1, nCols);
-
-   //---
-   //--- fix all non-active columns to 0, this is everything
-   //---  except the master-only columns
-   //---
-   UtilFillN(model->colLB, nCols, 0.0);
-   UtilFillN(model->colUB, nCols, 0.0);
-   
-   //---
-   //--- set the master-only vars but watch for unbounded
-   //---
-   int i;
-   vector<int>::iterator vit;
-   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
-      i = *vit;
-      model->colLB[i] = colLB[*vit];
-      model->colUB[i] = colUB[*vit];
-      if(m_appParam.ColumnUB <  1.0e15)
-	 if(colUB[i] >  1.0e15)
-	    model->colUB[i] = m_appParam.ColumnUB;
-      if(m_appParam.ColumnLB > -1.0e15)
-	 if(colLB[i] < -1.0e15)
-	    model->colLB[i] = m_appParam.ColumnLB;
-   }
-
-   //---
-   //--- the master-only columns are the only active columns
-   //---
-   model->activeColumns.insert(model->activeColumns.end(),
-			       masterOnlyCols.begin(),
-			       masterOnlyCols.end());
-
-   
-   //---
-   //--- set the indices of the integer variables of modelRelax
-   //---  also set the column names, if they exist
-   //---
-   for(i = 0; i < nCols; i++){
-      const char * colName = m_mpsIO.columnName(i);
-      if(colName)
-         model->colNames.push_back(colName);
-      if(integerVars && integerVars[i]){
-         model->integerVars.push_back(i);            
-      }
-   }   
-
-   //---
-   //--- to avoid any issues with an empty constraint matrix
-   //---   just add one column bound as an explicity row
-   //---
-   CoinPackedVector row;
-   string           rowName  = "fake_row";
-   int              colIndex = masterOnlyCols[0];
-   if(m_appParam.LogLevel >= 2){
-      (*m_osLog) << "Masteronly colindex = " << colIndex << endl;
-      (*m_osLog) << "  colUB now rowUB   = " << model->colUB[colIndex] << endl;
-   }
-   row.insert(colIndex, 1.0);
-   model->appendRow(row, -DecompInf, model->colUB[colIndex], rowName);
-
-   if(m_appParam.LogLevel >= 2){
-      (*m_osLog) << "model numcols= " << model->getNumCols() << endl;
-      (*m_osLog) << "model numrows= " << model->getNumRows() << endl;
-   }
-
-   return model;   
-}
-*/
 
 //===========================================================================//
 void
@@ -1006,12 +808,6 @@ void MILPBlock_DecompApp::createModels(){
    
    for(mdi = m_modelR.begin(); mdi != m_modelR.end(); mdi++){
       DecompConstraintSet * modelRelax = (*mdi).second;
-      //if(!m_appParam.UseSparse){
-      //---
-      //--- fix column bounds on non-active columns
-      //---
-      // (*mdi).second->fixNonActiveColumns();
-      //}
       //---
       //--- set system in framework
       //---
@@ -1033,35 +829,15 @@ void MILPBlock_DecompApp::createModels(){
    //---   since I don't know what OSI will do with empty problem
    //---   we will make column bounds explicity rows
    //---
+   ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
+#if 0
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
    if(nMasterOnlyCols){
       if(m_appParam.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
-
-      /*
-      if(m_appParam.MasterOnlyOneBlock){
-         DecompConstraintSet * modelMasterOnly
-            = createModelMasterOnly(modelCore->masterOnlyCols);
-         int nBlocks = static_cast<int>(m_blocks.size());
-         m_modelR.insert(make_pair(nBlocks, modelMasterOnly));
-
-         //---
-         //--- set system in framework
-         //---
-         setModelRelax(modelMasterOnly, "master_only", nBlocks);
-         
-         if(m_appParam.LogLevel >= 3){
-            (*m_osLog) << "Active Columns:" << endl;
-            UtilPrintVector(modelMasterOnly->activeColumns, m_osLog);
-	    if(modelCore->getColNames().size() > 0)
-	       UtilPrintVector(modelMasterOnly->activeColumns, 
-			       modelCore->getColNames(), m_osLog);
-         }
-      }
-      else{*/
-      createModelMasterOnlys2(modelCore->masterOnlyCols);
-      //}
+      createModelMasterOnlys(modelCore->masterOnlyCols);
    }
+#endif
       
    //---
    //--- free up local memory
