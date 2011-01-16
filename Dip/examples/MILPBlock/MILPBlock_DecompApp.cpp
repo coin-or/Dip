@@ -830,7 +830,7 @@ void MILPBlock_DecompApp::createModels(){
    //---   we will make column bounds explicity rows
    //---
    ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
-#if 0
+#if 1
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
    if(nMasterOnlyCols){
       if(m_appParam.LogLevel >= 1)
