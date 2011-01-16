@@ -6391,7 +6391,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
    m_stats.timerOther1.reset();
 #endif
 
-#ifdef DECOMP_MASTERONLY_DIRECT
+#ifndef DECOMP_MASTERONLY_DIRECT
    //---
    //--- deal with the special case of master-only variables
    //---   
