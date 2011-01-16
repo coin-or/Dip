@@ -3009,7 +3009,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    //---
    bool   isGapTight = false;
    double tightGap   = m_param.MasterGapLimit;
-   double relGap     = getNodeBoundGap();
+   double relGap     = getNodeLPGap();
    if(relGap <= tightGap)
       isGapTight = true;
    if(m_param.LogDebugLevel >= 2){

@@ -759,10 +759,24 @@ public:
    }
    
    /**
-    * Get the current node bound gap.
+    * Get the current node (integrality) gap.
     */
-   inline const double getNodeBoundGap() const {
+   inline const double getNodeIPGap() const {
       return UtilCalculateGap(getObjBestBoundLB(), getObjBestBoundUB());
+   }
+
+   /**
+    * Get the current node (continuous) gap.
+    */
+   inline const double getNodeLPGap() const {
+      int nHistorySize = static_cast<int>(m_nodeStats.objHistoryLB.size());
+      if(nHistorySize > 0){		  
+	 const DecompObjBound & objBound 
+	    = m_nodeStats.objHistoryLB[nHistorySize-1];
+	 return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB);
+      }
+      else
+	 return DecompInf;	 
    }
 
    /** 
