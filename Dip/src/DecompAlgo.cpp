@@ -455,13 +455,26 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
    //---
    //--- set column and row names (if they exist)
    //---  
+   string           objName  = "objective";
    vector<string> & colNames = model->colNames;
    vector<string> & rowNames = model->rowNames;
-   subprobSI->setIntParam(OsiNameDiscipline, 1);//1=Lazy
+   subprobSI->setIntParam(OsiNameDiscipline, 1);//1=Lazy, 2=Full
    if(colNames.size())
       subprobSI->setColNames(colNames, 0, nCols, 0);
    if(rowNames.size())
       subprobSI->setRowNames(rowNames, 0, nRows, 0);   
+   subprobSI->setObjName(objName);
+   UTIL_DEBUG(m_param.LogDebugLevel, 5,
+	      int i;
+	      for(i = 0; i < nCols; i++){
+		 (*m_osLog) << "User column name (" << i << ") = "
+			    << colNames[i] << endl;
+	      }
+	      for(i = 0; i < nCols; i++){
+		 (*m_osLog) << "OSI  column name (" << i << ") = "
+			    << subprobSI->getColName(i) << endl;
+	      }		    
+	      );   
 
    //---
    //--- set subproblem pointer
@@ -661,12 +674,14 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //--- set column and row names
    //---
    si->setIntParam(OsiNameDiscipline, 1);//1=Lazy
+   string           objName   = "objective";
    vector<string> & colNames  = core->colNames;
    vector<string> & rowNamesC = core->rowNames;
    if(colNames.size())
       si->setColNames(colNames,  0, nCols, 0);
    if(rowNamesC.size())
       si->setRowNames(rowNamesC, 0, nRowsC, 0);
+   si->setObjName(objName);
    rowIndex = nRowsC;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();

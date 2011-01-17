@@ -507,22 +507,91 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
       filename += ".b" + UtilIntToStr(blockId);
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "printCurrentProblem()", m_param.LogDebugLevel, 2);
-   
+
+#ifdef __DECOMP_IP_CPX__
+   //---
+   //--- There is no derived OsiCpx::writeLp and the base writeLp does not 
+   //---   use names - for some reason (even though they are in Osi memory)
+   //---
+   //--- The characters [] are often used in names but not allowed by 
+   //---   CoinLp writer - so replace them here with ().
+   //---
+   int     i            = 0;
+   int     nCols        = si->getNumCols();
+   int     nRows        = si->getNumRows();
+   char ** colNamesChar = new char*[nCols];      
+   char ** rowNamesChar = new char*[nRows+1];      
+   for(i = 0; i < nCols; i++){
+      string colName  = si->getColName(i);
+      replace(colName.begin(), colName.end(), '[', '(');
+      replace(colName.begin(), colName.end(), ']', ')');
+      colNamesChar[i] = new char[colName.size()+1];
+      copy(colName.begin(), colName.end(), colNamesChar[i]);
+      colNamesChar[i][colName.size()] = '\0';	 
+   }
+   for(i = 0; i < nRows; i++){
+      string rowName  = si->getRowName(i);
+      replace(rowName.begin(), rowName.end(), '[', '(');
+      replace(rowName.begin(), rowName.end(), ']', ')');
+      rowNamesChar[i] = new char[rowName.size()+1];
+      copy(rowName.begin(), rowName.end(), rowNamesChar[i]);
+      rowNamesChar[i][rowName.size()] = '\0';	 
+   }
+   string objName = si->getObjName();
+   replace(objName.begin(), objName.end(), '[', '(');
+   replace(objName.begin(), objName.end(), ']', ')');
+   rowNamesChar[nRows] = new char[objName.size()+1];
+   copy(objName.begin(), objName.end(), rowNamesChar[nRows]);
+   rowNamesChar[nRows][objName.size()] = '\0';	    
+#endif
+
+
    UTIL_DEBUG(m_param.LogDebugLevel, 3,
 	      if(printMps)
-	      (*m_osLog) << "calling writeMps filename = " << filename << endl;
+		 (*m_osLog) << "calling writeMps filename = " 
+			    << filename << endl;
 	      if(printLp)
-	      (*m_osLog) << "calling writeLp  filename = " << filename << endl;
-	      );
+		 (*m_osLog) << "calling writeLp  filename = " 
+			    << filename << endl;
+	      ); 
+  
    if(printMps){
 #ifdef __DECOMP_IP_CPX__
-      si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
+      string filenameMps = filename + ".mps";
+      si->writeMpsNative(filenameMps.c_str(), 
+			 const_cast<const char**>(rowNamesChar), 
+			 const_cast<const char**>(colNamesChar), 1);
 #else
       si->writeMps(filename.c_str());
 #endif
    }
-   if(printLp)      
-      si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
+
+   if(printLp){
+      double epsilon      = 1e-30;
+      int    numberAcross = 5;
+      int    decimals     = 10;
+      string filenameLp   = filename + ".lp";
+#ifdef __DECOMP_IP_CPX__
+      si->writeLpNative(filenameLp.c_str(), 
+			rowNamesChar, colNamesChar,
+			epsilon, numberAcross, decimals);
+#else      
+      //This works because the Osi object in this case is OsiClp
+      // and Clp takes care of transferring the names.
+      si->writeLp(filename.c_str(), "lp", 
+		  epsilon, numberAcross, decimals)
+#endif
+   }
+
+#ifdef __DECOMP_IP_CPX__
+   for(i = 0; i < nCols; i++)
+      UTIL_DELPTR(colNamesChar[i]);
+   for(i = 0; i < (nRows+1); i++)
+      UTIL_DELPTR(rowNamesChar[i]);
+   UTIL_DELARR(colNamesChar);
+   UTIL_DELARR(rowNamesChar);
+#endif
+
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "printCurrentProblem()", m_param.LogDebugLevel, 2);
 }
