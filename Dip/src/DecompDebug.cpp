@@ -585,9 +585,9 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 
 #ifdef __DECOMP_IP_CPX__
    for(i = 0; i < nCols; i++)
-      UTIL_DELPTR(colNamesChar[i]);
+      UTIL_DELARR(colNamesChar[i]);
    for(i = 0; i < (nRows+1); i++)
-      UTIL_DELPTR(rowNamesChar[i]);
+      UTIL_DELARR(rowNamesChar[i]);
    UTIL_DELARR(colNamesChar);
    UTIL_DELARR(rowNamesChar);
 #endif
