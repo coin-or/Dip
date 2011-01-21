@@ -579,7 +579,7 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
       //This works because the Osi object in this case is OsiClp
       // and Clp takes care of transferring the names.
       si->writeLp(filename.c_str(), "lp", 
-		  epsilon, numberAcross, decimals)
+		  epsilon, numberAcross, decimals);
 #endif
    }
 
