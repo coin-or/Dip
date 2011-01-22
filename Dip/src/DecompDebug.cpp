@@ -538,11 +538,13 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
       rowNamesChar[i][rowName.size()] = '\0';	 
    }
    string objName = si->getObjName();
+   //printf("objname=%s\n", objName.c_str());
    replace(objName.begin(), objName.end(), '[', '(');
    replace(objName.begin(), objName.end(), ']', ')');
    rowNamesChar[nRows] = new char[objName.size()+1];
    copy(objName.begin(), objName.end(), rowNamesChar[nRows]);
    rowNamesChar[nRows][objName.size()] = '\0';	    
+   //printf("nRows=%d objname=%s\n", nRows, rowNamesChar[nRows]);
 #endif
 
 

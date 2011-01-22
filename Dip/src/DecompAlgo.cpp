@@ -1054,9 +1054,11 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
 	 conRowNames.push_back(rowName);
       }
       m_masterSI->setRowNames(conRowNames, 0, m_numConvexCon, nRowNames);
+      string objName = "objective";
+      m_masterSI->setObjName(objName);
    }
    if(nColNames > 0)
-      m_masterSI->setColNames(colNames, 0, nColNames, 0);
+      m_masterSI->setColNames(colNames, 0, nColNames, 0);   
 
    //TODO: make a function
    UTIL_DEBUG(m_param.LogDebugLevel, 4,                 
@@ -5781,6 +5783,10 @@ void DecompAlgo::addVarsFromPool(){
    bool             hasNames  = colNamesM.size() > 0 ? true : false;
    const int        colIndex0 = m_masterSI->getNumCols();
    if(hasNames){
+      if(colIndex0 != static_cast<int>(colNamesM.size())){
+	 printf("master num cols=%d names size=%d", 
+		colIndex0, colNamesM.size());
+      }
       assert(colIndex0 == static_cast<int>(colNamesM.size()));
    }
 
