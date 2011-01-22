@@ -29,32 +29,29 @@ OBJS        += VRP_Main.@OBJEXT@
 # Additional variables for libraries
 ###########################################################################
 
-# Concorde
-CONCORDE_LIB = concorde.a
+# concorde
+CONCORDE_LIB = concorde
 CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
-CONCORDE_INC = ${CONCORDE_DIR}/INCLUDE
-QSOPT_DIR    = ../ExternalSolvers/TSP
-QSOPT_LIB    = qsopt.a
 
-# Boost
+# boost
 BOOST_DIR = ../ExternalSolvers/Graph
 
 # CVRPSEP
-CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP
 CVRPSEP_LIB = cvrpsep
+CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP
 
 ###########################################################################
 # CHANGEME: Put the directories to find the source files here
 ###########################################################################
 
 SRCDIR = @srcdir@
-VPATH = @srcdir@
+VPATH  = @srcdir@
 
 ###########################################################################
 # CHANGEME: Put any additional flags here
 ###########################################################################
 
-CFLAGS     = -I$(CONCORDE_INC)
+CFLAGS     = -I$(CONCORDE_DIR)/INCLUDE
 CFLAGS    += -I$(BOOST_DIR)
 CFLAGS    += -I$(CVRPSEP_DIR)
 
@@ -62,8 +59,8 @@ CFLAGS    += -I$(CVRPSEP_DIR)
 # CHANGEME: Put any additional libraries here
 ###########################################################################
 
-LIBS       = $(CONCORDE_DIR)/$(CONCORDE_LIB)
-LIBS      += $(CONCORDE_DIR)/$(QSOPT_LIB)
+LIBS       = $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+LIBS      += $(CONCORDE_DIR)/../qsopt.a
 LIBS      += -L$(CVRPSEP_DIR)/obj -l$(CVRPSEP_LIB)
 
 ###########################################################################
@@ -71,7 +68,8 @@ LIBS      += -L$(CVRPSEP_DIR)/obj -l$(CVRPSEP_LIB)
 #           These should be accompanied by custom targets to build them.
 ###########################################################################
 
-DEPS = $(CONCORDE_DIR)/$(CONCORDE_LIB)
+DEPS  = $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+DEPS += $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a
 
 ###########################################################################
 # include default COIN flags, library options, and targets
@@ -83,7 +81,7 @@ include ../Makefile.Examples
 # CHANGEME: Customized targets
 ###########################################################################
 
-$(CONCORDE_DIR)/$(CONCORDE_LIB):
+$(CONCORDE_DIR)/$(CONCORDE_LIB).a:
 	(cd ${CONCORDE_DIR} \
         && ./configure --with-qsopt=@abs_lib_dir@/../Dip/examples/ExternalSolvers/TSP \
 	&& make)
