@@ -34,7 +34,7 @@ CONCORDE_LIB = concorde
 CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
 
 # boost
-BOOST_DIR = ../ExternalSolvers/Graph/boost_1_43_0
+BOOST_DIR = ../ExternalSolvers/Graph
 
 ###########################################################################
 # CHANGEME: Put the directories to find the source files here

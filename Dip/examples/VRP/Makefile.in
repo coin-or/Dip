@@ -37,7 +37,7 @@ QSOPT_DIR    = ../ExternalSolvers/TSP
 QSOPT_LIB    = qsopt.a
 
 # Boost
-BOOST_DIR = ../ExternalSolvers/Graph/boost_1_45_0
+BOOST_DIR = ../ExternalSolvers/Graph
 
 # CVRPSEP
 CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP

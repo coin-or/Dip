@@ -1,2 +1,1 @@
-wget http://sourceforge.net/projects/boost/files/boost/1.45.0/boost_1_45_0.tar.gz
-tar -zxvf boost_1_45_0.tar.gz
+svn export http://svn.boost.org/svn/boost/trunk/boost boost
