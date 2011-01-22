@@ -234,6 +234,7 @@ AC_CONFIG_FILES([Makefile
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm
                  examples/TSP/data_extract.sh
+                 examples/TSP/get_boost.sh
                  examples/TSP/get_concorde.sh
                  examples/SmallIP/Makefile
                  examples/SmallIP/smallip.parm

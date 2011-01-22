@@ -118,6 +118,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/SmallIP/test.sh.in \
 	$(top_srcdir)/examples/TSP/Makefile.in \
 	$(top_srcdir)/examples/TSP/data_extract.sh.in \
+	$(top_srcdir)/examples/TSP/get_boost.sh.in \
 	$(top_srcdir)/examples/TSP/get_concorde.sh.in \
 	$(top_srcdir)/examples/TSP/tsp.parm.in \
 	$(top_srcdir)/examples/VRP/Makefile.in \
@@ -141,12 +142,12 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
 CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/TSP/data_extract.sh \
-	examples/TSP/get_concorde.sh examples/SmallIP/Makefile \
-	examples/SmallIP/smallip.parm examples/SmallIP/README.txt \
-	examples/SmallIP/test.sh examples/MILP/Makefile \
-	examples/MILP/milp.parm examples/MILP/data_extract.sh \
-	examples/MILP/README.txt examples/MILPBlock/Makefile \
-	examples/MILPBlock/milpblock.parm \
+	examples/TSP/get_boost.sh examples/TSP/get_concorde.sh \
+	examples/SmallIP/Makefile examples/SmallIP/smallip.parm \
+	examples/SmallIP/README.txt examples/SmallIP/test.sh \
+	examples/MILP/Makefile examples/MILP/milp.parm \
+	examples/MILP/data_extract.sh examples/MILP/README.txt \
+	examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm \
 	examples/MILPBlock/milpblock.parm2 \
 	examples/MILPBlock/data_extract.sh \
 	examples/MILPBlock/README.txt examples/MILPBlock/test.sh \
@@ -520,6 +521,8 @@ examples/TSP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/
 examples/TSP/tsp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/tsp.parm.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/data_extract.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/TSP/get_boost.sh: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/get_boost.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/get_concorde.sh: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/get_concorde.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

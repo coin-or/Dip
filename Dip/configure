@@ -21033,9 +21033,9 @@ COIN_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
 # best would actually to use ${libdir}, since .pc files get installed into ${libdir}/pkgconfig,
 # unfortunately, ${libdir} expands to ${exec_prefix}/lib and ${exec_prefix} to ${prefix}...
 if test "x${prefix}" = xNONE ; then
-  COIN_PKG_CONFIG_PATH="${ac_default_prefix}/lib/pkgconfig:${COIN_PKG_CONFIG_PATH}"
+  COIN_PKG_CONFIG_PATH="${ac_default_prefix}/lib/pkgconfig:${ac_default_prefix}/share/pkgconfig:${COIN_PKG_CONFIG_PATH}"
 else
-  COIN_PKG_CONFIG_PATH="${prefix}/lib/pkgconfig:${COIN_PKG_CONFIG_PATH}"
+  COIN_PKG_CONFIG_PATH="${prefix}/lib/pkgconfig:${prefix}/share/pkgconfig:${COIN_PKG_CONFIG_PATH}"
 fi
 
 
@@ -21047,7 +21047,7 @@ if test "${with_coin_instdir+set}" = set; then
 echo "$as_me: error: argument for --with-coin-instdir not a directory" >&2;}
    { (exit 1); exit 1; }; }
    fi
-   COIN_PKG_CONFIG_PATH="$withval/lib/pkgconfig:${COIN_PKG_CONFIG_PATH}"
+   COIN_PKG_CONFIG_PATH="$withval/lib/pkgconfig:$withval/share/pkgconfig:${COIN_PKG_CONFIG_PATH}"
 
 fi;
 
@@ -24495,7 +24495,7 @@ CFLAGS=$CXXFLAGS
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc"
 
 
 
@@ -25289,6 +25289,7 @@ do
   "examples/TSP/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/Makefile" ;;
   "examples/TSP/tsp.parm" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/tsp.parm" ;;
   "examples/TSP/data_extract.sh" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/data_extract.sh" ;;
+  "examples/TSP/get_boost.sh" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/get_boost.sh" ;;
   "examples/TSP/get_concorde.sh" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/get_concorde.sh" ;;
   "examples/SmallIP/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/SmallIP/Makefile" ;;
   "examples/SmallIP/smallip.parm" ) CONFIG_FILES="$CONFIG_FILES examples/SmallIP/smallip.parm" ;;
