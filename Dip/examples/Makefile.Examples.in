@@ -41,9 +41,9 @@ CYGPATH_W = @CYGPATH_W@
 COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
 
 ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip`
+LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip`
 else
-LIBS = -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@
+LIBS += -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@
 endif
 
 CFLAGS += -DCOIN_ASSERT
@@ -98,7 +98,7 @@ all: $(EXE)
 
 .SUFFIXES: .cpp .c .o .obj
 
-$(EXE): $(OBJS)
+$(EXE): $(OBJS) $(DEPS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
 	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS)

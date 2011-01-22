@@ -72,6 +72,12 @@ CFLAGS    += -I$(KNAP_INC)
 
 DEPS = $(KNAP_DIR)/libKnapPisinger.a
 
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
 $(KNAP_DIR)/libKnapPisinger.a:
 	(cd ${KNAP_DIR} && ${MAKE})
 
