@@ -224,7 +224,7 @@ void DecompAlgoRC::phaseDone(){
       }
       if(viBest){
 	 //save the best
-	 setObjBoundUB(bestBoundUB);
+	 setObjBoundIP(bestBoundUB);
 	 m_xhatIPBest = viBest;
       }
    }

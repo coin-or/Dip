@@ -165,7 +165,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //---
    //--- reset user-currentUB (if none given, this will have no effect)
    //---
-   decompAlgo->setObjBoundUB(decompAlgo->getCutoffUB());
+   decompAlgo->setObjBoundIP(decompAlgo->getCutoffUB());
 
    if(!isRoot){
       //---
@@ -246,7 +246,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //--- update the currentUB value for decomp algo
    //---
    currentUB = getKnowledgeBroker()->getIncumbentValue();
-   decompAlgo->setObjBoundUB(currentUB);//??
+   decompAlgo->setObjBoundIP(currentUB);//??
 
    gap      = DecompInf;
    globalUB = getKnowledgeBroker()->getIncumbentValue();
@@ -292,7 +292,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //--- update the local currentUB value and the decomp global UB
       //---
       currentUB = getKnowledgeBroker()->getIncumbentValue();
-      decompAlgo->setObjBoundUB(currentUB);
+      decompAlgo->setObjBoundIP(currentUB);
    }
    
    switch(decompStatus){

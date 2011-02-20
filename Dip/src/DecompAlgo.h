@@ -670,7 +670,7 @@ public:
 
    inline void setCutoffUB(const double thisBound) {
       m_cutoffUB = thisBound;
-      setObjBoundUB(thisBound);
+      setObjBoundIP(thisBound);
    }
 
    //TODO
@@ -769,10 +769,11 @@ public:
     * Get the current node (continuous) gap.
     */
    inline const double getNodeLPGap() const {
-      int nHistorySize = static_cast<int>(m_nodeStats.objHistoryLB.size());
+      int nHistorySize 
+	 = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
       if(nHistorySize > 0){		  
 	 const DecompObjBound & objBound 
-	    = m_nodeStats.objHistoryLB[nHistorySize-1];
+	    = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
 	 return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB);
       }
       else
@@ -805,7 +806,8 @@ public:
       }
 
       DecompObjBound objBound;
-      objBound.lbOrUb      = 0;
+      objBound.phase       = m_phase == PHASE_PRICE1 ? 1 : 2;
+      objBound.boundType   = DecompBoundContinuous;
       objBound.cutPass     = m_nodeStats.cutCallsTotal;
       objBound.pricePass   = m_nodeStats.priceCallsTotal;      
       objBound.thisBound   = thisBound;
@@ -816,15 +818,15 @@ public:
 #else
       objBound.timeStamp   = -1;
 #endif      
-      m_nodeStats.objHistoryLB.push_back(objBound);
+      m_nodeStats.objHistoryBoundLP.push_back(objBound);
       UtilPrintFuncEnd(m_osLog, m_classTag,
 		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
    }
    
    /**
-    * Set the current UB and update best/history.
+    * Set the current UP bound and update best/history.
     */
-   inline void setObjBoundUB(const double thisBound){
+   inline void setObjBoundIP(const double thisBound){
       if(thisBound < m_nodeStats.objBest.second){
          //printf("thisBound= %g objBest= %g\n",
          //     thisBound, m_nodeStats.objBest.second);
@@ -834,9 +836,17 @@ public:
 	 m_nodeStats.objBest.second = thisBound;
          
       }
+      int nHistorySize 
+	 = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
+      if(nHistorySize > 0){		  
+	 DecompObjBound & objBoundLP 
+	    = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
+	 objBoundLP.thisBoundIP = thisBound;
+	 objBoundLP.bestBoundIP = m_nodeStats.objBest.second;
+      }
 
       DecompObjBound objBound;
-      objBound.lbOrUb    = 1;
+      objBound.boundType = DecompBoundInteger;
       objBound.cutPass   = m_nodeStats.cutCallsTotal;
       objBound.pricePass = m_nodeStats.priceCallsTotal;      
       objBound.thisBound = thisBound;
@@ -846,7 +856,7 @@ public:
 #else
       objBound.timeStamp = -1;
 #endif      
-      m_nodeStats.objHistoryUB.push_back(objBound);
+      m_nodeStats.objHistoryBoundIP.push_back(objBound);
    }
 
 

@@ -22,52 +22,167 @@
 #include "UtilTimer.h"
 //===========================================================================//
 
+enum DecompBoundType {
+   DecompBoundContinuous = 0,
+   DecompBoundInteger    = 1
+};
 
 //===========================================================================//
-typedef struct DecompObjBound DecompObjBound;
-struct DecompObjBound
+//typedef struct DecompObjBound DecompObjBound;
+class DecompObjBound
 {
-   int    lbOrUb;  //0=LB, 1=UB
-   int    cutPass;
-   int    pricePass;
+public:
+   /**
+    * The type of bound (continuous or integral).
+    */
+   DecompBoundType boundType;
+   /**
+    * The phase when bound was recorded.
+    */
+   int phase;
+   /**
+    * The cut pass when bound was recorded.
+    */
+   int cutPass;
+   /**
+    * The price pass when bound was recorded.
+    */
+   int pricePass;
+   /**
+    * The time stamp (from start) when bound was recorded.
+    */
    double timeStamp;
-   double thisBound;  //=zDW_LB      (for lbOrUb=0)
-   double thisBoundUB;//=zDW_UB      (for lbOrUb=0)
-   double bestBound;  //=max{zDW_LB} (for lbOrUb=0)
+   /**
+    * The recorded bound.
+    *   DecompBoundContinuous: continuous lower bound 
+    *   DecompBoundInteger   : integer feasible solution (a global UB)
+    */
+   double thisBound;
+   /**
+    * The recorded bound.
+    *   DecompBoundContinuous: continuous upper bound 
+    *   DecompBoundInteger   : <not used>
+    */
+   double thisBoundUB;
+   /**
+    * The best recorded bound.
+    *   DecompBoundContinuous: global LB = max{active node lower bounds}
+    *   DecompBoundInteger   : global UB = min(       node upper bounds)
+    */
+   double bestBound; 
 
+   double thisBoundIP;
+   double bestBoundIP;
+
+   /**
+    * Comparison operator for sorting on time.
+    */
    bool operator<(const DecompObjBound & objBound) const {
       if(timeStamp < objBound.timeStamp)
 	 return true;
       else 
 	 return false;
    }
+
+public:
+   DecompObjBound() :
+      phase      (0),
+      cutPass    (0),
+      pricePass  (0),
+      timeStamp  (0.0),
+      thisBound  (-DecompInf),
+      thisBoundUB( DecompInf),
+      bestBound  (-DecompInf),
+      thisBoundIP( DecompInf),
+      bestBoundIP( DecompInf)
+   {}
+      
 };
 
 //===========================================================================//
 class DecompNodeStats{
 public:
 
-   vector< DecompObjBound > objHistoryLB;
-   vector< DecompObjBound > objHistoryUB;
-   pair<double, double>     objBest;
+   //---
+   //--- Storage for the bound history for a node.
+   //---    NOTE: we always assume a minimization problem
+   //---
 
+   /**
+    * Storage of the continuous lower and upper bounds.
+    *   CPM  : Bounds on the objective of optimal master linear 
+    *          relaxation. Typically, this is an LP solved to optimality,
+    *          so, LB = zCP = UB.
+    *   PC/RC: Given bounds on the objective of optimal restricted master 
+    *          linear relaxation zPC_LB <= zPC* <= zPC_UB and a lower bound
+    *          on the most negative reduced cost (RC_LB) extreme point (ray) 
+    *          from the subproblem polytope (for the associated master duals).
+    *               LB = zPC_LB + RC_LB <= zPC* <= zPC_UB = UB
+    */ 
+   vector< DecompObjBound > objHistoryBoundLP;
+   
+   /**
+    * Storage of integer feasible solutions (these are global UBs).
+    */
+   vector< DecompObjBound > objHistoryBoundIP; 
+   
+   /**
+    * The global lower (.first) and upper (.second) bound.
+    */
+   pair<double, double> objBest;      
+   
+   /**
+    * The node index (in the branch-and-bound tree).
+    */
    int    nodeIndex;
+
+   /**
+    * Number of cuts generated in this round of cut calls.
+    */
    int    cutsThisRound;
+
+   /**
+    * Number of vars generated in this round of pricing calls.
+    */
    int    varsThisRound;
+
+   /**
+    * Number of cuts generated in this particular cut call.
+    */
    int    cutsThisCall;
+
+   /**
+    * Number of vars generated in this particular price call.
+    */
    int    varsThisCall;
+
+   /**
+    * Number of cut calls in this node in total.
+    */
    int    cutCallsTotal;
+
+   /**
+    * Number of price calls in this node in total.
+    */
    int    priceCallsTotal;
+
+   /**
+    * Number of cut calls in this round.
+    */
    int    cutCallsRound;
+
+   /**
+    * Number of price calls in this round.
+    */
    int    priceCallsRound;
    
 public:
    void init(){
-      objHistoryLB.clear();
-      objHistoryUB.clear();
+      objHistoryBoundLP.clear();
+      objHistoryBoundIP.clear();
       objBest.first   = -DecompInf;
       objBest.second  =  DecompInf;
-      nodeIndex       =  0;
+      nodeIndex       =  0;     
       cutsThisRound   =  0;
       varsThisRound   =  0;
       cutsThisCall    =  0;
@@ -79,9 +194,9 @@ public:
    }
 
 public:
-   void printObjHistory(ostream * os = &cout) const;
-   void printObjHistoryLB(ostream * os = &cout) const;
-   void printObjHistoryUB(ostream * os = &cout) const;
+   void printObjHistory       (ostream * os = &cout) const;
+   void printObjHistoryBoundLP(ostream * os = &cout) const;
+   void printObjHistoryBoundIP(ostream * os = &cout) const;
    inline void resetCutRound() {
       cutCallsRound = 0;
       cutsThisRound = 0;
@@ -90,12 +205,15 @@ public:
       priceCallsRound = 0;
       varsThisRound   = 0;
    }
+   inline void resetBestLB() {
+      objBest.first = -DecompInf;
+   }
 
 public:
    DecompNodeStats() :
-      objHistoryLB(),
-      objHistoryUB(),
-      objBest     ()
+      objHistoryBoundLP(),
+      objHistoryBoundIP(),
+      objBest          ()
    {
       init();
    }

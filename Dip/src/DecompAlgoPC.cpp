@@ -245,10 +245,10 @@ int DecompAlgoPC::compressColumns(){
    m_stats.timerOther1.reset();
 
    int nHistorySize 
-      = static_cast<int>(m_nodeStats.objHistoryLB.size());
+      = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
    if(nHistorySize > 0){		  
       DecompObjBound & objBound 
-	 = m_nodeStats.objHistoryLB[nHistorySize-1];
+	 = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = m_nodeStats.objBest.first;
       double masterGap = DecompInf;
@@ -968,7 +968,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
             }
             if(viBest){
                //save the best
-               setObjBoundUB(bestBoundUB);
+               setObjBoundIP(bestBoundUB);
                m_xhatIPBest = viBest;
             } 
 	 }
