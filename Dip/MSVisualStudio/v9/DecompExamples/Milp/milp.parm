@@ -18,8 +18,8 @@ Settings for all decomp algorithms.
   section=DECOMP
 #############################################################################
 [DECOMP]
-LogLevel      = 5
-LogDebugLevel = 5
+LogLevel      = 3
+LogDebugLevel = 3
 #LogLpLevel    = 2
 #LogDumpModel  = 2
 
@@ -34,7 +34,6 @@ Settings for decomp algorithm price and cut.
   section=PRICE_AND_CUT
 #############################################################################
 [PRICE_AND_CUT]
-CutCglGomory = 1
 
 #############################################################################
 Settings for ALPS framework.
@@ -53,11 +52,7 @@ LogLevel       = 3
 
 # Path to instance data.
 #   Data/Sample gets copied into build directory.
-#DataDir        = ..\..\..\..\Data\Sample
-
-#   Decomp/data contains user application data.
-DataDir        = ..\..\..\..\Decomp\data\MILP\miplib\miplib3
-#DataDir        = ..\..\..\..\Decomp\data\MILP\miplib\miplib3_pre
+DataDir        = C:\cygwin\home\magala\COIN\coin-Dip\Data\Sample
 
 # Name of MPS file for instance (assumed to be in DataDir).
 Instance        = p0033
