@@ -35,7 +35,7 @@ void DecompAlgoPC::phaseInit(DecompPhase & phase){
    //---  PhaseI pricing to prove infeasible
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "phaseInit()", m_param.LogDebugLevel, 1);
+		      "phaseInit()", m_param.LogDebugLevel, 2);
 
    //---
    //--- set column bounds
@@ -111,7 +111,7 @@ void DecompAlgoPC::phaseInit(DecompPhase & phase){
          phase = PHASE_PRICE1;
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "phaseInit()", m_param.LogDebugLevel, 1);
+                    "phaseInit()", m_param.LogDebugLevel, 2);
 }
 
 //===========================================================================//
@@ -120,7 +120,7 @@ void DecompAlgoPC::adjustMasterDualSolution(){
     return;
 
   UtilPrintFuncBegin(m_osLog, m_classTag,
-		     "adjustMasterDualSolution()", m_param.LogDebugLevel, 1);
+		     "adjustMasterDualSolution()", m_param.LogDebugLevel, 2);
 
 
   //---
@@ -195,7 +195,7 @@ void DecompAlgoPC::adjustMasterDualSolution(){
   }
   
   UtilPrintFuncEnd(m_osLog, m_classTag,
-		   "adjustMasterDualSolution()", m_param.LogDebugLevel, 1);  
+		   "adjustMasterDualSolution()", m_param.LogDebugLevel, 2);  
 }
 
 
@@ -207,7 +207,7 @@ int DecompAlgoPC::adjustColumnsEffCnt(){
    double         redCostI       = 0.0;
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "adjustColumnsEffCnt()", m_param.LogDebugLevel, 1);
+		      "adjustColumnsEffCnt()", m_param.LogDebugLevel, 2);
    
    DecompVarList::iterator li;            
    for(li = m_vars.begin(); li != m_vars.end(); li++){
@@ -226,7 +226,7 @@ int DecompAlgoPC::adjustColumnsEffCnt(){
 		 );
    }
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "adjustColumnsEffCnt()", m_param.LogDebugLevel, 1);
+		    "adjustColumnsEffCnt()", m_param.LogDebugLevel, 2);
    return status;
 }
 
@@ -240,7 +240,7 @@ int DecompAlgoPC::compressColumns(){
    //---
    int status = DecompStatOk;
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "compressColumns()", m_param.LogDebugLevel, 1);
+		      "compressColumns()", m_param.LogDebugLevel, 2);
 
    m_stats.timerOther1.reset();
 
@@ -532,21 +532,21 @@ int DecompAlgoPC::compressColumns(){
    UTIL_DELARR(isBasic);
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "compressColumns()", m_param.LogDebugLevel, 1);   
+		    "compressColumns()", m_param.LogDebugLevel, 2);   
    return status;
 }
 
 //===========================================================================//
 void DecompAlgoPC::phaseDone(){
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "phaseDone()", m_param.LogDebugLevel, 1);     
+		      "phaseDone()", m_param.LogDebugLevel, 2);     
    if(m_param.SolveMasterAsIp                                &&
       getNodeIndex() % m_param.SolveMasterAsIpFreqNode == 0  &&
       m_stopCriteria != DecompStopTime){
       solutionUpdateAsIP();
    }
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "phaseDone()", m_param.LogDebugLevel, 1);   
+		    "phaseDone()", m_param.LogDebugLevel, 2);   
 }
 
 //===========================================================================//
@@ -559,7 +559,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
       return;
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "solutionUpdateAsIp()", m_param.LogDebugLevel, 1);   
+		      "solutionUpdateAsIp()", m_param.LogDebugLevel, 2);   
    
    
    //---
@@ -1022,7 +1022,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 #endif
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "solutionUpdateAsIp()", m_param.LogDebugLevel, 1);   
+		    "solutionUpdateAsIp()", m_param.LogDebugLevel, 2);   
 }
 
 

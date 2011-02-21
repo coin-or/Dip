@@ -437,8 +437,11 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
    int nInts = model->getNumInts();
    int nCols = model->getNumCols();
    int nRows = model->getNumRows();
-   
-   subprobSI = new OsiLpSolverInterface();//THINK: not IpOsi?
+
+   if(nInts)
+      subprobSI = new OsiIpSolverInterface();
+   else
+      subprobSI = new OsiLpSolverInterface();
    assert(subprobSI);
    subprobSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
    
@@ -449,9 +452,19 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
                           NULL, //null objective
                           model->getRowLB(),
                           model->getRowUB());
-   if(nInts > 0)
+   if(nInts > 0){
       subprobSI->setInteger(model->getIntegerVars(), nInts);
-         
+#if defined (__DECOMP_IP_CPX__) or (__DECOMP_LP_CPX__)
+      OsiCpxSolverInterface * osiCpx 
+	 = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
+      osiCpx->switchToMIP();
+      //CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
+      //CPXLPptr  cpxLp  = osiCpx->getLpPtr();
+      //assert(cpxEnv && cpxLp);
+      //printf("probtype = %d\n", CPXgetprobtype(cpxEnv, cpxLp));
+#endif
+   }
+   
    //---
    //--- set column and row names (if they exist)
    //---  
@@ -1814,6 +1827,10 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	    //---
 	    addVarsFromPool();            
 	 }
+	 //printf("m_isColGenExact  = %d\n", m_isColGenExact);
+	 //printf("m_rrIterSinceAll = %d\n", m_rrIterSinceAll);
+	 //printf("m_status         = %d\n", m_status);
+	 
 	 //TODO: don't need check m_isColGenExact if we
 	 //  use LB's in mostNegRC (rather than varRedCost)... 
 	 /*if(m_isColGenExact           && 
@@ -3005,7 +3022,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
 	    << "BestLB = " << UtilDblToStr(m_nodeStats.objBest.first) << "\n";
 	    );
 
-   UTIL_DEBUG(m_param.LogDebugLevel, 1,
+   UTIL_DEBUG(m_param.LogDebugLevel, 2,
 	      (*m_osLog)
 	      << "PriceCallsRound= " 
 	      << setw(3)  << m_nodeStats.priceCallsRound
@@ -6715,7 +6732,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 	 if(whichBlock != -1){
 	    DecompAlgoModel & algoModelCheck = getModelRelax(whichBlock);
 	    UTIL_DEBUG(m_param.LogDebugLevel, 4,
-		       (*m_osLog) << "Check that var atisifes relax matrix "
+		       (*m_osLog) << "Check that var satisifes relax matrix "
 		       << whichBlock << endl;
 		       (*it)->print();
 		       );

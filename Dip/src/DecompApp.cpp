@@ -43,96 +43,6 @@ void DecompApp::startupLog(){
 }
 
 // --------------------------------------------------------------------- //
-/*int DecompApp::createModel(){
-
-   UTIL_MSG(m_param.LogLevel, 2,
-	    (*m_osLog) << "Initial Model Setup\n";	    
-	    );
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModel()", m_param.LogDebugLevel, 2);
-	    
-   //---
-   //--- APP: create the user model A = A' union A''
-   //---
-   APPcreateModel(m_model.objCoeff, m_modelCore, m_modelRelax);
-
-   //---
-   //--- TODO: sanity checks that the user gave you all the model
-   //--- information that is required, error codes if not
-   //---
-
-   //---
-   //--- For each model core:
-   //---   1.) set row senses and/or bounds (for relaxed too)
-   //---   2.) create row hash
-   //---   3.) set nBaseRows
-   //---   4.) flip to row ordered, if neccessary (for relaxed too)
-   //--- TODO: put timer on this ??
-   //---
-   DecompConstraintSet * modelCore = 0;
-   map<int, DecompConstraintSet*>::iterator mdc;
-   for(mdc = m_modelCore.begin(); mdc != m_modelCore.end(); mdc++){
-      modelCore = mdc->second;
-      if(!modelCore->M)
-         continue;
-      if(modelCore->M->isColOrdered()){      
-         modelCore->M->reverseOrdering();
-      }
-      modelCore->checkSenseAndBound();    
-      modelCore->createRowHash();
-      modelCore->nBaseRows = modelCore->getNumRows();
-
-      //TODO: make this an option
-      //---
-      //--- if row/col names are not given, make up default ones
-      //---
-      int i, j;
-      vector<string> & rowNames = modelCore->rowNames;
-      vector<string> & colNames = modelCore->colNames;
-	  if(rowNames.size() == 0){
-	      for(i = 0; i < modelCore->getNumRows(); i++)
-		     rowNames.push_back("core(" + UtilIntToStr(i) + ")");
-		}
-	  if(colNames.size() == 0){
-		for(j = 0; j < modelCore->getNumCols(); j++)
-			 colNames.push_back("x(" + UtilIntToStr(j) + ")");
-		}
-   }
-
-   DecompConstraintSet * modelRelax = 0;
-   map<int, vector< DecompConstraintSet* > >::iterator mdr;
-   vector<DecompConstraintSet*>::iterator vi;
-   for(mdr = m_modelRelax.begin(); mdr != m_modelRelax.end(); mdr++){
-      for(vi = mdr->second.begin(); vi != mdr->second.end(); vi++){
-	 modelRelax = *vi;
-	 if(!modelRelax->M)
-	    continue;
-	 if(modelRelax->M->isColOrdered()){      
-	    modelRelax->M->reverseOrdering();
-	 }
-	 modelRelax->checkSenseAndBound();    
-
-         int i, j;
-         vector<string> & rowNames = modelRelax->rowNames;
-         vector<string> & colNames = modelRelax->colNames;
-		 if(rowNames.size() == 0){
-	         for(i = 0; i < modelRelax->getNumRows(); i++)
-		        rowNames.push_back("core(" + UtilIntToStr(i) + ")");
-		 }
-		 if(colNames.size() == 0){
-	         for(j = 0; j < modelRelax->getNumCols(); j++)
-		        colNames.push_back("x(" + UtilIntToStr(j) + ")");
-		 }
-      }
-   }
-
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "createModel()", m_param.LogDebugLevel, 2);
-
-   return 0;//TODO: do return codes
-   }*/
-
-// --------------------------------------------------------------------- //
 int DecompApp::generateInitVars(DecompVarList & initVars){ 
    // ---
    // --- this function does nothing by default
@@ -145,8 +55,8 @@ int DecompApp::generateInitVars(DecompVarList & initVars){
 }
 
 // --------------------------------------------------------------------- //
-int DecompApp::generateCuts(const double                       * x, 
-			    DecompCutList                      & newCuts){
+int DecompApp::generateCuts(const double  * x, 
+			    DecompCutList & newCuts){
 
    // ---
    // --- this function does nothing by default

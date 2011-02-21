@@ -509,6 +509,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //---
    result->m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result->m_solStatus2 = 0;
+   //printf("cplex status  = %d\n", result->m_solStatus);
+   //printf("cplex status2 = %d\n", result->m_solStatus2);
 
    const int statusSet1[3] = {CPXMIP_OPTIMAL,
 			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
@@ -581,7 +583,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    }
    
    //printf("solStatus = %d\n", result->m_solStatus);
-   if(result->m_solStatus == CPXMIP_OPTIMAL){
+   if(result->m_solStatus == CPXMIP_OPTIMAL ||
+      result->m_solStatus == CPXMIP_OPTIMAL_TOL){
       result->m_isOptimal  = true;      
    }
    else{
