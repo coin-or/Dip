@@ -1694,7 +1694,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
       //for CPM, dont' we need to update obj lb here? in case that no cuts
       //  are found, then node is done and we need to update boundx
       if(m_algo == CUT)
-	 updateObjBoundLB();
+	 updateObjBound();
    }
 
    
@@ -1703,34 +1703,43 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //---
    while(m_phase != PHASE_DONE){
 
+      //TODO: LP only?
       UTIL_MSG(m_param.LogLevel, 2,
-               double gap = UtilCalculateGap(m_nodeStats.objBest.first,
-					 m_nodeStats.objBest.second);
+               double lpGap = getNodeLPGap();
+	       double ipGap = getNodeIPGap();
 	       int nHistorySize 
-	       = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
+	       = static_cast<int>(m_nodeStats.objHistoryBound.size());
 	       if(nHistorySize > 0){		  
 		  DecompObjBound & objBound 
-		     = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
+		     = m_nodeStats.objHistoryBound[nHistorySize-1];
+		  (*m_osLog) << setiosflags(ios::right);
 		  (*m_osLog)
-		     << "Processing Node "<< setw(5)  << nodeIndex
-		     << " algo = "        << setw(10) << DecompAlgoStr[m_algo] 
-		     << " phase = "       << setw(10) << DecompPhaseStr[m_phase]
-		     << " cutpass = "     << setw(5)  
+		     << "Processing Node "
+		     << setw(3)  << nodeIndex
+		     << " algo= "        
+		     << setw(13) << DecompAlgoStr[m_algo] 
+		     << " phase= "       
+		     << setw(12) << DecompPhaseStr[m_phase]
+		     << " c= " << setw(4)  
 		     << m_nodeStats.cutCallsTotal
-		     << " pricepass = "   << setw(5)  
+		     << " p= " << setw(4)  
 		     << m_nodeStats.priceCallsTotal
-		     << " thisLB = "      << setw(10) 
-		     << UtilDblToStr(objBound.thisBound,6)
-		     << " thisUB = "      << setw(10) 
-		     << UtilDblToStr(objBound.thisBoundUB,6)
-		     << " nodeLB = "
-		     << UtilDblToStr(m_nodeStats.objBest.first,6)
-		     << " globalLB = " 
-		     << UtilDblToStr(m_globalLB,6) 
-		     << " globalUB = " 
-		     << UtilDblToStr(m_nodeStats.objBest.second,6) 
-		     << " nodeGap = " << UtilDblToStr(gap,5) 
-		     << " time = "    << UtilDblToStr(globalTimer.getCpuTime(), 3)
+		     << " LB= " << setw(10) 
+		     << UtilDblToStr(objBound.thisBound,3)
+		     << " UB= " << setw(10) 
+		     << UtilDblToStr(objBound.thisBoundUB,3)
+		     << " nodeLB= " << setw(10)
+		     << UtilDblToStr(m_nodeStats.objBest.first,3)
+		     << " gLB= " << setw(10)
+		     << UtilDblToStr(m_globalLB,3) 
+		     << " gUB= " << setw(10)
+		     << UtilDblToStr(m_nodeStats.objBest.second,3) 
+		     << " lpGap= " << setw(10)
+		     << UtilDblToStr(lpGap,3) 
+		     << " ipGap= " << setw(10)
+		     << UtilDblToStr(ipGap,3) 
+		     << " time= " << setw(10)
+		     << UtilDblToStr(globalTimer.getCpuTime(), 2)
 		     << endl;
 	       }		
 	       else{
@@ -1841,7 +1850,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	 if(m_isColGenExact           && 
 	    m_rrIterSinceAll == 0     &&
 	    m_status == STAT_FEASIBLE)	    
-	    isGapTight = updateObjBoundLB(mostNegRC);
+	    isGapTight = updateObjBound(mostNegRC);
 
 
 	 //---
@@ -1976,7 +1985,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	       //make this some update that can be override for CPM vs PC
 	       // or move this update to phaseUpdate??? 
 	       if(m_algo == CUT && m_nodeStats.cutsThisCall > 0){
-		  updateObjBoundLB();
+		  updateObjBound();
 	       }
 	    }
 	 }
@@ -2236,10 +2245,10 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 
    UTIL_MSG(m_param.LogDebugLevel, 3,
 	    m_stats.printOverallStats(m_osLog);
-	    m_nodeStats.printObjHistory(m_osLog);
-	    m_nodeStats.printObjHistoryBoundLP(m_osLog);
-	    m_nodeStats.printObjHistoryBoundIP(m_osLog);
 	    );
+   if(m_param.LogObjHistory){
+      m_nodeStats.printObjHistoryBound(m_osLog);
+   }
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "processNode()", m_param.LogDebugLevel, 1);
 
@@ -2965,7 +2974,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
 
 //===========================================================================//
 //once we do RC, this probably won't be in base anyway
-bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
+bool DecompAlgo::updateObjBound(const double mostNegRC){
    //---
    //--- C    : LB = masterLP obj
    //--- PC   : LB = zDW_RMP + RC* <= zDW <= zDW_RMP
@@ -2978,7 +2987,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    //--- tree's global upper bound.
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "updateObjBoundLB()", m_param.LogDebugLevel, 2);
+		      "updateObjBound()", m_param.LogDebugLevel, 2);
 
 
    //for DualStab, this returns smoothed duals
@@ -2993,7 +3002,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    for(r = 0; r < m_masterSI->getNumRows(); r++)
       zDW_UBDual += dualSol[r] * rowRhs[r];
    zDW_LB = zDW_UBDual + mostNegRC;
-   setObjBoundLB(zDW_LB, zDW_UBPrimal);
+   setObjBound(zDW_LB, zDW_UBPrimal);
 
    double actDiff = fabs(zDW_UBDual-zDW_UBPrimal);
    double relDiff = actDiff;
@@ -3058,7 +3067,7 @@ bool DecompAlgo::updateObjBoundLB(const double mostNegRC){
    m_relGap = relGap;
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "updateObjBoundLB()", m_param.LogDebugLevel, 2);
+		    "updateObjBound()", m_param.LogDebugLevel, 2);
    return isGapTight;
 }
 
@@ -3296,6 +3305,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    //--- switch to PHASE II (art=0)
 	    //---
 	    masterPhaseItoII();
+	    setObjBound(m_nodeStats.getLastBound()->thisBound, phaseIObj);
             m_firstPhase2Call = true;
 	    m_nodeStats.resetCutRound();
 	    m_nodeStats.resetPriceRound();
@@ -5009,7 +5019,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    double         * redCostXb = 0;
 	    double         * uBlockAdj = 0;
 
-	    if(uBlockV.size() != m){
+	    if(static_cast<int>(uBlockV.size()) != m){
 	       throw UtilException("The size of the user dual vector is not the same as the number of master rows", 
 				   "generateVarsFea", "DecompAlgo");
 	    }
@@ -5809,7 +5819,7 @@ void DecompAlgo::addVarsFromPool(){
    if(hasNames){
       if(colIndex0 != static_cast<int>(colNamesM.size())){
 	 printf("master num cols=%d names size=%d", 
-		colIndex0, colNamesM.size());
+		colIndex0, static_cast<int>(colNamesM.size()));
       }
       assert(colIndex0 == static_cast<int>(colNamesM.size()));
    }
@@ -6901,7 +6911,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    //---
    //--- don't check for tailoff until we have enough iterations
    //---
-   if(static_cast<int>(m_nodeStats.objHistoryBoundLP.size()) <= changeLen)
+   if(static_cast<int>(m_nodeStats.objHistoryBound.size()) <= changeLen)
       return false;
 
 
@@ -6911,10 +6921,10 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    //--- TODO: get its own parameter?
    //---
    int nHistorySize 
-      = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
+      = static_cast<int>(m_nodeStats.objHistoryBound.size());
    if(nHistorySize > 0){		  
       DecompObjBound & objBound 
-	 = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
+	 = m_nodeStats.objHistoryBound[nHistorySize-1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = objBound.thisBound; 
       //double masterLB  = m_nodeStats.objBest.first;
@@ -6926,14 +6936,14 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    }
 
    vector< DecompObjBound >::reverse_iterator it 
-      = m_nodeStats.objHistoryBoundLP.rbegin();
+      = m_nodeStats.objHistoryBound.rbegin();
    int    len       = 0;
    double prevBound = (*it).thisBound;
    double diff      =  DecompInf;
    double sumDiff   = 0.0;
    double aveDiff   = 0.0;
    double perDiff   = 0.0;
-   for( ; it != m_nodeStats.objHistoryBoundLP.rend(); it++){
+   for( ; it != m_nodeStats.objHistoryBound.rend(); it++){
       diff       = fabs(prevBound - (*it).thisBound);
       UTIL_DEBUG(m_param.LogDebugLevel, 3,	      
 		 (*m_osLog) 

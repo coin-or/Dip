@@ -93,9 +93,7 @@ private:
    int generateVars(const DecompStatus   stat,
 		    DecompVarList    & newVars, 
 		    double           & mostNegReducedCost);
-   bool updateObjBoundLB(const double mostNegRC = -DecompBigNum);
-   //void addVarsToPool(DecompVarList & newVars);
-   //void addVarsFromPool();
+   bool updateObjBound(const double mostNegRC = -DecompBigNum);
 
    /**
     * Run the initial phase for processing node.

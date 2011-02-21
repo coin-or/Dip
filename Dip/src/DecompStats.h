@@ -22,20 +22,10 @@
 #include "UtilTimer.h"
 //===========================================================================//
 
-enum DecompBoundType {
-   DecompBoundContinuous = 0,
-   DecompBoundInteger    = 1
-};
-
 //===========================================================================//
-//typedef struct DecompObjBound DecompObjBound;
 class DecompObjBound
 {
 public:
-   /**
-    * The type of bound (continuous or integral).
-    */
-   DecompBoundType boundType;
    /**
     * The phase when bound was recorded.
     */
@@ -53,25 +43,26 @@ public:
     */
    double timeStamp;
    /**
-    * The recorded bound.
-    *   DecompBoundContinuous: continuous lower bound 
-    *   DecompBoundInteger   : integer feasible solution (a global UB)
+    * The recorded continuous lower bound.
     */
    double thisBound;
    /**
-    * The recorded bound.
-    *   DecompBoundContinuous: continuous upper bound 
-    *   DecompBoundInteger   : <not used>
+    * The recorded continuous upper bound.
     */
    double thisBoundUB;
    /**
-    * The best recorded bound.
-    *   DecompBoundContinuous: global LB = max{active node lower bounds}
-    *   DecompBoundInteger   : global UB = min(       node upper bounds)
+    * The best recorded continuous lower bound.
+    *   global LB = max{active node lower bounds}   
     */
    double bestBound; 
-
+   /**
+    * The recorded integer upper bound.
+    */   
    double thisBoundIP;
+   /**
+    * The best recorded integer upper bound.
+    *   global UB = min{node integer upper bounds}   
+    */
    double bestBoundIP;
 
    /**
@@ -109,7 +100,9 @@ public:
    //---
 
    /**
-    * Storage of the continuous lower and upper bounds.
+    * Storage of the bounds.
+    *
+    * For the continuous part:
     *   CPM  : Bounds on the objective of optimal master linear 
     *          relaxation. Typically, this is an LP solved to optimality,
     *          so, LB = zCP = UB.
@@ -119,13 +112,8 @@ public:
     *          from the subproblem polytope (for the associated master duals).
     *               LB = zPC_LB + RC_LB <= zPC* <= zPC_UB = UB
     */ 
-   vector< DecompObjBound > objHistoryBoundLP;
-   
-   /**
-    * Storage of integer feasible solutions (these are global UBs).
-    */
-   vector< DecompObjBound > objHistoryBoundIP; 
-   
+   vector< DecompObjBound > objHistoryBound;
+      
    /**
     * The global lower (.first) and upper (.second) bound.
     */
@@ -178,8 +166,7 @@ public:
    
 public:
    void init(){
-      objHistoryBoundLP.clear();
-      objHistoryBoundIP.clear();
+      objHistoryBound.clear();
       objBest.first   = -DecompInf;
       objBest.second  =  DecompInf;
       nodeIndex       =  0;     
@@ -194,9 +181,7 @@ public:
    }
 
 public:
-   void printObjHistory       (ostream * os = &cout) const;
-   void printObjHistoryBoundLP(ostream * os = &cout) const;
-   void printObjHistoryBoundIP(ostream * os = &cout) const;
+   void printObjHistoryBound  (ostream * os = &cout) const;
    inline void resetCutRound() {
       cutCallsRound = 0;
       cutsThisRound = 0;
@@ -208,12 +193,19 @@ public:
    inline void resetBestLB() {
       objBest.first = -DecompInf;
    }
-
+   inline DecompObjBound * getLastBound(){
+      int nHistorySize = static_cast<int>(objHistoryBound.size());
+      if(nHistorySize > 0){
+	 return &(objHistoryBound[nHistorySize-1]);
+      }
+      else
+	 return 0;
+   }
+   
 public:
    DecompNodeStats() :
-      objHistoryBoundLP(),
-      objHistoryBoundIP(),
-      objBest          ()
+      objHistoryBound(),
+      objBest        ()
    {
       init();
    }

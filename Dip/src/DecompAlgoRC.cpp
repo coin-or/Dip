@@ -638,7 +638,7 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
 }
 
 // ------------------------------------------------------------------------- //
-bool DecompAlgoRC::updateObjBoundLB(const double mostNegRC){
+bool DecompAlgoRC::updateObjBound(const double mostNegRC){
    //---
    //--- C    : LB = masterLP obj
    //--- PC   : LB = zDW_RMP + RC* <= zDW <= zDW_RMP
@@ -646,7 +646,7 @@ bool DecompAlgoRC::updateObjBoundLB(const double mostNegRC){
    //---    assuming the relaxation subproblem was solved exactly
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "updateObjBoundLB()", m_param.LogDebugLevel, 2);
+		      "updateObjBound()", m_param.LogDebugLevel, 2);
 
    DecompConstraintSet          * modelCore   = m_modelCore.getModel();
    //mostNegRC not used?
@@ -663,7 +663,7 @@ bool DecompAlgoRC::updateObjBoundLB(const double mostNegRC){
    }
    //double thisBoundLB = shatVar->getReducedCost() + constant;
    double thisBoundLB = mostNegRC + constant;
-   setObjBoundLB(thisBoundLB, constant);
+   setObjBound(thisBoundLB, constant);
 
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      (*m_osLog)
@@ -673,6 +673,6 @@ bool DecompAlgoRC::updateObjBoundLB(const double mostNegRC){
 	      );
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "updateObjBoundLB()", m_param.LogDebugLevel, 2);
+		    "updateObjBound()", m_param.LogDebugLevel, 2);
    return false;
 }

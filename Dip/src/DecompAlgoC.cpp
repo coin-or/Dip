@@ -74,7 +74,7 @@ void DecompAlgoC::setMasterBounds(const double * lbs,
 }
 
 //===========================================================================//
-bool DecompAlgoC::updateObjBoundLB(const double mostNegRC){
+bool DecompAlgoC::updateObjBound(const double mostNegRC){
    //---
    //--- C    : LB = masterLP obj
    //--- PC   : LB = zDW_RMP + RC* <= zDW <= zDW_RMP
@@ -84,8 +84,8 @@ bool DecompAlgoC::updateObjBoundLB(const double mostNegRC){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "updateObjBoundLB()", m_param.LogDebugLevel, 2);
    double thisBoundLB = m_masterSI->getObjValue();
-   setObjBoundLB(thisBoundLB, thisBoundLB);
-
+   setObjBound(thisBoundLB, thisBoundLB);
+   
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      (*m_osLog)
 	      << "ThisLB = " << UtilDblToStr(thisBoundLB) << "\t"

@@ -82,7 +82,7 @@ private:
     * Calculate the current objective LB, update the best, and 
     * store in history.
     */
-   bool updateObjBoundLB(const double mostNegRC = -DecompBigNum);
+   bool updateObjBound(const double mostNegRC = -DecompBigNum);
 
    void phaseInit(DecompPhase & phase){
       if(getNodeIndex() == 0)

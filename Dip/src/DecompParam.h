@@ -37,11 +37,18 @@ class DecompParam{
 public:   
    int    LogLevel;
    int    LogDebugLevel;
-   int    LogLpLevel;    
+   int    LogLpLevel;    //TODO: LpIpLevel separate
    //=0 never
    //=1 only on error
    //=2 dump every model
    int    LogDumpModel;
+   /**
+    * 0: print nothing 
+    * 1: print the node objective history
+    */
+   int    LogObjHistory;
+
+
    int    LimitInitVars; 
 
    int    DebugLevel;//=0 (default), =1 (extra checks on duals, etc)
@@ -190,6 +197,7 @@ public:
       PARAM_getSetting("LogDebugLevel",        LogDebugLevel);
       PARAM_getSetting("LogLpLevel",           LogLpLevel);
       PARAM_getSetting("LogDumpModel",         LogDumpModel);
+      PARAM_getSetting("LogObjHistory",        LogObjHistory);
       PARAM_getSetting("LimitInitVars",        LimitInitVars);
       PARAM_getSetting("DebugLevel",           DebugLevel);
       PARAM_getSetting("TolZero",              TolZero);
@@ -282,6 +290,7 @@ public:
       UtilPrintParameter(os, sec, "LogDebugLevel",       LogDebugLevel);
       UtilPrintParameter(os, sec, "LogLpLevel",          LogLpLevel);
       UtilPrintParameter(os, sec, "LogDumpModel",        LogDumpModel);
+      UtilPrintParameter(os, sec, "LogObjHistory",       LogObjHistory);
       UtilPrintParameter(os, sec, "LimitInitVars",       LimitInitVars);
       UtilPrintParameter(os, sec, "DebugLevel",          DebugLevel);
       UtilPrintParameter(os, sec, "TolZero",             TolZero);
@@ -360,6 +369,7 @@ public:
       LogDebugLevel        = 0;
       LogLpLevel           = 0;
       LogDumpModel         = 0;
+      LogObjHistory        = 0;
       LimitInitVars        = 5;
       DebugLevel           = 0;
       TolZero              = DecompEpsilon;

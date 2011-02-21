@@ -245,10 +245,10 @@ int DecompAlgoPC::compressColumns(){
    m_stats.timerOther1.reset();
 
    int nHistorySize 
-      = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
+      = static_cast<int>(m_nodeStats.objHistoryBound.size());
    if(nHistorySize > 0){		  
       DecompObjBound & objBound 
-	 = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
+	 = m_nodeStats.objHistoryBound[nHistorySize-1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = m_nodeStats.objBest.first;
       double masterGap = DecompInf;
@@ -568,7 +568,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    assert(m_numConvexCon > 1);   
 
-   int  i, j, b, colIndex;
+   int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda 
    int  logIpLevel  = m_param.LogLpLevel;
    DecompConstraintSet * modelCore = m_modelCore.getModel();
@@ -578,8 +578,9 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //--- set the master (generated) columns (lambda) to integer
    //--- set the master-onlys (that are integral) to integer
    //---
-   int                     numMOs         = UtilGetSize(m_masterOnlyCols);
-   const char            * intMarkerCore  = modelCore->getIntegerMark();
+   int          j, colIndex;
+   int          numMOs         = UtilGetSize(m_masterOnlyCols);
+   const char * intMarkerCore  = modelCore->getIntegerMark();
 
    for(colIndex = 0; colIndex < nMasterCols; colIndex++){
      if(isMasterColStructural(colIndex))

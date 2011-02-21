@@ -121,8 +121,8 @@ private:
    /**
     *
     */
-   virtual void setObjBoundLB(const double thisBound,
-			      const double thisBoundUB){
+   virtual void setObjBound(const double thisBound,
+			    const double thisBoundUB){
       UtilPrintFuncBegin(m_osLog, m_classTag,
 			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
       if(m_param.DualStab){
@@ -132,7 +132,7 @@ private:
 	    copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
 	 }
       }
-      DecompAlgo::setObjBoundLB(thisBound, thisBoundUB);
+      DecompAlgo::setObjBound(thisBound, thisBoundUB);
       UtilPrintFuncEnd(m_osLog, m_classTag,
 		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
    }

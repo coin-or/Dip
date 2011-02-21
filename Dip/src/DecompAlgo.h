@@ -340,7 +340,7 @@ public:
    /**
     * Calculate the current LB and update best/history.
     */
-   virtual bool updateObjBoundLB(const double mostNegRC = -DecompBigNum);
+   virtual bool updateObjBound(const double mostNegRC = -DecompBigNum);
 
 
    virtual void solutionUpdateAsIP(){}
@@ -770,10 +770,10 @@ public:
     */
    inline const double getNodeLPGap() const {
       int nHistorySize 
-	 = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
+	 = static_cast<int>(m_nodeStats.objHistoryBound.size());
       if(nHistorySize > 0){		  
 	 const DecompObjBound & objBound 
-	    = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
+	    = m_nodeStats.objHistoryBound[nHistorySize-1];
 	 return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB);
       }
       else
@@ -795,71 +795,66 @@ public:
    }
 
    /**
-    * Set the current LB and update best/history.
+    * Set the current continuous bounds and update best/history.
     */
-   virtual void setObjBoundLB(const double thisBound,
-			      const double thisBoundUB){
+   virtual void setObjBound(const double thisBound,
+			    const double thisBoundUB){
       UtilPrintFuncBegin(m_osLog, m_classTag,
-			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
+			 "setObjBound()", m_param.LogDebugLevel, 2);
       if(thisBound > m_nodeStats.objBest.first){
 	 m_nodeStats.objBest.first = thisBound;
+	 if(getNodeIndex() == 0)
+	    m_globalLB = thisBound;
       }
 
       DecompObjBound objBound;
-      objBound.phase       = m_phase == PHASE_PRICE1 ? 1 : 2;
-      objBound.boundType   = DecompBoundContinuous;
-      objBound.cutPass     = m_nodeStats.cutCallsTotal;
-      objBound.pricePass   = m_nodeStats.priceCallsTotal;      
-      objBound.thisBound   = thisBound;
-      objBound.thisBoundUB = thisBoundUB;
-      objBound.bestBound   = m_nodeStats.objBest.first;
+      objBound.phase         = m_phase == PHASE_PRICE1 ? 1 : 2;
+      objBound.cutPass       = m_nodeStats.cutCallsTotal;
+      objBound.pricePass     = m_nodeStats.priceCallsTotal;      
+      objBound.thisBound     = thisBound;
+      objBound.thisBoundUB   = thisBoundUB;
+      objBound.bestBound     = m_nodeStats.objBest.first;
+      objBound.bestBoundIP   = m_nodeStats.objBest.second;
 #ifdef UTIL_USE_TIMERS
-      objBound.timeStamp   = globalTimer.getRealTime();
+      objBound.timeStamp     = globalTimer.getRealTime();
 #else
-      objBound.timeStamp   = -1;
+      objBound.timeStamp     = -1;
 #endif      
-      m_nodeStats.objHistoryBoundLP.push_back(objBound);
+      m_nodeStats.objHistoryBound.push_back(objBound);
       UtilPrintFuncEnd(m_osLog, m_classTag,
-		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
+		       "setObjBound()", m_param.LogDebugLevel, 2);
    }
    
    /**
-    * Set the current UP bound and update best/history.
+    * Set the current integer bound and update best/history.
     */
    inline void setObjBoundIP(const double thisBound){
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "setObjBoundIP()", m_param.LogDebugLevel, 2);
       if(thisBound < m_nodeStats.objBest.second){
-         //printf("thisBound= %g objBest= %g\n",
-         //     thisBound, m_nodeStats.objBest.second);
 	 UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
 		  (*m_osLog) << "New Global UB = " 
 		  << UtilDblToStr(thisBound) << endl;);
-	 m_nodeStats.objBest.second = thisBound;
-         
+	 m_nodeStats.objBest.second = thisBound;         
       }
-      int nHistorySize 
-	 = static_cast<int>(m_nodeStats.objHistoryBoundLP.size());
-      if(nHistorySize > 0){		  
-	 DecompObjBound & objBoundLP 
-	    = m_nodeStats.objHistoryBoundLP[nHistorySize-1];
-	 objBoundLP.thisBoundIP = thisBound;
-	 objBoundLP.bestBoundIP = m_nodeStats.objBest.second;
-      }
-
-      DecompObjBound objBound;
-      objBound.boundType = DecompBoundInteger;
-      objBound.cutPass   = m_nodeStats.cutCallsTotal;
-      objBound.pricePass = m_nodeStats.priceCallsTotal;      
-      objBound.thisBound = thisBound;
-      objBound.bestBound = m_nodeStats.objBest.second;
+      //---
+      //--- copy the last continuous history, adjust the time
+      //---
+      DecompObjBound   objBoundIP;
+      DecompObjBound * objBoundLP = m_nodeStats.getLastBound();
+      if(objBoundLP)
+	 objBoundIP = *objBoundLP;
+      objBoundIP.thisBoundIP = thisBound;
+      objBoundIP.bestBoundIP = m_nodeStats.objBest.second;
 #ifdef UTIL_USE_TIMERS
-      objBound.timeStamp = globalTimer.getRealTime();
+      objBoundIP.timeStamp   = globalTimer.getRealTime();
 #else
-      objBound.timeStamp = -1;
+      objBoundIP.timeStamp   = -1;
 #endif      
-      m_nodeStats.objHistoryBoundIP.push_back(objBound);
+      m_nodeStats.objHistoryBound.push_back(objBoundIP);
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "setObjBoundIP()", m_param.LogDebugLevel, 2);
    }
-
-
 
 
    bool isTailoffLB(const int    changeLen      = 10,

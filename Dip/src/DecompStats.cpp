@@ -77,53 +77,8 @@ void DecompStats::calculateStats (){
 
 }
 
-
 // --------------------------------------------------------------------- //
-void DecompNodeStats::printObjHistory(ostream * os) const {
-
-   //---
-   //--- combine the bounds into one vector and sort
-   //---
-   vector<DecompObjBound> objHistory(objHistoryBoundLP);
-   objHistory.insert(objHistory.begin(), 
-		     objHistoryBoundIP.begin(), objHistoryBoundIP.end());
-
-   sort(objHistory.begin(), objHistory.end());
-
-   (*os) << setiosflags(ios::fixed|ios::showpoint);   
-   (*os).precision(2);    
-   (*os) << "\n========== OBJ History Node " 
-	 << nodeIndex << " [BEGIN]: ========= " << endl;
-
-   vector< DecompObjBound >::iterator it;
-   for(it = objHistory.begin(); it != objHistory.end(); it++){
-      if((*it).boundType)
-	 (*os) << setw(4) << "int";
-      else
-	 (*os) << setw(4) << "con";
-      (*os) << setw(6)  << (*it).cutPass
-	    << setw(6)  << (*it).pricePass
-	    << setw(10) << UtilDblToStr((*it).timeStamp,5);
-      if((*it).boundType){
-	 (*os) << setw(10) << "."
-	       << setw(10) << "."
-	       << setw(10) << UtilDblToStr((*it).thisBound,2)
-	       << setw(10) << UtilDblToStr((*it).bestBound,2);
-      }
-      else{
-	 (*os) << setw(10) << UtilDblToStr((*it).thisBound,2)
-	       << setw(10) << UtilDblToStr((*it).bestBound,2)	    
-	       << setw(10) << "."
-	       << setw(10) << ".";	    
-      }
-      (*os) << endl;
-   }
-   (*os) << "\n========== OBJ History Node "
-	 << nodeIndex << " [END]:   ========= " << endl;
-}
-
-// --------------------------------------------------------------------- //
-void DecompNodeStats::printObjHistoryBoundLP(ostream * os) const {
+void DecompNodeStats::printObjHistoryBound(ostream * os) const {
    (*os) << setiosflags(ios::fixed|ios::showpoint);   
    (*os).precision(2);    
    (*os) << "\n========== OBJ History Node " 
@@ -140,7 +95,7 @@ void DecompNodeStats::printObjHistoryBoundLP(ostream * os) const {
 	 << setw(10) << "ThisIP"
 	 << setw(10) << "BestIP"
 	 << endl;
-   for(it = objHistoryBoundLP.begin(); it != objHistoryBoundLP.end(); it++){
+   for(it = objHistoryBound.begin(); it != objHistoryBound.end(); it++){
       (*os) << setw(6)  << (*it).phase
 	    << setw(6)  << (*it).cutPass
 	    << setw(6)  << (*it).pricePass
@@ -156,25 +111,6 @@ void DecompNodeStats::printObjHistoryBoundLP(ostream * os) const {
 	 << nodeIndex << " [END]:   ==================================== "
 	 << endl;
    
-}
-
-// --------------------------------------------------------------------- //
-void DecompNodeStats::printObjHistoryBoundIP(ostream * os) const {
-   (*os) << setiosflags(ios::fixed|ios::showpoint);   
-   (*os).precision(2);    
-   (*os) << "\n========== OBJ IP History Node " 
-	 << nodeIndex << " [BEGIN]: ========= " << endl;   
-   vector< DecompObjBound >::const_iterator it;
-   for(it = objHistoryBoundIP.begin(); it != objHistoryBoundIP.end(); it++){
-      (*os) << setw(6)  << (*it).cutPass
-	    << setw(6)  << (*it).pricePass
-	    << setw(10) << UtilDblToStr((*it).timeStamp,5)
-	    << setw(10) << UtilDblToStr((*it).thisBound,2)
-	    << setw(10) << UtilDblToStr((*it).bestBound,2)
-	    << endl;
-   }
-   (*os) << "\n========== OBJ UB History Node "
-	 << nodeIndex << " [END]:   ========= " << endl;
 }
 
 // --------------------------------------------------------------------- //
