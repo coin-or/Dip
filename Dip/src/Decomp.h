@@ -256,7 +256,9 @@ const double DecompInf = CPX_INFBOUND;
 
 #ifdef __DECOMP_IP_CBC__
 #include "OsiCbcSolverInterface.hpp"
-typedef OsiCbcSolverInterface OsiIpSolverInterface;
+//confusing, since we use CbcModel/Main, we need OsiClp here
+typedef OsiClpSolverInterface OsiIpSolverInterface;
+//typedef OsiCbcSolverInterface OsiIpSolverInterface;
 #endif
 
 #ifdef __DECOMP_IP_CPX__

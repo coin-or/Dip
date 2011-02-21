@@ -454,7 +454,7 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
                           model->getRowUB());
    if(nInts > 0){
       subprobSI->setInteger(model->getIntegerVars(), nInts);
-#if defined (__DECOMP_IP_CPX__) or (__DECOMP_LP_CPX__)
+#if defined(__DECOMP_IP_CPX__)||(__DECOMP_LP_CPX__)
       OsiCpxSolverInterface * osiCpx 
 	 = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
       osiCpx->switchToMIP();
@@ -1010,7 +1010,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //TODO - REVISIT - that's not the right check
    //  needs to be feasible to subproblem?
    //bool     isZeroFeas = isIPFeasible(zeroSol);     
-   bool isZeroFeas = m_param.MasterConvexityLessThan;
+   int isZeroFeas = m_param.MasterConvexityLessThan;
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      if(isZeroFeas)
 		 (*m_osLog) << "Zero Sol is Feasible - relax convexity con.\n";
