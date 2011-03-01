@@ -3305,7 +3305,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    //--- switch to PHASE II (art=0)
 	    //---
 	    masterPhaseItoII();
-	    setObjBound(m_nodeStats.getLastBound()->thisBound, phaseIObj);
+	    setObjBound(m_nodeStats.getLastBoundThis(), phaseIObj);
             m_firstPhase2Call = true;
 	    m_nodeStats.resetCutRound();
 	    m_nodeStats.resetPriceRound();

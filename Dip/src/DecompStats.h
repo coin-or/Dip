@@ -201,6 +201,13 @@ public:
       else
 	 return 0;
    }
+   inline double getLastBoundThis(){
+      double           thisBound = -DecompInf;
+      DecompObjBound * lastBound = getLastBound();
+      if(lastBound)
+         thisBound = lastBound->thisBound;
+      return thisBound;
+   }
    
 public:
    DecompNodeStats() :

@@ -127,8 +127,8 @@ private:
 			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
       if(m_param.DualStab){
 	 if(thisBound > (m_nodeStats.objBest.first + DecompEpsilon)){
-	    (*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
-		       << " to " << thisBound << " , update duals" << endl;
+	    //(*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
+            //       << " to " << thisBound << " , update duals" << endl;
 	    copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
 	 }
       }
