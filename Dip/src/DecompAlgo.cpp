@@ -1601,8 +1601,9 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //--- PC  (node = 0) <-- PRICEI 
    //---     (node > 0) <-- <same as last node>
    //---
+   m_firstPhase2Call = false;
    phaseInit(m_phaseLast);
-   m_phase = m_phaseLast;
+   m_phase           = m_phaseLast;
 
    //---
    //--- it is possible that phaseInit can find
