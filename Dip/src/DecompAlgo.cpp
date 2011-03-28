@@ -2439,14 +2439,17 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       UTIL_MSG(m_param.LogLevel, 2,
                (*m_osLog) << "SolveMasterAsIp: PriceCallsTotal=" <<
                m_nodeStats.priceCallsTotal 
+               << " m_firstPhase2Call = "
+               << m_firstPhase2Call
                << endl;);
       solutionUpdateAsIP();
-      //if(m_firstPhase2Call) m_firstPhase2Call = false;
+      if(m_firstPhase2Call) 
+         m_firstPhase2Call = false;
    }
 
-   if(m_phase == PHASE_PRICE2)
-      if(m_firstPhase2Call) 
-	 m_firstPhase2Call = false;
+   //if(m_phase == PHASE_PRICE2)
+   // if(m_firstPhase2Call) 
+   // m_firstPhase2Call = false;
    
 
    //---
