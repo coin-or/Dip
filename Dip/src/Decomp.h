@@ -37,6 +37,7 @@
 #include <string>
 #include <map>
 #include <limits>
+#include <cmath>
 using namespace std;
 
 //===========================================================================//
@@ -238,6 +239,7 @@ const string DecompColTypeStr[12] = {
 //---      OsiLp, OsiIp, and DecompInf
 //---
 #include "CoinError.hpp"
+#include "CoinFinite.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinPackedMatrix.hpp"
 
