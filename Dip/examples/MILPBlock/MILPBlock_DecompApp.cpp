@@ -107,6 +107,7 @@ void MILPBlock_DecompApp::readBlockFile(){
    if(m_appParam.LogLevel >= 1)
       (*m_osLog) << "Reading " << fileName << endl;
 
+   map<int, vector<int> > blocks;
    map<int, vector<int> >::iterator blocksIt;
    if(m_appParam.BlockFileFormat == "List" ||
       m_appParam.BlockFileFormat == "LIST"){
@@ -131,7 +132,7 @@ void MILPBlock_DecompApp::readBlockFile(){
 	    else
 	       rowsInBlock.push_back(rowId);
 	 }
-	 m_blocks.insert(make_pair(blockId, rowsInBlock));
+	 blocks.insert(make_pair(blockId, rowsInBlock));
 	 if(is.eof()) break;      
       }
    }
@@ -149,13 +150,13 @@ void MILPBlock_DecompApp::readBlockFile(){
 	    rowIdP = mit->second;
 	 else
 	    rowIdP = rowId;
-	 blocksIt = m_blocks.find(blockId);
-	 if(blocksIt != m_blocks.end())
+	 blocksIt = blocks.find(blockId);
+	 if(blocksIt != blocks.end())
 	    blocksIt->second.push_back(rowIdP);
 	 else{
 	    vector<int> rowsInBlocks;
 	    rowsInBlocks.push_back(rowIdP);
-	    m_blocks.insert(make_pair(blockId, rowsInBlocks));	 
+	    blocks.insert(make_pair(blockId, rowsInBlocks));	 
 	 }
 	 is >> blockId;
 	 if(is.eof()) break;
@@ -190,24 +191,33 @@ void MILPBlock_DecompApp::readBlockFile(){
 	    //printf("rowName=%s rowId=%d\n", rowName.c_str(), rowId);
 	 }
 	 else{
-	    cerr << "Error: Row name ("
-		 << rowName << " in block file " 
-		 << "is not found in mps file" << endl;
-	    throw UtilException("Invalid Input.", 
-				"readBlockFile", "MILPBlock_DecompApp");
+	    //---
+	    //--- NOTE: this can happen if we use a presolved mps file
+	    //---  with an original blocks file
+	    //---
+	    if(m_appParam.LogLevel >= 3){
+	       (*m_osLog) << "Warning: Row name ("
+			  << rowName << " in block file " 
+			  << "is not found in mps file" << endl;
+	    }
+	    //throw UtilException("Invalid Input.", 
+	    //		"readBlockFile", "MILPBlock_DecompApp");
+	    rowId = -1;
 	 }	    
-	 mit = permute.find(rowId);
-	 if(mit != permute.end())
-	    rowIdP = mit->second;
-	 else
-	    rowIdP = rowId;	 
-	 blocksIt = m_blocks.find(blockId);
-	 if(blocksIt != m_blocks.end())
-	    blocksIt->second.push_back(rowIdP);
-	 else{
-	    vector<int> rowsInBlocks;
-	    rowsInBlocks.push_back(rowIdP);
-	    m_blocks.insert(make_pair(blockId, rowsInBlocks));	 
+	 if(rowId != -1){
+	    mit = permute.find(rowId);
+	    if(mit != permute.end())
+	       rowIdP = mit->second;
+	    else
+	       rowIdP = rowId;	 
+	    blocksIt = blocks.find(blockId);
+	    if(blocksIt != blocks.end())
+	       blocksIt->second.push_back(rowIdP);
+	    else{
+	       vector<int> rowsInBlocks;
+	       rowsInBlocks.push_back(rowIdP);
+	       blocks.insert(make_pair(blockId, rowsInBlocks));	 
+	    }
 	 }
 	 is >> blockId;
 	 if(is.eof()) 
@@ -220,6 +230,17 @@ void MILPBlock_DecompApp::readBlockFile(){
 	   << endl;
       throw UtilException("Invalid Parameter.", 
 			  "readBlockFile", "MILPBlock_DecompApp");
+   }
+
+   //---
+   //--- after presolve, some blocks might have been completely
+   //---  removed - renumber the block ids - it is arbitrary anyway
+   //--- and copy into class object m_blocks
+   //---
+   blockId = 0;
+   for(blocksIt = blocks.begin(); blocksIt != blocks.end(); blocksIt++){
+      m_blocks.insert(make_pair(blockId, blocksIt->second));
+      blockId++;
    }
 
    if(m_appParam.LogLevel >= 3){

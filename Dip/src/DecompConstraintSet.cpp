@@ -118,19 +118,13 @@ void DecompConstraintSet::prepareModel(bool modelIsCore){
 
    //---
    //--- mark integers (original number of cols)
-   //---
-   //---   THINK: This is expensive (memory and cpu) because
-   //---           it is based on the size of original columns.
-   //---          And, the only place it is being used is in 
-   //---           breakOutPartial - which probably doesn't relaly work.
-   //---
-   /*if(m_param.BreakOutPartial){
-       UtilFillN(integerMark, numColsOrig, 'C');
-     for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
-       integerMark[*vit] = 'I';
-     }   
+   //---    only do this for core
+   if(modelIsCore){
+      UtilFillN(integerMark, numColsOrig, 'C');
+      for(vit = integerVars.begin(); vit != integerVars.end(); vit++){
+	 integerMark[*vit] = 'I';
+      }   
    }
-   */
 }
 
 //===========================================================================//

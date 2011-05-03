@@ -1009,6 +1009,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    UtilFillN(zeroSol, nColsCore, 0.0);
    //TODO - REVISIT - that's not the right check
    //  needs to be feasible to subproblem?
+   //TODO: DETECT THIS
    //bool     isZeroFeas = isIPFeasible(zeroSol);     
    int isZeroFeas = m_param.MasterConvexityLessThan;
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
@@ -1468,8 +1469,13 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "breakOutPartial()", m_param.LogDebugLevel, 1);
 
-   //TOOD: what if modelRelax is not defined?
-   
+   //TODO: what if modelRelax is not defined?
+   //TODO: if lambda=1, don't bother, it means the partial 
+   //  is already there
+
+   DecompConstraintSet * modelCore  = m_modelCore.getModel();
+   const char          * integerMark= modelCore->getIntegerMark();   
+
    //---
    //--- for each block, check to see if active integer columns 
    //---  are integral - if so, use these as candidate columns
@@ -1484,8 +1490,6 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
          continue;
       int                   b          = algoModel.getBlockId();
       const vector<int>   & activeCols = model->getActiveColumns();
-      const char          * integerMark= model->getIntegerMark();
-
       bool blockFeasible = true;
       for(vit = activeCols.begin(); vit != activeCols.end(); vit++){
          if(integerMark[*vit] != 'I')
@@ -1500,13 +1504,17 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
          vector<double> els;
          double origCost = 0.0;
          for(vit = activeCols.begin(); vit != activeCols.end(); vit++){
-            ind.push_back(*vit);
-            els.push_back(xHat[*vit]);
-            origCost += objCoeff[*vit];
+	    if(!UtilIsZero(xHat[*vit])){
+	       ind.push_back(*vit);
+	       els.push_back(xHat[*vit]);
+	       origCost += objCoeff[*vit];
+	    }
          }
-         DecompVar * var = new DecompVar(ind, els, -1.0, origCost);
-         var->setBlockId(b);
-         newVars.push_back(var);
+	 if(ind.size() > 0){//THINK: allow 0-cols??
+	    DecompVar * var = new DecompVar(ind, els, -1.0, origCost);
+	    var->setBlockId(b);
+	    newVars.push_back(var);
+	 }
       }
    }
 
@@ -2072,7 +2080,6 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
             //---   add to masterLP directly - then need a resolve
             //---   to get back to current status
             //---
-	    /*
             if(m_param.BreakOutPartial){
                DecompVarList partialVars;
                breakOutPartial(m_xhat, partialVars);
@@ -2096,7 +2103,6 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                              << partialVars.size() << endl;
                }
             }
-	    */
         
             //TODO:
 	    m_app->APPheuristics(m_xhat, getOrigObjective(), m_xhatIPFeas);

@@ -416,7 +416,7 @@ public:
       InitVarsWithIPLimitTime  = 10;
       InitCompactSolve         = 0;
       DualStab                 = 0;
-      DualStabAlpha            = 0.10;
+      DualStablAlpha            = 0.10;
       BreakOutPartial          = 0;
       BranchEnforceInSubProb   = 0;
       BranchEnforceInMaster    = 1;
