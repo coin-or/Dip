@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2009, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -32,57 +32,23 @@
  *
  */
 
-#ifndef __DECOMPCONFIG_H__
+#ifndef __DIPCONFIG_H__
 
 #ifdef HAVE_CONFIG_H
+#ifdef DIP_BUILD
+#include "config.h"
+#else
 #include "config_dip.h"
-
-/* undefine macros that could conflict with those in other config.h
-   files */
-#undef PACKAGE
-#undef PACKAGE_BUGREPORT
-#undef PACKAGE_NAME
-#undef PACKAGE_STRING
-#undef PACKAGE_TARNAME
-#undef PACKAGE_VERSION
-#undef VERSION
+#endif
 
 #else /* HAVE_CONFIG_H */
 
-/* include the COIN-wide system specific configure header */
-#include "configall_system.h"
-
-/***************************************************************************/
-/*             HERE DEFINE MS PRAGMAS TO DISABLE SOME WARNINGS             */
-/***************************************************************************/
-#include "CoinPragma.hpp"
-#if defined(_MSC_VER)
-// warning C4290: C++ exception specification ignored except to indicate 
-// a function is not __declspec(nothrow)
-# pragma warning(disable:4290)
-//warning C4996: 'std::xxx' was declared deprecated
-# pragma warning(disable:4996)
+#ifdef DIP_BUILD
+#include "config_default.h"
+#else
+#include "config_dip_default.h"
 #endif
-
-
-/***************************************************************************/
-/*             HERE DEFINE THE CONFIGURATION SPECIFIC MACROS               */
-/***************************************************************************/
-
-/* Define to the debug sanity check level (0 is no test) */
-//#define COIN_DECOMP_CHECKLEVEL 0
-
-/* Define to the debug verbosity level (0 is no output) */
-//#define COIN_DECOMP_VERBOSITY 0
-
-#define __DECOMP_LP_CLP__
-#define __DECOMP_IP_CBC__
-
 
 #endif /* HAVE_CONFIG_H */
 
-#ifndef DIP_VERSION
-#define DIP_VERSION "trunk"
-#endif
-
-#endif /*__DECOMPCONFIG_H__ */
+#endif /*__DIPCONFIG_H__*/

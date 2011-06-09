@@ -1,4 +1,4 @@
-/* inc/config_dip.h.in.  Generated from configure.ac by autoheader.  */
+/* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to the debug sanity check level (0 is no test) */
 #undef COIN_DIP_CHECKLEVEL

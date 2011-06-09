@@ -9,7 +9,7 @@
 # Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
 #                    Ted Ralphs, Lehigh University                           #
 #                                                                            #
-# Copyright (C) 2002-2010, Lehigh University, Matthew Galati, Ted Ralphs     #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
@@ -35,7 +35,7 @@ AC_COPYRIGHT([
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2010, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 ])
@@ -288,7 +288,7 @@ AC_CONFIG_FILES([Makefile
 
 
 # Here put the location and name of the configuration header file
-AC_CONFIG_HEADER([inc/config_dip.h])
+AC_CONFIG_HEADER([src/config.h src/config_dip.h])
 
 # Finally, we let configure write all the output...
 AC_COIN_FINALIZE

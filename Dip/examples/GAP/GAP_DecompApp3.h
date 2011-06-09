@@ -6,7 +6,7 @@
 //                                                                           //
 // Author: Matthew Galati, Lehigh University                                 //
 //                                                                           //
-// Copyright (C) 2002-2008, Lehigh University, Matthew Galati, and Ted Ralphs//
+// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs//
 // All Rights Reserved.                                                      //
 //===========================================================================//
 

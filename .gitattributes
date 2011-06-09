@@ -336,7 +336,6 @@ Dip/examples/scripts/random/forestry/run200.sh -text
 Dip/examples/scripts/random/forestry/run240.sh -text
 Dip/examples/scripts/random/forestry/run40.sh -text
 Dip/examples/scripts/report_decomp.py -text
-Dip/inc/config_dip.h.in -text
 Dip/install-sh -text
 Dip/ltmain.sh -text
 Dip/missing -text
@@ -414,6 +413,10 @@ Dip/src/UtilMacrosDecomp.h -text
 Dip/src/UtilParameters.cpp -text
 Dip/src/UtilParameters.h -text
 Dip/src/UtilTimer.h -text
+Dip/src/config.h.in -text
+Dip/src/config_default.h -text
+Dip/src/config_dip.h.in -text
+Dip/src/config_dip_default.h -text
 Dip/src/old/BcpsDecompModel.cpp -text
 Dip/src/old/BcpsDecompModel.h -text
 Dip/src/old/BcpsDecompNodeDesc.h -text

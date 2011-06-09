@@ -20,7 +20,7 @@
 # // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 # //                    Ted Ralphs, Lehigh University                          //
 # //                                                                           //
-# // Copyright (C) 2002-2010, Lehigh University, Matthew Galati, Ted Ralphs    //
+# // Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
 # // All Rights Reserved.                                                      //
 # //===========================================================================//
 #
@@ -1305,7 +1305,7 @@ gives unlimited permission to copy, distribute and modify it.
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2010, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -21321,7 +21321,7 @@ COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
 
-# initial list of dependencies is "coinutils osi alps", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coinutils osi alps", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinutils osi alps"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -21819,7 +21819,7 @@ CLP_CFLAGS_INSTALLED=
 CLP_DATA=
 CLP_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-clp"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22296,7 +22296,7 @@ SAMPLE_CFLAGS_INSTALLED=
 SAMPLE_DATA=
 SAMPLE_DATA_INSTALLED=
 
-# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatasample"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -22773,7 +22773,7 @@ CGL_CFLAGS_INSTALLED=
 CGL_DATA=
 CGL_DATA_INSTALLED=
 
-# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cgl"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23265,7 +23265,7 @@ CBC_CFLAGS_INSTALLED=
 CBC_DATA=
 CBC_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-cbc", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-cbc", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cbc"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -23764,7 +23764,7 @@ CPX_CFLAGS_INSTALLED=
 CPX_DATA=
 CPX_DATA_INSTALLED=
 
-# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24248,7 +24248,7 @@ ASL_CFLAGS_INSTALLED=
 ASL_DATA=
 ASL_DATA_INSTALLED=
 
-# initial list of dependencies is "coinasl", but we need to filter out version number specifications (= x, <= x, >= x)
+# initial list of dependencies is "coinasl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinasl"
 
 # we first expand the list of projects to process by adding all dependencies just behind the project which depends on it
@@ -24725,7 +24725,7 @@ CFLAGS=$CXXFLAGS
 
 
 # Here put the location and name of the configuration header file
-          ac_config_headers="$ac_config_headers inc/config_dip.h"
+                    ac_config_headers="$ac_config_headers src/config.h src/config_dip.h"
 
 
 # Finally, we let configure write all the output...
@@ -25570,7 +25570,8 @@ do
   "test/MILP_Main.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MILP_Main.cpp:examples/MILP/MILP_Main.cpp" ;;
   "test/MILP_Param.h" ) CONFIG_LINKS="$CONFIG_LINKS test/MILP_Param.h:examples/MILP/MILP_Param.h" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
-  "inc/config_dip.h" ) CONFIG_HEADERS="$CONFIG_HEADERS inc/config_dip.h" ;;
+  "src/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
+  "src/config_dip.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/config_dip.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;

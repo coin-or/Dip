@@ -25,7 +25,7 @@
 # Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
 #                    Ted Ralphs, Lehigh University                           #
 #                                                                            #
-# Copyright (C) 2002-2009, Lehigh University, Matthew Galati, Ted Ralphs     #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
@@ -125,8 +125,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/VRP/get_boost.sh.in \
 	$(top_srcdir)/examples/VRP/get_concorde.sh.in \
 	$(top_srcdir)/examples/VRP/get_cvrpsep.sh.in \
-	$(top_srcdir)/examples/VRP/vrp.parm.in \
-	$(top_srcdir)/inc/config_dip.h.in AUTHORS config.guess \
+	$(top_srcdir)/examples/VRP/vrp.parm.in AUTHORS config.guess \
 	config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_2 = Dependencies
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Dependencies-stamp
@@ -139,7 +138,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
+CONFIG_HEADER = $(top_builddir)/src/config.h \
+	$(top_builddir)/src/config_dip.h
 CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/TSP/data_extract.sh \
 	examples/TSP/get_boost.sh examples/TSP/get_concorde.sh \
@@ -497,23 +497,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-
-inc/config_dip.h: inc/stamp-h1
-	@if test ! -f $@; then \
-	  rm -f inc/stamp-h1; \
-	  $(MAKE) inc/stamp-h1; \
-	else :; fi
-
-inc/stamp-h1: $(top_srcdir)/inc/config_dip.h.in $(top_builddir)/config.status
-	@rm -f inc/stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status inc/config_dip.h
-$(top_srcdir)/inc/config_dip.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
-	cd $(top_srcdir) && $(AUTOHEADER)
-	rm -f inc/stamp-h1
-	touch $@
-
-distclean-hdr:
-	-rm -f inc/config_dip.h inc/stamp-h1
 examples/Makefile.Examples: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.Examples.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/Makefile.in
@@ -785,7 +768,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP $(distdir)/inc
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -964,8 +947,8 @@ clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-hdr \
-	distclean-libtool distclean-local distclean-tags
+distclean-am: clean-am distclean-generic distclean-libtool \
+	distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -1017,19 +1000,18 @@ uninstall-info: uninstall-info-recursive
 	check-am clean clean-generic clean-libtool clean-local \
 	clean-recursive ctags ctags-recursive dist dist-all dist-bzip2 \
 	dist-gzip dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-generic distclean-hdr distclean-libtool \
-	distclean-local distclean-recursive distclean-tags \
-	distcleancheck distdir distuninstallcheck dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-data-hook install-exec install-exec-am \
-	install-info install-info-am install-man \
-	install-pkgconfiglibDATA install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-hook uninstall-info-am \
-	uninstall-pkgconfiglibDATA
+	distclean-generic distclean-libtool distclean-local \
+	distclean-recursive distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am \
+	install-data-hook install-exec install-exec-am install-info \
+	install-info-am install-man install-pkgconfiglibDATA \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am uninstall-hook \
+	uninstall-info-am uninstall-pkgconfiglibDATA
 
 
 ########################################################################

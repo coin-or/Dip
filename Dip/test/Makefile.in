@@ -63,7 +63,8 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/inc/config_dip.h
+CONFIG_HEADER = $(top_builddir)/src/config.h \
+	$(top_builddir)/src/config_dip.h
 CONFIG_CLEAN_FILES = MILP_DecompApp.cpp MILP_DecompApp.h MILP_Main.cpp \
 	MILP_Param.h
 PROGRAMS = $(noinst_PROGRAMS)

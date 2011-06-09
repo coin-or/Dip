@@ -13,42 +13,20 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
-//===========================================================================//
-#ifndef DecompMemPool_h_
-#define DecompMemPool_h_
+/***************************************************************************/
+/*           HERE DEFINE THE PROJECT SPECIFIC PUBLIC MACROS                */
+/*    These are only in effect in a setting that doesn't use configure     */
+/***************************************************************************/
 
-#include "CoinError.hpp"
+/* Version number of project */
+#undef DIP_VERSION "trunk"
 
-// --------------------------------------------------------------------- //
-class DecompMemPool {
-public:
-   double * dblArrNCoreCols;
-   double * dblArrNCoreRows;
-   
-public:
-   void allocateMemory(const int nCoreCols,
-                       const int nCoreRows) {
-      if(nCoreCols > 0){
-         dblArrNCoreCols = new double[nCoreCols];
-         CoinAssertHint(dblArrNCoreCols, "Error: Out of Memory");
-      }
-      if(nCoreRows > 0){
-         dblArrNCoreRows = new double[nCoreRows];
-         CoinAssertHint(dblArrNCoreRows, "Error: Out of Memory");
-      }
-   }
-   
-public:
-   DecompMemPool() :
-      dblArrNCoreCols(0),
-      dblArrNCoreRows(0)
-   {
-   }
-   ~DecompMemPool()
-   {
-      UTIL_DELARR(dblArrNCoreCols);
-      UTIL_DELARR(dblArrNCoreRows);
-   }
-};
+/* Major Version number of project */
+#undef DIP_VERSION_MAJOR   9999
 
-#endif
+/* Minor Version number of project */
+#undef DIP_VERSION_MINOR   9999
+
+/* Release Version number of project */
+#undef DIP_VERSION_RELEASE 9999
+
