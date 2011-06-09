@@ -23,10 +23,9 @@ unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS)
 unitTest_DEPENDENCIES = ../src/libDecomp.la $(DIPLIB_DEPENDENCIES)
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS)
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
+# This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src` \
-                   -I`$(CYGPATH_W) $(top_builddir)/inc`
+                   -I`$(CYGPATH_W) $(top_builddir)/src`
 
 ########################################################################
 #                     Includes for LP Solver                           #

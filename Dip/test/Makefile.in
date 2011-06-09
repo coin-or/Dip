@@ -336,10 +336,9 @@ AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS) \
 	$(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4)
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
+# This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src` \
-                   -I`$(CYGPATH_W) $(top_builddir)/inc`
+                   -I`$(CYGPATH_W) $(top_builddir)/src`
 
 all: all-am
 

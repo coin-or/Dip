@@ -397,11 +397,8 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 AM_CPPFLAGS = $(DIPLIB_CFLAGS) $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4)
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` \
-                   -I`$(CYGPATH_W) $(top_builddir)/inc`
-
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
 #                Headers that need to be installed                     #
@@ -427,12 +424,6 @@ includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
 	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \
 	AlpsDecompModel.h AlpsDecompSolution.h AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h
-
-#############################################################################
-# Create the Config.h file that always defines HAVE_CONFIG_H and install it #
-#############################################################################
-# You only need to adapt the following line
-ConfigHeader = DecompConfig.h
 all: config.h config_dip.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -779,12 +770,10 @@ uninstall-am: uninstall-includecoinHEADERS uninstall-info-am \
 
 
 install-exec-local:
-	cat $(srcdir)/$(ConfigHeader) >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-	rm -f bla
+	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/DecompConfig.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

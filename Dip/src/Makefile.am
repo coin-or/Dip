@@ -109,10 +109,8 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 AM_CPPFLAGS = $(DIPLIB_CFLAGS)
 
-# This line is necessary to allow VPATH compilation with MS compilers
-# on Cygwin
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` \
-                   -I`$(CYGPATH_W) $(top_builddir)/inc`
+# This line is necessary to allow VPATH compilation
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
 #                     Includes for LP Solver                           #
@@ -198,17 +196,8 @@ includecoin_HEADERS +=             \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
 
-
-#############################################################################
-# Create the Config.h file that always defines HAVE_CONFIG_H and install it #
-#############################################################################
-# You only need to adapt the following line
-ConfigHeader = DecompConfig.h
-
 install-exec-local:
-	cat $(srcdir)/$(ConfigHeader) >> bla
-	$(install_sh_DATA) bla $(DESTDIR)$(includecoindir)/$(ConfigHeader)
-	rm -f bla
+	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
 
 uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/$(ConfigHeader)
+	rm -f $(DESTDIR)$(includecoindir)/DecompConfig.h
