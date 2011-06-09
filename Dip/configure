@@ -2870,7 +2870,7 @@ if test x"$CFLAGS" = x; then
       *)
         coin_opt_cflags="-O3"
         coin_add_cflags="-pipe"
-        coin_dbg_cflags="-g"
+        coin_dbg_cflags="-g -O0"
         coin_warn_cflags="-Wimplicit -Wparentheses -Wsequence-point -Wreturn-type -Wcast-qual -Wall -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -3802,7 +3802,7 @@ if test x"$CXXFLAGS" = x; then
 # ToDo decide about unroll-loops
         coin_opt_cxxflags="-O3"
         coin_add_cxxflags="-pipe"
-        coin_dbg_cxxflags="-g"
+        coin_dbg_cxxflags="-g -O0"
         coin_warn_cxxflags="-Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wconversion -Wno-unknown-pragmas -Wno-long-long"
         case $build in
           *-darwin*)
@@ -21159,6 +21159,10 @@ fi
 COINDEPEND_LIBS=
 COINDEPEND_CFLAGS=
 COINDEPEND_DATA=
+COINDEPEND_DEPENDENCIES=
+COINDEPEND_PCLIBS=
+COINDEPEND_PCREQUIRES=
+COINDEPEND_DATA=
 
 
 
@@ -21187,6 +21191,7 @@ if test "${with_coindepend_lib+set}" = set; then
      else
        coin_has_coindepend=yes
        COINDEPEND_LIBS="$withval"
+       COINDEPEND_PCLIBS="$withval"
 
          DIPLIB_PCLIBS="$withval $DIPLIB_PCLIBS"
          DIPLIB_LIBS="$withval $DIPLIB_LIBS"
@@ -21277,6 +21282,7 @@ echo "${ECHO_T}yes: $COINDEPEND_VERSIONS" >&6
         then
           COINDEPEND_LIBS=`echo " $COINDEPEND_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        COINDEPEND_PCREQUIRES="coinutils osi alps"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in DipLib
 
@@ -21320,6 +21326,8 @@ COINDEPEND_CFLAGS=
 COINDEPEND_CFLAGS_INSTALLED=
 COINDEPEND_DATA=
 COINDEPEND_DATA_INSTALLED=
+COINDEPEND_PCLIBS=
+COINDEPEND_PCREQUIRES=
 
 # initial list of dependencies is "coinutils osi alps", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinutils osi alps"
@@ -21517,6 +21525,7 @@ _ACEOF
     COINDEPEND_LIBS_INSTALLED=`echo " $COINDEPEND_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  COINDEPEND_PCREQUIRES="coinutils osi alps"
 
     DIPLIB_PCREQUIRES="coinutils osi alps $DIPLIB_PCREQUIRES"
     DIPLIB_CFLAGS="$COINDEPEND_CFLAGS $DIPLIB_CFLAGS"
@@ -21592,9 +21601,13 @@ echo "$as_me: CoinDepend DEPENDENCIES are $COINDEPEND_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: CoinDepend DATA   is  $COINDEPEND_DATA" >&5
 echo "$as_me: CoinDepend DATA   is  $COINDEPEND_DATA" >&6;}
     fi
-    if test -n "$COINDEPEND_CFLAGS" ; then
-      { echo "$as_me:$LINENO: CoinDepend CFLAGS are $COINDEPEND_CFLAGS" >&5
-echo "$as_me: CoinDepend CFLAGS are $COINDEPEND_CFLAGS" >&6;}
+    if test -n "$COINDEPEND_PCLIBS" ; then
+      { echo "$as_me:$LINENO: CoinDepend PCLIBS are $COINDEPEND_PCLIBS" >&5
+echo "$as_me: CoinDepend PCLIBS are $COINDEPEND_PCLIBS" >&6;}
+    fi
+    if test -n "$COINDEPEND_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: CoinDepend PCREQUIRES are $COINDEPEND_PCREQUIRES" >&5
+echo "$as_me: CoinDepend PCREQUIRES are $COINDEPEND_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: DipLib CFLAGS are $DIPLIB_CFLAGS" >&5
@@ -21657,6 +21670,10 @@ fi
 CLP_LIBS=
 CLP_CFLAGS=
 CLP_DATA=
+CLP_DEPENDENCIES=
+CLP_PCLIBS=
+CLP_PCREQUIRES=
+CLP_DATA=
 
 
 
@@ -21685,6 +21702,7 @@ if test "${with_clp_lib+set}" = set; then
      else
        coin_has_clp=yes
        CLP_LIBS="$withval"
+       CLP_PCLIBS="$withval"
 
          DIPLIB_PCLIBS="$withval $DIPLIB_PCLIBS"
          DIPLIB_LIBS="$withval $DIPLIB_LIBS"
@@ -21775,6 +21793,7 @@ echo "${ECHO_T}yes: $CLP_VERSIONS" >&6
         then
           CLP_LIBS=`echo " $CLP_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CLP_PCREQUIRES="osi-clp"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in DipLib
 
@@ -21818,6 +21837,8 @@ CLP_CFLAGS=
 CLP_CFLAGS_INSTALLED=
 CLP_DATA=
 CLP_DATA_INSTALLED=
+CLP_PCLIBS=
+CLP_PCREQUIRES=
 
 # initial list of dependencies is "osi-clp", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-clp"
@@ -22015,6 +22036,7 @@ _ACEOF
     CLP_LIBS_INSTALLED=`echo " $CLP_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  CLP_PCREQUIRES="osi-clp"
 
     DIPLIB_PCREQUIRES="osi-clp $DIPLIB_PCREQUIRES"
     DIPLIB_CFLAGS="$CLP_CFLAGS $DIPLIB_CFLAGS"
@@ -22090,9 +22112,13 @@ echo "$as_me: Clp DEPENDENCIES are $CLP_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Clp DATA   is  $CLP_DATA" >&5
 echo "$as_me: Clp DATA   is  $CLP_DATA" >&6;}
     fi
-    if test -n "$CLP_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Clp CFLAGS are $CLP_CFLAGS" >&5
-echo "$as_me: Clp CFLAGS are $CLP_CFLAGS" >&6;}
+    if test -n "$CLP_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Clp PCLIBS are $CLP_PCLIBS" >&5
+echo "$as_me: Clp PCLIBS are $CLP_PCLIBS" >&6;}
+    fi
+    if test -n "$CLP_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Clp PCREQUIRES are $CLP_PCREQUIRES" >&5
+echo "$as_me: Clp PCREQUIRES are $CLP_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: DipLib CFLAGS are $DIPLIB_CFLAGS" >&5
@@ -22149,6 +22175,10 @@ fi
 SAMPLE_LIBS=
 SAMPLE_CFLAGS=
 SAMPLE_DATA=
+SAMPLE_DEPENDENCIES=
+SAMPLE_PCLIBS=
+SAMPLE_PCREQUIRES=
+SAMPLE_DATA=
 
 
 
@@ -22169,6 +22199,7 @@ if test "${with_sample_lib+set}" = set; then
      else
        coin_has_sample=yes
        SAMPLE_LIBS="$withval"
+       SAMPLE_PCLIBS="$withval"
 
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
@@ -22256,6 +22287,7 @@ echo "${ECHO_T}yes: $SAMPLE_VERSIONS" >&6
         then
           SAMPLE_LIBS=`echo " $SAMPLE_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        SAMPLE_PCREQUIRES="coindatasample"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
 
@@ -22295,6 +22327,8 @@ SAMPLE_CFLAGS=
 SAMPLE_CFLAGS_INSTALLED=
 SAMPLE_DATA=
 SAMPLE_DATA_INSTALLED=
+SAMPLE_PCLIBS=
+SAMPLE_PCREQUIRES=
 
 # initial list of dependencies is "coindatasample", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coindatasample"
@@ -22492,6 +22526,7 @@ _ACEOF
     SAMPLE_LIBS_INSTALLED=`echo " $SAMPLE_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  SAMPLE_PCREQUIRES="coindatasample"
 
 
 fi
@@ -22559,9 +22594,13 @@ echo "$as_me: Sample DEPENDENCIES are $SAMPLE_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Sample DATA   is  $SAMPLE_DATA" >&5
 echo "$as_me: Sample DATA   is  $SAMPLE_DATA" >&6;}
     fi
-    if test -n "$SAMPLE_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Sample CFLAGS are $SAMPLE_CFLAGS" >&5
-echo "$as_me: Sample CFLAGS are $SAMPLE_CFLAGS" >&6;}
+    if test -n "$SAMPLE_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Sample PCLIBS are $SAMPLE_PCLIBS" >&5
+echo "$as_me: Sample PCLIBS are $SAMPLE_PCLIBS" >&6;}
+    fi
+    if test -n "$SAMPLE_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Sample PCREQUIRES are $SAMPLE_PCREQUIRES" >&5
+echo "$as_me: Sample PCREQUIRES are $SAMPLE_PCREQUIRES" >&6;}
     fi
 
   fi
@@ -22611,6 +22650,10 @@ fi
 CGL_LIBS=
 CGL_CFLAGS=
 CGL_DATA=
+CGL_DEPENDENCIES=
+CGL_PCLIBS=
+CGL_PCREQUIRES=
+CGL_DATA=
 
 
 
@@ -22639,6 +22682,7 @@ if test "${with_cgl_lib+set}" = set; then
      else
        coin_has_cgl=yes
        CGL_LIBS="$withval"
+       CGL_PCLIBS="$withval"
 
          DIPLIB_PCLIBS="$withval $DIPLIB_PCLIBS"
          DIPLIB_LIBS="$withval $DIPLIB_LIBS"
@@ -22729,6 +22773,7 @@ echo "${ECHO_T}yes: $CGL_VERSIONS" >&6
         then
           CGL_LIBS=`echo " $CGL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CGL_PCREQUIRES="cgl"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in DipLib
 
@@ -22772,6 +22817,8 @@ CGL_CFLAGS=
 CGL_CFLAGS_INSTALLED=
 CGL_DATA=
 CGL_DATA_INSTALLED=
+CGL_PCLIBS=
+CGL_PCREQUIRES=
 
 # initial list of dependencies is "cgl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="cgl"
@@ -22969,6 +23016,7 @@ _ACEOF
     CGL_LIBS_INSTALLED=`echo " $CGL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  CGL_PCREQUIRES="cgl"
 
     DIPLIB_PCREQUIRES="cgl $DIPLIB_PCREQUIRES"
     DIPLIB_CFLAGS="$CGL_CFLAGS $DIPLIB_CFLAGS"
@@ -23044,9 +23092,13 @@ echo "$as_me: Cgl DEPENDENCIES are $CGL_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Cgl DATA   is  $CGL_DATA" >&5
 echo "$as_me: Cgl DATA   is  $CGL_DATA" >&6;}
     fi
-    if test -n "$CGL_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Cgl CFLAGS are $CGL_CFLAGS" >&5
-echo "$as_me: Cgl CFLAGS are $CGL_CFLAGS" >&6;}
+    if test -n "$CGL_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Cgl PCLIBS are $CGL_PCLIBS" >&5
+echo "$as_me: Cgl PCLIBS are $CGL_PCLIBS" >&6;}
+    fi
+    if test -n "$CGL_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Cgl PCREQUIRES are $CGL_PCREQUIRES" >&5
+echo "$as_me: Cgl PCREQUIRES are $CGL_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: DipLib CFLAGS are $DIPLIB_CFLAGS" >&5
@@ -23103,6 +23155,10 @@ fi
 CBC_LIBS=
 CBC_CFLAGS=
 CBC_DATA=
+CBC_DEPENDENCIES=
+CBC_PCLIBS=
+CBC_PCREQUIRES=
+CBC_DATA=
 
 
 
@@ -23131,6 +23187,7 @@ if test "${with_cbc_lib+set}" = set; then
      else
        coin_has_cbc=yes
        CBC_LIBS="$withval"
+       CBC_PCLIBS="$withval"
 
          DIPLIB_PCLIBS="$withval $DIPLIB_PCLIBS"
          DIPLIB_LIBS="$withval $DIPLIB_LIBS"
@@ -23221,6 +23278,7 @@ echo "${ECHO_T}yes: $CBC_VERSIONS" >&6
         then
           CBC_LIBS=`echo " $CBC_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CBC_PCREQUIRES="osi-cbc"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in DipLib
 
@@ -23264,6 +23322,8 @@ CBC_CFLAGS=
 CBC_CFLAGS_INSTALLED=
 CBC_DATA=
 CBC_DATA_INSTALLED=
+CBC_PCLIBS=
+CBC_PCREQUIRES=
 
 # initial list of dependencies is "osi-cbc", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cbc"
@@ -23461,6 +23521,7 @@ _ACEOF
     CBC_LIBS_INSTALLED=`echo " $CBC_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  CBC_PCREQUIRES="osi-cbc"
 
     DIPLIB_PCREQUIRES="osi-cbc $DIPLIB_PCREQUIRES"
     DIPLIB_CFLAGS="$CBC_CFLAGS $DIPLIB_CFLAGS"
@@ -23536,9 +23597,13 @@ echo "$as_me: Cbc DEPENDENCIES are $CBC_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Cbc DATA   is  $CBC_DATA" >&5
 echo "$as_me: Cbc DATA   is  $CBC_DATA" >&6;}
     fi
-    if test -n "$CBC_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Cbc CFLAGS are $CBC_CFLAGS" >&5
-echo "$as_me: Cbc CFLAGS are $CBC_CFLAGS" >&6;}
+    if test -n "$CBC_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Cbc PCLIBS are $CBC_PCLIBS" >&5
+echo "$as_me: Cbc PCLIBS are $CBC_PCLIBS" >&6;}
+    fi
+    if test -n "$CBC_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Cbc PCREQUIRES are $CBC_PCREQUIRES" >&5
+echo "$as_me: Cbc PCREQUIRES are $CBC_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: DipLib CFLAGS are $DIPLIB_CFLAGS" >&5
@@ -23602,6 +23667,10 @@ fi
 CPX_LIBS=
 CPX_CFLAGS=
 CPX_DATA=
+CPX_DEPENDENCIES=
+CPX_PCLIBS=
+CPX_PCREQUIRES=
+CPX_DATA=
 
 
 
@@ -23630,6 +23699,7 @@ if test "${with_cpx_lib+set}" = set; then
      else
        coin_has_cpx=yes
        CPX_LIBS="$withval"
+       CPX_PCLIBS="$withval"
 
          DIPLIB_PCLIBS="$withval $DIPLIB_PCLIBS"
          DIPLIB_LIBS="$withval $DIPLIB_LIBS"
@@ -23720,6 +23790,7 @@ echo "${ECHO_T}yes: $CPX_VERSIONS" >&6
         then
           CPX_LIBS=`echo " $CPX_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        CPX_PCREQUIRES="osi-cplex"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in DipLib
 
@@ -23763,6 +23834,8 @@ CPX_CFLAGS=
 CPX_CFLAGS_INSTALLED=
 CPX_DATA=
 CPX_DATA_INSTALLED=
+CPX_PCLIBS=
+CPX_PCREQUIRES=
 
 # initial list of dependencies is "osi-cplex", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="osi-cplex"
@@ -23960,6 +24033,7 @@ _ACEOF
     CPX_LIBS_INSTALLED=`echo " $CPX_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  CPX_PCREQUIRES="osi-cplex"
 
     DIPLIB_PCREQUIRES="osi-cplex $DIPLIB_PCREQUIRES"
     DIPLIB_CFLAGS="$CPX_CFLAGS $DIPLIB_CFLAGS"
@@ -24035,9 +24109,13 @@ echo "$as_me: Cpx DEPENDENCIES are $CPX_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: Cpx DATA   is  $CPX_DATA" >&5
 echo "$as_me: Cpx DATA   is  $CPX_DATA" >&6;}
     fi
-    if test -n "$CPX_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Cpx CFLAGS are $CPX_CFLAGS" >&5
-echo "$as_me: Cpx CFLAGS are $CPX_CFLAGS" >&6;}
+    if test -n "$CPX_PCLIBS" ; then
+      { echo "$as_me:$LINENO: Cpx PCLIBS are $CPX_PCLIBS" >&5
+echo "$as_me: Cpx PCLIBS are $CPX_PCLIBS" >&6;}
+    fi
+    if test -n "$CPX_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: Cpx PCREQUIRES are $CPX_PCREQUIRES" >&5
+echo "$as_me: Cpx PCREQUIRES are $CPX_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: DipLib CFLAGS are $DIPLIB_CFLAGS" >&5
@@ -24101,6 +24179,10 @@ fi
 ASL_LIBS=
 ASL_CFLAGS=
 ASL_DATA=
+ASL_DEPENDENCIES=
+ASL_PCLIBS=
+ASL_PCREQUIRES=
+ASL_DATA=
 
 
 
@@ -24121,6 +24203,7 @@ if test "${with_asl_lib+set}" = set; then
      else
        coin_has_asl=yes
        ASL_LIBS="$withval"
+       ASL_PCLIBS="$withval"
 
        # if project flags are given by user and we build without pkg-config, then we need to setup the _INSTALLED variables
        if test -z "$PKG_CONFIG" ; then
@@ -24208,6 +24291,7 @@ echo "${ECHO_T}yes: $ASL_VERSIONS" >&6
         then
           ASL_LIBS=`echo " $ASL_LIBS " | sed -e 's/ \(\/[^ ]*\/\)\([^ ]*\)\.lib / \`$(CYGPATH_W) \1 | sed -e "s|\\\\\\\\\\\\\\\\\\\\|\/|g"\`\2.lib /g'`
         fi
+        ASL_PCREQUIRES="coinasl"
 
         # augment X_PCREQUIRES, X_CFLAGS, and X_LIBS for each build target X in
 
@@ -24247,6 +24331,8 @@ ASL_CFLAGS=
 ASL_CFLAGS_INSTALLED=
 ASL_DATA=
 ASL_DATA_INSTALLED=
+ASL_PCLIBS=
+ASL_PCREQUIRES=
 
 # initial list of dependencies is "coinasl", but we need to filter out version number specifications (= x, <= x, >= x, != x)
 projtoprocess="coinasl"
@@ -24444,6 +24530,7 @@ _ACEOF
     ASL_LIBS_INSTALLED=`echo " $ASL_LIBS_INSTALLED" | sed -e 's/ \(\/[^ ]*\/\)/ \`$(CYGPATH_W) \1\`/g' -e 's/ -L\([^ ]*\)/ \/libpath:\`$(CYGPATH_W) \1\`/g' -e 's/ -l\([^ ]*\)/ lib\1.lib/g'`
   fi
 
+  ASL_PCREQUIRES="coinasl"
 
 
 fi
@@ -24511,9 +24598,13 @@ echo "$as_me: ASL DEPENDENCIES are $ASL_DEPENDENCIES" >&6;}
       { echo "$as_me:$LINENO: ASL DATA   is  $ASL_DATA" >&5
 echo "$as_me: ASL DATA   is  $ASL_DATA" >&6;}
     fi
-    if test -n "$ASL_CFLAGS" ; then
-      { echo "$as_me:$LINENO: ASL CFLAGS are $ASL_CFLAGS" >&5
-echo "$as_me: ASL CFLAGS are $ASL_CFLAGS" >&6;}
+    if test -n "$ASL_PCLIBS" ; then
+      { echo "$as_me:$LINENO: ASL PCLIBS are $ASL_PCLIBS" >&5
+echo "$as_me: ASL PCLIBS are $ASL_PCLIBS" >&6;}
+    fi
+    if test -n "$ASL_PCREQUIRES" ; then
+      { echo "$as_me:$LINENO: ASL PCREQUIRES are $ASL_PCREQUIRES" >&5
+echo "$as_me: ASL PCREQUIRES are $ASL_PCREQUIRES" >&6;}
     fi
 
   fi
