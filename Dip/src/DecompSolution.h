@@ -41,8 +41,11 @@ public:
    inline const double getQuality() const {return m_quality;}
 
 public:
-   virtual void print(ostream & os = cout) const {
+   /** Print solution. */
+   virtual void print(int       precision = 2,
+		      ostream & os        = cout) const {
       int i;
+      os << setprecision(precision);
       os << setiosflags(ios::fixed|ios::showpoint)
          << setw(14);
       
@@ -54,6 +57,25 @@ public:
          }
       }
       os << "-------------------------" << endl;
+      os << resetiosflags(ios::fixed|ios::showpoint|ios::scientific); 
+   }
+
+   /** Print solution in MIPLIB2010 solution checker format. */
+   virtual void print(const vector<string> & colNames,
+		      int                    precision = 2,
+		      ostream              & os        = cout) const {
+      int i;
+      os << setprecision(precision);
+      os << setiosflags(ios::fixed|ios::showpoint);
+      
+      //os << "-------------------------" << endl;
+      os << "=obj= " << getQuality() << endl;
+      for (i = 0; i < m_size; i++) {
+         if (!UtilIsZero(m_values[i])){
+	    os << colNames[i] << " " << m_values[i] << endl;
+         }
+      }
+      //os << "-------------------------" << endl;
       os << resetiosflags(ios::fixed|ios::showpoint|ios::scientific); 
    }
    

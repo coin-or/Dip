@@ -154,9 +154,13 @@ int main(int argc, char ** argv){
          //--- get optimal solution
          //---     
          if(alpsModel.getSolStatus() == AlpsExitStatusOptimal){
+	    string   solutionFile = milp.getInstanceName() + ".sol";
+	    ofstream osSolution(solutionFile.c_str());
             const DecompSolution * solution = alpsModel.getBestSolution();
+	    const vector<string> & colNames = alpsModel.getColNames();
             cout << "Optimal Solution" << endl;
-            solution->print();         	 
+            solution->print(colNames, 8, osSolution);
+	    osSolution.close();
          }
 
 	 //---

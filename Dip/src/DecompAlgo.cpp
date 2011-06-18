@@ -2474,11 +2474,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
-   int cpxStat=0, cpxMethod=0;
+   //int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-   CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+   //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
@@ -4469,7 +4469,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    const double * userU         = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
    const double * origObjective = getOrigObjective();
-   //int            numThreads    = m_param.NumThreads;
+   int            numThreads    = m_param.NumThreads;
    double       * redCostX      = NULL;   
    double         alpha         = 0.0;
    int            whichBlock;
@@ -6384,7 +6384,7 @@ static void * solveRelaxedThread(void * args){
    //--- NOTE, redCost does not include alpha as sent in
    //---
    int         i, b;
-   DecompApp * app = algo->getDecompAppMutable();
+   //DecompApp * app = algo->getDecompAppMutable();
    for(i = 0; i < batchSz; i++){
       b = batch[i];
       printf("THREAD %d solving b %d\n", threadId, b); fflush(stdout);
@@ -6392,14 +6392,14 @@ static void * solveRelaxedThread(void * args){
       //is this thread safe??
       DecompAlgoModel & algoModel = algo->getModelRelax(b);
 
-      int    isExact  = 0;
-      int    nVars    = static_cast<int>(vars->size());
-      int    nNewVars = 0;
+      //int    isExact  = 0;
+      //int    nVars    = static_cast<int>(vars->size());
+      //int    nNewVars = 0;
       double             alpha        = u[nBaseCoreRows + b];
-      DecompSolverStatus solverStatus = DecompSolStatNoSolution;
+      //DecompSolverStatus solverStatus = DecompSolStatNoSolution;
       
-      bool useExact  = true;
-      bool useCutoff = false;
+      //bool useExact  = true;
+      //bool useCutoff = false;
       DecompSolverResult solveResult;
 
       //too many cases where ned locks - make threaded version

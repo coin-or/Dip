@@ -216,6 +216,23 @@ public:
       return m_decompAlgo->getModelCore().getModel()->getNumCols();
    }
 
+   /** 
+    * Get the column names in core decomp model.
+    */
+   inline const vector<string> & getColNames() const {
+      return m_decompAlgo->getModelCore().getModel()->getColNames();
+   }
+
+   /** 
+    * Get the row names in core decomp model.
+    */
+   inline const vector<string> & getRowNames() const {
+      return m_decompAlgo->getModelCore().getModel()->getRowNames();
+   }
+
+   /**
+    * Get the best solution found.
+    */
    inline const DecompSolution * getBestSolution() const {
       return m_decompAlgo->getXhatIPBest();
    }

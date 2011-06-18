@@ -83,6 +83,14 @@ private:
                           set<int>          & activeColsSet);
    
 public:
+   /** User access methods. */
+   
+   /** Get instance name. */
+   const string getInstanceName(){
+      return m_appParam.Instance;
+   }
+  
+public:
    /** @name Constructor and Destructor */
    MILPBlock_DecompApp(UtilParameters & utilParam) : 
       DecompApp  (utilParam),
