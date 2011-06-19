@@ -18,6 +18,8 @@
 #include "UtilMacrosDecomp.h"
 #include "DecompConstraintSet.h"
 
+using namespace std;
+
 //===========================================================================//
 void DecompConstraintSet::prepareModel(bool modelIsCore){
    //---
