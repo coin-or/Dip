@@ -25,6 +25,8 @@
 #include "CglMixedIntegerRounding2.hpp"
 #include "CoinPackedMatrix.hpp"
 
+using namespace std;
+
 //===========================================================================//
 int DecompAlgoCGL::initGenerators(const int doClique,
                                   const int doOddHole,

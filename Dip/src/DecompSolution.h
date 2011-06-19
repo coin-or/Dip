@@ -43,40 +43,40 @@ public:
 public:
    /** Print solution. */
    virtual void print(int       precision = 2,
-		      ostream & os        = cout) const {
+		      std::ostream & os        = std::cout) const {
       int i;
-      os << setprecision(precision);
-      os << setiosflags(ios::fixed|ios::showpoint)
-         << setw(14);
+      os << std::setprecision(precision);
+      os << std::setiosflags(std::ios::fixed|std::ios::showpoint)
+         << std::setw(14);
       
-      os << "-------------------------" << endl;
-      os << "Quality = " << getQuality() << endl;
+      os << "-------------------------" << std::endl;
+      os << "Quality = " << getQuality() << std::endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-	    os << setw(6) << i << " " << m_values[i] << endl;
+	    os << std::setw(6) << i << " " << m_values[i] << std::endl;
          }
       }
-      os << "-------------------------" << endl;
-      os << resetiosflags(ios::fixed|ios::showpoint|ios::scientific); 
+      os << "-------------------------" << std::endl;
+      os << std::resetiosflags(std::ios::fixed|std::ios::showpoint|std::ios::scientific); 
    }
 
    /** Print solution in MIPLIB2010 solution checker format. */
-   virtual void print(const vector<string> & colNames,
+   virtual void print(const std::vector<std::string> & colNames,
 		      int                    precision = 2,
-		      ostream              & os        = cout) const {
+		      std::ostream              & os        = std::cout) const {
       int i;
-      os << setprecision(precision);
-      os << setiosflags(ios::fixed|ios::showpoint);
+      os << std::setprecision(precision);
+      os << std::setiosflags(std::ios::fixed|std::ios::showpoint);
       
-      //os << "-------------------------" << endl;
-      os << "=obj= " << getQuality() << endl;
+      //os << "-------------------------" << std::endl;
+      os << "=obj= " << getQuality() << std::endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-	    os << colNames[i] << " " << m_values[i] << endl;
+	    os << colNames[i] << " " << m_values[i] << std::endl;
          }
       }
-      //os << "-------------------------" << endl;
-      os << resetiosflags(ios::fixed|ios::showpoint|ios::scientific); 
+      //os << "-------------------------" << std::endl;
+      os << std::resetiosflags(std::ios::fixed|std::ios::showpoint|std::ios::scientific); 
    }
    
 public:

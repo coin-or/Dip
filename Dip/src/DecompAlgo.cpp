@@ -43,6 +43,7 @@
 #define USE_MULTI_RAY
 #endif
 
+using namespace std;
 
 //===========================================================================//
 #ifdef RELAXED_THREADED

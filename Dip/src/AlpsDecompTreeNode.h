@@ -28,7 +28,7 @@ class AlpsDecompModel;
 class AlpsDecompTreeNode : public AlpsTreeNode {
 private:
    /** class tag for debugging */
-   string m_classTag;
+   std::string m_classTag;
 
    std::vector< std::pair<int, double> > downBranchLB_;
    std::vector< std::pair<int, double> > downBranchUB_;

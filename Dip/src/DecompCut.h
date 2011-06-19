@@ -41,7 +41,7 @@ private:
   int              m_effCnt;    //effectiveness counter
 
 protected:
-  string           m_strHash;
+  std::string           m_strHash;
   //TODO - use distance instead of violation? see SAS
   
  public:
@@ -49,7 +49,7 @@ protected:
   inline double    getUpperBound()   const { return m_ub;        }
   inline double    getViolation()    const { return m_violation; }
   inline int       getEffCnt()       const { return m_effCnt;    }
-  inline string    getStrHash()      const { return m_strHash;   }
+  inline std::string    getStrHash()      const { return m_strHash;   }
  
 public:
   inline void      setLowerBound(const double lb) { m_lb = lb; }
@@ -97,7 +97,7 @@ public:
 
   virtual bool     isSame(const DecompCut * cut) const { return false; }
   
-  virtual void     print(ostream * os = &cout) const;
+  virtual void     print(std::ostream * os = &std::cout) const;
   
 public:
   inline void resetEffCnt(){

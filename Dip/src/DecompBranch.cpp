@@ -16,6 +16,9 @@
 
 #include "DecompAlgo.h"
 #include "DecompApp.h"
+
+using namespace std;
+
 // --------------------------------------------------------------------- //
 bool DecompAlgo::
 chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,

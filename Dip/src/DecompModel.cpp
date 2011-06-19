@@ -18,6 +18,8 @@
 #include "DecompSolverResult.h"
 //===========================================================================//
 
+using namespace std;
+
 //===========================================================================//
 bool DecompAlgoModel::isPointFeasible(const double * x,
                                       const bool     isXSparse,

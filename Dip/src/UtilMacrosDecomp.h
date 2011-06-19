@@ -33,7 +33,7 @@ class DecompApp;
 #include "UtilTimer.h"
 //NOTE: this is not thread safe!
 static UtilTimer              globalTimer;
-static map<string, UtilTimer> globalTimerFuncMap;
+static std::map<std::string, UtilTimer> globalTimerFuncMap;
 #endif
 
 // =========================================================================
@@ -48,51 +48,51 @@ static map<string, UtilTimer> globalTimerFuncMap;
 // =========================================================================
 #ifdef UTIL_USE_TIMERS
 // ------------------------------------------------------------------------- //
-inline void UtilPrintFuncBegin(ostream      * os,
-			       const string & classTag,
-			       const string & funcName,
+inline void UtilPrintFuncBegin(std::ostream      * os,
+			       const std::string & classTag,
+			       const std::string & funcName,
 			       const int      logLevel,
 			       const int      logLimit){
 
    const size_t nDashes = 30;
-   string      funcKey       = classTag + funcName;
+   std::string      funcKey       = classTag + funcName;
    UtilTimer & thisFuncTimer = globalTimerFuncMap[funcKey];
    thisFuncTimer.reset();
    if(logLevel >= logLimit){
       size_t i;
-      string funcBegin = "<--- " + funcName + " ";
+      std::string funcBegin = "<--- " + funcName + " ";
       for(i = funcBegin.size(); i < nDashes; i++){
 	 funcBegin += "-";
       }
-      (*os) << left << setw(9) << classTag << ": "
-	    << setprecision(3) << setw(8) << globalTimer.getRealTime()
-	    << " [CPU: " << setprecision(3) << setw(8) 
+      (*os) << std::left << std::setw(9) << classTag << ": "
+	    << std::setprecision(3) << std::setw(8) << globalTimer.getRealTime()
+	    << " [CPU: " << std::setprecision(3) << std::setw(8) 
             << globalTimer.getCpuTime() << "] " << funcBegin << "\n";      
    }
 }
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintFuncEnd(ostream      * os,
-			     const string & classTag,
-			     const string & funcName,
+inline void UtilPrintFuncEnd(std::ostream      * os,
+			     const std::string & classTag,
+			     const std::string & funcName,
 			     const int      logLevel,
 			     const int      logLimit){
    
    const size_t nDashes = 30;
-   string      funcKey       = classTag + funcName;
+   std::string      funcKey       = classTag + funcName;
    UtilTimer & thisFuncTimer = globalTimerFuncMap[funcKey];
    if(logLevel >= logLimit){
       size_t i;
-      string funcEnd = " --- " + funcName + " ";
+      std::string funcEnd = " --- " + funcName + " ";
       for(i = funcEnd.size(); i < nDashes; i++){
 	 funcEnd += "-";
       }
       funcEnd += ">";
-      (*os) << left << setw(9) << classTag << ": " 
-	    << setprecision(3) << setw(8) << globalTimer.getRealTime() 
-	    << " [CPU: " << setprecision(4) << setw(8) 
+      (*os) << std::left << std::setw(9) << classTag << ": " 
+	    << std::setprecision(3) << std::setw(8) << globalTimer.getRealTime() 
+	    << " [CPU: " << std::setprecision(4) << std::setw(8) 
             << globalTimer.getCpuTime() << "] " << funcEnd << " funcT = "
-	    << setprecision(3) << setw(8) << thisFuncTimer.getCpuTime()
+	    << std::setprecision(3) << std::setw(8) << thisFuncTimer.getCpuTime()
 	    << "\n";      
    }
 }
@@ -170,11 +170,11 @@ void UtilPackedVectorFromDense(const int          len,
                                CoinPackedVector & v);
 
 void UtilPrintPackedVector(const CoinPackedVector & v,
-                           ostream                * os  = &cout,
+                           std::ostream                * os  = &std::cout,
                            DecompApp              * app = 0);
 void UtilPrintPackedVector(const CoinPackedVector & v,
-                           ostream                * os,
-                           const vector<string>         & colNames,
+                           std::ostream                * os,
+                           const std::vector<std::string>         & colNames,
 			   const double           * value = NULL);
 
 

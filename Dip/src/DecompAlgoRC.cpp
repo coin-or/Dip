@@ -18,6 +18,8 @@
 #include "DecompVar.h"
 #include "DecompAlgoRC.h"
 
+using namespace std;
+
 //===========================================================================//
 DecompPhase DecompAlgoRC::phaseInit(){
    

@@ -261,12 +261,12 @@ public:
    }
 
    inline void getSettings(UtilParameters & param){
-      const string sec = "DECOMP";
+      const std::string sec = "DECOMP";
       getSettingsImpl(param, sec.c_str());
    }
    
    inline void getSettings(UtilParameters & param,
-			   const string   & sec){
+			   const std::string & sec){
       //---
       //--- first get any settings that apply across any DECOMP algo
       //---    from the [DECOMP] section
@@ -282,8 +282,8 @@ public:
    }
 
    /** \todo this should be derived from utilparam? */
-   void dumpSettings(const string & sec,
-		     ostream      * os = &cout){
+   void dumpSettings(const std::string & sec,
+		     std::ostream      * os = &std::cout){
       (*os) << "\n========================================================";
       (*os) << "\nDECOMP PARAMETER SETTINGS\n";
       UtilPrintParameter(os, sec, "LogLevel",            LogLevel);
@@ -426,8 +426,8 @@ public:
       DebugCheckBlocksColumns  = true;
    }
    
-   void dumpSettings(ostream * os = &cout){
-      const string sec = "DECOMP";
+   void dumpSettings(std::ostream * os = &std::cout){
+      const std::string sec = "DECOMP";
       dumpSettings(sec, os);
    }
    /**

@@ -29,7 +29,6 @@
 
 //===========================================================================//
 #include <string>
-using namespace std;
 
 //===========================================================================//
 class AlpsTreeNode;
@@ -77,7 +76,7 @@ private:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
 
    /**
     * Parameters for Alps.
@@ -219,14 +218,14 @@ public:
    /** 
     * Get the column names in core decomp model.
     */
-   inline const vector<string> & getColNames() const {
+   inline const std::vector<std::string> & getColNames() const {
       return m_decompAlgo->getModelCore().getModel()->getColNames();
    }
 
    /** 
     * Get the row names in core decomp model.
     */
-   inline const vector<string> & getRowNames() const {
+   inline const std::vector<std::string> & getRowNames() const {
       return m_decompAlgo->getModelCore().getModel()->getRowNames();
    }
 

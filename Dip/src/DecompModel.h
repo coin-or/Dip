@@ -30,17 +30,17 @@
 class DecompAppModel {
 protected:
    DecompConstraintSet * m_model;
-   string                m_modelName;
+   std::string                m_modelName;
    int                   m_blockId;
 
 public:
    DecompConstraintSet * getModel()     const { return m_model; }
-   const string        & getModelName() const { return m_modelName; }
+   const std::string        & getModelName() const { return m_modelName; }
    const int             getBlockId()   const { return m_blockId; }
 
 public:
    void setModel    (DecompConstraintSet * model) { m_model = model; }
-   void setModelName(const string modelName) { m_modelName = modelName; }
+   void setModelName(const std::string modelName) { m_modelName = modelName; }
    void setBlockId  (const int blockId) { m_blockId = blockId; }
    
 public:
@@ -60,7 +60,7 @@ public:
       m_modelName(""),
       m_blockId  (0) {};
    DecompAppModel(DecompConstraintSet * model,
-                  string                modelName,
+                  std::string                modelName,
                   int                   blockId) :
       m_model    (model),
       m_modelName(modelName),
@@ -100,8 +100,8 @@ public:
       assert(m_numCols == m_osi->getNumCols());
       if(getModel()->isSparse()){
 	 const DecompConstraintSet * model = getModel();
-	 const map<int,int> & origToSparse = model->getMapOrigToSparse();
-	 map<int,int>::const_iterator mcit;
+	 const std::map<int,int> & origToSparse = model->getMapOrigToSparse();
+	 std::map<int,int>::const_iterator mcit;
 	 for(mcit = origToSparse.begin(); 
 	     mcit != origToSparse.end(); mcit++){
 	    m_osi->setObjCoeff(mcit->second,           //sparse-index
@@ -116,14 +116,14 @@ public:
    void setActiveColBounds(const double * colLB,
                            const double * colUB){
       DecompConstraintSet * model         = getModel();
-      vector<int>         & activeColumns = model->activeColumns;
+      std::vector<int>         & activeColumns = model->activeColumns;
       //---
       //--- if no active columns are set,  assume they are all active
       //---   for e.g., in the case of one block (or sparse)
       //---
       if(model->isSparse()){
-         const map<int,int> & origToSparse = model->getMapOrigToSparse();
-         map<int,int>::const_iterator mcit;
+         const std::map<int,int> & origToSparse = model->getMapOrigToSparse();
+         std::map<int,int>::const_iterator mcit;
          for(mcit  = origToSparse.begin(); 	
              mcit != origToSparse.end(); mcit++){
             m_osi->setColLower(mcit->second,        //sparse-index
@@ -138,7 +138,7 @@ public:
       }
       else{
          if(activeColumns.size()){
-            vector<int>::iterator vi;
+            std::vector<int>::iterator vi;
             for(vi = activeColumns.begin(); vi != activeColumns.end(); vi++){
 	       //printf("setColBounds i:%d to LB:%g UB:%g\n",
 	       //     *vi, colLB[*vi], colUB[*vi]);
@@ -188,7 +188,7 @@ public:
       m_numCols     (0   ),
       m_colIndices  (NULL){};
    DecompAlgoModel(DecompConstraintSet * model,
-                   string                modelName,
+                   std::string                modelName,
                    int                   blockId) :      
       DecompAppModel(model, modelName, blockId),
       m_osi         (NULL),

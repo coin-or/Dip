@@ -38,7 +38,6 @@
 #include <map>
 #include <limits>
 #include <cmath>
-using namespace std;
 
 //===========================================================================//
 // DECOMP Enums, Constants and Typedefs                                      //
@@ -72,7 +71,7 @@ enum DecompAlgoType{
    VOL_AND_CUT,
    DECOMP
 };
-const string DecompAlgoStr[5] = {
+const std::string DecompAlgoStr[5] = {
    "CUT", 
    "PRICE_AND_CUT", 
    "RELAX_AND_CUT", 
@@ -91,7 +90,7 @@ enum DecompAlgoStop{
    DecompStopBound,
    DecompStopTime
 };
-const string DecompAlgoStopStr[6] = {
+const std::string DecompAlgoStopStr[6] = {
    "DecompStopNo",
    "DecompStopGap",
    "DecompStopTailOff",
@@ -112,7 +111,7 @@ enum DecompPhase{
    PHASE_DONE,
    PHASE_UNKNOWN
 };
-const string DecompPhaseStr[6] = {
+const std::string DecompPhaseStr[6] = {
    "PHASE_PRICE1", 
    "PHASE_PRICE2", 
    "PHASE_CUT", 
@@ -129,7 +128,7 @@ enum DecompStatus{
    STAT_INFEASIBLE,
    STAT_UNKNOWN
 };
-const string DecompStatusStr[3] = {
+const std::string DecompStatusStr[3] = {
    "STAT_FEASIBLE", 
    "STAT_INFEASIBLE",
    "STAT_UNKNOWN"
@@ -179,7 +178,7 @@ enum DecompRowType{
    //row which is a cut
    DecompRow_Cut
 };
-const string DecompRowTypeStr[4] = {     
+const std::string DecompRowTypeStr[4] = {     
    "DecompRow_Original",
    "DecompRow_Branch",   
    "DecompRow_Convex",
@@ -213,7 +212,7 @@ enum DecompColType {
    //marker used for deletion
    DecompCol_ToBeDeleted
 };
-const string DecompColTypeStr[12] = {
+const std::string DecompColTypeStr[12] = {
    "DecompCol_Structural",
    "DecompCol_Structural_NoDelete",
    "DecompCol_MasterOnly",

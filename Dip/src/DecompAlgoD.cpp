@@ -20,6 +20,7 @@
 #include "DecompCutOsi.h"
 #include "DecompSolverResult.h"
 
+using namespace std;
 
 //TODO: generateInitVars should be based on cost = -xhat
 

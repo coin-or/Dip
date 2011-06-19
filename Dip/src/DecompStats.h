@@ -112,12 +112,12 @@ public:
     *          from the subproblem polytope (for the associated master duals).
     *               LB = zPC_LB + RC_LB <= zPC* <= zPC_UB = UB
     */ 
-   vector< DecompObjBound > objHistoryBound;
+   std::vector< DecompObjBound > objHistoryBound;
       
    /**
     * The global lower (.first) and upper (.second) bound.
     */
-   pair<double, double> objBest;      
+   std::pair<double, double> objBest;      
    
    /**
     * The node index (in the branch-and-bound tree).
@@ -181,7 +181,7 @@ public:
    }
 
 public:
-   void printObjHistoryBound  (ostream * os = &cout) const;
+   void printObjHistoryBound  (std::ostream * os = &std::cout) const;
    inline void resetCutRound() {
       cutCallsRound = 0;
       cutsThisRound = 0;
@@ -249,19 +249,19 @@ class DecompStats{
    double maxCompressCols;
 
  public:
-   vector<double> thisDecomp;
-   vector<double> thisSolveRelax;
-   vector<double> thisSolveRelaxApp;
-   vector<double> thisSolUpdate;
-   vector<double> thisGenCuts;
-   vector<double> thisGenCutsApp;
-   vector<double> thisGenVars;
-   vector<double> thisCompressCols;
+   std::vector<double> thisDecomp;
+   std::vector<double> thisSolveRelax;
+   std::vector<double> thisSolveRelaxApp;
+   std::vector<double> thisSolUpdate;
+   std::vector<double> thisGenCuts;
+   std::vector<double> thisGenCutsApp;
+   std::vector<double> thisGenVars;
+   std::vector<double> thisCompressCols;
 
  public:
    void calculateStats();
-   void printOverallStats (ostream * os = &cout);//ostream?
-   void printDetailedStats(ostream * os = &cout);//ostream?
+   void printOverallStats (std::ostream * os = &std::cout);//ostream?
+   void printDetailedStats(std::ostream * os = &std::cout);//ostream?
    
  public:
    DecompStats() :

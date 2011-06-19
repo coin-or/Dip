@@ -34,10 +34,10 @@ private:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */   
-   const string m_classTag;
+   const std::string m_classTag;
    
 private:
-   vector<double>   m_u;   //dual vector
+   std::vector<double>   m_u;   //dual vector
    double         * m_rc;  //reduced cost
 
    double           m_UB;
@@ -140,13 +140,13 @@ public:
       m_zeroSub  (false),
       m_shatVar  ()
    {
-      string paramSection = DecompAlgoStr[RELAX_AND_CUT]; 
+      std::string paramSection = DecompAlgoStr[RELAX_AND_CUT]; 
       initSetup(utilParam, paramSection);
    }
    
    DecompAlgoRC(DecompApp      * app,
 		UtilParameters * utilParam,
-		string         & paramSection) :
+		std::string         & paramSection) :
       DecompAlgo(RELAX_AND_CUT, app, utilParam),
       m_classTag ("D-ALGORC"),
       m_u        (),

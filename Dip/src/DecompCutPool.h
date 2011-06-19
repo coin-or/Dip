@@ -20,7 +20,6 @@
 #include "DecompWaitingRow.h"
 
 #include <functional>
-using namespace std;
 
 class DecompConstraintSet;
 
@@ -52,7 +51,7 @@ class DecompCutPool : public std::vector<DecompWaitingRow> {
     m_rowsAreValid = rowsAreValid;
   }
 
-  void print(ostream * os = &cout) const; //THINK: virtual??
+  void print(std::ostream * os = &std::cout) const; //THINK: virtual??
   void reExpand(const DecompVarList & vars, 
                 const int             n_coreCols,
                 const int             n_artCols);
@@ -81,7 +80,7 @@ class DecompCutPool : public std::vector<DecompWaitingRow> {
     //---
     //--- delete any memory that is left in the waiting rows
     //---
-    vector<DecompWaitingRow>::iterator vi;
+    std::vector<DecompWaitingRow>::iterator vi;
     for(vi = begin(); vi != end(); vi++){
       (*vi).deleteCut();
       (*vi).deleteRow();

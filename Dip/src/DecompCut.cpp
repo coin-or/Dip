@@ -16,6 +16,8 @@
 
 #include "DecompCut.h"
 
+using namespace std;
+
 // --------------------------------------------------------------------- //
 bool DecompCut::calcViolation(const CoinPackedVector * row,
                               const double           * x){

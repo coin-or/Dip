@@ -46,7 +46,7 @@ private:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
 
    //TODO
    double            * m_xhatD;
@@ -76,7 +76,7 @@ private:
                                double           * colLB,
                                double           * colUB,
                                double           * objCoeff,
-                               vector<string>   & colNames,
+                               std::vector<std::string>   & colNames,
                                int                startRow,
                                int                endRow,
                                char               origOrBranch);
@@ -131,13 +131,13 @@ public:
 	       int                    numOrigCols) //need to pass this? :
       :
    DecompAlgoPC(app, utilParam, 
-                const_cast<string&>(DecompAlgoStr[DECOMP]), false),
+                const_cast<std::string&>(DecompAlgoStr[DECOMP]), false),
    m_classTag   ("D-ALGOD"),
    m_xhatD      (xhat),
    m_newCuts    (0),
    m_numOrigCols(numOrigCols) //need?
    {
-      string paramSection = DecompAlgoStr[DECOMP];
+      std::string paramSection = DecompAlgoStr[DECOMP];
       m_algo              = DECOMP;
       initSetup(utilParam, paramSection);
    }
@@ -145,7 +145,7 @@ public:
    //need this?
    DecompAlgoD(DecompApp      * app,
 	       UtilParameters * utilParam,
-	       string         & paramSection,
+	       std::string         & paramSection,
 	       double         * xhat,
 	       int              numOrigCols):
       DecompAlgoPC(app, utilParam, paramSection, false),

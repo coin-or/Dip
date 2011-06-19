@@ -22,9 +22,9 @@
 // Graph Macros                                                             
 // =========================================================================
 // ------------------------------------------------------------------------- //
-pair<int,int> UtilBothEndsU(const int index){
+std::pair<int,int> UtilBothEndsU(const int index){
    int i = (int)(floor(sqrt(1 + 8.0 * index) / 2 + .500000001));
-   return make_pair( i, index - (i * (i - 1) / 2) );
+   return std::make_pair( i, index - (i * (i - 1) / 2) );
 }
 
 // =========================================================================

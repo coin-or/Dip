@@ -18,21 +18,20 @@
 #define UTIL_HASH_INCLUDED
 
 #include <string>
-using namespace std;
 
-string UtilCreateStringHash(const int      len,
+std::string UtilCreateStringHash(const int      len,
                             const double * els,
                             const int      precision = 6);
 
-string UtilCreateStringHash(const int      len,
+std::string UtilCreateStringHash(const int      len,
                             const int    * ind,
                             const double * els,
                             const int      precision = 6);
-string UtilCreateStringHash(const int      len,
+std::string UtilCreateStringHash(const int      len,
                             const int    * ind,
                             const double   els,
                             const int      precision = 6);
-string UtilCreateStringHash(const int      len,
+std::string UtilCreateStringHash(const int      len,
                             const int    * ind,
                             const double * els,
                             const char     sense,

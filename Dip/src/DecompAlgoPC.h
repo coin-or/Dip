@@ -42,7 +42,7 @@ private:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
 
    /**
     * Dual vector.
@@ -51,21 +51,21 @@ private:
     * This dual vector is the one used in reduced-cost calculations when
     * using a stabilized dual method (m_param.DualStab > 0).
     */
-   vector<double> m_dual;    
+   std::vector<double> m_dual;    
 
    /**
     * Dual vector from restricted master.
     * 
     * A copy of the dual vector from the restricted master.
     */
-   vector<double> m_dualRM;  
+   std::vector<double> m_dualRM;  
 
    /**
     * Dual vector stabilized.
     * 
     * The stabilized dual from dual stabilization method.
     */
-   vector<double> m_dualST;  
+   std::vector<double> m_dualST;  
 
    /**
     * @}
@@ -174,10 +174,10 @@ private:
    //-----------------------------------------------------------------------//
 public:
 
-   vector<double> & getDualBest(){
+   std::vector<double> & getDualBest(){
       return m_dual;
    }
-   vector<double> & getDualRMP(){
+   std::vector<double> & getDualRMP(){
       return m_dualRM;
    }
 
@@ -201,14 +201,14 @@ public:
       //--- run init setup
       //---
       if(doSetup){
-         string paramSection = DecompAlgoStr[PRICE_AND_CUT];
+         std::string paramSection = DecompAlgoStr[PRICE_AND_CUT];
          initSetup(utilParam, paramSection);
       }
    }
       
    DecompAlgoPC(DecompApp      * app,
                 UtilParameters * utilParam,
-                string         & paramSection,
+                std::string         & paramSection,
                 bool             doSetup    = true) :
       //is utilParam used in base class?
       DecompAlgo(PRICE_AND_CUT, app, utilParam),

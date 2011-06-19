@@ -33,27 +33,27 @@ public:
    CoinPackedMatrix   * M;
    int                  nBaseRowsOrig;
    int                  nBaseRows;
-   vector<string>       rowHash;
-   vector<char>         rowSense;
-   vector<double>       rowRhs;
-   vector<double>       rowLB;
-   vector<double>       rowUB;
-   vector<double>       colLB;
-   vector<double>       colUB;
-   vector<int>          integerVars;
-   vector<char>         integerMark; //'C' = continuous, 'I' = integral
-   vector<string>       colNames;
-   vector<string>       rowNames;
-   vector<int>          activeColumns; //if block, define the active columns
-   set<int>             activeColumnsS;//if block, define the active columns
-   vector<int>          masterOnlyCols;
+   std::vector<std::string>       rowHash;
+   std::vector<char>         rowSense;
+   std::vector<double>       rowRhs;
+   std::vector<double>       rowLB;
+   std::vector<double>       rowUB;
+   std::vector<double>       colLB;
+   std::vector<double>       colUB;
+   std::vector<int>          integerVars;
+   std::vector<char>         integerMark; //'C' = continuous, 'I' = integral
+   std::vector<std::string>       colNames;
+   std::vector<std::string>       rowNames;
+   std::vector<int>          activeColumns; //if block, define the active columns
+   std::set<int>             activeColumnsS;//if block, define the active columns
+   std::vector<int>          masterOnlyCols;
    bool                 prepHasRun;
 
    //for storage of several rows of row-majored sparse matrix
    //  to be used with appendRows
-   vector<CoinBigIndex> m_rowBeg;
-   vector<int         > m_rowInd;
-   vector<double      > m_rowVal;
+   std::vector<CoinBigIndex> m_rowBeg;
+   std::vector<int         > m_rowInd;
+   std::vector<double      > m_rowVal;
 
    //for special case of master-only vars
    bool                 m_masterOnly;
@@ -65,8 +65,8 @@ public:
    //for special case of sparse representation
    bool          m_isSparse;
    int           m_numColsOrig;
-   map<int, int> m_origToSparse;
-   map<int, int> m_sparseToOrig;
+   std::map<int, int> m_origToSparse;
+   std::map<int, int> m_sparseToOrig;
    
 public:
    inline void setSparse(const int numColsOrig){
@@ -84,12 +84,12 @@ public:
       return isSparse() ? m_numColsOrig : getNumCols(); };
    inline const int getNumInts() const {
       return static_cast<int>(integerVars.size());}
-   inline const vector<int>    & getActiveColumns() const {
+   inline const std::vector<int>    & getActiveColumns() const {
       return activeColumns;}
-   inline const vector<string> & getRowNames() const {return rowNames;}
-   inline const vector<string> & getColNames() const {return colNames;}   
-   inline vector<string> & getRowNamesMutable() {return rowNames;}
-   inline vector<string> & getColNamesMutable() {return colNames;}
+   inline const std::vector<std::string> & getRowNames() const {return rowNames;}
+   inline const std::vector<std::string> & getColNames() const {return colNames;}   
+   inline std::vector<std::string> & getRowNamesMutable() {return rowNames;}
+   inline std::vector<std::string> & getColNamesMutable() {return colNames;}
    inline const char   * getIntegerMark() { return &integerMark[0];}
    inline const int    * getIntegerVars() { return &integerVars[0];}
    inline const double * getColLB() const { return &colLB[0]; };
@@ -98,11 +98,11 @@ public:
    inline const double * getRowUB() const { return &rowUB[0]; };
    inline const bool     hasPrepRun() const { return prepHasRun; };
    inline const bool     isMasterOnly() const { return m_masterOnly; };
-   inline const map<int,int> & getMapOrigToSparse() const {
+   inline const std::map<int,int> & getMapOrigToSparse() const {
       return m_origToSparse;};
-   inline const map<int,int> & getMapSparseToOrig() const {
+   inline const std::map<int,int> & getMapSparseToOrig() const {
       return m_sparseToOrig;};
-   inline const vector<int> & getMasterOnlyCols() const {return masterOnlyCols;}
+   inline const std::vector<int> & getMasterOnlyCols() const {return masterOnlyCols;}
    
 
 public:
@@ -124,7 +124,7 @@ public:
    inline void appendRow(CoinPackedVector & row,
 			 double             loBound,
 			 double             upBound,
-			 string           & rowName){
+			 std::string           & rowName){
       appendRow(row, loBound, upBound);
       rowNames.push_back(rowName);         
    }   
@@ -140,8 +140,8 @@ public:
 	 integerVars.push_back(index);
       assert(!(origIndex==-1 && m_isSparse));
       if(origIndex >= 0){
-	 m_origToSparse.insert(make_pair(origIndex, index));
-	 m_sparseToOrig.insert(make_pair(index, origIndex));
+	 m_origToSparse.insert(std::make_pair(origIndex, index));
+	 m_sparseToOrig.insert(std::make_pair(index, origIndex));
       }
    }
 

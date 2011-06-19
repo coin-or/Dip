@@ -31,6 +31,8 @@
 //===========================================================================//
 #include "CoinUtility.hpp"
 
+using namespace std;
+
 //===========================================================================//
 AlpsTreeNode * 
 AlpsDecompTreeNode::createNewTreeNode(AlpsNodeDesc *& desc) const {

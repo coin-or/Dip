@@ -20,12 +20,11 @@
 #include <map>
 #include <string>
 #include <fstream>
-using namespace std;
 
 //===========================================================================//
 struct UtilParamT {
    //bad name for this string, really valueStr?
-   string paramName;
+   std::string paramName;
    bool   isUsed;        //is used in code (a call to getSetting)?
 };
 typedef struct UtilParamT UtilParam;
@@ -34,7 +33,7 @@ typedef struct UtilParamT UtilParam;
 class UtilParameters 
 {
 private:
-   map<string, UtilParam> m_paramMap;
+   std::map<std::string, UtilParam> m_paramMap;
     
 public:
    UtilParameters() 
@@ -51,14 +50,14 @@ public:
 
    void ScanCmdLineArgs(int  & argc, 
                         char * argv[]);
-   void   LoadParamFile(string & paramFileName);
-   void   Add(string & section, 
-              string & name, 
-              string & value);
+   void   LoadParamFile(std::string & paramFileName);
+   void   Add(std::string & section, 
+              std::string & name, 
+              std::string & value);
    void   Add(const char * section, 
               const char * name, 
               const char * value);
-   string GetSetting(const char * name,
+   std::string GetSetting(const char * name,
                      const char * defaultValue,
                      const char * section = NULL);
    int    GetSetting(const char * name,
@@ -77,7 +76,7 @@ public:
 private:
    UtilParam * FindEntry(const char * section, 
                          const char * name);
-   string    * Find(const char * section, 
+   std::string    * Find(const char * section, 
                     const char * name);
 };
 

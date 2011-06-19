@@ -104,9 +104,9 @@ public:
   }
 
 public:
-  void print(ostream * os = &cout) const{
+  void print(std::ostream * os = &std::cout) const{
     (*os).precision(2);
-    (*os) << endl;
+    (*os) << std::endl;
     const int    * ind = m_osiCut.row().getIndices();
     const double * els = m_osiCut.row().getElements();
     for(int i = 0; i < m_osiCut.row().getNumElements(); i++){

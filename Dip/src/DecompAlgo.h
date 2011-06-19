@@ -74,7 +74,7 @@ protected:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
 
    /**
 // DIP is distributed under the Eclipse Public License as part of the        //
@@ -117,7 +117,7 @@ protected:
    /**
     * Stream for log file (default to stdout).
     */
-   ostream * m_osLog;
+   std::ostream * m_osLog;
 
    DecompAlgoCGL * m_cgl;
 
@@ -128,8 +128,8 @@ protected:
 
 
    
-   vector<double>        m_origColLB;
-   vector<double>        m_origColUB;
+   std::vector<double>        m_origColLB;
+   std::vector<double>        m_origColUB;
 
    /**
     * Solver interface(s) for subproblems (P').
@@ -157,8 +157,8 @@ protected:
 
    const double                      * m_objective;
    DecompAlgoModel                     m_modelCore;
-   map<int, DecompAlgoModel>           m_modelRelax;
-   map<int, vector<DecompAlgoModel> >  m_modelRelaxNest;
+   std::map<int, DecompAlgoModel>           m_modelRelax;
+   std::map<int, std::vector<DecompAlgoModel> >  m_modelRelaxNest;
 
 
    /**
@@ -184,13 +184,13 @@ protected:
     */
    double   m_cutoffUB;
    //THINK - use solution pool
-   vector<DecompSolution*>   m_xhatIPFeas;
+   std::vector<DecompSolution*>   m_xhatIPFeas;
    DecompSolution          * m_xhatIPBest;
 
 
    //for cpx
-   vector<double> m_primSolution;
-   vector<double> m_dualSolution;
+   std::vector<double> m_primSolution;
+   std::vector<double> m_dualSolution;
 
    bool m_isColGenExact;
 
@@ -210,9 +210,9 @@ protected:
    int m_nRowsBranch;
    int m_nRowsConvex;
    int m_nRowsCuts;
-   vector<DecompRowType> m_masterRowType;
-   vector<DecompColType> m_masterColType;
-   vector<int>           m_masterArtCols;
+   std::vector<DecompRowType> m_masterRowType;
+   std::vector<DecompColType> m_masterColType;
+   std::vector<int>           m_masterArtCols;
 
    //to enforce in subproblems
    double * m_colLBNode;
@@ -234,12 +234,12 @@ protected:
 
    double       m_stabEpsilon;
    bool         m_useInitLpDuals;
-   map<int,int> m_artColIndToRowInd;
+   std::map<int,int> m_artColIndToRowInd;
 
    double       m_globalLB;
    double       m_globalUB;
 
-   vector<double> m_phaseIObj;
+   std::vector<double> m_phaseIObj;
 
    int          m_function;//calling function
    bool         m_firstPhase2Call;
@@ -383,7 +383,7 @@ public:
    
    //TODO: should move out to PC
    //THINK - helper func?, or specific to PC - right? as is genInit
-   vector<double*> getDualRays(int maxNumRays);
+   std::vector<double*> getDualRays(int maxNumRays);
    virtual int generateVarsFea(DecompVarList    & newVars, 
 			       double           & mostNegReducedCost);
 
@@ -419,7 +419,7 @@ public:
 			     const bool            isNested,
                              DecompAlgoModel     & algoModel,
 			     DecompSolverResult  * solveResult,
-			     list<DecompVar*>    & vars);
+			     std::list<DecompVar*>    & vars);
    
    
    inline void appendVars(DecompVar * var){
@@ -454,7 +454,7 @@ public:
     * Initial setup of algorithm structures and solver interfaces.
     */
    void initSetup(UtilParameters * utilParam,
-		  string         & sectionParam);
+		  std::string         & sectionParam);
    void getModelsFromApp();
    void createOsiSubProblem(DecompAlgoModel & algoModel);
 
@@ -486,29 +486,29 @@ public:
 			  const double           * colLB,
 			  const double           * colUB,
 			  const double           * rowRhs,
-			  ostream                * os);
+			  std::ostream                * os);
    bool isDualRayInfProofCpx(const double           * dualRay,
 			     const CoinPackedMatrix * rowMatrix,
 			     const double           * colLB,
 			     const double           * colUB,
 			     const double           * rowRhs,
-			     ostream                * os);
+			     std::ostream                * os);
 
    void printBasisInfo(OsiSolverInterface * si,
-		       ostream            * os);
+		       std::ostream            * os);
 
 
    /**
     *
     */
    void printCurrentProblemDual(OsiSolverInterface * si,
-				const string         baseName,
+				const std::string         baseName,
 				const int            nodeIndex,
 				const int            cutPass,
 				const int            pricePass);
 
    void printCurrentProblem(const OsiSolverInterface * si,
-                            const string               baseName,
+                            const std::string               baseName,
                             const int                  nodeIndex,
                             const int                  cutPass,
                             const int                  pricePass,
@@ -519,20 +519,20 @@ public:
     *
     */
    void printCurrentProblem(const OsiSolverInterface * si,
-                            const string               fileName,
+                            const std::string               fileName,
                             const bool                 printMps   = true,
                             const bool                 printLp    = true);
    
    /**
     *
     */
-   void printVars(ostream * os);
-   void printCuts(ostream * os);
+   void printVars(std::ostream * os);
+   void printCuts(std::ostream * os);
 
    /**
     *
     */
-   void createFullMps(const string fileName);
+   void createFullMps(const std::string fileName);
 
    /**
     *
@@ -546,12 +546,12 @@ public:
 			      double           * colLB,
 			      double           * colUB,
 			      double           * objCoeff,
-			      vector<string>   & colNames);
+			      std::vector<string>   & colNames);
 #endif
 
-   void masterMatrixAddArtCol(vector<CoinBigIndex> & colBeg,
-			      vector<int         > & colInd,
-			      vector<double      > & colVal,
+   void masterMatrixAddArtCol(std::vector<CoinBigIndex> & colBeg,
+			      std::vector<int         > & colInd,
+			      std::vector<double      > & colVal,
 			      char                   LorG,
 			      int                    rowIndex,
 			      int                    colIndex,
@@ -564,7 +564,7 @@ public:
                                        double           * colLB,
                                        double           * colUB,
                                        double           * objCoeff,
-                                       vector<string>   & colNames,
+                                       std::vector<std::string>   & colNames,
                                        int                startRow,
                                        int                endRow,
                                        DecompRowType      rowType);
@@ -654,7 +654,7 @@ public:
    }
 
    inline DecompAlgoModel & getModelRelax(const int blockId){
-      map<int,DecompAlgoModel>::iterator mit;
+      std::map<int,DecompAlgoModel>::iterator mit;
       mit = m_modelRelax.find(blockId);
       assert(mit != m_modelRelax.end());      
       return (*mit).second;
@@ -678,7 +678,7 @@ public:
       return m_xhatIPBest;
    }
 
-   inline const vector<DecompSolution*> & getXhatIPFeas() const {
+   inline const std::vector<DecompSolution*> & getXhatIPFeas() const {
       return m_xhatIPFeas;
    }
    
@@ -834,7 +834,7 @@ public:
       if(thisBound < m_nodeStats.objBest.second){
 	 UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
 		  (*m_osLog) << "New Global UB = " 
-		  << UtilDblToStr(thisBound) << endl;);
+		  << UtilDblToStr(thisBound) << std::endl;);
 	 m_nodeStats.objBest.second = thisBound;         
       }
       //---
@@ -863,7 +863,7 @@ public:
 
    inline int getNumRowType(DecompRowType rowType){
       int   nRowsType = 0;
-      vector<DecompRowType>::iterator vi;
+      std::vector<DecompRowType>::iterator vi;
       for(vi = m_masterRowType.begin(); vi != m_masterRowType.end(); vi++){
 	 if(*vi == rowType)
 	    nRowsType++;
@@ -909,7 +909,7 @@ public:
       m_stats      (),
       m_nodeStats  (),
       m_memPool    (),
-      m_osLog      (&cout),
+      m_osLog      (&std::cout),
       m_cgl          (0),
       m_origColLB  (),
       m_origColUB  (),

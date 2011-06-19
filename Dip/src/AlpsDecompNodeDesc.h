@@ -67,7 +67,7 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
 
    //STOP
    //what here do i need?

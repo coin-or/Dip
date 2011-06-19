@@ -30,7 +30,6 @@
 #include "UtilMacros.h"
 
 #include <string>
-using namespace std;
 
 // ----------------------------------------------------------------------- //
 class UtilGraphLib{
@@ -66,7 +65,7 @@ public:
 public:
    //TODO: make these private and provide access functions?
    //TSPLIB/VRPLIB
-   string   name;
+   std::string name;
    int      n_vertices;
    int      n_edges;
    int      capacity;

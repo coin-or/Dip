@@ -47,14 +47,14 @@ public :
    bool      m_isOptimal;
    bool      m_isCutoff;   
    int       m_nSolutions;
-   vector< vector<double> > m_solution;
+   std::vector< std::vector<double> > m_solution;
    /**
     * @}
     */
 
 public:
    const double * getSolution(const int solIndex){
-      vector<double> & solution = m_solution[solIndex];
+      std::vector<double> & solution = m_solution[solIndex];
       return &solution[0];
    }
 
@@ -86,7 +86,7 @@ public:
 	 return;
       m_nSolutions = 1;
       m_objUB      = solution->getQuality();
-      vector<double> sol(values, values + solution->getSize());
+      std::vector<double> sol(values, values + solution->getSize());
       m_solution.push_back(sol);
    }
    

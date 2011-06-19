@@ -17,6 +17,8 @@
 #include "DecompAlgo.h"
 #include "DecompAlgoC.h"
 
+using namespace std;
+
 //===========================================================================//
 bool DecompAlgo::checkPointFeasible(const DecompConstraintSet * model,
                                     const double              * x){

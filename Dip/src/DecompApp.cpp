@@ -17,6 +17,8 @@
 #include "DecompVar.h"
 #include "DecompConfig.h"
 
+using namespace std;
+
 // --------------------------------------------------------------------- //
 void DecompApp::startupLog(){
    if(m_param.LogLevel >= 0){

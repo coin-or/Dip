@@ -17,6 +17,8 @@
 #include "DecompVarPool.h"
 #include "DecompConstraintSet.h"
 
+using namespace std;
+
 // --------------------------------------------------------------------- //
 bool DecompWaitingCol::setReducedCost(const double      * u, 
 				      const DecompStatus    stat){

@@ -44,13 +44,13 @@ private:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
   
 protected:
    /**
     *  Log file.
     */
-   ostream * m_osLog;
+   std::ostream * m_osLog;
 
    /**
     * The best known LB/UB for this application (if known, for debugging).
@@ -78,12 +78,12 @@ public:
    /**
     *  Model data: the relaxed model(s) (A')
     */  
-   map<int, DecompAppModel> m_modelRelax;
+   std::map<int, DecompAppModel> m_modelRelax;
 
    /**
     *  Model data: the relaxed (nested) model(s) (A')
     */  
-   map<int, vector<DecompAppModel> > m_modelRelaxNest;   
+   std::map<int, std::vector<DecompAppModel> > m_modelRelaxNest;   
 
    /**
     * Pointer to the base algorithmic object.
@@ -139,7 +139,7 @@ public:
    // it harder to view this as an interface class - it is unclear
    // what the user must do vs can do
    inline void setModelCore(DecompConstraintSet * model,
-                            const string          modelName){
+                            const std::string          modelName){
       assert(model);
       if(!model->hasPrepRun())
          model->prepareModel(true);
@@ -172,7 +172,7 @@ public:
     * not deriving the function DecompApp::solveRelaxed.
     */
    inline void setModelRelax(DecompConstraintSet * model,
-                             const string          modelName = "",
+                             const std::string          modelName = "",
                              const int             blockId   = 0){
       if(model && !model->hasPrepRun())
 	 model->prepareModel();      
@@ -180,16 +180,16 @@ public:
       //---
       //--- make sure this block has not been set yet
       //---
-      map<int, DecompAppModel>::iterator mit = m_modelRelax.find(blockId);
+      std::map<int, DecompAppModel>::iterator mit = m_modelRelax.find(blockId);
       if(mit != m_modelRelax.end()){
-	 cerr << "Block " << blockId << " relaxation has already been set. "
+	 std::cerr << "Block " << blockId << " relaxation has already been set. "
 	      << "Only one relaxation definition can be used at one time." 
-	      << endl;
+	      << std::endl;
 	 throw UtilException("Multiple relaxation definitions",
 			     "setModelRelax", "DecompApp");
       }	 
       DecompAppModel appModel(model, modelName, blockId);
-      m_modelRelax.insert(make_pair(blockId, appModel));
+      m_modelRelax.insert(std::make_pair(blockId, appModel));
    }
 
    /**
@@ -197,7 +197,7 @@ public:
     *  (for a particular block).
     */   
    inline void setModelRelaxNest(DecompConstraintSet * model,
-                                 const string          modelName,
+                                 const std::string          modelName,
                                  const int             blockId = 0){
       assert(model);
       if(!model->hasPrepRun())
@@ -235,7 +235,7 @@ public:
     * duals. By default, the restricted mater is used as the initial dual
     * and, therefore, no smoothing occurs in the first iteration.
    */
-   virtual void initDualVector(vector<double> & dualVector){}
+   virtual void initDualVector(std::vector<double> & dualVector){}
 
 
    //TODO: change name - no other one is using APP, why here?
@@ -269,7 +269,7 @@ public:
    
    virtual int APPheuristics(const double            * xhat,
 			     const double            * origCost,
-			     vector<DecompSolution*> & xhatIPFeas){
+			     std::vector<DecompSolution*> & xhatIPFeas){
       return 0;
    }
 
@@ -290,8 +290,8 @@ public:
    virtual int generateCuts(const double  * x, 
 			    DecompCutList & newCuts);
 
-   virtual void solveRelaxedWhich(vector<int>               & blocksToSolve,
-				  map< int,vector<double> > & userDualsByBlock)
+   virtual void solveRelaxedWhich(std::vector<int>               & blocksToSolve,
+				  std::map< int,std::vector<double> > & userDualsByBlock)
    {};
       
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
@@ -309,14 +309,14 @@ public:
 
 
    virtual void printOriginalColumn(const int   index, 
-                                    ostream   * os = &cout) const;
+                                    std::ostream   * os = &std::cout) const;
   
    //TODO: change api so colNames comes from modelCore if exists
    //  rather than - to simplify API 
    virtual void printOriginalSolution(const int              n_cols, 
-                                      const vector<string> & colNames,
+                                      const std::vector<std::string> & colNames,
                                       const double         * solution,
-                                      ostream              * os = &cout) const;
+                                      std::ostream              * os = &std::cout) const;
 
    /**
     * @}
@@ -332,7 +332,7 @@ public:
     */
    DecompApp(UtilParameters & utilParam) :
       m_classTag   ("D-APP"),
-      m_osLog      (&cout  ), 
+      m_osLog      (&std::cout  ), 
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
       m_objective  (0      ),

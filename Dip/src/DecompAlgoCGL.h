@@ -49,7 +49,7 @@ class DecompAlgoCGL {
    //----------------------------------------------------------------------//
 private:
    int                        m_logLevel;
-   ostream                  * m_logStream;
+   std::ostream                  * m_logStream;
 
    CglClique                * m_genClique;
    CglOddHole               * m_genOddHole;
@@ -80,7 +80,7 @@ public:
    int generateCuts(OsiSolverInterface * cutGenSI,
                     OsiSolverInterface * masterSI,
                     double             * xhat,
-		    vector<int>        & integerVars,
+		    std::vector<int>        & integerVars,
                     DecompCutList      & newCuts);
 
 
@@ -99,7 +99,7 @@ public:
    void setLogLevel(const int logLevel){
       m_logLevel = logLevel;
    }
-   void setLogStream(ostream * logStream){
+   void setLogStream(std::ostream * logStream){
       m_logStream = logStream;
    }
    /**
@@ -118,7 +118,7 @@ public:
     */   
    DecompAlgoCGL(int              logLevel  = 0,
 		 DecompAlgoType   algo      = CUT,
-                 ostream        * logStream = &cout):
+                 std::ostream        * logStream = &std::cout):
       m_logLevel      (logLevel),
       m_logStream     (logStream),
       m_genClique     (0),

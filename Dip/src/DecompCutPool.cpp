@@ -18,6 +18,8 @@
 #include "DecompCutPool.h"
 #include "DecompConstraintSet.h"
 
+using namespace std;
+
 #if 0
 // --------------------------------------------------------------------- //
 bool DecompWaitingRow::calcViolation(const double * x){

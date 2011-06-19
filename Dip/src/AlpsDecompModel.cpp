@@ -19,6 +19,8 @@
 #include "AlpsDecompTreeNode.h"
 #include "AlpsKnowledgeBrokerSerial.h"
 
+using namespace std;
+
 //===========================================================================//
 void AlpsDecompModel::setAlpsSettings(){
    //TODO: use stream not cout

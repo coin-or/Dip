@@ -38,7 +38,7 @@ private:
    double           m_origCost;
    double           m_redCost; //(c - uA'')s - alpha
    int              m_effCnt;  //effectiveness counter
-   string           m_strHash;
+   std::string           m_strHash;
    int              m_blockId;
    int              m_colMasterIndex;
    double           m_norm;
@@ -49,7 +49,7 @@ public:
    inline int    getEffectiveness()  const { return m_effCnt;  }
    inline double getLowerBound()     const { return 0.0;       }   //TODO
    inline double getUpperBound()     const { return DecompInf; }   //TODO
-   inline string getStrHash()        const { return m_strHash; }
+   inline std::string getStrHash()        const { return m_strHash; }
    inline int    getBlockId()        const { return m_blockId; }
    inline int    getColMasterIndex() const { return m_colMasterIndex; }
    inline double getNorm()           const { return m_norm; }
@@ -114,10 +114,10 @@ public:
                      double * arr);
   
 public:
-   virtual void  print(ostream   * os  = &cout,
+   virtual void  print(std::ostream   * os  = &std::cout,
                        DecompApp * app = 0) const;
-   virtual void  print(ostream              * os,
-                       const vector<string> & colNames,
+   virtual void  print(std::ostream              * os,
+                       const std::vector<std::string> & colNames,
 		       const double         * value    = NULL) const;
 
 public:
@@ -157,7 +157,7 @@ public:
       m_norm    (0.0)
    {}
 
-   DecompVar(const vector<int>    & ind, 
+   DecompVar(const std::vector<int>    & ind, 
              const double           els,
              const double           redCost,
              const double           origCost) : 
@@ -181,8 +181,8 @@ public:
       }
    }
 
-   DecompVar(const vector<int>    & ind, 
-             const vector<double> & els,
+   DecompVar(const std::vector<int>    & ind, 
+             const std::vector<double> & els,
              const double           redCost,
              const double           origCost) : 
       m_s       (), 

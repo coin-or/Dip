@@ -28,6 +28,7 @@
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 using namespace boost;
+using namespace std;
 
 typedef property<edge_weight_t, double,
                  property<edge_index_t, int> > edge_prop;

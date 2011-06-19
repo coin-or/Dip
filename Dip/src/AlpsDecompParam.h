@@ -98,16 +98,16 @@ public:
 	 dumpSettings();
    }
    
-   void dumpSettings(ostream * os = &cout){
+   void dumpSettings(std::ostream * os = &std::cout){
       static const char * sec = "ALPS";
       (*os) << "\n========================================================\n"
             << "ALPS PARAMETER SETTINGS \n";
-      (*os) << sec << ": logFileLevel    = " << logFileLevel    << endl;
-      (*os) << sec << ": printSolution   = " << printSolution   << endl;
-      (*os) << sec << ": checkMemory     = " << checkMemory     << endl;
-      (*os) << sec << ": msgLevel        = " << msgLevel        << endl;
-      (*os) << sec << ": nodeLimit       = " << nodeLimit       << endl;
-      (*os) << sec << ": nodeLogInterval = " << nodeLogInterval << endl;
+      (*os) << sec << ": logFileLevel    = " << logFileLevel    << std::endl;
+      (*os) << sec << ": printSolution   = " << printSolution   << std::endl;
+      (*os) << sec << ": checkMemory     = " << checkMemory     << std::endl;
+      (*os) << sec << ": msgLevel        = " << msgLevel        << std::endl;
+      (*os) << sec << ": nodeLimit       = " << nodeLimit       << std::endl;
+      (*os) << sec << ": nodeLogInterval = " << nodeLogInterval << std::endl;
    }
    /**
     * @}

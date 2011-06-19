@@ -35,10 +35,9 @@
 #include <cstring>
 #include <ctime>
 #include <memory>
-using namespace std;
 
 // =========================================================================
-const string UtilSpaces   = " \t\r\n";
+const std::string UtilSpaces   = " \t\r\n";
 const double UtilEpsilon  = 1.0e-6;
 const double UtilTooBig   = 1.0e20;
 const double UtilSmallerThanTooBig = 1.0e19;
@@ -86,43 +85,43 @@ enum UtilStatus {
 #define UtilAssert(expression,errorMsg,os) assert(expresssion)
 #else
 inline void UtilAssert(bool      expression,
-		       string    errorMsg,
-		       ostream * os){
+		       std::string    errorMsg,
+		       std::ostream * os){
    //---
    //--- this is a forced assertion (even when -NDEBUG)
    //---   
    if(!expression){
-      (*os) << "ERROR:"  << errorMsg << endl;
+      (*os) << "ERROR:"  << errorMsg << std::endl;
       abort();
    }
 }
 #endif
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintParameter(ostream      * os,
-			       const string & section,
-			       const string & name,
+inline void UtilPrintParameter(std::ostream      * os,
+			       const std::string & section,
+			       const std::string & name,
 			       const int      value){
-   (*os) << left << setw(15) << section
-	 << left << setw(25) << name
-	 << setw(10) << value  << endl;
+   (*os) << std::left << std::setw(15) << section
+	 << std::left << std::setw(25) << name
+	 << std::setw(10) << value  << std::endl;
 }
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintParameter(ostream      * os,
-			       const string & section,
-			       const string & name,
+inline void UtilPrintParameter(std::ostream      * os,
+			       const std::string & section,
+			       const std::string & name,
 			       const double   value){
-   (*os) << left << setw(15) << section
-	 << left << setw(25) << name
-	 << setw(10) << value  << endl;
+   (*os) << std::left << std::setw(15) << section
+	 << std::left << std::setw(25) << name
+	 << std::setw(10) << value  << std::endl;
 }
 
 // ------------------------------------------------------------------------- //
 template <class T> inline void 
-UtilPrintVector(const vector<T> & v,
-                ostream         * os = &cout) {
-   typename vector<T>::const_iterator it;
+UtilPrintVector(const std::vector<T> & v,
+                std::ostream         * os = &std::cout) {
+   typename std::vector<T>::const_iterator it;
    for(it = v.begin(); it != v.end(); it++){
       (*os) << *it << " ";
    }
@@ -131,21 +130,21 @@ UtilPrintVector(const vector<T> & v,
 
 // ------------------------------------------------------------------------- //
 template <class T> inline void 
-UtilPrintVector(const vector<T>      & v,
-		const vector<string> & label,
-                ostream              * os = &cout) {
-   typename vector<T>::const_iterator it;
+UtilPrintVector(const std::vector<T>      & v,
+		const std::vector<std::string> & label,
+                std::ostream              * os = &std::cout) {
+   typename std::vector<T>::const_iterator it;
    for(it = v.begin(); it != v.end(); it++){
-      (*os) << setw(5) << *it << " -> " 
-	    << setw(25) << label[*it] << endl;
+      (*os) << std::setw(5) << *it << " -> " 
+	    << std::setw(25) << label[*it] << std::endl;
    }
 }
 
 // ------------------------------------------------------------------------- //
 template <class T> inline void 
-UtilPrintList(const list<T> & v,
-              ostream       * os = &cout) {
-   typename list<T>::const_iterator it;
+UtilPrintList(const std::list<T> & v,
+              std::ostream       * os = &std::cout) {
+   typename std::list<T>::const_iterator it;
 
    (*os) << "\n";
    for(it = v.begin(); it != v.end(); it++){
@@ -210,20 +209,20 @@ inline int UtilIndexU(const int i, const int j){
 }
 
 /*-----------------------------------------------------------------------*/
-pair<int,int> UtilBothEndsU(const int index);
+std::pair<int,int> UtilBothEndsU(const int index);
 
 /*-----------------------------------------------------------------------*/
 inline void UtilPrintEdge(const int   index, 
-                          ostream   * os = &cout){
-   pair<int,int> uv = UtilBothEndsU(index);
-   (*os) << "(" << setw(2) << uv.first << "," << setw(2) << uv.second << ") ";
+                          std::ostream   * os = &std::cout){
+   std::pair<int,int> uv = UtilBothEndsU(index);
+   (*os) << "(" << std::setw(2) << uv.first << "," << std::setw(2) << uv.second << ") ";
 }
 
 /*-----------------------------------------------------------------------*/
-inline string UtilEdgeToStr(const int index){
-   stringstream  ss;
-   pair<int,int> uv = UtilBothEndsU(index);
-   ss << "(" << setw(2) << uv.first << "," << setw(2) << uv.second << ") ";
+inline std::string UtilEdgeToStr(const int index){
+   std::stringstream  ss;
+   std::pair<int,int> uv = UtilBothEndsU(index);
+   ss << "(" << std::setw(2) << uv.first << "," << std::setw(2) << uv.second << ") ";
    return ss.str();
 }
 
@@ -241,7 +240,7 @@ UtilFillN(T * to, const int size, const T value){
 
 // =========================================================================
 template <class T> inline void
-UtilFillN(vector<T> & v, const int size, const T value){
+UtilFillN(std::vector<T> & v, const int size, const T value){
    std::fill_n(back_inserter(v), size, value);
 }
 
@@ -257,7 +256,7 @@ inline void UtilIotaN(int       * first,
 }
 
 /*-----------------------------------------------------------------------*/
-inline void UtilIotaN(vector<int> & first, 
+inline void UtilIotaN(std::vector<int> & first, 
                       const int     size, 
                       const int     init){
    first.reserve(size);
@@ -299,13 +298,13 @@ inline double UtilNormRand(const double mean,
 // =========================================================================
 
 // ------------------------------------------------------------------------- //
-inline double UtilAve(const vector<double> & x){
+inline double UtilAve(const std::vector<double> & x){
    return std::accumulate(x.begin(), x.end(), 0.0) / 
       static_cast<double>(x.size());
 }
 
 // ------------------------------------------------------------------------- //
-inline double UtilAve(const vector<int> & x){
+inline double UtilAve(const std::vector<int> & x){
    return std::accumulate(x.begin(), x.end(), 0.0) / 
       static_cast<double>(x.size());
 }
@@ -321,15 +320,14 @@ inline double UtilAve(const double * x,
 // =========================================================================
 
 // ------------------------------------------------------------------------- //
-inline void UtilStringTokenize(string const   & input,
-			       string const   & delimiters,
-			       vector<string> & tokens) {
-   using namespace std;
-   string::size_type last_pos = 0;
-   string::size_type pos = 0;
+inline void UtilStringTokenize(std::string const   & input,
+			       std::string const   & delimiters,
+			       std::vector<std::string> & tokens) {
+   std::string::size_type last_pos = 0;
+   std::string::size_type pos = 0;
    while(true){
       pos = input.find_first_of(delimiters, last_pos);
-      if( pos == string::npos ){
+      if( pos == std::string::npos ){
 	 tokens.push_back(input.substr(last_pos));
 	 break;
       }
@@ -341,8 +339,8 @@ inline void UtilStringTokenize(string const   & input,
 }
 
 // ------------------------------------------------------------------------- //
-inline string UtilStringRandom(int iLength) {
-   string strReturn;
+inline std::string UtilStringRandom(int iLength) {
+   std::string strReturn;
    srand( (unsigned int)time(NULL) );
    for( int i = 0 ; i < iLength ; ++i ) {
       int iNumber;
@@ -361,23 +359,23 @@ inline string UtilStringRandom(int iLength) {
 
 // ------------------------------------------------------------------------- //
 //trims white space (as defined by UtilSpaces) in-place
-inline string & UtilStrTrim(string       & s,
-                            const string & t = UtilSpaces) {
+inline std::string & UtilStrTrim(std::string       & s,
+                            const std::string & t = UtilSpaces) {
    if(s.size() == 0)
       return s;
-   string::size_type pos = s.find_last_not_of(t);
-   if(pos != string::npos) {
+   std::string::size_type pos = s.find_last_not_of(t);
+   if(pos != std::string::npos) {
       s.erase(pos + 1);
       pos = s.find_first_not_of(t);
-      if(pos != string::npos) s.erase(0, pos);
+      if(pos != std::string::npos) s.erase(0, pos);
    }
    else s.erase(s.begin(), s.end());
    return s;
 }
 
 // ------------------------------------------------------------------------- //
-// returns a lower case version of the string in-place
-inline string & UtilStrToLower(string & s) {
+// returns a lower case version of the std::string in-place
+inline std::string & UtilStrToLower(std::string & s) {
    // Purify did not like this version:
    //   transform (s.begin(), s.end(), s.begin(), myToLower());
    if(s.size() == 0)
@@ -390,8 +388,8 @@ inline string & UtilStrToLower(string & s) {
 
 
 // ------------------------------------------------------------------------- //
-// returns an upper case version of the string in-place
-inline string & UtilStrToUpper(string & s) {
+// returns an upper case version of the std::string in-place
+inline std::string & UtilStrToUpper(std::string & s) {
    // Purify did not like this version:
    //   transform (s.begin(), s.end(), s.begin(), myToUpper());   
    int i;
@@ -407,7 +405,7 @@ inline string & UtilStrToUpper(string & s) {
 // =========================================================================
 
 // ------------------------------------------------------------------------- //
-template <class T> inline int UtilGetSize(const vector<T> & vec){
+template <class T> inline int UtilGetSize(const std::vector<T> & vec){
   return static_cast<int>(vec.size());
 }
 
@@ -469,17 +467,17 @@ inline bool UtilIsZero(const double x,
 }
 
 // ------------------------------------------------------------------------- //
-inline string UtilIntToStr(const int i){
-   stringstream ss;
+inline std::string UtilIntToStr(const int i){
+   std::stringstream ss;
    ss << i;
    return ss.str();
 }
 
 // ------------------------------------------------------------------------- //
-inline string UtilDblToStr(const double x, 
+inline std::string UtilDblToStr(const double x, 
 			   const int    precision = -1,
                            const double tooBig    = UtilSmallerThanTooBig){
-   stringstream ss;
+   std::stringstream ss;
    if(fabs(x) > tooBig){
       if(x < 0)
 	 ss << "-INF";
@@ -488,8 +486,8 @@ inline string UtilDblToStr(const double x,
    }
    else{
       if(precision >= 0){
-	 ss << setiosflags(ios::fixed|ios::showpoint);   
-	 ss << setprecision(precision);
+	 ss << std::setiosflags(std::ios::fixed|std::ios::showpoint);   
+	 ss << std::setprecision(precision);
       }
       ss << x;
    }
@@ -497,7 +495,7 @@ inline string UtilDblToStr(const double x,
 }
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintMemUsage(ostream  * os       = &cout,
+inline void UtilPrintMemUsage(std::ostream  * os       = &std::cout,
 			      int        logLevel = 0,
 			      int        logLimit = 2){
 // This doesn't build in gcc 4.5 (at least on MinGW)
@@ -516,59 +514,59 @@ inline void UtilPrintMemUsage(ostream  * os       = &cout,
 
 // ------------------------------------------------------------------------- //
 template <class T>
-void UtilDeleteVectorPtr(vector<T*> & vectorPtr,
-                         typename vector<T*>::iterator first,
-                         typename vector<T*>::iterator last){
+void UtilDeleteVectorPtr(std::vector<T*> & vectorPtr,
+                         typename std::vector<T*>::iterator first,
+                         typename std::vector<T*>::iterator last){
    
-   typename vector<T*>::iterator it;
+   typename std::vector<T*>::iterator it;
    for(it = first; it != last; it++)
       delete *it;
    vectorPtr.erase(first,last);
 }
 
 // ------------------------------------------------------------------------- //
-template <class T> void UtilDeleteVectorPtr(vector<T*> & vectorPtr){
+template <class T> void UtilDeleteVectorPtr(std::vector<T*> & vectorPtr){
    UtilDeleteVectorPtr(vectorPtr, vectorPtr.begin(), vectorPtr.end());
 }
 
 // ------------------------------------------------------------------------- //
-template <class T> void UtilDeleteListPtr(list<T*> & listPtr,
-                                          typename list<T*>::iterator first,
-                                          typename list<T*>::iterator last){
+template <class T> void UtilDeleteListPtr(std::list<T*> & listPtr,
+                                          typename std::list<T*>::iterator first,
+                                          typename std::list<T*>::iterator last){
    
-   typename list<T*>::iterator it;
+   typename std::list<T*>::iterator it;
    for(it = first; it != last; it++)
       delete *it;
    listPtr.erase(first,last);
 }
 
 // ------------------------------------------------------------------------- //
-template <class T> void UtilDeleteListPtr(list<T*> & listPtr){
+template <class T> void UtilDeleteListPtr(std::list<T*> & listPtr){
    UtilDeleteListPtr(listPtr, listPtr.begin(), listPtr.end());
 }
 
 // ------------------------------------------------------------------------- //
 template <class S, class T>
-void UtilDeleteMapPtr(map<S,T*> & mapPtr,
-		      typename map<S,T*>::iterator first,
-		      typename map<S,T*>::iterator last){  
-   typename map<S,T*>::iterator it;
+void UtilDeleteMapPtr(std::map<S,T*> & mapPtr,
+		      typename std::map<S,T*>::iterator first,
+		      typename std::map<S,T*>::iterator last){  
+   typename std::map<S,T*>::iterator it;
    for(it = first; it != last; it++)
       delete (*it).second;
    mapPtr.erase(first,last);
 }
 
 // ------------------------------------------------------------------------- //
-template <class S, class T> void UtilDeleteMapPtr(map<S,T*> & mapPtr){
+template <class S, class T> void UtilDeleteMapPtr(std::map<S,T*> & mapPtr){
    UtilDeleteMapPtr(mapPtr, mapPtr.begin(), mapPtr.end());
 }
 
 // ------------------------------------------------------------------------- //
 template <class S, class T>
-void UtilDeleteMapVecPtr(map<S, vector<T*> > & mapPtr,
-		      typename map<S, vector<T*> >::iterator first,
-		      typename map<S, vector<T*> >::iterator last){  
-   typename map<S, vector<T*> >::iterator it;
+void UtilDeleteMapVecPtr(std::map<S, std::vector<T*> > & mapPtr,
+		      typename std::map<S, std::vector<T*> >::iterator first,
+		      typename std::map<S, std::vector<T*> >::iterator last){  
+   typename std::map<S, std::vector<T*> >::iterator it;
    for(it = first; it != last; it++)
       UtilDeleteVectorPtr((*it).second);
    mapPtr.erase(first,last);
@@ -576,7 +574,7 @@ void UtilDeleteMapVecPtr(map<S, vector<T*> > & mapPtr,
 
 // ------------------------------------------------------------------------- //
 template <class S, class T> 
-void UtilDeleteMapVecPtr(map<S,vector<T*> > & mapPtr){
+void UtilDeleteMapVecPtr(std::map<S,std::vector<T*> > & mapPtr){
    UtilDeleteMapVecPtr(mapPtr, mapPtr.begin(), mapPtr.end());
 }
 
@@ -601,12 +599,12 @@ inline bool UtilIsIntegral(const double * x,
 // ------------------------------------------------------------------------- //
 template <class T> inline void UtilNegateArr(const int   arrLen,
                                              T         * arr){
-   transform(arr, arr + arrLen, arr, negate<T>());
+   transform(arr, arr + arrLen, arr, std::negate<T>());
 }
 
 // ------------------------------------------------------------------------- //
 template <class T> 
-struct AddOffset : public unary_function<T,T>
+struct AddOffset : public std::unary_function<T,T>
 {
    T m_n;   
    T operator() (const T & k) { return k + m_n; }
@@ -639,7 +637,7 @@ inline void UtilPerturbCost(const int      seed,
 			    const double   randUB,
 			    double       * arr){
     srand(seed);
-    transform(arr, arr + arrLen, arr, Perturb(randLB, randUB));
+    std::transform(arr, arr + arrLen, arr, Perturb(randLB, randUB));
 }
 
 // ------------------------------------------------------------------------- //
@@ -727,8 +725,8 @@ inline void UtilSenseToBound(const char     sense,
 // --------------------------------------------------------------------- //
 template<class S, class T> class UtilIsGreaterThan {
 public:
-   bool operator()( const pair<S,T> & x, 
-                    const pair<S,T> & y){
+   bool operator()( const std::pair<S,T> & x, 
+                    const std::pair<S,T> & y){
       return x.second > y.second;
    }
 };
@@ -736,15 +734,15 @@ public:
 // --------------------------------------------------------------------- //
 template<class S, class T> class UtilIsLessThan {
 public:
-   bool operator()( const pair<S,T> & x, 
-                    const pair<S,T> & y){
+   bool operator()( const std::pair<S,T> & x, 
+                    const std::pair<S,T> & y){
       return x.second < y.second;
    }
 };
 
 // ------------------------------------------------------------------------- //
-inline string UtilDirSlash(){
-   string slash;
+inline std::string UtilDirSlash(){
+   std::string slash;
 #if defined(_MSC_VER)
    slash = "\\"; 
 #else
@@ -754,15 +752,15 @@ inline string UtilDirSlash(){
 }
 
 // ------------------------------------------------------------------------- //
-inline int UtilOpenFile(ofstream   & os,
+inline int UtilOpenFile(std::ofstream   & os,
                         const char * fileName) {
    int status = UtilStatusOk;
    os.open(fileName);
    if(!os){
-      string errMessage = "Error: Filename = ";
+      std::string errMessage = "Error: Filename = ";
       errMessage += fileName;
       errMessage += " failed to open.";  
-      cerr << errMessage.c_str() << endl; fflush(stdout);
+      std::cerr << errMessage.c_str() << std::endl; fflush(stdout);
       status = UtilStatusFileIO;
       assert(os);
    }
@@ -770,15 +768,15 @@ inline int UtilOpenFile(ofstream   & os,
 }
 
 // ------------------------------------------------------------------------- //
-inline int UtilOpenFile(ifstream   & is,
+inline int UtilOpenFile(std::ifstream   & is,
                         const char * fileName) {
    int status = UtilStatusOk;
    is.open(fileName);
    if(!is){
-      string errMessage = "Error: Filename = ";
+      std::string errMessage = "Error: Filename = ";
       errMessage += fileName;
       errMessage += " failed to open.";
-      cerr << errMessage.c_str() << endl; fflush(stdout);
+      std::cerr << errMessage.c_str() << std::endl; fflush(stdout);
       status = UtilStatusFileIO;
       assert(is);
    }
@@ -786,14 +784,14 @@ inline int UtilOpenFile(ifstream   & is,
 }
 
 // ------------------------------------------------------------------------- //
-inline int UtilOpenFile(ofstream     & os,
-                       const string & fileName) {
+inline int UtilOpenFile(std::ofstream     & os,
+                       const std::string & fileName) {
    return UtilOpenFile(os, fileName.c_str());
 }
 
 // ------------------------------------------------------------------------- //
-inline int UtilOpenFile(ifstream     & is,
-                        const string & fileName) {
+inline int UtilOpenFile(std::ifstream     & is,
+                        const std::string & fileName) {
    return UtilOpenFile(is, fileName.c_str());
 }
 

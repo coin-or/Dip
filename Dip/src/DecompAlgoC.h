@@ -43,7 +43,7 @@ private:
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
-   string m_classTag;
+   std::string m_classTag;
    /**
     * @}
     */
@@ -138,13 +138,13 @@ public:
       DecompAlgo(CUT, app, utilParam),
       m_classTag("D-ALGOC")
    {
-      string paramSection = DecompAlgoStr[CUT];
+      std::string paramSection = DecompAlgoStr[CUT];
       initSetup(utilParam, paramSection);
    }
 
    DecompAlgoC(DecompApp      * app,
                UtilParameters * utilParam,
-               string         & paramSection):
+               std::string         & paramSection):
       DecompAlgo(CUT, app, utilParam),
       m_classTag("D-ALGOC")
    {

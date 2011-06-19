@@ -16,6 +16,8 @@
 #include "DecompVar.h"
 #include "DecompModel.h"
 
+using namespace std;
+
 // --------------------------------------------------------------------- //
 //Design question - we use a check over the entire space to simplify
 // storage of branching bounds. But, in reality, for node 1, for example,
