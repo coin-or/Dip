@@ -74,7 +74,7 @@ public:
       //---
       //--- delete any memory that is left in the waiting cols
       //---
-      vector<DecompWaitingCol>::iterator vi;
+      std::vector<DecompWaitingCol>::iterator vi;
       for(vi = begin(); vi != end(); vi++){
          (*vi).deleteVar();
          (*vi).deleteCol();
