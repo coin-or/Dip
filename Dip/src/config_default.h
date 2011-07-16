@@ -17,7 +17,7 @@
 #include "configall_system.h"
 
 /* include the public project specific macros */
-#include "config_alps_default.h"
+#include "config_dip_default.h"
 
 /***************************************************************************/
 /*             HERE DEFINE THE PROJECT SPECIFIC MACROS                     */
