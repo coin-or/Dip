@@ -163,7 +163,7 @@ void DecompAlgoD::phaseDone(){
       rowCut.setUb(-alpha);      
       DecompCutOsi * decompCut = new DecompCutOsi(rowCut);
       decompCut->setStringHash();//constructor should do!
-      decompCut->print(m_osLog);
+      //decompCut->print(m_osLog);
       (*m_newCuts).push_back(decompCut);     
    }
 

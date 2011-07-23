@@ -5390,7 +5390,7 @@ int DecompAlgo::generateCuts(double        * xhat,
    if((m_param.CutDC == 1 && newCuts.size() == 0) ||
       (m_param.CutDC == 2)){
      
-      printf("\n\n==================================== IN DECOMP\n\n");
+      //printf("\n\n==================================== IN DECOMP\n\n");
       DecompAlgoD D(m_app, m_utilParam,
 		    xhat, modelCore->getNumCols());
     
@@ -5458,11 +5458,11 @@ int DecompAlgo::generateCuts(double        * xhat,
       //farkas -- if decomp is found this means that z_LP = z_DW for that
       //relaxation?? 
 
-      printf("D.m_stopCriteria = %s\n", 
-	     DecompAlgoStopStr[D.m_stopCriteria].c_str());
+      // printf("D.m_stopCriteria = %s\n", 
+      //     DecompAlgoStopStr[D.m_stopCriteria].c_str());
       
       //who deletes this memory? better to pass in newCuts.. 
-      printf("\n\n====================================OUT DECOMP\n\n");
+      //printf("\n\n====================================OUT DECOMP\n\n");
       //exit(1);
    }
 #endif

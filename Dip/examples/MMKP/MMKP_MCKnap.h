@@ -30,14 +30,13 @@
 // --------------------------------------------------------------------- //
 extern "C"{
 #include "mcknap.h"
-   // solstruct solution;
-   // solstruct optsol;
 }
 
 //extern solstruct optsol;
 
 // --------------------------------------------------------------------- //
 #include "UtilMacros.h"
+using namespace std;
 
 // --------------------------------------------------------------------- //
 class MMKP_MCKnap{

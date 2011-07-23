@@ -34,7 +34,7 @@ extern "C"{
 // --------------------------------------------------------------------- //
 //#define MCKP_EPSILON      1.0e-4 //still causing overflow
 #define MCKP_EPSILON      1.0e-3
-#define MMKP_MCKNAP_DEBUG
+//#define MMKP_MCKNAP_DEBUG
 
 // --------------------------------------------------------------------- //
 #include "UtilMacros.h"
