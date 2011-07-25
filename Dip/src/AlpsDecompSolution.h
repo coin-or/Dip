@@ -55,11 +55,13 @@ public:
       m_quality   (1e75),
       m_app       (0){}
    
-   AlpsDecompSolution(const int         size, 
-                      const double    * values, 
-                      const double      quality,
-                      const DecompApp * app = NULL) : 
-      AlpsSolution(),
+   AlpsDecompSolution(const int             size, 
+                      const double        * values, 
+                      const double          quality,
+                      const DecompApp     * app = NULL,
+		      const int             depth = -1,
+		      const AlpsNodeIndex_t index = -1) : 
+      AlpsSolution(index, depth),
       m_size      (size),
       m_values    (0),
       m_quality   (quality),

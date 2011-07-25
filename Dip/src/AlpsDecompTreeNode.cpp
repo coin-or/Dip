@@ -79,7 +79,9 @@ void AlpsDecompTreeNode::checkIncumbent(AlpsDecompModel      * model,
          new AlpsDecompSolution(decompSol->getSize(),
                                 decompSol->getValues(),
                                 decompSol->getQuality(),
-                                decompAlgo->getDecompApp());	    
+                                decompAlgo->getDecompApp(),
+				getIndex(),
+				getDepth());	    
       getKnowledgeBroker()->addKnowledge(AlpsKnowledgeTypeSolution, 
                                          alpsDecompSol, 
                                          candidateUB);
