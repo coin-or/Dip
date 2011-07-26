@@ -3282,8 +3282,9 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
       //---      
       masterPhaseIItoI();
       m_nodeStats.resetBestLB();
-      nextPhase  = PHASE_PRICE1;
-      nextStatus = solutionUpdate(nextPhase);
+      m_firstPhase2Call = false;
+      nextPhase         = PHASE_PRICE1;
+      nextStatus        = solutionUpdate(nextPhase);
       goto PHASE_UPDATE_FINISH;
    }
 
