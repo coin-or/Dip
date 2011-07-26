@@ -1,19 +1,111 @@
-============================================================================
-Download DECOMP.
-============================================================================
-See https://projects.coin-or.org/DECOMP.
+These are quick install instructions mainly intended for UNIX-like systems
+(including Linux, OS X, AIX, Cygwin and MSys). Additional details for building
+this and other COIN projects are available at
 
-============================================================================
-Configure, compile, install and test DECOMP.
-============================================================================
-Assuming you have installed DECOMP in some directory ${DECOMP_ROOT}.
- (1) mkdir build
- (2) cd ${DECOMP_ROOT}/build
- (3) ../configure
- (4) make 
- (5) make install
- (6) make test
+  https://projects.coin-or.org/BuildTools
 
-This will install the DECOMP libraries. To build an application, go to
- ${DECOMP_ROOT}/build/Decomp/examples/<user app> and follow README.txt.
+You can find instructions for building with Microsoft Visual Studio under
+Windows at
 
+  https://projects.coin-or.org/MSVisualStudio
+
+**********************************************************************
+***                         DOWNLOAD                               ***
+**********************************************************************
+
+Pre-built binaries are available for some versions of Dip on some platforms.
+They can be downloaded at
+
+  http://www.coin-or.org/download/binary/Dip
+
+If you would like to build from source, you can obtain the source code for the
+Dip package in two ways:
+
+1. Obtain the source directly from the COIN-OR subversion repository
+   (recommended). For this you needs the program 'svn' installed on your
+   machine, and output of "svn --version" must contain "handles 'https'
+   scheme". On Windows, it is recommended to get the source with the SVN
+   client TortoiseSVN (http://tortoisesvn.net).
+
+   Assuming that you want to download a release version 0.82.0, as an example,
+   you would execute the command
+
+   svn co https://projects.coin-or.org/svn/Cbc/releases/0.82.0 Cbc-0.82.0
+
+   You can similarly get source for the latest stable version or the trunk
+   (development) version.
+
+2. Download the tarball from http://www.coin-or.org/download/source/Cbc 
+   and extract it. For example, for the release 0.82.0 you type
+
+   gunzip Dip-0.82.0.tgz
+   tar xvf Dip-0.82.0.tar
+
+   More detailed download instructions can be found at
+
+**********************************************************************
+***                        CONFIGURATION                           ***
+**********************************************************************
+
+Go into the directory that you just downloaded or extracted (e.g., Cbc-2.7.0).
+Then create a build directory and configure the package by typing
+
+   mkdir build
+   cd build
+   ../configure
+
+Note that you might have to specify additional options, in case you
+don't want to use the default choices that configure makes (e.g.,
+compilers).  Please visit
+
+   https://projects.coin-or.org/BuildTools/
+
+and the Cbc Trac page
+
+   https://projects.coin-or.org/Dip
+
+for more information.
+
+If everything went fine, you will see at the end of the output
+
+   "Main configuration of Dip successful"
+
+**********************************************************************
+***                COMPILATION AND INSTALLATION                    ***
+**********************************************************************
+
+In the directory where you ran the configure script:
+
+1. Compile the code by typing
+
+   make
+
+2. To test if the code works, you can type
+
+   make test
+
+3. To install the code, you type
+
+   make install
+
+   After this, you will find the executables, libraries and header
+   files in the "bin", "lib" and "include" subdirectory, respectively.
+
+More information on the compilation and installation can be found at
+
+   https://projects.coin-or.org/BuildTools/
+
+**********************************************************************
+***                  DIP EXAMPLES                                  ***
+**********************************************************************
+
+To get an idea of how DIP is used, take a look at the examples in the
+directory Dip/examples/. To build a given application, change to the
+appropriate subdirectory and type "make". For example, to build SmallIP, do
+
+  cd Dip/examples/SmallIP
+  make
+
+For more information, please see 
+
+  http://projects.coin-or.org/Dip

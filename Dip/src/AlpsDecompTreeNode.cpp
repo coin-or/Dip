@@ -396,7 +396,7 @@ int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel * model) {
                                                         upBranchLB_, 
                                                         upBranchUB_);
    if(!gotBranch){
-      setStatus(AlpsNodeStatusEvaluated);
+      setStatus(AlpsNodeStatusFathomed);
       //---
       //--- but if we can't branch on this and it DID finish pricing out
       //---   that means DW_LB=DW_UB for that node, then we are done 
