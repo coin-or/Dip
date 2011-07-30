@@ -313,7 +313,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
 
       //watch tolerance here... if quality is close enough, fathom it
       gap = UtilCalculateGap(thisQuality, currentUB);
-      if(gap <= relTolerance){	 
+      //if(gap <= relTolerance){
+      if (quality_ >= currentUB){
          doFathom = true;
          UTIL_DEBUG(param.msgLevel, 3,
                     cout << "Fathom since thisQuality= "
@@ -396,7 +397,7 @@ int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel * model) {
                                                         upBranchLB_, 
                                                         upBranchUB_);
    if(!gotBranch){
-      setStatus(AlpsNodeStatusFathomed);
+      setStatus(AlpsNodeStatusEvaluated);
       //---
       //--- but if we can't branch on this and it DID finish pricing out
       //---   that means DW_LB=DW_UB for that node, then we are done 

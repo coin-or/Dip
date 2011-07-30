@@ -103,7 +103,7 @@ void MMKP_DecompApp::createModels(){
    const int       numCols    = nGroupRows * nGroupCols;  
 
    //---
-   //--- Multi-Dimensional Mulit-Choice Knapsack Problem (MMKP).
+   //--- Multi-Dimensional Multi-Choice Knapsack Problem (MMKP).
    //---
    //---  max  sum{i in 1..n, j in 1..l[i]}  v[i,j]   x[i,j] <==>
    //---  min  sum{i in 1..n, j in 1..l[i]} -v[i,j]   x[i,j]
