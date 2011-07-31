@@ -124,7 +124,7 @@ private:
    virtual void setObjBound(const double thisBound,
 			    const double thisBoundUB){
       UtilPrintFuncBegin(m_osLog, m_classTag,
-			 "setObjBoundLB()", m_param.LogDebugLevel, 2);
+			 "setObjBound()", m_param.LogDebugLevel, 2);
       if(m_param.DualStab){
 	 if(thisBound > (m_nodeStats.objBest.first + DecompEpsilon)){
 	    //(*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
@@ -134,10 +134,17 @@ private:
       }
       DecompAlgo::setObjBound(thisBound, thisBoundUB);
       UtilPrintFuncEnd(m_osLog, m_classTag,
-		       "setObjBoundLB()", m_param.LogDebugLevel, 2);
+		       "setObjBound()", m_param.LogDebugLevel, 2);
    }
-   
+
    /**
+    * Set the current integer bound and update best/history.
+    */
+   virtual inline void setObjBoundIP(const double thisBound){
+      DecompAlgo::setObjBoundIP(thisBound);
+   }
+
+      /**
     * @}
     */
    

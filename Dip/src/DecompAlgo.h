@@ -828,7 +828,7 @@ public:
    /**
     * Set the current integer bound and update best/history.
     */
-   inline void setObjBoundIP(const double thisBound){
+   virtual inline void setObjBoundIP(const double thisBound){
       UtilPrintFuncBegin(m_osLog, m_classTag,
 			 "setObjBoundIP()", m_param.LogDebugLevel, 2);
       if(thisBound < m_nodeStats.objBest.second){

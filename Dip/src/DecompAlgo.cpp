@@ -7000,10 +7000,6 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       //---    better to just price it out since we cannot branch on it in 
       //---    this state.
       //---
-      //int    branchedOnIndex = -1;
-      //double branchedOnValue =  0;
-      //chooseBranchVar(branchedOnIndex, branchedOnValue);
-      //if(branchedOnIndex == -1)
       std::vector< std::pair<int, double> > downBranchLB, 
          downBranchUB, upBranchLB, upBranchUB;
       bool gotBranch = chooseBranchSet(downBranchLB, 

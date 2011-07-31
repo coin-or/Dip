@@ -64,7 +64,7 @@ private:
 
    //-----------------------------------------------------------------------//
    /**
-    * @name Derived from pure virtual functions of DecompAlgoPC
+    * @name Derived from virtual functions of DecompAlgoPC
     * @{
     */
    //-----------------------------------------------------------------------//
@@ -84,11 +84,26 @@ private:
                     DecompStatus & status);
    virtual void phaseDone();
 
+   /**
+    * Set the current integer bound and update best/history.
+    */
+   virtual inline void setObjBoundIP(const double thisBound){
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "setObjBoundIP()", m_param.LogDebugLevel, 2);
+      if(thisBound < m_nodeStats.objBest.second){
+	 UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+		  (*m_osLog) << "New Global UB = " 
+		  << UtilDblToStr(thisBound) << std::endl;);
+	 //For DECOMP, don't update this object's global UB
+	 //  otherwise, we might stop to early, since it will
+	 //  compare to this object's lower bound.
+	 //m_nodeStats.objBest.second = thisBound;         
+      }
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "setObjBoundIP()", m_param.LogDebugLevel, 2);
+   }
+
    
-   //int generateVarsFea(DecompVarList    & newVars, 
-   //                  double           & mostNegReducedCost);
-
-
 
 public:
    void solveD(DecompCutList * newCuts){
