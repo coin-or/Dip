@@ -381,7 +381,7 @@ public:
       LimitNodes           = COIN_INT_MAX;
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
-      MasterGapLimit       = 0.01;
+      MasterGapLimit       = 1.0e-6;
       CompressColumns      = 1;
       CompressColumnsIterFreq       = 2;
       CompressColumnsSizeMultLimit  = 1.20;

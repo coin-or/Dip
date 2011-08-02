@@ -1778,9 +1778,16 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
       
       //---
       //--- if the lower bound meets the global ub, we are done
-      //---   
-      if(m_nodeStats.objBest.first >= 
-	 (m_nodeStats.objBest.second - DecompEpsilon)){
+      //---    careful here - do NOT do this check in phase1 since
+      //---    ub is based on original objective while lb is based 
+      //---    on phase 1 objective
+      //---
+      //--- TOOD: seems confusing to store bounds from different objectives
+      //---       in the same structure - maybe should use m_nodeStats1/2
+      //---
+      if(m_phase != PHASE_PRICE1 &&
+	 (m_nodeStats.objBest.first >= 
+	  (m_nodeStats.objBest.second - DecompEpsilon))){
 	 UTIL_MSG(m_param.LogLevel, 2,
 		  (*m_osLog)
 		  << "Node " << nodeIndex << " process stopping on bound."
