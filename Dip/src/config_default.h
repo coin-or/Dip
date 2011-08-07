@@ -42,6 +42,21 @@
 /*             HERE DEFINE THE CONFIGURATION SPECIFIC MACROS               */
 /***************************************************************************/
 
+/* Define to 1 if the Cgl package is used */
+#define COIN_HAS_CGL 1
+
+/* Define to 1 if the Clp package is used */
+#define COIN_HAS_CLP 1
+
+/* Define to 1 if the CoinUtils package is used */
+#define COIN_HAS_COINUTILS 1
+
+/* Define to 1 if the Osi package is used */
+#define COIN_HAS_OSI 1
+
+/* Define to 1 if the Osi package is used */
+#define COIN_HAS_CBC 1
+
 /* Define to the debug sanity check level (0 is no test) */
 //#define COIN_DECOMP_CHECKLEVEL 0
 

@@ -7,5 +7,5 @@ Description: Decomposition for Integer Programs
 URL: https://projects.coin-or.org/Dip
 Version: @PACKAGE_VERSION@
 Libs: ${libdir}/libDecomp.la @DIPLIB_PCLIBS@
-Cflags: -I${includedir} -I@ABSBUILDDIR@/inc
+Cflags: -I${includedir}
 Requires: @DIPLIB_PCREQUIRES@

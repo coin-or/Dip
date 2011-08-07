@@ -24,8 +24,7 @@ unitTest_DEPENDENCIES = ../src/libDecomp.la $(DIPLIB_DEPENDENCIES)
 AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS)
 
 # This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src` \
-                   -I`$(CYGPATH_W) $(top_builddir)/src`
+DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src`
 
 ########################################################################
 #                     Includes for LP Solver                           #
