@@ -12,10 +12,10 @@ Settings for all decomp algorithms.
   section=DECOMP
 #############################################################################
 [DECOMP]
-LogLevel      = 2
+LogLevel      = 0
 LogAppLevel   = 0
 LogLpLevel    = 0
-LogDebugLevel = 2
+LogDebugLevel = 0
 
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
@@ -28,8 +28,8 @@ Settings for ALPS framework.
   section=ALPS
 #############################################################################
 [ALPS]
-nodeLogInterval = 1
-msgLevel        = 3
+#nodeLogInterval = 1
+#msgLevel        = 3
 
 
 #############################################################################
