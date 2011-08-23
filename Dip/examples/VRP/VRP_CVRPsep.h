@@ -137,10 +137,18 @@ public:
                = uv.second == 0 ? nVerts : uv.second;
 	    m_lpSol.EdgeHead[ind]               
                = uv.first  == 0 ? nVerts : uv.first;
-            printf("XLP[%d,%d -> %d,%d] = %g\n", 
-                   uv.first, uv.second, 
-                   m_lpSol.EdgeTail[ind],
-                   m_lpSol.EdgeHead[ind], x[e]);
+#if 0
+            printf("XLP[%d,%d -> %d,%d] = %g\n",
+		   uv.first, uv.second,
+		   m_lpSol.EdgeTail[ind],
+		   m_lpSol.EdgeHead[ind], x[e]);
+	    UTIL_DEBUG(m_appParam.Log, 5,
+		       (*m_osLog) << "XLP[" << uv.first << "," << uv.second;
+		       (*m_osLog) << " -> " << m_lpSol.EdgeTail[ind] << ",";
+		       (*m_osLog) << m_lpSol.EdgeHead[ind] << "]";
+		       (*m_osLog) << " = " << x[e] << endl;
+		       );
+#endif
 		assert(ind <= nNzs);
 	    ind++;
 	 }
@@ -178,8 +186,10 @@ public:
 			     &IntegerAndFeasible,
 			     &MaxViolation,
 			     m_newCuts);
+#if 0
       printf("Found %d capacity cuts. MaxViolation=%g\n", 
              m_newCuts->Size, MaxViolation);
+#endif
       return m_newCuts->Size;
    }
 
