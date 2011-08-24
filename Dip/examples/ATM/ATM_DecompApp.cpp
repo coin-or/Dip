@@ -1485,7 +1485,9 @@ bool ATM_DecompApp::APPisUserFeasible(const double * x,
       }
    }
 
+#if 0
    printf("IsUserFeas = %d\n", isFeas);
+#endif
 
    //---
    //--- free local memory
