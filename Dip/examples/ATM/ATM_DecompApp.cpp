@@ -271,6 +271,7 @@ void ATM_DecompApp::createModelColumns(DecompConstraintSet * model,
    addColumnNamesA (model, "x3", getColOffset_x3());
    addColumnNamesAD(model, "v",  getColOffset_v());
 
+#if 0
    {
       int i;
       for(i = 0; i < static_cast<int>(model->colNames.size()); i++){
@@ -281,6 +282,7 @@ void ATM_DecompApp::createModelColumns(DecompConstraintSet * model,
 		model->colUB[i]);
       }
    }
+#endif
 }
 
 //===========================================================================//
@@ -1468,14 +1470,17 @@ bool ATM_DecompApp::APPisUserFeasible(const double * x,
       pairIndex++;
    }
    for(a = 0; a < nAtms; a++){
+#if 0
       printf("COUNT[a=%3d->%10s]: %5g <= K=%5g\n",
 	     a, 
 	     m_instance.getAtmName(a).c_str(),
 	     count[a], 
 	     K_a[a]);
-	     
+#endif	     
       if(count[a] > (K_a[a] + 0.01)){
+#if 0
 	 printf("NOT FEASIBLE a:%d count=%g K=%g\n", a, count[a], K_a[a]);
+#endif
 	 isFeas = false;
       }
    }
