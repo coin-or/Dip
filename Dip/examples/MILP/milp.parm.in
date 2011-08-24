@@ -43,7 +43,7 @@ Settings for MILP application.
 #############################################################################
 [MILP]
 # Log level for messages from application.
-LogLevel       = 3
+LogLevel       = 0
 
 # Path to instance data.
 #   Data/Sample gets copied into build directory.
