@@ -74,6 +74,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/AP3/ap3.parm.in \
 	$(top_srcdir)/examples/ATM/Makefile.in \
 	$(top_srcdir)/examples/ATM/atm.parm.in \
+	$(top_srcdir)/examples/ATM/data_extract.sh.in \
 	$(top_srcdir)/examples/ExternalSolvers/Graph/get.boost.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in \
@@ -163,7 +164,7 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/VRP/Makefile examples/VRP/vrp.parm \
 	examples/VRP/get_boost.sh examples/VRP/get_concorde.sh \
 	examples/VRP/get_cvrpsep.sh examples/ATM/Makefile \
-	examples/ATM/atm.parm \
+	examples/ATM/atm.parm examples/ATM/data_extract.sh \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -586,6 +587,8 @@ examples/VRP/get_cvrpsep.sh: $(top_builddir)/config.status $(top_srcdir)/example
 examples/ATM/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/ATM/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ATM/atm.parm: $(top_builddir)/config.status $(top_srcdir)/examples/ATM/atm.parm.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/ATM/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/ATM/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

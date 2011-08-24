@@ -275,6 +275,7 @@ AC_CONFIG_FILES([Makefile
                  examples/VRP/get_cvrpsep.sh
                  examples/ATM/Makefile
                  examples/ATM/atm.parm
+                 examples/ATM/data_extract.sh
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
