@@ -144,6 +144,8 @@
     <ClInclude Include="..\..\..\..\src\AlpsDecompParam.h" />
     <ClInclude Include="..\..\..\..\src\AlpsDecompSolution.h" />
     <ClInclude Include="..\..\..\..\src\AlpsDecompTreeNode.h" />
+    <ClInclude Include="..\..\..\..\src\config_default.h" />
+    <ClInclude Include="..\..\..\..\src\config_dip_default.h" />
     <ClInclude Include="..\..\..\..\src\Decomp.h" />
     <ClInclude Include="..\..\..\..\src\DecompAlgo.h" />
     <ClInclude Include="..\..\..\..\src\DecompAlgoC.h" />
