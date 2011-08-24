@@ -40,7 +40,7 @@ Settings for MMKP application.
 #############################################################################
 [MCF]
 # Log level for messages from application.
-LogLevel       = 2
+LogLevel       = 0
 
 # Path to instance data.
 DataDir        = @srcdir@/../../data/MCF
