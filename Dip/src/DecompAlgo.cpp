@@ -5442,7 +5442,10 @@ int DecompAlgo::generateCuts(double        * xhat,
       for(it  = D.m_xhatIPFeas.begin();
 	  it != D.m_xhatIPFeas.end(); it++){
 	 thisBound = (*it)->getQuality();
-	 printf("From DECOMP, IP Feasible with Quality = %g\n", thisBound);
+         UTIL_DEBUG(m_param.LogDebugLevel, 3,
+                    (*m_osLog) << "From DECOMP, IP Feasible with Quality =";
+                    (*m_osLog) << thisBound <<endl;
+                    );
 	 if((*it)->getQuality() <= bestBoundUB){
 	    bestBoundUB = (*it)->getQuality();
 	    bestSol     = (*it);
@@ -5454,7 +5457,7 @@ int DecompAlgo::generateCuts(double        * xhat,
 	 m_xhatIPFeas.push_back(bestSolCp);	 
 	 setObjBoundIP(bestSolCp->getQuality());
 	 m_xhatIPBest = bestSolCp;
-	 m_xhatIPBest->print();
+	 //m_xhatIPBest->print();
       }
 
       //this could also very likely return a new gUB -

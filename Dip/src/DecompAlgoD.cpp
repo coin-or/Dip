@@ -87,7 +87,9 @@ void DecompAlgoD::phaseUpdate(DecompPhase  & phase,
       //---    than we are tailing off
       //---
       if(perDiff <= changePerLimit){
-         printf("DC is tailing off - STOP PROCESS\n");
+         UTIL_DEBUG(m_param.LogDebugLevel, 3,
+                    (*m_osLog) << "DC is tailing off - STOP PROCESS" << endl;
+                    );
          phase          = PHASE_DONE;
          m_stopCriteria = DecompStopTailOff;
       }
