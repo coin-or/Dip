@@ -1528,7 +1528,7 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
 //===========================================================================//
 DecompStatus DecompAlgo::processNode(const int    nodeIndex,
                                      const double globalLB,
-                                     const double globalUB){  
+                                     const double globalUB){
 
    double                mostNegRC = 0.0;
    DecompConstraintSet * modelCore = m_modelCore.getModel();
@@ -1596,8 +1596,15 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    //  move until much later
    //does this change effect anything else? wrt to short
    //  cutting and fathoming - check this
+   //you also have to watch for tailoff - if you set to 
+   //  parent obj and it takes a while to get there, then
+   //  it will look like it is tailing off and you might stop 
+   //  short
    //m_nodeStats.objBest.first  = globalLB;
+   //if(m_param.DualStab)
    m_nodeStats.objBest.first  = -DecompInf;
+   //else
+   //m_nodeStats.objBest.first  = globalLB;
    m_nodeStats.objBest.second = globalUB;
    m_compressColsLastPrice    = 0;
    m_compressColsLastNumCols  = m_masterSI->getNumCols();
@@ -1621,12 +1628,17 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
    if(m_phase == PHASE_DONE)
       m_status = STAT_INFEASIBLE;
    else{
-      if(m_param.LogDumpModel > 1)
+      //TODO: put sb candidate id in name of file
+      if(m_param.LogDumpModel > 1){
+	 string baseName = "masterProb";
+	 if(m_isStrongBranch)
+	    baseName += "_SB";	 
          printCurrentProblem(m_masterSI,
-                             "masterProb",
+                             baseName,
                              m_nodeStats.nodeIndex,
                              m_nodeStats.cutCallsTotal,
                              m_nodeStats.priceCallsTotal);
+      }
       
       //---
       //--- find the initial solution (dual and/or primal)
@@ -1975,12 +1987,16 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	 //---  RC: take PARM steps of subgradient
 	 //---  VC: take PARM steps of volume
 	 //---
-	 if(m_param.LogDumpModel > 1)
+	 if(m_param.LogDumpModel > 1){
+	    string baseName = "masterProb";
+	    if(m_isStrongBranch)
+	       baseName += "_SB";
 	    printCurrentProblem(m_masterSI,
-				"masterProb",
+				baseName,
 				m_nodeStats.nodeIndex,
 				m_nodeStats.cutCallsTotal,
 				m_nodeStats.priceCallsTotal);
+	 }
 
 
 	 //---
@@ -3161,12 +3177,16 @@ void DecompAlgo::masterPhaseItoII(){
       m_masterSI->setObjCoeff((*li)->getColMasterIndex(),
 			      (*li)->getOriginalCost());
    }   
-   if(m_param.LogDumpModel > 1)
+   if(m_param.LogDumpModel > 1){
+      string baseName = "masterProb_switchItoII";
+      if(m_isStrongBranch)
+	 baseName += "_SB";	 
       printCurrentProblem(m_masterSI,
-			  "masterProb_switchItoII",
+			  baseName,
 			  m_nodeStats.nodeIndex,
 			  m_nodeStats.cutCallsTotal,
 			  m_nodeStats.priceCallsTotal);
+   }
 #else
    assert(nMasterCols == static_cast<int>(m_masterColType.size()));
    for(i = 0; i < nMasterCols; i++){
@@ -3180,12 +3200,16 @@ void DecompAlgo::masterPhaseItoII(){
       m_masterSI->setObjCoeff((*li)->getColMasterIndex(),
 			      (*li)->getOriginalCost());
    }   
-   if(m_param.LogDumpModel > 1)
+   if(m_param.LogDumpModel > 1){
+      string baseName = "masterProb_switchItoII";
+      if(m_isStrongBranch)
+	 baseName += "_SB";	 
       printCurrentProblem(m_masterSI,
-			  "masterProb_switchItoII",
+			  baseName,
 			  m_nodeStats.nodeIndex,
 			  m_nodeStats.cutCallsTotal,
 			  m_nodeStats.priceCallsTotal);
+   }
 #endif
 }
 
@@ -3215,12 +3239,16 @@ void DecompAlgo::masterPhaseIItoI(){
 	 m_masterSI->setColBounds(i, 0.0, DecompInf);
       }
    }   
-   if(m_param.LogDumpModel > 1)
+   if(m_param.LogDumpModel > 1){
+      string baseName = "masterProb_switchIItoI";
+      if(m_isStrongBranch)
+	 baseName += "_SB";	 
       printCurrentProblem(m_masterSI,
-			  "masterProb_switchIItoI",
+			  baseName,
 			  m_nodeStats.nodeIndex,
 			  m_nodeStats.cutCallsTotal,
 			  m_nodeStats.priceCallsTotal);
+   }
 }
 
 //how does this logic work when dealing with TSP where
@@ -3411,7 +3439,8 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	       //---
 	       //--- if we exceed the cut iter limit, we are done
 	       //---
-	       nextPhase = PHASE_DONE;
+	       nextPhase      = PHASE_DONE;
+	       m_stopCriteria = DecompStopIterLimit;
 	    }
 	    else{
 	       if((cutCallsTotal > 0)  &&
@@ -3440,7 +3469,8 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 		  //---
 		  //--- if we exceed both iter limits, we are done
 		  //---
-		  nextPhase = PHASE_DONE;
+		  nextPhase      = PHASE_DONE;
+		  m_stopCriteria = DecompStopIterLimit;
 	       }
 	       else{
 		  //---
@@ -3630,7 +3660,8 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	       //---
 	       //--- if we exceed the price iter limit, we are done
 	       //---
-	       nextPhase = PHASE_DONE;
+	       nextPhase      = PHASE_DONE;
+	       m_stopCriteria = DecompStopIterLimit;
 	    }
 	    else{
 	       if((priceCallsTotal >  0) &&
@@ -3659,7 +3690,8 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 		  //---
 		  //--- if we exceed both iter limits, we are done
 		  //---
-		  nextPhase = PHASE_DONE;
+		  nextPhase      = PHASE_DONE;
+		  m_stopCriteria = DecompStopIterLimit;
 	       }
 	       else{
 		  //---
@@ -5377,12 +5409,16 @@ int DecompAlgo::generateCuts(double        * xhat,
             m_nodeStats.objBest.first;
          m_cutgenSI->setRowLower(m_cutgenObjCutInd, gLB);
       }
-      if(m_param.LogDumpModel > 1)
+      if(m_param.LogDumpModel > 1){
+	 string baseName = "cutgenProb";
+	 if(m_isStrongBranch)
+	    baseName += "_SB";	 
          printCurrentProblem(m_cutgenSI,
-                             "CUTGEN",
+                             baseName,
                              m_nodeStats.nodeIndex,
                              m_nodeStats.cutCallsTotal,
                              m_nodeStats.priceCallsTotal);      
+      }
       m_cgl->generateCuts(m_cutgenSI, 
                           m_masterSI,
                           xhat, 
@@ -6619,16 +6655,22 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //---
       if(m_param.LogDumpModel > 1){
          if(isNested){
+	    string baseName = "subProbN_" + algoModel.getModelName();
+	    if(m_isStrongBranch)
+	       baseName += "_SB";	
             printCurrentProblem(subprobSI,
-                                "subProbN_" + algoModel.getModelName(),
+				baseName,
                                 m_nodeStats.nodeIndex,
                                 m_nodeStats.cutCallsTotal,
                                 m_nodeStats.priceCallsTotal,
                                 whichBlock);
          }
          else{
+	    string baseName = "subProb_" + algoModel.getModelName();
+	    if(m_isStrongBranch)
+	       baseName += "_SB";	
             printCurrentProblem(subprobSI,
-                                "subProb_" + algoModel.getModelName(),
+				baseName,
                                 m_nodeStats.nodeIndex,
                                 m_nodeStats.cutCallsTotal,
                                 m_nodeStats.priceCallsTotal,

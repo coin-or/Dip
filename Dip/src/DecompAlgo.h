@@ -243,6 +243,7 @@ protected:
 
    int          m_function;//calling function
    bool         m_firstPhase2Call;
+   bool         m_isStrongBranch;
 
 #ifdef DECOMP_MASTERONLY_DIRECT
    //NOTE:
@@ -788,6 +789,13 @@ public:
    }
 
    /**
+    * Set the object to be in strong branching mode.
+    */
+   inline const void setStrongBranchIter(bool isStrongBranch=true) {
+      m_isStrongBranch = isStrongBranch;
+   }
+
+   /**
     * Get the current best UB.
     */
    inline const double getObjBestBoundUB() const {
@@ -936,7 +944,8 @@ public:
       m_relGap(DecompInf),
       m_stopCriteria(DecompStopNo),
       m_masterObjLast(DecompInf),
-     m_firstPhase2Call(false)
+      m_firstPhase2Call(false),
+      m_isStrongBranch(false)
 #ifdef DECOMP_MASTERONLY_DIRECT
 	 ,
      m_masterOnlyCols()

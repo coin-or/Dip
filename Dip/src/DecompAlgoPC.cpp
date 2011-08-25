@@ -109,8 +109,12 @@ void DecompAlgoPC::phaseInit(DecompPhase & phase){
    }
 
    if(phase != PHASE_DONE)
-      if(getNodeIndex() == 0)
+      if(getNodeIndex() == 0 && !m_isStrongBranch)
          phase = PHASE_PRICE1;
+
+   UTIL_MSG(m_param.LogLevel, 2,
+            (*m_osLog) << "phase = " << DecompPhaseStr[phase] << endl;
+	    );
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "phaseInit()", m_param.LogDebugLevel, 2);

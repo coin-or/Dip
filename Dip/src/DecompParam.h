@@ -164,6 +164,17 @@ public:
    double ParallelColsLimit;       //cosine of angle >, then consider parallel
 
    /**
+    * Number of iterations to process in estimating bounds
+    *  during strong branching.
+    * CPM: this is simplex iterations of master
+    * PC : this is outer price and cut iterations
+    *         sets LimitTotalCutIters=LimitTotalPriceIters=BranchStrongIter
+    *  THINK: or CPM could be cut passes... and solve master fully?
+    *          which is expensive and clearly not standard strong branching
+    */
+   int    BranchStrongIter;
+
+   /**
     * Number of threads to use in DIP. 
     *
     * Currently, only used for solving the pricing problem for block 
@@ -251,7 +262,9 @@ public:
       PARAM_getSetting("BranchEnforceInMaster",   BranchEnforceInMaster);
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
+      PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("NumThreads",              NumThreads);
+
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
 
       //---
@@ -358,6 +371,7 @@ public:
       UtilPrintParameter(os, sec, "MasterConvexityLessThan", 
                          MasterConvexityLessThan);
       UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
+      UtilPrintParameter(os, sec, "BranchStrongIter",  BranchStrongIter);
       UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       UtilPrintParameter(os, sec, 
 			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
@@ -422,6 +436,7 @@ public:
       BranchEnforceInMaster    = 1;
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
+      BranchStrongIter         = 0;
       NumThreads               = 1;
       DebugCheckBlocksColumns  = true;
    }

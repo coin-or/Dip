@@ -35,9 +35,6 @@ private:
    std::vector< std::pair<int, double> > upBranchLB_;
    std::vector< std::pair<int, double> > upBranchUB_;
   
-   //int branchedOn_;
-   //double branchedOnVal_;
-  
 public:
    /** Default constructor. */
    AlpsDecompTreeNode() :

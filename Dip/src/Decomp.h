@@ -90,15 +90,17 @@ enum DecompAlgoStop{
    DecompStopTailOff,
    DecompStopInfeasible,
    DecompStopBound,
-   DecompStopTime
+   DecompStopTime,
+   DecompStopIterLimit
 };
-const std::string DecompAlgoStopStr[6] = {
+const std::string DecompAlgoStopStr[7] = {
    "DecompStopNo",
    "DecompStopGap",
    "DecompStopTailOff",
    "DecompStopInfeasible",
    "DecompStopBound",
-   "DecompStopTime"
+   "DecompStopTime",
+   "DecompStopIterLimit"
 };
 
 

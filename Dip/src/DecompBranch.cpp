@@ -27,7 +27,7 @@ chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
                 std::vector< std::pair<int, double> > & upBranchUB) {
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "processNode()", m_param.LogDebugLevel, 1);
+                      "chooseBranchSet()", m_param.LogDebugLevel, 1);
 
    
    //---
@@ -35,8 +35,6 @@ chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
    //---   Choose variables farthest from integer - based on x formulation.
    //---
    vector<int>::iterator intIt;
-   //int    j;
-   //double x, dist, maxDist;
    int    branchedOnIndex, j;
    double branchedOnValue, x, dist, maxDist;
 
@@ -90,7 +88,6 @@ chooseBranchSet(std::vector< std::pair<int, double> > & downBranchLB,
    }  
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "processNode()", m_param.LogDebugLevel, 1);
-
+                      "chooseBranchSet()", m_param.LogDebugLevel, 1);
 }
 

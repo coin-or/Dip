@@ -195,11 +195,6 @@ int AlpsDecompTreeNode::process(bool isRoot,
 			  << colUBCore[c] << ")\t->\t(" << lbs[c]
 			  << "," << ubs[c] << ")" << endl;
 		  }
-		  //else{
-		  // cout << "\t(lb,ub): (" << colLBCore[c] << ","
-		  //  << colUBCore[c] << ")\t->\t(" << lbs[c]
-		  //  << "," << ubs[c] << ")" << endl;
-		  //}
 	       }
 	       );   
       decompAlgo->setMasterBounds(lbs, ubs);
@@ -273,14 +268,6 @@ int AlpsDecompTreeNode::process(bool isRoot,
 	 goto TERM_PROCESS;
       }      
    }
-   
-
-
-
-
-
-
-
    
    //---
    //--- solve the bounding problem (DecompAlgo)
@@ -430,17 +417,33 @@ AlpsDecompTreeNode::branch()  {
       = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
    AlpsDecompModel    * m     
       = dynamic_cast<AlpsDecompModel*>(desc->getModel());
-   AlpsDecompParam    & param = m->getParam();
+   AlpsDecompParam    & param       = m->getParam();
+   AlpsDecompNodeDesc * child       = 0;
+   DecompAlgo         * decompAlgo  = m->getDecompAlgo();
+   DecompParam        & decompParam = decompAlgo->getMutableParam();
 
    UtilPrintFuncBegin(&cout, m_classTag, "branch()", param.msgLevel, 3);
 
+   //---
+   //--- the return of the branch method expects a vector of triples
+   //--- that contain the following:
+   //---    (1) AlpsNodeDesc* - a ptr to the node description
+   //---    (2) AlpsNodeStatus - the inital status of the node (candidate)
+   //---    (3) double - the objective best lower bound
+   //---
    std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > newNodes;
 
+   //---
+   //--- get the current node's lb/ub in original space
+   //---
    double *  oldLbs  = desc->lowerBounds_;
    double *  oldUbs  = desc->upperBounds_;
    const int numCols = desc->numberCols_;  
    CoinAssert(oldLbs && oldUbs && numCols);
 
+   //---
+   //--- check to make sure the branching variables have been determined
+   //---
    if((downBranchLB_.size() + downBranchUB_.size() == 0) || 
       (upBranchLB_.size()   + upBranchUB_.size()   == 0)) {
       std::cout << "AlpsDecompError: " 
@@ -453,33 +456,19 @@ AlpsDecompTreeNode::branch()  {
                       "branch", "AlpsDecompTreeNode");
    }
    
-   /*if((branchedOn_ < 0) || (branchedOn_ >= numCols)) {
-      std::cout << "AlpsDecompError: branchedOn_ = " 
-                << branchedOn_ << "; numCols = " 
-                << numCols << "; index_ = " << index_ << std::endl;
-      throw CoinError("branch index is out of range", 
-                      "branch", "AlpsDecompTreeNode");
-                      }*/
-  
-
+   //---
+   //--- create space for the new bounds for the children
+   //---
    double * newLbs = new double[numCols];
    double * newUbs = new double[numCols];
    std::copy(oldLbs, oldLbs + numCols, newLbs);
    std::copy(oldUbs, oldUbs + numCols, newUbs);
-   
-   //printf("Start with old bounds:\n");
-   //for(i = 0; i < numCols; i++){
-   // printf("ind:%d -> lb:%g ub:%g\n", i, newLbs[i], newUbs[i]);
-   //}
-   
-   
+
+   //---
+   //--- the objective estimate of the new nodes are init'd to the
+   //---  current node's objective (the new node's parent's objective)
+   //---
    double objVal(getQuality());
-
-   
-   //newLbs[branchedOn_] = oldLbs[branchedOn_];
-   //newUbs[branchedOn_] = floor(branchedOnVal_);
-
-   AlpsDecompNodeDesc* child = 0;
 
    //---
    //--- Branch down
@@ -494,8 +483,7 @@ AlpsDecompTreeNode::branch()  {
                          "branch", "AlpsDecompTreeNode");
       }
       newLbs[downBranchLB_[i].first] = downBranchLB_[i].second;
-   }
-   
+   }   
    for (unsigned i = 0; i < downBranchUB_.size(); i++) {
       if((downBranchUB_[i].first < 0) || 
          (downBranchUB_[i].first >= numCols)) {
@@ -507,12 +495,33 @@ AlpsDecompTreeNode::branch()  {
       }
       newUbs[downBranchUB_[i].first] = downBranchUB_[i].second;
    }
-   assert(downBranchLB_.size() +downBranchUB_.size() > 0);
-   //assert(branchedOn_ >= 0);
+   assert(downBranchLB_.size()+downBranchUB_.size() > 0);
    child = new AlpsDecompNodeDesc(m, newLbs, newUbs);
-   //child->setBranchedOn(branchedOn_);
-   //child->setBranchedVal(branchedOnVal_);
-   child->setBranchedDir(-1);
+   child->setBranchedDir(-1);//enum?
+
+   if(decompParam.BranchStrongIter){
+      double globalUB             = getKnowledgeBroker()->getIncumbentValue();
+      int    solveMasterAsIp      = decompParam.SolveMasterAsIp;
+      int    limitTotalCutIters   = decompParam.LimitTotalCutIters;
+      int    limitTotalPriceIters = decompParam.LimitTotalPriceIters;
+      //---
+      //--- calculate an estimate on the lower bound after branching
+      //---
+      //decompParam.LimitTotalCutIters   = decompParam.BranchStrongIter;
+      decompParam.LimitTotalCutIters   = 0;
+      decompParam.LimitTotalPriceIters = decompParam.BranchStrongIter;
+      decompParam.SolveMasterAsIp      = 0;
+      decompAlgo->setStrongBranchIter(true);
+      decompAlgo->setMasterBounds(newLbs, newUbs);
+      decompAlgo->setSubProbBounds(newLbs,newUbs);
+      decompAlgo->processNode(getIndex(), objVal, globalUB);
+      decompAlgo->setStrongBranchIter(false);
+      decompParam.LimitTotalCutIters   = limitTotalCutIters;
+      decompParam.LimitTotalPriceIters = limitTotalPriceIters;
+      decompParam.SolveMasterAsIp      = solveMasterAsIp;
+      //TOOD: what if it stops in Phase1
+      //how will this work in CPM?
+   }
    newNodes.push_back(CoinMakeTriple(static_cast<AlpsNodeDesc *>(child),
                                      AlpsNodeStatusCandidate,
                                      objVal));
@@ -524,8 +533,6 @@ AlpsDecompTreeNode::branch()  {
    //TODO: this can be done more cheaply than a full copy
    std::copy(oldLbs, oldLbs + numCols, newLbs);
    std::copy(oldUbs, oldUbs + numCols, newUbs);
-   //newUbs[branchedOn_] = oldUbs[branchedOn_];
-   //newLbs[branchedOn_] = ceil(branchedOnVal_);
    for (unsigned i = 0; i < upBranchLB_.size(); i++) {
       if((upBranchLB_[i].first < 0) || 
          (upBranchLB_[i].first >= numCols)) {
@@ -537,7 +544,6 @@ AlpsDecompTreeNode::branch()  {
       }
       newLbs[upBranchLB_[i].first] = upBranchLB_[i].second;
    }
-
    for (unsigned i = 0; i < upBranchUB_.size(); i++) {
       if((upBranchUB_[i].first < 0) || 
          (upBranchUB_[i].first >= numCols)) {
@@ -548,14 +554,31 @@ AlpsDecompTreeNode::branch()  {
                          "branch", "AlpsDecompTreeNode");
       }      
       newUbs[upBranchUB_[i].first] = upBranchUB_[i].second;
-   }
-   
-   child = 0;
+   }   
    assert(upBranchLB_.size() + upBranchUB_.size() > 0);
    child = new AlpsDecompNodeDesc(m, newLbs, newUbs);
-   //child->setBranchedOn(branchedOn_);
-   //child->setBranchedVal(branchedOnVal_);
-   child->setBranchedDir(1);
+   child->setBranchedDir(1);//enum?
+   if(decompParam.BranchStrongIter){
+      double globalUB             = getKnowledgeBroker()->getIncumbentValue();
+      int    solveMasterAsIp      = decompParam.SolveMasterAsIp;
+      int    limitTotalCutIters   = decompParam.LimitTotalCutIters;
+      int    limitTotalPriceIters = decompParam.LimitTotalPriceIters;
+      //---
+      //--- calculate an estimate on the lower bound after branching
+      //---
+      //decompParam.LimitTotalCutIters   = decompParam.BranchStrongIter;
+      decompParam.LimitTotalCutIters   = 0;
+      decompParam.LimitTotalPriceIters = decompParam.BranchStrongIter;
+      decompParam.SolveMasterAsIp      = 0;
+      decompAlgo->setStrongBranchIter(true);
+      decompAlgo->setMasterBounds(newLbs, newUbs);
+      decompAlgo->setSubProbBounds(newLbs,newUbs);
+      decompAlgo->processNode(getIndex(), objVal, globalUB);
+      decompAlgo->setStrongBranchIter(false);
+      decompParam.LimitTotalCutIters   = limitTotalCutIters;
+      decompParam.LimitTotalPriceIters = limitTotalPriceIters;
+      decompParam.SolveMasterAsIp      = solveMasterAsIp;
+   }
    newNodes.push_back(CoinMakeTriple(static_cast<AlpsNodeDesc *>(child),
                                      AlpsNodeStatusCandidate,
                                      objVal));
