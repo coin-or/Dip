@@ -142,10 +142,12 @@ int main(int argc, char ** argv){
 	    //---
 	    //--- now, initialize direct solve with best
 	    //---   solution to PC
-	    //---	    
-	    DecompAlgo * algoC = new DecompAlgoC(&atm, &utilParam);
-	    algoC->solveDirect(algo->getXhatIPBest());
-	    delete algoC;
+	    //--- TODO: only useful if stop early on time or nodes   
+	    //--- TODO: cbc currently doesn't use warm-start, only cpx
+	    //---
+	    //DecompAlgo * algoC = new DecompAlgoC(&atm, &utilParam);
+	    //algoC->solveDirect(algo->getXhatIPBest());
+	    //delete algoC;
          }
 	 
          //---
