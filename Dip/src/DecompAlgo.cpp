@@ -455,7 +455,7 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel & algoModel){
                           model->getRowUB());
    if(nInts > 0){
       subprobSI->setInteger(model->getIntegerVars(), nInts);
-#if defined(__DECOMP_IP_CPX__)||(__DECOMP_LP_CPX__)
+#if defined(__DECOMP_IP_CPX__) || defined(__DECOMP_LP_CPX__)
       OsiCpxSolverInterface * osiCpx 
 	 = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
       osiCpx->switchToMIP();
