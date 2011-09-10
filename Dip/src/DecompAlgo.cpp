@@ -289,8 +289,6 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    memcpy(m_colLBNode, colLB, nCols * sizeof(double));
    memcpy(m_colUBNode, colUB, nCols * sizeof(double));
 
-
-
    //---
    //--- PC: create an initial set of points F'[0] subseteq F' (c    + eps)
    //--- DC: create an initial set of points F'[0] subseteq F' (xhat + eps)
@@ -309,6 +307,7 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
 #ifdef __DECOMP_LP_CLP__
    OsiClpSolverInterface * masterSIClp = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
    masterSIClp->getModelPtr()->setLogLevel(m_param.LogLpLevel);
+   masterSIClp->setupForRepeatedUse();
 #endif
 
    //---
@@ -1643,7 +1642,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
       //---
       //--- find the initial solution (dual and/or primal)
       //---
-      m_status = solutionUpdate(m_phase);
+      m_status = solutionUpdate(m_phase, true);
    }
 
    if(m_status != STAT_INFEASIBLE){
@@ -2442,10 +2441,11 @@ void DecompAlgo::setMasterBounds(const double * lbs,
 
 //===========================================================================//
 DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
+					bool              resolve,
                                         //TODO: not currently used?
                                         const int         maxInnerIter,
                                         const int         maxOuterIter){
-   
+
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "solutionUpdate()", m_param.LogDebugLevel, 2);
    
@@ -2488,7 +2488,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //#ifdef __DECOMP_LP_CLP__
    //m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
    //#else
-   m_masterSI->setHintParam(OsiDoPresolveInResolve, true, OsiHintDo);
+   //m_masterSI->setHintParam(OsiDoPresolveInResolve, true, OsiHintDo);
    //#endif
    
    //m_masterSI->setIntParam(OsiMaxNumIteration, maxInnerIter);
@@ -2540,12 +2540,20 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
 
 #else
-      m_masterSI->resolve();
+      if (resolve){
+	 m_masterSI->resolve();
+      }else{
+	 m_masterSI->initialSolve();
+      }
 #endif
       break;
    case PHASE_CUT:
       m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
-      m_masterSI->resolve();
+      if (resolve){
+	 m_masterSI->resolve();
+      }else{
+	 m_masterSI->initialSolve();
+      }
       break;
    default:
       assert(0);

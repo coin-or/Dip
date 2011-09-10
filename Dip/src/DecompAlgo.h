@@ -316,7 +316,8 @@ public:
     */
    virtual DecompStatus 
    solutionUpdate(const DecompPhase phase,
-                  const int         maxInnerIter = COIN_INT_MAX,
+		  const bool        resolve = true,
+		  const int         maxInnerIter = COIN_INT_MAX,
                   const int         maxOuterIter = COIN_INT_MAX);
    
    /**
