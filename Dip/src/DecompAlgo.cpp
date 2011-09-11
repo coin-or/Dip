@@ -2016,7 +2016,7 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 	       m_status = solutionUpdate(m_phase);
 	       //make this some update that can be override for CPM vs PC
 	       // or move this update to phaseUpdate??? 
-	       if(m_algo == CUT && m_nodeStats.cutsThisCall > 0){
+	       if(m_nodeStats.cutsThisCall > 0){
 		  updateObjBound();
 	       }
 	    }
@@ -3405,6 +3405,14 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
    case PHASE_PRICE2:
       {
 	 assert(status == STAT_FEASIBLE || status == STAT_UNKNOWN);
+
+	 //---
+	 //--- if we want to always favor cutting, then just do it
+	 //---
+	 if (m_param.PCStrategy == FavorCut && isCutPossible){
+	    nextPhase = PHASE_CUT;
+	    goto PHASE_UPDATE_FINISH;
+	 }
 	 //---
 	 //--- if this is the first call, just continue
 	 //---
@@ -3482,7 +3490,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	       }
 	       else{
 		  //---
-		  //--- if we exceed the cut iter limit, but not the price lim
+		  //--- if we exceed cut iter limit, but not the price lim
 		  //--- since we are not in mustSwitch, m_varsThisRound > 0,
 		  //--- so we can go back to pricing, even though it violates
 		  //--- the round counter, because we have no other choice
@@ -3503,6 +3511,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 		  //---
 		  nextPhase = PHASE_CUT;
 		  m_nodeStats.resetCutRound();
+		  m_nodeStats.objHistoryBound.clear();
 	       }
 	    }
 	 } //END: else if(considerSwitch)
@@ -3522,6 +3531,7 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 	    //---
 	    nextPhase = PHASE_CUT;
 	 }
+
       if(nextPhase == PHASE_PRICE2 && gapTight){
          m_stopCriteria = DecompStopGap;
          
@@ -3574,10 +3584,16 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
                        << "branch candidate" << endl;);
          }
       }
-      
       break;
    case PHASE_CUT:
       {
+	 //---
+	 //--- if we want to always favor pricing, then just do it
+	 //---
+	 if (m_param.PCStrategy == FavorPrice && isPricePossible){
+	    nextPhase = PHASE_PRICE2;
+	    goto PHASE_UPDATE_FINISH;
+	 }
 	 //---
 	 //--- if this is the first call, just continue
 	 //---
@@ -3637,7 +3653,6 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
 			  << "branch candidate" << endl;);
 	    }
 	 }
-	 
       
 	 //---
 	 //--- Princess Bride (1987):
@@ -6986,7 +7001,6 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    if(static_cast<int>(m_nodeStats.objHistoryBound.size()) <= changeLen)
       return false;
 
-
    //---
    //--- don't check for tailoff until we are at least in the ballpark
    //---   with respect to DW gap
@@ -7010,22 +7024,22 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    vector< DecompObjBound >::reverse_iterator it 
       = m_nodeStats.objHistoryBound.rbegin();
    int    len       = 0;
-   double prevBound = (*it).thisBound;
+   double prevBound = (*it).bestBound;
    double diff      =  DecompInf;
    double sumDiff   = 0.0;
    double aveDiff   = 0.0;
    double perDiff   = 0.0;
-   for( ; it != m_nodeStats.objHistoryBound.rend(); it++){
-      diff       = fabs(prevBound - (*it).thisBound);
+   for(it++; it != m_nodeStats.objHistoryBound.rend(); it++){
+      diff       = fabs(prevBound - (*it).bestBound);
       UTIL_DEBUG(m_param.LogDebugLevel, 3,	      
 		 (*m_osLog) 
 		 << setw(10) << "prevBound="
 		 << setw(10) << UtilDblToStr(prevBound, 2)
 		 << setw(10) << ", thisBound="
-		 << setw(10) << UtilDblToStr((*it).thisBound) << endl;
+		 << setw(10) << UtilDblToStr((*it).bestBound) << endl;
 		 );
       sumDiff   += diff;
-      prevBound  = (*it).thisBound; 
+      prevBound  = (*it).bestBound; 
       len++;
       if(len >= changeLen)
 	 break;
@@ -7056,7 +7070,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       //---    but we are not done pricing out (i.e., a column with negative 
       //---    RC still exist) and we declare that we are tailing off then the 
       //---    node will get put back in the node work queue. This can lead
-      //---    to that node being repeatedly stopped and reseted. It is
+      //---    to that node being repeatedly stopped and reset. It is
       //---    better to just price it out since we cannot branch on it in 
       //---    this state.
       //---
@@ -7067,7 +7081,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
                                        upBranchLB, 
                                        upBranchUB);
       if(gotBranch)
-	 return false;
-      else return true;   
+	 return true;
+      else return false;   
    }
 }

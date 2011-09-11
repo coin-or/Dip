@@ -34,18 +34,23 @@ class DecompParam{
     * @{
     */
    //----------------------------------------------------------------------//
+
 public:   
    int    LogLevel;
    int    LogDebugLevel;
    int    LogLpLevel;    //TODO: LpIpLevel separate
+
    //=0 never
    //=1 only on error
    //=2 dump every model
+
    int    LogDumpModel;
+
    /**
     * 0: print nothing 
     * 1: print the node objective history
     */
+
    int    LogObjHistory;
 
 
@@ -63,21 +68,33 @@ public:
    /**
     * Max number of nodes (copied from Alps parameters)
     */
+   
    int    LimitNodes;
-
 
    //---
    //--- tailing off when average bound over TailoffLength iterations 
    //--- has changed less than TailoffPercent
    //---
+
    int    TailoffLength;
    double TailoffPercent;
    double MasterGapLimit;
 
+   //---
+   //--- Strategy for switching from cutting to pricing
+   //--- 0 = Default
+   //--- 1 = Favor column generation
+   //--- 2 = Favor cut generation
+   
+   int PCStrategy;
+   
    int    CompressColumns;
-   int    CompressColumnsIterFreq;      //num iters between compress
-   double CompressColumnsSizeMultLimit; //don't compress unless number of cols increased by this mult
-   double CompressColumnsMasterGapStart;//do not start compression until master gap is within this limit
+   //num iters between compress
+   int    CompressColumnsIterFreq;     
+   //don't compress unless number of cols increased by this mult
+   double CompressColumnsSizeMultLimit;
+   //do not start compression until master gap is within this limit
+   double CompressColumnsMasterGapStart;
    int    CutDC;
    int    CutCGL;
    
@@ -101,16 +118,20 @@ public:
    // DecompDualSimplex = 0,
    // DecompPrimSimplex = 1,
    // DecompBarrier     = 2
+
    int    SubProbSolverStartAlgo;
 
    //n = 0: do all blocks each time
    //n > 0: do all blocks every n iterations
+
    int    RoundRobinInterval;
 
    //TODO: named values in parameters?
    //NOT working
    //0:RoundRobinRotate:    rotate through blocks in order 0...numBlocks-1
-   //1:RoundRobinMostNegRC: choose the block with most neg reduced cost (in last iter)
+   //1:RoundRobinMostNegRC: choose the block with most neg reduced cost
+   //(in last iter)
+
    int    RoundRobinStrategy;
 
    //solve master as IP at end of each node (this should only be done
@@ -126,6 +147,7 @@ public:
    // DecompDualSimplex = 0,
    // DecompPrimSimplex = 1,
    // DecompBarrier     = 2
+
    int    SolveMasterUpdateAlgo;
    
    
@@ -136,6 +158,7 @@ public:
    //1 = Use the built-in IP solve, even if there is a user defines a function.
    //2 = Calls the user defined function (if exists) and then calls built-in 
    //    IP solver (use this for debugging).
+
    int    SolveRelaxAsIp;
 
    int    InitVarsWithCutDC;
@@ -144,6 +167,7 @@ public:
    
    //solve compact formulation first before starting PhaseI
    //  hopefully identify infeasibiity in tree quicker
+
    int    InitCompactSolve;
 
    int    DualStab;
@@ -172,6 +196,7 @@ public:
     *  THINK: or CPM could be cut passes... and solve master fully?
     *          which is expensive and clearly not standard strong branching
     */
+
    int    BranchStrongIter;
 
    /**
@@ -181,12 +206,14 @@ public:
     * angular models. The subproblems (each block) are independent and 
     * can be solved in parallel.
     */
+
    int NumThreads;
 
    /*
     * Check user columns for overlap. The default is true, but this
     * can be shut off to speed up the setup.
     */
+
    int DebugCheckBlocksColumns;
 
    /**
@@ -200,7 +227,9 @@ public:
     * @{
     */
    //-----------------------------------------------------------------------//
+
 public:
+
    void getSettingsImpl(UtilParameters & param,
 			const char     * sec){
       /** \todo: think about putting these into sections of structs */
@@ -222,6 +251,7 @@ public:
       PARAM_getSetting("TailoffLength",        TailoffLength);
       PARAM_getSetting("TailoffPercent",       TailoffPercent);       
       PARAM_getSetting("MasterGapLimit",       MasterGapLimit);
+      PARAM_getSetting("PCStrategy",           PCStrategy);
       PARAM_getSetting("CompressColumns",      CompressColumns);       
       PARAM_getSetting("CompressColumnsIterFreq",       CompressColumnsIterFreq);       
       PARAM_getSetting("CompressColumnsSizeMultLimit",  CompressColumnsSizeMultLimit);       
@@ -316,11 +346,15 @@ public:
       
       UtilPrintParameter(os, sec, "TailoffLength",       TailoffLength);
       UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);      
-      UtilPrintParameter(os, sec, "MasterGapLimit",      MasterGapLimit);      
+      UtilPrintParameter(os, sec, "MasterGapLimit",      MasterGapLimit);
+      UtilPrintParameter(os, sec, "PCStrategy",          PCStrategy);
       UtilPrintParameter(os, sec, "CompressColumns",     CompressColumns);
-      UtilPrintParameter(os, sec, "CompressColumnsIterFreq",      CompressColumnsIterFreq);
-      UtilPrintParameter(os, sec, "CompressColumnsSizeMultLimit", CompressColumnsSizeMultLimit);
-      UtilPrintParameter(os, sec, "CompressColumnsMasterGapStart", CompressColumnsMasterGapStart);
+      UtilPrintParameter(os, sec, "CompressColumnsIterFreq",
+			 CompressColumnsIterFreq);
+      UtilPrintParameter(os, sec, "CompressColumnsSizeMultLimit",
+			 CompressColumnsSizeMultLimit);
+      UtilPrintParameter(os, sec, "CompressColumnsMasterGapStart",
+			 CompressColumnsMasterGapStart);
       UtilPrintParameter(os, sec, "CutDC",               CutDC);
       UtilPrintParameter(os, sec, "CutCGL",              CutCGL);
       UtilPrintParameter(os, sec, "CutCglKnapC",         CutCglKnapC);
@@ -396,6 +430,7 @@ public:
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 1.0e-6;
+      PCStrategy           = 0; 
       CompressColumns      = 1;
       CompressColumnsIterFreq       = 2;
       CompressColumnsSizeMultLimit  = 1.20;

@@ -138,6 +138,17 @@ const std::string DecompStatusStr[3] = {
    "STAT_UNKNOWN"
 };
 
+enum DecompPriceCutStrategy{
+   Default, 
+   FavorPrice,
+   FavorCut
+};
+const std::string DecompPriceCutStrategyStr[3] = {
+   "Default", 
+   "Favor Price",
+   "Favor Cut"
+};
+
 //===========================================================================//
 enum DecompSolverStatus {
    DecompSolStatError,
