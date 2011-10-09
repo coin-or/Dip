@@ -1,0 +1,4 @@
+cd @srcdir@/../../data/MMKP/hifi
+./get.data
+./prep.data
+

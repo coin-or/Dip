@@ -1,0 +1,48 @@
+##############################################################################
+# atm_5_10_1
+##############################################################################
+echo "========================================================================"
+echo "===== MILPBlock Test CPM atm_5_10_1                                ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 1 --doPriceCut 0 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/atm --MILPBlock:BlockFileFormat List --MILPBlock:BlockFile atm_5_10_1.block --MILPBlock:Instance atm_5_10_1 --MILPBlock:BestKnownLB 59704.02009 --MILPBlock:BestKnownUB 59704.02009
+
+echo "========================================================================"
+echo "===== MILPBlock Test CPM atm_5_10_1 (UseSparse)                    ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 1 --doPriceCut 0 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/atm --MILPBlock:BlockFileFormat List --MILPBlock:BlockFile atm_5_10_1.block --MILPBlock:Instance atm_5_10_1 --MILPBlock:BestKnownLB 59704.02009 --MILPBlock:BestKnownUB 59704.02009 --MILPBlock:UseSparse 1
+
+echo "========================================================================"
+echo "===== MILPBlock Test PC  atm_5_10_1                                ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 0 --doPriceCut 1 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/atm --MILPBlock:BlockFileFormat List --MILPBlock:BlockFile atm_5_10_1.block --MILPBlock:Instance atm_5_10_1 --MILPBlock:BestKnownLB 59704.02009 --MILPBlock:BestKnownUB 59704.02009
+
+echo "========================================================================"
+echo "===== MILPBlock Test PC  atm_5_10_1 (UseSparse)                    ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 0 --doPriceCut 1 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/atm --MILPBlock:BlockFileFormat List --MILPBlock:BlockFile atm_5_10_1.block --MILPBlock:Instance atm_5_10_1 --MILPBlock:BestKnownLB 59704.02009 --MILPBlock:BestKnownUB 59704.02009 --MILPBlock:UseSparse 1
+
+echo "========================================================================"
+echo "===== MILPBlock Test PC  atm_5_10_1 (UseSparse,DualStab)           ====="
+echo "========================================================================"
+./decomp_milpblock --param milpblock.parm --doCut 0 --doPriceCut 1 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/atm --MILPBlock:BlockFileFormat List --MILPBlock:BlockFile atm_5_10_1.block --MILPBlock:Instance atm_5_10_1 --MILPBlock:BestKnownLB 59704.02009 --MILPBlock:BestKnownUB 59704.02009 --MILPBlock:UseSparse 1 --DECOMP:DualStab 1
+
+
+##############################################################################
+# retail27
+##############################################################################
+echo "========================================================================"
+echo "===== MILPBlock Test PC  retail27 (UseSparse)                      ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 0 --doPriceCut 1 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/retail --MILPBlock:BlockFileFormat Pair --MILPBlock:BlockFile retail27.block --MILPBlock:Instance retail27 --MILPBlock:BestKnownLB 877.96112 --MILPBlock:BestKnownUB 877.96112
+
+echo "========================================================================"
+echo "===== MILPBlock Test PC  retail27 (UseSparse)                      ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 0 --doPriceCut 1 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/retail --MILPBlock:BlockFileFormat Pair --MILPBlock:BlockFile retail27.block --MILPBlock:Instance retail27 --MILPBlock:BestKnownLB 877.96112 --MILPBlock:BestKnownUB 877.96112 --MILPBlock:UseSparse 1
+
+echo "========================================================================"
+echo "===== MILPBlock Test PC  retail27 (UseSparse,DualStab)             ====="
+echo "========================================================================"
+#./decomp_milpblock --param milpblock.parm --doCut 0 --doPriceCut 1 --MILPBlock:DataDir ../../../../Dip/examples/MILPBlock/../../data/MILP/block/retail --MILPBlock:BlockFileFormat Pair --MILPBlock:BlockFile retail27.block --MILPBlock:Instance retail27 --MILPBlock:BestKnownLB 877.96112 --MILPBlock:BestKnownUB 877.96112 --MILPBlock:UseSparse 1 --DECOMP:DualStab 1
+
+

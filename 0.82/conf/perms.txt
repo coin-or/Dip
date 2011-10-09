@@ -1,0 +1,3 @@
+[Dip:/]
+
+mgalati = rw

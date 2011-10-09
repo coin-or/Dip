@@ -1,0 +1,19 @@
+============================================================================
+Download DECOMP.
+============================================================================
+See https://projects.coin-or.org/DECOMP.
+
+============================================================================
+Configure, compile, install and test DECOMP.
+============================================================================
+Assuming you have installed DECOMP in some directory ${DECOMP_ROOT}.
+ (1) mkdir build
+ (2) cd ${DECOMP_ROOT}/build
+ (3) ../configure
+ (4) make 
+ (5) make install
+ (6) make test
+
+This will install the DECOMP libraries. To build an application, go to
+ ${DECOMP_ROOT}/build/Decomp/examples/<user app> and follow README.txt.
+

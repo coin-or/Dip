@@ -1,0 +1,10 @@
+--- combo.h	1998-03-31 03:18:26.000000000 -0500
++++ /home/magh/COIN/coin-Decomp/Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.h	2009-10-06 18:43:30.000000000 -0400
+@@ -22,6 +22,7 @@
+   itype   p;              /* profit                  */
+   itype   w;              /* weight                  */
+   boolean x;              /* solution variable       */
++   int i;//MVG
+ } item;
+ 
+ /* ======================================================================

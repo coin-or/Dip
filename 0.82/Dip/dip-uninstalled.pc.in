@@ -1,0 +1,11 @@
+prefix=@prefix@
+libdir=@ABSBUILDDIR@/src
+includedir=@abs_source_dir@/src
+
+Name: DIP
+Description: Decomposition for Integer Programs
+URL: https://projects.coin-or.org/Dip
+Version: @PACKAGE_VERSION@
+Libs: ${libdir}/libDecomp.la @DIPLIB_PCLIBS@
+Cflags: -I${includedir}
+Requires: @DIPLIB_PCREQUIRES@

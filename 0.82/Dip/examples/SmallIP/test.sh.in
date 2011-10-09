@@ -1,0 +1,20 @@
+# version 1
+sed 's/SmallIP_DecompApp/SmallIP_DecompApp/' < Makefile > tmp
+sed 's/VERSION1/VERSION1/' < tmp > Makefile1
+make -f Makefile1 clean > tmp
+make -f Makefile1 > tmp
+./decomp_smallip --doCut      1
+./decomp_smallip --doPriceCut 1
+
+
+# version 2
+sed 's/SmallIP_DecompApp/SmallIP_DecompApp2/' < Makefile > tmp
+sed 's/VERSION1/VERSION2/' < tmp > Makefile2
+make -f Makefile2 clean > tmp
+make -f Makefile2 > tmp
+./decomp_smallip --doCut      1
+./decomp_smallip --doPriceCut 1
+
+
+rm tmp
+

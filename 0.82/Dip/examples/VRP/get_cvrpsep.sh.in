@@ -1,0 +1,4 @@
+cd ../ExternalSolvers/VRP
+chmod +x get.cvrpsep
+./get.cvrpsep
+

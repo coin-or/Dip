@@ -1,0 +1,17 @@
+- MAD CXX flags even with enable debug are -O3!
+- logical fixings - preprocess node
+- basic exchange heuristics
+- bin packing heuristics
+- some of cuts
+- symm breaking constraints
+- cplex brute force benchmarks
+- setup condor sanity checks
+- MAD-k version
+- knapsack solver
+- qualex lib, greedy heur first
+- qualex version that compiles in windows
+- valgrind
+- purify
+- quantify
+- not getting ANY Cgl cuts - not even cliques - weird! check by hand
+- OsiDecomp to deal with Cgl/Cpx issues

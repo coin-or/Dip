@@ -1,0 +1,51 @@
+============================================================================
+Introduction
+============================================================================
+This application solves the Integer Multicommodity Flow Problem
+   This example was taken from BCP/examples/MCF-1
+
+============================================================================
+Build DIP
+============================================================================
+To build DIP:
+ (1) cd ${DIP_ROOT}/build
+ (2) ../configure
+ (3) make 
+ (4) make install
+To run a basic unit test.
+ (5) make test 
+
+
+============================================================================
+Build MCF
+============================================================================
+To build MCF application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/MCF
+ (2) make
+
+
+============================================================================
+Extract the example data for MCF
+============================================================================
+This will extract the the example data to ${DIP_ROOT}/Dip/data/MCF.
+ (1) sh data_extract.sh
+
+
+============================================================================
+Run MCF
+============================================================================
+To run MCF application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/MCF
+ (2) ./decomp_mcf --param ${PARMFILE} < --section:option value >
+
+Example
+with parameter file:
+ ./decomp_mcf --param mcf.parm
+with command line override:
+ ./decomp_mcf --doCut 1
+
+============================================================================
+Notes
+============================================================================
+(1) See the example parameter file for some common options. A '#' in 
+    the parameter file is a comment and will be ignored.

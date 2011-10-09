@@ -1,0 +1,8 @@
+retail20.pc.txt:Status= 1 BestLB=  79.65584   BestUB= 36612.67995 Nodes= 11389  SetupCPU= 0.3200 SolveCPU= 301.2100 TotalCPU= 301.5300 SetupReal= 0.4010 SolveReal= 531.5799 TotalReal= 531.9810
+retail22.pc.txt:Status= 1 BestLB=  149.90718  BestUB= 230755.99347 Nodes= 5419   SetupCPU= 1.1700 SolveCPU= 298.6400 TotalCPU= 299.8100 SetupReal= 1.7378 SolveReal= 467.7341 TotalReal= 469.4719
+retail27.pc.txt:Status= 0 BestLB=  877.96112  BestUB= 877.96112  Nodes= 1      SetupCPU= 0.7600 SolveCPU= 0.6400 TotalCPU= 1.4000 SetupReal= 1.9631 SolveReal= 2.0208 TotalReal= 3.9839
+retail31.pc.txt:Status= 1 BestLB=  2386.03023 BestUB= 2402.71075 Nodes= 16     SetupCPU= 1.1400 SolveCPU= 298.0300 TotalCPU= 299.1700 SetupReal= 2.7804 SolveReal= 405.9064 TotalReal= 408.6868
+retail33.pc.txt:Status= 1 BestLB=  556.85352  BestUB= 759.19073  Nodes= 621    SetupCPU= 9.3400 SolveCPU= 289.9400 TotalCPU= 299.2800 SetupReal= 10.6410 SolveReal= 354.3419 TotalReal= 364.9829
+retail3.pc.txt:Status= 0 BestLB=  508.29976  BestUB= 508.29976  Nodes= 1      SetupCPU= 0.2200 SolveCPU= 0.2300 TotalCPU= 0.4500 SetupReal= 0.4174 SolveReal= 0.6733 TotalReal= 1.0907
+retail4.pc.txt:Status= 0 BestLB=  5767.92971 BestUB= 5767.92971 Nodes= 1      SetupCPU= 46.1200 SolveCPU= 43.3600 TotalCPU= 89.4800 SetupReal= 55.8393 SolveReal= 49.8834 TotalReal= 105.7228
+retail6.pc.txt:Status= 1 BestLB=  443.31056  BestUB= 443.61833  Nodes= 17053  SetupCPU= 0.1800 SolveCPU= 299.7900 TotalCPU= 299.9700 SetupReal= 0.3953 SolveReal= 574.5803 TotalReal= 574.9756

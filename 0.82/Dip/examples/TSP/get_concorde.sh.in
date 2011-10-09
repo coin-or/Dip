@@ -1,0 +1,5 @@
+cd ../ExternalSolvers/TSP
+chmod +x get.concorde
+./get.concorde
+tar -zxvf *.tgz
+cd ../../TSP

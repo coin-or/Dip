@@ -1,0 +1,84 @@
+#############################################################################
+Settings for main.
+#############################################################################
+#{0,1}: use DECOMP for cutting plane method
+doCut         = 0 
+
+#{0,1}: use DECOMP for price and cut
+doPriceCut    = 1 
+
+#{0,1}: use DECOMP to build compact formulation then call direct IP solver
+doDirect      = 0 
+
+#generate random instances
+doGenRandom  = 0
+randSeed     = 1
+randNumAtms  = 5
+randNumDates = 25
+
+#############################################################################
+Settings for all decomp algorithms.
+  section=DECOMP
+#############################################################################
+[DECOMP]
+# log levels
+LogLevel      = 0
+LogAppLevel   = 0
+LogLpLevel    = 0
+LogDebugLevel = 0
+
+# time limit
+# LimitTime     = 60
+
+#############################################################################
+Settings for decomp algorithm cutting plane method. 
+  section=CUT
+#############################################################################
+[CUT]
+
+#############################################################################
+Settings for decomp algorithm price and cut.
+  section=PRICE_AND_CUT
+#############################################################################
+[PRICE_AND_CUT]
+# limit the number of iterations of cuts before switching each round
+LimitRoundCutIters      = 10
+
+# limit the number of iterations of cuts before switching each round
+LimitRoundPriceIters    = 10
+
+# limit the number of initial variables generated
+LimitInitVars           = 2
+
+#############################################################################
+Settings for ALPS framework.
+  section=ALPS
+#############################################################################
+[ALPS]
+# nodeLogInterval = 1
+# msgLevel        = 2
+
+#############################################################################
+Settings for ATM application.
+  section=ATM
+#############################################################################
+[ATM]
+# Path to instance data.
+DataDir     = @srcdir@/../../data/ATM
+
+# Model definitions for core and relaxation.
+ModelNameCore  = BUDGET
+ModelNameRelax = CASH_COUNT
+
+# Name of files for instance (assumed to be in DataDir).
+DataAtm     = atm_randA_5_25_1.txt
+DataDate    = atm_randD_5_25_1.txt
+DataAtmDate = atm_randAD_5_25_1.txt
+
+#DataAtm     = atm_randA_10_50_1.txt
+#DataDate    = atm_randD_10_50_1.txt
+#DataAtmDate = atm_randAD_10_50_1.txt
+
+# Number of points used in approximation of continous range.
+NumSteps    = 10
+

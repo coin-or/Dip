@@ -1,0 +1,31 @@
+All -g for now. 
+
+(1)
+Possible effect of DC Farkas Cuts.
+
+I02:
+I02.cpm with gomory cuts LB=-364.24 UB=inf
+  solves in 2 nodes
+I02.cpm with dc LB=-364.04 UB=-364  -> DC helped with LB and UB!        
+  solves in 3 nodes
+I02.pc  no   gomory cuts LB=-365    UB=-299
+  solves in 13 nodes
+
+- check to see how PC + gomory does
+
+
+I03:
+I03.cpm root LB=-1625.28 after 600 nodes LB=-1613.6, UB=inf
+I03.cpm.dc   LB=-1625.28
+(1)
+   then into DECOMP, inf, new UB=-1556, farkas cut, LB=-1625.28
+
+   DECOMP rounds, inf, UB same, LB=-1625.25... -1625.19, not much help... tailoff stops it,
+   still infeasible so not inside P'
+Node 1: -1625.19 / -1566 (3.7% gap) - good.... advantage DC.... but expensive
+After 38 nodes: -1621.85/-1601 (0.013 gap)
+
+
+(2)
+Possible effect of PC gomory cuts.
+

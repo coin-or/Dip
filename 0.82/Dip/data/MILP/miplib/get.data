@@ -1,0 +1,2 @@
+wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/miplib3.tgz
+wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/miplib3_pre.tgz

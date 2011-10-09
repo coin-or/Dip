@@ -1,0 +1,33 @@
+doCut         = 1
+doPrice       = 0
+doPriceCut    = 0
+doRelaxCut    = 0
+
+[DECOMP]
+LogLevel      = 3
+LogAppLevel   = 0
+LogLpLevel    = 0
+LogDebugLevel = 3
+LimitInitVars = 5
+
+[CUT]
+CutCGL        = 1
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+
+
+[PRICE]
+LimitTotalCutIters      = 0
+LimitRoundPriceIters    = 100
+
+[PRICE_AND_CUT]
+LimitRoundCutIters      = 1
+LimitRoundPriceIters    = 1
+
+[MAD]
+DataDir    = ../../../../Decomp/data/MAD/miplib
+DataSubDir = miplib
+Instance   = p0033
+

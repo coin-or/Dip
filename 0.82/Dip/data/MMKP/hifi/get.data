@@ -1,0 +1,27 @@
+wget http://www.laria.u-picardie.fr/hifi/OR-Benchmark/MMKP/MMKP.html
+wget http://www.laria.u-picardie.fr/hifi/OR-Benchmark/MMKP/A_Readme_first
+
+for i in `seq 13`
+do
+  wget http://www.laria.u-picardie.fr/hifi/OR-Benchmark/MMKP/I${i}
+done
+
+for i in `seq 9`
+do
+  wget http://www.laria.u-picardie.fr/hifi/OR-Benchmark/MMKP/INST0${i}
+done
+
+for i in `seq 11 20`
+do
+  wget http://www.laria.u-picardie.fr/hifi/OR-Benchmark/MMKP/INST${i}
+done
+
+wget http://www.laria.u-picardie.fr/hifi/OR-Benchmark/MMKP/Instance8
+mv Instance8 I8
+
+for i in I*
+do
+  cat $i | tr '-' ' ' > tmp
+  mv tmp $i
+done
+rm tmp

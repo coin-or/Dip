@@ -1,0 +1,7 @@
+#wget https://coral.ie.lehigh.edu/~magh/decomp/atm.tgz
+#wget https://coral.ie.lehigh.edu/~magh/decomp/retail.tgz
+#wget https://coral.ie.lehigh.edu/~magh/decomp/drugport.tgz
+wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/atm.tgz
+wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/retail.tgz
+wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/drugport.tgz
+

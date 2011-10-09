@@ -1,0 +1,4 @@
+cd @srcdir@/../../data/TSP
+./get.data
+tar -zxvf tsplib.tgz
+

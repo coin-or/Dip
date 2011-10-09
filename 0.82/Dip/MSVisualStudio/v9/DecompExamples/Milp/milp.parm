@@ -1,0 +1,64 @@
+#############################################################################
+Settings for main.
+#############################################################################
+#{0,1}: use DECOMP for cutting plane method
+doCut         = 0
+
+#{0,1}: use DECOMP for price and cut
+doPriceCut    = 1
+
+#{0,1}: use DECOMP for relax and cut (BROKEN)
+doRelaxCut    = 0 
+
+#{0,1}: use DECOMP to build compact formulation then call direct IP solver
+doDirect      = 0
+
+#############################################################################
+Settings for all decomp algorithms.
+  section=DECOMP
+#############################################################################
+[DECOMP]
+LogLevel      = 3
+LogDebugLevel = 3
+#LogLpLevel    = 2
+#LogDumpModel  = 2
+
+#############################################################################
+Settings for decomp algorithm cutting plane method. 
+  section=CUT
+#############################################################################
+[CUT]
+
+#############################################################################
+Settings for decomp algorithm price and cut.
+  section=PRICE_AND_CUT
+#############################################################################
+[PRICE_AND_CUT]
+
+#############################################################################
+Settings for ALPS framework.
+  section=ALPS
+#############################################################################
+[ALPS]
+msgLevel = 3
+
+#############################################################################
+Settings for MILP application.
+  section=MILP
+#############################################################################
+[MILP]
+# Log level for messages from application.
+LogLevel       = 3
+
+# Path to instance data.
+#   Data/Sample gets copied into build directory.
+DataDir        = C:\cygwin\home\magala\COIN\coin-Dip\Data\Sample
+
+# Name of MPS file for instance (assumed to be in DataDir).
+Instance        = p0033
+
+# Seed for the random number generator (for choosing rows).
+RandomSeed   = 1
+
+# Percentage of rows (randomly chosen) for relaxation.
+RelaxPercent = 0.33

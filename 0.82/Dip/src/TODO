@@ -1,0 +1,16 @@
+- OsiCpx message handling - seeing all messages twice
+- projection for blocks to save memory (see SSR)
+- clean-up and document parameter names
+- Relax and Cut ---> what to do if no UB!?
+  -- for now, force user to give some idea
+- Decomp and Cut - first just do normal CPM + DC idea with farkas working
+  --> from multi-poly.... 
+  --> even during PC, x* --> decomp from other poly, then farks
+- Volume -> DecompAlgoVC? or direct DecompVol?
+- DecompInterface Idea
+- parameters need to be stored in algo, if doing multi-poly... 
+- really need multiple DecompModels? stored as a DecompApp?
+- if depend on COIN or Alps
+- UtilCoin, UtilAlps, ... others should be completely independent of COIN
+
+

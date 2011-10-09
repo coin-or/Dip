@@ -1,0 +1,4 @@
+wget http://surfnet.dl.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.gz
+tar -xzf boost_1_47_0.tar.gz
+ln -s boost_1_47_0/boost
+

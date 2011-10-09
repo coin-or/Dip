@@ -1,0 +1,38 @@
+doCut         = 0
+doPriceCut    = 1
+doRelaxCut    = 0
+
+[DECOMP]
+LogLevel      = 5
+LogAppLevel   = 0
+LogLpLevel    = 1
+LogDebugLevel = 5
+LogDumpModel  = 2
+CutCGL        = 1
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+
+[CUT]
+
+[PRICE_AND_CUT]
+CutCglGomory            = 1
+LimitRoundCutIters      = 10
+LimitRoundPriceIters    = 10
+LimitInitVars           = 2
+
+[ALPS]
+nodeLogInterval = 1
+msgLevel        = 10
+
+[VRP]
+LogLevel  = 2
+#DataDir   = ../../../../Decomp/data/VRP/vrplib
+DataDir   = ..\..\..\..\Decomp\data\VRP\vrplib
+Instance  = E-n13-k4
+NumRoutes = 4
+
+ModelNameCore  = 2DEGREE
+#ModelNameRelax = MTSP
+ModelNameRelax = ESPPRCC

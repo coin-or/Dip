@@ -1,0 +1,33 @@
+doCut         = 0
+doPriceCut    = 1
+doDirect      = 0
+timeLimit     = 3600
+
+[DECOMP]
+LogLevel      = 2
+LimitTime = 3600
+
+[PRICE_AND_CUT]
+SolveMasterAsIp         = 1
+#InitVarsWithIP          = 1
+#InitVarsWithIPLimitTime = 10
+
+[ALPS]
+nodeLogInterval = 1
+timeLimit       = 3600
+
+[MILPBlock]
+LogLevel     = 2
+
+DataDir     = /home/magh/AFS/COIN/coin-Dip/Dip/data/MILP/block/retail
+
+#BlockFile       = atm_5_10_1.block
+#BlockFileFormat = List
+#Instance        = atm_5_10_1
+
+#BlockFile       = kohls31_ld1.block
+BlockFileFormat = Pair
+#Instance        = kohls31_ld1
+#ColumnUB        = 100
+
+

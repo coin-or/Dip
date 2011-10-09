@@ -1,0 +1,4 @@
+cd @srcdir@/../../data/MILP/miplib
+./get.data
+tar -zxvf miplib3.tgz
+tar -zxvf miplib3_pre.tgz

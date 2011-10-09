@@ -1,0 +1,94 @@
+============================================================================
+Introduction
+============================================================================
+This application can be used to solve a generic MILP that has a block 
+angular structure. The user provides the MILP from an MPS file and the
+definitions of the blocks (using row-ids).
+
+
+============================================================================
+ToDo List
+============================================================================
+* allow initial columns input (flat file)
+* allow row-names to identify blocks and internally map to row-ids
+* use a package like Mondriaan to automatically find reorder the MILP matrix
+  into single-border block angular format
+* add extreme rays
+
+
+============================================================================
+Build DIP
+============================================================================
+To build DIP:
+ (1) cd ${DIP_ROOT}/build
+ (2) ../configure
+ (3) make 
+ (4) make install
+To run a basic unit test.
+ (5) make test 
+
+
+============================================================================
+Build MILPBlock
+============================================================================
+To build MILPBlock application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/MILPBlock
+ (3) make
+
+============================================================================
+Get example data for MILPBlock
+============================================================================
+This will get the example data using wget and then extract the example data 
+to ${DIP_ROOT}/Dip/data/MILP/block.
+ (1) sh data_extract.sh
+
+Note: If your system is unable to use wget, you will have to download the
+data examples manually and place them here ${DIP_ROOT}/Data/data/MILP/block
+or wherever you want to designate as MILPBlock:DataDir in the parameters.
+
+See the file ${DIP_ROOT}/Dip/data/MILP/block/get.data for the location
+of the data files.
+
+============================================================================
+Run MILPBlock
+============================================================================
+To run MILPBlock application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/MILPBlock
+ (2) ./decomp_milpblock --param ${PARMFILE} < --section:option value >
+
+Example
+with parameter file:
+ ./decomp_milpblock --param milpblock.parm
+
+with parameter file and command line override:  
+ ./decomp_milpblock --param milpblock.parm --MILPBlock:Instance retail4
+
+
+============================================================================
+Notes
+============================================================================
+(1) See the example parameter file for some common options. A '#' in 
+    the parameter file is a comment and will be ignored.
+(2) Example data files can be found in ${DIP_ROOT}/data/MILP/block.
+(3) Each problem instance is defined in two parts.
+    (a) [.mps]   an MPS file which defines the mixed-integer program,
+    (b) [.block] a block defintions file which defines which rows belong
+        to which blocks. 
+
+The block definition file has two possible formats which are defined 
+by the parameter MILPBlock:BlockFileFormat.
+
+(1) BlockFileFormat = Pair 
+  For example, see ${DIP_ROOT}/data/MILP/block/retail/retail4.block.
+  Each line contains: <block-id> <row-id>
+
+(2) BlockFileFormat = List
+  For example, see ${DIP_ROOT}/data/MILP/block/atm/atm_5_10_1.block
+   <block-id1> <number of rows in block1>
+   <rows in block 1...>
+   <block-id2> <number of rows in block2>
+   <rows in block 2...>
+   ...
+
+
+

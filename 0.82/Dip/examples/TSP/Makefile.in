@@ -1,0 +1,85 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
+
+EXE = decomp_tsp@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
+OBJS         = TSP_DecompApp.@OBJEXT@
+OBJS        += TSP_CutGen.@OBJEXT@
+OBJS        += TSP_SubtourCut.@OBJEXT@
+OBJS        += TSP_Main.@OBJEXT@
+
+###########################################################################
+# Additional variables for libraries
+###########################################################################
+
+# concorde
+CONCORDE_LIB = concorde
+CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
+
+# boost
+BOOST_DIR = ../ExternalSolvers/Graph
+
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = @srcdir@
+VPATH = @srcdir@
+
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+CFLAGS     = -I$(CONCORDE_DIR)/INCLUDE
+CFLAGS    += -I$(BOOST_DIR)
+
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+LIBS       = $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+LIBS      += $(CONCORDE_DIR)/../qsopt.a
+
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS = $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################
+
+$(CONCORDE_DIR)/$(CONCORDE_LIB).a:
+	(cd $(CONCORDE_DIR)   && \
+	./configure           && \
+	${MAKE})
+
+cleanall:
+	(cd $(CONCORDE_DIR) && ${MAKE} clean)
+	rm -rf $(EXE) $(OBJS)
+

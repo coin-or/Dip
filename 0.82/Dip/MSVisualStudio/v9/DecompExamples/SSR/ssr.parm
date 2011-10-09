@@ -1,0 +1,44 @@
+doCut           = 0
+doPriceCut      = 1
+doDirect        = 0
+
+[DECOMP]
+LogLevel      = 3
+LogAppLevel   = 3
+LogLpLevel    = 1
+LogDebugLevel = 3
+LogDumpModel  = 0
+CutCGL        = 0
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+
+[CUT]
+CutGomory     = 1
+
+[PRICE_AND_CUT]
+LimitRoundCutIters      = 10
+LimitRoundPriceIters    = 10
+LimitInitVars           = 5
+
+[RELAX_AND_CUT]
+LimitRoundCutIters      = 0
+LimitRoundPriceIters    = 50
+LimitInitVars           = 2
+
+[ALPS]
+nodeLogInterval = 1
+msgLevel        = 10
+
+[SSR]
+#DataDir      = ../../../../Decomp/data/ATM
+DataDir       = C:\cygwin\home\magala\COIN\coin-Decomp\Decomp\data\SSR
+
+DataFixed     = group_wk_21_fixed.amp
+DataCurrent   = group_wk_21_471375_currentSSR.amp
+DataDemand    = group_wk_21_471375_demand.amp 
+DataTransWork = group_wk_21_trans3_work_471375.amp
+DataWR        = readWR_471375.txt
+
+#

@@ -1,0 +1,3 @@
+cd @srcdir@/../../data/GAP
+./get.data
+tar -zxvf data_gap.tgz

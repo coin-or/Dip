@@ -1,0 +1,91 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
+
+EXE = decomp_vrp@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
+OBJS         = VRP_DecompApp.@OBJEXT@
+OBJS        += VRP_GSECCut.@OBJEXT@
+OBJS        += VRP_SPPRC.@OBJEXT@
+OBJS        += VRP_Main.@OBJEXT@
+
+###########################################################################
+# Additional variables for libraries
+###########################################################################
+
+# concorde
+CONCORDE_LIB = concorde
+CONCORDE_DIR = ../ExternalSolvers/TSP/concorde
+
+# boost
+BOOST_DIR = ../ExternalSolvers/Graph
+
+# CVRPSEP
+CVRPSEP_LIB = cvrpsep
+CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP
+
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = @srcdir@
+VPATH  = @srcdir@
+
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+CFLAGS     = -I$(CONCORDE_DIR)/INCLUDE
+CFLAGS    += -I$(BOOST_DIR)
+CFLAGS    += -I$(CVRPSEP_DIR)
+
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+LIBS       = $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+LIBS      += $(CONCORDE_DIR)/../qsopt.a
+LIBS      += -L$(CVRPSEP_DIR)/obj -l$(CVRPSEP_LIB)
+
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS  = $(CONCORDE_DIR)/$(CONCORDE_LIB).a
+DEPS += $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################
+
+$(CONCORDE_DIR)/$(CONCORDE_LIB).a:
+	(cd ${CONCORDE_DIR} \
+        && ./configure --with-qsopt=@abs_lib_dir@/../Dip/examples/ExternalSolvers/TSP \
+	&& make)
+
+$(CVRPSEP_DIR)/$(CVRPSEP_LIB).a:
+	(cd $(CVRPSEP_DIR) && make)
+

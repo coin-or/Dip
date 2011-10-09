@@ -1,0 +1,46 @@
+This directory contains gen_mmkp.py which is a little program that generates the MMKP instances from a definition file. 
+to run it, simply type:
+./gen_mmkp --def_file a-definition-file.xml
+
+The .xml files defines various groups of MMKP instances. For more details of these instances, please refer to our paper:
+“Hard Multidimensional Multiple Choice Knapsack Problems, an Empirical Study”, Bing Han, Jimmy Leblet, Gwendal Simon, under review.
+
+How to write a definition file? Here is an example:
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<mmkp_series>
+<mmkp name="rp_hop_hoc_weak_cor" classes="10" dimensions="5" instances="20" constraint_levels="100" p_value="int" w_value="int" c_value="int">
+  <class items="5" repeat="10">
+    <profit method="uniform">
+        <parameters min="1" max="50"> </parameters>
+    </profit>
+
+    <weight method="weakly_correlated" repeat="5">
+        <parameters delta="10"> </parameters>
+    </weight>
+  </class>
+</mmkp>
+</mmkp_series>
+
+"mmkp": defines a MMKP instance group
+    "name":  will appear as part of the instances file name. 
+    "classes": number of classes of the instance.
+    "dimensions": number of dimensions.
+    "instances": number of instances series, generate "instances" number of times of the instances group defined below. Used for instances with random parameters.
+    "constraint_levels": the number of instances in one series, defines the capacity of knapsack
+
+    "p_value": int or float for the profit value
+    "w_value": int or float for the weight
+    "c_value": int or float for the knapsack capacity
+
+"class" defines a class
+    "item": number of items in this class, current support only the case where all classes have same number of items.
+    "repeat": to make defining several similar classes easier, the definition will repeat for several times generating several classes. Note that the "repeat" times of each "class" should sum up to "classes"
+    "profit": defines a profit vector.
+	"method": generation method. Currently support "uniform", "linear", "fixed".
+	    "parameters": possible parameters. For uniform and linear: min and max; for fixed, a vector is provided with "values" keyword.
+    "weight": defines a weight vector. 
+	"method": generation method, currently support "uniform", "strongly_correlated", "weakly_correlated", "inv_strongly_correlated". 
+	"repeat": to make defining multiple dimensions of weight easier.
+	    "parameters": for "uniform", keyworks "min" and "max" should be used, for others, "delta" is used.
+

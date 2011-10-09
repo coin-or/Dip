@@ -1,0 +1,3 @@
+patch -p0 < @srcdir@/combo.c.patch
+patch -p0 < @srcdir@/combo.h.patch
+patch -p0 < @srcdir@/mcknap.c.patch

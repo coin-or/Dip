@@ -1,0 +1,619 @@
+//===========================================================================//
+// This file is part of the Decomp Solver Framework.                         //
+//                                                                           //
+// Decomp is distributed under the Common Public License as part of the      //
+// COIN-OR repository (http://www.coin-or.org).                              //
+//                                                                           //
+// Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       //
+//                                                                           //
+// Copyright (C) 2002-2007, Lehigh University, Matthew Galati, and Ted Ralphs//
+// All Rights Reserved.                                                      //
+//===========================================================================//
+
+#ifdef WIN32
+#pragma warning(disable:4786)
+#pragma warning(disable:4503)
+#endif
+
+#include "UtilParameters.h"
+
+#include <iostream>
+#include <cassert>
+using namespace std;
+
+// ------------------------------------------------------------------------ //
+static std::string& rtrim(std::string& str)
+{
+  char* ptr = const_cast<char*>(str.c_str());
+    
+  if(ptr == NULL)
+    return str;
+
+  int ii=static_cast<int>(strlen(ptr))-1;
+
+  for(;ii>=0;ii--)
+    {
+      if(ptr[ii] != ' ' &&
+         ptr[ii] != '\n' &&
+         ptr[ii] != '\t' &&
+         ptr[ii] != '\r')
+        break;
+      ptr[ii] = '\0';
+    }
+    
+  return str;
+}
+
+static std::string& ltrim(std::string& str)
+{
+  char* ptr = const_cast<char*>(str.c_str());
+    
+  if(ptr == NULL)
+    return str;
+
+  int ii;
+  for(ii=0;ii>=0;ii++)
+    {
+      if(ptr[ii] != ' ')
+        break;
+    }
+  std::string tmpS = &ptr[ii];
+  str = tmpS;
+  return str;
+}
+
+#if 0
+static std::string& upper(std::string& str)
+{
+  char* ptr = const_cast<char*>(str.c_str());
+    
+  if(ptr == NULL)
+    return str;
+    
+  while(*ptr != '\0')
+    {
+      *ptr = toupper(*ptr);
+      ptr++;
+    }
+  return str;
+}
+#endif
+static std::string& lower(std::string& str)
+{
+  char* ptr = const_cast<char*>(str.c_str());
+    
+  if(ptr == NULL)
+    return str;
+    
+  while(*ptr != '\0')
+    {
+      *ptr = tolower(*ptr);
+      ptr++;
+    }
+  return str;
+}
+
+static std::string& trim(std::string& str)
+{
+  rtrim(str);
+  ltrim(str);
+  return str;
+}
+
+
+static void trim(char* buf)
+{
+  char* ptr = strchr(buf,'#');
+  if(ptr != NULL)
+    *ptr = '\0';
+  std::string str(buf);
+  trim(str);
+  strcpy(buf,str.c_str());
+}
+
+
+
+
+
+
+
+// ------------------------------------------------------------------------ //
+UtilParameters::UtilParameters()
+{
+}
+
+UtilParameters::~UtilParameters()
+{
+}
+
+void UtilParameters::Load(std::istream& is)
+{
+  //
+  //    -----   read it
+  //
+  std::string     curSection("");
+  //
+  //      -----   foreach line in the file
+  //      -----           skip comments and blank lines
+  //
+  char buf[1024];
+  int lineNum = 0;
+
+  while(!is.eof())
+    {
+      is.getline(buf,sizeof(buf)-1);
+      //std::cout << buf << std::endl;
+      if(is.eof())
+        break;
+
+      lineNum++;
+      trim(buf);
+      if(strlen(buf) < 3)
+        continue;
+      //
+      //      -----           if line is '[section]'
+      //      -----                   create a new section
+      //
+      if(buf[0] == '[')
+        {
+          char* ptr = strchr(buf+1,']');
+          if(ptr == NULL)
+            {
+              std::cerr << "UtilParameters: syntax error on line " << lineNum
+                        << " '" << buf << "'" << endl;
+            }
+          *ptr = '\0';
+          curSection = buf+1;
+          continue;
+        }
+      //
+      //      -----           if line is 'name = value'
+      //      -----                   create a new name/value pair in the
+      //      -----                   current section
+      //
+      
+      char* ptr = strchr(buf,'=');
+      
+      if(ptr != NULL)
+        *ptr++ = '\0';
+      std::string name(buf);
+      std::string value("1");
+      trim(name);
+      lower(name);
+
+      if(ptr != NULL)
+        {
+          value = Expand(ptr);
+          trim(value);
+        }
+      //std::cout << curSection.c_str() << " : " << name.c_str() << " : " 
+      //<< value.c_str() <<  std::endl;
+      Add(curSection.c_str(),name.c_str(),value.c_str());
+    }
+}
+
+void UtilParameters::Add(const char* section, 
+                         const char* name, const char* value)
+{
+  if(section == NULL)
+    section = "";
+  assert(strlen(value) > 0);
+
+  char lSection[1024];
+  char lName[1024];
+
+  int ii;
+  for(ii=0; section[ii] != '\0'; ii++)
+    lSection[ii] = tolower(section[ii]);
+  lSection[ii] = '\0';
+
+  for(ii=0; name[ii] != '\0'; ii++)
+    lName[ii] = tolower(name[ii]);
+  lName[ii] = '\0';
+
+  std::string sSection(lSection);
+  std::string sName(lName);
+
+  if(sSection.size() == 0)
+	  sSection = "";
+
+  //assert(strlen(lSection) > 0);
+  assert(strlen(lName) > 0);
+
+  //assert(strlen(sSection.c_str()) > 0);
+  assert(strlen(sName.c_str()) > 0);
+
+  //NV_MAP::iterator      nmit;
+  //SECTION_MAP::iterator smit;
+  //smit = m_sectionMap.find(sSection);
+  //if(smit == m_sectionMap.end()){
+  //  m_sectionMap.insert(make_pair());
+  //}
+
+  //it = m_sectionMap.find(sSection);
+
+  std::pair<int,std::string> p = make_pair(0, value);
+  NV_MAP & thisMap = m_sectionMap[sSection];
+  NV_MAP::iterator it = thisMap.find(sName);
+  if(it == thisMap.end()){
+    thisMap.insert(make_pair(sName, p));
+  }
+  else
+    thisMap[sName] = p;
+
+  
+  //m_sectionMap[sSection][sName].first = 0;
+  //m_sectionMap[sSection][sName].second = value;
+  //purify is complaining about this
+}
+
+
+void UtilParameters::Save(std::ostream& os, CBFUNC* cb, void* pArgs)
+{
+
+  //
+  //    -----   foreach section
+  //
+  SECTION_MAP::iterator iSection;
+  for(iSection = m_sectionMap.begin(); iSection != m_sectionMap.end(); iSection++)
+    {
+      //
+      //        -----           output the section name
+      //
+      std::string sectionName = iSection->first;
+      if(sectionName.length() > 0)
+        {
+          os << std::endl;
+          os << "[" << sectionName << "]" << std::endl;
+        }
+      NV_MAP& nv = iSection->second;
+      //
+      //        -----           foreach parameter in the section
+      //
+      NV_MAP::iterator iParm;
+      for(iParm = nv.begin(); iParm != nv.end(); iParm++)
+        {
+          const std::string& name = iParm->first;
+          const std::string& value = iParm->second.second;
+          //
+          //    -----                   if there is a callback function
+          //    -----                           call it with this name/value pair
+          //
+          bool bOutput = true;
+          if(cb != NULL)
+            bOutput = (*cb)(pArgs,os,sectionName,name,value);
+          //
+          //    -----                   output the name/value pair
+          //
+          if(bOutput)
+            os << name << "    = " << value << std::endl;
+        }
+    }
+}
+
+std::pair<int,std::string>* UtilParameters::FindEntry(const char* section, const char* name)
+{
+  UtilParameters* ths = (UtilParameters*)this;
+  SECTION_MAP::iterator iSection;
+  iSection = ths->m_sectionMap.find(section);
+  if(iSection == ths->m_sectionMap.end())
+    {
+      return NULL;
+    }
+    
+  NV_MAP& nv = iSection->second;
+
+  NV_MAP::iterator iParm;
+  iParm = nv.find(name);
+  if(iParm == nv.end())
+    {
+      return NULL;
+    }
+
+  return &(iParm->second);
+}
+
+std::string* UtilParameters::Find(const char* section, const char* name) const
+{
+  if(section == NULL) section = "";
+  char lSection[1024];
+  char lName[1024];
+
+  int ii;
+  for(ii=0; section[ii] != '\0'; ii++)
+    lSection[ii] = tolower(section[ii]);
+  lSection[ii] = '\0';
+
+  for(ii=0; name[ii] != '\0'; ii++)
+    lName[ii] = tolower(name[ii]);
+  lName[ii] = '\0';
+
+  UtilParameters* ths = const_cast<UtilParameters*>(this);
+  std::pair<int,std::string>* pEntry = ths->FindEntry(lSection,lName);
+  if(pEntry == NULL) {
+    ths->Add(section,name,"(undefined)");
+    pEntry = ths->FindEntry(lSection,lName);
+    pEntry->first = -1;     // not defined
+    return NULL;
+  } else {
+    if(pEntry->first == -1) // if only defined by being referenced
+      return NULL;        // it has no value, so pretend it wasn't defined
+    pEntry->first = 1;      // mark entry as having been referenced
+    return &pEntry->second;
+  }
+#if 0    
+  UtilParameters* ths = (UtilParameters*)this;
+  SECTION_MAP::iterator iSection;
+  iSection = ths->m_sectionMap.find(lSection);
+  if(iSection == ths->m_sectionMap.end())
+    {
+      Add(lSection,lName,"");
+      return NULL;
+    }
+    
+  NV_MAP& nv = iSection->second;
+
+  NV_MAP::iterator iParm;
+  iParm = nv.find(lName);
+  if(iParm == nv.end())
+    {
+      return NULL;
+    }
+
+  iParm->second.first = 1;
+  return &(iParm->second.second);
+#endif
+}
+
+
+bool UtilParameters::GetSetting(const char* name, bool unUsed, const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  if(pVal == NULL) return false;
+
+  const char* cVal = pVal->c_str();
+  bool bVal = atoi(cVal) != 0;
+  return bVal;
+}
+
+std::string UtilParameters::GetSetting(const char* name,
+                                   const char* defaultValue,
+                                   const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  
+  if(pVal == NULL)
+    {
+      return std::string(defaultValue);
+    }
+  return *pVal;
+}
+
+short UtilParameters::GetSetting(const char* name,
+                             short defaultValue,
+                             const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  if(pVal == NULL)
+    return defaultValue;
+  short value = (short)atoi(pVal->c_str());
+  return value;
+}
+
+int UtilParameters::GetSetting(const char* name,
+                           int defaultValue,
+                           const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  if(pVal == NULL)
+    return defaultValue;
+  int value = atoi(pVal->c_str());
+  return value;
+}
+
+long UtilParameters::GetSetting(const char* name,
+                            long defaultValue,
+                            const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  if(pVal == NULL)
+    return defaultValue;
+  long value = atol(pVal->c_str());
+  return value;
+}
+
+/*
+float UtilParameters::GetSetting(const char* name,
+                             float defaultValue,
+                             const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  if(pVal == NULL)
+    return defaultValue;
+  float value = atof(pVal->c_str());
+  return value;
+}
+*/
+
+double UtilParameters::GetSetting(const char* name,
+                              double defaultValue,
+                              const char* section) const
+{
+  //
+  //    -----   build the qualified name using the section
+  //    -----   if the parameter is not found, return the default
+  //    -----   else convert the string to the appropriate type
+  //
+  std::string* pVal = Find(section,name);
+  if(pVal == NULL)
+    return defaultValue;
+  char * pEnd;
+  //why not atof??
+  double value = strtod(pVal->c_str(),&pEnd);
+  return value;
+}
+
+std::string UtilParameters::Expand(const char* value)
+{
+  //
+  //    -----   check for trivial input
+  //
+  if(value == NULL || *value == '\0')
+    return std::string();
+  //
+  //    -----   loop through the input string looking for "$("
+  //    -----   and copying everything else to the output buffer
+  //
+  char outBuf[1024];
+  bool bDollar = false;
+  int jj = 0;
+  for(int ii=0; value[ii] != '\0'; ii++)
+    {
+      char cc = value[ii];
+      //
+      //        -----           if we have not found the $ yet
+      //
+      if(!bDollar)
+        {
+          //
+          //    -----                   if this is a dollar sign
+          //    -----                           flag it and continue
+          //
+          if(cc == '$')
+            {
+              bDollar = true;
+              continue;
+            }
+          //
+          //    -----                   else (still not a dollar sign)
+          //    -----                           copy char to ouput buffer
+          //    -----                           and continue
+          //
+          outBuf[jj++] = cc;
+          continue;
+          //
+          //    -----           else (the previous char was a $
+          //    -----                   if this char is a "("
+          //
+        } else {
+          //
+          //    -----                           then we have found an ENV var
+          //    -----                           so copy all chars until ")" into
+          //    -----                           a name buffer
+          //
+          if(cc == '(')
+            {
+              char envBuf[1024];
+              //const char *ptr = &value[ii+1];
+              int kk=0;
+              char c1;
+
+              ii++;
+              while((c1 = value[ii++]) != ')' && c1 != '\0')
+                envBuf[kk++] = c1;
+              envBuf[kk] = '\0';
+              //
+              //        -----                           look up the value of the env var
+              //
+              char* eVal = getenv(envBuf);
+              if(eVal == NULL){
+                strcpy(eVal,"");
+                //eVal = "";
+              }
+              //
+              //        -----                           copy that value to the output buf
+              //
+              while(*eVal != '\0')
+                outBuf[jj++] = *eVal++;
+              //
+              //        -----                           we are not at the "$" anymore
+              //
+              bDollar = false;
+              //
+              //        -----                           reset to just barely skip over the ")"
+              //
+              ii--;
+              //
+              //        -----                   else (char not a "(")
+              //        -----                           copy the "$" into the output buf
+              //        -----                           copy this char to output buf
+              //        -----                           reset to not a "$"
+              //
+            } else {
+              outBuf[jj++] = '$';
+              outBuf[jj++] = cc;
+              bDollar = false;
+            }
+        }
+    }
+  outBuf[jj] = '\0';
+  std::string sExpand(outBuf);
+
+  return sExpand;
+}
+
+void UtilParameters::Dump(std::ostream& os) const
+{
+  //
+  //    -----   foreach section
+  //
+  SECTION_MAP::const_iterator iSection;
+  for(iSection = m_sectionMap.begin(); iSection != m_sectionMap.end(); iSection++)
+    {
+      //
+      //        -----           output the section name
+      //
+      std::string sectionName = iSection->first;
+      if(sectionName.length() > 0)
+        {
+          os << std::endl;
+          os << "[" << sectionName << "]" << std::endl;
+        }
+      const NV_MAP& nv = iSection->second;
+      //
+      //        -----           foreach parameter in the section
+      //
+      NV_MAP::const_iterator iParm;
+      for(iParm = nv.begin(); iParm != nv.end(); iParm++)
+        {
+          const std::string& name = iParm->first;
+          const std::string& value = iParm->second.second;
+          //
+          //    -----                   output the name/value pair
+          //
+          os << "[" << iParm->second.first << "] "
+             << name << "    = "
+             << value << std::endl;
+        }
+    }
+}

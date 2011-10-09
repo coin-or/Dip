@@ -1,0 +1,3 @@
+patch -p0 < combo.c.patch
+patch -p0 < combo.h.patch
+patch -p0 < mcknap.c.patch

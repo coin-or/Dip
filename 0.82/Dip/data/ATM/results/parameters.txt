@@ -1,0 +1,38 @@
+pc 1
+
+========================================================
+DECOMP PARAMETER SETTINGS
+PRICE_AND_CUT  LogLevel                 3
+PRICE_AND_CUT  LogDebugLevel            3
+PRICE_AND_CUT  LogLpLevel               0
+PRICE_AND_CUT  LogDumpModel             0
+PRICE_AND_CUT  LimitInitVars            2
+PRICE_AND_CUT  TolZero                  1e-06
+PRICE_AND_CUT  LimitTotalCutIters       2147483647
+PRICE_AND_CUT  LimitTotalPriceIters     2147483647
+PRICE_AND_CUT  LimitRoundCutIters       10
+PRICE_AND_CUT  LimitRoundPriceIters     10
+PRICE_AND_CUT  LimitTime                300
+PRICE_AND_CUT  TailoffLength            10
+PRICE_AND_CUT  TailoffPercent           0.1
+PRICE_AND_CUT  MasterGapLimit           0.01
+PRICE_AND_CUT  CompressColumns          1
+PRICE_AND_CUT  CutDC                    0
+PRICE_AND_CUT  CutCGL                   1
+PRICE_AND_CUT  CutCglKnapC              1
+PRICE_AND_CUT  CutCglFlowC              1
+PRICE_AND_CUT  CutCglMir                1
+PRICE_AND_CUT  CutCglClique             1
+PRICE_AND_CUT  CutCglOddHole            1
+PRICE_AND_CUT  CutCglGomory             0
+PRICE_AND_CUT  SubProbUseCutoff         0
+PRICE_AND_CUT  SubProbGapLimitExact     0.0001
+PRICE_AND_CUT  SubProbGapLimitInexact   0.1
+PRICE_AND_CUT  RoundRobinInterval       0
+PRICE_AND_CUT  RoundRobinStrategy       0
+PRICE_AND_CUT  SolveMasterAsIp          1
+PRICE_AND_CUT  SolveRelaxAsIp           0
+PRICE_AND_CUT  InitVarsWithCutDC        0
+PRICE_AND_CUT  InitVarsWithIP           0
+PRICE_AND_CUT  InitVarsWithIPLimitTime  10
+========================================================

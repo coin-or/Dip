@@ -1,0 +1,55 @@
+============================================================================
+Introduction
+============================================================================
+This application solves the Multi-Choice Multi-Dimensional Knapack Problem.
+
+
+============================================================================
+Build DIP
+============================================================================
+To build DIP:
+ (1) cd ${DIP_ROOT}/build
+ (2) ../configure
+ (3) make 
+ (4) make install
+To run a basic unit test.
+ (5) make test 
+
+
+============================================================================
+Build MMKP
+============================================================================
+The MMKP application uses the Multi-Choice Knapsack solver by Pisinger.
+The code can be downloaded and patched using the following script:
+ (1) sh get_pisinger.sh
+
+To build MMKP application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/MMKP
+ (2) make
+
+
+============================================================================
+Extract the example data for MMKP
+============================================================================
+This will extract the the example data to ${DIP_ROOT}/Dip/data/MMKP.
+ (1) sh data_extract.sh
+
+
+============================================================================
+Run MMKP
+============================================================================
+To run MMKP application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/MMKP
+ (2) ./decomp_mmkp --param ${PARMFILE} < --section:option value >
+
+Example
+with parameter file:
+ ./decomp_mmkp --param mmkp.parm
+with command line override:
+ ./decomp_mmkp --doCut 1
+
+============================================================================
+Notes
+============================================================================
+(1) See the example parameter file for some common options. A '#' in 
+    the parameter file is a comment and will be ignored.

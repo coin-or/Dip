@@ -1,0 +1,9 @@
+wget http://www.tsp.gatech.edu/concorde/downloads/codes/src/co031219.tgz
+tar -zxvf co031219.tgz
+
+#TODO: should depend on arch/OS
+wget http://www2.isye.gatech.edu/~wcook/qsopt/downloads/codes/linux24/qsopt.a.gz
+wget http://www2.isye.gatech.edu/~wcook/qsopt/downloads/codes/linux24/qsopt.h
+gunzip qsopt.a.gz
+
+

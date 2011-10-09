@@ -1,0 +1,48 @@
+DIP README
+==========
+
+Welcome to the README for the Decomposition in Integer Programming (DIP)
+Framework. DIP is distributed under the Eclipse Public License and is freely
+redistributable. All source code and documentation is Copyright IBM and
+others. This README may be redistributed freely.
+
+DOCUMENTATION
+=============
+
+For a quick start guide, please see the INSTALL file in this distribution.
+Automatically generated documentation of the source code can be found here:
+
+http://www.coin-or.org/Doxygen/Dip/
+
+Further information can be found here:
+
+http://projects.coin-or.org/Dip
+
+WHAT'S NEW
+==========
+
+Release 0.82.0:
+
+1. Support for MSVC++ version 10 added.
+
+2. Support for BuildTools version 0.7 to incorporate recent enhancements,
+including proper library versioning in Linux, prohibiting installation of
+private headers, etc.
+
+3. Updated externals to new stable versions of dependent projects.
+
+4. Minor bug fixes. 
+
+SUPPORT
+=======
+
+1. List Serve
+
+DIP users should use the Dip mailing list. To subscribe, go to 
+http://list.coin-or.org/mailman/listinfo/dip
+
+3. Bug Reports
+
+Bug reports should be reported on the DIP development web site at
+
+https://projects.coin-or.org/Dip/newticket

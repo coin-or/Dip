@@ -1,0 +1,83 @@
+#TODO copyright
+# $Id: $
+
+##########################################################################
+#    You can modify this example makefile to fit for your own program.   #
+#    Usually, you only need to change the five CHANGEME entries below.   #
+##########################################################################
+
+# CHANGEME: This should be the name of your executable
+EXEDECOMP = decomp_ap3@EXEEXT@
+EXEALPS   = alps_ap3@EXEEXT@
+
+# CHANGEME: Here is the name of all object files corresponding to the source
+#           code that you wrote in order to define the problem statement
+OBJS        = AP3_DecompApp.@OBJEXT@
+OBJS_DECOMP = $(OBJS) AP3_DecompMain.@OBJEXT@
+OBJS_ALPS   = $(OBJS) AP3_Main.@OBJEXT@
+
+# CHANGEME: Additional libraries
+ADDLIBS =
+
+# CHANGEME: Additional flags for compilation (e.g., include flags)
+ADDINCFLAGS =
+
+# CHANGEME: Directory to the sources for the (example) problem definition
+# files
+SRCDIR = @srcdir@
+VPATH = @srcdir@
+
+##########################################################################
+#  Usually, you don't have to change anything below.  Note that if you   #
+#  change certain compiler options, you might have to recompile the      #
+#  COIN package.                                                         #
+##########################################################################
+
+# C++ Compiler command
+CXX = @CXX@
+
+# C++ Compiler options
+CXXFLAGS = @CXXFLAGS@
+
+# additional C++ Compiler options for linking
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+
+# Directory with COIN libraries
+COINLIBDIR = @abs_lib_dir@
+
+# Necessary Include dirs (we use the CYGPATH_W variables to allow
+# compilation with Windows compilers)
+INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)
+
+#TODO
+include ../Makefile.Examples
+
+# The following is necessary under cygwin, if native compilers are used
+CYGPATH_W = @CYGPATH_W@
+
+#TODO: needs to be conditional on alps or not
+#all: $(EXEDECOMP) $(EXEALPS)
+all: $(EXEALPS)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXEDECOMP): $(OBJS_DECOMP)
+	bla=;\
+	for file in $(OBJS_DECOMP); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+$(EXEALPS): $(OBJS_ALPS)
+	bla=;\
+	for file in $(OBJS_ALPS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(ADDLIBS) $(LIBS)
+
+clean:
+	rm -rf $(EXE) $(OBJS_DECOMP) $(OBJS_ALPS)
+
+#.cpp.o:
+#	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+
+#.cpp.obj:
+#	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

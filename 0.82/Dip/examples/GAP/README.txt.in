@@ -1,0 +1,55 @@
+============================================================================
+Introduction
+============================================================================
+This application solves the Generalized Assignment Problem.
+
+
+============================================================================
+Build DIP
+============================================================================
+To build DIP:
+ (1) cd ${DIP_ROOT}/build
+ (2) ../configure
+ (3) make 
+ (4) make install
+To run a basic unit test.
+ (5) make test 
+
+
+============================================================================
+Build GAP
+============================================================================
+The GAP application uses the Binary Knapsack solver by Pisinger.
+The code can be downloaded and patched using the following script:
+ (1) sh get_pisinger.sh
+
+To build GAP application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/GAP
+ (2) make
+
+
+============================================================================
+Extract the example data for GAP
+============================================================================
+This will get and extract the the example data to ${DIP_ROOT}/Dip/data/GAP.
+ (1) sh data_extract.sh
+
+
+============================================================================
+Run GAP
+============================================================================
+To run GAP application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/GAP
+ (2) ./decomp_smallip --param ${PARMFILE} < --section:option value >
+
+Example
+with parameter file:
+ ./decomp_gap --param gap.parm
+with command line override:
+ ./decomp_gap --doCut 1
+
+============================================================================
+Notes
+============================================================================
+(1) See the example parameter file for some common options. A '#' in 
+    the parameter file is a comment and will be ignored.

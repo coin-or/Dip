@@ -1,0 +1,51 @@
+doGenRandom  = 0
+randSeed     = 1
+randNumAtms  = 5
+randNumDates = 25
+
+doCut           = 0
+doPriceCut      = 1
+
+[DECOMP]
+LogLevel      = 3
+LogAppLevel   = 1
+LogLpLevel    = 1
+LogDebugLevel = 3
+CutCGL        = 1
+CutCglKnapC   = 1
+CutCglFlowC   = 1
+CutCglMir     = 1
+CutCglClique  = 1
+SolveMasterAsIp = 1
+
+[CUT]
+CutCglGomory = 1
+
+[PRICE_AND_CUT]
+InitVarsWithCutDC       = 0
+LimitRoundCutIters      = 10
+LimitRoundPriceIters    = 10
+LimitInitVars           = 2
+
+[ALPS]
+nodeLogInterval = 1
+msgLevel        = 2
+
+[ATM]
+#DataDir     = ../../../../Decomp/data/ATM
+DataDir     = .\
+
+ModelNameCore  = BUDGET
+ModelNameRelax = CASH_COUNT
+
+DataAtm     = atm_randA_5_25_1.txt
+DataDate    = atm_randD_5_25_1.txt
+DataAtmDate = atm_randAD_5_25_1.txt
+
+#DataAtm     = atm_randA_10_50_1.txt
+#DataDate    = atm_randD_10_50_1.txt
+#DataAtmDate = atm_randAD_10_50_1.txt
+
+NumSteps    = 10
+
+#

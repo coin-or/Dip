@@ -1,0 +1,5 @@
+for i in I*
+do
+  cat $i | tr '-' ' ' > tmp
+  mv tmp $i
+done

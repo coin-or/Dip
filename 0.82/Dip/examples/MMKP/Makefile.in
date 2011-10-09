@@ -1,0 +1,74 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
+
+EXE = decomp_mmkp@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
+OBJS          = MMKP_Main.@OBJEXT@
+OBJS         += MMKP_Instance.@OBJEXT@
+OBJS         += MMKP_DecompApp.@OBJEXT@
+OBJS         += MMKP_MCKnap.@OBJEXT@
+
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = @srcdir@
+VPATH  = @srcdir@
+
+###########################################################################
+# Additional variables for the knapsack solver
+###########################################################################
+
+KNAP_DIR = ../ExternalSolvers/Knapsack/Pisinger
+KNAP_LIB  = KnapPisinger
+KNAP_INC  = $(KNAP_DIR)
+
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+LIBS      = -L$(KNAP_DIR) -l$(KNAP_LIB)
+
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+CFLAGS    += -I$(KNAP_INC)
+
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS = $(KNAP_DIR)/libKnapPisinger.a
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################
+
+$(KNAP_DIR)/libKnapPisinger.a:
+	(cd ${KNAP_DIR} && ${MAKE})
+

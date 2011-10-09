@@ -1,0 +1,6 @@
+cd ../ExternalSolvers/Knapsack/Pisinger
+chmod +x get.pisinger
+chmod +x patch.pisinger
+./get.pisinger
+./patch.pisinger
+cd ../../../MMKP

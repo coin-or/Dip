@@ -1,0 +1,45 @@
+============================================================================
+Introduction
+============================================================================
+This application gives a simple example of solving a small integer 
+program using DIP.
+
+
+============================================================================
+Build DIP
+============================================================================
+To build DIP:
+ (1) cd ${DIP_ROOT}/build
+ (2) ../configure
+ (3) make 
+ (4) make install
+To run a basic unit test.
+ (5) make test 
+
+
+============================================================================
+Build SmallIP
+============================================================================
+To build SmallIP application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/SmallIP
+ (2) make
+
+
+============================================================================
+Run SmallIP
+============================================================================
+To run SmallIP application:
+ (1) cd ${DIP_ROOT}/build/Dip/examples/SmallIP
+ (2) ./decomp_smallip --param ${PARMFILE} < --section:option value >
+
+Example
+with parameter file:
+ ./decomp_smallip --param smallip.parm
+with command line override:
+ ./decomp_smallip --doCut 1
+
+============================================================================
+Notes
+============================================================================
+(1) See the example parameter file for some common options. A '#' in 
+    the parameter file is a comment and will be ignored.

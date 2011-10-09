@@ -1,0 +1,32 @@
+doCut           = 0
+doPriceCut      = 1
+doDirect        = 0
+timeLimit       = 3600
+
+[DECOMP]
+LogLevel      = 2
+SolveMasterAsIp = 1
+LimitTime = 3600
+
+
+[ALPS]
+nodeLogInterval = 1
+timeLimit       = 3600
+
+[ATM]
+DataDir     = /home/magh/AFS/COIN/coin-Dip/Dip/data/ATM
+
+ModelNameCore  = BUDGET
+ModelNameRelax = CASH_COUNT
+
+#DataAtm     = atm_randA_5_25_1.txt
+#DataDate    = atm_randD_5_25_1.txt
+#DataAtmDate = atm_randAD_5_25_1.txt
+
+#DataAtm     = atm_randA_10_50_1.txt
+#DataDate    = atm_randD_10_50_1.txt
+#DataAtmDate = atm_randAD_10_50_1.txt
+
+NumSteps    = 10
+
+#

@@ -1,0 +1,64 @@
+#TODO copyright
+# $Id: $
+
+##########################################################################
+#    You can modify this example makefile to fit for your own program.   #
+#    Usually, you only need to change the five CHANGEME entries below.   #
+##########################################################################
+
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
+
+EXE = decomp_atm@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
+OBJS          = ATM_Main.@OBJEXT@
+OBJS         += ATM_Instance.@OBJEXT@
+OBJS         += ATM_DecompApp.@OBJEXT@
+
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = @srcdir@
+VPATH = @srcdir@
+
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+CFLAGS =
+
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+LIBS =
+
+###########################################################################
+# To link the KNAP library
+###########################################################################
+
+# Knap (for now, assume its been built)
+# KNAP_LIB  = KnapPisinger
+# KNAP_DIR  = @srcdir@/../ExternalSolvers/Knapsack/Pisinger
+
+# CHANGEME: Additional libraries
+# LIBS += -L$(KNAP_DIR) -l$(KNAP_LIB)
+
+# CHANGEME: Additional flags for compilation (e.g., include flags)
+# CFLAGS  =-I$(KNAP_DIR)
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################
