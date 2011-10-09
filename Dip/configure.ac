@@ -77,11 +77,6 @@ AC_COIN_INIT_AUTO_TOOLS
 # Get the EXEXT variable for CYGWIN
 AC_EXEEXT
 
-# Check if user wants to use readline library
-AC_COIN_CHECK_GNU_READLINE
-AM_CONDITIONAL(COIN_HAS_READLINE,
-               [test $coin_has_readline = yes])
-
 #############################################################################
 #                              COIN components                              #
 #############################################################################
@@ -275,6 +270,7 @@ AC_CONFIG_FILES([Makefile
                  examples/VRP/get_cvrpsep.sh
                  examples/ATM/Makefile
                  examples/ATM/atm.parm
+                 examples/ATM/data_extract.sh
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger

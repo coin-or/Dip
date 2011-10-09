@@ -1778,9 +1778,16 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
       
       //---
       //--- if the lower bound meets the global ub, we are done
-      //---   
-      if(m_nodeStats.objBest.first >= 
-	 (m_nodeStats.objBest.second - DecompEpsilon)){
+      //---    careful here - do NOT do this check in phase1 since
+      //---    ub is based on original objective while lb is based 
+      //---    on phase 1 objective
+      //---
+      //--- TOOD: seems confusing to store bounds from different objectives
+      //---       in the same structure - maybe should use m_nodeStats1/2
+      //---
+      if(m_phase != PHASE_PRICE1 &&
+	 (m_nodeStats.objBest.first >= 
+	  (m_nodeStats.objBest.second - DecompEpsilon))){
 	 UTIL_MSG(m_param.LogLevel, 2,
 		  (*m_osLog)
 		  << "Node " << nodeIndex << " process stopping on bound."
@@ -3282,8 +3289,9 @@ void DecompAlgo::phaseUpdate(DecompPhase  & phase,
       //---      
       masterPhaseIItoI();
       m_nodeStats.resetBestLB();
-      nextPhase  = PHASE_PRICE1;
-      nextStatus = solutionUpdate(nextPhase);
+      m_firstPhase2Call = false;
+      nextPhase         = PHASE_PRICE1;
+      nextStatus        = solutionUpdate(nextPhase);
       goto PHASE_UPDATE_FINISH;
    }
 
@@ -5434,7 +5442,10 @@ int DecompAlgo::generateCuts(double        * xhat,
       for(it  = D.m_xhatIPFeas.begin();
 	  it != D.m_xhatIPFeas.end(); it++){
 	 thisBound = (*it)->getQuality();
-	 printf("From DECOMP, IP Feasible with Quality = %g\n", thisBound);
+         UTIL_DEBUG(m_param.LogDebugLevel, 3,
+                    (*m_osLog) << "From DECOMP, IP Feasible with Quality =";
+                    (*m_osLog) << thisBound <<endl;
+                    );
 	 if((*it)->getQuality() <= bestBoundUB){
 	    bestBoundUB = (*it)->getQuality();
 	    bestSol     = (*it);
@@ -5446,7 +5457,7 @@ int DecompAlgo::generateCuts(double        * xhat,
 	 m_xhatIPFeas.push_back(bestSolCp);	 
 	 setObjBoundIP(bestSolCp->getQuality());
 	 m_xhatIPBest = bestSolCp;
-	 m_xhatIPBest->print();
+	 //m_xhatIPBest->print();
       }
 
       //this could also very likely return a new gUB -
@@ -6999,10 +7010,6 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       //---    better to just price it out since we cannot branch on it in 
       //---    this state.
       //---
-      //int    branchedOnIndex = -1;
-      //double branchedOnValue =  0;
-      //chooseBranchVar(branchedOnIndex, branchedOnValue);
-      //if(branchedOnIndex == -1)
       std::vector< std::pair<int, double> > downBranchLB, 
          downBranchUB, upBranchLB, upBranchUB;
       bool gotBranch = chooseBranchSet(downBranchLB, 

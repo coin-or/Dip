@@ -103,7 +103,7 @@ void MMKP_DecompApp::createModels(){
    const int       numCols    = nGroupRows * nGroupCols;  
 
    //---
-   //--- Multi-Dimensional Mulit-Choice Knapsack Problem (MMKP).
+   //--- Multi-Dimensional Multi-Choice Knapsack Problem (MMKP).
    //---
    //---  max  sum{i in 1..n, j in 1..l[i]}  v[i,j]   x[i,j] <==>
    //---  min  sum{i in 1..n, j in 1..l[i]} -v[i,j]   x[i,j]
@@ -116,7 +116,7 @@ void MMKP_DecompApp::createModels(){
    //---       sum{j in 1..l[i]}                      x[i,j]  = 1   , i in 1..n
    //---       x[i,j] in {0,1}, i in 1..n, j in 1..l[i]
    //---
-   //--- Multi-Dimensional Knapsack Polytope (MCKP) 
+   //--- Multi-Dimensional Knapsack Polytope (MDKP) 
    //---  s.t. sum{i in 1..n, j in 1..l[i]}  r[k,i,j] x[i,j] <= b[k], k in 1..m
    //---       x[i,j] in {0,1}, i in 1..n, j in 1..l[i]
    //---

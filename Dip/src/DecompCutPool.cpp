@@ -157,7 +157,7 @@ DecompCutPool::createRowReform(const int                n_coreCols,
        rowReform->insert(colIndex, coeff);
     }
   }
-  assert(rowReform->getNumElements() > 0);
+  //assert(rowReform->getNumElements() > 0);
 
   //---
   //--- delete the temporary memory

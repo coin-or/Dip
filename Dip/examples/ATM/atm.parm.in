@@ -22,13 +22,13 @@ Settings for all decomp algorithms.
 #############################################################################
 [DECOMP]
 # log levels
-LogLevel      = 3
-LogAppLevel   = 1
+LogLevel      = 0
+LogAppLevel   = 0
 LogLpLevel    = 0
-LogDebugLevel = 3
+LogDebugLevel = 0
 
 # time limit
-LimitTime     = 60
+# LimitTime     = 60
 
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
@@ -55,8 +55,8 @@ Settings for ALPS framework.
   section=ALPS
 #############################################################################
 [ALPS]
-nodeLogInterval = 1
-msgLevel        = 2
+# nodeLogInterval = 1
+# msgLevel        = 2
 
 #############################################################################
 Settings for ATM application.

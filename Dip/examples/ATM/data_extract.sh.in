@@ -1,0 +1,3 @@
+cd @srcdir@/../../data/ATM
+./get.data
+tar -zxvf atm_rand.tgz

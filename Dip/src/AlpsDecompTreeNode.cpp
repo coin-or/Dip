@@ -311,7 +311,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
 
       //watch tolerance here... if quality is close enough, fathom it
       gap = UtilCalculateGap(thisQuality, currentUB);
-      if(gap <= relTolerance){	 
+      //if(gap <= relTolerance){
+      if (quality_ >= currentUB){
          doFathom = true;
          UTIL_DEBUG(param.msgLevel, 3,
                     cout << "Fathom since thisQuality= "

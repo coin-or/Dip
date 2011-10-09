@@ -376,8 +376,10 @@ DecompSolverStatus VRP_DecompApp::solveRelaxed(const int          whichBlock,
          varRedCost  += coeff * redCostX[index];
          varOrigCost += coeff * m_objective[index];
       }
-      printf("VAR varRedCost=%g varOrigCost=%g\n",
-             varRedCost-convexDual, varOrigCost);
+      UTIL_DEBUG(m_appParam.LogLevel, 5,
+		 (*m_osLog) << "VAR varRedCost=" << varRedCost-convexDual;
+		 (*m_osLog) << "varOrigCost=" << varOrigCost << endl;
+		 );
 
       DecompVar * var = new DecompVar(vrpRouteInd,
                                       vrpRouteEls,

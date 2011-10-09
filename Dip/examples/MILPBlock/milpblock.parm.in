@@ -18,7 +18,7 @@ Settings for all decomp algorithms.
   section=DECOMP
 #############################################################################
 [DECOMP]
-LogLevel      = 1
+LogLevel      = 0
 
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
