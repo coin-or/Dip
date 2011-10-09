@@ -378,11 +378,13 @@ inline std::string & UtilStrTrim(std::string       & s,
 inline std::string & UtilStrToLower(std::string & s) {
    // Purify did not like this version:
    //   transform (s.begin(), s.end(), s.begin(), myToLower());
-   if(s.size() == 0)
+	if(s.size() == 0)
       return s;
-   int i;
-   for (i = 0; s[i] != '\0'; i++)
-      s[i] = static_cast<char>(tolower(s[i]));
+	// This is a fix for MSVC++ The old version is below
+    std::transform(s.begin(), s.end(), s.begin(),std::ptr_fun<int,int>(tolower));
+   //int i;
+   //for (i = 0; s[i] != '\0'; i++)
+   //   s[i] = static_cast<char>(tolower(s[i]));
    return s;
 }
 
