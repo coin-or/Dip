@@ -480,7 +480,6 @@ Dip/test/Makefile.in -text
 /Makefile.am -text
 /Makefile.in -text
 /README -text
-conf/perms.txt -text
 /config.guess -text
 /config.sub -text
 /configure -text
