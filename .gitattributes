@@ -462,7 +462,6 @@ Win32/v9/DecompExamples/SmallIP/SmallIP.vcproj -text
 Win32/v9/DecompExamples/SmallIP/smallip.parm -text
 Win32/v9/DecompExamples/VRP/VRP.vcproj -text
 Win32/v9/DecompExamples/VRP/vrp.parm -text
-conf/perms.txt -text
 /config.guess -text
 /config.sub -text
 /configure -text
