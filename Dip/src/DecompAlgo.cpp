@@ -2541,8 +2541,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
 #else
       if (resolve){
-	 //m_masterSI->resolve();
-	 m_masterSI->initialSolve();
+	 m_masterSI->resolve();
       }else{
 	 m_masterSI->initialSolve();
       }
@@ -2551,8 +2550,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_CUT:
       m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
       if (resolve){
-	 //m_masterSI->resolve();
-	 m_masterSI->initialSolve();
+	 m_masterSI->resolve();
       }else{
 	 m_masterSI->initialSolve();
       }
