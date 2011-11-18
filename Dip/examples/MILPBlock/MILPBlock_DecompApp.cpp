@@ -446,6 +446,18 @@ MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
       //0=cont, 1=integer
       model->m_masterOnlyIsInt = 
          (integerVars && integerVars[i]) ? true : false;
+      if(colUB[i]            >  1.0e15 &&
+	 m_appParam.ColumnUB >= 1.0e15)
+	 (*m_osLog) << "WARNING: Master-only column " << i 
+		    << " has unbounded upper bound. DIP does not"
+		    << " yet support extreme rays. Please bound all"
+		    << " variables or use the ColumnUB parameter." << endl;
+      if(colLB[i]            <  -1.0e15 && 
+	 m_appParam.ColumnLB <= -1.0e15)
+	 (*m_osLog) << "WARNING: Master-only column " << i 
+		    << " has unbounded lower bound. DIP does not"
+		    << " yet support extreme rays. Please bound all"
+		    << " variables or use the ColumnLB parameter." << endl;
       if(m_appParam.ColumnUB <  1.0e15)
 	 if(colUB[i] >  1.0e15)
 	    model->m_masterOnlyUB = m_appParam.ColumnUB;
