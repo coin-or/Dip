@@ -467,8 +467,8 @@ public:
       DualStab                 = 0;
       DualStabAlpha            = 0.10;
       BreakOutPartial          = 0;
-      BranchEnforceInSubProb   = 0;
-      BranchEnforceInMaster    = 1;
+      BranchEnforceInSubProb   = 1;//usually much better if can
+      BranchEnforceInMaster    = 0;
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
