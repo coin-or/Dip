@@ -2,10 +2,10 @@
 Settings for main.
 #############################################################################
 #{0,1}: use DECOMP for cutting plane method
-doCut         = 0
+doCut         = 0 
 
 #{0,1}: use DECOMP for price and cut
-doPriceCut    = 1
+doPriceCut    = 1 
 
 #{0,1}: use DECOMP to build compact formulation then call direct IP solver
 doDirect      = 0 
@@ -16,18 +16,6 @@ Settings for all decomp algorithms.
 #############################################################################
 [DECOMP]
 
-
-#SolveMasterUpdateAlgo = 2
-#LogLpLevel       = 1
-#LogDebugLevel = 5
-#LogLevel = 3
-LogLevel          = 3
-#SubProbTimeLimitExact = 30
-#SubProbTimeLimitInexact = 30
-#SubProbNumSolLimit = 6
-TailoffPercent       = 0
-MasterGapLimit       = 0
-CompressColumns = 0
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
   section=CUT
@@ -40,40 +28,24 @@ Settings for decomp algorithm price and cut.
 #############################################################################
 [PRICE_AND_CUT]
 
-#LogLevel = 8
-#LogDebugLevel = 8
-#LogDumpModel = 2
-#LogLpLevel = 8
-#DebugLevel = 8
-#SolveRelaxAsIp = 1
-#SolveMasterAsIp = 1
 #############################################################################
 Settings for ALPS framework.
   section=ALPS
 #############################################################################
 [ALPS]
 
-
-#LogLevel = 2
-#LogDebugLevel = 2
 #############################################################################
 Settings for MMKP application.
   section=MMKP
 #############################################################################
 [MCF]
 # Log level for messages from application.
-
-#LogLevel       = 5
+LogLevel       = 0
 
 # Path to instance data.
+DataDir        = ../../../../Dip/examples/SDPUC/../../data/SDPUC
 
-DataDir        = data
+# Name of file for instance (assumed to be in DataDir).
 Instance       = ieee118_k0.dat
-
-#silcep3node.dat
-#ieee118.dat
-
-
-UseSparse       = 0
 
 #

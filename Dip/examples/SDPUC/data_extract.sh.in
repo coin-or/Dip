@@ -1,0 +1,4 @@
+cd @srcdir@/../../data/MCF
+./get.data
+tar -zxvf data_mcf.tgz
+
