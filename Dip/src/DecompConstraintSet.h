@@ -124,7 +124,14 @@ public:
    inline void appendRow(CoinPackedVector & row,
 			 double             loBound,
 			 double             upBound,
-			 std::string           & rowName){
+			 std::string      & rowName){
+      appendRow(row, loBound, upBound);
+      rowNames.push_back(rowName);         
+   }   
+   inline void appendRow(CoinPackedVector & row,
+			 double             loBound,
+			 double             upBound,
+			 std::string        rowName){
       appendRow(row, loBound, upBound);
       rowNames.push_back(rowName);         
    }   
