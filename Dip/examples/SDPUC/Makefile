@@ -1,0 +1,61 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
+
+EXE = decomp_sdpuc
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
+OBJS          = SDPUC_Main.o
+OBJS         += SDPUC_Instance.o
+OBJS         += SDPUC_DecompApp.o
+
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = ./
+VPATH = ./
+
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+CFLAGS =
+
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+LIBS =
+
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS =
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
+###########################################################################
+# CHANGEME: Customized targets
+###########################################################################

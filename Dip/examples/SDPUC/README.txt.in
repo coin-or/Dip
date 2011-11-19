@@ -1,0 +1,19 @@
+
+Dear Matthew,
+
+We did in fact try an implementation in DIP.  As I recall, it was a bit slower than the AMPL implementation.
+
+I will be happy to cooperate with you on this . Please find data and source code for the unit commitment model with switching in DIP.  It has been a while since I worked with this problem so I have probably forgotten something - please let me know.
+
+I modified DecompAlgo.cpp in order to solve the master problem with CPLEX barrier.  The code is not pretty and i'm sure this could have been optimised.
+
+Note that the model presented in the paper is a simplification of what is usually defined as the unit commitment problem in the litterature. See e.g. reference [6] for additional constraints (min. up/down time, ramping constraints, security constraints). These constraints are likely to affect the decomposition (positively or negatively) as they link different time periods.
+
+A few notes on usage:
+- "Arcs" in the DIP model represent either generators (having from node = 0) or transmission lines.
+- the k-value can be adjusted in the .dat file.
+
+You are welcome to experiment with this and please let me know if you have any questions.  I hope you would like to share any interesting results, that might improve our paper. If you do get publishable results, I would like to know.
+
+Best regards,
+Jonas Christoffer Villumsen
