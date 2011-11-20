@@ -1,4 +1,4 @@
-cd @srcdir@/../../data/MCF
+cd @srcdir@/../../data/SDPUC
 ./get.data
-tar -zxvf data_mcf.tgz
+tar -zxvf data_sdpuc.tgz
 
