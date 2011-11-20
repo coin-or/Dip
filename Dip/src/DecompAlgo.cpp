@@ -574,10 +574,9 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //--- append to bottom the relax matrix/matrices
    //---  create block file (for use in MILPBlock app)
    //---
-   //#define CREATE_BLOCKFILE
-#ifdef CREATE_BLOCKFILE
-   ofstream os("blockFile.txt");
-#endif
+   ofstream os;
+   if(m_param.LogDumpModel >= 2)
+      os.open("blockFile.txt");
    map<int, DecompAlgoModel>::iterator mit;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
@@ -585,12 +584,8 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
       //   currently cannot do if sparse without alot of work
       if(!relax || !relax->M)
          continue;
-      //printf("DUMP relax matrix\n");
-      //relax->M->dumpMatrix();
-      nRowsR  = relax->getNumRows();
-      
-#ifdef CREATE_BLOCKFILE         
-      {
+      nRowsR  = relax->getNumRows();      
+      if(m_param.LogDumpModel >= 2){
 	 int r;
 	 os << (*mit).second.getBlockId();
 	 os << " " << nRowsR << endl;
@@ -599,29 +594,20 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
 	 }
 	 os << endl;
       }
-#endif
-      
       nRows  += nRowsR;
 
       if(relax->isSparse()){
-         //printf("DUMP before relax append\n");
-         //M->dumpMatrix();
          CoinPackedMatrix * MDense = relax->sparseToOrigMatrix();
          assert(MDense);
-         //printf("DUMP dense before relax append\n");
-         //MDense->dumpMatrix();
          M->bottomAppendPackedMatrix(*MDense);
          UTIL_DELPTR(MDense);
-         //printf("DUMP after relax append\n");
-         //M->dumpMatrix();
       }
       else{
          M->bottomAppendPackedMatrix(*relax->M);
       }
    }
-#ifdef CREATE_BLOCKFILE         
-   os.close();
-#endif
+   if(m_param.LogDumpModel >= 2)
+      os.close();
 
    //---
    //--- set column and row bounds and objective coeffs
