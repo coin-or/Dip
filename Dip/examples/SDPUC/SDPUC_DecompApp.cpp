@@ -199,7 +199,7 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
 
    //---
    //--- MASTER (A''):
-   //---	  z[i,j,t] <= y1[i,j]  for all (i,j) in A, t in T				  //arc-investment
+   //---	  z[i,j,t] <= y1[i,j]  for all (i,j) in A, t in T		  //arc-investment
    //---	  z[i,j,t] - z[i,j,t-1] <= y2[i,j,t]  for all (i,j) in A, t in T  //arc(unit) commitment
    //---	  y[i,j] binary for all (i,j) in A
    //---                                    
@@ -207,9 +207,9 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
    int   numTimeperiods =		 m_instance.m_numTimeperiods;
    int   numArcs        =		 m_instance.m_numArcs;
    int   numNodes		=		 m_instance.m_numNodes;
-   int   numCols        =		 numArcs						//y1-vars
-      + 3 * numTimeperiods * numArcs	//y2-, z-, and x-vars
-      + numTimeperiods * numNodes;		//theta-vars
+   int   numCols        =		 numArcs   //y1-vars
+      + 3 * numTimeperiods * numArcs	           //y2-, z-, and x-vars
+      + numTimeperiods * numNodes;		   //theta-vars
    int   numRows		  =		 numArcs * numTimeperiods;
    int	 col_yStartIndex  =		 0;
    int	 col_zStartIndex  =		 numArcs*(1+numTimeperiods);
@@ -244,16 +244,20 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
 	 
       for(t = 0; t < numTimeperiods; t++){
 	 int t_prev = 0;
-	 if(t == 0) {t_prev = numTimeperiods - 1;}
-	 else {t_prev = t - 1;}
+	 if(t == 0) {
+            t_prev = numTimeperiods - 1;
+         }
+	 else {
+            t_prev = t - 1;
+         }
 
 	 colIndex = a + t * numArcs + numArcs;
 	 //add y2-vars   
 	 model->colLB[colIndex] = 0;
 	 model->colUB[colIndex] = 1;
 
-	 CoinPackedVector row1;   // 0 <= y1[i,j] - z[i,j,t]  for all (i,j) in A, t in T
-	 CoinPackedVector row2;   // 0 <= y2[i,j,t] - z[i,j,t] + z[i,j,t-1]  for all (i,j) in A, t in T 
+	 CoinPackedVector row1;        // 0 <= y1[i,j] - z[i,j,t]  for all (i,j) in A, t in T
+	 CoinPackedVector row2;        // 0 <= y2[i,j,t] - z[i,j,t] + z[i,j,t-1]  for all (i,j) in A, t in T 
 	 CoinPackedVector rowFix_y1;   //fix y1=1
 	 CoinPackedVector y2upper1;   // y2(t) <= z(t)  : if off in t then we dont start-up
 	 CoinPackedVector y2upper2;   // y2(t) <= 1-z(t-1)  : if on in t-1 then dont start up in t
@@ -278,14 +282,21 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
 	 row2.insert(colIndex, 1.0);
 	 y2upper2.insert(colIndex, -1.0);
 
-	 //TODO: any issue with range constraints?
-	 model->appendRow(row1, 0.0, DecompInf, std::string("MP1_1-constraint"));  //add MP1-constraints (arc investments)
-	 model->appendRow(row1, -DecompInf, 1.0, std::string("MP1_2-constraint"));  //add MP1-constraints (arc investments)
+         std::string rowName1_1 = "MP1_1_" + UtilIntToStr(a) + "_" + UtilIntToStr(t);
+         std::string rowName1_2 = "MP1_2_" + UtilIntToStr(a) + "_" + UtilIntToStr(t);
+         std::string rowName2_1 = "MP2_1_" + UtilIntToStr(a) + "_" + UtilIntToStr(t);
+         std::string rowName2_2 = "MP2_2_" + UtilIntToStr(a) + "_" + UtilIntToStr(t);
+         std::string rowNameFix = "fix_y1_" + UtilIntToStr(a) + "_" + UtilIntToStr(t);
+ 
+	 //TODO: any issue with range constraint
+	 model->appendRow(row1, 0.0, DecompInf, rowName1_1);  //add MP1_constraints (arc investments)
+         
+         model->appendRow(row1, -DecompInf, 1.0, rowName1_2);  //add MP1_constraints (arc investments)
 	 if(arcs[a].tail == 0) {   //ONLY for supply arcs (!!)
-	    model->appendRow(row2, 0.0, DecompInf, std::string("MP2_1-constraint"));  //add MP2-constraints (arc commitment) 
-	    model->appendRow(row2, -DecompInf, 1.0, std::string("MP2_2-constraint"));  //add MP2-constraints (arc commitment) 
+	    model->appendRow(row2, 0.0, DecompInf, rowName2_1);  //add MP2_constraints (arc commitment) 
+	    model->appendRow(row2, -DecompInf, 1.0, rowName2_2);  //add MP2_constraints (arc commitment) 
 	 }
-	 model->appendRow(rowFix_y1, 1.0, DecompInf, std::string("fix_y1-constraint"));  //add fix y1 vars
+	 model->appendRow(rowFix_y1, 1.0, DecompInf, rowNameFix);  //add fix y1 vars
 	 //model->appendRow(y2upper1, 0.0, DecompInf, std::string("y2-upperbound-1"));  //add upperbounds on y2
 	 //model->appendRow(y2upper2, -1.0, DecompInf, std::string("y2-upperbound-2"));  //..to strengthen formulation
       }
@@ -296,41 +307,41 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
    //---
    //y-vars
    for(a = 0; a < numArcs; a++){
-      std::string colName = "y1(a" + UtilIntToStr(a) + "<" +
+      std::string colName = "y1(a" + UtilIntToStr(a) + "(" +
 	 UtilIntToStr(arcs[a].tail) + "," +
-	 UtilIntToStr(arcs[a].head) + ">)";
+	 UtilIntToStr(arcs[a].head) + "))";
       model->colNames.push_back(colName);
    }
    for(t = 0; t < numTimeperiods; t++){
       for(a = 0; a < numArcs; a++){
-	 std::string colName = "y2(t" + UtilIntToStr(t) + ", a" + UtilIntToStr(a) + "<" +
+	 std::string colName = "y2(t" + UtilIntToStr(t) + ",a" + UtilIntToStr(a) + "(" +
             UtilIntToStr(arcs[a].tail) + "," +
-            UtilIntToStr(arcs[a].head) + ">)";
+            UtilIntToStr(arcs[a].head) + "))";
 	 model->colNames.push_back(colName);
       }
    }
    //z-vars
    for(t = 0; t < numTimeperiods; t++){
       for(a = 0; a < numArcs; a++){
-         std::string colName = "z(t" + UtilIntToStr(t) + ", a" + UtilIntToStr(a) + "<" +
+         std::string colName = "z(t" + UtilIntToStr(t) + ",a" + UtilIntToStr(a) + "(" +
             UtilIntToStr(arcs[a].tail) + "," +
-            UtilIntToStr(arcs[a].head) + ">)";
+            UtilIntToStr(arcs[a].head) + "))";
          model->colNames.push_back(colName);
       }
    }
    //x-vars
    for(t = 0; t < numTimeperiods; t++){
       for(a = 0; a < numArcs; a++){
-         std::string colName = "x(t" + UtilIntToStr(t) + ", a" + UtilIntToStr(a) + "<" +
+         std::string colName = "x(t" + UtilIntToStr(t) + ",a" + UtilIntToStr(a) + "(" +
             UtilIntToStr(arcs[a].tail) + "," +
-            UtilIntToStr(arcs[a].head) + ">)";
+            UtilIntToStr(arcs[a].head) + "))";
          model->colNames.push_back(colName);
       }
    }
    //theta-vars
    for(t = 0; t < numTimeperiods; t++){
       for(i = 0; i < numNodes; i++){
-         std::string colName = "theta(t" + UtilIntToStr(t) + ", n" + UtilIntToStr(i) + ")";
+         std::string colName = "theta(t" + UtilIntToStr(t) + ",n" + UtilIntToStr(i) + ")";
          model->colNames.push_back(colName);
       }
    }
@@ -504,11 +515,12 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
 
       //set demand d
       double d = nodes[i].demand * ts[nodes[i].tsdemand].values[tpId];
+      std::string rowName = "balance_" + UtilIntToStr(i) + "_" + UtilIntToStr(tpId);
       if(i == source) {
-         model->appendRow(row, -DecompInf, 0.0, std::string("balance"));
+         model->appendRow(row, -DecompInf, 0.0, rowName);
       }
       else {
-         model->appendRow(row, d, d, std::string("balance"));
+         model->appendRow(row, d, d, rowName);
       }
    }
 
@@ -531,8 +543,10 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
 		 
 		 
       //set flow lower and upperbound
-      model->appendRow(rowLB, 0.0, DecompInf, std::string("lb"));
-      model->appendRow(rowUB, -DecompInf, 0.0, std::string("ub"));
+      std::string rowNameLB = "lb_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
+      std::string rowNameUB = "ub_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
+      model->appendRow(rowLB, 0.0, DecompInf, rowNameLB);
+      model->appendRow(rowUB, -DecompInf, 0.0, rowNameUB);
 
       //set kirchoffs voltage constraints for ac-arcs
       if(arcs[a].acline == 1) {
@@ -555,8 +569,10 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
 	       rowK2.insert(colIndex, 1.0);
 	    }
 	 }
-	 model->appendRow(rowK1, -DecompInf, bigM, std::string("k1"));
-	 model->appendRow(rowK2, -bigM, DecompInf, std::string("k2"));
+         std::string rowNameK1 = "k1_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
+         std::string rowNameK2 = "k2_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
+	 model->appendRow(rowK1, -DecompInf, bigM, rowNameK1);
+	 model->appendRow(rowK2, -bigM, DecompInf, rowNameK2);
       }
 
    }
@@ -569,7 +585,9 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
 	 row.insert(colIndex, 1.0);
       }
    }
-   model->appendRow(row, numACArcs-numSwitchings, numACArcs, std::string("sum{1-z}<=k"));
+   //model->appendRow(row, numACArcs-numSwitchings, numACArcs, std::string("sum{1-z}<=k"));
+   std::string rowNameSumK = "sumk_" + UtilIntToStr(tpId);
+   model->appendRow(row, numACArcs-numSwitchings, numACArcs, rowNameSumK);
 
 
    //---
