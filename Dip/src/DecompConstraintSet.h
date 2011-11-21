@@ -121,13 +121,13 @@ public:
       rowLB.push_back(loBound);
       rowUB.push_back(upBound);
    }
-   inline void appendRow(CoinPackedVector & row,
-			 double             loBound,
-			 double             upBound,
-			 std::string      & rowName){
-      appendRow(row, loBound, upBound);
-      rowNames.push_back(rowName);         
-   }   
+   //inline void appendRow(CoinPackedVector & row,
+   //		 double             loBound,
+   //		 double             upBound,
+   //		 std::string      & rowName){
+   //   appendRow(row, loBound, upBound);
+   // rowNames.push_back(rowName);         
+   //}   
    inline void appendRow(CoinPackedVector & row,
 			 double             loBound,
 			 double             upBound,

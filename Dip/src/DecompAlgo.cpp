@@ -576,7 +576,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
    //---
    ofstream os;
    if(m_param.LogDumpModel >= 2)
-      os.open("blockFile.txt");
+      os.open("blockFile.txt");//<block id> <row name> or <row id>
    map<int, DecompAlgoModel>::iterator mit;
    for(mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
       relax = (*mit).second.getModel();
@@ -584,17 +584,23 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
       //   currently cannot do if sparse without alot of work
       if(!relax || !relax->M)
          continue;
-      nRowsR  = relax->getNumRows();      
+
+      const vector<string> & rowNames = relax->getRowNames();
+      nRowsR                          = relax->getNumRows();      
       if(m_param.LogDumpModel >= 2){
-	 int r;
-	 os << (*mit).second.getBlockId();
-	 os << " " << nRowsR << endl;
+	 int r;         
+	 //os << (*mit).second.getBlockId();
+	 //os << " " << nRowsR << endl;
+	 //for(r = 0; r < nRowsR; r++){
+	 //   os << nRows + r << " ";
+         //}
+	 //os << endl;
 	 for(r = 0; r < nRowsR; r++){
-	    os << nRows + r << " ";
-	 }
-	 os << endl;
+            os << (*mit).second.getBlockId()
+               << " " << rowNames[r] << endl;
+         }
       }
-      nRows  += nRowsR;
+      nRows += nRowsR;
 
       if(relax->isSparse()){
          CoinPackedMatrix * MDense = relax->sparseToOrigMatrix();
