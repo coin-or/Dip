@@ -19,7 +19,7 @@
 /***************************************************************************/
 
 /* Version number of project */
-#define DIP_VERSION "0.83.1"
+#define DIP_VERSION "0.83"
 
 /* Major Version number of project */
 #define DIP_VERSION_MAJOR 0
@@ -28,5 +28,5 @@
 #define DIP_VERSION_MINOR 83
 
 /* Release Version number of project */
-#define DIP_VERSION_RELEASE 1
+#define DIP_VERSION_RELEASE 9999
 
