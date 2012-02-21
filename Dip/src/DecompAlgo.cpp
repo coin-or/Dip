@@ -2282,15 +2282,18 @@ DecompStatus DecompAlgo::processNode(const int    nodeIndex,
 void DecompAlgo::setSubProbBounds(const double * lbs,
 				  const double * ubs){
 
-   if(!m_param.BranchEnforceInSubProb)
-      return;
+   //NOTE: set them in either case so customized user
+   //   can access the information from branching
+   //if(!m_param.BranchEnforceInSubProb)
+   //   return;
    
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "setSubProbBounds()", m_param.LogDebugLevel, 2);
       
    //---
    //--- make copy so we can enforce in subproblems
-   //---
+   //---   THINK: If serial mode, why not just a pointer into node desc?
+   //---          
    DecompConstraintSet * modelCore = m_modelCore.getModel();  
    const int             nCols     = modelCore->getNumCols();
    memcpy(m_colLBNode, lbs, nCols * sizeof(double));
@@ -6663,7 +6666,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //---  bounds - if for some reason they don't want that 
       //---  to match up with core, this might cause an issue
       //---
-      algoModel.setActiveColBounds(m_colLBNode, m_colUBNode);
+      if(m_param.BranchEnforceInSubProb)
+         algoModel.setActiveColBounds(m_colLBNode, m_colUBNode);
       
       //---
       //--- dump subproblem model .mps/.lp

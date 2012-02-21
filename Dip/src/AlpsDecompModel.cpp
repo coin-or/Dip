@@ -114,6 +114,7 @@ bool AlpsDecompModel::fathomAllNodes() {
    //TODO: make option
    double optimalAbsGap_ = 1.0e-6;
    double optimalRelGap_ = 0.01;//0.01%
+   //TODO: cutoffIncrement (currentUB-cutoffIncrement)
    if ( (currAbsGap_ <= optimalAbsGap_ + ALPS_ZERO) ||
         (currRelGap_ <= optimalRelGap_ + ALPS_ZERO) ) {
       m_bestLB = feasBound;

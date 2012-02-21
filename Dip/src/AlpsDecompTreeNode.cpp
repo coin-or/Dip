@@ -148,6 +148,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
    const int             n_cols    = modelCore->getNumCols();
 
 
+   //TODO: cutoffIncrement (currentUB-cutoffIncrement)
    /** \todo get primalTolerance from parameter */
    if ((parentObjValue - primalTolerance) > currentUB) {
       doFathom = true;
@@ -256,6 +257,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //---
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
+      //TODO: cutoffIncrement (currentUB-cutoffIncrement)
       gap = UtilCalculateGap(globalLB, globalUB);
       if(gap <= relTolerance){	 
 	 doFathom = true;
