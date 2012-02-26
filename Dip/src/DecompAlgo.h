@@ -55,6 +55,7 @@
 #include "DecompMemPool.h"
 #include "DecompSolution.h"
 #include "DecompAlgoCGL.h"
+#include "AlpsDecompTreeNode.h"
 #include "OsiClpSolverInterface.hpp"
 class OsiSolverInterface;
 class DecompConstraintSet;
@@ -304,6 +305,12 @@ public:
                                     const double globalLB = -DecompInf,
                                     const double globalUB =  DecompInf); 
   
+   /**
+    * Do some information sending after the node has been processed. Does
+    * nothing by default.
+    */
+   virtual void postProcessNode(AlpsDecompTreeNode * node) {};
+
    /**
     * Generate initial variables for master problem (PC/DC/RC).
     *   - in CPM, this does nothing
@@ -801,6 +808,13 @@ public:
     */
    inline const double getObjBestBoundUB() const {
       return m_nodeStats.objBest.second;
+   }
+
+   /**
+    * Get a specific row type.
+    */
+   inline const double getMasterRowType(int row) const {
+      return m_masterRowType[row];
    }
 
    /**

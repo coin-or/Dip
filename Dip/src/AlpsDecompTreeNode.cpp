@@ -275,6 +275,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //--- solve the bounding problem (DecompAlgo)
    //---
    decompStatus = decompAlgo->processNode(getIndex(), globalLB, globalUB);
+
+   decompAlgo->postProcessNode(this);
       
    //---
    //--- during processNode, did we find any IP feasible points?
