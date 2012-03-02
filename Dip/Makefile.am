@@ -71,7 +71,7 @@ else
 if COIN_CXX_IS_CL
 	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libDip.lib @DIPLIB_LIBS_INSTALLED@" > $(addlibsdir)/dip_addlibs.txt
 else
-	echo -L@abs_lib_dir@ -lDip @DIPLIB_LIBS_INSTALLED@ > $(addlibsdir)/dip_addlibs.txt
+	echo -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@ > $(addlibsdir)/dip_addlibs.txt
 endif
 endif
 
