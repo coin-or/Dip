@@ -190,15 +190,17 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
       //TODO: any issue with range constraints?
       model->appendRow(row, -DecompInf, arcUB);
       string rowNameUB = "capUB(" +
+	 UtilIntToStr(a)            + "_" + 
 	 UtilIntToStr(arcs[a].tail) + "," +
 	 UtilIntToStr(arcs[a].head) + ")";
-      model->rowNames.push_back(rowNameUB);
+	 model->rowNames.push_back(rowNameUB);
 
       model->appendRow(row, arcLB,  DecompInf);
       string rowNameLB = "capLB(" +
+	 UtilIntToStr(a)            + "_" + 
 	 UtilIntToStr(arcs[a].tail) + "," +
 	 UtilIntToStr(arcs[a].head) + ")";
-      model->rowNames.push_back(rowNameLB);      
+	 model->rowNames.push_back(rowNameLB);
    }
 
    //---
@@ -206,9 +208,10 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet * model){
    //---
    for(k = 0; k < numCommodities; k++){
       for(a = 0; a < numArcs; a++){
-         string colName = "x(comm_" + UtilIntToStr(k) + ",(" +
+         string colName = "x(comm_" + UtilIntToStr(k) + "," +
+            UtilIntToStr(a)            + "_" +
             UtilIntToStr(arcs[a].tail) + "," +
-            UtilIntToStr(arcs[a].head) + "))";
+            UtilIntToStr(arcs[a].head) + ")";
          model->colNames.push_back(colName);
       }
    }
@@ -293,10 +296,11 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet * model,
       else 
          model->appendRow(row, 0.0, 0.0);
 
-      string rowName = "flow(" +
-	 UtilIntToStr(commId) + "," +
-	 UtilIntToStr(arcs[a].tail) + "," +
-	 UtilIntToStr(arcs[a].head) + ")";
+      string rowName = "flow(" +	 
+	 UtilIntToStr(commId) + "_" +
+	 UtilIntToStr(i)      + "_" +
+	 UtilIntToStr(source) + "," + 
+	 UtilIntToStr(sink)   + ")";
       model->rowNames.push_back(rowName);      
    }
 
