@@ -501,12 +501,22 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const bool                 printLp){
   if(!si)
      return;
-   string filename = DecompAlgoStr[m_algo] + "_" + baseName 
+   string fileName = DecompAlgoStr[m_algo] + "_" + baseName 
       + ".n" + UtilIntToStr(nodeIndex)
       + ".c" + UtilIntToStr(cutPass) 
       + ".p" + UtilIntToStr(pricePass);
    if(blockId != -1)
-      filename += ".b" + UtilIntToStr(blockId);
+      fileName += ".b" + UtilIntToStr(blockId);
+   printCurrentProblem(si, fileName, printMps, printLp);
+}
+
+//===========================================================================//
+void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
+                                     const string               fileName,
+                                     const bool                 printMps,
+                                     const bool                 printLp){
+  if(!si)
+     return;
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "printCurrentProblem()", m_param.LogDebugLevel, 2);
 
@@ -552,21 +562,21 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 
    UTIL_DEBUG(m_param.LogDebugLevel, 3,
 	      if(printMps)
-		 (*m_osLog) << "calling writeMps filename = " 
-			    << filename << endl;
+		 (*m_osLog) << "calling writeMps fileName = " 
+			    << fileName << endl;
 	      if(printLp)
-		 (*m_osLog) << "calling writeLp  filename = " 
-			    << filename << endl;
+		 (*m_osLog) << "calling writeLp  fileName = " 
+			    << fileName << endl;
 	      ); 
   
    if(printMps){
 #ifdef __DECOMP_IP_CPX__
-      string filenameMps = filename + ".mps";
-      si->writeMpsNative(filenameMps.c_str(), 
+      string fileNameMps = fileName + ".mps";
+      si->writeMpsNative(fileNameMps.c_str(), 
 			 const_cast<const char**>(rowNamesChar), 
 			 const_cast<const char**>(colNamesChar), 1);
 #else
-      si->writeMps(filename.c_str());
+      si->writeMps(fileName.c_str());
 #endif
    }
 
@@ -574,15 +584,15 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
       double epsilon      = 1e-30;
       int    numberAcross = 5;
       int    decimals     = 10;
-      string filenameLp   = filename + ".lp";
+      string fileNameLp   = fileName + ".lp";
 #ifdef __DECOMP_IP_CPX__
-      si->writeLpNative(filenameLp.c_str(), 
+      si->writeLpNative(fileNameLp.c_str(), 
 			rowNamesChar, colNamesChar,
 			epsilon, numberAcross, decimals);
 #else      
       //This works because the Osi object in this case is OsiClp
       // and Clp takes care of transferring the names.
-      si->writeLp(filename.c_str(), "lp", 
+      si->writeLp(fileName.c_str(), "lp", 
 		  epsilon, numberAcross, decimals);
 #endif
    }
@@ -600,6 +610,7 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
 		    "printCurrentProblem()", m_param.LogDebugLevel, 2);
 }
 
+/*
 //===========================================================================//
 void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
                                      const string               fileName,
@@ -619,7 +630,7 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
    if(printLp)
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
 }
-
+*/
 
 //===========================================================================//
 void DecompAlgo::printVars(ostream * os){
