@@ -1517,9 +1517,18 @@ void DecompAlgo::breakOutPartial(const double  * xHat,
 }
 
 //===========================================================================//
-DecompStatus DecompAlgo::processNode(const int    nodeIndex,
+DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
                                      const double globalLB,
                                      const double globalUB){
+
+   if (node == NULL){
+      throw UtilException("NULL node being processed.", "processNode", 
+			  "DecompAlgo");
+   }
+   
+   m_curNode = node;
+   int nodeIndex = node->getIndex();
+
 
    double                mostNegRC = 0.0;
    DecompConstraintSet * modelCore = m_modelCore.getModel();

@@ -274,9 +274,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //---
    //--- solve the bounding problem (DecompAlgo)
    //---
-   decompStatus = decompAlgo->processNode(getIndex(), globalLB, globalUB);
-
-   decompAlgo->postProcessNode(this);
+   decompStatus = decompAlgo->processNode(this, globalLB, globalUB);
+   decompAlgo->postProcessNode();
       
    //---
    //--- during processNode, did we find any IP feasible points?
@@ -518,7 +517,7 @@ AlpsDecompTreeNode::branch()  {
       decompAlgo->setStrongBranchIter(true);
       decompAlgo->setMasterBounds(newLbs, newUbs);
       decompAlgo->setSubProbBounds(newLbs,newUbs);
-      decompAlgo->processNode(getIndex(), objVal, globalUB);
+      decompAlgo->processNode(this, objVal, globalUB);
       decompAlgo->setStrongBranchIter(false);
       decompParam.LimitTotalCutIters   = limitTotalCutIters;
       decompParam.LimitTotalPriceIters = limitTotalPriceIters;
@@ -577,7 +576,7 @@ AlpsDecompTreeNode::branch()  {
       decompAlgo->setStrongBranchIter(true);
       decompAlgo->setMasterBounds(newLbs, newUbs);
       decompAlgo->setSubProbBounds(newLbs,newUbs);
-      decompAlgo->processNode(getIndex(), objVal, globalUB);
+      decompAlgo->processNode(this, objVal, globalUB);
       decompAlgo->setStrongBranchIter(false);
       decompParam.LimitTotalCutIters   = limitTotalCutIters;
       decompParam.LimitTotalPriceIters = limitTotalPriceIters;

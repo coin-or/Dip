@@ -116,7 +116,7 @@ public:
       m_param.LimitRoundPriceIters = 1000;    
       m_param.SolveMasterAsIp      = 0;
       
-      processNode();
+      processNode(NULL);
    }
 
 

@@ -246,6 +246,8 @@ protected:
    bool         m_firstPhase2Call;
    bool         m_isStrongBranch;
 
+   const AlpsDecompTreeNode * m_curNode;
+
 #ifdef DECOMP_MASTERONLY_DIRECT
    //NOTE:
    // this should be found by framework
@@ -301,15 +303,22 @@ public:
    /**
     * The main DECOMP process loop for a node.
     */
-   virtual DecompStatus processNode(const int nodeIndex   = 0,
+   virtual DecompStatus processNode(const AlpsDecompTreeNode * node,
                                     const double globalLB = -DecompInf,
                                     const double globalUB =  DecompInf); 
   
    /**
-    * Do some information sending after the node has been processed. Does
-    * nothing by default.
+    * Provide the current node the algorithm is solving.
     */
-   virtual void postProcessNode(AlpsDecompTreeNode * node) {};
+
+   const AlpsDecompTreeNode * getCurrentNode() const { return m_curNode; };
+ 
+   /**
+    * Do some information sending after the current node has been processed.
+    * Does nothing by default.
+    */
+
+   virtual void postProcessNode() {};
 
    /**
     * Generate initial variables for master problem (PC/DC/RC).
