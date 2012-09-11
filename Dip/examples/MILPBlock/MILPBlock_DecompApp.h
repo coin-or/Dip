@@ -39,6 +39,10 @@ private:
    /** Application specific parameters. */
    MILPBlock_Param m_appParam;
 
+   /** Original Constraint matrix for the instance */ 
+
+   const CoinPackedMatrix * m_matrix; 
+
    /** The model objective coefficients (original space). */
    double * m_objective;
    
@@ -77,6 +81,11 @@ private:
 
    /** Read block file. */
    void readBlockFile();
+
+
+   /** Automatically detect singly bordered structure */
+   
+   void singlyBorderStructureDetection();
 
    /** Find the active columns for some block. */
    void findActiveColumns(const vector<int> & rowsPart,

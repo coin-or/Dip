@@ -222,6 +222,7 @@ Dip/examples/MILPBlock/MILPBlock_Param.h -text
 Dip/examples/MILPBlock/Makefile.in -text
 Dip/examples/MILPBlock/README.txt.in -text
 Dip/examples/MILPBlock/data_extract.sh.in -text
+Dip/examples/MILPBlock/hmetis.h -text
 Dip/examples/MILPBlock/milpblock.parm.in -text
 Dip/examples/MILPBlock/milpblock.parm2.in -text
 Dip/examples/MILPBlock/test.sh.in -text

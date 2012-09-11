@@ -35,13 +35,26 @@ DATADIR = @srcdir@/../../data/MILP/block
 # CHANGEME: Put any additional flags here
 ###########################################################################
 
-CFLAGS = 
 
+#Comment autoDecomp if user provides a block file
+CFLAGS +=-DautoDecomp 
+
+#The default partitioner is hMeTiS, uncomment this if
+#PaToH is used for automatic decomposition
+
+#CFLAGS +=-DPaToH
+
+CFLAGS += -I@srcdir@/../../../ThirdParty/PaToH_v3.2/Linux-i686
+
+
+
+#LIBS = -L@srcdir@/../../../ThirdParty/PaToH_v3.2/Linux-x86_64 -lpatoh
 ###########################################################################
 # CHANGEME: Put any additional libraries here
 ###########################################################################
 
-LIBS = 
+LIBS =-L@srcdir@/../../../ThirdParty/hmetis-1.5-linux -lhmetis
+
 
 ###########################################################################
 # CHANGEME: Put any additional dependencies for the executable here.

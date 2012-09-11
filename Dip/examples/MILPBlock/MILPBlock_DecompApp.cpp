@@ -13,6 +13,25 @@
 //===========================================================================//
 #include "DecompAlgo.h"
 #include "MILPBlock_DecompApp.h"
+#include "MILPBlock_Param.h"
+#include <vector>
+#include <set>
+#include <fstream>
+
+#if defined(autoDecomp) && defined(PaToH)
+
+#include "patoh.h"
+
+#elif defined(autoDecomp)
+
+extern "C"{
+
+#include "hmetis.h"
+
+}
+
+#endif
+
 
 //===========================================================================//
 void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
@@ -25,6 +44,7 @@ void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---   
 
    m_appParam.getSettings(utilParam);   
+
    if(m_appParam.LogLevel >= 1)
       m_appParam.dumpSettings();
 
@@ -52,18 +72,39 @@ void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
    setBestKnownLB(m_appParam.BestKnownLB + offset);
    setBestKnownUB(m_appParam.BestKnownUB + offset);
 
+
+   #ifndef autoDecomp
+   
    //---
    //--- read block file
    //---
+
    readBlockFile();
 
-   //---
-   //--- create models
-   //---
-   createModels();
 
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "initializeApp()", m_appParam.LogLevel, 2);
+   #else 
+
+   // automatic structure detection
+
+   singlyBorderStructureDetection();
+
+   #endif
+
+
+   /*
+    * After identifying the strucuture either through files or 
+    * automatic structure detection, call the method below to
+    * create models 
+    *
+    */
+   
+
+    createModels();
+
+
+
+    UtilPrintFuncEnd(m_osLog, m_classTag,
+		     "initializeApp()", m_appParam.LogLevel, 2);
 }
 
 //===========================================================================//
@@ -897,6 +938,495 @@ int MILPBlock_DecompApp::generateInitVars(DecompVarList & initVars){
                     "generateInitVars()", m_appParam.LogLevel, 2);  
    return static_cast<int>(initVars.size());
 }
+
+
+
+void MILPBlock_DecompApp::singlyBorderStructureDetection(){
+
+
+
+   //======================================================================
+   // Using Row-net hypergraph model for automatic matrix decomposition 
+   //======================================================================
+
+   // number of rows in the matrix 
+
+   int numRows = m_mpsIO.getNumRows();
+
+   // number of columns in the matrix
+
+   int numCols = m_mpsIO.getNumCols();
+
+   // number of non-zero elements in the matrix
+
+   int numElements = m_mpsIO.getNumElements();
+
+   // get the constraint matrix 
+
+   m_matrix = m_mpsIO.getMatrixByRow();
+
+   // get the column/row index for by-row matrix
+
+   const int * minorIndex = m_matrix->getIndices();
+
+   const int * majorIndex = m_matrix->getMajorIndices();
+
+
+   UTIL_MSG(m_param.LogLevel,2,
+	    (*m_osLog)
+	    << "The number of rows is " << numRows << "\n"
+	    << "The number of columns is "<< numCols << "\n"
+	    << "The number of elements is "<< numElements
+	    << "\n"; 
+	    );
+   
+   // Here assume the matrix to be partitioned into singly-bordered
+   // diagonal matrix. ToDo: complete the Doubly-bordered diagonal 
+   // matrix mapping
+   
+   // the number of vertices
+
+   int numVertices ; 
+
+   // The number of hyperedges
+
+   int numHyperedges; 
+
+   #ifdef doublyBordered
+
+   numVertices = numElements; 
+
+   numHyperedges = numRows + numCols; 
+
+   #else 
+
+   // default singlyBordered 
+
+   numVertices = numElements ; 
+
+   numHyperedges = numRows; 
+
+   #endif
+   
+   /*
+     throw UtilException("Please provide a valid partitioning model" ,
+			 "initializeApp", "MILPBlock_DecompApp");  
+   */
+   
+   //======================================================================
+   // The code below  prepares the input parameters of the hypergraph
+   // partitioning. for details , please refer to 
+   //
+   //  http://glaros.dtc.umn.edu/gkhome/fetch/sw/hmetis/manual.pdf
+   //
+   //======================================================================
+   
+   // pointer to hyperedge
+
+   int *eptr = new int[numHyperedges + 1]; 
+
+   // the length vector for each row (number of nonzero elements
+   // in each row)
+
+   const int * lengthRows = m_matrix->getVectorLengths();
+
+   /*
+     assigning the pointer to hyperedges, indicating the number of 
+     vertices in each hyperedge
+   */
+   
+   eptr[0] = 0; 
+
+   for (int k = 1 ; k < numHyperedges + 1; k ++ ){
+
+     eptr[k] = eptr[k-1] + lengthRows[k-1]; 
+   }
+
+   assert(eptr[numHyperedges] == numVertices); 
+   
+     
+   // declaring the hyperedges, which correspond to the rows in the matrix
+
+   int * eind = new int[numVertices];
+
+   for (int i = 0; i < numVertices; i ++){
+
+     eind[i] = minorIndex[i]; 
+     
+   }
+
+   // declaring the number of partitions 
+
+   int nparts = m_param.NumBlocks;
+
+   
+   // maximum load imbalance (%)
+   
+   int ubfactor = 5; 
+
+   // weights of vertices and hyperedges
+
+   int * vwgts = new int[numVertices] ; 
+
+   int * hewgts = new int[numHyperedges] ; 
+
+
+   /*
+    * declare boolean variables indicating whether the nonzero elements
+    * are integer or not (corresponding to the vertices), the row in 
+    * the matrix has integer columns (corresponding to the hyperedges)
+    * or not 
+    */
+
+   bool * intVertices = new bool[numVertices]; 
+
+   bool * intHyperedges = new bool[numHyperedges]; 
+
+   // initialization
+
+   for (int i = 0 ; i < numHyperedges; i ++){
+     intHyperedges[i] = false ; 
+   }
+
+
+   // the index of the original consstraint matrix 
+
+   int index_base = 0 ; 
+
+   int index = 0; 
+
+
+   // counter of integer variables 
+
+   int intCounter = 0 ; 
+
+   // vector containing the number of integer elements in each row
+
+   int * intLengthRows = new int[numRows]; 
+
+   for (int i = 0 ; i < numRows ; i ++){
+     intLengthRows[i] = 0 ; 
+   }
+
+   for (int i = 0; i < numRows ; i ++){
+     
+     intCounter = 0 ; 
+
+     for ( int j = 0 ; j < lengthRows[i] ; j ++ ){
+       
+       index = index_base + j ; 
+
+       // determine whether the corresponding column is
+       // integer or not 
+	if(m_mpsIO.isInteger(minorIndex[index])){
+	  
+	  intVertices[index] = true; 
+	  
+	  intHyperedges[majorIndex[index]] = true;
+
+	  intCounter ++; 
+	  	  
+	}
+
+	else{
+	  
+	  intVertices[index] = false; 	
+	  
+	}
+	
+     }
+
+      index_base = index_base + lengthRows[i]; 
+
+      intLengthRows[i] = intCounter ; 
+      
+    }
+
+   
+   /*
+    *  define the weight parameter in the hypergraph
+    */
+
+
+   // assign the weights on vertices
+   
+   for (int i = 0 ; i < numVertices ; i ++){
+
+    #ifdef VARIABLE_WEIGHT
+	if(intVertices[i])
+	  vwgts[i] = 2 ; 
+	else
+	  vwgts[i] = 1; 
+    #else
+	vwgts[i] = 1; 
+    #endif
+   }
+
+   // assign the weights on hyperedges
+
+   for (int i = 0 ; i < numHyperedges; i ++){
+
+    #ifdef VARIABLE_WEIGHT
+     if(intHyperedges[i])
+       hewgts[i] = 2*lengthRows[i]; 
+     else
+       hewgts[i] = 1; 
+    #else
+     hewgts[i] = 1; 
+    #endif
+   }
+
+   // part is an array of size nvtxs that returns the computed partition
+   
+   int * part = new int[numElements];
+
+   // edgecut is the number of hyperedge cut 
+   
+   int * edgecut = new int[1]; 
+
+   edgecut[0] = 0 ; 
+
+   int *options = new int[1]; 
+
+   // 0 indicates the default paraemter value, 1 otherwise; 
+   options[0] = 0 ;
+    
+   
+   int *partweights = new int[nparts]; 
+       
+   // initialization 
+   for (int i = 0; i < nparts ; i ++){
+     partweights[i] = 1; 
+   }
+
+
+   // calling HMETIS_PartKway API to perform the hypergraph partitioning
+   #ifdef PaToH
+
+    PaToH_Parameters args; 
+
+   args._k = nparts; 
+
+   //  PaToH_Initialize_Parameters(&args, PATOH_CUTPART, PATOH_SUGPARAM_QUALITY); 
+
+   PaToH_Initialize_Parameters(&args, PATOH_CONPART,
+			       PATOH_SUGPARAM_DEFAULT); 
+
+   // the number of constraint in the multilevel algorithm
+   int nconst = 1; // single constraint 
+   
+   PaToH_Alloc(&args, numVertices,numHyperedges,nconst, 
+	       vwgts,hewgts,eptr,eind);
+
+
+   int cut =0; 
+   PaToH_Part(&args, numVertices, numHyperedges, nconst , 0 , vwgts, 
+	      hewgts, eptr, eind, NULL, part, partweights, &cut); 
+   
+   edgecut[0] = cut ; 
+
+   int computedCut = PaToH_Compute_Cut(nparts, PATOH_CONPART,numVertices, 
+				       numHyperedges,hewgts,eptr, eind,
+				       part); 
+
+   UTIL_MSG(m_param.LogDebugLevel,2,
+	    (*m_osLog)
+	    << "The computedCut is "
+	    << computedCut << "\n"; 
+	    );
+  
+   #else
+
+   clock_t begin = clock();
+   
+   HMETIS_PartRecursive(numVertices,numHyperedges, vwgts, eptr, 
+			eind,hewgts, nparts, ubfactor, options, part, edgecut); 
+   
+   clock_t end = clock();
+
+   UTIL_MSG(m_param.LogLevel,2,
+	    (*m_osLog)
+	    << "********************************************" << "\n"
+	    << "The time elapse for hypergraph partitioning is "
+	    << (end-begin)/CLOCKS_PER_SEC << " seconds" <<"\n"
+	    << "********************************************"
+	    << "\n"; 
+	    );
+        
+   #endif 
+   
+   /*
+    *The following codes try to find the hyperedges in the 
+    * vertex separator set by traversing the hyperedges.
+    *If a hyperedge has vertices in more than one part,
+    *then it is a cut hyperedge then it is in separator.
+    */
+
+   
+   /*
+    * define a set to store the coupling rows (hyperedges in 
+    * the vertex separator set)
+    */
+ 
+    std::set<int> netSet; 
+    std::set<int> :: iterator netIter; 
+
+    // initilizations for global index
+
+    index = 0 ; 
+
+    index_base = 0 ; 
+
+    int tempBase = 0 ; 
+
+    /*
+     * Identify the coupling row in the matrix by storing
+     * them in a net set
+     */
+
+    for ( int i = 0 ; i < numRows ; i ++){
+      
+      for ( int j = 0 ; j < lengthRows[i] ; j ++ ){
+	
+	index = index_base + j ; 
+
+	if ( j == 0)
+	  tempBase = part[minorIndex[index_base]]; 
+	else {
+	 
+	  if (tempBase != part[minorIndex[index]]){
+	    
+	    netSet.insert(i); 
+	    j = lengthRows[i]; 
+	  }
+	} 
+      }              
+      //update index_base
+      index_base = index_base + lengthRows[i];
+    }
+    
+
+    UTIL_MSG(m_param.LogLevel,2,
+	     (*m_osLog)
+	     << "The size of the net set after finding the coupling"
+	     << "row is " 
+	     << static_cast<int>(netSet.size())
+	     << "\n";
+	     );
+
+    
+    // Eliminate the coupling rows from each partition set
+
+    std::set<int> numRowIndex; 
+
+   
+    std::set<int> :: iterator rowIter; 
+
+    std::vector<int> rowsBlock;   
+
+
+    /*
+     * truePartNum indicates the true partition number after eliminating the partitioned
+     * blocks where there is no element in the block
+     */
+   
+    int truePartNum = 0 ; 
+
+
+    
+    for (int part_index = 0 ; part_index < nparts; part_index ++){
+
+      // first, store the rows in different nets 
+
+      for (int j = 0; j < numElements; j ++){
+	
+	if (part[minorIndex[j]] == part_index )
+	  
+	  numRowIndex.insert(majorIndex[j]); 
+	
+      }
+
+      //second, temp stores the row index that is duplicating in the 
+      // coupling net set, and then removes it
+
+      std::vector<int> temp; 
+
+      for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end(); rowIter ++){
+	for (netIter = netSet.begin(); netIter != netSet.end(); netIter ++){
+	   
+	  if ((*rowIter)==(*netIter))
+	    temp.push_back(*rowIter); 
+	  
+	}
+	
+      }
+      
+      for (int s = 0 ; s < temp.size(); s ++){
+	
+	numRowIndex.erase(temp.at(s)); 	  
+      }
+
+
+      if(numRowIndex.size()!= 0){
+
+	for(rowIter = numRowIndex.begin();rowIter !=numRowIndex.end();
+	    rowIter++) {
+	  
+	  rowsBlock.push_back(*rowIter);
+	  
+	}
+     
+	m_blocks.insert(make_pair(truePartNum,rowsBlock)); 
+	
+	truePartNum ++; 
+      }
+      
+      numRowIndex.clear();
+
+      rowsBlock.clear();
+
+      temp.clear();
+    }
+    
+    
+    UTIL_DELARR(eptr);
+
+    UTIL_DELARR(eind);
+
+    //UTIL_DELARR(minorIndex);
+
+    //UTIL_DELARR(lengthRows);
+
+    UTIL_DELARR(majorIndex);
+
+    UTIL_DELARR(intLengthRows);
+
+    UTIL_DELARR(edgecut);
+
+    UTIL_DELARR(part);
+
+    UTIL_DELARR(vwgts);
+
+    UTIL_DELARR(hewgts);
+
+    UTIL_DELARR(options);
+
+    UTIL_DELARR(intVertices);
+    
+    UTIL_DELARR(intHyperedges);
+
+    UTIL_DELARR(partweights);
+
+    #ifdef PaToH
+    PaToH_Free();
+    #endif
+
+    
+    std::cout << "The number of blocks is " << nparts << std::endl; 
+	
+}
+
+
 
 /*
 #if 0

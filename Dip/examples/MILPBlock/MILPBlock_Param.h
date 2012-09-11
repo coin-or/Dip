@@ -63,6 +63,7 @@ public:
    //TOOD: better solution for this
    int ObjectiveSense;   //1=min, -1=max
 
+
 public:
    void getSettings(UtilParameters & utilParam){
       static const char * common = "MILPBlock";

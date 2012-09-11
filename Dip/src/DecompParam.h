@@ -216,6 +216,15 @@ public:
 
    int DebugCheckBlocksColumns;
 
+
+   /*
+    * The block number for automatic decomposition
+    */
+    
+   int NumBlocks; 
+
+   
+
    /**
     * @}
     */
@@ -296,6 +305,8 @@ public:
       PARAM_getSetting("NumThreads",              NumThreads);
 
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
+
+      PARAM_getSetting("NumBlocks",NumBlocks); 
 
       //---
       //--- store the original setting for DualStabAlpha
@@ -409,6 +420,9 @@ public:
       UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       UtilPrintParameter(os, sec, 
 			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
+      UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
+
+
       (*os) << "========================================================\n";
    }
    
@@ -474,6 +488,7 @@ public:
       BranchStrongIter         = 0;
       NumThreads               = 1;
       DebugCheckBlocksColumns  = true;
+      NumBlocks                = 3; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
