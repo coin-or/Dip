@@ -275,6 +275,7 @@ AC_CONFIG_FILES([Makefile
 		 examples/SDPUC/sdpuc.parm
 		 examples/SDPUC/data_extract.sh
 		 examples/SDPUC/README.txt
+                 examples/DIP/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
