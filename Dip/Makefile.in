@@ -76,6 +76,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/ATM/atm.parm.in \
 	$(top_srcdir)/examples/ATM/data_extract.sh.in \
 	$(top_srcdir)/examples/DIP/Makefile.in \
+	$(top_srcdir)/examples/DIP/data_extract.sh.in \
 	$(top_srcdir)/examples/ExternalSolvers/Graph/get.boost.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in \
@@ -172,7 +173,7 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/ATM/atm.parm examples/ATM/data_extract.sh \
 	examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm \
 	examples/SDPUC/data_extract.sh examples/SDPUC/README.txt \
-	examples/DIP/Makefile \
+	examples/DIP/Makefile examples/DIP/data_extract.sh \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -605,6 +606,8 @@ examples/SDPUC/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/exam
 examples/SDPUC/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/SDPUC/README.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/DIP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/DIP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/DIP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/DIP/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@

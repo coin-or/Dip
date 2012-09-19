@@ -1,0 +1,29 @@
+cd @srcdir@/../../data/MILP/block
+./get.data
+tar -zxvf atm.tgz
+tar -zxvf retail.tgz
+tar -zxvf drugport.tgz
+
+cd @srcdir@/../../../ThirdParty
+
+wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/hmetis/hmetis-1.5-linux.tar.gz
+
+gunzip hmetis-1.5-linux.tar.gz
+
+tar -xvf hmetis-1.5-linux.tar
+
+wget http://bmi.osu.edu/~umit/PaToH/patoh-Linux-x86_64.tar.gz
+
+gunzip patoh-Linux-x86_64.tar.gz
+
+mkdir PaToH_v3.2
+
+tar xvf patoh-Linux-x86_64.tar -C PaToH_v3.2/
+
+rm *.tar
+
+cd ./PaToH_v3.2/
+
+cp -rf ./build/* .
+
+rm -rf ./build
