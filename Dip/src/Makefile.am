@@ -101,6 +101,25 @@ libDecomp_la_SOURCES +=        \
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
+#                            DIP binary                                #
+########################################################################
+
+if COIN_HAS_HMETIS
+
+# Name of the executable compiled in this directory.  We want it to be
+# installed in the 'bin' directory
+bin_PROGRAMS = dip
+
+# List all source files for this executable, including headers
+dip_SOURCES = DecompMain.cpp
+
+# Additional libraries
+dip_LDADD = libDecomp.la $(DIPLIB_LIBS) $(HMETISLIB)
+dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
+
+endif
+
+########################################################################
 #                            Additional flags                          #
 ########################################################################
 

@@ -106,6 +106,7 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 # Ampl Solver library
 
 AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
+AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
 
 #############################################################################
 #                      Check for the LP solver                              #

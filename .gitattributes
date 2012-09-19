@@ -405,6 +405,7 @@ Dip/src/DecompCutOsi.h -text
 Dip/src/DecompCutPool.cpp -text
 Dip/src/DecompCutPool.h -text
 Dip/src/DecompDebug.cpp -text
+Dip/src/DecompMain.cpp -text
 Dip/src/DecompMemPool.h -text
 Dip/src/DecompModel.cpp -text
 Dip/src/DecompModel.h -text
