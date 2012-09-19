@@ -1,3 +1,4 @@
+
 //===========================================================================//
 // This file is part of the DIP Solver Framework.                            //
 //                                                                           //
@@ -23,6 +24,8 @@
 #include "DecompModel.h"
 #include "DecompSolution.h"
 #include "DecompConstraintSet.h"
+#include "CoinMpsIO.hpp"
+
 //===========================================================================//
 class DecompAlgo;
 
@@ -58,6 +61,9 @@ protected:
    double m_bestKnownLB;
    double m_bestKnownUB;
 
+
+
+
   
 public:
    /**
@@ -70,6 +76,7 @@ public:
     */  
    const double * m_objective;
 
+   
    /**
     *  Model data: the core model (A'')
     */  
@@ -90,6 +97,33 @@ public:
     *   NOTE: only for the advanced user
     */
    DecompAlgo * m_decompAlgo;
+
+   
+   /*
+    *  The following definitiions was from MILPBlock
+    *
+    */
+
+   /** MPS object for reading instances */
+   CoinMpsIO m_mpsIO; 
+
+
+   /** Original constraint matrix for the instance */
+
+   const CoinPackedMatrix * m_matrix; 
+
+      
+   /** The model constraint systems used for different algos */
+
+   DecompConstraintSet *  m_modelC; 
+   std::map<int, DecompConstraintSet*>  m_modelR;
+
+
+   /** Definition of blocks (by rows) */
+   
+   std::map<int,std::vector<int> > m_blocks; 
+
+
    
 public:
    /**
@@ -322,6 +356,60 @@ public:
     * @}
     */
 
+
+
+public: 
+   
+   /** Initialize applications */
+   void initializeApp(UtilParameters & utilParam); 
+
+   /** Create model parts */
+
+   void createModels();
+
+   DecompConstraintSet * createModelPart(const int nRowsPart,
+					 const int * rowsPart);
+
+   void createModelPart(DecompConstraintSet * model,
+			const int             nRowsPart,
+			const int           * rowsPart); 
+
+   void createModelPartSparse(DecompConstraintSet * model,
+			      const int             nRowsPart,
+			      const int           * rowsPart);
+
+   void createModelMasterOnlys(std::vector<int> & masterOnlyCols);
+
+   void readInitSolutionFile(DecompVarList & initVars); 
+
+   /** Read block file */
+   void readBlockFile();
+   
+
+   /** Automatically detect singly bordered structure */
+
+   void singlyBorderStructureDetection();
+
+   /** Find the active columns for some block */
+   void findActiveColumns(const std::vector<int> & rowsPart,
+			  std::set<int>          & activeColsSet); 
+
+   /** Get Intance name */
+
+   const std::string getInstanceName(){
+     return m_param.Instance;
+   }
+
+   void  HMETIS_PartKway(int nvtxs, int nhedges, int *vwgts, int *eptr,
+		      int *eind, int *hewgts, int nparts, int ubfactor,
+		      int * options, int * part, int *edgecut);
+
+   void  HMETIS_PartRecursive(int nvtxs, int nhedges, int *vwgts, int *eptr,
+			   int *eind, int *hewgts, int nparts, int ubfactor,
+			   int * options, int * part, int *edgecut);
+
+
+   
    
 
 public:
