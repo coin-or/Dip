@@ -1,0 +1,70 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       #
+#                                                                           #
+# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# CHANGEME: Put the name of your executable here
+###########################################################################
+
+EXE = dip@EXEEXT@
+
+###########################################################################
+# CHANGEME: Put the names of source files here
+###########################################################################
+
+OBJS        = DecompMain.@OBJEXT@
+
+###########################################################################
+# CHANGEME: Put the directories to find the source files here
+###########################################################################
+
+SRCDIR = @srcdir@
+VPATH = @srcdir@
+#DATADIR = @srcdir@/../../data/MILP/block
+
+###########################################################################
+# CHANGEME: Put any additional flags here
+###########################################################################
+
+
+#Comment autoDecomp if user provides a block file
+CFLAGS +=-DautoDecomp 
+
+#The default partitioner is hMeTiS, uncomment this if
+#PaToH is used for automatic decomposition
+
+#CFLAGS +=-DPaToH
+
+CFLAGS += -I@srcdir@/../../../ThirdParty/PaToH_v3.2/Linux-i686
+
+
+
+#ADDLIBS = -L@srcdir@/../../../ThirdParty/PaToH_v3.2/Linux-x86_64 -lpatoh
+###########################################################################
+# CHANGEME: Put any additional libraries here
+###########################################################################
+
+ADDLIBS =-L@srcdir@/../../../ThirdParty/hmetis-1.5-linux -lhmetis
+
+
+###########################################################################
+# CHANGEME: Put any additional dependencies for the executable here.
+#           These should be accompanied by custom targets to build them.
+###########################################################################
+
+DEPS =
+
+###########################################################################
+# include default COIN flags, library options, and targets
+###########################################################################
+
+include ../Makefile.Examples
+
