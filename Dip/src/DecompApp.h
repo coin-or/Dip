@@ -26,6 +26,9 @@
 #include "DecompConstraintSet.h"
 #include "CoinMpsIO.hpp"
 
+extern "C"{
+#include "hmetis.h"
+}
 //===========================================================================//
 class DecompAlgo;
 
@@ -399,7 +402,7 @@ public:
    const std::string getInstanceName(){
      return m_param.Instance;
    }
-
+   /*
    void  HMETIS_PartKway(int nvtxs, int nhedges, int *vwgts, int *eptr,
 		      int *eind, int *hewgts, int nparts, int ubfactor,
 		      int * options, int * part, int *edgecut);
@@ -407,7 +410,7 @@ public:
    void  HMETIS_PartRecursive(int nvtxs, int nhedges, int *vwgts, int *eptr,
 			   int *eind, int *hewgts, int nparts, int ubfactor,
 			   int * options, int * part, int *edgecut);
-
+   */
 
    
    

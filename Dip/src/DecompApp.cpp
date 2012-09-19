@@ -31,7 +31,7 @@
 
 extern "C"{
 
-  //#include "hmetis.h"
+#include "hmetis.h"
 
 }
 
