@@ -151,6 +151,7 @@ Dip/examples/ATM/Makefile.in -text
 Dip/examples/ATM/atm.parm.in -text
 Dip/examples/ATM/data_extract.sh.in -text
 Dip/examples/ATM/notes.txt -text
+Dip/examples/DIP/DecompMain.cpp -text
 Dip/examples/ExternalSolvers/Graph/get.boost.in -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in -text
 Dip/examples/ExternalSolvers/Knapsack/Pisinger/combo.c.patch -text
