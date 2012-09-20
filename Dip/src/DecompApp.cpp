@@ -866,7 +866,7 @@ void DecompApp::createModels(){
    //---
    //--- Construct the objective function.
    //---
-   double * objective = new double[nCols];
+      double * objective = new double[nCols];
    if(!objective)
       throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
    memcpy(objective, 

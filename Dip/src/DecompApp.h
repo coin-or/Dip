@@ -430,7 +430,9 @@ public:
       m_decompAlgo (0      )
    {    
       m_param.getSettings(utilParam);
+      initializeApp(utilParam); 
       startupLog();    
+      
    };
 
    /**

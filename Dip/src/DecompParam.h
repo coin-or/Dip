@@ -358,16 +358,27 @@ public:
 
 
       PARAM_getSetting("NumBlocks",NumBlocks); 
+      DataDir      = param.GetSetting("DataDir",      "",    "MILPBlock");
+      Instance     = param.GetSetting("Instance",     "",    "MILPBlock");    
+      BlockFile    = param.GetSetting("BlockFile",    "",    "MILPBlock");
+      PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILPBlock");
+      BlockFileFormat 
+         = param.GetSetting("BlockFileFormat",    "",    "MILPBlock");    
+      InitSolutionFile
+         = param.GetSetting("InitSolutionFile",    "",    "MILPBlock");    
+
+
+
       PARAM_getSetting("LogLevel",LogLevel);
-      PARAM_getSetting("DataDir",DataDir);
-      PARAM_getSetting("Instance",Instance);
-      PARAM_getSetting("BlockFile",BlockFile); 
-      PARAM_getSetting("PermuteFile",PermuteFile);
-      PARAM_getSetting("BlockFileFormat",BlockFileFormat);
-      PARAM_getSetting("InitSolutionFile",InitSolutionFile);
+      // PARAM_getSetting("DataDir",DataDir);
+      //PARAM_getSetting("Instance",Instance);
+      //PARAM_getSetting("BlockFile",BlockFile); 
+      //PARAM_getSetting("PermuteFile",PermuteFile);
+      //PARAM_getSetting("BlockFileFormat",BlockFileFormat);
+      //PARAM_getSetting("InitSolutionFile",InitSolutionFile);
       PARAM_getSetting("UseNames",UseNames);
       PARAM_getSetting("UseSparse",UseSparse);
-      PARAM_getSetting("NumBlocks",BlockFileFormat);
+
       PARAM_getSetting("FullModel",FullModel);
       PARAM_getSetting("BestKnownLB",BestKnownLB);
       PARAM_getSetting("BestKnownUB",BestKnownUB);
