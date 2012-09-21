@@ -170,22 +170,22 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    setBestKnownUB(m_param.BestKnownUB + offset);
 
 
-   #ifndef autoDecomp
+   if(!m_param.AutoDecomp)
    
    //---
    //--- read block file
    //---
 
-   readBlockFile();
+     readBlockFile();
 
 
-   #else 
+   else 
 
    // automatic structure detection
 
-   singlyBorderStructureDetection();
+     singlyBorderStructureDetection();
 
-   #endif
+
 
 
    /*

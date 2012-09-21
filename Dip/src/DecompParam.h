@@ -272,7 +272,7 @@ public:
 
    int ObjectiveSense; //1=min, -1=max
 
-
+   int AutoDecomp; 
 
    /**
     * @}
@@ -386,7 +386,7 @@ public:
       PARAM_getSetting("ColumnLB",ColumnLB);
       PARAM_getSetting("ObjectiveSense",ObjectiveSense);
 
-
+      PARAM_getSetting("AutoDecomp", AutoDecomp); 
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -531,6 +531,8 @@ public:
 
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
 
+      UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
+
       (*os) << "========================================================\n";
    }
    
@@ -617,6 +619,7 @@ public:
       ColumnLB                 =-1.e20;
       ObjectiveSense           = 1;
 
+      AutoDecomp               = 0;
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
