@@ -57,6 +57,7 @@
 #include "DecompAlgoCGL.h"
 #include "AlpsDecompTreeNode.h"
 #include "OsiClpSolverInterface.hpp"
+#include "queue"
 class OsiSolverInterface;
 class DecompConstraintSet;
 class DecompSolverResult;
@@ -64,6 +65,11 @@ class DecompSolverResult;
 //===========================================================================//
 class DecompAlgo {
 
+
+ public:
+
+  static std::queue<int> subprobQueue; 
+  
 protected:
 
    //----------------------------------------------------------------------//
@@ -246,6 +252,10 @@ protected:
    bool         m_firstPhase2Call;
    bool         m_isStrongBranch;
 
+
+
+
+
    const AlpsDecompTreeNode * m_curNode;
 
 #ifdef DECOMP_MASTERONLY_DIRECT
@@ -261,6 +271,10 @@ protected:
 #endif
 
 public:   
+
+
+
+
    /**
     * @}
     */
@@ -273,7 +287,9 @@ public:
    /**
     * Create the master problem (all algorithms must define this function).
     */
+
    //virtual void createMasterProblem(DecompVarList & initVars) = 0;
+
    virtual void createMasterProblem(DecompVarList & initVars);
    void loadSIFromModel(OsiSolverInterface           * si,
                         //need next 2 args? ever different?
@@ -916,6 +932,8 @@ public:
    
 
 
+
+
    
    //-----------------------------------------------------------------------//
    /**
@@ -959,7 +977,7 @@ public:
       m_xhatIPBest (NULL),
       m_isColGenExact(false),
       m_utilParam    (utilParam),
-      m_numConvexCon (1),
+	//      m_numConvexCon (1),
       m_rrLastBlock (-1),
       m_rrIterSinceAll(0),
 
@@ -970,8 +988,12 @@ public:
       m_masterObjLast(DecompInf),
       m_firstPhase2Call(false),
       m_isStrongBranch(false)
+     
+
+
+
 #ifdef DECOMP_MASTERONLY_DIRECT
-	 ,
+	
      m_masterOnlyCols()
 #endif
    {
