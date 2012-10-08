@@ -364,7 +364,7 @@ public:
 public: 
    
    /** Initialize applications */
-   void initializeApp(UtilParameters & utilParam); 
+   virtual void initializeApp(UtilParameters & utilParam); 
 
    /** Create model parts */
 
@@ -429,9 +429,13 @@ public:
       m_objective  (0      ),
       m_decompAlgo (0      )
    {    
-      m_param.getSettings(utilParam);
-      initializeApp(utilParam); 
-      startupLog();    
+     //---
+     //--- comment these functions, which were used in
+     //--- MILPBlock, otherwise, conflict occurs in building
+     //--- individual examples 
+     //     m_param.getSettings(utilParam);
+     //     initializeApp(utilParam); 
+     //     startupLog();    
       
    };
 

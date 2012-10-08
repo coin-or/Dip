@@ -56,6 +56,13 @@ int main(int argc, char ** argv){
       DecompApp milp(utilParam); 
 
       //---
+      //--- put the one of the functions in the constructor into the main
+      //---
+      milp.initializeApp(utilParam); 
+
+      milp.startupLog(); 
+
+      //---
       //--- create the algorithm (a DecompAlgo)
       //---
       DecompAlgo * algo = NULL;
@@ -128,6 +135,10 @@ int main(int argc, char ** argv){
 	      << " TotalReal= " << timeSetupReal + timeSolveReal
 	      << endl;      
 
+
+	 cout << "The parallel efficiency is "
+	      << timeSolveCpu/(milp.m_param.NumThreads*timeSolveReal)
+	      << endl;
          //---
          //--- sanity check
          //---   if user defines bestLB==bestUB (i.e., known optimal)

@@ -4886,115 +4886,123 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
 #ifdef RELAXED_THREADED
 
-     printf("===== START Threaded solve of subproblems. =====\n");
-
-     pthread_t                * threads       = 0 ; 
-     SolveRelaxedThreadArgs   * arg            = 0 ; 
-     DecompVarList            * potentialVarsT = 0 ; 
+   printf("===== START Threaded solve of subproblems. =====\n");
      
-     
-     potentialVarsT = new DecompVarList[numThreads];
-     CoinAssertHint(potentialVarsT, "Error: Out of Memory");
+   pthread_t                * threads       = 0 ;
 
-     arg = new SolveRelaxedThreadArgs[numThreads];
-     CoinAssertHint(arg, "Error: Out of Memory");
+   //   printf("pthread_t\n");
+   SolveRelaxedThreadArgs   * arg            = 0 ; 
+   //   printf("SolveRelaxedThreadArgs\n");
+   DecompVarList            * potentialVarsT = 0 ; 
+   //   printf("DecompVarList\n");
+     
+   potentialVarsT = new DecompVarList[numThreads];
+   //   printf("ptentialVarsT\n");
+   CoinAssertHint(potentialVarsT, "Error: Out of Memory");
+
+   arg = new SolveRelaxedThreadArgs[numThreads];
+   CoinAssertHint(arg, "Error: Out of Memory");
+   //   printf("arg\n");   
+   threads = new pthread_t[numThreads];
+   CoinAssertHint(threads, "Error: Out of Memory");
+   //   printf("threads\n");
+
+   pthread_mutex_t count_mutex;
+     
+   //   printf("pthreads_mutex\n");
+   // return condition of pthread_create method
+   int rc; 
       
-     threads = new pthread_t[numThreads];
-     CoinAssertHint(threads, "Error: Out of Memory");
+   bool useCutoff = false;      
+   if(m_phase == PHASE_PRICE2)
+     useCutoff = m_param.SubProbUseCutoff;
+   m_isColGenExact = false; //so it goes to IP solver - ugh
+   
 
-     pthread_mutex_t count_mutex;
-     
+   //   pthread_attr_t attr;
+   //pthread_attr_init(&attr);
 
-     // return condition of pthread_create method
-     int rc; 
-      
-     bool useCutoff = false;      
-     if(m_phase == PHASE_PRICE2)
-       useCutoff = m_param.SubProbUseCutoff;
-     m_isColGenExact = false; //so it goes to IP solver - ugh
+   //pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE);
 
-
-     pthread_attr_t attr;
-     pthread_attr_init(&attr);
-
-     pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE);
 	  
-     pthread_mutex_init(&count_mutex, NULL); 
+   pthread_mutex_init(&count_mutex, NULL); 
 
-
+   printf("pthread_mutex_init\n");
      
      
-      for(int t = 0; t < numThreads;t++){
+   for(int t = 0; t < numThreads;t++){
 
-       arg[t].algo          = this;
-       arg[t].threadId      = t;
-       arg[t].nBaseCoreRows = nBaseCoreRows;
-       arg[t].u             = const_cast<double*>(u); //duals (for alpha)
-       arg[t].redCostX      = redCostX; 
-       arg[t].origCost      = origObjective;
-       arg[t].n_origCols    = nCoreCols;
-       arg[t].vars          = &potentialVarsT[t];
-       arg[t].mutex_pointer = &count_mutex; 
-       rc = pthread_create(&threads[t],
-			   &attr,
-			   solveRelaxedThread, (void*)&arg[t]);
+     arg[t].algo          = this;
+     arg[t].threadId      = t;
+     arg[t].nBaseCoreRows = nBaseCoreRows;
+     arg[t].u             = const_cast<double*>(u); //duals (for alpha)
+     arg[t].redCostX      = redCostX; 
+     arg[t].origCost      = origObjective;
+     arg[t].n_origCols    = nCoreCols;
+     arg[t].vars          = &potentialVarsT[t];
+     arg[t].mutex_pointer = &count_mutex; 
+     //printf("pthread_create_before\n"); 
+     rc = pthread_create(&threads[t],
+			 NULL,
+			 solveRelaxedThread, (void*)&arg[t]);
+     //printf("pthread_create_after\n"); 
+     if(rc){
+       printf("Failed with %d at %s \n",rc,"pthread_create");
+     }
        
-       if(rc){
-	 printf("Failed with %d at %s \n",rc,"pthread_create");
-       }
+   }
+     
+     
 
-      }
+   pthread_mutex_destroy(&count_mutex);
+   //printf("pthread_mutex_destroy\n");
+   //  pthread_attr_destroy(&attr);
+     
+   for(int i=0; i< numThreads; i++){
+	
+     pthread_join(threads[i],NULL);
+     //   printf("pthread_join\n");
+   }
 
-      
-
-       pthread_mutex_destroy(&count_mutex);
-
-       for(int i=0; i< numThreads; i++){
-
-	 pthread_join(threads[i],NULL);
-       }
-
-       m_isColGenExact = true;
+   m_isColGenExact = true;
 
        //clean-up memory
-       for(int t = 0; t < numThreads; t++){
-	 printf("arg[%d].vars size=%d\n", 
-		t, static_cast<int>(arg[t].vars->size()));
-	 for(it  = arg[t].vars->begin();
-	     it != arg[t].vars->end(); it++){
-	   varRedCost = (*it)->getReducedCost();
-	   whichBlock = (*it)->getBlockId();
-	   alpha      = u[nBaseCoreRows + whichBlock];
-	   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		      (*m_osLog) 
-		      << "alpha[block=" << whichBlock << "]:" << alpha 
-		      << " varRedCost: " << varRedCost << "\n";
-		      );
-	    
-	    
-	 }
-       }
-       printf("===== END   Threaded solve of subproblems. =====\n");
-      
-       for(int t = 0; t < numThreads; t++){
-	 //one function to do this?
-	 for(it  = arg[t].vars->begin();
-	     it != arg[t].vars->end(); it++){	    
-	   potentialVars.push_back(*it);
-	 }
-       }
-      //put the vars from all threads into one vector
-
-
-      //---
-      //--- clean-up local memory
-      //---
-      UTIL_DELARR(potentialVarsT);
-      UTIL_DELARR(arg);
-      UTIL_DELARR(threads);
-
-
+   for(int t = 0; t < numThreads; t++){
+     printf("arg[%d].vars size=%d\n", 
+	    t, static_cast<int>(arg[t].vars->size()));
+     for(it  = arg[t].vars->begin();
+	 it != arg[t].vars->end(); it++){
+       varRedCost = (*it)->getReducedCost();
+       whichBlock = (*it)->getBlockId();
+       alpha      = u[nBaseCoreRows + whichBlock];
+       UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		  (*m_osLog) 
+		  << "alpha[block=" << whichBlock << "]:" << alpha 
+		  << " varRedCost: " << varRedCost << "\n";
+		  );
      }
+   }
+   printf("===== END   Threaded solve of subproblems. =====\n");
+      
+   for(int t = 0; t < numThreads; t++){
+     //one function to do this?
+     for(it  = arg[t].vars->begin();
+	 it != arg[t].vars->end(); it++){	    
+       potentialVars.push_back(*it);
+     }
+   }
+   //put the vars from all threads into one vector
+
+
+   //---
+   //--- clean-up local memory
+   //---
+   UTIL_DELARR(potentialVarsT);
+   UTIL_DELARR(arg);
+   UTIL_DELARR(threads);
+
+
+   }
 
 
 
@@ -6592,9 +6600,11 @@ bool DecompAlgo::isLPFeasible(const double * x,
 #ifdef RELAXED_THREADED
 
 static void * solveRelaxedThread(void * args){  
+
+    //printf("Before declare\n");
    SolveRelaxedThreadArgs * targs 
       = static_cast<SolveRelaxedThreadArgs*>(args);
-
+   
    DecompAlgo          * algo         = targs->algo;
    int                   threadId     = targs->threadId;
    int                   nBaseCoreRows= targs->nBaseCoreRows;   
@@ -6603,7 +6613,7 @@ static void * solveRelaxedThread(void * args){
    const double        * origObjective= targs->origCost; //read-only
    int                   nCoreCols    = targs->n_origCols;  
    list<DecompVar*>    * vars         = targs->vars;
-   
+   //   printf("After declare\n");
    
    //---
    //--- For pricing,
@@ -6652,23 +6662,18 @@ static void * solveRelaxedThread(void * args){
 	    threadId, subprobIndex);
      
      fflush(stdout);
-
-     
-
   
      printf("THREAD %d: Done with work \n",
-	    threadId);
- 
-     
+	    threadId);     
      
      if(DecompAlgo::subprobQueue.empty())
        pthread_exit(NULL);
 
-
    }
-
+   
 }
 
+#endif
 /*
 static void * solveRelaxedThread(void * args){
    SolveRelaxedThreadArgs * targs 
@@ -6730,7 +6735,7 @@ static void * solveRelaxedThread(void * args){
    return NULL;
 }
 */
-#endif
+
 
 //--------------------------------------------------------------------- //
 DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
