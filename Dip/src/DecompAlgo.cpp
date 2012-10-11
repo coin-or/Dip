@@ -24,7 +24,7 @@
 
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
-#define   RELAXED_THREADED
+//#define   RELAXED_THREADED
 
 
 
@@ -1879,6 +1879,8 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	 mostNegRC                  = 0.0;
 
 	 
+	 #if defined RELAXED_THREADED
+
 	 
 	 assert(DecompAlgo::subprobQueue.empty());
 
@@ -1887,7 +1889,8 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	   DecompAlgo::subprobQueue.push(i); 
 
 	 assert(DecompAlgo::subprobQueue.size()== m_numConvexCon);
-
+	 
+	 #endif 
 
 
 	 m_nodeStats.varsThisCall   = generateVars(m_status,
@@ -5190,6 +5193,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       } 
 #endif
       //} //END: if(doAllBlocks)
+}
   else{
 
       //---

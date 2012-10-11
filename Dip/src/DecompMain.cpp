@@ -35,8 +35,8 @@ int main(int argc, char ** argv){
       //---
       UtilParameters utilParam(argc, argv);  
 
-      bool doCut        = utilParam.GetSetting("doCut",        true);
-      bool doPriceCut   = utilParam.GetSetting("doPriceCut",   false);
+      bool doCut        = utilParam.GetSetting("doCut",        false);
+      bool doPriceCut   = utilParam.GetSetting("doPriceCut",   true);
       bool doDirect     = utilParam.GetSetting("doDirect",     false);
       
       UtilTimer timer;
