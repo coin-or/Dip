@@ -3,6 +3,10 @@ cd @srcdir@/../../data/MILP/block
 tar -zxvf atm.tgz
 tar -zxvf retail.tgz
 tar -zxvf drugport.tgz
+tar -zxvf gerald.tgz
+mkdir gerald
+
+cp -rf instances/* gerald/.
 
 cd @srcdir@/../../../ThirdParty
 
