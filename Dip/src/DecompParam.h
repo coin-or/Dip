@@ -540,7 +540,7 @@ public:
       LogLevel             = 0;
       LogDebugLevel        = 0;
       LogLpLevel           = 0;
-      LogDumpModel         = 0;
+      LogDumpModel         = 1;
       LogObjHistory        = 0;
       LimitInitVars        = 5;
       DebugLevel           = 0;

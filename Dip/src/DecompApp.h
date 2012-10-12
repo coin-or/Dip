@@ -51,7 +51,13 @@ private:
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
    std::string m_classTag;
-  
+
+   /*
+    * Help read LP format instance besides original mps file 
+    */
+   //   OsiSolverInterface * m_IO; 
+
+
 protected:
    /**
     *  Log file.
@@ -78,6 +84,8 @@ public:
     *  Model data: objective function 
     */  
    const double * m_objective;
+
+
 
    
    /**
@@ -108,6 +116,8 @@ public:
     */
 
    /** MPS object for reading instances */
+  
+
    CoinMpsIO m_mpsIO; 
 
 

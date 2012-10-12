@@ -852,7 +852,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    result.m_solStatus2 = 0;
    //cout << "CPX IP solver status = " << result.m_solStatus << endl;
    
-   if(result.m_solStatus == 119)
+   if(result.m_solStatus == CPXMIP_INForUNBD)
      result.m_solStatus = CPXMIP_INFEASIBLE; 
    
 

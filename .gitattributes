@@ -442,7 +442,6 @@ Dip/src/config.h.in -text
 Dip/src/config_default.h -text
 Dip/src/config_dip.h.in -text
 Dip/src/config_dip_default.h -text
-Dip/src/hmetis.h -text
 Dip/src/old/BcpsDecompModel.cpp -text
 Dip/src/old/BcpsDecompModel.h -text
 Dip/src/old/BcpsDecompNodeDesc.h -text

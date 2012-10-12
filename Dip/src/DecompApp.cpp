@@ -151,16 +151,34 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    string fileName = m_param.DataDir 
       + UtilDirSlash() + m_param.Instance;   
 
+   if(!fileName.empty()){
+     cerr << "==========================================================="<< std::endl
+	  << "Users need to provide correct "
+	  << "instance path and name" << std::endl
+          << "                                                     " << std::endl 
+	  << "Example: ./dip  --MILPBlock:BlockFileFormat List" << std::endl
+	  << "                --MILPBlock:Instance /FilePath/ABC.mps" << std::endl
+	  << "                --MILPBlock:BlockFile /FilePath/ABC.block" << std::endl
+	  << "==========================================================="<< std::endl
+	  << std::endl;
+       throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
+   }
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
-   int rstatus = m_mpsIO.readMps(fileName.c_str());   
+
+   
+   
+   int rstatus = m_mpsIO.readMps(fileName.c_str()); 
+
    if(rstatus < 0){
       cerr << "Error: Filename = " << fileName << " failed to open." << endl;
-      throw UtilException("I/O Error.", "initalizeApp", "MILPBlock_DecompApp");
+      throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
+
+   
    if(m_param.LogLevel >= 2)
-      (*m_osLog) << "Objective Offset = " 
-                 << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
+     (*m_osLog) << "Objective Offset = " 
+                << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
 
    //---
    //--- set best known lb/ub
@@ -524,7 +542,7 @@ void DecompApp::readInitSolutionFile(DecompVarList & initVars){
 
 
 void DecompApp::findActiveColumns(const vector<int> & rowsPart,
-                                       set<int>          & activeColsSet){
+				  set<int>          & activeColsSet){
 
    const CoinPackedMatrix * M    = m_mpsIO.getMatrixByRow();
    const int              * ind  = M->getIndices();
@@ -553,6 +571,7 @@ void DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
    const double * colLB       = m_mpsIO.getColLower();
    const double * colUB       = m_mpsIO.getColUpper();
    const char   * integerVars = m_mpsIO.integerColumns();
+
    int            nMasterOnlyCols =
      static_cast<int>(masterOnlyCols.size());
 

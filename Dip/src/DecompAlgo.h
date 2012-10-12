@@ -132,9 +132,6 @@ protected:
     * Pointer (and label) to current active model core/relax.
     */
 
-
-
-   
    std::vector<double>        m_origColLB;
    std::vector<double>        m_origColUB;
 
