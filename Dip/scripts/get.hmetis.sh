@@ -8,6 +8,8 @@ tar -xvf hmetis-1.5-linux.tar
 
 rm hmetis-1.5-linux.tar
 
-cd ./hmetis-1.5-linux
+mv hmetis-1.5-linux HMetis
+
+cd HMetis
 
 wget http://coral.ie.lehigh.edu/~jiadongwang/DIP/hmetis.h

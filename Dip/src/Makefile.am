@@ -128,6 +128,12 @@ endif
 
 AM_CPPFLAGS = $(DIPLIB_CFLAGS)
 
+if COIN_HAS_HMETIS
+
+AM_CPPFLAGS += -I`$(CYGPATH_W) $(HMETISINCDIR)`
+
+endif
+
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 

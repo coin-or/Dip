@@ -8,50 +8,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-########################################################################
-#                      unitTest for DIP                                #
-########################################################################
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src`
-
-########################################################################
-#                     Includes for LP Solver                           #
-########################################################################
-
-if CPLEX_LP_SOLVER
-AM_CPPFLAGS += -D__DECOMP_LP_CPX__
-endif
-
-if CLP_LP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_LP_CLP__
-endif
-
-########################################################################
-#                     Includes for IP Solver                           #
-########################################################################
-
-if CBC_IP_SOLVER
-if COIN_HAS_CBC
-AM_CPPFLAGS += -D__DECOMP_IP_CBC__
-endif
-endif
-
-if CPLEX_IP_SOLVER
-AM_CPPFLAGS += -D__DECOMP_IP_CPX__
-endif
-
-
-
 test: ../src/dip$(EXEEXT)
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance  `$(GYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(GYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
-	
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(GYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(GYGPATH_W)$(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
-	
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_18.mps --MILP:BlockFile `$(GYGPATH_W)$(SAMPLE_DATA)`/wedding_18.block --MILP:BestKnownLB 13   --MILP::BestKnownUB 13
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
 
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W)$(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
 
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_18.mps --MILP:BlockFile `$(CYGPATH_W)$(SAMPLE_DATA)`/wedding_18.block --MILP:BestKnownLB 13   --MILP::BestKnownUB 13
 
 .PHONY: test
 
