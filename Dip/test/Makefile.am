@@ -12,17 +12,6 @@ AUTOMAKE_OPTIONS = foreign
 #                      unitTest for DIP                                #
 ########################################################################
 
-noinst_PROGRAMS = unitTest
-
-nodist_unitTest_SOURCES = \
-	MILP_DecompApp.cpp MILP_DecompApp.h \
-	MILP_Main.cpp MILP_Param.h
-
-# List libraries that need to be linked in
-unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS)
-unitTest_DEPENDENCIES = ../src/libDecomp.la $(DIPLIB_DEPENDENCIES)
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS)
-
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src`
 
@@ -52,9 +41,17 @@ if CPLEX_IP_SOLVER
 AM_CPPFLAGS += -D__DECOMP_IP_CPX__
 endif
 
-test: unitTest$(EXEEXT)
 
-	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir `$(CYGPATH_W) $(SAMPLE_DATA)` --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+
+test: ../src/dip$(EXEEXT)
+
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance  `$(GYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(GYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
+	
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(GYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(GYGPATH_W)$(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
+	
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_18.mps --MILP:BlockFile `$(GYGPATH_W)$(SAMPLE_DATA)`/wedding_18.block --MILP:BestKnownLB 13   --MILP::BestKnownUB 13
+
+
 
 .PHONY: test
 
