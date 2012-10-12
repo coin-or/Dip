@@ -14,7 +14,7 @@ test: ../src/dip$(EXEEXT)
 
 	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_17.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_17.block --MILP:BestKnownLB 13   --MILP::BestKnownUB 13
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --MILP:BestKnownLB 11   --MILP::BestKnownUB 11
 
 .PHONY: test
 
