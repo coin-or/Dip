@@ -226,7 +226,7 @@ public:
    
    /*
     * The following parameters are extended from MILPBlock 
-    * applications. 
+    * applications but changed to MILP domain
     *
     */
 
@@ -358,14 +358,14 @@ public:
 
 
       PARAM_getSetting("NumBlocks",NumBlocks); 
-      DataDir      = param.GetSetting("DataDir",      "",    "MILPBlock");
-      Instance     = param.GetSetting("Instance",     "",    "MILPBlock");    
-      BlockFile    = param.GetSetting("BlockFile",    "",    "MILPBlock");
-      PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILPBlock");
+      DataDir      = param.GetSetting("DataDir",      "",    "MILP");
+      Instance     = param.GetSetting("Instance",     "",    "MILP");    
+      BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
+      PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
       BlockFileFormat 
-         = param.GetSetting("BlockFileFormat",    "",    "MILPBlock");    
+         = param.GetSetting("BlockFileFormat",    "",    "MILP");    
       InitSolutionFile
-         = param.GetSetting("InitSolutionFile",    "",    "MILPBlock");    
+         = param.GetSetting("InitSolutionFile",    "",    "MILP");    
 
 
 
@@ -601,7 +601,7 @@ public:
       NumBlocks                = 3; 
 
       /*
-       * parameters from MILPBlock
+       * parameters from MILPBlock and to be MILP
        */
       LogLevel                 = 0;
       DataDir                  = "";

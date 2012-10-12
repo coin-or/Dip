@@ -146,7 +146,7 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
       m_param.dumpSettings();
 
    //---
-   //--- read MILPBlock instance (mps format)
+   //--- read MILP instance (mps format)
    //---
    string fileName = m_param.DataDir 
       + UtilDirSlash() + m_param.Instance;   
@@ -156,9 +156,9 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
 	  << "Users need to provide correct "
 	  << "instance path and name" << std::endl
           << "                                                     " << std::endl 
-	  << "Example: ./dip  --MILPBlock:BlockFileFormat List" << std::endl
-	  << "                --MILPBlock:Instance /FilePath/ABC.mps" << std::endl
-	  << "                --MILPBlock:BlockFile /FilePath/ABC.block" << std::endl
+	  << "Example: ./dip  --MILP:BlockFileFormat List" << std::endl
+	  << "                --MILP:Instance /FilePath/ABC.mps" << std::endl
+	  << "                --MILP:BlockFile /FilePath/ABC.block" << std::endl
 	  << "==========================================================="<< std::endl
 	  << std::endl;
        throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
@@ -385,7 +385,7 @@ void DecompApp::readBlockFile(){
 	   << " is an invalid type. Valid types = (List,Pair,PairName)." 
 	   << endl;
       throw UtilException("Invalid Parameter.", 
-			  "readBlockFile", "MILPBlock_DecompApp");
+			  "readBlockFile", "DecompApp");
    }
 
    //---
@@ -641,7 +641,7 @@ void DecompApp::createModelPart(DecompConstraintSet * model,
    
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
    if(!model->M)
-      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
+      throw UtilExceptionMemory("createModels", "DecompApp");
    model->reserve(nRowsPart, nCols);
    model->M->submatrixOf(*m_mpsIO.getMatrixByRow(), nRowsPart, rowsPart);   
    
@@ -769,7 +769,7 @@ void DecompApp::createModelPartSparse(DecompConstraintSet * model,
    
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
    if(!model->M)
-      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
+      throw UtilExceptionMemory("createModels", "DecompApp");
    model->M->setDimensions(0, nCols);
    model->reserve(nRowsPart, nCols);
 
@@ -887,7 +887,7 @@ void DecompApp::createModels(){
    //---
       double * objective = new double[nCols];
    if(!objective)
-      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
+      throw UtilExceptionMemory("createModels", "DecompApp");
    memcpy(objective, 
           m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
    if(m_param.ObjectiveSense == -1){
@@ -955,7 +955,7 @@ void DecompApp::createModels(){
    //---
    int * colMarker = new int[nCols];
    if(!colMarker)
-      throw UtilExceptionMemory("createModels", "MILPBlock_DecompApp");
+      throw UtilExceptionMemory("createModels", "DecompApp");
    UtilFillN(colMarker, nCols, 0);
    
    vector<int>                      ::iterator vi;
@@ -1119,7 +1119,7 @@ void DecompApp::singlyBorderStructureDetection(){
    
    /*
      throw UtilException("Please provide a valid partitioning model" ,
-			 "initializeApp", "MILPBlock_DecompApp");  
+			 "initializeApp", "DecompApp");  
    */
    
    //======================================================================
