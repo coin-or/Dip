@@ -151,7 +151,7 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    string fileName = m_param.DataDir 
       + UtilDirSlash() + m_param.Instance;   
 
-   if(!fileName.empty()){
+   if(fileName.erase(0,1).empty()){
      cerr << "==========================================================="<< std::endl
 	  << "Users need to provide correct "
 	  << "instance path and name" << std::endl
