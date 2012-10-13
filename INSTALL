@@ -30,7 +30,7 @@ Dip package in two ways:
    Assuming that you want to download a release version 0.82.0, as an example,
    you would execute the command
 
-   svn co https://projects.coin-or.org/svn/Cbc/releases/0.82.0 Cbc-0.82.0
+   svn co https://projects.coin-or.org/svn/DIP/releases/0.82.0 Dip-0.82.0
 
    You can similarly get source for the latest stable version or the trunk
    (development) version.
@@ -43,16 +43,23 @@ Dip package in two ways:
 
    More detailed download instructions can be found at
 
+
+
+3. Go into the ~/Dip-0.82.0/Dip/scripts, 
+   run the three scripts :  get.hmetis.sh, get.patoh.sh and get.test_data.sh
+
+
 **********************************************************************
 ***                        CONFIGURATION                           ***
 **********************************************************************
 
-Go into the directory that you just downloaded or extracted (e.g., Cbc-2.7.0).
+
+Go into the directory that you just downloaded or extracted (e.g., Dip-0.82.0).
 Then create a build directory and configure the package by typing
 
    mkdir build
    cd build
-   ../configure
+   ../configure 
 
 Note that you might have to specify additional options, in case you
 don't want to use the default choices that configure makes (e.g.,
@@ -60,7 +67,7 @@ compilers).  Please visit
 
    https://projects.coin-or.org/BuildTools/
 
-and the Cbc Trac page
+and the Dip Trac page
 
    https://projects.coin-or.org/Dip
 
