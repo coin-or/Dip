@@ -10,9 +10,9 @@ AUTOMAKE_OPTIONS = foreign
 
 test: ../src/dip$(EXEEXT)
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance  /retail3.mps --MILP:BlockFile `$(CYGPATH_W)`../`$(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W)`../`$(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
 
 	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --MILP:BestKnownLB 11   --MILP::BestKnownUB 11
 

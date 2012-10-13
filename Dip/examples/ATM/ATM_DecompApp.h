@@ -191,7 +191,7 @@ public:
       m_classTag  ("ATM-APP"),
       m_objective (NULL)
    {
-      initializeApp(utilParam);
+     ATM_DecompApp::initializeApp(utilParam);
    };
    
    virtual ~ATM_DecompApp() {
