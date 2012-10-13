@@ -51,14 +51,9 @@ void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    //--- read MILPBlock instance (mps format)
    //---
-
-   
    string fileName = m_appParam.DataDir 
       + UtilDirSlash() + m_appParam.Instance;   
 
-   //   std::cout << "the data directory is "
-   //	     << m_appParam.DataDir 
-   //<< std::endl; 
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
    int rstatus = m_mpsIO.readMps(fileName.c_str());   

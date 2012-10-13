@@ -30,11 +30,11 @@ void ATM_DecompApp::initializeApp(UtilParameters & utilParam) {
    //---
    //--- read instance
    //
-   string fileNameA = m_appParam.DataDir_ATM
+   string fileNameA = m_appParam.DataDir
       + UtilDirSlash() + m_appParam.DataAtm;
-   string fileNameD = m_appParam.DataDir_ATM
+   string fileNameD = m_appParam.DataDir
       + UtilDirSlash() + m_appParam.DataDate;
-   string fileNameAD = m_appParam.DataDir_ATM
+   string fileNameAD = m_appParam.DataDir
       + UtilDirSlash() + m_appParam.DataAtmDate;
    m_instance.readInstance(fileNameA,
                            fileNameD,

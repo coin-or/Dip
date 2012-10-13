@@ -29,7 +29,7 @@ using namespace std;
 class ATM_Param {
 public:
    int    LogLevel;          //application log level
-   string DataDir_ATM;           //data directory
+   string DataDir;           //data directory
    string DataAtm;           //data file (atms)
    string DataDate;          //data file (dates)
    string DataAtmDate;       //data file (atms x dates)
@@ -43,7 +43,7 @@ public:
    void getSettings(UtilParameters & utilParam){
       static const char * common = "ATM";
       LogLevel       = utilParam.GetSetting("LogLevel",         0, common);
-      DataDir_ATM    = utilParam.GetSetting("DataDir_ATM",         "", common);
+      DataDir        = utilParam.GetSetting("DataDir",         "", common);
       DataAtm        = utilParam.GetSetting("DataAtm",         "", common);    
       DataDate       = utilParam.GetSetting("DataDate",        "", common);    
       DataAtmDate    = utilParam.GetSetting("DataAtmDate",     "", common);    
@@ -60,7 +60,7 @@ public:
       (*os) << "\n=====================================================\n"
             << "ATM_DECOMP PARAMETER SETTINGS \n";
       (*os) << common << ": LogLevel          : " << LogLevel          << endl;
-      (*os) << common << ": DataDir_ATM       : " << DataDir_ATM       << endl;
+      (*os) << common << ": DataDir           : " << DataDir           << endl;
       (*os) << common << ": DataAtm           : " << DataAtm           << endl;
       (*os) << common << ": DataDate          : " << DataDate          << endl;
       (*os) << common << ": DataAtmDate       : " << DataAtmDate       << endl;
@@ -75,7 +75,7 @@ public:
 public:
    ATM_Param():    
       LogLevel          (0),
-      DataDir_ATM       (""),
+      DataDir           (""),
       DataAtm           (""),
       DataDate          (""),
       DataAtmDate       (""),
