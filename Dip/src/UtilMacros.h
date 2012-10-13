@@ -40,7 +40,7 @@
 const std::string UtilSpaces   = " \t\r\n";
 const double UtilEpsilon  = 1.0e-6;
 const double UtilTooBig   = 1.0e20;
-const double UtilSmallerThanTooBig = 1.0e19;
+const double UtilSmallerThanTooBig = 1.0e12;
 #ifndef INT_MAX
 #define INT_MAX (static_cast<int>((~(static_cast<unsigned int>(0))) >> 1))
 #endif
