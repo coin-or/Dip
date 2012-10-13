@@ -142,6 +142,12 @@ void DecompAlgo::checkBlocksColumns(){
                  << modelRelax2.getBlockId() 
                  << " -> " << modelRelax2.getModelName() << " overlap." 
                  << endl;
+
+	    if(m_param.LogDebugLevel<2){
+	      
+	      throw UtilException("Columns in some blocks overlap.",
+				  "checkBlocksColumns", "DecompAlgo");
+	    }
             set<int>::iterator it;
             for(it  = activeCols1inter2.begin();
                 it != activeCols1inter2.end(); it++){
@@ -186,6 +192,11 @@ void DecompAlgo::checkBlocksColumns(){
                     << setw(25) << modelCore.getModel()->colNames[i] 
                     << " is missing from union of blocks." << endl;
          allColsCovered = false;
+	 
+	 if(m_param.LogDebugLevel<2){
+	   throw UtilException("Some columns not covered in blocks",
+			       "checkBlocksColumns", "DecompAlgo");
+	 }
       }
    }
 #ifndef DECOMP_MASTERONLY_DIRECT
