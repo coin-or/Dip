@@ -1,4 +1,4 @@
-cd ../../build_informs/Data/Sample
+cd ../../Data/Sample
 
 wget http://coral.ie.lehigh.edu/~jiadongwang/DIP/make_test/atm_5_10_1.block
 
