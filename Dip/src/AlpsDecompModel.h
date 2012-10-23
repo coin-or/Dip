@@ -73,6 +73,15 @@ private:
     * @{      
     */
    //----------------------------------------------------------------------//
+
+
+  /*
+   * using m_osLog instead of cout
+   */
+  std::ostream * m_osLog;
+
+
+
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */

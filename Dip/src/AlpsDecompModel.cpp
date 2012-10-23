@@ -23,8 +23,8 @@ using namespace std;
 
 //===========================================================================//
 void AlpsDecompModel::setAlpsSettings(){
-   //TODO: use stream not cout
-   UtilPrintFuncBegin(&cout, m_classTag,
+
+   UtilPrintFuncBegin(m_osLog, m_classTag,
                       "setAlpsSettings()", m_param.msgLevel, 3);
 
    AlpsPar()->setEntry(AlpsParams::logFileLevel,    m_param.logFileLevel);
@@ -37,7 +37,7 @@ void AlpsDecompModel::setAlpsSettings(){
    double timeLimit = m_decompAlgo->getParam().LimitTime;
    AlpsPar()->setEntry(AlpsParams::timeLimit,       timeLimit);
 
-   UtilPrintFuncEnd(&cout, m_classTag,
+   UtilPrintFuncEnd(m_osLog, m_classTag,
                     "setAlpsSettings()", m_param.msgLevel, 3);
 }
 
@@ -49,7 +49,7 @@ AlpsTreeNode * AlpsDecompModel::createRoot(){
    //--- Create the root node description and set explicit (no diff'ing)
    //---    NOTE: Alps will delete this memory;
    //---
-   UtilPrintFuncBegin(&cout, m_classTag,
+   UtilPrintFuncBegin(m_osLog, m_classTag,
                       "createRoot()", m_param.msgLevel, 3);
 
    AlpsDecompTreeNode * root = new AlpsDecompTreeNode();
@@ -70,7 +70,7 @@ AlpsTreeNode * AlpsDecompModel::createRoot(){
    root->setDesc(desc);
    //root->setExplicit(1);  
    
-   UtilPrintFuncEnd(&cout, m_classTag,
+   UtilPrintFuncEnd(m_osLog, m_classTag,
                     "setAlpsSettings()", m_param.msgLevel, 3);
 
    return root;
@@ -136,7 +136,7 @@ AlpsExitStatus AlpsDecompModel::solve(){
    globalTimer.reset();
 #endif
 
-   UtilPrintFuncBegin(&cout, m_classTag,
+   UtilPrintFuncBegin(m_osLog, m_classTag,
                       "solve()", m_param.msgLevel, 3);
 
    //---
@@ -186,7 +186,7 @@ AlpsExitStatus AlpsDecompModel::solve(){
    }
    m_alpsStatus = alpsBroker.getSolStatus();
 
-   UtilPrintFuncEnd(&cout, m_classTag,
+   UtilPrintFuncEnd(m_osLog, m_classTag,
                     "solve()", m_param.msgLevel, 3);
 
    return alpsBroker.getSolStatus();
