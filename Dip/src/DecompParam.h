@@ -555,12 +555,12 @@ public:
       TailoffPercent       = 0.10;
       MasterGapLimit       = 1.0e-6;
       PCStrategy           = 0; 
-      CompressColumns      = 1;
+      CompressColumns      = 0;
       CompressColumnsIterFreq       = 2;
       CompressColumnsSizeMultLimit  = 1.20;
       CompressColumnsMasterGapStart = 0.20;
       CutDC                = 0;
-      CutCGL               = 1;
+      CutCGL               = 0;
       CutCglKnapC          = 1;
       CutCglFlowC          = 1;
       CutCglMir            = 1;
@@ -575,6 +575,7 @@ public:
       SubProbNumThreads       = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
+      
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
       SolveMasterAsIp          = 1;//TODO: turn off if one block
@@ -584,6 +585,7 @@ public:
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
+
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;

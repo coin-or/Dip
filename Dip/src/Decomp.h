@@ -169,6 +169,7 @@ enum DecompSolverType {
    DecompDualSimplex = 0,
    DecompPrimSimplex = 1,
    DecompBarrier     = 2
+   //   DecompVolume      = 3
 };
 
 enum DecompRoundRobin {

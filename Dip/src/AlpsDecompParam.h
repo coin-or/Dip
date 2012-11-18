@@ -93,6 +93,7 @@ public:
       checkMemory     = param.GetSetting("checkMemory",     false,        sec);
       msgLevel        = param.GetSetting("msgLevel",        2,            sec);
       nodeLimit       = param.GetSetting("nodeLimit",       ALPS_INT_MAX, sec);
+      //nodeLimit       = param.GetSetting("nodeLimit",       1, sec);
       nodeLogInterval = param.GetSetting("nodeLogInterval", 10,           sec);
       if(msgLevel > 2)
 	 dumpSettings();

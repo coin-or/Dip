@@ -521,6 +521,10 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
 			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
 			      CPXMIP_TIME_LIM_FEAS,
 			      CPXMIP_INFEASIBLE};
+
+   if(result->m_solStatus == CPXMIP_INForUNBD) 
+     result->m_solStatus = CPXMIP_INFEASIBLE;  
+
    if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
       cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CPX solver status", 

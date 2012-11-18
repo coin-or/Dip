@@ -32,7 +32,6 @@ std::queue<int> DecompAlgo::subprobQueue;
 
 
 
-//#define   DO_INTERIOR //also in DecompAlgoPC
 
 //===========================================================================//
 //#define STAB_DUMERLE
@@ -2556,11 +2555,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //if we allow for interior, need crossover too?
 
 #ifdef __DECOMP_LP_CPX__
-   //int cpxStat=0, cpxMethod=0;
+   int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface * masterCpxSI 
       = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-   //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+   CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
    CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
@@ -2576,37 +2575,45 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    case PHASE_PRICE1:
    case PHASE_PRICE2:
       m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
+      m_masterSI->setHintParam(OsiDoPresolveInResolve,true, OsiHintDo);
+	
 
       if(m_param.SolveMasterUpdateAlgo == DecompDualSimplex)
-	 m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+	m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+      else if (m_param.SolveMasterUpdateAlgo == DecompPrimSimplex)
+	m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+      else if(m_param.SolveMasterUpdateAlgo == DecompBarrier)
+	m_masterSI->setHintParam(OsiDoBarrierInResolve,true, OsiHintDo); 
       else
-	 m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
-      //TODO: interior
 
+	throw UtilException("Master Method Unspecified", "solutionUpdate", "DecompAlgo"); 
+      
+      ; 
+      
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
 
-#if defined(DO_INTERIOR) && defined(__DECOMP_LP_CPX__)
-
-      //TODO: option, not compile time
-
-      //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
-      CPXbaropt(env, lp);
-      cpxMethod = CPXgetmethod(env, lp);
-      cpxStat = CPXgetstat(env, lp);
-      //if(cpxStat)
-      // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
-
-#else
       if (resolve){
 	 m_masterSI->resolve();
       }else{
 	 m_masterSI->initialSolve();
       }
-#endif
+
       break;
    case PHASE_CUT:
-      m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+     m_masterSI->setHintParam(OsiDoPresolveInResolve,true, OsiHintDo);
+
+     if(m_param.SolveMasterUpdateAlgo == DecompDualSimplex)
+       m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
+      else if (m_param.SolveMasterUpdateAlgo == DecompPrimSimplex)
+	m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+      else if(m_param.SolveMasterUpdateAlgo == DecompBarrier)
+	m_masterSI->setHintParam(OsiDoBarrierInResolve,true, OsiHintDo); 
+      else
+	throw UtilException("Master Method Unspecified", "solutionUpdate", "DecompAlgo"); 
+	
+	; 
+
       if (resolve){
 	 m_masterSI->resolve();
       }else{
@@ -2640,13 +2647,18 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
               }
               );
 #endif
+
+   int statusCheck ; 
+
+
 #ifdef __DECOMP_LP_CPX__  
-   //int cpxStat = CPXgetstat(env, lp);
-   //if(cpxStat)
-   // printf("cpxStat = %d\n", cpxStat);   
+   cpxStat = CPXgetstat(env, lp);
+   
+   statusCheck = cpxStat; 
 #endif
 
    
+
    UTIL_DEBUG(m_param.LogDebugLevel, 3,
 	      (*m_osLog)
 	      << "Iteration Count               : "
@@ -2667,7 +2679,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 	      << m_masterSI->isIterationLimitReached() << "\n";
 	      );
                 
-   if(m_masterSI->isProvenOptimal()){
+   if(m_masterSI->isProvenOptimal()||(statusCheck ==1)){
       status = STAT_FEASIBLE;  
 
       //if we are using cpx, we need to save the 
@@ -2712,9 +2724,13 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //---   
       //--- Check to see if some lambda < 0 - i.e., junk. If so, assume that
       //---  it meant to return infeasible.
-      //---
+      //--- 
+      //--- actually, we might change primSol[i]< tol instead of 0 since the 
+      //--- same experience happened to using cplex barrier agorithm. it is optimal
+      //--- but the optimal solution 0 is actually a small negative value, 
+      //--- 
       for(i = 0; i < nCols; i++){
-         if(primSol[i] < -1){
+         if(primSol[i] < -m_param.TolZero){
             (*m_osLog) << "ERROR: NEGATIVE LAMBDA, but Osi returns as optimal"
                        << " assume it was meant to be infeasible." << endl;
             status = STAT_INFEASIBLE;
@@ -2722,7 +2738,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       }
    }
    else if(m_masterSI->isProvenPrimalInfeasible() ||
-	   m_masterSI->isProvenDualInfeasible()){
+	   m_masterSI->isProvenDualInfeasible()||(statusCheck==2)){
       //for interior, if infeasible, the status is not
       //  getting picked up properly by OSI
 
@@ -2740,14 +2756,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    }
    else
       {
-#ifdef DO_INTERIOR
-	 if(m_masterSI->isDualObjectiveLimitReached()){
-	    status = STAT_INFEASIBLE;
-	 }
-	 else
-#endif
 	    {
-	       assert(0);
+	      //	       assert(0);
 	    }
       }
 
@@ -4680,7 +4690,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       const CoinPackedMatrix * M     = m_masterSI->getMatrixByRow();
       double                 * uA    = new double[nCols];
       M->transposeTimes(pi, uA);
-#ifndef DO_INTERIOR 
+      //#ifndef DO_INTERIOR 
       for(i = 0; i < nCols; i++){
 	 if(!UtilIsZero( x[i], 1.0e-5 ) &&
 	    !UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ){
@@ -4694,7 +4704,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	    assert(0);
 	 }      
       }
-#endif
+      //#endif
       UTIL_DELARR(uA);
    }
 
