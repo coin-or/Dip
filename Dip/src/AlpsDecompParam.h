@@ -79,6 +79,13 @@ public:
    int nodeLogInterval;
 
 
+   /**
+    * Search Strategy 
+    */
+
+   int searchStrategy; 
+
+   
    //-----------------------------------------------------------------------//
    /**
     * @name Helper functions.
@@ -93,8 +100,9 @@ public:
       checkMemory     = param.GetSetting("checkMemory",     false,        sec);
       msgLevel        = param.GetSetting("msgLevel",        2,            sec);
       nodeLimit       = param.GetSetting("nodeLimit",       ALPS_INT_MAX, sec);
-      //nodeLimit       = param.GetSetting("nodeLimit",       1, sec);
       nodeLogInterval = param.GetSetting("nodeLogInterval", 10,           sec);
+      searchStrategy  = param.GetSetting("searchStrategy",  0,            sec); 
+
       if(msgLevel > 2)
 	 dumpSettings();
    }

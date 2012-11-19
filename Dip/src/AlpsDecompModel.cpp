@@ -33,6 +33,7 @@ void AlpsDecompModel::setAlpsSettings(){
    AlpsPar()->setEntry(AlpsParams::msgLevel,        m_param.msgLevel);
    AlpsPar()->setEntry(AlpsParams::nodeLimit,       m_param.nodeLimit);
    AlpsPar()->setEntry(AlpsParams::nodeLogInterval, m_param.nodeLogInterval);
+   AlpsPar()->setEntry(AlpsParams::searchStrategy, m_param.searchStrategy); 
 
    double timeLimit = m_decompAlgo->getParam().LimitTime;
    AlpsPar()->setEntry(AlpsParams::timeLimit,       timeLimit);
