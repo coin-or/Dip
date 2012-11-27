@@ -522,7 +522,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
 			      CPXMIP_TIME_LIM_FEAS,
 			      CPXMIP_INFEASIBLE};
 
-   if(result->m_solStatus == CPXMIP_INForUNBD) 
+   if(result->m_solStatus == CPXMIP_INForUNBD || result->m_solStatus == CPXMIP_UNBOUNDED) 
      result->m_solStatus = CPXMIP_INFEASIBLE;  
 
    if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
