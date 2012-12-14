@@ -413,6 +413,10 @@ Dip/src/DecompMemPool.h -text
 Dip/src/DecompModel.cpp -text
 Dip/src/DecompModel.h -text
 Dip/src/DecompParam.h -text
+Dip/src/DecompRay.cpp -text
+Dip/src/DecompRay.h -text
+Dip/src/DecompRayPool.cpp -text
+Dip/src/DecompRayPool.h -text
 Dip/src/DecompSolution.h -text
 Dip/src/DecompSolverResult.h -text
 Dip/src/DecompStats.cpp -text

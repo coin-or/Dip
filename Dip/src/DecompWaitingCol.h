@@ -26,7 +26,9 @@ class DecompWaitingCol {
  private:
   DecompVar        * m_var;  //s        the variable
   CoinPackedVector * m_col;  //(A'' s)  the column
-  
+  DecompRay        * m_ray;  // r        the ray
+  DecompRay        * m_col_ray;  // (A''r) the column that corresponds to the ray
+
  public:
   inline DecompVar        * getVarPtr() const { return m_var; }
   inline CoinPackedVector * getColPtr() const { return m_col; }
