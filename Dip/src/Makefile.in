@@ -94,12 +94,12 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libDecomp_la_LIBADD =
 am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	DecompAlgoPC.lo DecompAlgoRC.lo DecompAlgoCGL.lo DecompCut.lo \
-	DecompCutPool.lo DecompApp.lo DecompStats.lo DecompDebug.lo \
-	DecompModel.lo DecompVar.lo DecompVarPool.lo DecompBranch.lo \
-	DecompConstraintSet.lo UtilGraphLib.lo UtilHash.lo \
-	UtilMacros.lo UtilMacrosDecomp.lo UtilParameters.lo \
-	UtilKnapsack.lo AlpsDecompModel.lo AlpsDecompTreeNode.lo \
-	UtilMacrosAlps.lo
+	DecompCutPool.lo DecompRay.lo DecompRayPool.lo DecompApp.lo \
+	DecompStats.lo DecompDebug.lo DecompModel.lo DecompVar.lo \
+	DecompVarPool.lo DecompBranch.lo DecompConstraintSet.lo \
+	UtilGraphLib.lo UtilHash.lo UtilMacros.lo UtilMacrosDecomp.lo \
+	UtilParameters.lo UtilKnapsack.lo AlpsDecompModel.lo \
+	AlpsDecompTreeNode.lo UtilMacrosAlps.lo
 libDecomp_la_OBJECTS = $(am_libDecomp_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -381,7 +381,8 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	DecompAlgoC.h DecompAlgoD.cpp DecompAlgoD.h DecompAlgoPC.cpp \
 	DecompAlgoPC.h DecompAlgoRC.cpp DecompAlgoRC.h \
 	DecompAlgoCGL.cpp DecompAlgoCGL.h DecompCut.cpp DecompCut.h \
-	DecompCutOsi.h DecompCutPool.cpp DecompCutPool.h DecompApp.cpp \
+	DecompCutOsi.h DecompCutPool.cpp DecompCutPool.h DecompRay.cpp \
+	DecompRay.h DecompRayPool.cpp DecompRayPool.h DecompApp.cpp \
 	DecompApp.h Decomp.h DecompStats.cpp DecompStats.h \
 	DecompDebug.cpp DecompModel.cpp DecompModel.h DecompParam.h \
 	DecompVar.cpp DecompVar.h DecompVarPool.cpp DecompVarPool.h \
@@ -587,6 +588,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompDebug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompMain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompModel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompRay.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompRayPool.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompStats.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompVar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompVarPool.Plo@am__quote@

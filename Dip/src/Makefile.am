@@ -41,7 +41,11 @@ libDecomp_la_SOURCES +=   \
 	DecompCut.h       \
 	DecompCutOsi.h    \
 	DecompCutPool.cpp \
-	DecompCutPool.h  
+	DecompCutPool.h   \
+	DecompRay.cpp     \
+        DecompRay.h       \
+	DecompRayPool.cpp \
+        DecompRayPool.h
 
 # DecompApp
 libDecomp_la_SOURCES +=  \
