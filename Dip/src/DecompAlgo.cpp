@@ -30,7 +30,8 @@
 
 std::queue<int> DecompAlgo::subprobQueue;
 
-//#define deleteColumn
+
+
 
 //===========================================================================//
 //#define STAB_DUMERLE
@@ -2365,294 +2366,6 @@ void DecompAlgo::setSubProbBounds(const double * lbs,
 }
 
 //--------------------------------------------------------------------- //
-/*
-void DecompAlgo::setMasterBounds(const double * lbs,
-                                 const double * ubs){
-
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "setMasterBounds()", m_param.LogDebugLevel, 2);
-
-   //TODO: how to handle case where relax is not defined explicitly
-   //  like in GAP... 
-   bool           isRoot                    = getNodeIndex() ? false : true;
-   if(!m_param.BranchEnforceInMaster ){
-      assert(m_param.BranchEnforceInSubProb);
-      //---
-      //--- Must remove (or fix to 0) any column in master that 
-      //---    does not satisfy the branching bounds.
-      //--- However -- be careful that these bounds should
-      //---    only be applied to their relevant blocks.
-      //---
-      //--- For example, if branch is x(abc,2)=1, and 2 is 
-      //---    the block id, we do not want to remove columns
-      //---    in block 1 where x(abc,1)=0. That is a partial
-      //---    column which might have x(abc,2)=0 in projected
-      //---    space, but should remain in that branching node.
-      //--- Otherwise, it will just be reproduced at the next 
-      //---    phase of generating vars for block 0.
-      //---
-      DecompVarList::iterator li;            
-      int            masterColIndex;      
-      DecompConstraintSet * modelCore = m_modelCore.getModel();   
-      const int             nCols     = modelCore->getNumCols();
-      const double        * colUB     = m_masterSI->getColUpper();
-      double              * denseS    = new double[nCols];
-
-      #ifdef deleteColumn
-
-      const int      nMasterCols               = modelCore->getNumCols();
-      const int      nMasterRows               = modelCore->getNumRows();
-      int    c;
-      int  * basics  = new int[nMasterRows];
-      bool * isBasic = new bool[nMasterCols]; 
-      assert(basics && isBasic);
-
-      UtilFillN(isBasic, nMasterCols, false); 
-
-      int nColsNoDel  = 0;
-      int nColsBasic  = 0;
-      
-      if(m_param.SolveMasterUpdateAlgo !=DecompBarrier && !isRoot){
-	bool            mustDeleteWS = false;
-	CoinWarmStartBasis * warmStart    
-	  = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(mustDeleteWS));
-	for(c = 0; c < nMasterCols; c++){
-	  if(warmStart->getStructStatus(c) == CoinWarmStartBasis::basic)
-	    isBasic[c] = true;
-	}
-	if(mustDeleteWS)
-	  UTIL_DELPTR(warmStart);
-      }
-      
-      vector<int> lpColsToDelete;
-      vector<int> indexShift;
-      int shift       = 0;
-      int nMasterColsStruct = 0;
-      UtilFillN(indexShift, nMasterCols,0);
-      #endif
-
-      map<int, DecompAlgoModel>::iterator mit;
-      for(li = m_vars.begin(); li != m_vars.end(); li++){
-	masterColIndex = (*li)->getColMasterIndex();
-	assert(isMasterColStructural(masterColIndex));
-	mit = m_modelRelax.find((*li)->getBlockId());
-	assert(mit != m_modelRelax.end());
-	#ifdef deleteColumn
-	indexShift[masterColIndex] = shift; 
-	#endif
-	if(!(*li)->doesSatisfyBounds(nCols,denseS, 
-				     mit->second,
-				     lbs,ubs)){    
-	  //---
-	  //--- if needs to be fixed
-	  //---
-
-	  if(colUB[masterColIndex] > DecompEpsilon){
-     #ifndef deleteColumn
-	    m_masterSI->setColBounds(masterColIndex, 0.0, 0.0);
-	    if(m_param.LogDebugLevel >= 4){
-	      (*m_osLog) << "Set masterColIndex=" << masterColIndex
-			 << " UB to 0" << endl;
-	      (*li)->print(m_osLog, modelCore->getColNames());
-	    }
-
-      #elif defined deleteColumn
-	   // Instead of getting rid of the violated column by imposing
-	   //   lb and ub to zero, we just delete them
-	    //	   indexShift[masterColIndex] = shift; 
-	   assert(isMasterColStructural(masterColIndex));
-
-	   //---
-	   //--- do not delete any columns that were marked "NoDelete" 
-	   //---   these were degenerate points and deleting them can 
-	   //---   cause cycling
-	   //---
-	   if(m_masterColType[masterColIndex] == DecompCol_Structural_NoDelete){
-	     //	     li++;
-	     nColsNoDel++;
-	     continue;}
-
-	   //---
-	   //--- do not delete any columns that are basic
-	   //---
-	   //   if( !isRoot && isBasic[masterColIndex])
-	   //  nColsBasic++;
-	     
-	   //  if( !isRoot && isBasic[masterColIndex]){
-	     //  li++;
-	   //   continue;
-	   // }
-	   
-	   delete *li; 
-	   li = m_vars.erase(li);
-	    
-	   lpColsToDelete.push_back(masterColIndex);
-	   std::cout <<"the column going to delete is "<< masterColIndex << std::endl;
-	   m_masterColType[masterColIndex] = DecompCol_ToBeDeleted;
-	   shift ++;
-         #endif
-	 }
-
-      
-	 else{
-	    //---
-	    //--- if needs to be unfixed (from previous node)
-	    //---
-	    if(colUB[masterColIndex] <= 0){	       
-	       m_masterSI->setColBounds(masterColIndex, 0.0, DecompInf);
-	       if(m_param.LogDebugLevel >= 4){
-		  (*m_osLog) << "Set masterColIndex=" << masterColIndex
-			     << " UB to INF" << endl;
-		  (*li)->print(m_osLog, modelCore->getColNames());
-	       }
-	    }
-	 }
-	  
-	  
-	 
-	}
-         
-      }
-#ifdef deleteColumn
-	  UTIL_DELARR(basics);
-	  UTIL_DELARR(isBasic);
-	  #endif 
-
-      #ifdef deleteColumn
-      if(lpColsToDelete.size() > 0){
-	
-	/*for(c = 0; c < m_masterSI->getNumCols(); c++){	
-	  const string colN = m_masterSI->getColName(c);
-	  printf("Before Col[%4d] Name: %30s Type: %20s\n",
-	  c, 
-	  colN.c_str(),
-	  DecompColTypeStr[m_masterColType[c]].c_str());
-	  }
-
-
-	m_masterSI->deleteCols(static_cast<int>(lpColsToDelete.size()), 
-			       &lpColsToDelete[0]);
-	
-	m_cutpool.setRowsAreValid(false);
-	
-	//---
-	//--- now, we must update the mapping between LP index and 
-	//---  the index in the var list objects - but we might have
-	//---  artificial columns lurking in between the LP columns
-	//---
-	//--- reset the master index in m_vars
-	//---
-	for(li = m_vars.begin(); li != m_vars.end(); li++){
-	  masterColIndex = (*li)->getColMasterIndex();
-	  (*li)->setColMasterIndex(masterColIndex - indexShift[masterColIndex]);
-	}
-      
-	//---
-	//--- delete the entries in vector m_masterColType
-	//---   NOTE: this would be much faster if used list instead of vector
-	//---
-	vector<DecompColType>::iterator vi = m_masterColType.begin();
-
-	std::cout << "The number of col type is " << static_cast<int>(m_masterColType.size()) << std::endl;
-	while(vi != m_masterColType.end()){
-	  if(*vi == DecompCol_ToBeDeleted)
-	    vi = m_masterColType.erase(vi);
-	  else
-	    vi++;
-	}
-      
-	//---
-	//--- sanity check
-	//---    m_vars should contain just the structural columns
-	//---
-	int nMasterColsNew = m_masterSI->getNumCols();
-	nMasterColsStruct  = 0;
-	assert(nMasterColsNew == static_cast<int>(m_masterColType.size()));
-	for(li = m_vars.begin(); li != m_vars.end(); li++){
-	  masterColIndex = (*li)->getColMasterIndex();
-	  std::cout << "isMasterColStructural(masterColIndex)  " << masterColIndex <<"   " <<    isMasterColStructural(masterColIndex)<<std::endl;
-	  assert(isMasterColStructural(masterColIndex));
-	}
-	for(c = 0; c < nMasterColsNew; c++){
-	  if(isMasterColStructural(c))
-	    nMasterColsStruct++;
-	}
-	assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
-      
-      }
-
-#endif
-
-      UTIL_DELARR(denseS);
-   }      
-   else{
-      int                   c, coreColIndex;
-      DecompConstraintSet * modelCore = m_modelCore.getModel();   
-      const int             nIntVars  = modelCore->getNumInts();
-      //const int             nCols     = modelCore->getNumCols();
-      const int             beg       = modelCore->nBaseRowsOrig;
-   
-      //TODO: can reuse this memory
-      int      nRows   = 2 * nIntVars;
-      int    * index   = new int[nRows];
-      char   * sense   = new char[nRows];
-      double * rhs     = new double[nRows];
-      double * range   = new double[nRows];
-      const int * integerVars = modelCore->getIntegerVars();
-   
-   
-      //lbs,ubs is indexed on core column index
-      // but c is being looped over integers here... 
-   
-      //---
-      //--- the row index for column c's UB (x <= u) is: beg            + c
-      //--- the row index for column c's LB (x >= l) is: beg + nIntVars + c
-      //---
-      for(c = 0; c < nIntVars; c++){
-	 //x <= u
-	 coreColIndex = integerVars[c];
-	 index[c]     = beg + c; //row index into master
-	 sense[c]     = 'L';
-	 rhs  [c]     = ubs[coreColIndex];
-	 range[c]     = 0.0;
-	 if(m_masterRowType[beg+c] != DecompRow_Branch){
-	    printf("ERROR: row %d type: %s\n",
-		   beg+c,
-		   DecompRowTypeStr[m_masterRowType[beg+c]].c_str());
-	 }
-	 assert(m_masterRowType[beg+c] == DecompRow_Branch);
-      }
-
-      for(c = nIntVars; c < (2*nIntVars); c++){
-	 //x >= l
-	 coreColIndex = integerVars[c - nIntVars];
-	 index[c]     = beg + c; 
-	 sense[c]     = 'G';
-	 rhs  [c]     = lbs[coreColIndex];
-	 range[c]     = 0.0;
-	 if(m_masterRowType[beg+c] != DecompRow_Branch){
-	    printf("ERROR: row %d type: %s\n",
-		   beg+c,
-		   DecompRowTypeStr[m_masterRowType[beg+c]].c_str());
-	 }
-	 assert(m_masterRowType[beg+c] == DecompRow_Branch);
-      }
-   
-      m_masterSI->setRowSetTypes(index, index+(2*nIntVars), sense, rhs, range);
-      UTIL_DELARR(index);
-      UTIL_DELARR(sense);
-      UTIL_DELARR(rhs);
-      UTIL_DELARR(range);
-
-   }
-   
-
-
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "setMasterBounds()", m_param.LogDebugLevel, 2);   
-}
-*/
-
 void DecompAlgo::setMasterBounds(const double * lbs,
                                  const double * ubs){
 
@@ -2736,7 +2449,7 @@ void DecompAlgo::setMasterBounds(const double * lbs,
       const int * integerVars = modelCore->getIntegerVars();
    
    
-      // lbs,ubs is indexed on core column index
+      //lbs,ubs is indexed on core column index
       // but c is being looped over integers here... 
    
       //---
@@ -7486,10 +7199,6 @@ void DecompAlgo::recomposeSolution(const double * solution,
    for(li = m_vars.begin(); li != m_vars.end(); li++){
       colIndex = (*li)->getColMasterIndex();
       lamSol   = solution[colIndex];
-
-      //  std::cout << "colIndex is " << colIndex << std::endl;
-      // std::cout << "m_masterSI->getNumCols is " << m_masterSI->getNumCols() << std::endl;
-      // std::cout << "size of m_vars is " << static_cast<int>(m_vars.size()) << std::endl;
       assert(colIndex < m_masterSI->getNumCols());
       assert(isMasterColStructural(colIndex));
       if(lamSol > m_param.TolZero){
@@ -7508,7 +7217,6 @@ void DecompAlgo::recomposeSolution(const double * solution,
 	}
       }
    }
-   std::cout << "end" << std::endl;
 #ifdef DECOMP_MASTERONLY_DIRECT
    //---
    //--- now set the master-only variable assignments
