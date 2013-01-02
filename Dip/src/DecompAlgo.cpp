@@ -552,6 +552,43 @@ void DecompAlgo::getModelsFromApp(){
                           "getModelsFromApp", "DecompAlgo");
 
    m_objective = m_app->m_objective;
+
+   if((m_param.MasterUB!= DecompInf || m_param.MasterLB!= -DecompInf)
+      && m_param.setMasterBound){
+    
+     CoinPackedVector auxilRow; 
+
+     DecompConstraintSet * core  = m_app->m_modelCore.getModel();
+     
+     int nCols  = core->getNumCols();
+
+     std::cout << "the number of nCols is " << nCols << std::endl;
+    
+     for (int i = 0 ; i < nCols; i ++){
+       
+       auxilRow.insert(i,m_objective[i]);
+       
+     }
+
+     /*row Name for the master bound */
+     string rowNameMB("DecompRow_Original"); 
+   
+     if (m_param.MasterUB != DecompInf){
+       m_app->m_modelCore.getModel()->appendRow(auxilRow,-DecompInf,
+						m_param.MasterUB , rowNameMB );
+   
+       m_app->m_modelCore.getModel()->rowSense.push_back('L'); 
+     }
+   
+     if (m_param.MasterLB != -DecompInf){
+       m_app->m_modelCore.getModel()->appendRow(auxilRow,m_param.MasterLB,
+						DecompInf , rowNameMB);
+       
+       m_app->m_modelCore.getModel()->rowSense.push_back('G'); 
+    }
+ 
+  }
+
    m_modelCore = m_app->m_modelCore;
 
    map<int, DecompAppModel>         ::iterator mit;
