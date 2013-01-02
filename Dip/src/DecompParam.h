@@ -274,6 +274,14 @@ public:
 
    int AutoDecomp; 
 
+
+   double MasterLB; 
+
+   double MasterUB; 
+
+   int setMasterBound; 
+
+
    /**
     * @}
     */
@@ -387,6 +395,13 @@ public:
       PARAM_getSetting("ObjectiveSense",ObjectiveSense);
 
       PARAM_getSetting("AutoDecomp", AutoDecomp); 
+
+      PARAM_getSetting("MasterUB", MasterUB);
+      PARAM_getSetting("MasterLB", MasterLB);
+      PARAM_getSetting("setMasterBound", setMasterBound);
+
+
+
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -532,6 +547,11 @@ public:
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
 
       UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
+      UtilPrintParameter(os, sec,  "MasterLB", MasterLB);
+      
+      UtilPrintParameter(os, sec,  "MasterUB", MasterUB);
+ 
+      UtilPrintParameter(os, sec,  "setMasterBound", setMasterBound);
 
       (*os) << "========================================================\n";
    }
@@ -622,6 +642,11 @@ public:
       ObjectiveSense           = 1;
 
       AutoDecomp               = 0;
+
+      setMasterBound           = 0 ; 
+      MasterUB                 = DecompInf; 
+      MasterLB                 = -DecompInf; 
+
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

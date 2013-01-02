@@ -81,6 +81,27 @@ const std::string DecompAlgoStr[5] = {
    "DECOMP"
 };
 
+
+//--- DECOMP branching strategies 
+//---
+enum DecompBranchingStrategy{
+  DecompBranchingMostFractional,
+  DecompBranchingPseudoCost,
+  DecompBranchingStrong,
+  DecompBranchingHybrid
+};
+
+const std::string DecompBranchingStrategy[4] =  {
+   "DecompBranchingMostFractional", 
+   "DecompBranchingPseudoCost", 
+   "DecompBranchingStrong", 
+   "DecompBranchingHybrid"
+};
+
+
+
+
+
 //---
 //--- node stopping criteria
 //---

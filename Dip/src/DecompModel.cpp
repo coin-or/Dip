@@ -513,18 +513,33 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    result->m_solStatus2 = 0;
    //printf("cplex status  = %d\n", result->m_solStatus);
    //printf("cplex status2 = %d\n", result->m_solStatus2);
-
+   
    const int statusSet1[3] = {CPXMIP_OPTIMAL,
 			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
 			      CPXMIP_TIME_LIM_FEAS};
+   
    const int statusSet2[4] = {CPXMIP_OPTIMAL,
 			      CPXMIP_OPTIMAL_TOL, //for stopping on gap
 			      CPXMIP_TIME_LIM_FEAS,
 			      CPXMIP_INFEASIBLE};
-
-   if(result->m_solStatus == CPXMIP_INForUNBD || result->m_solStatus == CPXMIP_UNBOUNDED) 
+   
+   /*
+   if(result->m_solStatus == CPXMIP_INForUNBD 
+      || result->m_solStatus == CPXMIP_UNBOUNDED
+      || result->m_solStatus ==CPXMIP_INFEASIBLE) 
      result->m_solStatus = CPXMIP_INFEASIBLE;  
+   */
 
+   
+   if(result->m_solStatus == CPXMIP_INForUNBD ||result->m_solStatus ==CPXMIP_INFEASIBLE)
+     result->m_solStatus = CPXMIP_INFEASIBLE;
+   
+
+   /*
+   if(result->m_solStatus == CPXMIP_UNBOUNDED && result->m_nSolutions>=1){
+     result->m_solStatus = CPXMIP_OPTIMAL_TOL;
+   }
+   */
    if(!UtilIsInSet(result->m_solStatus, statusSet2, 4)){
       cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CPX solver status", 
@@ -536,6 +551,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //---   unless due to cutoff. But, after branching it
    //---   can be infeasible.
    //---
+   
+   /*
    if(!doCutoff && isRoot){
       if(!UtilIsInSet(result->m_solStatus, statusSet1, 3)){
          cerr << "Error: CPX IP solver 2nd status = " 
@@ -552,7 +569,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
                              "solveOsiAsIp", "DecompAlgoModel");
       }
    }
-   
+   */
+
+
    //---
    //--- update results object 
    //---
