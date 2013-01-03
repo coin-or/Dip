@@ -281,6 +281,7 @@ public:
    
    int setMasterBound;  
 
+   double MasterIPUB; 
 
 
    /**
@@ -404,7 +405,7 @@ public:
       PARAM_getSetting("MasterUB", MasterUB); 
       PARAM_getSetting("MasterLB", MasterLB); 
       PARAM_getSetting("setMasterBound", setMasterBound); 
-
+      PARAM_getSetting("MasterUB", MasterIPUB); 
 
 
 
@@ -556,6 +557,8 @@ public:
       
       UtilPrintParameter(os, sec,  "MasterUB", MasterUB); 
       
+      UtilPrintParameter(os, sec,  "MasterUB", MasterIPUB); 
+      
       UtilPrintParameter(os, sec,  "setMasterBound", setMasterBound); 
     
 
@@ -656,6 +659,8 @@ public:
       
       MasterLB                 = -DecompInf;  
 
+
+      MasterIPUB               = DecompInf
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

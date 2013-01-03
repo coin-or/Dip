@@ -1679,7 +1679,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
    m_nodeStats.objBest.first  = -DecompInf;
    //else
    //m_nodeStats.objBest.first  = globalLB;
-   m_nodeStats.objBest.second = globalUB;
+   m_nodeStats.objBest.second = std::min(globalUB, m_param.MasterIPUB);
    m_compressColsLastPrice    = 0;
    m_compressColsLastNumCols  = m_masterSI->getNumCols();
    m_phaseIObj.clear();
@@ -1881,8 +1881,28 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 		  << UtilDblToStr(m_nodeStats.objBest.first)
 		  << " Global UB= " 
 		  << UtilDblToStr(m_nodeStats.objBest.second) << "." << endl;);
+
 	 m_stopCriteria = DecompStopBound;
 	 m_phase        = PHASE_DONE;	 	 
+
+
+	 if(m_nodeStats.objBest.first >=
+	    (m_nodeStats.objBest.second - 1) && 
+	    m_nodeStats.objBest.second == m_param.MasterUB){
+	   
+	   
+	   UTIL_MSG(m_param.LogLevel, 2,
+		    (*m_osLog)
+		    << "*********************************************"
+		    << " The global Upper bound was e set too tigh " 
+		    << "********************************************"
+		    << endl;);
+	   
+	   m_stopCriteria = DecompStopInfeasible;
+	   
+	   m_status = STAT_INFEASIBLE;
+	 }
+
       }
       if(m_phase == PHASE_DONE)
 	 break;
