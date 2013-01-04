@@ -14,8 +14,8 @@
 //===========================================================================//
 
 
-#ifndef DECOMP_RAY_POOL_INCLUDE
-#define DECOMP_RAY_POOL_INCLUDE
+#ifndef DECOMP_VAR_POOL_INCLUDE
+#define DECOMP_VAR_POOL_INCLUDE
 
 #include "Decomp.h"
 #include "DecompWaitingCol.h"
@@ -32,10 +32,10 @@ public:
 };
 
 // --------------------------------------------------------------------- //
-class DecompValPool : public std::vector<DecompWaitingCol> {
+class DecompVarPool : public std::vector<DecompWaitingCol> {
 private:
-   DecompValPool(const DecompValPool &);
-   DecompValPool & operator=(const DecompValPool &);
+   DecompVarPool(const DecompVarPool &);
+   DecompVarPool & operator=(const DecompVarPool &);
 
 private:
    static const char * classTag;

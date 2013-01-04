@@ -16,8 +16,8 @@
 //this is a theta variable
 //assumption throughout is theta is [0,inf)
 
-#ifndef DECOMP_VAR_INCLUDED
-#define DECOMP_VAR_INCLUDED
+#ifndef DECOMP_Ray_INCLUDED
+#define DECOMP_Ray_INCLUDED
 
 #include "Decomp.h"
 #include "UtilHash.h"
@@ -35,7 +35,7 @@ public:
   
 private:
    //TODO: lb, ub, "type"?
-   //  double           m_origCost;
+   double           m_origCost;
    double           m_redCost; //(c - uA'')s - alpha
    int              m_effCnt;  //effectiveness counter
    std::string           m_strHash;
@@ -44,8 +44,10 @@ private:
    double           m_norm;
   
 public:
-  
-   // inline int    getEffectiveness()  const { return m_effCnt;  }
+   inline double getOriginalCost()   const { return m_origCost;}
+   inline double getReducedCost()    const { return m_redCost; }
+   
+   inline int    getEffectiveness()  const { return m_effCnt;  }
    inline double getLowerBound()     const { return 0.0;       }   //TODO
    inline double getUpperBound()     const { return DecompInf; }   //TODO
    inline std::string getStrHash()        const { return m_strHash; }
@@ -184,7 +186,7 @@ public:
              const double           redCost,
              const double           origCost) : 
       m_s       (), 
-	//      m_origCost(origCost), 
+      m_origCost(origCost), 
       m_redCost (redCost), 
       m_effCnt  (0),
       m_strHash (),
@@ -228,9 +230,11 @@ public:
    DecompRay(const int              len,
              const int            * ind, 
              const double         * els,
-             const double           redCost
+             const double           redCost, 
+	     const double           origCost
 	     ): 
       m_s       (), 
+      m_origCost(origCost),
       m_redCost (redCost), 
       m_effCnt  (0),
       m_strHash (),
@@ -249,7 +253,9 @@ public:
 
    DecompRay(const int              len,
              const int            * ind, 
-             const double           els
+             const double           els,
+	     const double           redCost,
+	     const double           origCost
              ):
       m_s       (), 
       m_redCost (redCost), 

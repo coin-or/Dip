@@ -19,6 +19,9 @@
 #include "Decomp.h"
 #include "DecompVar.h"
 #include "UtilMacros.h"
+#include "DecompRay.h"
+
+
 
 // ---------------------------------------------------------------------- //
 class DecompWaitingCol {
@@ -27,10 +30,11 @@ class DecompWaitingCol {
   DecompVar        * m_var;  //s        the variable
   CoinPackedVector * m_col;  //(A'' s)  the column
   DecompRay        * m_ray;  // r        the ray
-  DecompRay        * m_col_ray;  // (A''r) the column that corresponds to the ray
+  //  compRay        * m_col_ray;  // (A''r) the column that corresponds to the ray
 
  public:
   inline DecompVar        * getVarPtr() const { return m_var; }
+  inline DecompRay        * getRayPtr() const { return m_ray; }
   inline CoinPackedVector * getColPtr() const { return m_col; }
   inline const double getReducedCost() const  { return m_var->getReducedCost();}
   inline const double getLowerBound() const   { return m_var->getLowerBound(); }
@@ -39,7 +43,9 @@ class DecompWaitingCol {
   
   inline void   deleteCol() { UTIL_DELPTR(m_col); }
   inline void   deleteVar() { UTIL_DELPTR(m_var); }
+  inline void   deleteRay() { UTIL_DELPTR(m_ray); }
   inline void   clearVar()  { m_var = 0;          }
+
   inline void   setCol(CoinPackedVector * col) { m_col = col; }
 
   bool setReducedCost(const double      * u, 

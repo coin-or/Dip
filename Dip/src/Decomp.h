@@ -51,9 +51,10 @@
 //---
 class DecompVar;
 class DecompCut;
+class DecompRay;
 typedef std::list<DecompVar*> DecompVarList;
 typedef std::list<DecompCut*> DecompCutList;
-
+typedef std::list<DecompRay*> DecompRayList; 
 //===========================================================================//
 //---
 //--- DECOMP constants
@@ -80,27 +81,6 @@ const std::string DecompAlgoStr[5] = {
    "VOL_AND_CUT",
    "DECOMP"
 };
-
-
-//--- DECOMP branching strategies 
-//---
-enum DecompBranchingStrategy{
-  DecompBranchingMostFractional,
-  DecompBranchingPseudoCost,
-  DecompBranchingStrong,
-  DecompBranchingHybrid
-};
-
-const std::string DecompBranchingStrategy[4] =  {
-   "DecompBranchingMostFractional", 
-   "DecompBranchingPseudoCost", 
-   "DecompBranchingStrong", 
-   "DecompBranchingHybrid"
-};
-
-
-
-
 
 //---
 //--- node stopping criteria
