@@ -660,7 +660,7 @@ public:
       MasterLB                 = -DecompInf;  
 
 
-      MasterIPUB               = DecompInf
+      MasterIPUB               = DecompInf;
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

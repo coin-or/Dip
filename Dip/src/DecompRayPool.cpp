@@ -27,8 +27,8 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
       // ---
       // --- RC[s] = c[r] - u (A''r)
       // ---
-      redCost = m_var->getOriginalCost() - m_col->dotProduct(u);
-      m_var->setReducedCost(redCost);
+      redCost = m_ray->getOriginalCost() - m_col->dotProduct(u);
+      m_ray->setReducedCost(redCost);
       return redCost <= -0.0000000001;//m_app->m_param.dualTol;
    }
    else{
@@ -56,23 +56,23 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
 
 
 // --------------------------------------------------------------------- //
-bool DecompVarPool::isParallel(const DecompVarList    & vars,
+bool DecompRayPool::isParallel(const DecompRayList    & rays,
                                const DecompWaitingCol & wcol,
                                const double             maxCosine){
 
-   DecompVarList::const_iterator vi;
+   DecompRayList::const_iterator vi;
    int            j1, j2, index1, index2;
    double         cosine;
-   DecompVar    * var    = wcol.getVarPtr();
-   const int      block1 = var->getBlockId();
-   const int      len1   = var->m_s.getNumElements();
-   const int    * ind1   = var->m_s.getIndices();
-   const double * els1   = var->m_s.getElements();
-   const double   norm1  = var->getNorm();
+   DecompRay    * ray    = wcol.getRayPtr();
+   const int      block1 = ray->getBlockId();
+   const int      len1   = ray->m_s.getNumElements();
+   const int    * ind1   = ray->m_s.getIndices();
+   const double * els1   = ray->m_s.getElements();
+   const double   norm1  = ray->getNorm();
    bool           isPara = false;
    if(len1 == 0)
       return false;
-   for(vi = vars.begin(); vi != vars.end(); vi++){
+   for(vi = rays.begin(); vi != rays.end(); vi++){
       //---
       //--- if different blocks, it doesn't matter if rest of var
       //---   is close to parallel
@@ -128,13 +128,13 @@ bool DecompVarPool::isParallel(const DecompVarList    & vars,
 }
 
 // --------------------------------------------------------------------- //
-bool DecompVarPool::isDuplicate(const DecompVarList    & vars,
+bool DecompRayPool::isDuplicate(const DecompRayList    & rays,
                                 const DecompWaitingCol & wcol){
-   DecompVarList::const_iterator vi;
-   DecompVar * var = wcol.getVarPtr();
-   for(vi = vars.begin(); vi != vars.end(); vi++){
-      if(((*vi)->getBlockId() == var->getBlockId()) &&
-         ((*vi)->getStrHash() == var->getStrHash())) {
+   DecompRayList::const_iterator vi;
+   DecompRay * ray = wcol.getRayPtr();
+   for(vi = rays.begin(); vi != rays.end(); vi++){
+      if(((*vi)->getBlockId() == ray->getBlockId()) &&
+         ((*vi)->getStrHash() == ray->getStrHash())) {
 	 return true;
       }
    }
@@ -142,13 +142,13 @@ bool DecompVarPool::isDuplicate(const DecompVarList    & vars,
 }
 
 // --------------------------------------------------------------------- //
-bool DecompVarPool::isDuplicate(const DecompWaitingCol & wcol){
+bool DecompRayPool::isDuplicate(const DecompWaitingCol & wcol){
    vector<DecompWaitingCol>::const_iterator vi;
-   DecompVar * var1 = wcol.getVarPtr();
+   DecompRay * ray1 = wcol.getRayPtr();
    for(vi = begin(); vi != end(); vi++){
-      DecompVar * var2 = (*vi).getVarPtr();
-      if((var1->getBlockId() == var2->getBlockId()) &&
-         (var1->getStrHash() == var2->getStrHash())) {
+      DecompRay * ray2 = (*vi).getRayPtr();
+      if((ray1->getBlockId() == ray2->getBlockId()) &&
+         (ray1->getStrHash() == ray2->getStrHash())) {
 	 return true;
       }
    }
@@ -156,27 +156,27 @@ bool DecompVarPool::isDuplicate(const DecompWaitingCol & wcol){
 }
 
 /*-------------------------------------------------------------------------*/
-bool DecompVarPool::setReducedCosts(const double            * u,
+bool DecompRayPool::setReducedCosts(const double            * u,
 				    const DecompStatus          stat,
-				    DecompVarPool::iterator   first,
-				    DecompVarPool::iterator   last){
+				    DecompRayPool::iterator   first,
+				    DecompRayPool::iterator   last){
 
    //printf("\nHERE DecompVarPool::setReducedCosts");
-   bool found_negrc_var = false;
-   for(DecompVarPool::iterator vi = first; vi != last; vi++){
+   bool found_negrc_ray = false;
+   for(DecompRayPool::iterator vi = first; vi != last; vi++){
       // ---
       // --- calculate and set the reduced costs for the variables
       // --- which are pointed to in this pool, if any have rc < 0,
       // --- return true
       // --- 
-      found_negrc_var = (*vi).setReducedCost(u, stat) ? true : found_negrc_var;
+      found_negrc_ray = (*vi).setReducedCost(u, stat) ? true : found_negrc_ray;
    }
-   return found_negrc_var;
+   return found_negrc_ray;
 }
 
 // --------------------------------------------------------------------- //
 //THINK: this is specific to PC and DC?? 
-void DecompVarPool::reExpand(const DecompConstraintSet & modelCore,
+void DecompRayPool::reExpand(const DecompConstraintSet & modelCore,
                              const double                tolZero){
   
    //THIS IS WRONG...
@@ -194,7 +194,7 @@ void DecompVarPool::reExpand(const DecompConstraintSet & modelCore,
       // --- 
       // --- get dense column = A''s, append convexity constraint on end 
       // ---
-      modelCore.M->times((*vi).getVarPtr()->m_s, denseCol);
+      modelCore.M->times((*vi).getRayPtr()->m_s, denseCol);
       denseCol[modelCore.getNumRows()] = 1.0; 
     
       // ---
@@ -212,9 +212,9 @@ void DecompVarPool::reExpand(const DecompConstraintSet & modelCore,
 }
 
 // --------------------------------------------------------------------- //
-void DecompVarPool::print(ostream * os) const { 
+void DecompRayPool::print(ostream * os) const { 
    vector<DecompWaitingCol>::const_iterator vi;
    for(vi = begin(); vi != end(); vi++){
-      (*vi).getVarPtr()->print(os);
+      (*vi).getRayPtr()->print(os);
    }
 }
