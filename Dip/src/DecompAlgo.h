@@ -318,7 +318,7 @@ public:
     * Does nothing by default.
     */
 
-   virtual void postProcessNode() {};
+   virtual void postProcessNode(DecompStatus decompStatus) {};
 
    /**
     * Generate initial variables for master problem (PC/DC/RC).

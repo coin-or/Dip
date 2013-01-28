@@ -72,6 +72,15 @@ public:
        about how the branching is to be done. The stati of the children
        are AlpsNodeStatusCandidate. */
    std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > branch(); 
+
+   //For now, we assume there is only one variable being branched on.
+   int getBranchedVar(){
+	   if (!downBranchLB_.empty()){
+		   return downBranchLB_[0].first;
+	   }else{
+		   return -1;
+	   }
+   }
 };
 
 #endif
