@@ -291,8 +291,6 @@ int AlpsDecompTreeNode::process(bool isRoot,
       decompAlgo->setObjBoundIP(currentUB);
    }
    
-   decompAlgo->postProcessNode(decompStatus);
-
    switch(decompStatus){
     case STAT_FEASIBLE:
     case STAT_IP_FEASIBLE:
@@ -361,6 +359,9 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //---   return (since we are not evaluating any more nodes anyway)
    //--- so, we fake it by acting like a branching candidate was found
    //---
+
+	decompAlgo->postProcessNode(decompStatus);
+
    if(param.nodeLimit == 0)
       setStatus(AlpsNodeStatusPregnant);
    else if(doFathom) // || param.nodeLimit == 0)
