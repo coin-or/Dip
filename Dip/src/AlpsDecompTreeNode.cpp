@@ -362,12 +362,14 @@ int AlpsDecompTreeNode::process(bool isRoot,
 
 	decompAlgo->postProcessNode(decompStatus);
 
-   if(param.nodeLimit == 0)
+   if(param.nodeLimit == 0){
       setStatus(AlpsNodeStatusPregnant);
-   else if(doFathom) // || param.nodeLimit == 0)
+   }else if(doFathom){ // || param.nodeLimit == 0){
       setStatus(AlpsNodeStatusFathomed);
-   else
+   }else{
       status = chooseBranchingObject(model);
+	  decompAlgo->postProcessBranch(decompStatus);
+	}
    
    UtilPrintFuncEnd(&cout, m_classTag,
                     "process()", param.msgLevel, 3);
