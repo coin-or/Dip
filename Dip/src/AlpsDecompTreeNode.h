@@ -49,7 +49,7 @@ public:
    virtual ~AlpsDecompTreeNode(){
    }
 
-   void checkIncumbent(AlpsDecompModel      * model,
+   bool checkIncumbent(AlpsDecompModel      * model,
                        const DecompSolution * decompSol);
     
    //---

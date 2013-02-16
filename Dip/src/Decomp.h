@@ -129,6 +129,7 @@ const std::string DecompPhaseStr[6] = {
 //---
 enum DecompStatus{
    STAT_FEASIBLE, 
+   STAT_IP_FEASIBLE,
    STAT_INFEASIBLE,
    STAT_UNKNOWN
 };
