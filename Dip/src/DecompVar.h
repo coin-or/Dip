@@ -44,6 +44,7 @@ private:
    double           m_norm;
   
 public:
+
    inline double getOriginalCost()   const { return m_origCost;}
    inline double getReducedCost()    const { return m_redCost; }
    inline int    getEffectiveness()  const { return m_effCnt;  }

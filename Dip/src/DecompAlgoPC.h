@@ -80,12 +80,13 @@ private:
    /**
     * Create the master problem (all algorithms must define this function).
     */
-   virtual void createMasterProblem(DecompVarList & initVars){
-      DecompAlgo::createMasterProblem(initVars);
+   virtual void createMasterProblem(DecompVarList & initVars, DecompRayList & initRays){
+     DecompAlgo::createMasterProblem(initVars, initRays);
    }
    virtual int generateVarsFea(DecompVarList    & newVars, 
+			       DecompRayList    & newRays,
 			       double           & mostNegReducedCost){
-      return DecompAlgo::generateVarsFea(newVars, mostNegReducedCost);
+     return DecompAlgo::generateVarsFea(newVars, newRays, mostNegReducedCost);
    }
    virtual void phaseInit(DecompPhase & phase);
 

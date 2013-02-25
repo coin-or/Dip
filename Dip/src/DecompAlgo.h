@@ -51,6 +51,7 @@
 #include "DecompParam.h"
 #include "DecompStats.h"
 #include "DecompVarPool.h"
+#include "DecompRayPool.h"
 #include "DecompCutPool.h"
 #include "DecompMemPool.h"
 #include "DecompSolution.h"
@@ -171,6 +172,9 @@ protected:
    DecompVarList m_vars;
    DecompVarPool m_varpool;
 
+   DecompRayList m_rays;
+   DecompRayPool m_raypool;
+
    /**
     * Containers for cuts (current and pool).
     */
@@ -287,7 +291,7 @@ public:
 
    //virtual void createMasterProblem(DecompVarList & initVars) = 0;
 
-   virtual void createMasterProblem(DecompVarList & initVars);
+   virtual void createMasterProblem(DecompVarList & initVars, DecompRayList & initRays);
    void loadSIFromModel(OsiSolverInterface           * si,
                         //need next 2 args? ever different?
                         //DecompAlgoModel              & modelCore,
@@ -338,7 +342,7 @@ public:
     *   - in CPM, this does nothing
     */
    //THINK: belongs in base? PC or... 
-   virtual int generateInitVars(DecompVarList & initVars);
+   virtual int generateInitVars(DecompVarList & initVars, DecompRayList & initRays);
 
    /**
     * Update of the solution vectors (primal and/or dual).
@@ -416,16 +420,23 @@ public:
    //THINK - helper func?, or specific to PC - right? as is genInit
    std::vector<double*> getDualRays(int maxNumRays);
    virtual int generateVarsFea(DecompVarList    & newVars, 
+			       DecompRayList    & newRays, 
 			       double           & mostNegReducedCost);
 
    virtual int generateVars(const DecompStatus   stat,
 			    DecompVarList    & newVars, 
+			    DecompRayList    & newRays, 
 			    double           & mostNegReducedCost);
+
    virtual int generateCuts(double        * xhat,
 			    DecompCutList & newCuts);
 
    virtual void addVarsToPool(DecompVarList & newVars);
    virtual void addVarsFromPool();
+
+   //  virtual void addRaysToPool(DecompRayList & newRays);
+   //  virtual void addRaysFromPool();
+
    virtual void addCutsToPool(const double  *  x,
 			      DecompCutList & newCuts,
 			      int           & m_cutsThisCall);
@@ -450,7 +461,8 @@ public:
 			     const bool            isNested,
                              DecompAlgoModel     & algoModel,
 			     DecompSolverResult  * solveResult,
-			     std::list<DecompVar*>    & vars);
+			     std::list<DecompVar*>    & vars,
+			     std::list<DecompRay*>    & rays);
    
    
    inline void appendVars(DecompVar * var){
@@ -459,6 +471,14 @@ public:
    inline void appendVars(DecompVarList & varList){
       copy(varList.begin(), varList.end(), back_inserter(m_vars));
    }
+
+   inline void appendRays(DecompRay * ray){
+      m_rays.push_back(ray);
+   }
+   inline void appendRays(DecompRayList & rayList){
+      copy(rayList.begin(), rayList.end(), back_inserter(m_rays));
+   }
+
    virtual void setMasterBounds(const double * lbs,
 				const double * ubs);
    virtual void setSubProbBounds(const double * lbs,
@@ -558,6 +578,7 @@ public:
     *
     */
    void printVars(std::ostream * os);
+   void printRays(std::ostream * os);
    void printCuts(std::ostream * os);
 
    /**
@@ -966,6 +987,8 @@ public:
       m_auxSI      (NULL),
       m_vars       (),
       m_varpool    (),
+      m_rays       (),
+      m_raypool    (),
       m_cuts       (),
       m_cutpool    (),
       m_xhat       (0),
@@ -1010,6 +1033,7 @@ public:
       UTIL_DELPTR(m_cgl);
       UtilDeleteVectorPtr(m_xhatIPFeas);
       UtilDeleteListPtr(m_vars);
+      UtilDeleteListPtr(m_rays);
       UtilDeleteListPtr(m_cuts);
       UTIL_DELARR(m_colLBNode);
       UTIL_DELARR(m_colUBNode);

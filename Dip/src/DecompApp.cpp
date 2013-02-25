@@ -1020,6 +1020,12 @@ void DecompApp::createModels(){
    ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
 #if 1
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
+
+   std::cout << "The number of master Only Cols is " << nMasterOnlyCols << std::endl;
+
+   std::cout << "(kappa) The percentage of Masater Only Cols over total columns is " 
+	     << double(nMasterOnlyCols)/nCols << std::endl; 
+
    if(nMasterOnlyCols){
       if(m_param.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
@@ -1142,6 +1148,7 @@ void DecompApp::singlyBorderStructureDetection(){
 
    const int * lengthRows = m_matrix->getVectorLengths();
 
+
    /*
      assigning the pointer to hyperedges, indicating the number of 
      vertices in each hyperedge
@@ -1212,6 +1219,12 @@ void DecompApp::singlyBorderStructureDetection(){
 
    int intCounter = 0 ; 
 
+
+   // totoal number of integer elements in the matrix 
+
+   int intNum = 0 ; 
+
+
    // vector containing the number of integer elements in each row
 
    int * intLengthRows = new int[numRows]; 
@@ -1237,7 +1250,7 @@ void DecompApp::singlyBorderStructureDetection(){
 	  intHyperedges[majorIndex[index]] = true;
 
 	  intCounter ++; 
-	  	  
+	  intNum ++ ; 	  
 	}
 
 	else{
@@ -1255,6 +1268,14 @@ void DecompApp::singlyBorderStructureDetection(){
     }
 
    
+   int totalIntNum = 0 ; 
+
+   for (int i = 0 ; i < numRows ; ++i){
+
+     totalIntNum += intLengthRows[i]; 
+
+   }
+
    /*
     *  define the weight parameter in the hypergraph
     */
@@ -1500,6 +1521,60 @@ void DecompApp::singlyBorderStructureDetection(){
       temp.clear();
     }
     
+
+    // the number of nonzero elements in the coupling rows 
+
+    int numElementsRelaxed = 0 ; 
+
+    // the number of integer elements int the coupling rows
+     int numIntegerRelaxed = 0; 
+     // the percentage of nonzero elements in the coupling rows over all the nonzero elements
+
+     double numElementsRelaxedPercentage = 0.0 ; 
+
+	 // integer percentage in the coupling rows 
+     // calculated by number of integer in coupling rows / total number of integers 
+
+     double numIntegerCouplingSparsity = 0.0; 
+
+     for ( netIter = netSet.begin(); netIter != netSet.end(); netIter ++ )
+       {
+	 std::cout << *netIter << std::endl; 
+
+	 numElementsRelaxed += (lengthRows[*netIter]); 
+
+	 numIntegerRelaxed +=(intLengthRows[*netIter]); 
+       }
+
+
+
+    numElementsRelaxedPercentage =( double)numElementsRelaxed/numElements; 
+
+   double  numIntegerRelaxedPercentage = (double) numIntegerRelaxed/numElementsRelaxed; 
+
+    numIntegerCouplingSparsity = (double) numIntegerRelaxed/intNum; 
+
+    std::cout << " (alpha) The percent of nonzero elements of the coupling rows in the matrix over total Num is "
+	      << numElementsRelaxedPercentage
+	      << std::endl;
+
+    std::cout << "The percent of integer elements of the coupling rows over No.Elements in the coupling rowsis "
+	      << numIntegerRelaxedPercentage
+	      << std::endl;
+
+    
+
+    std::cout << " (gamma) Sparsity of integer elements in the coupling row over the integer number in the matrix is "
+	      <<  numIntegerCouplingSparsity
+	      << std::endl; 
+
+
+
+
+
+
+
+
     
     UTIL_DELARR(eptr);
 

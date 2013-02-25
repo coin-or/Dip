@@ -206,6 +206,12 @@ const std::string DecompRowTypeStr[4] = {
 enum DecompColType {
    //structural column
    DecompCol_Structural,
+
+   //structural column that corresponds to extreme points
+   DecompCol_Structural_Point, 
+   //structural column that corresponds to extreme rays
+   DecompCol_Structural_Ray,
+
    //structural column (which should never be deleted)
    DecompCol_Structural_NoDelete,
    //master-only column

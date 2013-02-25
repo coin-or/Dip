@@ -25,14 +25,14 @@
 class DecompConstraintSet;
 
 // --------------------------------------------------------------------- //
-class is_less_thanD{//member of class instead??
+/*class is_less_thanD{//member of class instead??
 public:
    bool operator()( const DecompWaitingCol & x, 
                     const DecompWaitingCol & y){
       return x.getRayPtr()->getReducedCost() < y.getRayPtr()->getReducedCost();
    }
 };
-
+*/
 // --------------------------------------------------------------------- //
 class DecompRayPool : public std::vector<DecompWaitingCol> {
 private:

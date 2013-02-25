@@ -48,6 +48,8 @@ public :
    bool      m_isCutoff;   
    int       m_nSolutions;
    std::vector< std::vector<double> > m_solution;
+
+   std::vector< std::vector<double> > m_ray; 
    /**
     * @}
     */

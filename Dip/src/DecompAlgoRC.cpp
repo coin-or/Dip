@@ -248,9 +248,10 @@ void DecompAlgoRC::createMasterProblem(DecompVarList & initVars){
    //--- there is no master LP in RC, just initialize the dual vector
    //---
 
+   DecompRayList  initRays; 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "createMasterProblem()", m_param.LogDebugLevel, 2);
-   DecompAlgo::createMasterProblem(initVars);
+   DecompAlgo::createMasterProblem(initVars, initRays);
    CoinAssert(initVars.size() > 0);
 
    //---

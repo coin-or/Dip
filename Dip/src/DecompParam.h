@@ -283,6 +283,9 @@ public:
 
    double MasterIPUB; 
 
+   int checkIlledColumns; 
+
+   int checkColumnThreshold; 
 
    /**
     * @}
@@ -407,6 +410,9 @@ public:
       PARAM_getSetting("setMasterBound", setMasterBound); 
       PARAM_getSetting("MasterUB", MasterIPUB); 
 
+      PARAM_getSetting("checkIlledColumns", checkIlledColumns);
+      PARAM_getSetting("checkColumnThreshold", checkColumnThreshold); 
+      
 
 
 
@@ -560,7 +566,10 @@ public:
       UtilPrintParameter(os, sec,  "MasterUB", MasterIPUB); 
       
       UtilPrintParameter(os, sec,  "setMasterBound", setMasterBound); 
-    
+      
+      UtilPrintParameter(os, sec,  "checkIlledColumns", checkIlledColumns); 
+
+      UtilPrintParameter(os, sec,  "checkColumnThreshold", checkColumnThreshold );     
 
 
       (*os) << "========================================================\n";
@@ -621,7 +630,7 @@ public:
       InitVarsWithIPLimitTime  = 10;
       InitCompactSolve         = 0;
       DualStab                 = 0;
-      DualStabAlpha            = 0.10;
+      DualStabAlpha            = 0.1;
       BreakOutPartial          = 0;
       BranchEnforceInSubProb   = 1;//usually much better if can
       BranchEnforceInMaster    = 0;
@@ -661,6 +670,11 @@ public:
 
 
       MasterIPUB               = DecompInf;
+
+      checkIlledColumns        = 0 ; 
+
+      checkColumnThreshold     = 1.e6; 
+
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

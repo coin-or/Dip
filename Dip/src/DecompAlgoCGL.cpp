@@ -127,6 +127,7 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
    //---
    cutGenClpSI->setColSolution(xhat);
 
+
    //---
    //--- set primal row solution (i.e., activities)
    //---
@@ -135,10 +136,6 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
 
    bool            mustDeleteWS = true;
    CoinWarmStart * warmStart    = NULL;    
-
-   //TODO: check on crossover code - some speedups possible
-   //  with a version that accepts memory - so not alloc/free
-   //  too often
    
    switch(m_algo){
    case CUT:
@@ -244,9 +241,9 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface * cutGenSI,
       nGomoryCuts = osiCuts.sizeCuts() - nTotalCuts;
       nTotalCuts  = osiCuts.sizeCuts();
    }
-      
-   
-   UTIL_MSG(m_logLevel, 3,
+
+
+   UTIL_MSG(m_logLevel, 1,
             (*m_logStream)
             << "Num clique     cuts= " << nCliqueCuts      << endl
             << "Num odd-hole   cuts= " << nOddHoleCuts     << endl

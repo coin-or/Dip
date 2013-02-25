@@ -333,7 +333,8 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    //---  C: do nothing - DecompAlgo base
    //---
    DecompVarList initVars;
-   m_nodeStats.varsThisCall += generateInitVars(initVars);
+   DecompRayList initRays; 
+   m_nodeStats.varsThisCall += generateInitVars(initVars, initRays);
    
    //---
    //--- create the master OSI interface
@@ -365,7 +366,7 @@ void DecompAlgo::initSetup(UtilParameters * utilParam,
    //---
    //--- create master problem
    //---
-   createMasterProblem(initVars);
+   createMasterProblem(initVars, initRays);
    UTIL_MSG(m_param.LogLevel, 2,
             (*m_osLog) 
             << "Model core nCols= " << modelCore->getNumCols()
@@ -779,7 +780,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface * si,
 }
 
 //===========================================================================//
-void DecompAlgo::createMasterProblem(DecompVarList & initVars){
+void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & initRays){
 
    //---
    //--- Initialize the solver interface for the master problem.
@@ -838,6 +839,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    //---          splus[i] - sminus[i] ~ b''[i],  i in R''
    //---      sum{s in F'[k]} lambda[k][s] = 1, k in K
    //---      lambda[k][s]                >= 0, k in K, s in F'[k]
+   //---      theta[k][s]                 >=0, 
    //---      splus[i]                    >= 0, i in R''
    //---      sminus[i]                   >= 0, i in R''
    //---
@@ -1010,7 +1012,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
       //--- 
       //--- get dense column = A''s, append convexity constraint on end 
       //---   this memory is re-used, so be sure to clear out
-      //---
+      //---  
       //STOP: see addVarsToPool - here init, so no cuts to deal with
       // but we don't use dense array here - make a difference?
       //modelCore->M->times((*li)->m_s, denseCol);
@@ -1022,6 +1024,8 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
       UtilFillN(denseCol + nRowsCore, m_numConvexCon, 0.0);
       assert(blockIndex >= 0);
       assert(blockIndex < m_numConvexCon);
+
+      /*The theta is not in the convexity constraint*/
       denseCol[nRowsCore + blockIndex] = 1.0;
 
       //---
@@ -1057,13 +1061,109 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
       //---
       UTIL_DELPTR(sparseCol); 
    } //END: for(li = initVars.begin(); li != initVars.end(); li++)
+
+   // The following code adds the initial rays to the master
+   // Typically, there is no rays in the it 
+   
+   colIndex     = 0;
+   blockIndex   = 0;
+   DecompRayList::iterator lir;
+   //TODO:
+   //  this should be calling a function to add var to lp so don't dup code
+   //TODO:
+   //  check for duplicates in initVars
+   for(lir = initRays.begin(); lir != initRays.end(); lir++){
+      
+      //---
+      //--- appending these variables (lambda) to end of matrix
+      //---   after the artificials
+      //---
+      colIndex         = masterM->getNumCols();
+      m_colIndexUnique = colIndex;
+
+      //---
+      //--- store the col index for this var in the master LP
+      //---   NOTE: if we remove columns, this will be wrong
+      //---
+      (*li)->setColMasterIndex(colIndex);
+      
+      //---
+      //--- we expect the user to define the block id in the ray object
+      //---
+      blockIndex = (*li)->getBlockId();
+
+      //---
+      //--- give the column a name
+      //---
+      string colName = "theta(c_" + UtilIntToStr(m_colIndexUnique)
+	 + ",b_" + UtilIntToStr(blockIndex) + ")";
+      colNames.push_back(colName);
+      
+      UTIL_DEBUG(m_param.LogDebugLevel, 5,
+		 (*li)->print(m_osLog, m_app);
+		 );
+	      
+      //--- 
+      //--- get dense column = A''s, append convexity constraint on end 
+      //---   this memory is re-used, so be sure to clear out
+      //---
+      //STOP: see addVarsToPool - here init, so no cuts to deal with
+      // but we don't use dense array here - make a difference?
+      //modelCore->M->times((*li)->m_s, denseCol);
+      (*li)->fillDenseArr(modelCore->getNumCols(),
+			  dblArrNCoreCols);
+      modelCore->M->times(dblArrNCoreCols, denseCol);
+
+
+      UtilFillN(denseCol + nRowsCore, m_numConvexCon, 0.0);
+      assert(blockIndex >= 0);
+      assert(blockIndex < m_numConvexCon);
+
+      /*The theta is not in the convexity constraint*/
+      denseCol[nRowsCore + blockIndex] = 0.0;
+
+      //---
+      //--- create a sparse column from the dense column
+      //---
+      // THINK: do i need a DecompCol?
+      // THINK: does this allocate memory for coinpackedvec twice?
+      CoinPackedVector * sparseCol 
+	 = UtilPackedVectorFromDense(nRowsCore + m_numConvexCon,
+				     denseCol, m_param.TolZero);
+      UTIL_DEBUG(m_param.LogDebugLevel, 5,
+		 (*m_osLog) << "\nSparse Col: \n";
+		 UtilPrintPackedVector(*sparseCol, m_osLog);
+		 );
+      
+      //TODO: check for duplicates (against m_vars)
+      //      or force initVars to be sent in with no dups?	 	 
+      //--- 
+      //--- append the sparse column to the matrix
+      //---  
+      masterM->appendCol(*sparseCol);
+      colLB[colIndex]    = 0.0;      
+      colUB[colIndex]    = DecompInf;
+      objCoeff[colIndex] = 0.0;       //PHASE I
+
+      //---
+      //--- set master column type
+      //---
+      m_masterColType.push_back(DecompCol_Structural);
+	 
+      //---
+      //--- clean-up 
+      //---
+      UTIL_DELPTR(sparseCol); 
+   } //END: for(li = initVars.begin(); li != initVars.end(); li++)
+
    
    //---
    //--- insert the initial set of variables into the master variable list
    //---
    //THINK: now doing in loop, so can check for dups
    appendVars(initVars);
-      
+
+   appendRays(initRays); 
    //---
    //--- THINK: do we want to adjust modelCore directly here?
    //---   adjust row bounds for convexity constraint 
@@ -1909,6 +2009,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 
       bool          isGapTight = false;      
       DecompVarList newVars;
+      DecompRayList newRays; 
       DecompCutList newCuts;
       switch(m_phase){
       case PHASE_PRICE1:
@@ -1961,19 +2062,23 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 
 
 	 m_nodeStats.varsThisCall   = generateVars(m_status,
-						   newVars, mostNegRC);
+						   newVars,
+						   newRays,
+						   mostNegRC);
 	 m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
 	 m_nodeStats.cutsThisCall   = 0;
 	 
 	 if(m_nodeStats.varsThisCall > 0){
 	    //--- 
 	    //--- add the newly generated variables to the var pool
-	    //---
-	    addVarsToPool(newVars);	    
+	    //---	    
+	  
+	       addVarsToPool(newVars);	    
 	    //---
 	    //--- add variables from the variable pool to the master problem
 	    //---
-	    addVarsFromPool();            
+	       addVarsFromPool();            
+	  
 	 }
 	 //printf("m_isColGenExact  = %d\n", m_isColGenExact);
 	 //printf("m_rrIterSinceAll = %d\n", m_rrIterSinceAll);
@@ -2836,7 +2941,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 }
 
 //===========================================================================//
-int DecompAlgo::generateInitVars(DecompVarList & initVars){
+int DecompAlgo::generateInitVars(DecompVarList & initVars, DecompRayList & initRays){
 
    int          c, attempts;
    double       aveC;
@@ -2923,7 +3028,8 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
                          false,                 //isNested
                          algoModel,
 			 &subprobResult,        //results
-			 initVars);             //var list to populate
+			 initVars,
+			 initRays);             //var list to populate
 	    if(attempts == 0){
 	       //TODO: have to treat masterOnly differently
 	       //  we don't correctly populate LB/UB in
@@ -2949,7 +3055,8 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars){
                             true,                  //isNested
                             (*vit),
                             &subprobResult,        //results
-                            initVars);             //var list to populate
+                            initVars,
+			    initRays);             //var list to populate
             }
          }
          
@@ -4612,6 +4719,7 @@ void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
 
 //------------------------------------------------------------------------ //
 int DecompAlgo::generateVarsFea(DecompVarList    & newVars, 
+				DecompRayList    & newRays,
                                 double           & mostNegReducedCost){
    //---
    //--- solve min{s in F' | RC[s]} to generate new variables
@@ -4650,6 +4758,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 
    int                   i, b;
    DecompVarList         potentialVars;
+   DecompRayList         potentialRays;
    DecompConstraintSet * modelCore   = m_modelCore.getModel();
    const int      m             = m_masterSI->getNumRows();
    int            nBaseCoreRows = modelCore->nBaseRows;
@@ -5233,7 +5342,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 		      false, //isNested
                       algoModel,
 		      &solveResult,
-		      potentialVars);
+		      potentialVars,
+		      potentialRays);
 	 //if cutoff delcares infeasible, we know subprob >= 0
 	 //  we can use 0 as valid (but possibly weaker bound)
 	 if(solveResult.m_isCutoff){
@@ -5263,7 +5373,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			 true,                  //isNested
                          (*vit),
                          &solveResult,          //results
-                         potentialVars);        //var list to populate
+                         potentialVars,
+			 potentialRays);        //var list to populate
             if(solveResult.m_isCutoff){
                mostNegRCvec[b] = min(mostNegRCvec[b],0.0);
             }            
@@ -5339,7 +5450,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			 false,//isNested
 			 algoModel,
 			 &solveResult,
-			 potentialVars);
+			 potentialVars,
+			 potentialRays);
 	 }
 	 else{
 	    vector<double> & uBlockV   = mitv->second;
@@ -5389,7 +5501,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			 false,//isNested
 			 algoModel,
 			 &solveResult,
-			 potentialVars);
+			 potentialVars,
+			 potentialRays);
 
 	    UTIL_DELARR(redCostXb);
 	    UTIL_DELARR(uBlockAdj);
@@ -5454,7 +5567,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			 false, //isNested
 			 algoModel,
 			 &solveResult,
-			 potentialVars);
+			 potentialVars,
+			 potentialRays);
 	    //if cutoff delcares infeasible, we know subprob >= 0
 	    //  we can use 0 as valid (but possibly weaker bound)
 	    if(solveResult.m_isCutoff){
@@ -5483,7 +5597,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			    true,                  //isNested
 			    (*vit),
 			    &solveResult,          //results
-			    potentialVars);        //var list to populate
+			    potentialVars,
+			    potentialRays);        //var list to populate
 	       if(solveResult.m_isCutoff){
 		  mostNegRCvec[b] = min(mostNegRCvec[b],0.0);
 	       }            
@@ -5610,6 +5725,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 //------------------------------------------------------------------------ //
 int DecompAlgo::generateVars(const DecompStatus   stat,
                              DecompVarList      & newVars, 
+			     DecompRayList      & newRays,
                              double             & mostNegReducedCost){
   
    //---
@@ -5629,7 +5745,7 @@ int DecompAlgo::generateVars(const DecompStatus   stat,
    
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "generateVars()", m_param.LogDebugLevel, 2);
-   return generateVarsFea(newVars, mostNegReducedCost);
+   return generateVarsFea(newVars, newRays, mostNegReducedCost);
 
    /*#else
      switch(stat){
@@ -6737,7 +6853,8 @@ static void * solveRelaxedThread(void * args){
 			false,//isNested
 			algoModel,
 			&solveResult,
-			*vars);
+			*vars,
+			*rays);
      
 
      printf("THREAD %d solving subproblem %d\n",
@@ -6827,7 +6944,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 				      const bool            isNested,
                                       DecompAlgoModel     & algoModel,
                                       DecompSolverResult  * solveResult,
-                                      list<DecompVar*>    & vars){
+                                      list<DecompVar*>    & vars,
+				      list<DecompRay*>    & rays){
    
    //---
    //--- For pricing,
@@ -7093,7 +7211,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 		  i = mcit->first;  //sparse-index
 		  c = mcit->second; //original-index	       
 		  if(!UtilIsZero(milpSolution[i], m_app->m_param.TolZero)){
-		     ind.push_back(c);				
+		     ind.push_back(c);			
+		  
 		     els.push_back(milpSolution[i]);	    
 		     //the reduced cost of shat: (c-uA").s
 		     varRedCost  += redCostX[c] * milpSolution[i];	    

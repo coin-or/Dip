@@ -350,10 +350,29 @@ public:
                                            DecompVarList    & varList){
       return DecompSolStatNoSolution;
    }
+
+   /* a new function that captures the extreme ray  */
+   virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
+                                           const double     * redCostX,
+                                           const double       convexDual,
+                                           DecompVarList    & varList,
+					   DecompRayList    & rayList){
+      return DecompSolStatNoSolution;
+   }
+
    virtual DecompSolverStatus solveRelaxedNest(const int          whichBlock,
                                                const double     * redCostX,
                                                const double       convexDual,
                                                DecompVarList    & varList){
+      return DecompSolStatNoSolution;
+   }
+   
+   /* a new function that captures the extreme ray */ 
+   virtual DecompSolverStatus solveRelaxedNest(const int          whichBlock,
+                                               const double     * redCostX,
+                                               const double       convexDual,
+                                               DecompVarList    & varList,
+					       DecompRayList    & rayList){
       return DecompSolStatNoSolution;
    }
 
