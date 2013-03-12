@@ -86,7 +86,8 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(DIPPYdir)"
 pyexecLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pyexec_LTLIBRARIES)
-_dippy_la_LIBADD =
+am__DEPENDENCIES_1 =
+_dippy_la_DEPENDENCIES = ../libDecomp.la $(am__DEPENDENCIES_1)
 am__dippy_la_OBJECTS = _dippy_la-DippyDecompAlgo.lo \
 	_dippy_la-DippyDecompApp.lo _dippy_la-DippyPythonUtils.lo \
 	_dippy_la-DippyModule.lo _dippy_la-DippySolve.lo
@@ -380,7 +381,8 @@ _dippy_la_SOURCES = \
 # This is for libtool
 _dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_1) \
 	$(am__append_2) $(am__append_3) $(am__append_4)
-_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext
+_dippy_la_LIBADD = ../libDecomp.la $(DIPLIB_LIBS)
+_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I.. -I`$(CYGPATH_W) $(srcdir)` -I`$(CYGPATH_W) $(srcdir)/../` 
