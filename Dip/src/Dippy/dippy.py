@@ -2,8 +2,10 @@ import pulp
 
 import sys
 
-sys.path.append('C:\\cygwin\\home\\ted\\COIN\\trunk\\Dippy\\MSVisualStudio\\v10\\Win32-v100-Debug')
-sys.path.append('C:\\cygwin\\home\\ted\\COIN\\trunk\\Dippy\\MSVisualStudio\\v10\\Win32-v100-Release')
+try:
+    import path.py
+except ImportError:
+    pass
 
 from dipapi import DipAPI
 

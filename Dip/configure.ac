@@ -111,7 +111,8 @@ AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 #                       Python Stuff (for Dippy)                            #
 #############################################################################
 
-AM_PATH_PYTHON(2.7)
+AM_PATH_PYTHON([2.6],,[:])
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
 PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
 PYTHON_LIBS="-lpython$PYTHON_VERSION"
 PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"

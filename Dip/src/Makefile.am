@@ -12,7 +12,10 @@
 
 ## $Id: $
 
-SUBDIRS = Dippy
+SUBDIRS = 
+if HAVE_PYTHON
+SUBDIRS += Dippy
+endif
 
 ########################################################################
 #                               libDecomp                              #
