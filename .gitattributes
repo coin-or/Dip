@@ -359,6 +359,7 @@ Dip/examples/scripts/report_decomp.py -text
 Dip/install-sh -text
 Dip/ltmain.sh -text
 Dip/missing -text
+Dip/py-compile -text
 Dip/scripts/Copyright -text
 Dip/scripts/average.awk -text
 Dip/scripts/copyright_add.sh -text
