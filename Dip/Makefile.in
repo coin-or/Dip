@@ -131,7 +131,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/VRP/get_concorde.sh.in \
 	$(top_srcdir)/examples/VRP/get_cvrpsep.sh.in \
 	$(top_srcdir)/examples/VRP/vrp.parm.in AUTHORS config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
+	config.sub depcomp install-sh ltmain.sh missing py-compile
 @HAVE_EXTERNALS_TRUE@am__append_2 = Dependencies
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Dependencies-stamp
 subdir = .
@@ -368,6 +368,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PYTHON = @PYTHON@
+PYTHON_CFLAGS = @PYTHON_CFLAGS@
+PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
+PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_PLATFORM = @PYTHON_PLATFORM@
+PYTHON_PREFIX = @PYTHON_PREFIX@
+PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
 SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
@@ -430,8 +437,12 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pkgpyexecdir = @pkgpyexecdir@
+pkgpythondir = @pkgpythondir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+pyexecdir = @pyexecdir@
+pythondir = @pythondir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@

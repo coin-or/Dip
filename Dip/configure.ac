@@ -108,6 +108,17 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 
 #############################################################################
+#                       Python Stuff (for Dippy)                            #
+#############################################################################
+
+AM_PATH_PYTHON(2.7)
+PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
+PYTHON_LIBS="-lpython$PYTHON_VERSION"
+PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+AC_SUBST([PYTHON_LIBS])
+AC_SUBST([PYTHON_CFLAGS])
+
+#############################################################################
 #                      Check for the LP solver                              #
 #############################################################################
 
@@ -225,6 +236,7 @@ AC_SUBST(CLLCFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 src/Dippy/Makefile
                  examples/Makefile.Examples
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm
