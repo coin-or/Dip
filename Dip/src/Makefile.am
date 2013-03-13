@@ -12,7 +12,7 @@
 
 ## $Id: $
 
-SUBDIRS = 
+SUBDIRS = .
 if HAVE_PYTHON
 SUBDIRS += Dippy
 endif
