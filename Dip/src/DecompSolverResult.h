@@ -47,6 +47,9 @@ public :
    bool      m_isOptimal;
    bool      m_isCutoff;   
    int       m_nSolutions;
+
+   bool      m_isUnbounded; 
+
    std::vector< std::vector<double> > m_solution;
 
    std::vector< std::vector<double> > m_ray; 

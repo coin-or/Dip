@@ -808,6 +808,9 @@ inline int UtilOpenFile(std::ifstream     & is,
    return UtilOpenFile(is, fileName.c_str());
 }
 
+int UtilGcd(int a, int b); 
+
+
 
 
 #endif

@@ -104,6 +104,32 @@ int UtilScaleDblToIntArr(const int      arrLen,
 
 
 /*==========================================================================*/
+//---
+//--- find the greatest common division of two integer numbers
+//---
+int UtilGcd(int a, int b){
+
+  if(a > b){
+    if(a % b == 0){
+      return b;
+    }
+    else{
+      b = a % b;
+      UtilGcd(a, b);
+    }
+  }
+  else{
+    if(b % a == 0){
+      return a;
+    }
+    else{
+      a = b % a;
+      UtilGcd(a, b);
+    }
+  }
+}
+
+/*==========================================================================*/
 int UtilScaleDblToIntArr(const int      arrLen,
                          const double * arrDbl,
                          int          * arrInt,
@@ -386,4 +412,5 @@ void UtilScaleDblToIntArrCC(const int      arrLen,
                             int          * arrInt){   
    integerize_vector(arrLen, arrDbl, arrInt);
 }
+
 #endif

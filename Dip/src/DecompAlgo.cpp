@@ -3067,6 +3067,13 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars, DecompRayList & initR
          //---
          nInitVars = static_cast<int>(initVars.size());
 	 attempts++;
+	 std::cout << "The number of attempts is "
+		   << attempts 	   
+		   << std::endl
+		   << "The number of nInitVars is"
+		   << nInitVars
+		   << std::endl;
+	 
       }
 
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
@@ -7190,7 +7197,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       // THINK: we really don't want to force the user to create vars
       // and check rc and obj, etc... but they might know how to be smart
       // and produce more than one, etc... THINK
-      if(solveResult->m_nSolutions){
+      if(solveResult->m_nSolutions && !solveResult->m_isUnbounded){
 	 int k;
 	 for(k = 0; k < solveResult->m_nSolutions; k++){
 	    const double * milpSolution = solveResult->getSolution(k);
