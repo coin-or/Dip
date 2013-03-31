@@ -112,10 +112,15 @@ AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 #############################################################################
 
 AM_PATH_PYTHON([2.6],,[:])
-AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
-PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
-PYTHON_LIBS="-lpython$PYTHON_VERSION"
-PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+if test "$PYTHON" != "" ; then
+AC_COIN_CHECK_HEADER([Python.h],,[PYTHON=])
+fi
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
+if test "$PYTHON" != "" ; then
+  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
+  PYTHON_LIBS="-lpython$PYTHON_VERSION"
+  PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+fi
 AC_SUBST([PYTHON_LIBS])
 AC_SUBST([PYTHON_CFLAGS])
 
