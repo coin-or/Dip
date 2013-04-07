@@ -2744,8 +2744,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 	m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
       else if (m_param.SolveMasterUpdateAlgo == DecompPrimSimplex)
 	m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+
+      #ifdef DecompBarrier
       else if(m_param.SolveMasterUpdateAlgo == DecompBarrier)
 	m_masterSI->setHintParam(OsiDoBarrierInResolve,true, OsiHintDo); 
+      #endif
       else
 
 	throw UtilException("Master Method Unspecified", "solutionUpdate", "DecompAlgo"); 
@@ -2769,8 +2772,10 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
        m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
       else if (m_param.SolveMasterUpdateAlgo == DecompPrimSimplex)
 	m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+     #ifdef DecompBarrier
       else if(m_param.SolveMasterUpdateAlgo == DecompBarrier)
 	m_masterSI->setHintParam(OsiDoBarrierInResolve,true, OsiHintDo); 
+     #endif
       else
 	throw UtilException("Master Method Unspecified", "solutionUpdate", "DecompAlgo"); 
 	
