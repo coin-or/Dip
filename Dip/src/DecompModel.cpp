@@ -524,9 +524,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
                               CPX_STAT_UNBOUNDED,// newly added status
                               CPXMIP_INForUNBD}; // newly added status
 
-   std::cout << "The status of the problem is "
-	     << result->m_solStatus
-	     << std::endl;
+   // std::cout << "The status of the problem is "
+   // 	     << result->m_solStatus
+   // 	     << std::endl;
 
    // update result object
    result->m_nSolutions = 0;
@@ -536,7 +536,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
        
 
    if(result->m_solStatus == CPXMIP_INForUNBD || 
-      result->m_solStatus == CPX_STAT_UNBOUNDED){
+      result->m_solStatus == CPX_STAT_UNBOUNDED||
+      result->m_solStatus == CPXMIP_UNBOUNDED ){
+
+
+     std::cout << "There might be extreme rays in the subproblem "
+	       << std::endl;
 
      // turn off the presolve and solve the relaxation of
      // the subproblem at the root 
@@ -582,7 +587,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    else
 
      {
-
 
        if(!UtilIsInSet(result->m_solStatus, statusSet2, 6)){
 	 cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
