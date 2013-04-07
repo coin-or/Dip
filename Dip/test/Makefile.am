@@ -8,53 +8,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-########################################################################
-#                      unitTest for DIP                                #
-########################################################################
+test: ../src/dip$(EXEEXT)
 
-noinst_PROGRAMS = unitTest
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance `$(CYGPATH_W)`.\./`$(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(CYGPATH_W)`../`$(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
 
-nodist_unitTest_SOURCES = \
-	MILP_DecompApp.cpp MILP_DecompApp.h \
-	MILP_Main.cpp MILP_Param.h
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W)`../`$(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
 
-# List libraries that need to be linked in
-unitTest_LDADD = ../src/libDecomp.la $(DIPLIB_LIBS)
-unitTest_DEPENDENCIES = ../src/libDecomp.la $(DIPLIB_DEPENDENCIES)
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/../src` $(DIPLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(top_srcdir)/src`
-
-########################################################################
-#                     Includes for LP Solver                           #
-########################################################################
-
-if CPLEX_LP_SOLVER
-AM_CPPFLAGS += -D__DECOMP_LP_CPX__
-endif
-
-if CLP_LP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_LP_CLP__
-endif
-
-########################################################################
-#                     Includes for IP Solver                           #
-########################################################################
-
-if CBC_IP_SOLVER
-if COIN_HAS_CBC
-AM_CPPFLAGS += -D__DECOMP_IP_CBC__
-endif
-endif
-
-if CPLEX_IP_SOLVER
-AM_CPPFLAGS += -D__DECOMP_IP_CPX__
-endif
-
-test: unitTest$(EXEEXT)
-
-	./unitTest$(EXEEXT) --doPriceCut 1 --doCut 0 --MILP:DataDir `$(CYGPATH_W) $(SAMPLE_DATA)` --MILP:Instance tp3 --MILP:BestKnownLB 155 --MILP:BestKnownUB 155
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --MILP:BestKnownLB 11   --MILP::BestKnownUB 11
 
 .PHONY: test
 

@@ -24,6 +24,9 @@
 /* Define to 1 if the Cpx package is available */
 #undef COIN_HAS_CPX
 
+/* Define to 1 if the HMetis package is available */
+#undef COIN_HAS_HMETIS
+
 /* Define to 1 if the Sample package is available */
 #undef COIN_HAS_SAMPLE
 

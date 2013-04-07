@@ -75,6 +75,8 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/ATM/Makefile.in \
 	$(top_srcdir)/examples/ATM/atm.parm.in \
 	$(top_srcdir)/examples/ATM/data_extract.sh.in \
+	$(top_srcdir)/examples/DIP/Makefile.in \
+	$(top_srcdir)/examples/DIP/data_extract.sh.in \
 	$(top_srcdir)/examples/ExternalSolvers/Graph/get.boost.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in \
@@ -171,6 +173,7 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/ATM/atm.parm examples/ATM/data_extract.sh \
 	examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm \
 	examples/SDPUC/data_extract.sh examples/SDPUC/README.txt \
+	examples/DIP/Makefile examples/DIP/data_extract.sh \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -288,6 +291,8 @@ COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
 COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
+COIN_HAS_HMETIS_FALSE = @COIN_HAS_HMETIS_FALSE@
+COIN_HAS_HMETIS_TRUE = @COIN_HAS_HMETIS_TRUE@
 COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
 COIN_HAS_PKGCONFIG_TRUE = @COIN_HAS_PKGCONFIG_TRUE@
 COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
@@ -340,6 +345,8 @@ HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 HAVE_PYTHON_FALSE = @HAVE_PYTHON_FALSE@
 HAVE_PYTHON_TRUE = @HAVE_PYTHON_TRUE@
+HMETISINCDIR = @HMETISINCDIR@
+HMETISLIB = @HMETISLIB@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -615,6 +622,10 @@ examples/SDPUC/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/exam
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/SDPUC/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/SDPUC/README.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/DIP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/DIP/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/DIP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/DIP/data_extract.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in
@@ -796,7 +807,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/DIP $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

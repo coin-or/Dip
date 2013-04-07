@@ -72,7 +72,10 @@ public:
    double GetSetting(const char * name,
                      const double defaultValue,
                      const char * section = NULL);
-    
+
+   std::string GetSetting(const char * name,
+			  const std::string defaultValue,
+			  const char * section = NULL) ; 
 private:
    UtilParam * FindEntry(const char * section, 
                          const char * name);

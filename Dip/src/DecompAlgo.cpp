@@ -23,7 +23,7 @@
 #include "DecompSolverResult.h"
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
-//#define   RELAXED_THREADED
+#define   RELAXED_THREADED
 
 //#define   DO_INTERIOR //also in DecompAlgoPC
 
@@ -50,7 +50,7 @@ using namespace std;
 //#include "pfunc/pfunc.hpp"
 static void * solveRelaxedThread(void * args);
 #endif
-typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
+//typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
 struct SolveRelaxedThreadArgs {
    DecompAlgo         *  algo;
    int                   threadId;

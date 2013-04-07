@@ -364,6 +364,9 @@ Dip/py-compile -text
 Dip/scripts/Copyright -text
 Dip/scripts/average.awk -text
 Dip/scripts/copyright_add.sh -text
+Dip/scripts/get.hmetis.sh -text
+Dip/scripts/get.patoh.sh -text
+Dip/scripts/get.test_data.sh -text
 Dip/scripts/parse.atm.sh -text
 Dip/scripts/parse.awk.retail.sh -text
 Dip/scripts/parse.awk.sh -text
@@ -403,6 +406,7 @@ Dip/src/DecompCutOsi.h -text
 Dip/src/DecompCutPool.cpp -text
 Dip/src/DecompCutPool.h -text
 Dip/src/DecompDebug.cpp -text
+Dip/src/DecompMain.cpp -text
 Dip/src/DecompMemPool.h -text
 Dip/src/DecompModel.cpp -text
 Dip/src/DecompModel.h -text
@@ -459,6 +463,7 @@ Dip/src/config.h.in -text
 Dip/src/config_default.h -text
 Dip/src/config_dip.h.in -text
 Dip/src/config_dip_default.h -text
+Dip/src/hmetis.h -text
 Dip/src/old/BcpsDecompModel.cpp -text
 Dip/src/old/BcpsDecompModel.h -text
 Dip/src/old/BcpsDecompNodeDesc.h -text

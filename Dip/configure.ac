@@ -106,6 +106,7 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 # Ampl Solver library
 
 AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
+AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
 
 #############################################################################
 #                       Python Stuff (for Dippy)                            #
@@ -293,6 +294,8 @@ AC_CONFIG_FILES([Makefile
 		 examples/SDPUC/sdpuc.parm
 		 examples/SDPUC/data_extract.sh
 		 examples/SDPUC/README.txt
+                 examples/DIP/Makefile
+		 examples/DIP/data_extract.sh
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
