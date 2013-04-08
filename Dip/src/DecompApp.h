@@ -28,7 +28,9 @@
 
 
 extern "C"{
+#if defined (COIN_HAS_METIS)
 #include "hmetis.h"
+#endif
 }
 
 

@@ -31,9 +31,9 @@
 #else 
 
 extern "C"{
-
+#if defined (COIN_HAS_METIS)
 #include "hmetis.h"
-
+#endif
 }
 
 #endif
@@ -205,8 +205,10 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
      
      // automatic structure detection
      
+     #if defined (COIN_HAS_METIS)
      singlyBorderStructureDetection();
    
+     #endif
 
 
 
@@ -1524,10 +1526,10 @@ void DecompApp::singlyBorderStructureDetection(){
    #else
 
    clock_t begin = clock();
-   
+   #if defined(COIN_HAS_METIS)
    HMETIS_PartRecursive(numVertices,numHyperedges, vwgts, eptr, 
 			eind,hewgts, nparts, ubfactor, options, part, edgecut); 
-   
+   #endif
    clock_t end = clock();
 
    UTIL_MSG(m_param.LogLevel,2,
