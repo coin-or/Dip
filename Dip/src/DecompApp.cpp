@@ -202,11 +202,11 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
 
 
    else 
-
-   // automatic structure detection
-
+     
+     // automatic structure detection
+     
      singlyBorderStructureDetection();
-
+   
 
 
 
@@ -1152,7 +1152,7 @@ void DecompApp::singlyBorderStructureDetection(){
 
    // The following code creates a histogram table to store the 
    // nonzero counts and number of rows
-
+   /*
    std::map<int,int> histogram; 
    
    for (int i = 0 ; i < numRows; ++i)
@@ -1299,7 +1299,7 @@ void DecompApp::singlyBorderStructureDetection(){
 
      }
 
-
+   */
 
 
    /*
