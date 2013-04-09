@@ -109,8 +109,6 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 #                            DIP binary                                #
 ########################################################################
 
-if COIN_HAS_HMETIS
-
 # Name of the executable compiled in this directory.  We want it to be
 # installed in the 'bin' directory
 bin_PROGRAMS = dip
@@ -119,10 +117,11 @@ bin_PROGRAMS = dip
 dip_SOURCES = DecompMain.cpp
 
 # Additional libraries
-dip_LDADD = libDecomp.la $(DIPLIB_LIBS) $(HMETISLIB)
-dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
-
+dip_LDADD = libDecomp.la $(DIPLIB_LIBS)
+if COIN_HAS_HMETIS
+dip_LDADD +=  $(HMETISLIB)
 endif
+dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
 
 ########################################################################
 #                            Additional flags                          #
@@ -134,9 +133,7 @@ endif
 AM_CPPFLAGS = $(DIPLIB_CFLAGS)
 
 if COIN_HAS_HMETIS
-
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(HMETISINCDIR)`
-
 endif
 
 # This line is necessary to allow VPATH compilation
