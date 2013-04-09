@@ -20,6 +20,7 @@
 using namespace std;
 
 // --------------------------------------------------------------------- //
+/*
 bool DecompWaitingCol::setReducedCost(const double      * u, 
 				      const DecompStatus    stat){
    double redCost;  
@@ -39,6 +40,7 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
       return redCost <= -0.0000000001;//m_app->m_param.dualTol;
    }
 }
+*/
 
 
 // --------------------------------------------------------------------- //
