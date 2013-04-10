@@ -192,13 +192,13 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
 
 
    else 
-
-   // automatic structure detection
-
+     
+     // automatic structure detection
+     {     
      #if defined (COIN_HAS_METIS)
      singlyBorderStructureDetection();
      #endif
-
+     }
 
 
 
@@ -1012,6 +1012,12 @@ void DecompApp::createModels(){
    ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
 #if 1
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
+
+   std::cout << "The number of master Only Cols is " << nMasterOnlyCols << std::endl;
+
+   std::cout << "(kappa) The percentage of Master Only Cols over total columns is " 
+	     << double(nMasterOnlyCols)/nCols << std::endl; 
+
    if(nMasterOnlyCols){
       if(m_param.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
