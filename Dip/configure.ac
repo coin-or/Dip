@@ -114,11 +114,12 @@ AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
 
 AM_PATH_PYTHON([2.6],,[:])
 if test "$PYTHON" != "" ; then
-AC_COIN_CHECK_HEADER([Python.h],,[PYTHON=])
+  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
+  AC_COIN_CHECK_HEADER([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],,
+		       [PYTHON=])
 fi
 AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
 if test "$PYTHON" != "" ; then
-  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
   PYTHON_LIBS="-lpython$PYTHON_VERSION"
   PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
 fi

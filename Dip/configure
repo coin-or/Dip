@@ -24911,15 +24911,16 @@ echo "${ECHO_T}$am_cv_python_pyexecdir" >&6
 
 
 if test "$PYTHON" != "" ; then
+  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
 
 #if test x"" = x; then
-#  hdr="#include <Python.h>"
+#  hdr="#include <$PY_PREFIX/include/python$PYTHON_VERSION/Python.h>"
 #else
 #  hdr=""
 #fi
-#AC_CHECK_HEADERS([Python.h],[],[PYTHON=],[$hdr])
+#AC_CHECK_HEADERS([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],[],[PYTHON=],[$hdr])
 
-for ac_header in Python.h
+for ac_header in $PY_PREFIX/include/python$PYTHON_VERSION/Python.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -25083,7 +25084,6 @@ else
 fi
 
 if test "$PYTHON" != "" ; then
-  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
   PYTHON_LIBS="-lpython$PYTHON_VERSION"
   PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
 fi
