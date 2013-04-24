@@ -50,8 +50,10 @@ int UtilAlpsEncodeWarmStart(AlpsEncoded              * encoded,
 }
 
 //===========================================================================//
-CoinWarmStartBasis * UtilAlpsDecodeWarmStart(AlpsEncoded      & encoded,
-                                             AlpsReturnStatus * rc) {
+CoinWarmStartBasis * UtilAlpsDecodeWarmStart(AlpsEncoded & encoded){
+
+  // AlpsReturnStatus* rc
+
   //rc not used? not checked?
 
   int numCols;

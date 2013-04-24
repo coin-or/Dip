@@ -31,7 +31,6 @@ int UtilAlpsEncodeWarmStart(AlpsEncoded              * encoded,
                             const CoinWarmStartBasis * ws);
 
 /** Unpack coin warm start from an encoded object. */
-CoinWarmStartBasis * UtilAlpsDecodeWarmStart(AlpsEncoded      & encoded,
-                                             AlpsReturnStatus * rc);
+CoinWarmStartBasis * UtilAlpsDecodeWarmStart(AlpsEncoded      & encoded)
 
 #endif
