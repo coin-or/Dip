@@ -20,7 +20,7 @@
 #include "Decomp.h"
 #include "UtilMacros.h"
 #include "UtilParameters.h"
-
+#include "string"
 //===========================================================================//
 #define PARAM_getSetting(xstr, x) x = param.GetSetting(xstr, x, sec)
 
@@ -216,6 +216,64 @@ public:
 
    int DebugCheckBlocksColumns;
 
+
+   /*
+    * The block number for automatic decomposition
+    */
+    
+   int NumBlocks; 
+
+   
+   /*
+    * The following parameters are extended from MILPBlock 
+    * applications but changed to MILP domain
+    *
+    */
+
+   std::string DataDir;
+   std::string Instance;
+   
+      /*
+    * The file defining which rows are in which blocks.
+    */
+   std::string BlockFile;
+   
+   /**
+    * The format of BlockFile.
+    *
+    * (1) "List" or "LIST"
+    * The block file defines those rows in each block.
+    *   <block id>  <num rows in block>
+    *   <row ids...>
+    *   <block id>  <num rows in block>
+    *   <row ids...>
+    *
+    * (2) "Pair" or "PAIR"
+    * Each line is a block id to row id pair.
+    *   <block id> <row id> 
+    *
+    * (3) "PairName" or "PAIRNAME"
+    * Each line is a block id to row name (matching mps) pair.
+    *   <block id> <row name>     
+    */
+   std::string BlockFileFormat;
+
+   std::string PermuteFile;
+
+   std::string InitSolutionFile; 
+   
+   int UseNames; // col/row names for debugging 
+   int UseSparse; // create all blocks sparsely
+   int FullModel; // create full model for CPM or direct
+   double BestKnownLB; 
+   double BestKnownUB;
+   double ColumnUB; // hack since missing extreme rays
+   double ColumnLB; //hack since missing extreme rays
+
+   int ObjectiveSense; //1=min, -1=max
+
+   int AutoDecomp; 
+
    /**
     * @}
     */
@@ -297,6 +355,38 @@ public:
 
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
 
+
+
+      PARAM_getSetting("NumBlocks",NumBlocks); 
+      DataDir      = param.GetSetting("DataDir",      "",    "MILP");
+      Instance     = param.GetSetting("Instance",     "",    "MILP");    
+      BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
+      PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
+      BlockFileFormat 
+         = param.GetSetting("BlockFileFormat",    "",    "MILP");    
+      InitSolutionFile
+         = param.GetSetting("InitSolutionFile",    "",    "MILP");    
+
+
+
+      PARAM_getSetting("LogLevel",LogLevel);
+      // PARAM_getSetting("DataDir",DataDir);
+      //PARAM_getSetting("Instance",Instance);
+      //PARAM_getSetting("BlockFile",BlockFile); 
+      //PARAM_getSetting("PermuteFile",PermuteFile);
+      //PARAM_getSetting("BlockFileFormat",BlockFileFormat);
+      //PARAM_getSetting("InitSolutionFile",InitSolutionFile);
+      PARAM_getSetting("UseNames",UseNames);
+      PARAM_getSetting("UseSparse",UseSparse);
+
+      PARAM_getSetting("FullModel",FullModel);
+      PARAM_getSetting("BestKnownLB",BestKnownLB);
+      PARAM_getSetting("BestKnownUB",BestKnownUB);
+      PARAM_getSetting("ColumnUB",ColumnUB);
+      PARAM_getSetting("ColumnLB",ColumnLB);
+      PARAM_getSetting("ObjectiveSense",ObjectiveSense);
+
+      PARAM_getSetting("AutoDecomp", AutoDecomp); 
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -409,6 +499,40 @@ public:
       UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       UtilPrintParameter(os, sec, 
 			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
+      UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
+
+      UtilPrintParameter(os, sec, "LogLevel",  LogLevel);
+
+      UtilPrintParameter(os, sec, "DataDir",  DataDir);
+      
+      UtilPrintParameter(os, sec, "Instance",  Instance);
+
+      UtilPrintParameter(os, sec, "BlockFile",  BlockFile);
+      
+      UtilPrintParameter(os, sec, "PermuteFile",  PermuteFile);
+      
+      UtilPrintParameter(os, sec, "BlockFileFormat",  BlockFileFormat);
+
+      UtilPrintParameter(os, sec, "InitSolutionFile",  InitSolutionFile);
+
+      UtilPrintParameter(os, sec, "UseNames",  UseNames);
+
+      UtilPrintParameter(os, sec, "UseSparse",  UseSparse);
+
+      UtilPrintParameter(os, sec, "FullModel",  FullModel);
+
+      UtilPrintParameter(os, sec, "BestKnownLB",  BestKnownLB);
+
+      UtilPrintParameter(os, sec, "BestKnownUB",  BestKnownUB);
+
+      UtilPrintParameter(os, sec, "ColumnUB",  ColumnUB);
+
+      UtilPrintParameter(os, sec, "ColumnLB",  ColumnLB);
+
+      UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
+
+      UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
+
       (*os) << "========================================================\n";
    }
    
@@ -474,6 +598,28 @@ public:
       BranchStrongIter         = 0;
       NumThreads               = 1;
       DebugCheckBlocksColumns  = true;
+      NumBlocks                = 3; 
+
+      /*
+       * parameters from MILPBlock and to be MILP
+       */
+      LogLevel                 = 0;
+      DataDir                  = "";
+      Instance                 = "";
+      BlockFile                = ""; 
+      BlockFileFormat          = "";
+      PermuteFile              = ""; 
+      InitSolutionFile         = "";
+      UseNames                 = 0 ;
+      UseSparse                = 1 ; 
+      FullModel                = 0 ; 
+      BestKnownLB              = -1.e100;
+      BestKnownUB              = 1.e100;
+      ColumnUB                 = 1.e20;
+      ColumnLB                 =-1.e20;
+      ObjectiveSense           = 1;
+
+      AutoDecomp               = 0;
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

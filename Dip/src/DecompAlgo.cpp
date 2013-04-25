@@ -50,7 +50,7 @@ using namespace std;
 //#include "pfunc/pfunc.hpp"
 static void * solveRelaxedThread(void * args);
 #endif
-typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
+//typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
 struct SolveRelaxedThreadArgs {
    DecompAlgo         *  algo;
    int                   threadId;
@@ -2184,7 +2184,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	       m_objNoChange = true;
                
                UTIL_DEBUG(m_param.LogDebugLevel, 3,
-                          (*m_osLog) << "No objective change" << endl;);           
+                          (*m_osLog) << "No objective change" << endl;);
 	       //0 1 2 3 4
 	       // w new vars
 	       //4x 3x 2 1 0

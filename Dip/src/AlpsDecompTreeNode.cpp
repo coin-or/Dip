@@ -55,7 +55,7 @@ AlpsDecompTreeNode::createNewTreeNode(AlpsNodeDesc *& desc) const {
 }
 
 //===========================================================================//
-void AlpsDecompTreeNode::checkIncumbent(AlpsDecompModel      * model,
+bool AlpsDecompTreeNode::checkIncumbent(AlpsDecompModel      * model,
                                         const DecompSolution * decompSol){
    
    AlpsDecompParam    & param      = model->getParam();
@@ -96,9 +96,10 @@ void AlpsDecompTreeNode::checkIncumbent(AlpsDecompModel      * model,
       UTIL_DEBUG(param.msgLevel, 3,
                  app->printOriginalSolution(decompSol->getSize(),
                                             modelCore->getColNames(),
-                                            decompSol->getValues());
-                 );
+                                            decompSol->getValues()););
+	  return true;
    }
+   return false;
 }
 
 //===========================================================================//
@@ -275,13 +276,14 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //--- solve the bounding problem (DecompAlgo)
    //---
    decompStatus = decompAlgo->processNode(this, globalLB, globalUB);
-   decompAlgo->postProcessNode();
-      
+
    //---
    //--- during processNode, did we find any IP feasible points?
    //--- 
    if(decompAlgo->getXhatIPBest()){
-      checkIncumbent(model, decompAlgo->getXhatIPBest());
+      if (checkIncumbent(model, decompAlgo->getXhatIPBest())){
+	 decompStatus = STAT_IP_FEASIBLE;
+      }
       //---
       //--- update the local currentUB value and the decomp global UB
       //---
@@ -290,7 +292,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
    }
    
    switch(decompStatus){
-   case STAT_FEASIBLE:
+    case STAT_FEASIBLE:
+    case STAT_IP_FEASIBLE:
       //---
       //--- the relaxation is feasible
       //---   if the new bound is > current currentUB, fathom 
@@ -300,7 +303,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       currentUB      = getKnowledgeBroker()->getIncumbentValue(); //UB (min)
       if(thisQuality > quality_)
          quality_ = thisQuality;
-
+      
       //watch tolerance here... if quality is close enough, fathom it
       gap = UtilCalculateGap(thisQuality, currentUB);
       //if(gap <= relTolerance){
@@ -321,7 +324,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
                << " doFathom " << doFathom << endl;
                );      
       break;
-   case STAT_INFEASIBLE:
+    case STAT_INFEASIBLE:
       //---
       //--- the relaxation is infeasible, fathom 
       //---
@@ -331,7 +334,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
                cout << "Fathom since node infeasible\n";
                );
       break;
-   default:
+    default:
       assert(0);
    }
 
@@ -356,12 +359,17 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //---   return (since we are not evaluating any more nodes anyway)
    //--- so, we fake it by acting like a branching candidate was found
    //---
-   if(param.nodeLimit == 0)
+
+	decompAlgo->postProcessNode(decompStatus);
+
+   if(param.nodeLimit == 0){
       setStatus(AlpsNodeStatusPregnant);
-   else if(doFathom) // || param.nodeLimit == 0)
+   }else if(doFathom){ // || param.nodeLimit == 0){
       setStatus(AlpsNodeStatusFathomed);
-   else
+   }else{
       status = chooseBranchingObject(model);
+	  decompAlgo->postProcessBranch(decompStatus);
+	}
    
    UtilPrintFuncEnd(&cout, m_classTag,
                     "process()", param.msgLevel, 3);

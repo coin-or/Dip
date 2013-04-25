@@ -12,6 +12,11 @@
 
 ## $Id: $
 
+SUBDIRS = .
+if HAVE_PYTHON
+SUBDIRS += Dippy
+endif
+
 ########################################################################
 #                               libDecomp                              #
 ########################################################################
@@ -101,6 +106,24 @@ libDecomp_la_SOURCES +=        \
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
+#                            DIP binary                                #
+########################################################################
+
+# Name of the executable compiled in this directory.  We want it to be
+# installed in the 'bin' directory
+bin_PROGRAMS = dip
+
+# List all source files for this executable, including headers
+dip_SOURCES = DecompMain.cpp
+
+# Additional libraries
+dip_LDADD = libDecomp.la $(DIPLIB_LIBS)
+if COIN_HAS_HMETIS
+dip_LDADD +=  $(HMETISLIB)
+endif
+dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
+
+########################################################################
 #                            Additional flags                          #
 ########################################################################
 
@@ -108,6 +131,10 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 
 AM_CPPFLAGS = $(DIPLIB_CFLAGS)
+
+if COIN_HAS_HMETIS
+AM_CPPFLAGS += -I`$(CYGPATH_W) $(HMETISINCDIR)`
+endif
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`

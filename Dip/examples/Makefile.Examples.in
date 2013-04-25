@@ -101,7 +101,7 @@ all: $(EXE)
 $(EXE): $(OBJS) $(DEPS)
 	bla=;\
 	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS) $(ADDLIBS)
 
 clean:
 	rm -rf $(EXE) $(OBJS)

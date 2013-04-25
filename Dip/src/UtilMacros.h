@@ -117,6 +117,17 @@ inline void UtilPrintParameter(std::ostream      * os,
 	 << std::setw(10) << value  << std::endl;
 }
 
+
+inline void UtilPrintParameter(std::ostream      * os,
+			       const std::string & section,
+			       const std::string & name,
+			       const std::string &  value){
+   (*os) << std::left << std::setw(15) << section
+	 << std::left << std::setw(25) << name
+	 << std::setw(10) << value  << std::endl;
+}
+
+
 // ------------------------------------------------------------------------- //
 template <class T> inline void 
 UtilPrintVector(const std::vector<T> & v,

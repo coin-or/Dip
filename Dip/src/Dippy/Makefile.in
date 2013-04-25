@@ -26,7 +26,9 @@
 #                    Ted Ralphs, Lehigh University                           #
 #============================================================================#
 
-
+########################################################################
+#                               libDippy                               #
+########################################################################
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -34,7 +36,7 @@ VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ..
+top_builddir = ../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -50,34 +52,30 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_PYTHON_TRUE@am__append_1 = Dippy
-bin_PROGRAMS = dip$(EXEEXT)
-@COIN_HAS_HMETIS_TRUE@am__append_2 = $(HMETISLIB)
-@COIN_HAS_HMETIS_TRUE@am__append_3 = -I`$(CYGPATH_W) $(HMETISINCDIR)`
 
 ########################################################################
 #                     Includes for LP Solver                           #
 ########################################################################
 #because CGL depends on CLP, we need this in any case
-@CLP_LP_SOLVER_TRUE@am__append_4 = -D__DECOMP_LP_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_5 = -D__DECOMP_LP_CPX__
+@CLP_LP_SOLVER_TRUE@am__append_1 = -D__DECOMP_LP_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_2 = -D__DECOMP_LP_CPX__
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_6 = -D__DECOMP_IP_CBC__
-@CPLEX_IP_SOLVER_TRUE@am__append_7 = -D__DECOMP_IP_CPX__
-subdir = src
-DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/config_dip.h.in TODO
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_3 = -D__DECOMP_IP_CBC__
+@CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
+subdir = src/Dippy
+DIST_COMMON = $(DIPPY_PYTHON) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = config.h config_dip.h
+CONFIG_HEADER = $(top_builddir)/src/config.h \
+	$(top_builddir)/src/config_dip.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -85,26 +83,15 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(includecoindir)"
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
-libDecomp_la_LIBADD =
-am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
-	DecompAlgoPC.lo DecompAlgoRC.lo DecompAlgoCGL.lo DecompCut.lo \
-	DecompCutPool.lo DecompApp.lo DecompStats.lo DecompDebug.lo \
-	DecompModel.lo DecompVar.lo DecompVarPool.lo DecompBranch.lo \
-	DecompConstraintSet.lo UtilGraphLib.lo UtilHash.lo \
-	UtilMacros.lo UtilMacrosDecomp.lo UtilParameters.lo \
-	UtilKnapsack.lo AlpsDecompModel.lo AlpsDecompTreeNode.lo \
-	UtilMacrosAlps.lo
-libDecomp_la_OBJECTS = $(am_libDecomp_la_OBJECTS)
-binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-PROGRAMS = $(bin_PROGRAMS)
-am_dip_OBJECTS = DecompMain.$(OBJEXT)
-dip_OBJECTS = $(am_dip_OBJECTS)
+am__installdirs = "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(DIPPYdir)"
+pyexecLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(pyexec_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-@COIN_HAS_HMETIS_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+_dippy_la_DEPENDENCIES = ../libDecomp.la $(am__DEPENDENCIES_1)
+am__dippy_la_OBJECTS = _dippy_la-DippyDecompAlgo.lo \
+	_dippy_la-DippyDecompApp.lo _dippy_la-DippyPythonUtils.lo \
+	_dippy_la-DippyModule.lo _dippy_la-DippySolve.lo
+_dippy_la_OBJECTS = $(am__dippy_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -123,19 +110,12 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libDecomp_la_SOURCES) $(dip_SOURCES)
-DIST_SOURCES = $(libDecomp_la_SOURCES) $(dip_SOURCES)
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-exec-recursive install-info-recursive \
-	install-recursive installcheck-recursive installdirs-recursive \
-	pdf-recursive ps-recursive uninstall-info-recursive \
-	uninstall-recursive
-includecoinHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(includecoin_HEADERS)
+SOURCES = $(_dippy_la_SOURCES)
+DIST_SOURCES = $(_dippy_la_SOURCES)
+DIPPYPYTHON_INSTALL = $(INSTALL_DATA)
+py_compile = $(top_srcdir)/py-compile
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = . Dippy
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ABSBUILDDIR = @ABSBUILDDIR@
 ACLOCAL = @ACLOCAL@
@@ -381,93 +361,36 @@ sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUBDIRS = . $(am__append_1)
-
-########################################################################
-#                               libDecomp                              #
-########################################################################
-
-# Name of the library compiled in this directory.  We want it to be installed
-# in the 'lib' directory
-lib_LTLIBRARIES = libDecomp.la
+DIPPYdir = $(pythondir)/dippy
+DIPPY_PYTHON = __init__.py dipapi.py dippy.py
+pyexec_LTLIBRARIES = _dippy.la
 
 # List all source files for this library, including headers
+_dippy_la_SOURCES = \
+	DippyDecompAlgo.cpp    \
+	DippyDecompAlgo.h      \
+	DippyDecompApp.cpp    \
+	DippyDecompApp.h      \
+	DippyPythonUtils.cpp    \
+	DippyPythonUtils.h      \
+	DippyDecompCut.h     \
+	DippyModule.cpp   \
+	DippySolve.cpp
 
-# DecompAlgo
-
-# DecompApp
-
-# other 
-
-# Util
-libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
-	DecompAlgoC.h DecompAlgoD.cpp DecompAlgoD.h DecompAlgoPC.cpp \
-	DecompAlgoPC.h DecompAlgoRC.cpp DecompAlgoRC.h \
-	DecompAlgoCGL.cpp DecompAlgoCGL.h DecompCut.cpp DecompCut.h \
-	DecompCutOsi.h DecompCutPool.cpp DecompCutPool.h DecompApp.cpp \
-	DecompApp.h Decomp.h DecompStats.cpp DecompStats.h \
-	DecompDebug.cpp DecompModel.cpp DecompModel.h DecompParam.h \
-	DecompVar.cpp DecompVar.h DecompVarPool.cpp DecompVarPool.h \
-	DecompBranch.cpp DecompMemPool.h DecompSolution.h \
-	DecompSolverResult.h DecompConstraintSet.cpp \
-	DecompConstraintSet.h DecompWaitingCol.h DecompWaitingRow.h \
-	UtilGraphLib.cpp UtilGraphLib.h UtilHash.cpp UtilHash.h \
-	UtilMacros.cpp UtilMacros.h UtilMacrosDecomp.cpp \
-	UtilMacrosDecomp.h UtilParameters.cpp UtilParameters.h \
-	UtilKnapsack.cpp UtilKnapsack.h UtilTimer.h \
-	AlpsDecompModel.cpp AlpsDecompModel.h AlpsDecompSolution.h \
-	AlpsDecompTreeNode.cpp AlpsDecompTreeNode.h \
-	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
-	UtilMacrosAlps.h
-
-# This is for libtool
-libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
-
-# List all source files for this executable, including headers
-dip_SOURCES = DecompMain.cpp
-
-# Additional libraries
-dip_LDADD = libDecomp.la $(DIPLIB_LIBS) $(am__append_2)
-dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
 
 ########################################################################
 #                            Additional flags                          #
 ########################################################################
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-AM_CPPFLAGS = $(DIPLIB_CFLAGS) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_7)
+# This is for libtool
+_dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_1) \
+	$(am__append_2) $(am__append_3) $(am__append_4)
+_dippy_la_LIBADD = ../libDecomp.la $(DIPLIB_LIBS)
+_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined
 
 # This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
-
-########################################################################
-#                Headers that need to be installed                     #
-########################################################################
-# Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
-
-#DecompAlgo
-
-# DecompApp
-
-# other 
-
-# Util
-includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
-	DecompAlgoPC.h DecompAlgoRC.h DecompAlgoCGL.h DecompCut.h \
-	DecompCutOsi.h DecompCutPool.h DecompApp.h Decomp.h \
-	DecompStats.h DecompModel.h DecompParam.h DecompVar.h \
-	DecompVarPool.h DecompMemPool.h DecompSolution.h \
-	DecompSolverResult.h DecompConstraintSet.h DecompWaitingCol.h \
-	DecompWaitingRow.h UtilGraphLib.h UtilHash.h UtilMacros.h \
-	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \
-	AlpsDecompModel.h AlpsDecompSolution.h AlpsDecompTreeNode.h \
-	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h
-all: config.h config_dip.h
-	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+DEFAULT_INCLUDES = -I. -I.. -I`$(CYGPATH_W) $(srcdir)` -I`$(CYGPATH_W) $(srcdir)/../` 
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .cpp .lo .o .obj
@@ -480,9 +403,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Dippy/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/Makefile
+	  $(AUTOMAKE) --gnu  src/Dippy/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -500,93 +423,35 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-
-config.h: stamp-h1
-	@if test ! -f $@; then \
-	  rm -f stamp-h1; \
-	  $(MAKE) stamp-h1; \
-	else :; fi
-
-stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status src/config.h
-$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
-	cd $(top_srcdir) && $(AUTOHEADER)
-	rm -f stamp-h1
-	touch $@
-
-config_dip.h: stamp-h2
-	@if test ! -f $@; then \
-	  rm -f stamp-h2; \
-	  $(MAKE) stamp-h2; \
-	else :; fi
-
-stamp-h2: $(srcdir)/config_dip.h.in $(top_builddir)/config.status
-	@rm -f stamp-h2
-	cd $(top_builddir) && $(SHELL) ./config.status src/config_dip.h
-
-distclean-hdr:
-	-rm -f config.h stamp-h1 config_dip.h stamp-h2
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+install-pyexecLTLIBRARIES: $(pyexec_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	test -z "$(pyexecdir)" || $(mkdir_p) "$(DESTDIR)$(pyexecdir)"
+	@list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	    echo " $(LIBTOOL) --mode=install $(pyexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(pyexecdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(pyexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(pyexecdir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-libLTLIBRARIES:
+uninstall-pyexecLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	@set -x; list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
 	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(pyexecdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(pyexecdir)/$$p"; \
 	done
 
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+clean-pyexecLTLIBRARIES:
+	-test -z "$(pyexec_LTLIBRARIES)" || rm -f $(pyexec_LTLIBRARIES)
+	@list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libDecomp.la: $(libDecomp_la_OBJECTS) $(libDecomp_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libDecomp_la_LDFLAGS) $(libDecomp_la_OBJECTS) $(libDecomp_la_LIBADD) $(LIBS)
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  if test -f $$p \
-	     || test -f $$p1 \
-	  ; then \
-	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
-	  else :; fi; \
-	done
-
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
-	done
-
-clean-binPROGRAMS:
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
-dip$(EXEEXT): $(dip_OBJECTS) $(dip_DEPENDENCIES) 
-	@rm -f dip$(EXEEXT)
-	$(CXXLINK) $(dip_LDFLAGS) $(dip_OBJECTS) $(dip_LDADD) $(LIBS)
+_dippy.la: $(_dippy_la_OBJECTS) $(_dippy_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(pyexecdir) $(_dippy_la_LDFLAGS) $(_dippy_la_OBJECTS) $(_dippy_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -594,32 +459,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AlpsDecompModel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AlpsDecompTreeNode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgo.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgoC.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgoCGL.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgoD.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgoPC.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgoRC.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompApp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompBranch.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompConstraintSet.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompCut.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompCutPool.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompDebug.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompMain.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompModel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompStats.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompVar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompVarPool.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilGraphLib.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilHash.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilKnapsack.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilMacros.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilMacrosAlps.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilMacrosDecomp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilParameters.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dippy_la-DippyDecompAlgo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dippy_la-DippyDecompApp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dippy_la-DippyModule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dippy_la-DippyPythonUtils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dippy_la-DippySolve.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -642,6 +486,41 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
+_dippy_la-DippyDecompAlgo.lo: DippyDecompAlgo.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT _dippy_la-DippyDecompAlgo.lo -MD -MP -MF "$(DEPDIR)/_dippy_la-DippyDecompAlgo.Tpo" -c -o _dippy_la-DippyDecompAlgo.lo `test -f 'DippyDecompAlgo.cpp' || echo '$(srcdir)/'`DippyDecompAlgo.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/_dippy_la-DippyDecompAlgo.Tpo" "$(DEPDIR)/_dippy_la-DippyDecompAlgo.Plo"; else rm -f "$(DEPDIR)/_dippy_la-DippyDecompAlgo.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DippyDecompAlgo.cpp' object='_dippy_la-DippyDecompAlgo.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o _dippy_la-DippyDecompAlgo.lo `test -f 'DippyDecompAlgo.cpp' || echo '$(srcdir)/'`DippyDecompAlgo.cpp
+
+_dippy_la-DippyDecompApp.lo: DippyDecompApp.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT _dippy_la-DippyDecompApp.lo -MD -MP -MF "$(DEPDIR)/_dippy_la-DippyDecompApp.Tpo" -c -o _dippy_la-DippyDecompApp.lo `test -f 'DippyDecompApp.cpp' || echo '$(srcdir)/'`DippyDecompApp.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/_dippy_la-DippyDecompApp.Tpo" "$(DEPDIR)/_dippy_la-DippyDecompApp.Plo"; else rm -f "$(DEPDIR)/_dippy_la-DippyDecompApp.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DippyDecompApp.cpp' object='_dippy_la-DippyDecompApp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o _dippy_la-DippyDecompApp.lo `test -f 'DippyDecompApp.cpp' || echo '$(srcdir)/'`DippyDecompApp.cpp
+
+_dippy_la-DippyPythonUtils.lo: DippyPythonUtils.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT _dippy_la-DippyPythonUtils.lo -MD -MP -MF "$(DEPDIR)/_dippy_la-DippyPythonUtils.Tpo" -c -o _dippy_la-DippyPythonUtils.lo `test -f 'DippyPythonUtils.cpp' || echo '$(srcdir)/'`DippyPythonUtils.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/_dippy_la-DippyPythonUtils.Tpo" "$(DEPDIR)/_dippy_la-DippyPythonUtils.Plo"; else rm -f "$(DEPDIR)/_dippy_la-DippyPythonUtils.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DippyPythonUtils.cpp' object='_dippy_la-DippyPythonUtils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o _dippy_la-DippyPythonUtils.lo `test -f 'DippyPythonUtils.cpp' || echo '$(srcdir)/'`DippyPythonUtils.cpp
+
+_dippy_la-DippyModule.lo: DippyModule.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT _dippy_la-DippyModule.lo -MD -MP -MF "$(DEPDIR)/_dippy_la-DippyModule.Tpo" -c -o _dippy_la-DippyModule.lo `test -f 'DippyModule.cpp' || echo '$(srcdir)/'`DippyModule.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/_dippy_la-DippyModule.Tpo" "$(DEPDIR)/_dippy_la-DippyModule.Plo"; else rm -f "$(DEPDIR)/_dippy_la-DippyModule.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DippyModule.cpp' object='_dippy_la-DippyModule.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o _dippy_la-DippyModule.lo `test -f 'DippyModule.cpp' || echo '$(srcdir)/'`DippyModule.cpp
+
+_dippy_la-DippySolve.lo: DippySolve.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT _dippy_la-DippySolve.lo -MD -MP -MF "$(DEPDIR)/_dippy_la-DippySolve.Tpo" -c -o _dippy_la-DippySolve.lo `test -f 'DippySolve.cpp' || echo '$(srcdir)/'`DippySolve.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/_dippy_la-DippySolve.Tpo" "$(DEPDIR)/_dippy_la-DippySolve.Plo"; else rm -f "$(DEPDIR)/_dippy_la-DippySolve.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DippySolve.cpp' object='_dippy_la-DippySolve.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(_dippy_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o _dippy_la-DippySolve.lo `test -f 'DippySolve.cpp' || echo '$(srcdir)/'`DippySolve.cpp
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -651,93 +530,33 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-includecoinHEADERS: $(includecoin_HEADERS)
+install-DIPPYPYTHON: $(DIPPY_PYTHON)
 	@$(NORMAL_INSTALL)
-	test -z "$(includecoindir)" || $(mkdir_p) "$(DESTDIR)$(includecoindir)"
-	@list='$(includecoin_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(includecoinHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(includecoindir)/$$f'"; \
-	  $(includecoinHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(includecoindir)/$$f"; \
-	done
+	test -z "$(DIPPYdir)" || $(mkdir_p) "$(DESTDIR)$(DIPPYdir)"
+	@list='$(DIPPY_PYTHON)'; dlist=''; for p in $$list; do\
+	  if test -f "$$p"; then b=; else b="$(srcdir)/"; fi; \
+	  if test -f $$b$$p; then \
+	    f=$(am__strip_dir) \
+	    dlist="$$dlist $$f"; \
+	    echo " $(DIPPYPYTHON_INSTALL) '$$b$$p' '$(DESTDIR)$(DIPPYdir)/$$f'"; \
+	    $(DIPPYPYTHON_INSTALL) "$$b$$p" "$(DESTDIR)$(DIPPYdir)/$$f"; \
+	  else :; fi; \
+	done; \
+	if test -n "$$dlist"; then \
+	  if test -z "$(DESTDIR)"; then \
+	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(DIPPYdir)" $$dlist; \
+	  else \
+	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(DIPPYdir)" $$dlist; \
+	  fi; \
+	else :; fi
 
-uninstall-includecoinHEADERS:
+uninstall-DIPPYPYTHON:
 	@$(NORMAL_UNINSTALL)
-	@list='$(includecoin_HEADERS)'; for p in $$list; do \
+	@list='$(DIPPY_PYTHON)'; dlist=''; for p in $$list; do\
 	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(includecoindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(includecoindir)/$$f"; \
-	done
-
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run `make' without going through this Makefile.
-# To change the values of `make' variables: instead of editing Makefiles,
-# (1) if the variable is set in `config.status', edit `config.status'
-#     (which will cause the Makefiles to be regenerated when you run `make');
-# (2) otherwise, pass the desired values on the `make' command line.
-$(RECURSIVE_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
-mostlyclean-recursive clean-recursive distclean-recursive \
-maintainer-clean-recursive:
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	rev=''; for subdir in $$list; do \
-	  if test "$$subdir" = "."; then :; else \
-	    rev="$$subdir $$rev"; \
-	  fi; \
-	done; \
-	rev="$$rev ."; \
-	target=`echo $@ | sed s/-recursive//`; \
-	for subdir in $$rev; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done && test -z "$$fail"
-tags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
-	done
-ctags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
+	  rm -f "$(DESTDIR)$(DIPPYdir)/$$f"; \
+	  rm -f "$(DESTDIR)$(DIPPYdir)/$${f}c"; \
+	  rm -f "$(DESTDIR)$(DIPPYdir)/$${f}o"; \
 	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -750,24 +569,11 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in config_dip.h.in $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
-	list='$(SOURCES) $(HEADERS) config.h.in config_dip.h.in $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -779,11 +585,11 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in config_dip.h.in $(TAGS_DE
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES) config.h.in config_dip.h.in $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS) config.h.in config_dip.h.in $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -828,41 +634,22 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d "$(distdir)/$$subdir" \
-	    || $(mkdir_p) "$(distdir)/$$subdir" \
-	    || exit 1; \
-	    distdir=`$(am__cd) $(distdir) && pwd`; \
-	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
-	    (cd $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$top_distdir" \
-	        distdir="$$distdir/$$subdir" \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h \
-		config_dip.h
-install-binPROGRAMS: install-libLTLIBRARIES
-
-installdirs: installdirs-recursive
-installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includecoindir)"; do \
+check: check-am
+all-am: Makefile $(LTLIBRARIES)
+installdirs:
+	for dir in "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(DIPPYdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -878,85 +665,71 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-pyexecLTLIBRARIES \
+	mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags
+	distclean-libtool distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
-info: info-recursive
+info: info-am
 
 info-am:
 
-install-data-am: install-includecoinHEADERS
+install-data-am: install-DIPPYPYTHON
 
-install-exec-am: install-binPROGRAMS install-exec-local \
-	install-libLTLIBRARIES
+install-exec-am: install-pyexecLTLIBRARIES
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-man:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-includecoinHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES uninstall-local
+uninstall-am: uninstall-DIPPYPYTHON uninstall-info-am \
+	uninstall-pyexecLTLIBRARIES
 
-uninstall-info: uninstall-info-recursive
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-pyexecLTLIBRARIES ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-DIPPYPYTHON install-am install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-pyexecLTLIBRARIES \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-DIPPYPYTHON \
+	uninstall-am uninstall-info-am uninstall-pyexecLTLIBRARIES
 
-.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am \
-	clean clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool clean-recursive ctags ctags-recursive distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-recursive distclean-tags distdir \
-	dvi dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-exec \
-	install-exec-am install-exec-local install-includecoinHEADERS \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-includecoinHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES uninstall-local
-
-
-install-exec-local:
-	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
-
-uninstall-local:
-	rm -f $(DESTDIR)$(includecoindir)/DecompConfig.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

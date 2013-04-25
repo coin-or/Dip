@@ -20,7 +20,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.9],[dip@lists.coin-or.org])
+AC_INIT([Dip],[trunk],[dip@lists.coin-or.org])
 
 # copyright for configure script
 AC_COPYRIGHT([
@@ -106,6 +106,25 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 # Ampl Solver library
 
 AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
+AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
+
+#############################################################################
+#                       Python Stuff (for Dippy)                            #
+#############################################################################
+
+AM_PATH_PYTHON([2.6],,[:])
+if test "$PYTHON" != "" ; then
+  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
+  AC_COIN_CHECK_HEADER([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],,
+		       [PYTHON=])
+fi
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
+if test "$PYTHON" != "" ; then
+  PYTHON_LIBS="-lpython$PYTHON_VERSION"
+  PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+fi
+AC_SUBST([PYTHON_LIBS])
+AC_SUBST([PYTHON_CFLAGS])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -225,6 +244,7 @@ AC_SUBST(CLLCFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 src/Dippy/Makefile
                  examples/Makefile.Examples
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm

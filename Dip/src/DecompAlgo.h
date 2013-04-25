@@ -318,7 +318,14 @@ public:
     * Does nothing by default.
     */
 
-   virtual void postProcessNode() {};
+   virtual void postProcessNode(DecompStatus decompStatus) {};
+
+   /**
+    * Do some information sending after the current node has been branched.
+    * Does nothing by default.
+    */
+
+   virtual void postProcessBranch(DecompStatus decompStatus) {};
 
    /**
     * Generate initial variables for master problem (PC/DC/RC).

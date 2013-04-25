@@ -299,6 +299,25 @@ string * UtilParameters::Find(const char * section,
 
 // ------------------------------------------------------------------------- //
 string UtilParameters::GetSetting(const char * name,
+                                  const std::string  defaultValue,
+                                  const char * section) {
+   //---
+   //--- build the qualified name using the section
+   //--- if the parameter is not found, return the default
+   //--- else convert the string to the appropriate type
+   //---
+   string * pVal = Find(section, name);  
+   if(pVal == NULL) {
+      return defaultValue;
+   }
+   return *pVal;
+}
+
+
+
+
+// ------------------------------------------------------------------------- //
+string UtilParameters::GetSetting(const char * name,
                                   const char * defaultValue,
                                   const char * section) {
    //---

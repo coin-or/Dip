@@ -75,13 +75,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\..\CoinUtils\src;..\..\..\..\..\Osi\src\Osi;..\..\..\..\..\Cbc\src\OsiCbc;..\..\..\..\..\BuildTools\headers;..\..\..\..\..\Osi\src\OsiSpx;..\..\..\..\..\Osi\src\OsiVol;..\..\..\..\..\Osi\src\OsiOsl;..\..\..\..\..\Osi\src\OsiXpr;..\..\..\..\..\Osi\src\OsiCpx;..\..\..\..\..\Clp\src\OsiClp;..\..\..\..\..\Cgl\src;..\..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\..\Cgl\src\CglClique;..\..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\..\Cgl\src\CglGomory;..\..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\..\Cgl\src\CglProbing;..\..\..\..\..\Clp\src;..\..\..\..\..\Cbc\src;..\..\..\..\..\Bcps\src;..\..\..\..\..\Alps\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DIP_BUILD;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;COIN_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4267; 4996;4244;4290;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
@@ -93,11 +88,8 @@
       <AdditionalIncludeDirectories>..\..\..\..\..\CoinUtils\src;..\..\..\..\..\Osi\src\Osi;..\..\..\..\..\Cbc\src\OsiCbc;..\..\..\..\..\BuildTools\headers;..\..\..\..\..\Osi\src\OsiSpx;..\..\..\..\..\Osi\src\OsiVol;..\..\..\..\..\Osi\src\OsiOsl;..\..\..\..\..\Osi\src\OsiXpr;..\..\..\..\..\Osi\src\OsiCpx;..\..\..\..\..\Clp\src\OsiClp;..\..\..\..\..\Cgl\src;..\..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\..\Cgl\src\CglClique;..\..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\..\Cgl\src\CglGomory;..\..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\..\Cgl\src\CglProbing;..\..\..\..\..\Clp\src;..\..\..\..\..\Cbc\src;..\..\..\..\..\Bcps\src;..\..\..\..\..\Alps\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DIP_BUILD;WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;COIN_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4267; 4996;4244;4290;4018;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
@@ -108,11 +100,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\..\CoinUtils\src;..\..\..\..\..\Osi\src\Osi;..\..\..\..\..\Cbc\src\OsiCbc;..\..\..\..\..\BuildTools\headers;..\..\..\..\..\Osi\src\OsiSpx;..\..\..\..\..\Osi\src\OsiVol;..\..\..\..\..\Osi\src\OsiOsl;..\..\..\..\..\Osi\src\OsiXpr;..\..\..\..\..\Osi\src\OsiCpx;..\..\..\..\..\Clp\src\OsiClp;..\..\..\..\..\Cgl\src;..\..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\..\Cgl\src\CglClique;..\..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\..\Cgl\src\CglGomory;..\..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\..\Cgl\src\CglProbing;..\..\..\..\..\Clp\src;..\..\..\..\..\Cbc\src;..\..\..\..\..\Bcps\src;..\..\..\..\..\Alps\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DIP_BUILD;WIN32;NDEBUG;_LIB;COIN_ASSERT;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)libDecomp.lib</OutputFile>
@@ -122,11 +111,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\..\CoinUtils\src;..\..\..\..\..\Osi\src\Osi;..\..\..\..\..\Cbc\src\OsiCbc;..\..\..\..\..\BuildTools\headers;..\..\..\..\..\Osi\src\OsiSpx;..\..\..\..\..\Osi\src\OsiVol;..\..\..\..\..\Osi\src\OsiOsl;..\..\..\..\..\Osi\src\OsiXpr;..\..\..\..\..\Osi\src\OsiCpx;..\..\..\..\..\Clp\src\OsiClp;..\..\..\..\..\Cgl\src;..\..\..\..\..\Cgl\src\CglTwomir;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding;..\..\..\..\..\Cgl\src\CglMixedIntegerRounding2;..\..\..\..\..\Cgl\src\CglFlowCover;..\..\..\..\..\Cgl\src\CglClique;..\..\..\..\..\Cgl\src\CglOddHole;..\..\..\..\..\Cgl\src\CglKnapsackCover;..\..\..\..\..\Cgl\src\CglGomory;..\..\..\..\..\Cgl\src\CglPreProcess;..\..\..\..\..\Cgl\src\CglProbing;..\..\..\..\..\Clp\src;..\..\..\..\..\Cbc\src;..\..\..\..\..\Bcps\src;..\..\..\..\..\Alps\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DIP_BUILD;WIN32;NDEBUG;_LIB;COIN_ASSERT;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
     </ClCompile>
     <Lib>
