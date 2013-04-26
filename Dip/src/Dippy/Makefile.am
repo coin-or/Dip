@@ -16,7 +16,9 @@
 #                               libDippy                               #
 ########################################################################
 
-DIPPYdir = $(pythondir)/dippy
+PACKAGE = dippy
+
+DIPPYdir = $(pkgpythondir)
 
 DIPPY_PYTHON = __init__.py dipapi.py dippy.py
 
