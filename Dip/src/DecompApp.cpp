@@ -1010,21 +1010,23 @@ void DecompApp::createModels(){
    //---   we will make column bounds explicity rows
    //---
    ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
-#if 1
-   int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
 
-   std::cout << "The number of master Only Cols is " << nMasterOnlyCols << std::endl;
+     int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
 
-   std::cout << "(kappa) The percentage of Master Only Cols over total columns is " 
-	     << double(nMasterOnlyCols)/nCols << std::endl; 
-
-   if(nMasterOnlyCols){
-      if(m_param.LogLevel >= 1)
+     if(nMasterOnlyCols){
+       if(m_param.LogLevel >= 1)
          (*m_osLog) << "Create model part Master-Only." << endl;
-      createModelMasterOnlys(modelCore->masterOnlyCols);
-   }
-#endif
-      
+       if(m_param.LogLevel >=2){ 
+
+	 (*m_osLog) << "The number of master Only Cols is: " 
+		    << nMasterOnlyCols << std::endl;
+
+	 (*m_osLog) << "(kappa) The percentage of Master Only Cols over total columns is "
+		    << double(nMasterOnlyCols)/nCols << std::endl;
+       }
+       createModelMasterOnlys(modelCore->masterOnlyCols);
+	 
+     }
    //---
    //--- free up local memory
    //---

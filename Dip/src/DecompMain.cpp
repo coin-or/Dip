@@ -135,11 +135,14 @@ int main(int argc, char ** argv){
 	      << " TotalReal= " << timeSetupReal + timeSolveReal
 	      << endl;      
 
-
+	 /* TODO: Add a global parameter to control the subproblem
+	          parallelization
 	 cout << "The parallel efficiency is "
 	      << timeSolveCpu/(milp.m_param.NumThreads*timeSolveReal)
 	      << endl;
-         //---
+	 */
+
+	 //---
          //--- sanity check
          //---   if user defines bestLB==bestUB (i.e., known optimal)
          //---   and solved claims we have optimal, check that they match
