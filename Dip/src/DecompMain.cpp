@@ -120,8 +120,30 @@ int main(int argc, char ** argv){
 	 //--- sanity check
 	 //---
 	 cout << setiosflags(ios::fixed|ios::showpoint);
-	 cout << "Status= "   << alpsModel.getSolStatus()  
-	      << " BestLB=  " << setw(10) 
+	 int statusCheck = alpsModel.getSolStatus(); 
+	 cout << "Status ";
+	 if ( !statusCheck)
+	   cout << "Optimal" << endl;
+	 else if (statusCheck == 1)
+	   cout << "TimeLimit" << endl;
+	 else if (statusCheck == 2)
+	   cout << "NodeLimit" << endl;
+	 else if (statusCheck == 3)
+	   cout << "SolLimit" << endl;
+	 else if (statusCheck == 4)
+	   cout << "Feasible" << endl;
+	 else if (statusCheck == 5)
+	   cout << "Infeasible" << endl;
+	 else if (statusCheck == 6)
+	   cout << "NoMemory" << endl;
+	 else if (statusCheck == 7)
+	   cout << "Failed" << endl;
+	 else if (stautsCheck == 8)
+	   cout << "Unbounded" << endl;
+	 else 
+	   cout << "Unknown" << endl;
+	 
+	 cout << " BestLB=  " << setw(10) 
 	      << UtilDblToStr(alpsModel.getGlobalLB(),5)
 	      << " BestUB= " << setw(10)
 	      << UtilDblToStr(alpsModel.getGlobalUB(),5)        
@@ -129,10 +151,10 @@ int main(int argc, char ** argv){
 	      << alpsModel.getNumNodesProcessed()
 	      << " SetupCPU= "  << timeSetupCpu
 	      << " SolveCPU= "  << timeSolveCpu 
-	      << " TotalCPU= "  << timeSetupCpu + timeSolveCpu
-	      << " SetupReal= " << timeSetupReal
-	      << " SolveReal= " << timeSolveReal
-	      << " TotalReal= " << timeSetupReal + timeSolveReal
+	      << " TotalCPU= "  << timeSetupCpu + timeSolveCpu << endl
+	      << " SetupWallclock= " << timeSetupReal
+	      << " SolveWallclock= " << timeSolveReal
+	      << " TotalWallclock= " << timeSetupReal + timeSolveReal
 	      << endl;      
 
 	 /* TODO: Add a global parameter to control the subproblem
@@ -175,7 +197,7 @@ int main(int argc, char ** argv){
 	    ofstream osSolution(solutionFile.c_str());
             const DecompSolution * solution = alpsModel.getBestSolution();
 	    const vector<string> & colNames = alpsModel.getColNames();
-            cout << "Optimal Solution" << endl;
+            cout << "Optimal Solution can be found in .sol file " << endl;
             solution->print(colNames, 8, osSolution);
 	    osSolution.close();
          }
