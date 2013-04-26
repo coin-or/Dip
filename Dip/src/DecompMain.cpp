@@ -121,7 +121,7 @@ int main(int argc, char ** argv){
 	 //---
 	 cout << setiosflags(ios::fixed|ios::showpoint);
 	 int statusCheck = alpsModel.getSolStatus(); 
-	 cout << "Status ";
+	 cout << " Status = ";
 	 if ( !statusCheck)
 	   cout << "Optimal" << endl;
 	 else if (statusCheck == 1)
@@ -138,7 +138,7 @@ int main(int argc, char ** argv){
 	   cout << "NoMemory" << endl;
 	 else if (statusCheck == 7)
 	   cout << "Failed" << endl;
-	 else if (stautsCheck == 8)
+	 else if (statusCheck == 8)
 	   cout << "Unbounded" << endl;
 	 else 
 	   cout << "Unknown" << endl;
@@ -197,7 +197,8 @@ int main(int argc, char ** argv){
 	    ofstream osSolution(solutionFile.c_str());
             const DecompSolution * solution = alpsModel.getBestSolution();
 	    const vector<string> & colNames = alpsModel.getColNames();
-            cout << "Optimal Solution can be found in .sol file " << endl;
+            cout << " Optimal Solution can be found in the file "
+		 << solutionFile  << endl;
             solution->print(colNames, 8, osSolution);
 	    osSolution.close();
          }
