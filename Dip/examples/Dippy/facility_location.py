@@ -2,9 +2,6 @@ DEBUGGING = True
 
 import sys
 
-#sys.path.append("C:\\COIN\\GIMPy\\GrUMPy\\trunk")
-#sys.path.append("C:\\COIN\\GIMPy\\trunk")
-
 from pulp import *
 
 if DEBUGGING:
@@ -18,13 +15,11 @@ from math import floor, ceil
 tol = pow(pow(2, -24), 2.0 / 3.0)
 
 from facility_ex1 import REQUIREMENT, PRODUCTS, LOCATIONS, CAPACITY
-#from facility_test1 import REQUIREMENT, PRODUCTS, LOCATIONS, CAPACITY
-#from facility_test2 import REQUIREMENT, PRODUCTS, LOCATIONS, CAPACITY
-#from facility_test6 import REQUIREMENT, PRODUCTS, LOCATIONS, CAPACITY
 
-prob = dippy.DipProblem("Facility Location", display_mode = 'xdot',
-                        layout = 'dot', 
-                        display_interval = 1)
+display_mode = 'off'
+
+prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
+                        layout = 'dot', display_interval = 1)
 
 assign_vars = LpVariable.dicts("x",
               [(i, j) for i in LOCATIONS
@@ -33,7 +28,7 @@ assign_vars = LpVariable.dicts("x",
 use_vars    = LpVariable.dicts("y",
               LOCATIONS, 0, 1, LpBinary)
 
-debug_print = True
+debug_print = False
 
 debug_print_lp = False
 
@@ -86,7 +81,8 @@ def choose_antisymmetry_branch(prob, sol):
         up_branch_lb = dict([(use_vars[LOCATIONS[n]], 1)
                              for n in range(0, int(up))])
         # Return the advanced branch to DIP
-        print "branch sets =", {}, down_branch_ub, up_branch_lb, {}
+        if debug_print:
+            print "branch sets =", {}, down_branch_ub, up_branch_lb, {}
         return {}, down_branch_ub, up_branch_lb, {}
 
 def solve_subproblem(prob, key, redCosts, convexDual):
@@ -388,10 +384,6 @@ def init_one_each(prob):
             print bvs
     return bvs
 
-prob.writeLP('facility_main.lp')
-for i in LOCATIONS:
-    prob.writeRelaxed(i, 'facility_relax%s.lp' % i);
-
 if debug_print_lp:
     prob.writeLP('facility_main.lp')
     for n, i in enumerate(LOCATIONS):
@@ -401,7 +393,7 @@ prob.branch_method = choose_antisymmetry_branch
 prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 prob.init_vars = init_first_fit
-prob.generate_cuts = generate_weight_cuts
+#prob.generate_cuts = generate_weight_cuts
 prob.heuristics = heuristics
 prob.root_heuristic = True
 prob.node_heuristic = True
