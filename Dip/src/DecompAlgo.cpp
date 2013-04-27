@@ -851,7 +851,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    assert(modelCore); //TODO - can core be empty?   
 
 
-   int r, c, startRow, endRow;
+   int r, startRow, endRow;
    int nColsCore = modelCore->getNumCols();
    int nRowsCore = modelCore->getNumRows();
    int nIntVars  = modelCore->getNumInts();
@@ -4577,8 +4577,8 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    else{
       rays.push_back(raysT[0]);
    }
-   const double * ray = rays[0];
-   assert(ray);
+   //   const double * ray = rays[0];
+   // assert(ray);
 
       
 
@@ -4663,7 +4663,7 @@ void DecompAlgo::generateVarsCalcRedCost(const double * u,
 void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
 					 double       * uNew){
 
-   int                   i, r;
+   int                   r;
    int                   nMasterRows   = m_masterSI->getNumRows();
    DecompConstraintSet * modelCore     = m_modelCore.getModel();
    int                   nBaseCoreRows = modelCore->nBaseRows;
