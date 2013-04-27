@@ -121,7 +121,9 @@ int main(int argc, char ** argv){
 	 //---
 	 cout << setiosflags(ios::fixed|ios::showpoint);
 	 int statusCheck = alpsModel.getSolStatus(); 
-	 cout << " Status = ";
+	 cout << "                                             "<< endl;
+	 cout << "\n ============== DECOMP Solution Info [Begin]: ============= \n";
+	 cout << " Status        = ";
 	 if ( !statusCheck)
 	   cout << "Optimal" << endl;
 	 else if (statusCheck == 1)
@@ -143,20 +145,19 @@ int main(int argc, char ** argv){
 	 else 
 	   cout << "Unknown" << endl;
 	 
-	 cout << " BestLB=  " << setw(10) 
-	      << UtilDblToStr(alpsModel.getGlobalLB(),5)
-	      << " BestUB= " << setw(10)
-	      << UtilDblToStr(alpsModel.getGlobalUB(),5)        
-	      << " Nodes= " << setw(6) 
-	      << alpsModel.getNumNodesProcessed()
-	      << " SetupCPU= "  << timeSetupCpu
-	      << " SolveCPU= "  << timeSolveCpu 
-	      << " TotalCPU= "  << timeSetupCpu + timeSolveCpu << endl
-	      << " SetupWallclock= " << timeSetupReal
-	      << " SolveWallclock= " << timeSolveReal
-	      << " TotalWallclock= " << timeSetupReal + timeSolveReal
-	      << endl;      
-
+	 cout << " BestLB        = " << setw(10) 
+	      << UtilDblToStr(alpsModel.getGlobalLB(),5) << endl
+	      << " BestUB        = " << setw(10)
+	      << UtilDblToStr(alpsModel.getGlobalUB(),5) << endl      
+	      << " Nodes         = " 
+	      << alpsModel.getNumNodesProcessed() << endl
+	      << " SetupCPU      = " << timeSetupCpu << endl
+	      << " SolveCPU      = " << timeSolveCpu << endl
+	      << " TotalCPU      = " << timeSetupCpu + timeSolveCpu << endl
+	      << " SetupWallclock= " << timeSetupReal << endl
+	      << " SolveWallclock= " << timeSolveReal << endl
+	      << " TotalWallclock= " << timeSetupReal + timeSolveReal    ; 
+	 cout << "\n ============== DECOMP Solution Info [END  ]: ============= \n";
 	 /* TODO: Add a global parameter to control the subproblem
 	          parallelization
 	 cout << "The parallel efficiency is "
