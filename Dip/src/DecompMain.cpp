@@ -120,21 +120,44 @@ int main(int argc, char ** argv){
 	 //--- sanity check
 	 //---
 	 cout << setiosflags(ios::fixed|ios::showpoint);
-	 cout << "Status= "   << alpsModel.getSolStatus()  
-	      << " BestLB=  " << setw(10) 
-	      << UtilDblToStr(alpsModel.getGlobalLB(),5)
-	      << " BestUB= " << setw(10)
-	      << UtilDblToStr(alpsModel.getGlobalUB(),5)        
-	      << " Nodes= " << setw(6) 
-	      << alpsModel.getNumNodesProcessed()
-	      << " SetupCPU= "  << timeSetupCpu
-	      << " SolveCPU= "  << timeSolveCpu 
-	      << " TotalCPU= "  << timeSetupCpu + timeSolveCpu
-	      << " SetupReal= " << timeSetupReal
-	      << " SolveReal= " << timeSolveReal
-	      << " TotalReal= " << timeSetupReal + timeSolveReal
-	      << endl;      
-
+	 int statusCheck = alpsModel.getSolStatus(); 
+	 cout << "                                             "<< endl;
+	 cout << "\n ============== DECOMP Solution Info [Begin]: ============= \n";
+	 cout << " Status        = ";
+	 if ( !statusCheck)
+	   cout << "Optimal" << endl;
+	 else if (statusCheck == 1)
+	   cout << "TimeLimit" << endl;
+	 else if (statusCheck == 2)
+	   cout << "NodeLimit" << endl;
+	 else if (statusCheck == 3)
+	   cout << "SolLimit" << endl;
+	 else if (statusCheck == 4)
+	   cout << "Feasible" << endl;
+	 else if (statusCheck == 5)
+	   cout << "Infeasible" << endl;
+	 else if (statusCheck == 6)
+	   cout << "NoMemory" << endl;
+	 else if (statusCheck == 7)
+	   cout << "Failed" << endl;
+	 else if (statusCheck == 8)
+	   cout << "Unbounded" << endl;
+	 else 
+	   cout << "Unknown" << endl;
+	 
+	 cout << " BestLB        = " << setw(10) 
+	      << UtilDblToStr(alpsModel.getGlobalLB(),5) << endl
+	      << " BestUB        = " << setw(10)
+	      << UtilDblToStr(alpsModel.getGlobalUB(),5) << endl      
+	      << " Nodes         = " 
+	      << alpsModel.getNumNodesProcessed() << endl
+	      << " SetupCPU      = " << timeSetupCpu << endl
+	      << " SolveCPU      = " << timeSolveCpu << endl
+	      << " TotalCPU      = " << timeSetupCpu + timeSolveCpu << endl
+	      << " SetupWallclock= " << timeSetupReal << endl
+	      << " SolveWallclock= " << timeSolveReal << endl
+	      << " TotalWallclock= " << timeSetupReal + timeSolveReal    ; 
+	 cout << "\n ============== DECOMP Solution Info [END  ]: ============= \n";
 	 /* TODO: Add a global parameter to control the subproblem
 	          parallelization
 	 cout << "The parallel efficiency is "
@@ -175,7 +198,8 @@ int main(int argc, char ** argv){
 	    ofstream osSolution(solutionFile.c_str());
             const DecompSolution * solution = alpsModel.getBestSolution();
 	    const vector<string> & colNames = alpsModel.getColNames();
-            cout << "Optimal Solution" << endl;
+            cout << " Optimal Solution can be found in the file "
+		 << solutionFile  << endl;
             solution->print(colNames, 8, osSolution);
 	    osSolution.close();
          }

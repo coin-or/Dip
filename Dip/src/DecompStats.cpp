@@ -120,7 +120,7 @@ void DecompStats::printOverallStats (ostream * os){
 
    (*os) << setiosflags(ios::fixed|ios::showpoint);   
    (*os).precision(2);    
-   (*os) << "\n========== DECOMP Statistics [BEGIN]: ========= ";
+   (*os) << "\n================ DECOMP Statistics [BEGIN]: =============== ";
    totalOverall = totalDecomp;
    (*os) << setw(40) << "\nTotal Decomp          = "         
          << setw(10) << totalDecomp
@@ -163,8 +163,8 @@ void DecompStats::printOverallStats (ostream * os){
          << setw(10) << 100.0 * totalCompressCols / totalOverall
          << setw(6)  << thisCompressCols.size()
          << setw(6)  << maxCompressCols
-      ;
-   (*os) << "\n========== DECOMP Statistics [END  ]: ========= \n";
+     ;
+   (*os) << "\n================ DECOMP Statistics [END  ]: =============== \n";
 }
 
 
