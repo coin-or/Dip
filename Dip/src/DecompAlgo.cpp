@@ -1075,7 +1075,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
                             << setw(20) << DecompRowTypeStr[m_masterRowType[r]]
                             << endl;
               }
-              for(c = 0; c < m_masterSI->getNumCols(); c++){	
+              for(int c = 0; c < m_masterSI->getNumCols(); c++){	
                  const string colN = m_masterSI->getColName(c);
                  (*m_osLog) << "Col[" << setw(4) << c << "] Name: "
                             << setw(30) << colN << " Type: "
@@ -4468,7 +4468,7 @@ void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
 		     uNew        + nBaseCoreRows);                  //to
    
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-	      for(i = 0; i < nMasterRows; i++){
+	      for(int i = 0; i < nMasterRows; i++){
 		 if(!UtilIsZero(uOld[i], DecompEpsilon)){
 		    (*m_osLog) << "uOld[" << setw(5) << i << " ]: " 
 			       << setw(12) << UtilDblToStr(uOld[i],3)
@@ -4479,7 +4479,7 @@ void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
 	      );
    
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-	      for(i = 0; i < (nMasterRows - m_numConvexCon); i++){
+	      for(int i = 0; i < (nMasterRows - m_numConvexCon); i++){
 		 if(!UtilIsZero(uNew[i], DecompEpsilon)){
 		    (*m_osLog) << "uNew[" << setw(5) << i << " ]: " 
 			       << setw(12) << UtilDblToStr(uNew[i],3) 
