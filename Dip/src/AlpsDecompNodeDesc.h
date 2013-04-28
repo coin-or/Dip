@@ -24,7 +24,7 @@
 #include "UtilMacrosAlps.h"
 
 //===========================================================================//
-class CoinWarmStartBasis;
+//class CoinWarmStartBasis;
 
 //===========================================================================//
 /**
@@ -53,6 +53,7 @@ class CoinWarmStartBasis;
 //===========================================================================//
 
 //===========================================================================//
+
 class AlpsDecompNodeDesc : public AlpsNodeDesc {
 
  private:
@@ -155,70 +156,6 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    std::vector< std::pair<int, double> > getBranched() const { 
       return branched_; }
 
- protected:
-
-   //---
-   //--- helper functions for encode/decode
-   //---
-
-   /** Pack blis portion of node description into an encoded. */
-   AlpsReturnStatus encodeAlpsDecomp(AlpsEncoded *encoded) const {
-      AlpsReturnStatus status = AlpsReturnStatusOk;
-      encoded->writeRep(branchedDir_);
-
-      // Basis
-      int ava = 0;
-      if (basis_) {
-	 ava = 1;
-	 encoded->writeRep(ava);
-	 //should this be a util func or blis func?
-	 //seems pretty standard, alps/coin util type stuff
-	 UtilAlpsEncodeWarmStart(encoded, basis_);
-      }
-      else {
-	 encoded->writeRep(ava);
-      }
-	
-      return status;
-   }
-
-   /** Unpack blis portion of node description from an encoded. */
-   AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded &encoded) {
-      AlpsReturnStatus status = AlpsReturnStatusOk;	
-      encoded.readRep(branchedDir_);
-	
-      // Basis
-      int ava;
-      encoded.readRep(ava);
-      if (ava == 1) {
-	 basis_ = UtilAlpsDecodeWarmStart(encoded, &status);
-      }
-      else {
-	 basis_ = NULL;
-      }
-	
-      return status;
-   }
-
- public:
-
-   //---
-   //--- pure virtual functions from AlpsNodeDesc or AlpsNodeDesc
-   //---  
-    
-   /** Pack node description into an encoded. */
-   virtual AlpsReturnStatus encode(AlpsEncoded *encoded) const {
-      AlpsReturnStatus status = AlpsReturnStatusOk;       
-      status = encodeAlpsDecomp(encoded);	
-      return status;
-   }
-
-   /** Unpack a node description from an encoded. Fill member data. */
-   virtual AlpsReturnStatus decode(AlpsEncoded &encoded) {	
-      AlpsReturnStatus status = AlpsReturnStatusOk;
-      status = decodeAlpsDecomp(encoded);
-      return status;
-   }
     
 };
 #endif

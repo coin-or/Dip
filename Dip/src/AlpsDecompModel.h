@@ -250,6 +250,25 @@ public:
    const int    getSolStatus() const { return m_alpsStatus;}
    const int    getNumNodesProcessed() const { return m_nodesProcessed;}
 
+   
+ public: 
+   
+   /** The method that encodes the solution into a buffer. */
+   virtual AlpsEncoded* encode();
+
+   /** The method that decodes model data from the encoded form and                                                 
+       fill member data. */
+   virtual void decodeToSelf(AlpsEncoded& encoded);
+
+
+   void encodeDecompAlgo(AlpsEncoded*& encoded) const ; 
+
+   void decodeDecompAlgo(AlpsEncoded& encoded); 
+
+   void encodeAlpsDecompParam(AlpsEncoded*& encoded) ; 
+
+   AlpsDecompParam decodeAlpsDecompParam(AlpsEncoded& encoded); 
+
    /**
     * @}
     */

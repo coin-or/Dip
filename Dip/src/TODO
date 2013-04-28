@@ -14,6 +14,11 @@
 - UtilCoin, UtilAlps, ... others should be completely independent of COIN
 
 
+The following are added by Jiadong
+
+1. AlpsDecompSolution and DecompSolution needed to be aggregated into one 
+   file, many duplicattion part in these two files
+
 
 Debug: 
 

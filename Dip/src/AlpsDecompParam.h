@@ -138,6 +138,20 @@ public:
       getSettings(utilParam);
    }
 
+   AlpsDecompParam(int logFile,
+		   bool printS,
+		   bool check,
+		   int msg,
+		   int node,
+		   int nodeLog,
+		   int search):
+   logFileLevel(logFile), printSolution(printS),
+     checkMemory(check), msgLevel(msg), nodeLimit(node),
+     nodeLogInterval(nodeLog), searchStrategy(search){}
+
+
+
+
    /**
     * Destructor
     */   

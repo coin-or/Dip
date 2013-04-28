@@ -159,10 +159,21 @@ AlpsExitStatus AlpsDecompModel::solve(){
    //---
    decompParam.LimitNodes = m_param.nodeLimit;
    
+
+
+#ifdef COIN_HAS_MPI
    //---
-   //--- declare an AlpsKnowledgeBroker for serial application
-   //---   
+   // declare an AlpsKnowledgeBroker for parallel application
+   //---
+   AlpsKnowledgeBrokerMPI alpsBroker(0, NULL, *this);
+#else
+
+   //---
+   // declare an AlpsKnowledgeBroker for serial application
+   //---
    AlpsKnowledgeBrokerSerial alpsBroker(0, NULL, *this);
+#endif
+
    
    //---
    //--- search for the best solution 
@@ -193,3 +204,221 @@ AlpsExitStatus AlpsDecompModel::solve(){
    return alpsBroker.getSolStatus();
 }
 
+void
+AlpsDecompModel::encodeDecompAlgo(AlpsEncoded*& encoded) const{
+
+
+} 
+
+void
+AlpsDecompModel::decodeDecompAlgo(AlpsEncoded& encoded){
+
+  
+
+
+}
+
+
+void 
+AlpsDecompModel::encodeAlpsDecompParam(AlpsEncoded*& encoded){
+
+
+  encoded->writeRep(getParam().logFileLevel); 
+  
+  encoded->writeRep(getParam().printSolution); 
+
+  encoded->writeRep(getParam().checkMemory); 
+
+  encoded->writeRep(getParam().msgLevel); 
+
+  encoded->writeRep(getParam().nodeLimit); 
+
+  encoded->writeRep(getParam().nodeLogInterval); 
+
+  encoded->writeRep(getParam().searchStrategy); 
+  
+}
+
+AlpsDecompParam 
+AlpsDecompModel::decodeAlpsDecompParam(AlpsEncoded& encoded){
+
+  int logFileLevel; 
+
+  bool printSolution; 
+
+  bool checkMemory; 
+
+  int msgLevel; 
+
+  int nodeLimit; 
+
+  int nodeLogInterval; 
+
+  int searchStrategy; 
+
+  
+  encoded.readRep(logFileLevel); 
+  
+  encoded.writeRep(printSolution); 
+
+  encoded.writeRep(checkMemory); 
+
+  encoded.writeRep(msgLevel); 
+
+  encoded.writeRep(nodeLimit); 
+
+  encoded.writeRep(nodeLogInterval); 
+
+  encoded.writeRep(searchStrategy); 
+
+  AlpsDecompParam param(logFileLevel, printSolution,
+			checkMemory, msgLevel,
+			nodeLimit, nodeLogInterval,
+			searchStrategy); 
+
+  return param; 
+
+}
+
+
+
+
+//#########################################################################
+// Send model and root so that initial solve
+AlpsEncoded* AlpsDecompModel::encode()
+{
+
+  AlpsReturnStatus status = AlpsReturnStatusOk; 
+
+  AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeModel); 
+
+  //*****************************************
+  // Encode Alps part
+  //*****************************************
+
+  status = encodeAlps(encoded); 
+
+
+  //*****************************************
+  // Encode DecompModel part
+  //*****************************************
+  
+
+  //write the model data into representation
+
+  encoded->writeRep(m_bestLB);
+  
+  encoded->writeRep(m_bestUB); 
+
+  encoded->writeRep(m_nodesProcessed);
+
+  encoded->writeRep(m_alpsStatus);
+
+  
+  const CoinPackedMatrix* matrixByCol = m_decompAlgo->getMasterOSI()->getMatrixByCol();
+
+  int numRows = matrixByCol->getNumRows();
+
+  encoded->writeRep(numRows);
+
+  int numCols = matrixByCol->getNumCols();
+
+  encoded->writeRep(numCols); 
+
+
+  const double* collb = m_decompAlgo->getMasterOSI()->getColLower();
+
+  encoded->writeRep(collb, numCols);
+
+  const double* colub = m_decompAlgo->getMasterOSI()->getColUpper();
+
+  encoded->writeRep(colub, numCols);
+
+  const double* obj = m_decompAlgo->getMasterOSI()->getObjCoefficients();
+
+  encoded->writeRep(obj, numCols);
+
+  const double objSense = m_decompAlgo->getMasterOSI()->getObjSense();
+
+  encoded->writeRep(objSense);
+
+  const double* rowlb = m_decompAlgo->getMasterOSI()->getRowLower();
+
+  encoded->writeRep(rowlb, numRows);
+
+  const double* rowub = m_decompAlgo->getMasterOSI()->getRowUpper();
+
+  encoded->writeRep(rowub, numRows);
+
+  int numElements = m_decompAlgo->getMasterOSI()->getNumElements();
+
+  encoded->writeRep(numElements);
+
+  const double* elementValue = matrixByCol->getElements();
+
+  encoded->writeRep(elementValue, numElements);
+
+  const CoinBigIndex* colStart = matrixByCol->getVectorStarts();
+
+  int numStart = numCols + 1;
+
+  encoded->writeRep(colStart, numStart);
+
+  const int* index = matrixByCol->getIndices();
+
+  encoded->writeRep(index, numElements);
+  
+  int numberIntegers = 0;
+
+
+  int* integerVariable = new int[numElements];
+  for (int iColumn=0; iColumn<numCols; iColumn++) {
+    if( m_decompAlgo->getMasterOSI()->isInteger(iColumn))
+      integerVariable[numberIntegers++]=iColumn;
+    
+  }
+  if (!numberIntegers){
+    integerVariable = NULL;
+  }
+
+  encoded->writeRep(numberIntegers);
+  encoded->writeRep(integerVariable, numberIntegers);
+  
+
+  delete [] integerVariable; 
+
+
+  encodeDecompAlgo(encoded);
+
+  encodeAlpsDecompParam(encoded);
+  
+  return encoded;
+
+}
+
+
+//#########################################################################
+//
+
+void
+AlpsDecompModel::decodeToSelf(AlpsEncoded& encoded)
+{
+
+  AlpsReturnStatus status = AlpsReturnStatusOk;
+
+  double m_bLB; 
+  double m_bUB; 
+  int m_nodesP; 
+  int m_alpsStat; 
+
+  encoded.readRep(m_bLB); 
+  encoded.readRep(m_bUB); 
+  encoded.readRep(m_nodesP);
+  encoded.readRep(m_alpsStat);
+
+  decodeDecompAlgo(encoded); 
+
+  decodeAlpsDecompParam(encoded); 
+  
+
+}

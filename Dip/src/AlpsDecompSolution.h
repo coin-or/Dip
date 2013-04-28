@@ -20,6 +20,7 @@
 #include "AlpsSolution.h"
 #include "AlpsDecompModel.h"
 
+#include "AlpsTreeNode.h"
 //===========================================================================//
 class AlpsDecompSolution : public AlpsSolution {
 protected:
@@ -48,6 +49,8 @@ public:
    inline const double getQuality() const {return m_quality;}
 
  public:
+
+
    AlpsDecompSolution() : 
       AlpsSolution(),
       m_size      (0), 
@@ -102,6 +105,45 @@ public:
       os << "-------------------------" << endl;
       os << resetiosflags(ios::fixed|ios::showpoint|ios::scientific); */
    }
+
+   /** The method that encodes the node into an encoded object **/
+   virtual AlpsEncoded* encode() const{
+
+     AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeSolution); 
+     
+     encoded->writeRep(m_size);
+     encoded->writeRep(m_values, m_size);
+     encoded->writeRep(m_quality); 
+
+     return encoded; 
+     
+   }
+
+   /** The method that decodes the node from an encoded object **/
+   virtual AlpsKnowledge* decode(AlpsEncoded& encoded) const{
+
+     int s, q; 
+     double* v = 0; 
+     
+     encoded.readRep(s); 
+     encoded.readRep(v,s);
+     encoded.readRep(q);
+
+
+     //TODO: change of design of AlpsDecompSolution
+     //       constructor
+     return new AlpsDecompSolution(s,v,q,NULL,
+				   -1,
+				   -1);
+     
+   }
+
+
+
+
+
+
+
 };
 
 #endif
