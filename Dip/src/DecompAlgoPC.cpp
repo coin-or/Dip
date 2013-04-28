@@ -273,7 +273,7 @@ int DecompAlgoPC::compressColumns(){
    const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
    const int      nMasterCols               = m_masterSI->getNumCols();
    const int      nMasterRows               = m_masterSI->getNumRows();
-   const double * masterSolution            = getMasterPrimalSolution();
+
    int nColsSinceLast 
       = nMasterCols - m_compressColsLastNumCols;
    int nIterSinceLast      
@@ -403,6 +403,7 @@ int DecompAlgoPC::compressColumns(){
 	 continue;
       }
       UTIL_DEBUG(m_param.LogLevel, 4,
+		 const double * masterSolution            = getMasterPrimalSolution();
 		 (*m_osLog) << "CompressCol" 
 		 << " lpIndex= " << setw(5) << colMasterIndex
 		 << " effCnt= "  << setw(2)  << (*li)->getEffectiveness() 

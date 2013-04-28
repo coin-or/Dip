@@ -386,11 +386,16 @@ void DecompAlgoD::createMasterProblem(DecompVarList & initVars){
    double           * colLB    = new double[nColsMax];
    double           * colUB    = new double[nColsMax];
    double           * objCoeff = new double[nColsMax];   
-   double           * denseCol = new double[nRows];
+
    CoinPackedMatrix * masterM  = new CoinPackedMatrix(true, 0, 0);
    vector<string>     colNames;
-   CoinAssertHint(colLB && colUB && objCoeff && denseCol && masterM,
-                  "Error: Out of Memory");   
+
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      double * denseCol = new double[nRows];
+	      CoinAssertHint(colLB && colUB && objCoeff && denseCol && masterM,
+			     "Error: Out of Memory");   	      
+              );
+
 
    //---
    //--- set the number of rows, we will add columns
