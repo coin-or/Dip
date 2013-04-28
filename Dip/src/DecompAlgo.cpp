@@ -6847,7 +6847,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       for(it = vars.begin(); it != vars.end(); it++){
 	 int               whichBlock     = (*it)->getBlockId();
 	 if(whichBlock != -1){
-	    DecompAlgoModel & algoModelCheck = getModelRelax(whichBlock);
 	    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		       (*m_osLog) << "Check that var satisifes relax matrix "
 		       << whichBlock << endl;
