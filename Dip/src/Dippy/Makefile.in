@@ -273,7 +273,7 @@ MPICXX = @MPICXX@
 OBJEXT = @OBJEXT@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
-PACKAGE = @PACKAGE@
+PACKAGE = dippy
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
@@ -361,7 +361,7 @@ sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DIPPYdir = $(pythondir)/dippy
+DIPPYdir = $(pkgpythondir)
 DIPPY_PYTHON = __init__.py dipapi.py dippy.py
 pyexec_LTLIBRARIES = _dippy.la
 

@@ -11,6 +11,8 @@ Dip/MSVisualStudio/v10/DecompExamples/MCF/MCF.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/Milp/Milp.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/MilpBlock/MilpBlock.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/SmallIP/SmallIP.vcxproj -text
+Dip/MSVisualStudio/v10/Dippy/Dippy.sln -text
+Dip/MSVisualStudio/v10/Dippy/Dippy.vcxproj -text
 Dip/MSVisualStudio/v9/Decomp/ExternalSolvers/Knapsack/Pisinger/Pisinger.sln -text
 Dip/MSVisualStudio/v9/Decomp/ExternalSolvers/Knapsack/Pisinger/Pisinger.vcproj -text
 Dip/MSVisualStudio/v9/Decomp/ExternalSolvers/TSP/libConcorde/libConcorde.vcproj -text

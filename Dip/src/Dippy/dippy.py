@@ -127,7 +127,7 @@ def Solve(prob, params=None):
         # solList  is a list of (col_name, value) pairs
         # dualList is a list of (row_name, value) pairs
 
-        if prob.display_mode == 'svg':
+        if prob.display_mode == 'svg' and gimpy_installed:
             if prob.display_interval is not None:
                 prob.Tree.write_as_svg(filename = "%s_%d" % (prob.svg_prefix, 
                                                              prob.last_svg + 1),

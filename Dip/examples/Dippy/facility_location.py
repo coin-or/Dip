@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 DEBUGGING = True
 
 import sys
