@@ -37,7 +37,7 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
    const  vector<string>  & colNames = model->getColNames();
    const  vector<string>  & rowNames = model->getRowNames();
    int    c, r, i;
-   int    precision   = 7;
+
    bool   isFeas      = true;
    bool   hasColNames = false;
    bool   hasRowNames = false;
@@ -79,6 +79,7 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
       clb      = model->colLB[c];
       cub      = model->colUB[c];      
       UTIL_DEBUG(logLevel, 5,
+		 int    precision   = 7;
 		 if(!UtilIsZero(xj)){
 		    cout << "Point " << c;
 		    if(hasColNames)
@@ -100,6 +101,7 @@ bool DecompAlgoModel::isPointFeasible(const double * x,
       if(relViol > feasVarTol){
          //Notify, but don't mark in feasible unless 10x worse.
          UTIL_DEBUG(logLevel, 4,
+		    int    precision   = 7;
                     cout << "Point violates column " << c;
                     if(hasColNames)
                        cout << " -> " << colNames[c];

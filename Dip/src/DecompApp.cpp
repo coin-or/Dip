@@ -1172,9 +1172,6 @@ void DecompApp::singlyBorderStructureDetection(){
    int nparts = m_param.NumBlocks;
 
    
-   // maximum load imbalance (%)
-   
-   int ubfactor = 5; 
 
    // weights of vertices and hyperedges
 
@@ -1350,7 +1347,11 @@ void DecompApp::singlyBorderStructureDetection(){
    #else
 
    clock_t begin = clock();
-   #if defined(COIN_HAS_METIS)
+#if defined(COIN_HAS_METIS)     
+   // maximum load imbalance (%)
+   
+   int ubfactor = 5; 
+
    HMETIS_PartRecursive(numVertices,numHyperedges, vwgts, eptr, 
 			eind,hewgts, nparts, ubfactor, options, part, edgecut); 
    #endif

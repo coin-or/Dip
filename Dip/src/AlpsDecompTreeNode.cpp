@@ -12,7 +12,7 @@
 // Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
-
+   
 /**
  * \todo cleanup decomp status codes - scope them like Alps
  */
@@ -58,14 +58,13 @@ AlpsDecompTreeNode::createNewTreeNode(AlpsNodeDesc *& desc) const {
 bool AlpsDecompTreeNode::checkIncumbent(AlpsDecompModel      * model,
                                         const DecompSolution * decompSol){
    
-   AlpsDecompParam    & param      = model->getParam();
    DecompAlgo         * decompAlgo = model->getDecompAlgo();
    //---
    //--- decompAlgo found an IP (and user) feasible point
    //---	
    double currentUB   = getKnowledgeBroker()->getIncumbentValue(); 
    double candidateUB = decompSol->getQuality();
-   UTIL_DEBUG(param.msgLevel, 3,
+   UTIL_DEBUG(model->getParam().msgLevel, 3,
               cout
               << "DecompAlgo found IP incum = " 
               << UtilDblToStr(candidateUB)
@@ -89,11 +88,11 @@ bool AlpsDecompTreeNode::checkIncumbent(AlpsDecompModel      * model,
       //---
       //--- print the new solution (if debugging)
       //---
-      const DecompApp            * app         
-         = decompAlgo->getDecompApp();
-      const DecompConstraintSet  * modelCore 
-         = decompAlgo->getModelCore().getModel();
-      UTIL_DEBUG(param.msgLevel, 3,
+      UTIL_DEBUG(model->getParam().msgLevel, 3,
+		 const DecompApp            * app         
+		 = decompAlgo->getDecompApp();
+		 const DecompConstraintSet  * modelCore 
+		 = decompAlgo->getModelCore().getModel();		 
                  app->printOriginalSolution(decompSol->getSize(),
                                             modelCore->getColNames(),
                                             decompSol->getValues()););
