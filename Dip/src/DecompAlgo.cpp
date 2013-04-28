@@ -775,7 +775,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars){
    assert(modelCore); //TODO - can core be empty?   
 
 
-   int r, c, startRow, endRow;
+   int r, startRow, endRow;
    int nColsCore = modelCore->getNumCols();
    int nRowsCore = modelCore->getNumRows();
    int nIntVars  = modelCore->getNumInts();
@@ -4302,6 +4302,10 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "getDualRays()", m_param.LogDebugLevel, 2);
    vector<double*> raysT = m_masterSI->getDualRays(maxNumRays);   
+
+
+
+
    const double * rayT = raysT[0];
    assert(rayT);
 
@@ -4337,13 +4341,11 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    else{
       rays.push_back(raysT[0]);
    }
-   const double * ray = rays[0];
-   assert(ray);
-
-      
 
 #if 1
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      const double * ray = rays[0];
+	      assert(ray);
 	      bool isProof = isDualRayInfProof(ray,
 					       m_masterSI->getMatrixByRow(),
 					       m_masterSI->getColLower(),
@@ -4383,7 +4385,7 @@ void DecompAlgo::generateVarsCalcRedCost(const double * u,
 
 
    int                   i;
-   int                   nMasterRows   = m_masterSI->getNumRows();
+
    DecompConstraintSet * modelCore     = m_modelCore.getModel();
    int                   nCoreCols     = modelCore->getNumCols();
    const double        * origObjective = getOrigObjective();
@@ -4396,13 +4398,16 @@ void DecompAlgo::generateVarsCalcRedCost(const double * u,
    //--- in D , we use (c-u   )x, we don't use the core matrix
    //---    u, in this case has dimension = #core cols
    //---
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      int nMasterRows   = m_masterSI->getNumRows();
+	      assert((nMasterRows - m_numConvexCon) == 
+		     modelCore->M->getNumCols());
+	      );
    if(m_algo == DECOMP){
-      assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumCols());
       for(i = 0; i < nCoreCols; i++)
 	 redCostX[i] = u[i];
    }
    else{
-      assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumRows());
       modelCore->M->transposeTimes(u, redCostX);
    }
 
@@ -4423,7 +4428,7 @@ void DecompAlgo::generateVarsCalcRedCost(const double * u,
 void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
 					 double       * uNew){
 
-   int                   i, r;
+   int                   r;
    int                   nMasterRows   = m_masterSI->getNumRows();
    DecompConstraintSet * modelCore     = m_modelCore.getModel();
    int                   nBaseCoreRows = modelCore->nBaseRows;
@@ -4537,7 +4542,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    const double * userU         = NULL;
    const double   epsilonRedCost= 1.0e-4;//make option
    const double * origObjective = getOrigObjective();
-   int            numThreads    = m_param.NumThreads;
+
    double       * redCostX      = NULL;   
    double         alpha         = 0.0;
    int            whichBlock;
@@ -4844,6 +4849,8 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //---
 #ifdef RELAXED_THREADED
       //round-robin assign blocks to threads
+      int            numThreads    = m_param.NumThreads;
+
       printf("===== START Threaded solve of subproblems. =====\n");
       pthread_attr_t             pthread_custom_attr;
       pthread_t                * threads        = 0;
@@ -5955,8 +5962,16 @@ void DecompAlgo::addVarsFromPool(){
 			      colIndex0);
    }
    
-   const int n_colsAfter  = m_masterSI->getNumCols();
-   assert(colIndex0 + n_newcols == n_colsAfter);
+
+
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      const int n_colsAfter  = m_masterSI->getNumCols();
+	      assert(colIndex0 + n_newcols == n_colsAfter);
+              );
+
+
+
+
     
    //---
    //--- 3.) delete the col memory and clear the var pointer from varpool
@@ -6840,9 +6855,13 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 		       );
 	    (*it)->fillDenseArr(n_origCols, xTemp);
 	    //TODO: get rid of this function, use isPointFeasible
-	    bool isRelaxFeas 
-	       = checkPointFeasible(algoModelCheck.getModel(), xTemp);
-	    assert(isRelaxFeas);
+
+	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		       bool isRelaxFeas 
+		       = checkPointFeasible(algoModelCheck.getModel(), xTemp);
+		       assert(isRelaxFeas);
+		       );
+
 	 }
       }
       UTIL_DELARR(xTemp);
