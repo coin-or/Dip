@@ -4364,13 +4364,13 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
 		 printBasisInfo(m_masterSI, m_osLog);
 		 fflush(stdout);
 	      }
+	      assert(isDualRayInfProof(ray,
+				       m_masterSI->getMatrixByRow(),
+				       m_masterSI->getColLower(),
+				       m_masterSI->getColUpper(),
+				       m_masterSI->getRightHandSide(),
+				       NULL));
 	      );;
-   assert(isDualRayInfProof(ray,
-			    m_masterSI->getMatrixByRow(),
-			    m_masterSI->getColLower(),
-			    m_masterSI->getColUpper(),
-			    m_masterSI->getRightHandSide(),
-			    NULL));
 #endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "getDualRays()", m_param.LogDebugLevel, 2);
@@ -6856,8 +6856,11 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 	    //TODO: get rid of this function, use isPointFeasible
 
 	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-		       bool isRelaxFeas 
-		       = checkPointFeasible(algoModelCheck.getModel(), xTemp);
+		       DecompAlgoModel & algoModelCheck =
+		                         getModelRelax(whichBlock); 
+		       bool isRelaxFeas =
+                            checkPointFeasible(algoModelCheck.getModel(), 
+					       xTemp);
 		       assert(isRelaxFeas);
 		       );
 
