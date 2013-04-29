@@ -5,7 +5,7 @@
 # for an e.g. see gap0512-2.dat included in this directory
 
 from pulp import *
-import dippy as dippy
+import coinor.dippy as dippy
 import sys
 
 debug_print = False

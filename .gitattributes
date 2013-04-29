@@ -153,6 +153,7 @@ Dip/examples/ATM/Makefile.in -text
 Dip/examples/ATM/atm.parm.in -text
 Dip/examples/ATM/data_extract.sh.in -text
 Dip/examples/ATM/notes.txt -text
+Dip/examples/Dippy/facility_ex1.py -text
 Dip/examples/Dippy/facility_location.py -text
 Dip/examples/Dippy/gap.py -text
 Dip/examples/Dippy/gap0515-2.dat -text

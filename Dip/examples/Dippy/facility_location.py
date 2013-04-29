@@ -6,8 +6,12 @@ import sys
 
 from pulp import *
 
+try:
+    import path
+except ImportError:
+    pass
+        
 if DEBUGGING:
-#    import path
     from dippy import dippy
 else:
     import coinor.dippy as dippy
