@@ -2040,7 +2040,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	 //--- TODO: for nonexplicity, also check user app isfeasible
 	 //---
 	 //TODO: should this whole section be phaseDone?
-	 if(nChanges && m_status != STAT_INFEASIBLE){
+	 if(m_status != STAT_INFEASIBLE){
 	    recomposeSolution(getMasterPrimalSolution(), m_xhat);
 	    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		       m_app->printOriginalSolution(modelCore->getNumCols(),
