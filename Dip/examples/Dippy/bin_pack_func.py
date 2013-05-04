@@ -2,7 +2,6 @@ DEBUGGING = True
 
 import sys
 
-#import coinor.pulp as pulp
 from pulp import *
 
 if DEBUGGING:

@@ -38,15 +38,16 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo *algo, std::vector< std::pair<in
     if (pResult == Py_None) {
         // if chooseBranchSet returns None, do default branching for this algo
         ret_val = algo->DecompAlgo::chooseBranchSet(downBranchLB, downBranchUB, upBranchLB, upBranchUB);
-		PyObject * downBranchVar, * upBranchVar;
-		pDownUB = PyDict_New();
-		downBranchVar = PyList_GetItem(app->m_colList, downBranchUB[0].first);
-		PyDict_SetItem(pDownUB, downBranchVar, PyInt_FromLong(static_cast<int>(round(downBranchUB[0].second))));
-		pUpLB = PyDict_New();
-		upBranchVar = PyList_GetItem(app->m_colList, upBranchLB[0].first);
-		assert(downBranchVar == upBranchVar);
-		PyDict_SetItem(pUpLB, upBranchVar, PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
-
+		if (downBranchUB.size() > 0){
+			PyObject * downBranchVar, * upBranchVar;
+			pDownUB = PyDict_New();
+			downBranchVar = PyList_GetItem(app->m_colList, downBranchUB[0].first);
+			PyDict_SetItem(pDownUB, downBranchVar, PyInt_FromLong(static_cast<int>(round(downBranchUB[0].second))));
+			pUpLB = PyDict_New();
+			upBranchVar = PyList_GetItem(app->m_colList, upBranchLB[0].first);
+			PyDict_SetItem(pUpLB, upBranchVar, PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
+			assert(downBranchVar == upBranchVar);
+		}
 		return ret_val;
     }else{
         // or else, the function should have returned 4 lists of (name, value) tuples

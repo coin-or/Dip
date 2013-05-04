@@ -391,7 +391,7 @@ if debug_print_lp:
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
 #prob.branch_method = choose_antisymmetry_branch
-#prob.relaxed_solver = solve_subproblem
+prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
@@ -402,6 +402,8 @@ if debug_print_lp:
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
     'doPriceCut': '1',
+    'CutCGL': '0',
+    'SolveMaserAsIP': '0'
 #    'generateInitVars': '1',
 #    'LogDebugLevel': 5,
 #    'LogDumpModel': 5,
