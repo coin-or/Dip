@@ -20,12 +20,12 @@ from math import floor, ceil
 
 tol = pow(pow(2, -24), 2.0 / 3.0)
 
-from facility_ex1 import REQUIREMENT, PRODUCTS, LOCATIONS, CAPACITY
+from facility_ex1 import REQUIREMENT, PRODUCTS, FIXED_COST, LOCATIONS, CAPACITY
 
-display_mode = 'off'
+display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
-                        layout = 'dot', display_interval = 1)
+                        layout = 'dot', display_interval = None)
 
 assign_vars = LpVariable.dicts("x",
               [(i, j) for i in LOCATIONS
@@ -38,10 +38,7 @@ debug_print = False
 
 debug_print_lp = False
 
-# objective: minimise waste
-prob += lpSum(CAPACITY * use_vars[i] - 
-              lpSum(assign_vars[(i, j)] * REQUIREMENT[j] for j in PRODUCTS) 
-              for i in LOCATIONS), "min"
+prob += lpSum(use_vars[i] * FIXED_COST[i] for i in LOCATIONS), "min"
 
 # assignment constraints
 for j in PRODUCTS:
@@ -107,21 +104,20 @@ def solve_subproblem(prob, key, redCosts, convexDual):
     # Use 0-1 KP to max. total effective value of products at location
     z, solution = knapsack01(obj, weights, CAPACITY)
    
-    # Get the reduced cost of the knapsack solution and waste
+    # Get the reduced cost of the knapsack solution
     if debug_print:
         print [(v, redCosts[v]) for v in avars]
         print obj
         print "z, solution =", z, solution
         print "redCosts[use_vars[loc]] =", redCosts[use_vars[loc]]
 
-    waste = CAPACITY - sum(weights[i] for i in solution)
     rc = redCosts[use_vars[loc]] - z
 
     if debug_print:
-        print "waste, rc, convexDual", waste, rc, convexDual
+        print "Fixed cost, rc, convexDual", FIXED_COST[loc], rc, convexDual
     # Return the solution if the reduced cost is low enough
     # ...
-    if -convexDual < -tol and rc > tol: # ... or an empty location is "useful"
+    if rc > tol: # ... or an empty location is "useful"
        
         var_values = {}
 
@@ -131,18 +127,17 @@ def solve_subproblem(prob, key, redCosts, convexDual):
             print var_tuple
         return [var_tuple]
 
-    elif rc - convexDual < -tol:
-        var_values = dict([(avars[i], 1) for i in solution])
-        var_values[use_vars[loc]] = 1
+    var_values = dict([(avars[i], 1) for i in solution])
+    var_values[use_vars[loc]] = 1
 
-        var_tuple = (waste, rc - convexDual, var_values)
-        rcCheck = 0.0
-        for v in var_values.keys():
-            rcCheck += redCosts[v] * var_values[v]
-        if debug_print:
-            print "Checking rc calc", rc, rcCheck 
-            print var_tuple
-        return [var_tuple]
+    var_tuple = (FIXED_COST[loc], rc - convexDual, var_values)
+    rcCheck = 0.0
+    for v in var_values.keys():
+        rcCheck += redCosts[v] * var_values[v]
+    if debug_print:
+        print "Checking rc calc", rc, rcCheck 
+        print var_tuple
+    return [var_tuple]
 
 
 def knapsack01(obj, weights, capacity):
@@ -395,19 +390,19 @@ if debug_print_lp:
     for n, i in enumerate(LOCATIONS):
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
-prob.branch_method = choose_antisymmetry_branch
-prob.relaxed_solver = solve_subproblem
+#prob.branch_method = choose_antisymmetry_branch
+#prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
-prob.init_vars = init_first_fit
+#prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
-prob.heuristics = heuristics
-prob.root_heuristic = True
-prob.node_heuristic = True
+#prob.heuristics = heuristics
+#prob.root_heuristic = True
+#prob.node_heuristic = True
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
     'doPriceCut': '1',
-    'generateInitVars': '1',
+#    'generateInitVars': '1',
 #    'LogDebugLevel': 5,
 #    'LogDumpModel': 5,
 })

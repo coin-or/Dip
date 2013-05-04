@@ -1,5 +1,4 @@
 # The requirements for the products
-
 REQUIREMENT = {
     1 : 7,
     2 : 5,
@@ -7,13 +6,22 @@ REQUIREMENT = {
     4 : 2,
     5 : 2
 }
+
 # Set of all products
 PRODUCTS = REQUIREMENT.keys()
 PRODUCTS.sort()
 
-# Set of all locations
+# Costs of the facilities
+FIXED_COST = {
+    1 : 10,
+    2 : 20,
+    3 : 16, 
+    4 : 1, 
+    5 : 2
+}
 
-LOCATIONS = [1, 2, 3, 4, 5]
+# Set of facilities
+LOCATIONS = FIXED_COST.keys()
 LOCATIONS.sort()
 
 # The capacity of the facilities

@@ -4,9 +4,21 @@
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
 
-from pulp import *
-import coinor.dippy as dippy
+DEBUGGING = True
+
 import sys
+
+from pulp import *
+
+try:
+    import path
+except ImportError:
+    pass
+        
+if DEBUGGING:
+    from dippy import dippy
+else:
+    import coinor.dippy as dippy
 
 debug_print = False
 
@@ -46,7 +58,11 @@ for m in MACHINES:
         v.append(LpVariable("M%dT%d" % (m, t), cat=LpBinary))
     assignVars.append(v)
 
-prob = dippy.DipProblem("GAP", LpMinimize)
+prob = dippy.DipProblem("GAP",
+                        display_mode = 'xdot', 
+                        layout = 'dot',
+                        display_interval = None,
+                        )
 
 # objective
 prob += lpSum(assignVars[m][t] * COSTS[m][t] for m, t in MACHINES_TASKS), "min"
@@ -81,10 +97,10 @@ def solve_subproblem(prob, machine, redCosts, convexDual):
     rc = -z
 
     if debug_print:
-        print "waste, rc, convexDual", waste, rc, convexDual
+        print "rc, convexDual", rc, convexDual
     # Return the solution if the reduced cost is low enough
     # ...
-    if -convexDual < -tol and rc > tol: # ... or an empty location is "useful"
+    if rc > tol: # ... or an empty location is "useful"
        
         var_values = {}
 
@@ -94,18 +110,18 @@ def solve_subproblem(prob, machine, redCosts, convexDual):
             print var_tuple
         return [var_tuple]
 
-    elif rc - convexDual < -tol:
-        orig_cost = sum(prob.objective.get(vars[idx]) for idx in solution)
-        var_values = dict([(vars[i], 1) for i in solution])
+    orig_cost = sum(prob.objective.get(vars[idx]) for idx in solution)
+    var_values = dict([(vars[i], 1) for i in solution])
 
-        var_tuple = (orig_cost, rc - convexDual, var_values)
-        rcCheck = 0.0
-        for v in var_values.keys():
-            rcCheck += redCosts[v] * var_values[v]
-        if debug_print:
-            print "Checking rc calc", rc, rcCheck 
-            print var_tuple
-        return [var_tuple]
+    var_tuple = (orig_cost, rc - convexDual, var_values)
+    rcCheck = 0.0
+    for v in var_values.keys():
+        rcCheck += redCosts[v] * var_values[v]
+    if debug_print:
+        print "Checking rc calc", rc, rcCheck 
+        print var_tuple
+    return [var_tuple]
+    return None
 
 def knapsack01(obj, weights, capacity):
     """ 0/1 knapsack solver, maximizes profit. weights and capacity integer """
@@ -164,7 +180,7 @@ prob.relaxed_solver = solve_subproblem
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
-    'doPriceCut': '1',
+    'doCut': '1',
 #    'logLevel': '3', 
 })
 
@@ -175,3 +191,8 @@ for m in MACHINES:
         v = assignVars[m][t].varValue
         if v:
             print "%d" %t,
+            
+if prob.display_mode != 'off':
+    if (prob.Tree.display_mode == 'pygame') or (prob.Tree.display_mode == 'xdot'):
+        prob.Tree.display()
+
