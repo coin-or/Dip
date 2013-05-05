@@ -27,12 +27,9 @@ display_mode = 'xdot'
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
                         layout = 'dot', display_interval = None)
 
-assign_vars = LpVariable.dicts("x",
-              [(i, j) for i in LOCATIONS
-                      for j in PRODUCTS],
-              0, 1, LpBinary)
-use_vars    = LpVariable.dicts("y",
-              LOCATIONS, 0, 1, LpBinary)
+ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
+assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
+use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
 debug_print = False
 
@@ -50,9 +47,8 @@ for i in LOCATIONS:
                                 for j in PRODUCTS) <= CAPACITY * use_vars[i]
 
 # Disaggregate capacity constraints
-for i in LOCATIONS:
-    for j in PRODUCTS:
-        prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
+for i, j in ASSIGNMENTS:
+    prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
         
 # Ordering constraints
 #for index, location in enumerate(LOCATIONS):
@@ -389,10 +385,10 @@ if debug_print_lp:
     for n, i in enumerate(LOCATIONS):
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
-prob.branch_method = choose_antisymmetry_branch
+#prob.branch_method = choose_antisymmetry_branch
 prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
-prob.init_vars = init_first_fit
+#prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
 #prob.heuristics = heuristics
 #prob.root_heuristic = True
@@ -400,10 +396,10 @@ prob.init_vars = init_first_fit
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
-    'doPriceCut': '1',
+    'doCut': '1',
     'CutCGL': '0',
 #    'SolveMasterAsIp': '0'
-    'generateInitVars': '1',
+#    'generateInitVars': '1',
 #    'LogDebugLevel': 5,
 #    'LogDumpModel': 5,
 })
@@ -419,10 +415,8 @@ if prob.display_mode != 'off':
 print "Optimal solution found!" 
 print "************************************"
 for i in LOCATIONS:
-    if use_vars[i].varValue > tol:
-        print "Location ", i, \
-              " is assigned ", \
-              [j for j in PRODUCTS
-               if assign_vars[(i, j)].varValue > tol]
+    if use_vars[i].varValue > 0:
+        print "Location ", i, " is assigned: ",
+        print [j for j in PRODUCTS if assign_vars[(i, j)].varValue > 0]
 print "************************************"
 print
