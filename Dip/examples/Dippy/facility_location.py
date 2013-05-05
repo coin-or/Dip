@@ -55,9 +55,9 @@ for i in LOCATIONS:
         prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
         
 # Ordering constraints
-for index, location in enumerate(LOCATIONS):
-    if index > 0:
-        prob += use_vars[LOCATIONS[index-1]] >= use_vars[location]
+#for index, location in enumerate(LOCATIONS):
+#    if index > 0:
+#        prob += use_vars[LOCATIONS[index-1]] >= use_vars[location]
         
 # Anti-symmetry branches
 def choose_antisymmetry_branch(prob, sol):
@@ -115,8 +115,7 @@ def solve_subproblem(prob, key, redCosts, convexDual):
 
     if debug_print:
         print "Fixed cost, rc, convexDual", FIXED_COST[loc], rc, convexDual
-    # Return the solution if the reduced cost is low enough
-    # ...
+
     if rc > tol: # ... or an empty location is "useful"
        
         var_values = {}
@@ -390,10 +389,10 @@ if debug_print_lp:
     for n, i in enumerate(LOCATIONS):
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
-#prob.branch_method = choose_antisymmetry_branch
+prob.branch_method = choose_antisymmetry_branch
 prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
-#prob.init_vars = init_first_fit
+prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
 #prob.heuristics = heuristics
 #prob.root_heuristic = True
@@ -403,8 +402,8 @@ dippy.Solve(prob, {
     'TolZero': '%s' % tol,
     'doPriceCut': '1',
     'CutCGL': '0',
-    'SolveMaserAsIP': '0'
-#    'generateInitVars': '1',
+#    'SolveMasterAsIp': '0'
+    'generateInitVars': '1',
 #    'LogDebugLevel': 5,
 #    'LogDumpModel': 5,
 })
@@ -417,9 +416,13 @@ if prob.display_mode != 'off':
     prob.Tree.display()
 
 # print solution
+print "Optimal solution found!" 
+print "************************************"
 for i in LOCATIONS:
     if use_vars[i].varValue > tol:
         print "Location ", i, \
               " is assigned ", \
               [j for j in PRODUCTS
                if assign_vars[(i, j)].varValue > tol]
+print "************************************"
+print

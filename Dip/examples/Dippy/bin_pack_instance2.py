@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from bin_pack_func import BinPackProb, formulate, solve
 
 if __name__ == '__main__':
