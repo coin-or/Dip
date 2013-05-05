@@ -17,7 +17,11 @@
 #include "AlpsDecompModel.h"
 #include "AlpsDecompNodeDesc.h"
 #include "AlpsDecompTreeNode.h"
+#ifdef COIN_HAS_MPI
+#include "AlpsKnowledgeBrokerMPI.h"
+#else
 #include "AlpsKnowledgeBrokerSerial.h"
+#endif
 
 using namespace std;
 
