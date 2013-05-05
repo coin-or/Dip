@@ -17,7 +17,14 @@
 #include "AlpsDecompModel.h"
 #include "AlpsDecompNodeDesc.h"
 #include "AlpsDecompTreeNode.h"
+//#define DIP_HAS_MPI
+
+#ifdef DIP_HAS_MPI
+#include "AlpsKnowledgeBrokerMPI.h"
+#else
 #include "AlpsKnowledgeBrokerSerial.h"
+#endif
+
 
 using namespace std;
 
@@ -161,7 +168,7 @@ AlpsExitStatus AlpsDecompModel::solve(){
    
 
 
-#ifdef COIN_HAS_MPI
+#ifdef DIP_HAS_MPI
    //---
    // declare an AlpsKnowledgeBroker for parallel application
    //---
