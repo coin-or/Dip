@@ -4581,13 +4581,15 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    else{
       rays.push_back(raysT[0]);
    }
-   //   const double * ray = rays[0];
-   // assert(ray);
+   
+   
 
       
 
 #if 1
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      const double * ray = rays[0];
+	      assert(ray);
 	      bool isProof = isDualRayInfProof(ray,
 					       m_masterSI->getMatrixByRow(),
 					       m_masterSI->getColLower(),
@@ -4606,13 +4608,15 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
 		 printBasisInfo(m_masterSI, m_osLog);
 		 fflush(stdout);
 	      }
-	      );;
-   assert(isDualRayInfProof(ray,
-			    m_masterSI->getMatrixByRow(),
-			    m_masterSI->getColLower(),
-			    m_masterSI->getColUpper(),
-			    m_masterSI->getRightHandSide(),
-			    NULL));
+	      assert(isDualRayInfProof(ray,
+				       m_masterSI->getMatrixByRow(),
+				       m_masterSI->getColLower(),
+				       m_masterSI->getColUpper(),
+				       m_masterSI->getRightHandSide(),
+				       NULL));
+
+	      );
+
 #endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "getDualRays()", m_param.LogDebugLevel, 2);
