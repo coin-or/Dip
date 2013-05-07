@@ -45,12 +45,14 @@ public :
    double    m_objLB;
    double    m_objUB;
    bool      m_isOptimal;
-   bool      m_isCutoff;   
-   int       m_nSolutions;
+   bool      m_isCutoff;
    
+   int       m_nPoints;
+   int       m_nRays; 
+
    bool      m_isUnbounded; 
 
-   std::vector< std::vector<double> > m_solution;
+   std::vector< std::vector<double> > m_point;
 
    std::vector< std::vector<double> > m_ray; 
    /**
@@ -59,7 +61,7 @@ public :
 
 public:
    const double * getSolution(const int solIndex){
-      std::vector<double> & solution = m_solution[solIndex];
+      std::vector<double> & solution = m_point[solIndex];
       return &solution[0];
    }
 
@@ -72,8 +74,9 @@ public:
       m_objLB     (-DecompInf),
       m_objUB     ( DecompInf),
       m_isOptimal (false),
-      m_isCutoff  (false),
-      m_nSolutions(0)
+      m_isCutoff  (false),	
+      m_nPoints(0),
+      m_nRays(0)
    {
    }
 
@@ -84,15 +87,18 @@ public:
       m_objUB     ( DecompInf),
       m_isOptimal (false),
       m_isCutoff  (false),
-      m_nSolutions(0)
+      m_nPoints(0),
+      m_nRays(0)	
    {
       const double * values = solution->getValues();
       if(!values)
 	 return;
-      m_nSolutions = 1;
+      m_nPoints = 1;
+      m_nRays = 0; 
+
       m_objUB      = solution->getQuality();
       std::vector<double> sol(values, values + solution->getSize());
-      m_solution.push_back(sol);
+      m_point.push_back(sol);
    }
    
    /**

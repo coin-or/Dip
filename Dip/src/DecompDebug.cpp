@@ -866,11 +866,11 @@ DecompSolverResult * DecompAlgoC::solveDirect(const DecompSolution * startSol){
       if(result && cbc.getSolutionCount()){
          const double * solDbl = cbc.getColSolution();
 	 vector<double> solVec(solDbl, solDbl + numCols);
-	 result->m_solution.push_back(solVec);
-	 result->m_nSolutions++;
-         assert(result->m_nSolutions == 
-		static_cast<int>(result->m_solution.size()));
-	 //copy(solution, solution+numCols, result->m_solution);
+	 result->m_point.push_back(solVec);
+	 result->m_nPoints++;
+         assert(result->m_nPoints == 
+		static_cast<int>(result->m_point.size()));
+	 //copy(solution, solution+numCols, result->m_point);
       }
    }
 
@@ -961,11 +961,11 @@ DecompSolverResult * DecompAlgoC::solveDirect(const DecompSolution * startSol){
       if(result){	 
          const double * solDbl = m_masterSI->getColSolution();
 	 vector<double> solVec(solDbl, solDbl + numCols);
-	 result->m_solution.push_back(solVec);
-	 result->m_nSolutions++;
-	 assert(result->m_nSolutions == 
-		static_cast<int>(result->m_solution.size()));
-	 //copy(solution, solution+numCols, result->m_solution);
+	 result->m_point.push_back(solVec);
+	 result->m_nPoints++;
+	 assert(result->m_nPoints == 
+		static_cast<int>(result->m_point.size()));
+	 //copy(solution, solution+numCols, result->m_point);
       }
    }
 

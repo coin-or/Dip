@@ -209,7 +209,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //---
    //--- clear out any old solutions
    //---
-   result->m_solution.clear();
+   result->m_point.clear();
 
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
@@ -348,17 +348,17 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //---
    //--- update results object 
    //---
-   result->m_nSolutions = 0;
+   result->m_nPoints = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
    if(cbc.isProvenOptimal()){
-      result->m_nSolutions = 1;
+      result->m_nPoints = 1;
       result->m_isOptimal  = true;      
    }
    else{
       if(cbc.isProvenInfeasible()){
-         result->m_nSolutions = 0;
+         result->m_nPoints = 0;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = true;         
       }
@@ -366,7 +366,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
          //---
          //--- else it must have stopped on gap
          //---
-         result->m_nSolutions = 1;
+         result->m_nPoints = 1;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;      
       }
@@ -376,15 +376,15 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    //--- get copy of solution
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
-   if(result->m_nSolutions >= 1){
+   if(result->m_nPoints >= 1){
       result->m_objUB = cbc.getObjValue();
       const double * solDbl = cbc.getColSolution();
       vector<double> solVec(solDbl, solDbl + numCols);
-      result->m_solution.push_back(solVec);
-      //memcpy(result->m_solution, 
+      result->m_point.push_back(solVec);
+      //memcpy(result->m_point, 
       //  cbc.getColSolution(), numCols * sizeof(double));
-      assert(result->m_nSolutions == 
-	     static_cast<int>(result->m_solution.size()));
+      assert(result->m_nPoints == 
+	     static_cast<int>(result->m_point.size()));
    }
 #endif
 
@@ -531,7 +531,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    // 	     << std::endl;
 
    // update result object
-   result->m_nSolutions = 0;
+   result->m_nPoints = 0;
    result->m_isUnbounded = false; 
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
@@ -574,12 +574,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
 
      vector<double> solVec(solution, solution + numCols);
 
-     result->m_solution.push_back(solVec);
+     result->m_point.push_back(solVec);
 
-     result->m_nSolutions++;
+     result->m_nPoints++;
 
-     assert(result->m_nSolutions ==
-	    static_cast<int>(result->m_solution.size()));
+     assert(result->m_nPoints ==
+	    static_cast<int>(result->m_point.size()));
      
        //       OsiCp->getPrimalRays(maxNumRays); 
    }
@@ -642,14 +642,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
 	   status = CPXgetsolnpoolx(cpxEnv, cpxLp, i, 
 				    solution, 0, numCols-1);
 	   vector<double> solVec(solution, solution + numCols);
-	   result->m_solution.push_back(solVec);
-	   result->m_nSolutions++;
-	   assert(result->m_nSolutions == 
-		  static_cast<int>(result->m_solution.size()));	 
-	   //memcpy(result->m_solution, 
+	   result->m_point.push_back(solVec);
+	   result->m_nPoints++;
+	   assert(result->m_nPoints == 
+		  static_cast<int>(result->m_point.size()));	 
+	   //memcpy(result->m_point, 
 	   //	osiCpx->getColSolution(), numCols * sizeof(double));
 	 }
-	 result->m_nSolutions = nSols;
+	 result->m_nPoints = nSols;
        }
    
      }
@@ -668,7 +668,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
      }
    else {
       if(result->m_solStatus == CPXMIP_INFEASIBLE){
-         result->m_nSolutions = 0;
+         result->m_nPoints = 0;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = true;         
       }
@@ -688,7 +688,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    if(status)
      throw UtilException("CPXgetbestobjval failure", 
 			 "solveOsiAsIp", "DecompAlgoModel");   
-   if(result->m_nSolutions >= 1){
+   if(result->m_nPoints >= 1){
      status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
      if(status)
        throw UtilException("CPXgetmipobjval failure", 

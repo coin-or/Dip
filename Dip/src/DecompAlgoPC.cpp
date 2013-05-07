@@ -736,7 +736,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    //--- update results object 
    //---
-   result.m_nSolutions = 0;
+   result.m_nPoints = 0;
    result.m_isOptimal  = false;
    //TODO: can get multple solutions!
    //   how to retrieve?
@@ -745,7 +745,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //TODO: look into setNumberThreads
    //TODO: redo cpx in this same way - it could be stopping on time, not gap
    int nSolutions = cbc.getSolutionCount();
-   result.m_nSolutions = nSolutions ? 1 : 0;
+   result.m_nPoints = nSolutions ? 1 : 0;
    if(cbc.isProvenOptimal() ||
       cbc.isProvenInfeasible())
       result.m_isOptimal  = true;            
@@ -759,10 +759,10 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 
       const double * solDbl = cbc.getColSolution();
       vector<double> solVec(solDbl, solDbl + nMasterCols);
-      result.m_solution.push_back(solVec);
-      assert(result.m_nSolutions == 
-	     static_cast<int>(result.m_solution.size()));
-      //memcpy(result.m_solution, 
+      result.m_point.push_back(solVec);
+      assert(result.m_nPoints == 
+	     static_cast<int>(result.m_point.size()));
+      //memcpy(result.m_point, 
       //     cbc.getColSolution(), 
       //     nMasterCols * sizeof(double));
    }
@@ -872,17 +872,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    //---
    //--- update results object 
    //---
-   result.m_nSolutions = 0;
+   result.m_nPoints = 0;
    result.m_isOptimal  = false;
    if(result.m_solStatus == CPXMIP_OPTIMAL ||
       result.m_solStatus == CPXMIP_OPTIMAL_TOL){
-      result.m_nSolutions = 1;
+      result.m_nPoints = 1;
       result.m_isOptimal  = true;      
    }
    else{
       if(result.m_solStatus == CPXMIP_INFEASIBLE ||
 	 result.m_solStatus == CPXMIP_TIME_LIM_INFEAS){
-         result.m_nSolutions = 0;
+         result.m_nPoints = 0;
          result.m_isOptimal  = true;         
       }
       //STOP - could have stopped on time... not just gap... do 
@@ -891,7 +891,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
          //---
          //--- else it must have stopped on gap
          //---
-         result.m_nSolutions = 1;
+         result.m_nPoints = 1;
          result.m_isOptimal  = false;      
       }
    }
@@ -903,7 +903,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
    if(status)
       throw UtilException("CPXgetbestobjval failure", 
                           "solutionUpdateAsIp", "DecompAlgoPC");
-   if(result.m_nSolutions >= 1){
+   if(result.m_nPoints >= 1){
       status = CPXgetmipobjval(cpxEnv, cpxLp, &result.m_objUB);
       if(status)
 	 throw UtilException("CPXgetmipobjval failure", 
@@ -911,17 +911,17 @@ void DecompAlgoPC::solutionUpdateAsIP(){
 
       const double * solDbl = osiCpx->getColSolution();
       vector<double> solVec(solDbl, solDbl + nMasterCols);
-      result.m_solution.push_back(solVec);
-      assert(result.m_nSolutions == 
-	     static_cast<int>(result.m_solution.size()));
-      //memcpy(result.m_solution, 
+      result.m_point.push_back(solVec);
+      assert(result.m_nPoints == 
+	     static_cast<int>(result.m_point.size()));
+      //memcpy(result.m_point, 
       //     cbc.getColSolution(), 
       //     nMasterCols * sizeof(double));
    }
 
 #endif      
       
-   if(result.m_nSolutions){
+   if(result.m_nPoints){
       double * rsolution = new double[modelCore->getNumCols()];
       if(!rsolution)
          throw UtilExceptionMemory("solutionUpdateAsIp", "DecompAlgoPC");

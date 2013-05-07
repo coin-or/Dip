@@ -3159,7 +3159,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars, DecompRayList & initR
       m_param.LimitTime = m_param.InitVarsWithIPLimitTime;      
       result = direct.solveDirect();
       m_param.LimitTime = oldSetting;
-      if(result->m_nSolutions){
+      if(result->m_nPoints){
 	 //---
 	 //--- if an incumbent was found, create a var(s) from it
 	 //---
@@ -7206,8 +7206,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
 
       //double * milpSolution = NULL;
-      //if(solveResult->m_nSolutions)
-      // milpSolution = solveResult->m_solution;
+      //if(solveResult->m_nPoints)
+      // milpSolution = solveResult->m_point;
       
      
       //TODO:
@@ -7228,9 +7228,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       // THINK: we really don't want to force the user to create vars
       // and check rc and obj, etc... but they might know how to be smart
       // and produce more than one, etc... THINK
-      if(solveResult->m_nSolutions && !solveResult->m_isUnbounded){
+      if(solveResult->m_nPoints && !solveResult->m_isUnbounded){
 	 int k;
-	 for(k = 0; k < solveResult->m_nSolutions; k++){
+	 for(k = 0; k < solveResult->m_nPoints; k++){
 	    const double * milpSolution = solveResult->getSolution(k);
 	    //---
 	    //--- create a DecompVar (shat) from the optimal solution      
