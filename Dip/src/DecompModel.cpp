@@ -203,6 +203,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogLpLevel;
 
+   // The solution here can be either extreme point, or 
+   // extreme ray, depending on the boundedness of the problem
    double * solution = new double[numCols];
    assert(solution);
 
@@ -558,7 +560,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
      
      result->m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
 
-     int maxNumRays = 1; 
 
      //CPXgetray() returns dense vector while IloCplex::getRay() returns
      // the sparse one
@@ -574,12 +575,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
 
      vector<double> solVec(solution, solution + numCols);
 
-     result->m_point.push_back(solVec);
+     result->m_ray.push_back(solVec);
 
-     result->m_nPoints++;
+     result->m_nRays++;
 
-     assert(result->m_nPoints ==
-	    static_cast<int>(result->m_point.size()));
+     assert(result->m_nRays ==
+	    static_cast<int>(result->m_ray.size()));
      
        //       OsiCp->getPrimalRays(maxNumRays); 
    }
