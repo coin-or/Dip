@@ -594,7 +594,7 @@ public:
       TailoffPercent       = 0.10;
       MasterGapLimit       = 1.0e-6;
       PCStrategy           = 0; 
-      CompressColumns      = 0;
+      CompressColumns      = 1;
       CompressColumnsIterFreq       = 2;
       CompressColumnsSizeMultLimit  = 1.20;
       CompressColumnsMasterGapStart = 0.20;
