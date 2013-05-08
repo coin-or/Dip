@@ -49,40 +49,6 @@ for i in LOCATIONS:
 # Disaggregate capacity constraints
 for i, j in ASSIGNMENTS:
     prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
-        
-# Ordering constraints
-#for index, location in enumerate(LOCATIONS):
-#    if index > 0:
-#        prob += use_vars[LOCATIONS[index-1]] >= use_vars[location]
-        
-# Anti-symmetry branches
-def choose_antisymmetry_branch(prob, sol):
-    if debug_print:
-        print "In choose_antisymmetry_branch..."
-        print "sol =", sol
-    num_locations = sum(sol[use_vars[i]] for i in LOCATIONS)
-    up   = ceil(num_locations)  # Round up to next nearest integer 
-    down = floor(num_locations) # Round down
-    if  ((up - num_locations   > tol)             
-         and (num_locations - down > tol)): # Is fractional?
-        if debug_print:
-            print "New branching solution...!"
-            for i in LOCATIONS:
-                if sol[use_vars[i]] > tol:
-                    print "Location ", i, \
-                        " produces ", \
-                        [(j, sol[assign_vars[(i, j)]]) for j in PRODUCTS
-                         if sol[assign_vars[(i, j)]] > tol]
-        # Down branch: provide upper bounds, lower bounds are default
-        down_branch_ub = dict([(use_vars[LOCATIONS[n]], 0)
-                               for n in range(int(down), len(LOCATIONS))])
-        # Up branch: provide lower bounds, upper bounds are default
-        up_branch_lb = dict([(use_vars[LOCATIONS[n]], 1)
-                             for n in range(0, int(up))])
-        # Return the advanced branch to DIP
-        if debug_print:
-            print "branch sets =", {}, down_branch_ub, up_branch_lb, {}
-        return {}, down_branch_ub, up_branch_lb, {}
 
 def solve_subproblem(prob, key, redCosts, convexDual):
     if debug_print:
