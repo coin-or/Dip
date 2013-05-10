@@ -21,6 +21,7 @@
 #include <fstream>
 #include <string>
 #include "UtilMacros.h"
+#include "iterator"
 
 //#if defined(autoDecomp) && defined(PaToH)
 #if  defined(PaToH)
@@ -31,7 +32,7 @@
 #else 
 
 extern "C"{
-#if defined (COIN_HAS_METIS)
+#if defined (COIN_HAS_HMETIS)
 #include "hmetis.h"
 #endif
 }
@@ -137,6 +138,53 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "initializeApp()", m_param.LogLevel, 2);
    
+
+   if(!m_param.AutoDecomp)
+   
+   //---
+   //--- read block file
+   //---
+
+     readBlockFile();
+
+
+   else 
+     
+     // automatic structure detection
+     {     
+     #if defined (COIN_HAS_HMETIS)
+     singlyBorderStructureDetection();
+   
+     #endif
+     }
+
+
+   /*
+    * After identifying the strucuture either through files or 
+    * automatic structure detection, call the method below to
+    * create models 
+    *
+    */
+   
+
+    createModels();
+
+
+
+    UtilPrintFuncEnd(m_osLog, m_classTag,
+		     "initializeApp()", m_param.LogLevel, 2);
+}
+
+
+void DecompApp::preprocess(){}
+
+
+void DecompApp::preprocessApp(UtilParameters & utilParam, std::vector<int> &blockNums){
+
+  
+  UtilPrintFuncBegin(m_osLog, m_classTag,
+		     "preprocessApp()", m_param.LogLevel, 2);
+   
    //---
    //--- get application parameters
    //---   
@@ -192,41 +240,197 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    setBestKnownUB(m_param.BestKnownUB + offset);
 
 
-   if(!m_param.AutoDecomp)
+   preprocess();
+
+
+
+
+   if(m_param.Concurrent == 1){
+   m_matrix = m_mpsIO.getMatrixByRow();
+
+   const int* lengthRows = m_matrix->getVectorLengths();
    
-   //---
-   //--- read block file
-   //---
+   int numRows = m_mpsIO.getNumRows();
 
-     readBlockFile();
+   // The following code creates a histogram table to store the 
+   // nonzero counts and number of rows
 
-
-   else 
-     
-     // automatic structure detection
-     {     
-     #if defined (COIN_HAS_METIS)
-     singlyBorderStructureDetection();
+   std::map<int,int> histogram; 
    
-     #endif
+   for (int i = 0 ; i < numRows; ++i)
+     {
+       if(histogram.count(lengthRows[i])>0)
+	 histogram[lengthRows[i]] += 1;
+       else
+         histogram.insert(std::pair<int,int>(lengthRows[i],1));
      }
 
+   std::map<int,int>::iterator histIter;
+   
+   if(m_param.LogDebugLevel >= 1){
+     
+     std::ofstream histogramTable;      
+     
+     histogramTable.open("/home/jiw508/Dip-branch/build_test_main/bin/histogramTable.dat");
+     
+     for (histIter = histogram.begin(); histIter != histogram.end();
+	  ++histIter)
+       {
+	 histogramTable << histIter->first << " " << histIter->second <<"\n";
+       }
+     
+     histogramTable.close();
+   }
 
-   /*
-    * After identifying the strucuture either through files or 
-    * automatic structure detection, call the method below to
-    * create models 
-    *
-    */
+
+   
+   // Aggregation steps, aggregate the entries in the histogram
+   //     Number of nonzeros      Number of rows
+   //     4                          8 
+   //     9                          8
+   // After aggregation: 
+   //     9             8
+
+   std::map<int,int>::iterator histIter2;
+
+   
+   std::map<int,int> histogram2(histogram); 
+
+   for(histIter = histogram.begin(); histIter!=histogram.end();
+       ++histIter)
+     {
+       int keyvalue_pre = histIter->second ; 
+       
+       for(histIter2 = histogram2.begin(); histIter2!=histogram2.end();
+	   ++histIter2)
+	 {
+	   int keyvalue_curr = histIter2->second; 
+
+	   // std::cout << " The current value of key is " << keyvalue_curr 
+	   // <<std::endl; 
+	   
+	   if (keyvalue_pre == keyvalue_curr)
+	     {
+	       if(histIter->first > histIter2->first)
+		 histogram2.erase(histIter2); 
+	     }
+      
+        // remove the entry with map values equal 1
+
+	   if(keyvalue_curr == 1)
+	     histogram2.erase(histIter2);
+
+	 }       
+     }
    
 
-    createModels();
+   if(m_param.LogDebugLevel >= 1){
+     
+     std::ofstream histogramTable1;      
+     
+     histogramTable1.open("/home/jiw508/Dip-branch/build_test_ray/bin/histogramTable1.dat");
+     
+     for (histIter = histogram2.begin(); histIter != histogram2.end();
+	  ++histIter)
+       {
+	 histogramTable1 << histIter->first << " " << histIter->second <<"\n";
+       }
+     
+     histogramTable1.close();
+   }
+
+   
 
 
+   
+   int blockCands = std::min(m_param.NumBlocksCand, static_cast<int>(histogram2.size())); 
 
-    UtilPrintFuncEnd(m_osLog, m_classTag,
-		     "initializeApp()", m_param.LogLevel, 2);
+   std::map<int,int>::iterator histIterLower  = histogram2.end();
+
+   std::advance(histIterLower, - blockCands);
+
+   histIter = histogram2.end();
+
+   for(--histIter; histIter != histIterLower; 
+       --histIter)
+     {
+       blockNums.push_back(histIter->second); 
+       
+     }
+
+   }
+   /*
+   if(histogram2.size() == 1){
+     histIter = histogram2.begin(); 
+     numBlocksCand = (++histIter)->second; 
+     
+     std::cout << "The block number is "
+	     << numBlocksCand << std::endl; 
+
+   }
+   
+   else if(histogram2.size()<=3){
+     
+     for(histIter = histogram2.begin(); histIter != histogram2.end();
+	 ++histIter)
+       {
+	 int nB = histIter->first; 
+	 histIter2 = ++histIter; 
+	 if (nB < histIter2->first)
+	   {numBlocksCand = (++histIter)->second; }
+	 else
+	   {numBlocksCand = nB;}
+       }
+     std::cout << "The block number is "
+	       << numBlocksCand << std::endl; 
+
+     }
+
+   else 
+
+     {
+       int gcd = (++histogram2.begin())->second; 
+
+       for(histIter = histogram2.begin(); histIter != histogram2.end();
+	   ++histIter)
+	 {
+	   if(gcd !=1)
+	     gcd = UtilGcd(histIter->second, gcd);
+	   else 
+	     {
+	       histIter2 = histIter; 
+	       gcd = UtilGcd(histIter->second, (++histIter2)->second); 
+	     }
+
+	 }
+
+       if(gcd != 1){
+
+	 int mblockNum = (histogram2.find((histogram2.rbegin())->first))->second;
+
+	 std::cout << "The single one is " << mblockNum 
+		   <<std::endl; 
+
+	 std::cout << "The block number is " 
+		   << gcd <<" " << gcd*2 << " "
+		   << gcd*4 <<" " << gcd*8 <<std::endl; 
+       }
+
+      
+
+     }
+
+   */
+   
+
+   //   UTIL_DELARR(lengthRows);
+
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+		    "preprocessApp()", m_param.LogLevel, 2); 
+
 }
+
+
 
 void DecompApp::readBlockFile(){
 
@@ -418,6 +622,7 @@ void DecompApp::readBlockFile(){
    //exit(1);
    is.close();
 }
+
 
 
 void DecompApp::readInitSolutionFile(DecompVarList & initVars){
@@ -1154,156 +1359,6 @@ void DecompApp::singlyBorderStructureDetection(){
    const int * lengthRows = m_matrix->getVectorLengths();
 
 
-   // The following code creates a histogram table to store the 
-   // nonzero counts and number of rows
-   /*
-   std::map<int,int> histogram; 
-   
-   for (int i = 0 ; i < numRows; ++i)
-     {
-       if(histogram.count(lengthRows[i])>0)
-	 histogram[lengthRows[i]] += 1;
-       else
-         histogram.insert(std::pair<int,int>(lengthRows[i],1));
-     }
-
-   std::map<int,int>::iterator histIter;
-   
-   if(m_param.LogDebugLevel >= 1){
-     
-     std::ofstream histogramTable;      
-     
-     histogramTable.open("/home/jiw508/Dip-branch/build_test_ray/bin/histogramTable.dat");
-     
-     for (histIter = histogram.begin(); histIter != histogram.end();
-	  ++histIter)
-       {
-	 histogramTable << histIter->first << " " << histIter->second <<"\n";
-       }
-     
-     histogramTable.close();
-   }
-
-
-   
-   // Aggregation steps, aggregate the entries in the histogram
-   //     Number of nonzeros      Number of rows
-   //     4                          8 
-   //     9                          8
-   // After aggregation: 
-   //     9             8
-
-   std::map<int,int>::iterator histIter2;
-
-   
-   std::map<int,int> histogram2(histogram); 
-
-   for(histIter = histogram.begin(); histIter!=histogram.end();
-       ++histIter)
-     {
-       int keyvalue_pre = histIter->second ; 
-       
-       for(histIter2 = histogram2.begin(); histIter2!=histogram2.end();
-	   ++histIter2)
-	 {
-	   int keyvalue_curr = histIter2->second; 
-
-	   // std::cout << " The current value of key is " << keyvalue_curr 
-	   // <<std::endl; 
-	   
-	   if (keyvalue_pre == keyvalue_curr)
-	     {
-	       if(histIter->first > histIter2->first)
-		 histogram2.erase(histIter2); 
-	     }
-      
-        // remove the entry with map values equal 1
-
-	   if(keyvalue_curr == 1)
-	     histogram2.erase(histIter2);
-
-	 }       
-     }
-   
-
-   if(m_param.LogDebugLevel >= 1){
-     
-     std::ofstream histogramTable1;      
-     
-     histogramTable1.open("/home/jiw508/Dip-branch/build_test_ray/bin/histogramTable1.dat");
-     
-     for (histIter = histogram2.begin(); histIter != histogram2.end();
-	  ++histIter)
-       {
-	 histogramTable1 << histIter->first << " " << histIter->second <<"\n";
-       }
-     
-     histogramTable1.close();
-   }
-
-   int numBlocksCand; 
-
-   if(histogram2.size() == 1){
-     histIter = histogram2.begin(); 
-     numBlocksCand = (++histIter)->second; 
-     
-     std::cout << "The block number is "
-	     << numBlocksCand << std::endl; 
-
-   }
-   
-   else if(histogram2.size()<=3){
-     
-     for(histIter = histogram2.begin(); histIter != histogram2.end();
-	 ++histIter)
-       {
-	 int nB = histIter->first; 
-	 histIter2 = ++histIter; 
-	 if (nB < histIter2->first)
-	   {numBlocksCand = (++histIter)->second; }
-	 else
-	   {numBlocksCand = nB;}
-       }
-     std::cout << "The block number is "
-	       << numBlocksCand << std::endl; 
-
-     }
-
-   else 
-
-     {
-       int gcd = (++histogram2.begin())->second; 
-
-       for(histIter = histogram2.begin(); histIter != histogram2.end();
-	   ++histIter)
-	 {
-	   if(gcd !=1)
-	     gcd = UtilGcd(histIter->second, gcd);
-	   else 
-	     {
-	       histIter2 = histIter; 
-	       gcd = UtilGcd(histIter->second, (++histIter2)->second); 
-	     }
-
-	 }
-
-       if(gcd != 1){
-
-	 int mblockNum = (histogram2.find((histogram2.rbegin())->first))->second;
-
-	 std::cout << "The single one is " << mblockNum 
-		   <<std::endl; 
-
-	 std::cout << "The block number is " 
-		   << gcd <<" " << gcd*2 << " "
-		   << gcd*4 <<" " << gcd*8 <<std::endl; 
-       }
-
-      
-
-     }
-
-   */
 
 
    /*
@@ -1525,7 +1580,7 @@ void DecompApp::singlyBorderStructureDetection(){
    #else
 
    clock_t begin = clock();
-#if defined(COIN_HAS_METIS)     
+#if defined(COIN_HAS_HMETIS)     
    // maximum load imbalance (%)
    
    int ubfactor = 5; 
@@ -1708,7 +1763,7 @@ void DecompApp::singlyBorderStructureDetection(){
 
     numElementsRelaxedPercentage =( double)numElementsRelaxed/numElements; 
 
-   double  numIntegerRelaxedPercentage = (double) numIntegerRelaxed/numElementsRelaxed; 
+    double  numIntegerRelaxedPercentage = (double) numIntegerRelaxed/numElementsRelaxed; 
 
     numIntegerCouplingSparsity = (double) numIntegerRelaxed/intNum; 
 

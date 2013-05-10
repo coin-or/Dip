@@ -287,6 +287,22 @@ public:
 
    int checkColumnThreshold; 
 
+
+   // variable indicates whether to use 
+   // multiple cores to compute concurrently
+
+   int Concurrent; 
+
+
+   // number of block candidates
+   int NumBlocksCand; 
+
+   // time of concurrent CutOffTime to finalize
+   // the choice of MILP solution method
+
+   double ConcurrentCutOffTime; 
+
+
    /**
     * @}
     */
@@ -412,7 +428,12 @@ public:
 
       PARAM_getSetting("checkIlledColumns", checkIlledColumns);
       PARAM_getSetting("checkColumnThreshold", checkColumnThreshold); 
+
+      PARAM_getSetting("concurrent", Concurrent); 
       
+      PARAM_getSetting("NumBlocksCand", NumBlocksCand); 
+
+      PARAM_getSetting("ConcurrentCutOffTime", ConcurrentCutOffTime); 
 
 
 
@@ -570,6 +591,12 @@ public:
       UtilPrintParameter(os, sec,  "checkIlledColumns", checkIlledColumns); 
 
       UtilPrintParameter(os, sec,  "checkColumnThreshold", checkColumnThreshold );     
+      
+      UtilPrintParameter(os, sec,  "checkColumnThreshold", Concurrent );     
+
+      UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand); 
+
+      UtilPrintParameter(os, sec, "ConcurrentCufOffTime", ConcurrentCutOffTime); 
 
 
       (*os) << "========================================================\n";
@@ -674,6 +701,12 @@ public:
       checkIlledColumns        = 0 ; 
 
       checkColumnThreshold     = 1.e6; 
+
+      Concurrent               = 0; 
+
+      NumBlocksCand            = 5; 
+
+      ConcurrentCutOffTime     = 100; 
 
    }
    

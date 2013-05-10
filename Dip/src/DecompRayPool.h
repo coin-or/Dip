@@ -21,7 +21,6 @@
 #include "DecompWaitingCol.h"
 
 
-
 class DecompConstraintSet;
 
 // --------------------------------------------------------------------- //

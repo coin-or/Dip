@@ -149,6 +149,20 @@ public:
     * @name Helper functions.
     * @{
     */
+   
+   /**
+    *  preprocessApp method takes the instances and performs the following
+    *  1. MILP preprocessing ( tighting the variable bounds, remove redundant
+    *                          constraints etc, on the TODO list) 
+    *  
+    *  2. determining the candidate block numbers based on the instance fequency 
+    *     table
+    *  
+    */
+
+   void preprocessApp(UtilParameters & utilParam, std::vector<int> & blockNums);
+
+
 
    /**
     * Print startup message to log.
@@ -423,6 +437,9 @@ public:
    /** Read block file */
    void readBlockFile();
    
+   /** Preprocess (standard ): on the TODO list*/
+
+   void preprocess();
 
    /** Automatically detect singly bordered structure */
 

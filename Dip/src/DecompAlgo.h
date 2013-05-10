@@ -51,17 +51,20 @@
 #include "DecompParam.h"
 #include "DecompStats.h"
 #include "DecompVarPool.h"
-#include "DecompRayPool.h"
 #include "DecompCutPool.h"
+#include "DecompRayPool.h"
 #include "DecompMemPool.h"
 #include "DecompSolution.h"
 #include "DecompAlgoCGL.h"
 #include "AlpsDecompTreeNode.h"
 #include "OsiClpSolverInterface.hpp"
 #include "queue"
+
 class OsiSolverInterface;
 class DecompConstraintSet;
 class DecompSolverResult;
+
+
 
 //===========================================================================//
 class DecompAlgo {
