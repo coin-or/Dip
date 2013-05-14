@@ -182,25 +182,21 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    setBestKnownUB(m_param.BestKnownUB + offset);
 
 
-   if(!m_param.AutoDecomp)
+   if(!m_param.AutoDecomp){
    
-   //---
-   //--- read block file
-   //---
+      //---
+      //--- read block file
+      //---
 
-     readBlockFile();
-
-
-   else 
-     
-     // automatic structure detection
-     {     
+      readBlockFile();
+   }else{     
+      //---
+      //--- automatic structure detection
+      //---
      #if defined (COIN_HAS_METIS)
      singlyBorderStructureDetection();
      #endif
-     }
-
-
+   }
 
    /*
     * After identifying the strucuture either through files or 
@@ -208,11 +204,8 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
     * create models 
     *
     */
-   
 
     createModels();
-
-
 
     UtilPrintFuncEnd(m_osLog, m_classTag,
 		     "initializeApp()", m_param.LogLevel, 2);
@@ -1054,8 +1047,6 @@ int DecompApp::generateInitVars(DecompVarList & initVars){
 */
 
 void DecompApp::singlyBorderStructureDetection(){
-
-
 
    //======================================================================
    // Using Row-net hypergraph model for automatic matrix decomposition 
