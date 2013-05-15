@@ -12,7 +12,7 @@ except ImportError:
     pass
         
 if DEBUGGING:
-    from dippy import dippy
+    import dippy
 else:
     import coinor.dippy as dippy
 
@@ -354,7 +354,7 @@ if debug_print_lp:
 #prob.branch_method = choose_antisymmetry_branch
 prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
-#prob.init_vars = init_first_fit
+prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
 #prob.heuristics = heuristics
 #prob.root_heuristic = True
@@ -362,7 +362,7 @@ prob.relaxed_solver = solve_subproblem
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
-    'doCut': '1',
+    'doPriceCut': '1',
     'CutCGL': '0',
 #    'SolveMasterAsIp': '0'
 #    'generateInitVars': '1',
