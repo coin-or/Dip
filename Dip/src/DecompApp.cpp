@@ -148,7 +148,7 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    string fileName = m_param.DataDir 
       + UtilDirSlash() + m_param.Instance;   
 
-   if(fileName.erase(0,1).empty()){
+   if(fileName.empty()){
      cerr << "==========================================================="<< std::endl
 	  << "Users need to provide correct "
 	  << "instance path and name" << std::endl
@@ -305,24 +305,12 @@ void DecompApp::readBlockFile(){
 	 if(is.eof()) break;
 	 vector<int> rowsInBlock;
 	 for(i = 0; i < numRowsInBlock; i++){
-	    if (m_param.UseNames){
-	       is >> rowName;
-	       rowNameToIdIt = rowNameToId.find(rowName);
-	       if(rowNameToIdIt != rowNameToId.end()){
-		  rowId = rowNameToIdIt->second;
-	       }else{
-		  std::cout << "Warning: Unrecognized row name" << rowName;
-		  std::cout << "in block file" << std::endl;
-	       }
-	       rowsInBlock.push_back(rowId);
+	    is >> rowId;
+	    mit = permute.find(rowId);
+	    if(mit != permute.end()){
+	       rowsInBlock.push_back(mit->second);
 	    }else{
-	       is >> rowId;
-	       mit = permute.find(rowId);
-	       if(mit != permute.end()){
-		  rowsInBlock.push_back(mit->second);
-	       }else{
-		  rowsInBlock.push_back(rowId);
-	       }
+	       rowsInBlock.push_back(rowId);
 	    }
 	 }
 	 blocks.insert(make_pair(blockId, rowsInBlock));
@@ -331,47 +319,47 @@ void DecompApp::readBlockFile(){
    }
    else if(m_param.BlockFileFormat == "ZIBList" ||
 	   m_param.BlockFileFormat == "ZIBLIST"){
+       
+       //-- The block file defines those rows in each block.
+       //--   NBLOCKS
+       //--   <numBlocks>
+       //--   BLOCK <block id>
+       //--   <row names...>
+       //--   BLOCK  <block id>
+       //--   <row names...>
 
-      //---
-      //--- The block file defines those rows in each block.
-      //---   <block id>  <num rows in block>
-      //---     <row ids...>
-      //---   <block id>  <num rows in block>
-      //---     <row ids...>
-      //---      
-
-      int numBlocks = 0;
-      string tmp, rowName;
-      while (!numBlocks){
-	 is >> tmp;
-	 if (tmp == "NBLOCKS"){
-	    is >> numBlocks;
-	 }
-      }
-      while (tmp != "BLOCK"){
-	 is >> tmp;
-      }
-      while(!is.eof() && rowName == "MASTERCONS"){
-	 is >> blockId;
-	 if(is.eof()) break;
-	 vector<int> rowsInBlock;
-	 while (true){
-	    is >> rowName;
-	    if (rowName == "BLOCK" || rowName == "MASTERCONS"){
-	       break;
-	    }
-	    rowNameToIdIt = rowNameToId.find(rowName);
-	    if(rowNameToIdIt != rowNameToId.end()){
-	       rowId = rowNameToIdIt->second;
-	    }else{
-	       std::cout << "Warning: Unrecognized row name" << rowName;
-	       std::cout << "in block file" << std::endl;
-	    }
-	    rowsInBlock.push_back(rowId);
-	 }
-	 blocks.insert(make_pair(blockId, rowsInBlock));
-	 if(is.eof()) break;      
-      }
+       int numBlocks = 0;
+       string tmp, rowName;
+       while (!numBlocks){
+	   is >> tmp;
+	   if (tmp == "NBLOCKS"){
+	       is >> numBlocks;
+	   }
+       }
+       while (tmp != "BLOCK"){
+	   is >> tmp;
+       }
+       while(!is.eof() && rowName != "MASTERCONSS"){
+	   is >> blockId;
+	   if(is.eof()) break;
+	   vector<int> rowsInBlock;
+	   while (true){
+	       is >> rowName;
+	       if (rowName == "BLOCK" || rowName == "MASTERCONSS"){
+		   break;
+	       }
+	       rowNameToIdIt = rowNameToId.find(rowName);
+	       if(rowNameToIdIt != rowNameToId.end()){
+		   rowId = rowNameToIdIt->second;
+	       }else{
+		   std::cout << "Warning: Unrecognized row name" << rowName;
+		   std::cout << "in block file" << std::endl;
+	       }
+	       rowsInBlock.push_back(rowId);
+	   }
+	   blocks.insert(make_pair(blockId, rowsInBlock));
+	   if(is.eof()) break;      
+       }
    }
    else if(m_param.BlockFileFormat == "Pair" ||
 	   m_param.BlockFileFormat == "PAIR"){
