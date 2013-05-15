@@ -370,7 +370,7 @@ public:
       PARAM_getSetting("NumBlocks",NumBlocks); 
       DataDir       = param.GetSetting("DataDir",       "",    "MILP");
       Instance      = param.GetSetting("Instance",      "",    "MILP");    
-      InstanceFormat= param.GetSetting("InstanceFormat","MPS", "MILP");    
+      InstanceFormat= param.GetSetting("InstanceFormat","",    "MILP");    
       BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
       PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
       BlockFileFormat 

@@ -164,6 +164,22 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
 
    int rstatus = 0;
    bool foundFormat = false;
+   if (m_param.InstanceFormat == ""){
+       string::size_type idx = fileName.rfind('.');
+       
+       if (idx != string::npos){
+	   string extension = fileName.substr(idx+1);
+	   if (extension == "MPS" || extension == "mps"){
+	       m_param.InstanceFormat = "MPS";
+	   }else if (extension == "LP" || extension == "lp"){ 
+	       m_param.InstanceFormat = "LP";
+	   }
+      }else{
+	   cerr << "File format not specified and no file extension" << endl;
+	   throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
+       }
+   }
+
    if (m_param.InstanceFormat == "MPS"){
      rstatus = m_mpsIO.readMps(fileName.c_str());
      foundFormat = true;
@@ -287,6 +303,22 @@ void DecompApp::readBlockFile(){
 
    map<int, vector<int> > blocks;
    map<int, vector<int> >::iterator blocksIt;
+
+   if (m_param.BlockFileFormat == ""){
+       string::size_type idx = fileName.rfind('.');
+       
+       if (idx != string::npos){
+	   string extension = fileName.substr(idx+1);
+	   if (extension == "DEC" || extension == "dec"){
+	       m_param.BlockFileFormat = "ZIBList";
+	   }else if (extension == "block" || extension == "blk"){ 
+	       m_param.BlockFileFormat = "List";
+	   }
+      }else{
+	   cerr << "File format not specified and no file extension" << endl;
+	   throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
+       }
+   }
 
    if(m_param.BlockFileFormat == "List" ||
       m_param.BlockFileFormat == "LIST"){
