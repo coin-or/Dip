@@ -273,7 +273,7 @@ void DecompApp::readBlockFile(){
    if (m_param.InstanceFormat == "MPS"){
      numRows = m_mpsIO.getNumRows();
      for(i = 0; i < numRows; i++){
-       rowNameToId.insert(make_pair(m_lpIO.rowName(i), i));
+       rowNameToId.insert(make_pair(m_mpsIO.rowName(i), i));
      }
    }else if (m_param.InstanceFormat == "LP"){
      numRows = m_lpIO.getNumRows();
