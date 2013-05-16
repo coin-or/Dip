@@ -917,6 +917,15 @@ DecompSolverResult * DecompAlgoC::solveDirect(const DecompSolution * startSol){
       throw UtilException("CPXsetdblparam failure", 
                           "solveDirect", "DecompAlgoC");
 
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
+
+   if(status)
+     throw UtilException("CPXsetdblparam failure", 
+			 "solveDirect", "DecompAlgoC");
+
+
+
+
    //---
    //--- solve the MILP
    //---

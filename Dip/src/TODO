@@ -19,7 +19,16 @@ The following are added by Jiadong
 1. AlpsDecompSolution and DecompSolution needed to be aggregated into one 
    file, many duplicattion part in these two files
 
+2. solution pool
+
 
 Debug: 
 
 harp2 : on the part of block identification part
+
+1. in phase I, if time limit is reached. It should return 
+   time limit reached rather than infeasible
+2. 
+
+
+Discuss with Gerald

@@ -303,6 +303,7 @@ public:
    double ConcurrentCutOffTime; 
 
 
+   int ThreadIndex; 
    /**
     * @}
     */
@@ -434,6 +435,8 @@ public:
       PARAM_getSetting("NumBlocksCand", NumBlocksCand); 
 
       PARAM_getSetting("ConcurrentCutOffTime", ConcurrentCutOffTime); 
+
+      PARAM_getSetting("ThreadIndex", ThreadIndex); 
 
 
 
@@ -598,6 +601,7 @@ public:
 
       UtilPrintParameter(os, sec, "ConcurrentCufOffTime", ConcurrentCutOffTime); 
 
+      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );     
 
       (*os) << "========================================================\n";
    }
@@ -708,6 +712,7 @@ public:
 
       ConcurrentCutOffTime     = 100; 
 
+      ThreadIndex              = 0;
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

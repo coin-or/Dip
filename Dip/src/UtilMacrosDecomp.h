@@ -34,6 +34,9 @@ class DecompApp;
 //NOTE: this is not thread safe!
 static UtilTimer              globalTimer;
 static std::map<std::string, UtilTimer> globalTimerFuncMap;
+//static UtilTimer              globalTimer;
+//static  std::map<std::string, UtilTimer> globalTimerFuncMap;
+
 #endif
 
 // =========================================================================
