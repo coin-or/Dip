@@ -12,7 +12,7 @@ except ImportError:
     pass
         
 if DEBUGGING:
-    import dippy
+    from dippy import dippy
 else:
     import coinor.dippy as dippy
 
@@ -20,14 +20,28 @@ from math import floor, ceil
 
 tol = pow(pow(2, -24), 2.0 / 3.0)
 
-from facility_ex1 import REQUIREMENT, PRODUCTS, FIXED_COST, LOCATIONS, CAPACITY
+from facility_ex2 import REQUIREMENT, PRODUCTS
+from facility_ex2 import LOCATIONS, CAPACITY
+try:
+    from facility_ex2 import FIXED_COST
+except ImportError:
+    FIXED_COST = [1 for i in LOCATIONS]
+
+try:
+    from facility_ex2 import ASSIGNMENTS
+except ImportError:
+    ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
+
+try:
+    from facility_ex2 import ASSIGNMENT_COSTS
+except ImportError:
+    ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
 display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
                         layout = 'dot', display_interval = None)
 
-ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
@@ -35,7 +49,9 @@ debug_print = False
 
 debug_print_lp = False
 
-prob += lpSum(use_vars[i] * FIXED_COST[i] for i in LOCATIONS), "min"
+prob += (lpSum(use_vars[i] * FIXED_COST[i] for i in LOCATIONS) +
+         lpSum(assign_vars[j] * ASSIGNMENT_COSTS[j] for j in ASSIGNMENTS), 
+         "min")
 
 # assignment constraints
 for j in PRODUCTS:
@@ -351,10 +367,12 @@ if debug_print_lp:
     for n, i in enumerate(LOCATIONS):
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
+prob.writeFull('facility.lp', 'facility.dec')
+
 #prob.branch_method = choose_antisymmetry_branch
-prob.relaxed_solver = solve_subproblem
+#prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
-prob.init_vars = init_first_fit
+#prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
 #prob.heuristics = heuristics
 #prob.root_heuristic = True

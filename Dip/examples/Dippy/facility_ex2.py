@@ -26,6 +26,12 @@ FIXED_COST = {
 LOCATIONS = FIXED_COST.keys()
 LOCATIONS.sort()
 
+ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
+
+ASSIGNMENT_COSTS = {}
+for a in ASSIGNMENTS:
+    ASSIGNMENT_COSTS[a] = randint(1, 10)
+
 # The capacity of the facilities
 
 CAPACITY = 8
