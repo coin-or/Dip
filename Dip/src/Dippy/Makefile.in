@@ -361,7 +361,7 @@ sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DIPPYdir = $(pkgpythondir)
+DIPPYdir = $(pythondir)/dippy
 DIPPY_PYTHON = __init__.py dipapi.py dippy.py
 pyexec_LTLIBRARIES = _dippy.la
 

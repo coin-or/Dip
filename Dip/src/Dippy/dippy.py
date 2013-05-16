@@ -418,7 +418,71 @@ class DipProblem(pulp.LpProblem, DipAPI):
         """
         return self.relaxation.dict
 
-    def writeRelaxed(self, block, filename, mip = 1):
+    def writeFull(self, instancefile, blockfile, mip = True):
+        f = file(instancefile, "w")
+        b = file(blockfile, "w")
+        f.write("\\* "+self.name+" *\\\n")
+        if self.sense == 1:
+            f.write("Minimize\n")
+        else:
+            f.write("Maximize\n")
+        wasNone, dummyVar = self.fixObjective()
+        objName = self.objective.name
+        if not objName: objName = "OBJ"
+        f.write(self.objective.asCplexLpAffineExpression(objName, constant = 0))
+        f.write("Subject To\n")
+        b.write("NBLOCKS\n")
+        b.write("%i\n" % len(self.relaxation.dict))
+        for k in self.constraints:
+            f.write(self.constraints[k].asCplexLpConstraint(k))
+        for r in self.relaxation.dict:
+            b.write("BLOCK %i\n" % r)
+            for k in self.relaxation.dict[r].constraints:
+                f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+str(r)))
+                b.write(str(k)+'_'+str(r)+'\n')
+        vs = list(self.variables())
+        # check if any names are longer than 100 characters
+        long_names = [v.name for v in vs if len(v.name) > 100]
+        if long_names:
+            raise PulpError('Variable names too long for Lp format\n' 
+                                + str(long_names))
+        # check for repeated names
+        repeated_names = {}
+        for v in vs:
+            repeated_names[v.name] = repeated_names.get(v.name, 0) + 1
+        repeated_names = [(key, value) for key, value in repeated_names.items()
+                            if value >= 2]
+        if repeated_names:
+            raise PulpError('Repeated variable names in Lp format\n' 
+                                + str(repeated_names))
+        # Bounds on non-"positive" variables
+        # Note: XPRESS and CPLEX do not interpret integer variables without 
+        # explicit bounds
+        if mip:
+            vg = [v for v in vs if not (v.isPositive() and v.cat == LpContinuous) \
+                and not v.isBinary()]
+        else:
+            vg = [v for v in vs if not v.isPositive()]
+        if vg:
+            f.write("Bounds\n")
+            for v in vg:
+                f.write("%s\n" % v.asCplexLpVariable())
+        # Integer non-binary variables
+        if mip:
+            vg = [v for v in vs if v.cat == pulp.LpInteger and not v.isBinary()]
+            if vg:
+                f.write("Generals\n")
+                for v in vg: f.write("%s\n" % v.name)
+            # Binary variables
+            vg = [v for v in vs if v.isBinary()]
+            if vg:
+                f.write("Binaries\n")
+                for v in vg: f.write("%s\n" % v.name)
+        f.write("End\n")
+        f.close()
+        self.restoreObjective(wasNone, dummyVar)
+
+    def writeRelaxed(self, block, filename, mip = True):
         """
         Write the given block into a .lp file.
         

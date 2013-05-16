@@ -18,7 +18,7 @@
 
 PACKAGE = dippy
 
-DIPPYdir = $(pkgpythondir)
+DIPPYdir = $(pythondir)/dippy
 
 DIPPY_PYTHON = __init__.py dipapi.py dippy.py
 
