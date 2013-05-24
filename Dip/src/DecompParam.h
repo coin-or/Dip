@@ -430,7 +430,7 @@ public:
       PARAM_getSetting("checkIlledColumns", checkIlledColumns);
       PARAM_getSetting("checkColumnThreshold", checkColumnThreshold); 
 
-      PARAM_getSetting("concurrent", Concurrent); 
+      PARAM_getSetting("Concurrent", Concurrent); 
       
       PARAM_getSetting("NumBlocksCand", NumBlocksCand); 
 
@@ -600,6 +600,8 @@ public:
       UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand); 
 
       UtilPrintParameter(os, sec, "ConcurrentCufOffTime", ConcurrentCutOffTime); 
+      
+      UtilPrintParameter(os, sec, "Concurrent", Concurrent); 
 
       UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );     
 
@@ -708,7 +710,7 @@ public:
 
       Concurrent               = 0; 
 
-      NumBlocksCand            = 5; 
+      NumBlocksCand            = 10; 
 
       ConcurrentCutOffTime     = 100; 
 
