@@ -443,6 +443,7 @@ Dip/src/Dippy/DippySolve.cpp -text
 Dip/src/Dippy/LICENSE -text
 Dip/src/Dippy/Makefile.am -text
 Dip/src/Dippy/Makefile.in -text
+Dip/src/Dippy/README.rst -text
 Dip/src/Dippy/__init__.py -text
 Dip/src/Dippy/dipapi.py -text
 Dip/src/Dippy/dippy.py -text
