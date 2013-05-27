@@ -430,6 +430,7 @@ Dip/src/DecompVarPool.cpp -text
 Dip/src/DecompVarPool.h -text
 Dip/src/DecompWaitingCol.h -text
 Dip/src/DecompWaitingRow.h -text
+Dip/src/Dippy/AUTHORS -text
 Dip/src/Dippy/DippyDecompAlgo.cpp -text
 Dip/src/Dippy/DippyDecompAlgo.h -text
 Dip/src/Dippy/DippyDecompApp.cpp -text
@@ -439,11 +440,14 @@ Dip/src/Dippy/DippyModule.cpp -text
 Dip/src/Dippy/DippyPythonUtils.cpp -text
 Dip/src/Dippy/DippyPythonUtils.h -text
 Dip/src/Dippy/DippySolve.cpp -text
+Dip/src/Dippy/LICENSE -text
 Dip/src/Dippy/Makefile.am -text
 Dip/src/Dippy/Makefile.in -text
 Dip/src/Dippy/__init__.py -text
 Dip/src/Dippy/dipapi.py -text
 Dip/src/Dippy/dippy.py -text
+Dip/src/Dippy/ez_setup.py -text
+Dip/src/Dippy/setup.py -text
 Dip/src/Dippy/tests/__init__.py -text
 Dip/src/Dippy/tests/dippy_tests.py -text
 Dip/src/Dippy/tests/test_coke.py -text

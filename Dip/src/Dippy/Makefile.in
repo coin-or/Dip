@@ -67,7 +67,7 @@ host_triplet = @host@
 @CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
 subdir = src/Dippy
 DIST_COMMON = $(DIPPY_PYTHON) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+	$(srcdir)/Makefile.in AUTHORS
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
