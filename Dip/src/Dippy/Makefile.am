@@ -16,13 +16,13 @@
 #                               libDippy                               #
 ########################################################################
 
-PACKAGE = dippy
-
 DIPPYdir = $(pythondir)/dippy
+
+DIPPYlibdir = $(pyexecdir)/dippy
 
 DIPPY_PYTHON = __init__.py dipapi.py dippy.py
 
-pyexec_LTLIBRARIES = _dippy.la
+DIPPYlib_LTLIBRARIES = _dippy.la
 
 # List all source files for this library, including headers
 _dippy_la_SOURCES = \

@@ -122,6 +122,7 @@ AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
 if test "$PYTHON" != "" ; then
   PYTHON_LIBS="-lpython$PYTHON_VERSION"
   PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+  pkgpyexecdir=$pyexecdir/dippy
 fi
 AC_SUBST([PYTHON_LIBS])
 AC_SUBST([PYTHON_CFLAGS])

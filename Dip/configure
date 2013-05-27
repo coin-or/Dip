@@ -25086,6 +25086,7 @@ fi
 if test "$PYTHON" != "" ; then
   PYTHON_LIBS="-lpython$PYTHON_VERSION"
   PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+  pkgpyexecdir=$pyexecdir/dippy
 fi
 
 
