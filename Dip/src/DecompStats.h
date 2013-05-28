@@ -163,6 +163,17 @@ public:
     * Number of price calls in this round.
     */
    int    priceCallsRound;
+
+   /**
+    * Number of rays generated in this particular price call.
+    */
+   int    raysThisCall;
+
+   /**
+    * Number of vars generated in this round of pricing calls.
+    */
+   int    raysThisRound;
+
    
 public:
    void init(){
@@ -248,6 +259,10 @@ class DecompStats{
    double maxGenVars;
    double maxCompressCols;
 
+   double totalGenRays; 
+   double maxGenRays;
+
+
  public:
    std::vector<double> thisDecomp;
    std::vector<double> thisSolveRelax;
@@ -257,6 +272,8 @@ class DecompStats{
    std::vector<double> thisGenCutsApp;
    std::vector<double> thisGenVars;
    std::vector<double> thisCompressCols;
+
+   std::vector<double> thisGenRays;
 
  public:
    void calculateStats();
@@ -283,9 +300,13 @@ class DecompStats{
       maxSolUpdate      (0.0),
       maxGenCuts        (0.0),
       maxGenVars        (0.0),
-      maxCompressCols   (0.0)
-      
+      maxCompressCols   (0.0),
+
+      maxGenRays        (0.0),
+      totalGenRays      (0.0)
+
       {
+
       }
    
    ~DecompStats() {}
