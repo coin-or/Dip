@@ -115,14 +115,19 @@ AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
 AM_PATH_PYTHON([2.6],,[:])
 if test "$PYTHON" != "" ; then
   PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
+  echo $PY_PREFIX
+  PY_PLATFORM=`$PYTHON -c 'import sys ; print sys.platform'`
+  echo $PY_PLATFORM
   AC_COIN_CHECK_HEADER([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],,
 		       [PYTHON=])
 fi
 AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
-if test "$PYTHON" != "" ; then
+if test "$PY_PLATFORM" != "win32" ; then
   PYTHON_LIBS="-lpython$PYTHON_VERSION"
   PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
-  pkgpyexecdir=$pyexecdir/dippy
+else
+  PYTHON_LIBS="-lpython"
+  PYTHON_CFLAGS="-I$PY_PREFIX\include"
 fi
 AC_SUBST([PYTHON_LIBS])
 AC_SUBST([PYTHON_CFLAGS])

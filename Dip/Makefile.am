@@ -69,7 +69,7 @@ if COIN_HAS_PKGCONFIG
 	$(PKG_CONFIG) --libs dip > $(addlibsdir)/dip_addlibs.txt
 else
 if COIN_CXX_IS_CL
-	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libDip.lib @DIPLIB_LIBS_INSTALLED@" > $(addlibsdir)/dip_addlibs.txt
+	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libDecomp.lib @DIPLIB_LIBS_INSTALLED@" > $(addlibsdir)/dip_addlibs.txt
 else
 	echo -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@ > $(addlibsdir)/dip_addlibs.txt
 endif
