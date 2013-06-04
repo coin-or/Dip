@@ -27,10 +27,10 @@ class CoinWarmStartBasis;
 
 //===========================================================================//
 /** Pack coin warm start into an encoded object. */
-int UtilAlpsEncodeWarmStart(AlpsEncoded              * encoded, 
-                            const CoinWarmStartBasis * ws);
+int UtilAlpsEncodeWarmStart(AlpsEncoded*               encoded,
+                            const CoinWarmStartBasis* ws);
 
 /** Unpack coin warm start from an encoded object. */
-CoinWarmStartBasis * UtilAlpsDecodeWarmStart(AlpsEncoded & encoded); 
+CoinWarmStartBasis* UtilAlpsDecodeWarmStart(AlpsEncoded& encoded);
 
 #endif

@@ -26,47 +26,47 @@ class DecompConstraintSet;
 #include "DecompCutPool.h"
 
 /*-----------------------------------------------------------------------*/
-class DecompModel{
+class DecompModel {
 
 private:
-  /**
-     Disable copy constructors.
-  */
-  DecompModel(const DecompModel &);
-  DecompModel & operator=(const DecompModel &);
-  
-public:
-  //TODO - change all data members to have m_
-  /**
-     Model data objects (must be defined by users).
-  */
-  double                *   objCoeff;      //original c (x-space)
-  //DecompConstraintSet     modelCore;     //[A'', b''] : THINK - naming
-  //DecompConstraintSet     modelRelax;    //[A',  b' ]
-  
-  /**
-     Model data objects will be used during algos.
-     THINK: belong here or in algos?
-  */
-  DecompVarList           vars;          //list of vars added to master
-  DecompCutList           cuts;
-  DecompVarPool           varpool;
-  DecompCutPool           cutpool;
+   /**
+      Disable copy constructors.
+   */
+   DecompModel(const DecompModel&);
+   DecompModel& operator=(const DecompModel&);
 
 public:
-  DecompModel() :
-    objCoeff(0),
-    //modelCore(),
-    //modelRelax(),
-    vars(),
-    cuts(),
-    varpool(),
-    cutpool()
-  {};
-  virtual ~DecompModel(){
-    UTIL_DELARR(objCoeff);    
-  }
-                       
+   //TODO - change all data members to have m_
+   /**
+      Model data objects (must be defined by users).
+   */
+   double*                   objCoeff;      //original c (x-space)
+   //DecompConstraintSet     modelCore;     //[A'', b''] : THINK - naming
+   //DecompConstraintSet     modelRelax;    //[A',  b' ]
+
+   /**
+      Model data objects will be used during algos.
+      THINK: belong here or in algos?
+   */
+   DecompVarList           vars;          //list of vars added to master
+   DecompCutList           cuts;
+   DecompVarPool           varpool;
+   DecompCutPool           cutpool;
+
+public:
+   DecompModel() :
+      objCoeff(0),
+      //modelCore(),
+      //modelRelax(),
+      vars(),
+      cuts(),
+      varpool(),
+      cutpool()
+   {};
+   virtual ~DecompModel() {
+      UTIL_DELARR(objCoeff);
+   }
+
 };
 
 #endif

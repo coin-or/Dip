@@ -49,14 +49,14 @@ class DecompAlgoCGL {
    //----------------------------------------------------------------------//
 private:
    int                        m_logLevel;
-   std::ostream                  * m_logStream;
+   std::ostream*                   m_logStream;
 
-   CglClique                * m_genClique;
-   CglOddHole               * m_genOddHole;
-   CglFlowCover             * m_genFlowCover;
-   CglKnapsackCover         * m_genKnapCover;
-   CglMixedIntegerRounding2 * m_genMixIntRound;
-   CglGomory                * m_genGomory;
+   CglClique*                 m_genClique;
+   CglOddHole*                m_genOddHole;
+   CglFlowCover*              m_genFlowCover;
+   CglKnapsackCover*          m_genKnapCover;
+   CglMixedIntegerRounding2* m_genMixIntRound;
+   CglGomory*                 m_genGomory;
 
    DecompAlgoType             m_algo;
    /**
@@ -64,7 +64,7 @@ private:
     */
 
 
-public:   
+public:
    //-----------------------------------------------------------------------//
    /**
     * @name Helper functions.
@@ -77,29 +77,29 @@ public:
                       const int doKnapCover,
                       const int doMixIntRound,
                       const int doGomory);
-   int generateCuts(OsiSolverInterface * cutGenSI,
-                    OsiSolverInterface * masterSI,
-                    double             * xhat,
-		    std::vector<int>        & integerVars,
-                    DecompCutList      & newCuts);
+   int generateCuts(OsiSolverInterface* cutGenSI,
+                    OsiSolverInterface* masterSI,
+                    double*              xhat,
+                    std::vector<int>        & integerVars,
+                    DecompCutList&       newCuts);
 
 
-   
+
    /**
     * @}
     */
-   
-public:   
+
+public:
    //-----------------------------------------------------------------------//
    /**
     * @name Set/get methods.
     * @{
     */
    //-----------------------------------------------------------------------//
-   void setLogLevel(const int logLevel){
+   void setLogLevel(const int logLevel) {
       m_logLevel = logLevel;
    }
-   void setLogStream(std::ostream * logStream){
+   void setLogStream(std::ostream* logStream) {
       m_logStream = logStream;
    }
    /**
@@ -115,10 +115,10 @@ public:
 public:
    /**
     * Default constructors.
-    */   
+    */
    DecompAlgoCGL(int              logLevel  = 0,
-		 DecompAlgoType   algo      = CUT,
-                 std::ostream        * logStream = &std::cout):
+                 DecompAlgoType   algo      = CUT,
+                 std::ostream*         logStream = &std::cout):
       m_logLevel      (logLevel),
       m_logStream     (logStream),
       m_genClique     (0),
@@ -127,20 +127,19 @@ public:
       m_genKnapCover  (0),
       m_genMixIntRound(0),
       m_genGomory     (0),
-      m_algo          (algo)
-   {
+      m_algo          (algo) {
    }
-   
+
    /**
     * Destructor.
     */
-   ~DecompAlgoCGL(){
+   ~DecompAlgoCGL() {
       UTIL_DELPTR(m_genClique);
       UTIL_DELPTR(m_genOddHole);
       UTIL_DELPTR(m_genFlowCover);
       UTIL_DELPTR(m_genKnapCover);
       UTIL_DELPTR(m_genMixIntRound);
-      UTIL_DELPTR(m_genGomory);      
+      UTIL_DELPTR(m_genGomory);
    }
    /**
     * @}

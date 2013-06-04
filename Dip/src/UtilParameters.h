@@ -30,57 +30,55 @@ struct UtilParamT {
 typedef struct UtilParamT UtilParam;
 
 //===========================================================================//
-class UtilParameters 
-{
+class UtilParameters {
 private:
    std::map<std::string, UtilParam> m_paramMap;
-    
+
 public:
-   UtilParameters() 
+   UtilParameters()
       : m_paramMap() {}
 
-   UtilParameters(int  & argc, 
-                  char * argv[]) :
-      m_paramMap()
-   {
+   UtilParameters(int&   argc,
+                  char* argv[]) :
+      m_paramMap() {
       ScanCmdLineArgs(argc, argv);
    };
 
    ~UtilParameters() {};
 
-   void ScanCmdLineArgs(int  & argc, 
-                        char * argv[]);
-   void   LoadParamFile(std::string & paramFileName);
-   void   Add(std::string & section, 
-              std::string & name, 
-              std::string & value);
-   void   Add(const char * section, 
-              const char * name, 
-              const char * value);
-   std::string GetSetting(const char * name,
-                     const char * defaultValue,
-                     const char * section = NULL);
-   int    GetSetting(const char * name,
+   void ScanCmdLineArgs(int&   argc,
+                        char* argv[]);
+   void   LoadParamFile(std::string& paramFileName);
+   void   Add(std::string& section,
+              std::string& name,
+              std::string& value);
+   void   Add(const char* section,
+              const char* name,
+              const char* value);
+   std::string GetSetting(const char* name,
+                          const char* defaultValue,
+                          const char* section = NULL);
+   int    GetSetting(const char* name,
                      const int    defaultValue,
-                     const char * section = NULL);
-   bool   GetSetting(const char * name,
+                     const char* section = NULL);
+   bool   GetSetting(const char* name,
                      const bool   defaultValue,
-                     const char * section = NULL);
-   long   GetSetting(const char * name,
+                     const char* section = NULL);
+   long   GetSetting(const char* name,
                      const long   defaultValue,
-                     const char * section = NULL);
-   double GetSetting(const char * name,
+                     const char* section = NULL);
+   double GetSetting(const char* name,
                      const double defaultValue,
-                     const char * section = NULL);
+                     const char* section = NULL);
 
-   std::string GetSetting(const char * name,
-			  const std::string defaultValue,
-			  const char * section = NULL) ; 
+   std::string GetSetting(const char* name,
+                          const std::string defaultValue,
+                          const char* section = NULL) ;
 private:
-   UtilParam * FindEntry(const char * section, 
-                         const char * name);
-   std::string    * Find(const char * section, 
-                    const char * name);
+   UtilParam* FindEntry(const char* section,
+                        const char* name);
+   std::string*     Find(const char* section,
+                         const char* name);
 };
 
 #endif

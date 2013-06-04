@@ -26,7 +26,7 @@ class DecompConstraintSet;
 // --------------------------------------------------------------------- //
 /*class is_less_thanD{//member of class instead??
 public:
-   bool operator()( const DecompWaitingCol & x, 
+   bool operator()( const DecompWaitingCol & x,
                     const DecompWaitingCol & y){
       return x.getRayPtr()->getReducedCost() < y.getRayPtr()->getReducedCost();
    }
@@ -35,49 +35,51 @@ public:
 // --------------------------------------------------------------------- //
 class DecompRayPool : public std::vector<DecompWaitingCol> {
 private:
-   DecompRayPool(const DecompRayPool &);
-   DecompRayPool & operator=(const DecompRayPool &);
+   DecompRayPool(const DecompRayPool&);
+   DecompRayPool& operator=(const DecompRayPool&);
 
 private:
-   static const char * classTag;
+   static const char* classTag;
    bool m_colsAreValid;
 
 public:
-   const inline bool colsAreValid() const {return m_colsAreValid;}
-   inline void setColsAreValid(bool colsAreValid){
+   const inline bool colsAreValid() const {
+      return m_colsAreValid;
+   }
+   inline void setColsAreValid(bool colsAreValid) {
       m_colsAreValid = colsAreValid;
    }
 
-   void print(std::ostream * os = &std::cout) const; //THINK: virtual??
-   void reExpand(const DecompConstraintSet & modelCore,
+   void print(std::ostream* os = &std::cout) const;  //THINK: virtual??
+   void reExpand(const DecompConstraintSet& modelCore,
                  const double                tolZero);
-   bool isDuplicate(const DecompWaitingCol & wcol);
-   bool isDuplicate(const DecompRayList    & vars,
-                    const DecompWaitingCol & wcol);
-   bool isParallel(const DecompRayList    & vars,
-                   const DecompWaitingCol & wcol,
+   bool isDuplicate(const DecompWaitingCol& wcol);
+   bool isDuplicate(const DecompRayList&     vars,
+                    const DecompWaitingCol& wcol);
+   bool isParallel(const DecompRayList&     vars,
+                   const DecompWaitingCol& wcol,
                    const double             maxCosine);
-   bool setReducedCosts(const double            * u,
+   bool setReducedCosts(const double*             u,
                         const DecompStatus          stat,
                         DecompRayPool::iterator   first,
                         DecompRayPool::iterator   last);
 
-   bool setReducedCosts(const double            * u, 
-                        const DecompStatus          stat){
+   bool setReducedCosts(const double*             u,
+                        const DecompStatus          stat) {
       return setReducedCosts(u, stat, begin(), end());
    }
-  
+
 public:
-   DecompRayPool() : 
+   DecompRayPool() :
       m_colsAreValid(true) {}
 
    ~DecompRayPool() {
-
       //---
       //--- delete any memory that is left in the waiting cols
       //---
       std::vector<DecompWaitingCol>::iterator vi;
-      for(vi = begin(); vi != end(); vi++){
+
+      for (vi = begin(); vi != end(); vi++) {
          (*vi).deleteRay();
          (*vi).deleteColRay();
       }

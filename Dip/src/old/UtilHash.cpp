@@ -30,43 +30,52 @@ using namespace std;
 
 // --------------------------------------------------------------------- //
 string UtilCreateStringHash(const int      len,
-                            const double * els,
-                            const int      precision){
+                            const double* els,
+                            const int      precision)
+{
    stringstream ss;
    ss << setprecision(precision);
-   for(int i = 0; i < len; i++){
-      if(!UtilIsZero(els[i]))
+
+   for (int i = 0; i < len; i++) {
+      if (!UtilIsZero(els[i])) {
          ss << i << "_" << els[i] << "_";
+      }
    }
+
    return ss.str();
 }
 
 // --------------------------------------------------------------------- //
 string UtilCreateStringHash(const int      len,
-                            const int    * ind,
-                            const double * els,
-                            const int      precision){
+                            const int*     ind,
+                            const double* els,
+                            const int      precision)
+{
    stringstream ss;
    ss << setprecision(precision);
-   for(int i = 0; i < len; i++){
-      if(!UtilIsZero(els[i]))
+
+   for (int i = 0; i < len; i++) {
+      if (!UtilIsZero(els[i])) {
          ss << ind[i] << "_" << els[i] << "_";
+      }
    }
+
    return ss.str();
 }
 
 // --------------------------------------------------------------------- //
 string UtilCreateStringHash(const int      len,
-                            const int    * ind,
-                            const double * els,
+                            const int*     ind,
+                            const double* els,
                             const char     sense,
                             const double   rhs,
-                            const int      precision){
+                            const int      precision)
+{
    stringstream ss;
    ss << setprecision(precision);
    ss << rhs << "_" << sense << "_";
    ss << UtilCreateStringHash(len, ind, els, precision);
    return ss.str();
 }
-  
+
 
