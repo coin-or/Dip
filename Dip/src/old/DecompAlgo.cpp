@@ -502,6 +502,7 @@ void DecompAlgo::solve(int whichModel)
                 );
       DecompVarList newVars;
       DecompCutList newCuts;
+
       //these are from last time you called that func
       //these are updated in phase update
       //n_newVars = 0;
@@ -593,6 +594,7 @@ void DecompAlgo::solve(int whichModel)
          n_cutCallsTotal++;
          m_cutCallsRound++;
          m_cutCallsTotal++;
+
          //m_varsThisRound = 0;
          // ---
          // --- after adding some cols, the rows in the cut pool
@@ -800,6 +802,7 @@ decompStat DecompAlgo::processNode(const int nodeIndex)
 
       DecompVarList newVars;
       DecompCutList newCuts;
+
       //these are from last time you called that func
       //these are updated in phase update
       //n_newVars = 0;
@@ -898,6 +901,7 @@ decompStat DecompAlgo::processNode(const int nodeIndex)
          //n_cutCallsTotal++;
          m_cutCallsRound++;
          m_cutCallsTotal++;
+
          //m_varsThisRound = 0;
          // ---
          // --- after adding some cols, the rows in the cut pool
@@ -2091,7 +2095,6 @@ void DecompAlgo::addVarsToPool(DecompVarList& newVars)
          sparseCol->insert(m_numOrigCols, 1.0);//convexity
          UtilPrintPackedVector(*sparseCol);
       }
-
       //    else
       //if(m_algo == PRICE_AND_CUT){
       //if this is needed, then just derive it!

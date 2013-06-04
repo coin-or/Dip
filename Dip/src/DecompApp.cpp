@@ -202,50 +202,53 @@ void DecompApp::preprocessApp(UtilParameters& utilParam, std::vector<int> &block
    string fileName = m_param.DataDir
                      + UtilDirSlash() + m_param.Instance;
 
-   if(m_param.Instance.empty()){
-     cerr << "==========================================================="<< std::endl
-	  << "Users need to provide correct "
-	  << "instance path and name" << std::endl
-          << "                                                     " << std::endl 
-	  << "Example: ./dip  --MILP:BlockFileFormat List" << std::endl
-	  << "                --MILP:Instance /FilePath/ABC.mps" << std::endl
-	  << "                --MILP:BlockFile /FilePath/ABC.block" << std::endl
-	  << "==========================================================="<< std::endl
-	  << std::endl;
-       throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
+   if (m_param.Instance.empty()) {
+      cerr << "===========================================================" << std::endl
+           << "Users need to provide correct "
+           << "instance path and name" << std::endl
+           << "                                                     " << std::endl
+           << "Example: ./dip  --MILP:BlockFileFormat List" << std::endl
+           << "                --MILP:Instance /FilePath/ABC.mps" << std::endl
+           << "                --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "===========================================================" << std::endl
+           << std::endl;
+      throw UtilException("I/O Error.", "initializeApp", "DecompApp");
    }
-   m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
+   m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
    int rstatus = 0;
    bool foundFormat = false;
-   if (m_param.InstanceFormat == ""){
-       string::size_type idx = fileName.rfind('.');
-       
-       if (idx != string::npos){
-	   string extension = fileName.substr(idx+1);
-	   if (extension == "MPS" || extension == "mps"){
-	       m_param.InstanceFormat = "MPS";
-	   }else if (extension == "LP" || extension == "lp"){ 
-	       m_param.InstanceFormat = "LP";
-	   }
-      }else{
-	   cerr << "File format not specified and no file extension" << endl;
-	   throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
-       }
+
+   if (m_param.InstanceFormat == "") {
+      string::size_type idx = fileName.rfind('.');
+
+      if (idx != string::npos) {
+         string extension = fileName.substr(idx + 1);
+
+         if (extension == "MPS" || extension == "mps") {
+            m_param.InstanceFormat = "MPS";
+         } else if (extension == "LP" || extension == "lp") {
+            m_param.InstanceFormat = "LP";
+         }
+      } else {
+         cerr << "File format not specified and no file extension" << endl;
+         throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+      }
    }
 
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
-   if (m_param.InstanceFormat == "MPS"){
-     rstatus = m_mpsIO.readMps(fileName.c_str());
-     foundFormat = true;
-   }else if (m_param.InstanceFormat == "LP"){
-     m_lpIO.readLp(fileName.c_str());
-     foundFormat = true;
+   if (m_param.InstanceFormat == "MPS") {
+      rstatus = m_mpsIO.readMps(fileName.c_str());
+      foundFormat = true;
+   } else if (m_param.InstanceFormat == "LP") {
+      m_lpIO.readLp(fileName.c_str());
+      foundFormat = true;
    }
-   if (!foundFormat){
-      cerr << "Error: Format = " << m_param.InstanceFormat << " unknown." 
-	   << endl;
+
+   if (!foundFormat) {
+      cerr << "Error: Format = " << m_param.InstanceFormat << " unknown."
+           << endl;
       throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
 
@@ -262,11 +265,13 @@ void DecompApp::preprocessApp(UtilParameters& utilParam, std::vector<int> &block
    //--- set best known lb/ub
    //---
    double offset = 0;
-   if (m_param.InstanceFormat == "MPS"){
-     offset = m_mpsIO.objectiveOffset();
-   }else if (m_param.InstanceFormat == "LP"){
-     offset = m_lpIO.objectiveOffset();
+
+   if (m_param.InstanceFormat == "MPS") {
+      offset = m_mpsIO.objectiveOffset();
+   } else if (m_param.InstanceFormat == "LP") {
+      offset = m_lpIO.objectiveOffset();
    }
+
    setBestKnownLB(m_param.BestKnownLB + offset);
    setBestKnownUB(m_param.BestKnownUB + offset);
    preprocess();
@@ -466,7 +471,6 @@ void DecompApp::readBlockFile()
    //---
    UtilOpenFile(is, fileName.c_str());
    int i, rowId, rowIdP, numRowsInBlock, blockId;
-
    //---
    //--- first create a map from row name to row id from mps
    //---   CHECK: mps to OSI guaranteed to keep order of rows?
@@ -474,16 +478,19 @@ void DecompApp::readBlockFile()
    map<string, int>           rowNameToId;
    map<string, int>::iterator rowNameToIdIt;
    int numRows = 0;
-   if (m_param.InstanceFormat == "MPS"){
-     numRows = m_mpsIO.getNumRows();
-     for(i = 0; i < numRows; i++){
-       rowNameToId.insert(make_pair(m_mpsIO.rowName(i), i));
-     }
-   }else if (m_param.InstanceFormat == "LP"){
-     numRows = m_lpIO.getNumRows();
-     for(i = 0; i < numRows; i++){
-       rowNameToId.insert(make_pair(m_lpIO.rowName(i), i));
-     }
+
+   if (m_param.InstanceFormat == "MPS") {
+      numRows = m_mpsIO.getNumRows();
+
+      for (i = 0; i < numRows; i++) {
+         rowNameToId.insert(make_pair(m_mpsIO.rowName(i), i));
+      }
+   } else if (m_param.InstanceFormat == "LP") {
+      numRows = m_lpIO.getNumRows();
+
+      for (i = 0; i < numRows; i++) {
+         rowNameToId.insert(make_pair(m_lpIO.rowName(i), i));
+      }
    }
 
    if (m_param.LogLevel >= 1) {
@@ -493,23 +500,22 @@ void DecompApp::readBlockFile()
    map<int, vector<int> > blocks;
    map<int, vector<int> >::iterator blocksIt;
 
-   if (m_param.BlockFileFormat == ""){
-       string::size_type idx = fileName.rfind('.');
-       
-       if (idx != string::npos){
-	   string extension = fileName.substr(idx+1);
-	   if (extension == "DEC" || extension == "dec"){
-	       m_param.BlockFileFormat = "ZIBList";
-	   }else if (extension == "block" || extension == "blk"){ 
-	       m_param.BlockFileFormat = "List";
-	   }
-      }else{
-	   cerr << "File format not specified and no file extension" << endl;
-	   throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
-       }
+   if (m_param.BlockFileFormat == "") {
+      string::size_type idx = fileName.rfind('.');
+
+      if (idx != string::npos) {
+         string extension = fileName.substr(idx + 1);
+
+         if (extension == "DEC" || extension == "dec") {
+            m_param.BlockFileFormat = "ZIBList";
+         } else if (extension == "block" || extension == "blk") {
+            m_param.BlockFileFormat = "List";
+         }
+      } else {
+         cerr << "File format not specified and no file extension" << endl;
+         throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+      }
    }
-
-
 
    if (m_param.BlockFileFormat == "List" ||
          m_param.BlockFileFormat == "LIST") {
@@ -521,6 +527,7 @@ void DecompApp::readBlockFile()
       //---     <row ids...>
       //---
       string rowName;
+
       while (!is.eof()) {
          is >> blockId;
          is >> numRowsInBlock;
@@ -528,71 +535,85 @@ void DecompApp::readBlockFile()
          if (is.eof()) {
             break;
          }
+
          vector<int> rowsInBlock;
 
          for (i = 0; i < numRowsInBlock; i++) {
-	    is >> rowId;
-	    mit = permute.find(rowId);
-	    if(mit != permute.end()){
-	       rowsInBlock.push_back(mit->second);
-	     } else {
+            is >> rowId;
+            mit = permute.find(rowId);
+
+            if (mit != permute.end()) {
+               rowsInBlock.push_back(mit->second);
+            } else {
                rowsInBlock.push_back(rowId);
-	     }
-	 }
+            }
+         }
 
          blocks.insert(make_pair(blockId, rowsInBlock));
-	 
+
          if (is.eof()) {
-	   break;
+            break;
          }
       }
-   } 
-   else if(m_param.BlockFileFormat == "ZIBList" ||
-	   m_param.BlockFileFormat == "ZIBLIST"){
-       
-       //-- The block file defines those rows in each block.
-       //--   NBLOCKS
-       //--   <numBlocks>
-       //--   BLOCK <block id>
-       //--   <row names...>
-       //--   BLOCK  <block id>
-       //--   <row names...>
+   } else if (m_param.BlockFileFormat == "ZIBList" ||
+              m_param.BlockFileFormat == "ZIBLIST") {
+      //-- The block file defines those rows in each block.
+      //--   NBLOCKS
+      //--   <numBlocks>
+      //--   BLOCK <block id>
+      //--   <row names...>
+      //--   BLOCK  <block id>
+      //--   <row names...>
+      int numBlocks = 0;
+      string tmp, rowName;
 
-       int numBlocks = 0;
-       string tmp, rowName;
-       while (!numBlocks){
-	   is >> tmp;
-	   if (tmp == "NBLOCKS"){
-	       is >> numBlocks;
-	   }
-       }
-       while (tmp != "BLOCK"){
-	   is >> tmp;
-       }
-       while(!is.eof() && rowName != "MASTERCONSS"){
-	   is >> blockId;
-	   if(is.eof()) break;
-	   vector<int> rowsInBlock;
-	   while (true){
-	       is >> rowName;
-	       if (rowName == "BLOCK" || rowName == "MASTERCONSS"){
-		   break;
-	       }
-	       rowNameToIdIt = rowNameToId.find(rowName);
-	       if(rowNameToIdIt != rowNameToId.end()){
-		   rowId = rowNameToIdIt->second;
-	       }else{
-		   std::cout << "Warning: Unrecognized row name" << rowName;
-		   std::cout << "in block file" << std::endl;
-	       }
-	       rowsInBlock.push_back(rowId);
-	   }
-	   blocks.insert(make_pair(blockId, rowsInBlock));
-	   if(is.eof()) break;      
-       }
-   }
+      while (!numBlocks) {
+         is >> tmp;
 
-   else if (m_param.BlockFileFormat == "Pair" ||
+         if (tmp == "NBLOCKS") {
+            is >> numBlocks;
+         }
+      }
+
+      while (tmp != "BLOCK") {
+         is >> tmp;
+      }
+
+      while (!is.eof() && rowName != "MASTERCONSS") {
+         is >> blockId;
+
+         if (is.eof()) {
+            break;
+         }
+
+         vector<int> rowsInBlock;
+
+         while (true) {
+            is >> rowName;
+
+            if (rowName == "BLOCK" || rowName == "MASTERCONSS") {
+               break;
+            }
+
+            rowNameToIdIt = rowNameToId.find(rowName);
+
+            if (rowNameToIdIt != rowNameToId.end()) {
+               rowId = rowNameToIdIt->second;
+            } else {
+               std::cout << "Warning: Unrecognized row name" << rowName;
+               std::cout << "in block file" << std::endl;
+            }
+
+            rowsInBlock.push_back(rowId);
+         }
+
+         blocks.insert(make_pair(blockId, rowsInBlock));
+
+         if (is.eof()) {
+            break;
+         }
+      }
+   } else if (m_param.BlockFileFormat == "Pair" ||
               m_param.BlockFileFormat == "PAIR") {
       //---
       //--- <block id> <row id>
@@ -632,7 +653,6 @@ void DecompApp::readBlockFile()
       //--- <block id> <row name>
       //---  ...
       //---
-
       string rowName     = "";
       is >> blockId;
 
@@ -876,21 +896,27 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
 void DecompApp::findActiveColumns(const vector<int> & rowsPart,
                                   set<int>          & activeColsSet)
 {
-  const CoinPackedMatrix * M = NULL;
-   if (m_param.InstanceFormat == "MPS"){
-     M    = m_mpsIO.getMatrixByRow();
-   }else if (m_param.InstanceFormat == "LP"){
-     M    = m_lpIO.getMatrixByRow();
+   const CoinPackedMatrix* M = NULL;
+
+   if (m_param.InstanceFormat == "MPS") {
+      M    = m_mpsIO.getMatrixByRow();
+   } else if (m_param.InstanceFormat == "LP") {
+      M    = m_lpIO.getMatrixByRow();
    }
 
    const int*               ind  = M->getIndices();
+
    const int*               beg  = M->getVectorStarts();
+
    const int*               len  = M->getVectorLengths();
+
    const int*               indR = NULL;
+
    //---
    //--- which columns are present in this part's rows
    //---
    int k, r;
+
    vector<int>::const_iterator it;
 
    for (it = rowsPart.begin(); it != rowsPart.end(); it++) {
@@ -907,20 +933,22 @@ void DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols)
 {
    int            nBlocks     = static_cast<int>(m_blocks.size());
    int      nCols       = 0;
-   double * colLB       = NULL;
-   double * colUB       = NULL;
-   char   * integerVars = NULL;
-   if (m_param.InstanceFormat == "MPS"){
-     nCols       = m_mpsIO.getNumCols();
-     colLB       = const_cast <double *>(m_mpsIO.getColLower());
-     colUB       = const_cast <double *>(m_mpsIO.getColUpper());
-     integerVars = const_cast <char *>  (m_mpsIO.integerColumns());
-   }else if (m_param.InstanceFormat == "LP"){
-     nCols       = m_lpIO.getNumCols();
-     colLB       = const_cast <double *>(m_lpIO.getColLower());
-     colUB       = const_cast <double *>(m_lpIO.getColUpper());
-     integerVars = const_cast <char *>  (m_lpIO.integerColumns());
+   double* colLB       = NULL;
+   double* colUB       = NULL;
+   char*    integerVars = NULL;
+
+   if (m_param.InstanceFormat == "MPS") {
+      nCols       = m_mpsIO.getNumCols();
+      colLB       = const_cast <double*>(m_mpsIO.getColLower());
+      colUB       = const_cast <double*>(m_mpsIO.getColUpper());
+      integerVars = const_cast <char*>  (m_mpsIO.integerColumns());
+   } else if (m_param.InstanceFormat == "LP") {
+      nCols       = m_lpIO.getNumCols();
+      colLB       = const_cast <double*>(m_lpIO.getColLower());
+      colUB       = const_cast <double*>(m_lpIO.getColUpper());
+      integerVars = const_cast <char*>  (m_lpIO.integerColumns());
    }
+
    int            nMasterOnlyCols =
       static_cast<int>(masterOnlyCols.size());
 
@@ -986,29 +1014,28 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
                                 const int             nRowsPart,
                                 const int*            rowsPart)
 {
+   int      nCols       = 0;
+   double* rowLB       = NULL;
+   double* rowUB       = NULL;
+   double* colLB       = NULL;
+   double* colUB       = NULL;
+   char*    integerVars = NULL;
 
-  int      nCols       = 0;
-  double * rowLB       = NULL;
-  double * rowUB       = NULL;
-  double * colLB       = NULL;
-  double * colUB       = NULL;
-  char   * integerVars = NULL;
-  
-  if (m_param.InstanceFormat == "MPS"){
-    nCols = m_mpsIO.getNumCols();
-    rowLB       = const_cast<double *>(m_mpsIO.getRowLower());
-    rowUB       = const_cast<double *>(m_mpsIO.getRowUpper());
-    colLB       = const_cast<double *>(m_mpsIO.getColLower());
-    colUB       = const_cast<double *>(m_mpsIO.getColUpper());
-    integerVars = const_cast<char *>  (m_mpsIO.integerColumns());
-  }else if(m_param.InstanceFormat == "LP"){
-    nCols = m_lpIO.getNumCols();
-    rowLB       = const_cast<double *>(m_lpIO.getRowLower());
-    rowUB       = const_cast<double *>(m_lpIO.getRowUpper());
-    colLB       = const_cast<double *>(m_lpIO.getColLower());
-    colUB       = const_cast<double *>(m_lpIO.getColUpper());
-    integerVars = const_cast<char *>  (m_lpIO.integerColumns());
-  }
+   if (m_param.InstanceFormat == "MPS") {
+      nCols = m_mpsIO.getNumCols();
+      rowLB       = const_cast<double*>(m_mpsIO.getRowLower());
+      rowUB       = const_cast<double*>(m_mpsIO.getRowUpper());
+      colLB       = const_cast<double*>(m_mpsIO.getColLower());
+      colUB       = const_cast<double*>(m_mpsIO.getColUpper());
+      integerVars = const_cast<char*>  (m_mpsIO.integerColumns());
+   } else if (m_param.InstanceFormat == "LP") {
+      nCols = m_lpIO.getNumCols();
+      rowLB       = const_cast<double*>(m_lpIO.getRowLower());
+      rowUB       = const_cast<double*>(m_lpIO.getRowUpper());
+      colLB       = const_cast<double*>(m_lpIO.getColLower());
+      colUB       = const_cast<double*>(m_lpIO.getColUpper());
+      integerVars = const_cast<char*>  (m_lpIO.integerColumns());
+   }
 
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
 
@@ -1017,10 +1044,11 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
    }
 
    model->reserve(nRowsPart, nCols);
-   if (m_param.InstanceFormat == "MPS"){
-     model->M->submatrixOf(*m_mpsIO.getMatrixByRow(), nRowsPart, rowsPart);   
-   }else if(m_param.InstanceFormat == "LP"){
-     model->M->submatrixOf(*m_lpIO.getMatrixByRow(), nRowsPart, rowsPart);   
+
+   if (m_param.InstanceFormat == "MPS") {
+      model->M->submatrixOf(*m_mpsIO.getMatrixByRow(), nRowsPart, rowsPart);
+   } else if (m_param.InstanceFormat == "LP") {
+      model->M->submatrixOf(*m_lpIO.getMatrixByRow(), nRowsPart, rowsPart);
    }
 
    //---
@@ -1033,16 +1061,17 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
       r = rowsPart[i];
 
       if (m_param.UseNames) {
-	const char * rowName = NULL;
-	if (m_param.InstanceFormat == "MPS"){
-	  rowName = m_mpsIO.rowName(r);
-	}else if(m_param.InstanceFormat == "LP"){
-	  rowName = m_lpIO.rowName(r);
-	}
-	if (rowName) {
+         const char* rowName = NULL;
+
+         if (m_param.InstanceFormat == "MPS") {
+            rowName = m_mpsIO.rowName(r);
+         } else if (m_param.InstanceFormat == "LP") {
+            rowName = m_lpIO.rowName(r);
+         }
+
+         if (rowName) {
             model->rowNames.push_back(rowName);
          }
-	
       }
 
       model->rowLB.push_back(rowLB[r]);
@@ -1086,12 +1115,14 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
    //---
    for (i = 0; i < nCols; i++) {
       if (m_param.UseNames) {
-	const char * colName = NULL;
-	if (m_param.InstanceFormat == "MPS"){
-	  colName = m_mpsIO.columnName(i);
-	}else if(m_param.InstanceFormat == "LP"){
-	  colName = m_lpIO.columnName(i);
-	}
+         const char* colName = NULL;
+
+         if (m_param.InstanceFormat == "MPS") {
+            colName = m_mpsIO.columnName(i);
+         } else if (m_param.InstanceFormat == "LP") {
+            colName = m_lpIO.columnName(i);
+         }
+
          if (colName) {
             model->colNames.push_back(colName);
          }
@@ -1109,29 +1140,28 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
                                       const int             nRowsPart,
                                       const int*            rowsPart)
 {
+   int      nColsOrig   = 0;
+   double* rowLB       = NULL;
+   double* rowUB       = NULL;
+   double* colLB       = NULL;
+   double* colUB       = NULL;
+   char*    integerVars = NULL;
 
-  int      nColsOrig   = 0;
-  double * rowLB       = NULL;
-  double * rowUB       = NULL;
-  double * colLB       = NULL;
-  double * colUB       = NULL;
-  char   * integerVars = NULL;
-
-  if (m_param.InstanceFormat == "MPS"){
-    nColsOrig   = m_mpsIO.getNumCols();
-    rowLB       = const_cast<double *>(m_mpsIO.getRowLower());
-    rowUB       = const_cast<double *>(m_mpsIO.getRowUpper());
-    colLB       = const_cast<double *>(m_mpsIO.getColLower());
-    colUB       = const_cast<double *>(m_mpsIO.getColUpper());
-    integerVars = const_cast<char *>  (m_mpsIO.integerColumns());
-  }else if (m_param.InstanceFormat == "LP"){
-    nColsOrig   = m_lpIO.getNumCols();
-    rowLB       = const_cast<double *>(m_lpIO.getRowLower());
-    rowUB       = const_cast<double *>(m_lpIO.getRowUpper());
-    colLB       = const_cast<double *>(m_lpIO.getColLower());
-    colUB       = const_cast<double *>(m_lpIO.getColUpper());
-    integerVars = const_cast<char *>  (m_lpIO.integerColumns());
-  }
+   if (m_param.InstanceFormat == "MPS") {
+      nColsOrig   = m_mpsIO.getNumCols();
+      rowLB       = const_cast<double*>(m_mpsIO.getRowLower());
+      rowUB       = const_cast<double*>(m_mpsIO.getRowUpper());
+      colLB       = const_cast<double*>(m_mpsIO.getColLower());
+      colUB       = const_cast<double*>(m_mpsIO.getColUpper());
+      integerVars = const_cast<char*>  (m_mpsIO.integerColumns());
+   } else if (m_param.InstanceFormat == "LP") {
+      nColsOrig   = m_lpIO.getNumCols();
+      rowLB       = const_cast<double*>(m_lpIO.getRowLower());
+      rowUB       = const_cast<double*>(m_lpIO.getRowUpper());
+      colLB       = const_cast<double*>(m_lpIO.getColLower());
+      colUB       = const_cast<double*>(m_lpIO.getColUpper());
+      integerVars = const_cast<char*>  (m_lpIO.integerColumns());
+   }
 
    //---
    //--- set model as sparse
@@ -1174,12 +1204,14 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
       }
 
       if (m_param.UseNames) {
-	const char * colName = NULL;
-	if (m_param.InstanceFormat == "MPS"){
-	  colName = m_mpsIO.columnName(origIndex);
-	}else if(m_param.InstanceFormat == "LP"){
-	  colName = m_lpIO.columnName(origIndex);
-	}
+         const char* colName = NULL;
+
+         if (m_param.InstanceFormat == "MPS") {
+            colName = m_mpsIO.columnName(origIndex);
+         } else if (m_param.InstanceFormat == "LP") {
+            colName = m_lpIO.columnName(origIndex);
+         }
+
          if (colName) {
             model->colNames.push_back(colName);
          }
@@ -1204,36 +1236,51 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
    //---
    int                      i, k, r, begInd;
    const map<int, int>     & origToSparse   = model->getMapOrigToSparse();
-   const CoinPackedMatrix * M              = NULL;
-   if (m_param.InstanceFormat == "MPS"){
-     M              = m_mpsIO.getMatrixByRow(); 
-   }else if (m_param.InstanceFormat == "LP"){
-     M              = m_lpIO.getMatrixByRow();
-   } 
+   const CoinPackedMatrix* M              = NULL;
+
+   if (m_param.InstanceFormat == "MPS") {
+      M              = m_mpsIO.getMatrixByRow();
+   } else if (m_param.InstanceFormat == "LP") {
+      M              = m_lpIO.getMatrixByRow();
+   }
+
    const int*               matInd         = M->getIndices();
+
    const CoinBigIndex*      matBeg         = M->getVectorStarts();
+
    const int*               matLen         = M->getVectorLengths();
+
    const double*            matVal         = M->getElements();
+
    const int*               matIndI        = NULL;
+
    const double*            matValI        = NULL;
+
    vector<CoinBigIndex>   & rowBeg         = model->m_rowBeg;//used as temp
+
    vector<int         >   & rowInd         = model->m_rowInd;//used as temp
+
    vector<double      >   & rowVal         = model->m_rowVal;//used as temp
+
    map<int, int>::const_iterator mit;
+
    begInd = 0;
+
    rowBeg.push_back(0);
 
    for (i = 0; i < nRowsPart; i++) {
       r = rowsPart[i];
 
       if (m_param.UseNames) {
-	const char * rowName = NULL;
-	if (m_param.InstanceFormat == "MPS"){
-	  rowName = m_mpsIO.rowName(r);
-	}else if(m_param.InstanceFormat == "LP"){
-	  rowName = m_lpIO.rowName(r);
-	}
-	if (rowName) {
+         const char* rowName = NULL;
+
+         if (m_param.InstanceFormat == "MPS") {
+            rowName = m_mpsIO.rowName(r);
+         } else if (m_param.InstanceFormat == "LP") {
+            rowName = m_lpIO.rowName(r);
+         }
+
+         if (rowName) {
             model->rowNames.push_back(rowName);
          }
       }
@@ -1272,21 +1319,18 @@ void DecompApp::createModels()
    //---
    //--- how many rows to put into relaxation
    //---
-
-   
-
-
-
    int            i, nRowsRelax, nRowsCore;
-   int     nRows = 0; 
-   int     nCols = 0; 
-   if (m_param.InstanceFormat == "MPS"){
-     nRows       = m_mpsIO.getNumRows();
-     nCols       = m_mpsIO.getNumCols();
-   }else if (m_param.InstanceFormat == "LP"){
-     nRows       = m_lpIO.getNumRows();
-     nCols       = m_lpIO.getNumCols();
+   int     nRows = 0;
+   int     nCols = 0;
+
+   if (m_param.InstanceFormat == "MPS") {
+      nRows       = m_mpsIO.getNumRows();
+      nCols       = m_mpsIO.getNumCols();
+   } else if (m_param.InstanceFormat == "LP") {
+      nRows       = m_lpIO.getNumRows();
+      nCols       = m_lpIO.getNumCols();
    }
+
    int            nBlocks     = static_cast<int>(m_blocks.size());
    map<int, vector<int> >::iterator mit;
    nRowsRelax = 0;
@@ -1347,12 +1391,12 @@ void DecompApp::createModels()
       throw UtilExceptionMemory("createModels", "DecompApp");
    }
 
-   if (m_param.InstanceFormat == "MPS"){
-     memcpy(objective, 
-	    m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
-   }else if (m_param.InstanceFormat == "LP"){
-     memcpy(objective, 
-	    m_lpIO.getObjCoefficients(), nCols * sizeof(double));
+   if (m_param.InstanceFormat == "MPS") {
+      memcpy(objective,
+             m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
+   } else if (m_param.InstanceFormat == "LP") {
+      memcpy(objective,
+             m_lpIO.getObjCoefficients(), nCols * sizeof(double));
    }
 
    if (m_param.ObjectiveSense == -1) {
@@ -1535,23 +1579,21 @@ void DecompApp::singlyBorderStructureDetection()
    //======================================================================
    // Using Row-net hypergraph model for automatic matrix decomposition
    //======================================================================
+   int numRows = 0;
+   int numCols = 0;
+   int numElements = 0;
 
-  int numRows = 0;
-  int numCols = 0;
-  int numElements = 0;
-  
-  if (m_param.InstanceFormat == "MPS"){
-    numRows = m_mpsIO.getNumRows();
-    numCols = m_mpsIO.getNumCols();
-    numElements = m_mpsIO.getNumElements();
-    m_matrix = m_mpsIO.getMatrixByRow();
-  }else if (m_param.InstanceFormat == "LP"){
-    numRows = m_lpIO.getNumRows();
-    numCols = m_lpIO.getNumCols();
-    numElements = m_lpIO.getNumElements();
-    m_matrix = m_lpIO.getMatrixByRow();
-  }
-
+   if (m_param.InstanceFormat == "MPS") {
+      numRows = m_mpsIO.getNumRows();
+      numCols = m_mpsIO.getNumCols();
+      numElements = m_mpsIO.getNumElements();
+      m_matrix = m_mpsIO.getMatrixByRow();
+   } else if (m_param.InstanceFormat == "LP") {
+      numRows = m_lpIO.getNumRows();
+      numCols = m_lpIO.getNumCols();
+      numElements = m_lpIO.getNumElements();
+      m_matrix = m_lpIO.getMatrixByRow();
+   }
 
    // get the column/row index for by-row matrix
    const int* minorIndex = m_matrix->getIndices();
@@ -1644,7 +1686,9 @@ void DecompApp::singlyBorderStructureDetection()
    for (int i = 0 ; i < numRows ; i ++) {
       intLengthRows[i] = 0 ;
    }
-   bool isInteger = false; 
+
+   bool isInteger = false;
+
    for (int i = 0; i < numRows ; i ++) {
       intCounter = 0 ;
 
@@ -1653,11 +1697,12 @@ void DecompApp::singlyBorderStructureDetection()
 
          // determine whether the corresponding column is
          // integer or not
-       if (m_param.InstanceFormat == "MPS"){
-	 isInteger = m_mpsIO.isInteger(minorIndex[index]);
-       }else if (m_param.InstanceFormat == "LP"){
-	 isInteger = m_lpIO.isInteger(minorIndex[index]);
-       }
+         if (m_param.InstanceFormat == "MPS") {
+            isInteger = m_mpsIO.isInteger(minorIndex[index]);
+         } else if (m_param.InstanceFormat == "LP") {
+            isInteger = m_lpIO.isInteger(minorIndex[index]);
+         }
+
          if (isInteger) {
             intVertices[index] = true;
             intHyperedges[majorIndex[index]] = true;

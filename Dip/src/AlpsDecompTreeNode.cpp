@@ -140,7 +140,6 @@ int AlpsDecompTreeNode::process(bool isRoot,
    const DecompApp*      app       = decompAlgo->getDecompApp();
    DecompConstraintSet* modelCore = decompAlgo->getModelCore().getModel();
    const int             n_cols    = modelCore->getNumCols();
-
    //TODO: cutoffIncrement (currentUB-cutoffIncrement)
 
    /** \todo get primalTolerance from parameter */

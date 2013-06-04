@@ -806,6 +806,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    }
 
    //#define PERMUTE_STUFF
+
    /*#ifdef  PERMUTE_STUFF
 
    //---

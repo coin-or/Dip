@@ -1,1 +1,1 @@
-astyle --pad-oper --break-blocks --pad-header --delete-empty-lines --add-brackets --indent=spaces=3 --style=stroustrup --indent-col1-comments --align-pointer=type --recursive /home/jiw508/Dip-branch/Dip/src/*.cpp /home/jiw508/Dip-branch/Dip/src/*.h
+astyle --pad-oper --break-blocks --pad-header --delete-empty-lines --add-brackets --indent=spaces=3 --style=stroustrup --indent-col1-comments --align-pointer=type --recursive /home/jiw508/Dip-branch-jiadong/Dip/src/*.cpp /home/jiw508/Dip-branch-jiadong/Dip/src/*.h

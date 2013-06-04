@@ -2128,7 +2128,6 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          //printf("m_isColGenExact  = %d\n", m_isColGenExact);
          //printf("m_rrIterSinceAll = %d\n", m_rrIterSinceAll);
          //printf("m_status         = %d\n", m_status);
-
          //TODO: don't need check m_isColGenExact if we
          //  use LB's in mostNegRC (rather than varRedCost)...
 
@@ -5529,6 +5528,7 @@ else
    }//END:for(i = 0; i < nBlocks; i++)
 
    m_rrIterSinceAll++;
+
    //---
    //--- if we searched through all the blocks but still didn't
    //---  find any columns with negative reduced cost, then we CAN
