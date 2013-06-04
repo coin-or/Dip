@@ -232,7 +232,7 @@ public:
 
    std::string DataDir;
    std::string Instance;
-
+   std::string InstanceFormat; 
    /*
        * The file defining which rows are in which blocks.
        */
@@ -385,6 +385,7 @@ public:
       PARAM_getSetting("NumBlocks", NumBlocks);
       DataDir      = param.GetSetting("DataDir",      "",    "MILP");
       Instance     = param.GetSetting("Instance",     "",    "MILP");
+      Instance     = param.GetSetting("InstanceFormat","",   "MILP");
       BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
       PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
       BlockFileFormat
