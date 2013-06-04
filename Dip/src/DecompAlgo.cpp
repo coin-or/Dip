@@ -24,9 +24,8 @@
 
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
+
 //#define   RELAXED_THREADED
-
-
 
 std::queue<int> DecompAlgo::subprobQueue;
 
@@ -796,7 +795,8 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //---  n       = orig number of vars
    //---  m''     = orig number of rows in A'', b''
    //---  |K|     = the number of blocks that defines [A' b']
-   //---  s       = a solution (e.p.) to the relaxed problem, size (1xn)
+   //---  s       = an extreme point (e.p.) to the relaxed problem, size (1xn)
+   //---  t       = an extreme ray (e.r.) to the relaxed problem, size (1xn)
    //---  c       = original cost, size (1xn)
    //---  F'[k]   = the current set of relaxed e.p.'s for block k in K
    //--- a''[i,j] = entry at row i, column j for A'' matrix
@@ -806,11 +806,14 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //--- The Dantzig-Wolfe LP:
    //---
    //--- min  sum{k in K, s in F'[k]}
-   //---        sum{j in C}(c[j]   * s[j]) * lambda[k][s]
+   //---        sum{j in C}(c[j]   * s[j]) * lambda[k][s] 
+   //---      + sum{k in K, t in F'[k]} sum{j in C}(c[j] * t[j])* theta[k][t]
+   //---
    //--- s.t. sum{k in K, s in F'[k]}
    //---        sum{j in C}(a''[i,j] * s[j])* lambda[k][s] ~ b''[i],  i in R''
    //---      sum{s in F'[k]} lambda[k][s] = 1, k in K
    //---      lambda[k][s]                >= 0, k in K, s in F'[k]
+   //---      theta[k][t]                 >= 0, k in K, t in F'[k] 
    //---
    //--- NOTE: if 0 is feasible to subproblem, we can relax convexity to <= 1
    //---   
@@ -874,10 +877,11 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //--- set the row counts
    //---
    m_nRowsOrig   = nRowsCore;
-   if(m_param.BranchEnforceInMaster)
-      m_nRowsBranch = 2 * nIntVars;
-   else
-      m_nRowsBranch = 0;
+   if(m_param.BranchEnforceInMaster){
+     m_nRowsBranch = 2 * nIntVars;}
+   else{
+     m_nRowsBranch = 0;}
+
    m_nRowsConvex = m_numConvexCon;
    m_nRowsCuts   = 0;
    
@@ -893,16 +897,18 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //--- In order to implement simple branching, we are going to
    //--- treat all column bounds as explicit constraints. Then branching
    //--- for DW can be done in the same way it is done for regular CPM.
-   //---   We want to add these directly to the core so as to facilitate
-   //---   operations to expand rows. Basically, we treat these just like cuts.
+   //--- We want to add these directly to the core so as to facilitate
+   //--- operations to expand rows. Basically, we treat these just like cuts.
    //---
-   if(m_param.BranchEnforceInMaster)
-      coreMatrixAppendColBounds();
+   if(m_param.BranchEnforceInMaster){
+     coreMatrixAppendColBounds();}
+
    nRowsCore = modelCore->getNumRows();
    
    //THINK - what need this for?
    //number of original core rows
    modelCore->nBaseRowsOrig = modelCore->nBaseRows;
+
    //number of original core rows plus branching rows
    modelCore->nBaseRows     = modelCore->getNumRows();
 
@@ -911,16 +917,21 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //---  make room for original rows, branching rows and convexity rows
    //---
    int                nRows    = m_nRowsOrig + m_nRowsConvex;
-   if(m_param.BranchEnforceInMaster)
+
+   if(m_param.BranchEnforceInMaster){
       nRows += m_nRowsBranch;
+   }
+
    int                nColsMax = nInitVars  
       + 2 * (m_nRowsOrig + m_nRowsBranch + m_nRowsConvex); 
+
    double           * colLB    = new double[nColsMax];
    double           * colUB    = new double[nColsMax];
    double           * objCoeff = new double[nColsMax];   
    double           * denseCol = new double[nRows];
    CoinPackedMatrix * masterM  = new CoinPackedMatrix(true, 0, 0);
    vector<string>     colNames;
+
    assert(colLB && colUB && objCoeff && denseCol && masterM);
    
    //---
@@ -936,12 +947,14 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //---
    startRow = 0;
    endRow   = m_nRowsOrig;  
+
    masterMatrixAddArtCols(masterM, 
 			  colLB, 
 			  colUB, 
 			  objCoeff, 
 			  colNames,
 			  startRow, endRow, DecompRow_Original);
+
    if(m_nRowsBranch > 0){
       startRow = m_nRowsOrig;
       endRow   = m_nRowsOrig + m_nRowsBranch;
@@ -952,8 +965,10 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
 			     colNames,
 			     startRow, endRow, DecompRow_Branch);
    }
+
    startRow = m_nRowsOrig + m_nRowsBranch;
    endRow   = m_nRowsOrig + m_nRowsBranch + m_nRowsConvex;
+
    masterMatrixAddArtCols(masterM, 
 			  colLB, 
 			  colUB, 
@@ -973,6 +988,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
       
    int colIndex     = 0;
    int blockIndex   = 0;
+
    DecompVarList::iterator li;
    //TODO:
    //  this should be calling a function to add var to lp so don't dup code
@@ -1003,6 +1019,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
       //---
       string colName = "lam(c_" + UtilIntToStr(m_colIndexUnique)
 	 + ",b_" + UtilIntToStr(blockIndex) + ")";
+
       colNames.push_back(colName);
       
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
@@ -1013,11 +1030,13 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
       //--- get dense column = A''s, append convexity constraint on end 
       //---   this memory is re-used, so be sure to clear out
       //---  
+
       //STOP: see addVarsToPool - here init, so no cuts to deal with
       // but we don't use dense array here - make a difference?
       //modelCore->M->times((*li)->m_s, denseCol);
       (*li)->fillDenseArr(modelCore->getNumCols(),
 			  dblArrNCoreCols);
+
       modelCore->M->times(dblArrNCoreCols, denseCol);
 
 
@@ -1075,7 +1094,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    for(lir = initRays.begin(); lir != initRays.end(); lir++){
       
       //---
-      //--- appending these variables (lambda) to end of matrix
+      //--- appending these variables (theta) to end of matrix
       //---   after the artificials
       //---
       colIndex         = masterM->getNumCols();
@@ -1085,12 +1104,12 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
       //--- store the col index for this var in the master LP
       //---   NOTE: if we remove columns, this will be wrong
       //---
-      (*li)->setColMasterIndex(colIndex);
+      (*lir)->setColMasterIndex(colIndex);
       
       //---
       //--- we expect the user to define the block id in the ray object
       //---
-      blockIndex = (*li)->getBlockId();
+      blockIndex = (*lir)->getBlockId();
 
       //---
       //--- give the column a name
@@ -1100,7 +1119,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
       colNames.push_back(colName);
       
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
-		 (*li)->print(m_osLog, m_app);
+		 (*lir)->print(m_osLog, m_app);
 		 );
 	      
       //--- 
@@ -1112,6 +1131,7 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
       //modelCore->M->times((*li)->m_s, denseCol);
       (*li)->fillDenseArr(modelCore->getNumCols(),
 			  dblArrNCoreCols);
+
       modelCore->M->times(dblArrNCoreCols, denseCol);
 
 
@@ -1178,13 +1198,14 @@ void DecompAlgo::createMasterProblem(DecompVarList & initVars, DecompRayList & i
    //TODO: DETECT THIS
    //bool     isZeroFeas = isIPFeasible(zeroSol);     
    int isZeroFeas = m_param.MasterConvexityLessThan;
+
    UTIL_DEBUG(m_param.LogDebugLevel, 5,
 	      if(isZeroFeas)
 		 (*m_osLog) << "Zero Sol is Feasible - relax convexity con.\n";
 	      );
    
    //---
-   //--- row bounds from core inclding
+   //--- row bounds from core including
    //---   original rows
    //---   branching rows
    //---
@@ -1994,7 +2015,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	   UTIL_MSG(m_param.LogLevel, 2,
 		    (*m_osLog)
 		    << "*********************************************"
-		    << " The global Upper bound was e set too tigh " 
+		    << " The global Upper bound was set too tigh " 
 		    << "********************************************"
 		    << endl;);
 	   
@@ -2059,27 +2080,50 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	 assert(DecompAlgo::subprobQueue.size()== m_numConvexCon);
 	 
 	 #endif 
+       
 
-
-	 m_nodeStats.varsThisCall   = generateVars(m_status,
-						   newVars,
-						   newRays,
-						   mostNegRC);
-	 m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
-	 m_nodeStats.cutsThisCall   = 0;
+	 generateVars(m_status,
+		      newVars,
+		      newRays,
+		      mostNegRC);
+	
+	 m_nodeStats.varsThisCall  = static_cast<int> (newVars.size());	 
+	 m_nodeStats.raysThisCall  = static_cast<int> (newRays.size()); 
 	 
+	 m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
+	 m_nodeStats.raysThisRound += m_nodeStats.raysThisCall;
+
+	 m_nodeStats.cutsThisCall   = 0;
+
+
 	 if(m_nodeStats.varsThisCall > 0){
 	    //--- 
-	    //--- add the newly generated variables to the var pool
+	    //--- add the newly generated vars to the ray pool
 	    //---	    
 	  
 	       addVarsToPool(newVars);	    
 	    //---
 	    //--- add variables from the variable pool to the master problem
 	    //---
-	       addVarsFromPool();            
-	  
+	       addVarsFromPool();            	  
 	 }
+
+
+	 
+	 if(m_nodeStats.raysThisCall > 0){
+	    //--- 
+	    //--- add the newly generated extreme rays to the var pool
+	    //---	    	  
+	       addRaysToPool(newRays);	    
+	    //---
+	    //--- add rays from the rays pool to the master problem
+	    //---
+	       addRaysFromPool();            	  
+	 }
+	 
+
+
+
 	 //printf("m_isColGenExact  = %d\n", m_isColGenExact);
 	 //printf("m_rrIterSinceAll = %d\n", m_rrIterSinceAll);
 	 //printf("m_status         = %d\n", m_status);
@@ -3164,7 +3208,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars, DecompRayList & initR
 	 //--- if an incumbent was found, create a var(s) from it
 	 //---
 	 //TODO: safe to assume 0th is the best
-	 const double * solution = result->getSolution(0);
+	 const double * solution = result->getPoints(0);
 	 if(m_numConvexCon == 1){	
 	    DecompVar * directVar = new DecompVar(nCoreCols,
 						  solution,
@@ -4747,7 +4791,7 @@ void DecompAlgo::generateVarsAdjustDuals(const double * uOld,
 }
 
 //------------------------------------------------------------------------ //
-int DecompAlgo::generateVarsFea(DecompVarList    & newVars, 
+void DecompAlgo::generateVarsFea(DecompVarList    & newVars, 
 				DecompRayList    & newRays,
                                 double           & mostNegReducedCost){
    //---
@@ -5749,11 +5793,11 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    m_stats.thisGenVars.push_back(m_stats.timerOther1.getRealTime()); 
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "generateVarsFea()", m_param.LogDebugLevel, 2); 
-   return static_cast<int>(newVars.size());
+//   return static_cast<int>(newVars.size());
 }
 
 //------------------------------------------------------------------------ //
-int DecompAlgo::generateVars(const DecompStatus   stat,
+void DecompAlgo::generateVars(const DecompStatus   stat,
                              DecompVarList      & newVars, 
 			     DecompRayList      & newRays,
                              double             & mostNegReducedCost){
@@ -5775,7 +5819,9 @@ int DecompAlgo::generateVars(const DecompStatus   stat,
    
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "generateVars()", m_param.LogDebugLevel, 2);
-   return generateVarsFea(newVars, newRays, mostNegReducedCost);
+   
+
+   generateVarsFea(newVars, newRays, mostNegReducedCost);
 
    /*#else
      switch(stat){
@@ -5786,7 +5832,7 @@ int DecompAlgo::generateVars(const DecompStatus   stat,
      default:
      assert(0);
      }*/
-   return 0;
+   //   return 0;
 }
 
 
@@ -5950,6 +5996,468 @@ int DecompAlgo::generateCuts(double        * xhat,
 
 
 
+void DecompAlgo::addRaysToPool(DecompRayList & newRays){
+
+
+   int                   blockIndex;
+   double              * denseCol  = NULL;
+   CoinPackedVector    * sparseCol = NULL;
+   DecompConstraintSet * modelCore = m_modelCore.getModel();
+
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "addRaysToPool()", m_param.LogDebugLevel, 2);
+   //printf("varpool size=%d\n", m_varpool.size());
+
+   //---
+   //--- sanity check - make sure the number of rows in core is
+   //---    num of (orig+branch+cuts) in LP formulation
+   //---
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      (*m_osLog) 
+	      << "num original= " << getNumRowType(DecompRow_Original) << "\n"
+	      << "num branch  = " << getNumRowType(DecompRow_Branch)   << "\n"
+	      << "num cut     = " << getNumRowType(DecompRow_Cut)      << "\n"
+	      << "num convex  = " << getNumRowType(DecompRow_Convex)   << "\n"
+	      << "num core    = " << modelCore->getNumRows()         << "\n";
+	      );
+
+   if(m_algo != DECOMP){
+      assert((getNumRowType(DecompRow_Original) +
+	      getNumRowType(DecompRow_Branch)   +
+	      getNumRowType(DecompRow_Cut)) == modelCore->getNumRows());
+      denseCol = new double[modelCore->getNumRows() + m_numConvexCon];
+   }
+
+
+   //---
+   //--- is it ok to purge vars that are parallel?
+   //---   just make sure at least one gets thru so process can continue
+   //--- NOTE: in case of RoundRobin, this will cause parallel check
+   //---   to never be activated, if pull in only one col at a time
+   //---
+   
+   //---
+   //--- as soon as found one good, can purge rest
+   //---   problem is, what if cols are par, par, not-par, not-par
+   //---   then, we accept the first two, even though should not have
+   //---
+   bool foundGoodCol = false; 
+   DecompRayList::iterator li;
+
+   for(li = newRays.begin(); li != newRays.end(); li++){
+      //--- 
+      //--- get dense column = A''s, append convexity constraint on end 
+      //---    THINK: PC specific
+      //---
+      //TODO - fix this derive method for decomp
+      if(m_algo == DECOMP){
+
+	 blockIndex = (*li)->getBlockId();
+	 sparseCol  = new CoinPackedVector((*li)->m_s);
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		    (*m_osLog) << "\nPRINT m_s\n";
+		    UtilPrintPackedVector((*li)->m_s);         
+		    );
+	 //add in convexity constraint, theta is not in the convexity constraint
+
+	 sparseCol->insert(modelCore->getNumCols() + blockIndex, 0.0);
+
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		    (*m_osLog) << "\nPRINT sparseCol\n";                    
+		    UtilPrintPackedVector(*sparseCol);
+		    );
+      }
+      else{
+	 //---
+	 //--- this creates a dense array of the column (in x-space)
+	 //---  it is stored as a sparse vector, so we have translate
+	 //---  it to do the matrix multiply
+	 //---
+	 //--- we put the dense array into the mem pool at dblArrNCoreCols
+	 //---
+	 (*li)->fillDenseArr(modelCore->getNumCols(),
+			     m_memPool.dblArrNCoreCols);
+
+	 //---
+	 //--- modelCore->M = A'' + branch-rows + new cuts
+	 //---    here, we caculate M.s (where s is a var in x-space)
+	 //---	 
+	 modelCore->M->times(m_memPool.dblArrNCoreCols, denseCol);
+
+	 //---
+	 //--- Let A'' = original rows and branching rows.
+	 //---
+	 //--- a dense column here gives the coefficients in the
+	 //--- reformulation by [A'' + cuts] * column (in x-space)
+	 //---
+	 //--- dimensions:
+	 //---      (m'' + ncuts x n) * (n x 1) -> (m'' + ncuts x 1)	 
+	 //---
+	 //--- but this is missing the convexity constraints, and these
+	 //--- need to be in order as originally setup (after A'', but
+	 //--- before cuts)
+	 //---
+	 //--- shift all the cuts over to make space for convexity cons
+	 //---
+	 //--- since the convexity constraints are just sum{} lambda = 1
+	 //--- we know that there is exactly one entry 1.0 for the approriate
+	 //--- convexity row (depends on block id)
+	 //---
+	 //---   r[0],   r[1],  ..., r[m''-1], 
+	 //---   cut[0], cut[1], ... cut[ncuts-1]
+	 //---      -->
+	 //---   r[0],    r[1],    ..., r[m''-1], 
+	 //---   conv[0], conv[1], ..., conv[b-1],
+	 //---   cut[0],  cut[1],  ...  cut[ncuts-1]	 
+	 //---
+
+	 int r, b;
+
+	 //number of rows in core (A''+cuts)
+	 int mpp             = modelCore->getNumRows();
+	 //number of rows in original core (before cuts: A'')
+	 int convexity_index = modelCore->nBaseRows;
+	 //in the master, the convexity constraints are put just 
+	 //   after A'' (before any cuts were added)
+	 assert(m_masterRowType[convexity_index] == DecompRow_Convex);
+	 assert(mpp - convexity_index == getNumRowType(DecompRow_Cut));
+	 
+	 //---
+	 //--- for each cut row, move it to right/down
+	 //---    o=original, b=branch, x=convex, c=cut
+	 //---                             0123456789012
+	 //---    LP                     : oooobbbbxxccc
+	 //---    Core (current denseCol): oooobbbbccc  
+	 //--- make room in denseCol, 0 out, then fill in for block
+	 //---    nRows=13, nCuts=3, nConv=2 
+	 //---       r=12..10 <-- r=10..8
+	 //---                             0123456789012
+	 //---                           : oooobbbb..ccc
+	 //---                           : oooobbbb00ccc
+	 //---                           : oooobbbb10ccc
+	 //---  
+	 int nCuts = mpp - convexity_index;
+	 int nRows = m_masterSI->getNumRows();
+	 assert(nRows == mpp + m_numConvexCon);
+	 
+	 for(r = (nRows - 1); r >= (nRows-nCuts); r--)
+	    denseCol[r] = denseCol[r - m_numConvexCon];
+
+	 for(b = 0; b < m_numConvexCon; b++)
+	    denseCol[convexity_index + b] = 0.0;
+
+	 denseCol[convexity_index + (*li)->getBlockId()] = 0.0;
+
+	 //---
+	 //--- creat a sparse column from the dense column
+	 //---
+	 sparseCol 
+	    = UtilPackedVectorFromDense(modelCore->getNumRows() +
+					m_numConvexCon,
+					denseCol, m_app->m_param.TolZero);
+
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		    (*m_osLog) << "\nPRINT sparseCol\n";
+		    UtilPrintPackedVector(*sparseCol);
+		    );
+		    
+	 
+      }//END: else(m_algo == DECOMP)
+
+      DecompWaitingCol waitingCol(*li, sparseCol);
+
+      //TOOD: since DecompVarList does not have its own class...
+      //  this is ugly, fix this later... make a helper funciton of DecompVar?
+      //TODO: this is very expensive - use hash like in cuts
+
+      if(m_raypool.isDuplicate(m_rays, waitingCol)){
+
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+                    (*m_osLog) << "Duplicate variable, already in vars!!\n";		    
+		    (*li)->print(m_osLog,
+				 modelCore->getColNames(),
+				 NULL);
+		    );
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		    (*m_osLog) << "\nVAR POOL:\n";
+		    m_raypool.print(m_osLog);
+		    (*m_osLog) << "\nVARS:\n";
+		    printVars(m_osLog);  
+		    );
+
+	 waitingCol.deleteRay();
+	 waitingCol.deleteColRay();
+	 if(m_algo != RELAX_AND_CUT){ //?? 
+	    m_nodeStats.varsThisCall--;
+	    m_nodeStats.varsThisRound--;
+	 }
+	 continue;
+      }   
+
+      if(m_raypool.isDuplicate(waitingCol)){
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog) << "Duplicate variable, already in var pool.\n";
+		    );
+	 waitingCol.deleteRay();
+	 waitingCol.deleteColRay();
+	 if(m_algo != RELAX_AND_CUT){ //??
+	    m_nodeStats.varsThisCall--;
+	    m_nodeStats.varsThisRound--;
+	 }
+         continue;
+      }
+      
+      //---
+      //--- check to see if this var is parallel to the ones in LP
+      //---   cosine=1.0 means the vars are exactly parallel
+      //---
+      if(foundGoodCol &&
+         m_raypool.isParallel(m_rays, waitingCol, m_param.ParallelColsLimit)){
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog) << "Parallel variable, already in vars.\n";
+		    );
+	 waitingCol.deleteRay();
+	 waitingCol.deleteColRay();
+	 if(m_algo != RELAX_AND_CUT){ //??
+	    m_nodeStats.varsThisCall--;
+	    m_nodeStats.varsThisRound--;
+	 }
+         continue;
+      }
+      
+      //---
+      //--- passed all filters, add the column to ray pool
+      //---
+      m_raypool.push_back(waitingCol);
+      foundGoodCol = true;
+   } //END: for(li = newVars.begin(); li != newVars.end(); li++)
+
+
+   //---
+   //--- in the case of Wengtes, you might get all duplicate
+   //---    columns - if this is the case, you don't want to stop
+   //---    searching - rather, reduce alpha and repeat gen vars
+   //---
+   if(m_phase        == PHASE_PRICE2 && 
+      newRays.size() >  0            && 
+      !foundGoodCol && m_param.DualStab){
+      m_phaseForce           = PHASE_PRICE2;
+      m_param.DualStabAlpha *= 0.90;
+      if(m_param.LogDebugLevel >= 2)
+	 (*m_osLog) << "No vars passed doing Wengtes. Reduce alpha to " 
+		    << m_param.DualStabAlpha << " and repeat." << endl;
+
+
+      //---
+      //--- adjust dual solution with updated stability parameter
+      //---
+      adjustMasterDualSolution();
+   }
+   else
+      m_phaseForce = PHASE_UNKNOWN;
+
+   //---
+   //--- if Wengtes parameter has been reduced, set it back to original 
+   //---
+   if(foundGoodCol && m_param.DualStabAlpha < m_param.DualStabAlphaOrig){
+      m_param.DualStabAlpha = m_param.DualStabAlphaOrig;
+      if(m_param.LogDebugLevel >= 2)
+	 (*m_osLog) << "Good column found doing Wengtes. Setting alpha back "
+		    << "to its original setting "
+		    << m_param.DualStabAlpha << "." << endl;
+   }
+
+   UTIL_DELARR(denseCol);
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+		    "addVarsToPool()", m_param.LogDebugLevel, 2);
+
+
+}
+
+void DecompAlgo::addRaysFromPool(){
+
+   //TODO: we have checked to make sure there are no dups added to pool
+   // do we also need to check that no dup vars are added to LP? for that
+   // we'd have to check across m_vars
+   UtilPrintFuncBegin(m_osLog, m_classTag,
+		      "addRaysFromPool()", m_param.LogDebugLevel, 2);
+   //TODO:
+   // const int maxvars_toadd = m_app->m_param.maxvars_periter;  
+   // int n_newcols = std::min<int>(m_varpool.size(), maxvars_toadd);
+
+   DecompRayPool::iterator vi;
+   DecompRayPool::iterator viLast;
+
+   int n_newcols = static_cast<int>(m_raypool.size());
+
+   if(n_newcols == 0){
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "addRaysFromPool()", m_param.LogDebugLevel, 2);
+      return;
+   }
+
+   //---
+   //--- sort the pool by increasing reduced cost
+   //---
+   partial_sort(m_raypool.begin(), 
+		m_raypool.begin() + n_newcols,
+		m_raypool.end(), 
+		is_less_thanD());
+  
+   UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+            (*m_osLog) << "size: ray pool = " << m_raypool.size();
+            (*m_osLog) << " master cols = "   << m_masterSI->getNumCols()
+            << endl;
+            );
+   
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 10,
+	      (*m_osLog) << "\nRAY POOL BEFORE:\n";
+	      m_raypool.print(m_osLog);
+	      (*m_osLog) << "\nRAYS BEFORE:\n";
+	      printRays(m_osLog);  
+	      );
+  
+   //---
+   //--- never add anything with pos rc
+   //---
+   int index = 0;
+   for(vi = m_raypool.begin(); vi != m_raypool.end(); vi++){
+      if(m_algo != RELAX_AND_CUT){//THINK??
+	 if((*vi).getRayReducedCost() >  -0.0000001){//TODO - param
+	    break;
+	 }
+      }
+      index++;
+   }
+   n_newcols = std::min<int>(n_newcols, index);
+   
+   //TODO
+   /*if(n_newcols > 0)
+     m_cutpool.setRowsAreValid(false);*/
+
+   //see CoinBuild or switch to ind,els,beg form
+   //---
+   //--- 1.) build up the block of columns to be added to the master
+   //---     create a block for speed, rather than one column at a time
+   //--- 2.) copy the var pointers to the DecompModel var list
+   //---
+   double * clb = new double[n_newcols];
+   double * cub = new double[n_newcols];
+   double * obj = new double[n_newcols];
+   const CoinPackedVectorBase ** colBlock =
+      new const CoinPackedVectorBase*[n_newcols];  
+   const vector<string> & colNamesM = m_masterSI->getColNames();
+   vector<string>   colNames;
+   bool             hasNames  = colNamesM.size() > 0 ? true : false;
+   const int        colIndex0 = m_masterSI->getNumCols();
+   if(hasNames){
+      if(colIndex0 != static_cast<int>(colNamesM.size())){
+	 printf("master num cols=%d names size=%d", 
+		colIndex0, static_cast<int>(colNamesM.size()));
+      }
+      assert(colIndex0 == static_cast<int>(colNamesM.size()));
+   }
+
+   index = 0;
+   for(vi = m_raypool.begin(); vi != m_raypool.end(); vi++){
+      if(index >= n_newcols)
+	 break;
+      const CoinPackedVector * col = (*vi).getColRayPtr();
+      DecompRay              * ray = (*vi).getRayPtr();
+      
+      assert(col);
+      colBlock[index] = col;
+      clb[index]      = (*vi).getRayLowerBound();
+      cub[index]      = (*vi).getRayUpperBound();
+      if(m_phase == PHASE_PRICE1){
+	 obj[index] = 0.0;
+      }
+      else{
+	 obj[index] = (*vi).getRayOrigCost();
+      }
+      
+      
+      int blockIndex = ray->getBlockId();
+      int colIndex   = colIndex0 + index;      
+      ray->setColMasterIndex(colIndex);
+      m_masterColType.push_back(DecompCol_Structural);
+      
+      //---
+      //--- give the column a name
+      //---
+      if(hasNames){
+	 string colName = "theta(c_" + UtilIntToStr(m_colIndexUnique)
+	    + ",b_" + UtilIntToStr(blockIndex) + ")";
+	 colNames.push_back(colName);
+      }
+      m_colIndexUnique++;
+         
+      appendRays(ray);
+      index++;
+   }
+   viLast = vi;
+
+   m_masterSI->addCols(n_newcols, colBlock, clb, cub, obj); 
+
+   if(hasNames){      
+      m_masterSI->setColNames(colNames, 0, 
+			      static_cast<int>(colNames.size()), 
+			      colIndex0);
+   }
+   
+
+
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      const int n_colsAfter  = m_masterSI->getNumCols();
+	      assert(colIndex0 + n_newcols == n_colsAfter);
+              );
+
+
+
+
+    
+   //---
+   //--- 3.) delete the col memory and clear the var pointer from varpool
+   //---     the column memory is no longer needed, it has been copied into 
+   //---     the master object, the variable memory is still needed, its 
+   //---     pointer is now in m_vars, and no longer is needed in varpool
+   //---
+   //THINK is this all neccessary? just to keep memory small? or 
+   //doing this for some reason of efficiency?
+   for(vi = m_raypool.begin(); vi != viLast; vi++){
+      (*vi).deleteColRay();    
+      (*vi).clearRay(); //needed? dangling pointer if not
+   }
+   //TODO: is this slow for vector? if so, maybe list is still the way to go
+   m_raypool.erase(m_raypool.begin(), viLast);
+
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 10,
+	      (*m_osLog) << "\nVAR POOL AFTER:\n";
+	      m_raypool.print(m_osLog);
+	      (*m_osLog) << "\nVARS AFTER:\n";
+	      printRays(m_osLog);  
+	      );
+
+   UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+            (*m_osLog) << "size: ray pool = " << m_raypool.size();
+            (*m_osLog) << " master cols = "   << m_masterSI->getNumCols()
+            << endl;
+            );
+
+
+   //---
+   //--- free local memory
+   //---
+   UTIL_DELARR(colBlock);
+   UTIL_DELARR(clb);
+   UTIL_DELARR(cub);
+   UTIL_DELARR(obj);
+   
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+		    "addRaysFromPool()", m_param.LogDebugLevel, 2);
+   
+
+}
 
 
 
@@ -6135,7 +6643,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 		    );
 
 	 waitingCol.deleteVar();
-	 waitingCol.deleteCol();
+	 waitingCol.deleteColVar();
 	 if(m_algo != RELAX_AND_CUT){ //?? 
 	    m_nodeStats.varsThisCall--;
 	    m_nodeStats.varsThisRound--;
@@ -6148,7 +6656,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 		    (*m_osLog) << "Duplicate variable, already in var pool.\n";
 		    );
 	 waitingCol.deleteVar();
-	 waitingCol.deleteCol();
+	 waitingCol.deleteColVar();
 	 if(m_algo != RELAX_AND_CUT){ //??
 	    m_nodeStats.varsThisCall--;
 	    m_nodeStats.varsThisRound--;
@@ -6166,7 +6674,7 @@ void DecompAlgo::addVarsToPool(DecompVarList & newVars){
 		    (*m_osLog) << "Parallel variable, already in vars.\n";
 		    );
 	 waitingCol.deleteVar();
-	 waitingCol.deleteCol();
+	 waitingCol.deleteColVar();
 	 if(m_algo != RELAX_AND_CUT){ //??
 	    m_nodeStats.varsThisCall--;
 	    m_nodeStats.varsThisRound--;
@@ -6270,7 +6778,7 @@ void DecompAlgo::addVarsFromPool(){
    int index = 0;
    for(vi = m_varpool.begin(); vi != m_varpool.end(); vi++){
       if(m_algo != RELAX_AND_CUT){//THINK??
-	 if((*vi).getReducedCost() >  -0.0000001){//TODO - param
+	 if((*vi).getVarReducedCost() >  -0.0000001){//TODO - param
 	    break;
 	 }
       }
@@ -6309,18 +6817,18 @@ void DecompAlgo::addVarsFromPool(){
    for(vi = m_varpool.begin(); vi != m_varpool.end(); vi++){
       if(index >= n_newcols)
 	 break;
-      const CoinPackedVector * col = (*vi).getColPtr();
+      const CoinPackedVector * col = (*vi).getColVarPtr();
       DecompVar              * var = (*vi).getVarPtr();
       
       assert(col);
       colBlock[index] = col;
-      clb[index]      = (*vi).getLowerBound();
-      cub[index]      = (*vi).getUpperBound();
+      clb[index]      = (*vi).getVarLowerBound();
+      cub[index]      = (*vi).getVarUpperBound();
       if(m_phase == PHASE_PRICE1){
 	 obj[index] = 0.0;
       }
       else{
-	 obj[index] = (*vi).getOrigCost();
+	 obj[index] = (*vi).getVarOrigCost();
       }
       
       
@@ -6345,6 +6853,7 @@ void DecompAlgo::addVarsFromPool(){
    viLast = vi;
 
    m_masterSI->addCols(n_newcols, colBlock, clb, cub, obj); 
+
    if(hasNames){      
       m_masterSI->setColNames(colNames, 0, 
 			      static_cast<int>(colNames.size()), 
@@ -6371,7 +6880,7 @@ void DecompAlgo::addVarsFromPool(){
    //THINK is this all neccessary? just to keep memory small? or 
    //doing this for some reason of efficiency?
    for(vi = m_varpool.begin(); vi != viLast; vi++){
-      (*vi).deleteCol();    
+      (*vi).deleteColVar();    
       (*vi).clearVar(); //needed? dangling pointer if not
    }
    //TODO: is this slow for vector? if so, maybe list is still the way to go
@@ -7132,7 +7641,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       //---  That is, it is ok to return suboptimal columns that 
       //---  have negative reduced cost.       
       //---
-      //--- To possible approaches to speed things up:
+      //--- Two possible approaches to speed things up:
       //---   (1) return as soon as an UB < 0 is found
       //---   (2) return when gap is tight
       //---
@@ -7231,7 +7740,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       if(solveResult->m_nPoints && !solveResult->m_isUnbounded){
 	 int k;
 	 for(k = 0; k < solveResult->m_nPoints; k++){
-	    const double * milpSolution = solveResult->getSolution(k);
+	    const double * milpSolution = solveResult->getPoints(k);
 	    //---
 	    //--- create a DecompVar (shat) from the optimal solution      
 	    //---

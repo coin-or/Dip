@@ -20,14 +20,14 @@
 using namespace std;
 
 // --------------------------------------------------------------------- //
-bool DecompWaitingCol::setReducedCost(const double      * u, 
+bool DecompWaitingCol::setVarReducedCost(const double      * u, 
 				      const DecompStatus    stat){
    double redCost;  
    if(stat == STAT_FEASIBLE){
       // ---
       // --- RC[s] = c[s] - u (A''s) - alpha
       // ---
-      redCost = m_var->getOriginalCost() - m_col->dotProduct(u);
+      redCost = m_var->getOriginalCost() - m_col_var->dotProduct(u);
       m_var->setReducedCost(redCost);
       return redCost <= -0.0000000001;//m_app->m_param.dualTol;
    }
@@ -35,7 +35,7 @@ bool DecompWaitingCol::setReducedCost(const double      * u,
       // ---
       // --- RC[s] = u (A''s) + alpha -> dual ray
       // ---
-      redCost = -m_col->dotProduct(u);
+      redCost = -m_col_var->dotProduct(u);
       return redCost <= -0.0000000001;//m_app->m_param.dualTol;
    }
 }
@@ -169,7 +169,7 @@ bool DecompVarPool::setReducedCosts(const double            * u,
       // --- which are pointed to in this pool, if any have rc < 0,
       // --- return true
       // --- 
-      found_negrc_var = (*vi).setReducedCost(u, stat) ? true : found_negrc_var;
+      found_negrc_var = (*vi).setVarReducedCost(u, stat) ? true : found_negrc_var;
    }
    return found_negrc_var;
 }
@@ -204,8 +204,8 @@ void DecompVarPool::reExpand(const DecompConstraintSet & modelCore,
          = UtilPackedVectorFromDense(modelCore.getNumRows() + 1,
                                      denseCol, tolZero);
     
-      (*vi).deleteCol();
-      (*vi).setCol(sparseCol);
+      (*vi).deleteColVar();
+      (*vi).setColVar(sparseCol);
    }
    setColsAreValid(true);
    UTIL_DELARR(denseCol);    

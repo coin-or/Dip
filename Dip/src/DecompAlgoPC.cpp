@@ -930,7 +930,7 @@ void DecompAlgoPC::solutionUpdateAsIP(){
                (*m_osLog) << "Solve as IP found a solution." << endl;);
       
 
-      recomposeSolution(result.getSolution(0), rsolution);
+      recomposeSolution(result.getPoints(0), rsolution);
       if(!isIPFeasible(rsolution))
          throw UtilException("Recomposed solution is not feasible",
                              "solutionUpdateAsIp", "DecompAlgoPC");
