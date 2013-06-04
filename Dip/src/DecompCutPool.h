@@ -25,70 +25,68 @@ class DecompConstraintSet;
 
 // --------------------------------------------------------------------- //
 //TODO: switch to distance
-class is_greater_thanD { //member of class instead??
-public:
-   //TODO: design, waitingcol, rc is member of var, not waiting col,
-   //but for waitingrow, distance is member of wr, not of cut - why?
-   bool operator()( const DecompWaitingRow& x,
-                    const DecompWaitingRow& y) {
-      return x.getViolation() > y.getViolation();
-   }
+class is_greater_thanD{//member of class instead??
+ public:
+  //TODO: design, waitingcol, rc is member of var, not waiting col,
+  //but for waitingrow, distance is member of wr, not of cut - why?
+  bool operator()( const DecompWaitingRow & x, 
+                   const DecompWaitingRow & y){
+    return x.getViolation() > y.getViolation();
+  }
 };
 
 // --------------------------------------------------------------------- //
 class DecompCutPool : public std::vector<DecompWaitingRow> {
-private:
-   DecompCutPool(const DecompCutPool&);
-   DecompCutPool& operator=(const DecompCutPool&);
+ private:
+  DecompCutPool(const DecompCutPool &);
+  DecompCutPool & operator=(const DecompCutPool &);
 
-private:
-   static const char* classTag;
-   bool m_rowsAreValid;
+ private:
+  static const char * classTag;
+  bool m_rowsAreValid;
 
-public:
-   const inline bool rowsAreValid() const {
-      return m_rowsAreValid;
-   }
-   inline void setRowsAreValid(bool rowsAreValid) {
-      m_rowsAreValid = rowsAreValid;
-   }
+ public:
+  const inline bool rowsAreValid() const {return m_rowsAreValid;}
+  inline void setRowsAreValid(bool rowsAreValid){
+    m_rowsAreValid = rowsAreValid;
+  }
 
-   void print(std::ostream* os = &std::cout) const;  //THINK: virtual??
-   void reExpand(const DecompVarList& vars,
-                 const int             n_coreCols,
-                 const int             n_artCols);
-
-   CoinPackedVector* createRowReform(const int                n_coreCols,
+  void print(std::ostream * os = &std::cout) const; //THINK: virtual??
+  void reExpand(const DecompVarList & vars, 
+                const int             n_coreCols,
+                const int             n_artCols);
+  
+  CoinPackedVector * createRowReform(const int                n_coreCols,
                                      //const int                n_artCols,
-                                     const CoinPackedVector* row,
-                                     const DecompVarList&     vars);
+                                     const CoinPackedVector * row,
+                                     const DecompVarList    & vars);
+  
+  //THINK
+  //bool isDuplicate(const DecompWaitingRow & wcol);
+  
+  bool calcViolations(const double            * x,
+                      DecompCutPool::iterator   first,
+                      DecompCutPool::iterator   last);
+  bool calcViolations(const double            * x){
+    return calcViolations(x, begin(), end());
+  }
+  
+ public:
+  DecompCutPool() : 
+    m_rowsAreValid(true) {}
 
-   //THINK
-   //bool isDuplicate(const DecompWaitingRow & wcol);
+  ~DecompCutPool() {
 
-   bool calcViolations(const double*             x,
-                       DecompCutPool::iterator   first,
-                       DecompCutPool::iterator   last);
-   bool calcViolations(const double*             x) {
-      return calcViolations(x, begin(), end());
-   }
-
-public:
-   DecompCutPool() :
-      m_rowsAreValid(true) {}
-
-   ~DecompCutPool() {
-      //---
-      //--- delete any memory that is left in the waiting rows
-      //---
-      std::vector<DecompWaitingRow>::iterator vi;
-
-      for (vi = begin(); vi != end(); vi++) {
-         (*vi).deleteCut();
-         (*vi).deleteRow();
-         (*vi).deleteRowReform();
-      }
-   }
+    //---
+    //--- delete any memory that is left in the waiting rows
+    //---
+    std::vector<DecompWaitingRow>::iterator vi;
+    for(vi = begin(); vi != end(); vi++){
+      (*vi).deleteCut();
+      (*vi).deleteRow();
+      (*vi).deleteRowReform();
+    }
+  }
 
 };
 

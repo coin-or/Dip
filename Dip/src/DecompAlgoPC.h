@@ -51,21 +51,21 @@ private:
     * This dual vector is the one used in reduced-cost calculations when
     * using a stabilized dual method (m_param.DualStab > 0).
     */
-   std::vector<double> m_dual;
+   std::vector<double> m_dual;    
 
    /**
     * Dual vector from restricted master.
-    *
+    * 
     * A copy of the dual vector from the restricted master.
     */
-   std::vector<double> m_dualRM;
+   std::vector<double> m_dualRM;  
 
    /**
     * Dual vector stabilized.
-    *
+    * 
     * The stabilized dual from dual stabilization method.
     */
-   std::vector<double> m_dualST;
+   std::vector<double> m_dualST;  
 
    /**
     * @}
@@ -80,79 +80,76 @@ private:
    /**
     * Create the master problem (all algorithms must define this function).
     */
-   virtual void createMasterProblem(DecompVarList& initVars, DecompRayList& initRays) {
-      DecompAlgo::createMasterProblem(initVars, initRays);
+   virtual void createMasterProblem(DecompVarList & initVars, DecompRayList & initRays){
+     DecompAlgo::createMasterProblem(initVars, initRays);
    }
-   virtual void generateVarsFea(DecompVarList&     newVars,
-                                DecompRayList&     newRays,
-                                double&            mostNegReducedCost) {
-      DecompAlgo::generateVarsFea(newVars, newRays, mostNegReducedCost);
+   virtual void generateVarsFea(DecompVarList    & newVars, 
+			       DecompRayList    & newRays,
+			       double           & mostNegReducedCost){
+     DecompAlgo::generateVarsFea(newVars, newRays, mostNegReducedCost);
    }
 
-   virtual void phaseInit(DecompPhase& phase);
+   virtual void phaseInit(DecompPhase & phase);
 
 
 
    /**
     * Get current dual solution for master problem.
-    *
+    * 
     * When using dual stabilization, this comes from the stabilized dual
-    * vector (m_dualST). Otherwise, it comes from m_dualSolution (which
+    * vector (m_dualST). Otherwise, it comes from m_dualSolution (which 
     * comes directly from the LP solver).
     *
     */
-   virtual const double* getMasterDualSolution() const {
+   virtual const double * getMasterDualSolution() const {
       //---
       //--- return the duals to be used in pricing step
       //---
-      if (m_param.DualStab) {
-         return &m_dualST[0];
-      } else {
-         return &m_dualSolution[0];
-      }
+     if(m_param.DualStab)
+       return &m_dualST[0];
+     else
+       return &m_dualSolution[0];
    }
 
    /**
     * Adjust the current dual solution for master problem.
-    *
+    * 
     * When using dual stabilization, this adjusts based on Wengtes smoothing.
     */
    virtual void adjustMasterDualSolution();
-
+   
 
 
    /**
     *
     */
    virtual void setObjBound(const double thisBound,
-                            const double thisBoundUB) {
+			    const double thisBoundUB){
       UtilPrintFuncBegin(m_osLog, m_classTag,
-                         "setObjBound()", m_param.LogDebugLevel, 2);
-
-      if (m_param.DualStab) {
-         if (thisBound > (m_nodeStats.objBest.first + DecompEpsilon)) {
-            //(*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
+			 "setObjBound()", m_param.LogDebugLevel, 2);
+      if(m_param.DualStab){
+	 if(thisBound > (m_nodeStats.objBest.first + DecompEpsilon)){
+	    //(*m_osLog) << "Bound improved " << m_nodeStats.objBest.first
             //       << " to " << thisBound << " , update duals" << endl;
-            copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
-         }
+	    copy(m_dualST.begin(), m_dualST.end(), m_dual.begin());
+	 }
       }
-
       DecompAlgo::setObjBound(thisBound, thisBoundUB);
       UtilPrintFuncEnd(m_osLog, m_classTag,
-                       "setObjBound()", m_param.LogDebugLevel, 2);
+		       "setObjBound()", m_param.LogDebugLevel, 2);
    }
 
    /**
     * Set the current integer bound and update best/history.
     */
-   virtual inline void setObjBoundIP(const double thisBound) {
+   virtual inline void setObjBoundIP(const double thisBound){
       DecompAlgo::setObjBoundIP(thisBound);
    }
 
-   /**
-       * @}
-       */
-
+      /**
+    * @}
+    */
+   
    //-----------------------------------------------------------------------//
    /**
     * @name Derived from virtual functions of DecompAlgo
@@ -160,9 +157,9 @@ private:
     */
    //-----------------------------------------------------------------------//
    //TODO
-   void addCutsToPool(const double*    x,
-                      DecompCutList& newCuts,
-                      int&            n_newCuts);
+   void addCutsToPool(const double  *  x,
+                      DecompCutList & newCuts,
+                      int           & n_newCuts);
 
    //TODO
    void phaseDone();
@@ -172,12 +169,12 @@ private:
    int  compressColumns    ();
 
 
-
+   
    /**
     * @}
     */
 
-
+   
    //-----------------------------------------------------------------------//
    /**
     * @name Constructors and destructor.
@@ -186,22 +183,23 @@ private:
    //-----------------------------------------------------------------------//
 public:
 
-   std::vector<double> & getDualBest() {
+   std::vector<double> & getDualBest(){
       return m_dual;
    }
-   std::vector<double> & getDualRMP() {
+   std::vector<double> & getDualRMP(){
       return m_dualRM;
    }
 
 
    /**
     * Default constructors.
-    */
-   DecompAlgoPC(DecompApp*       app,
-                UtilParameters* utilParam,
+    */   
+   DecompAlgoPC(DecompApp      * app,
+                UtilParameters * utilParam,
                 bool             doSetup    = true) :
       DecompAlgo(PRICE_AND_CUT, app, utilParam),
       m_classTag("D-ALGOPC") {
+
       //---
       //--- do any parameter overrides of the defaults here
       //---    by default turn off gomory cuts for PC
@@ -211,19 +209,20 @@ public:
       //---
       //--- run init setup
       //---
-      if (doSetup) {
+      if(doSetup){
          std::string paramSection = DecompAlgoStr[PRICE_AND_CUT];
          initSetup(utilParam, paramSection);
       }
    }
-
-   DecompAlgoPC(DecompApp*       app,
-                UtilParameters* utilParam,
-                std::string&          paramSection,
+      
+   DecompAlgoPC(DecompApp      * app,
+                UtilParameters * utilParam,
+                std::string         & paramSection,
                 bool             doSetup    = true) :
       //is utilParam used in base class?
       DecompAlgo(PRICE_AND_CUT, app, utilParam),
       m_classTag("D-ALGOPC") {
+
       //---
       //--- do any parameter overrides of the defaults here
       //---    by default turn off gomory cuts for PC
@@ -233,16 +232,15 @@ public:
       //---
       //--- run init setup
       //---
-      if (doSetup) {
+      if(doSetup)
          initSetup(utilParam, paramSection);
-      }
    }
-
-
+      
+      
    /**
     * Destructor.
     */
-   ~DecompAlgoPC() {}
+   ~DecompAlgoPC(){}
    /**
     * @}
     */

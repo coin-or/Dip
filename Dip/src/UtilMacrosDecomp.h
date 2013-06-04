@@ -47,114 +47,102 @@ static std::map<std::string, UtilTimer> globalTimerFuncMap;
 
 
 // =========================================================================
-// Debug Macros
+// Debug Macros                                                             
 // =========================================================================
 #ifdef UTIL_USE_TIMERS
 // ------------------------------------------------------------------------- //
-inline void UtilPrintFuncBegin(std::ostream*       os,
-                               const std::string& classTag,
-                               const std::string& funcName,
-                               const int      logLevel,
-                               const int      logLimit)
-{
+inline void UtilPrintFuncBegin(std::ostream      * os,
+			       const std::string & classTag,
+			       const std::string & funcName,
+			       const int      logLevel,
+			       const int      logLimit){
+
    const size_t nDashes = 30;
    std::string      funcKey       = classTag + funcName;
-   UtilTimer& thisFuncTimer = globalTimerFuncMap[funcKey];
+   UtilTimer & thisFuncTimer = globalTimerFuncMap[funcKey];
    thisFuncTimer.reset();
-
-   if (logLevel >= logLimit) {
+   if(logLevel >= logLimit){
       size_t i;
       std::string funcBegin = "<--- " + funcName + " ";
-
-      for (i = funcBegin.size(); i < nDashes; i++) {
-         funcBegin += "-";
+      for(i = funcBegin.size(); i < nDashes; i++){
+	 funcBegin += "-";
       }
-
       (*os) << std::left << std::setw(9) << classTag << ": "
-            << std::setprecision(3) << std::setw(8) << globalTimer.getRealTime()
-            << " [CPU: " << std::setprecision(3) << std::setw(8)
-            << globalTimer.getCpuTime() << "] " << funcBegin << "\n";
+	    << std::setprecision(3) << std::setw(8) << globalTimer.getRealTime()
+	    << " [CPU: " << std::setprecision(3) << std::setw(8) 
+            << globalTimer.getCpuTime() << "] " << funcBegin << "\n";      
    }
 }
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintFuncEnd(std::ostream*       os,
-                             const std::string& classTag,
-                             const std::string& funcName,
-                             const int      logLevel,
-                             const int      logLimit)
-{
+inline void UtilPrintFuncEnd(std::ostream      * os,
+			     const std::string & classTag,
+			     const std::string & funcName,
+			     const int      logLevel,
+			     const int      logLimit){
+   
    const size_t nDashes = 30;
    std::string      funcKey       = classTag + funcName;
-   UtilTimer& thisFuncTimer = globalTimerFuncMap[funcKey];
-
-   if (logLevel >= logLimit) {
+   UtilTimer & thisFuncTimer = globalTimerFuncMap[funcKey];
+   if(logLevel >= logLimit){
       size_t i;
       std::string funcEnd = " --- " + funcName + " ";
-
-      for (i = funcEnd.size(); i < nDashes; i++) {
-         funcEnd += "-";
+      for(i = funcEnd.size(); i < nDashes; i++){
+	 funcEnd += "-";
       }
-
       funcEnd += ">";
-      (*os) << std::left << std::setw(9) << classTag << ": "
-            << std::setprecision(3) << std::setw(8) << globalTimer.getRealTime()
-            << " [CPU: " << std::setprecision(4) << std::setw(8)
+      (*os) << std::left << std::setw(9) << classTag << ": " 
+	    << std::setprecision(3) << std::setw(8) << globalTimer.getRealTime() 
+	    << " [CPU: " << std::setprecision(4) << std::setw(8) 
             << globalTimer.getCpuTime() << "] " << funcEnd << " funcT = "
-            << std::setprecision(3) << std::setw(8) << thisFuncTimer.getCpuTime()
-            << "\n";
+	    << std::setprecision(3) << std::setw(8) << thisFuncTimer.getCpuTime()
+	    << "\n";      
    }
 }
 
 #else
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintFuncBegin(ostream*       os,
-                               const string& classTag,
-                               const string& funcName,
-                               const int      logLevel,
-                               const int      logLimit)
-{
-   const int nDashes = 30;
+inline void UtilPrintFuncBegin(ostream      * os,
+			       const string & classTag,
+			       const string & funcName,
+			       const int      logLevel,
+			       const int      logLimit){
 
-   if (logLevel >= logLimit) {
+   const int nDashes = 30;
+   if(logLevel >= logLimit){
       int i;
       string funcBegin = "<--- " + funcName + " ";
-
-      for (i = funcBegin.size(); i < nDashes; i++) {
-         funcBegin += "-";
+      for(i = funcBegin.size(); i < nDashes; i++){
+	 funcBegin += "-";
       }
-
-      (*os) << left << setw(9) << classTag << ": " << funcBegin << "\n";
+      (*os) << left << setw(9) << classTag << ": " << funcBegin << "\n";      
    }
 }
 
 // ------------------------------------------------------------------------- //
-inline void UtilPrintFuncEnd(ostream*       os,
-                             const string& classTag,
-                             const string& funcName,
-                             const int      logLevel,
-                             const int      logLimit)
-{
+inline void UtilPrintFuncEnd(ostream      * os,
+			     const string & classTag,
+			     const string & funcName,
+			     const int      logLevel,
+			     const int      logLimit){
+   
    const int nDashes = 30;
-
-   if (logLevel >= logLimit) {
+   if(logLevel >= logLimit){
       int i;
       string funcEnd = " --- " + funcName + " ";
-
-      for (i = funcEnd.size(); i < nDashes; i++) {
-         funcEnd += "-";
+      for(i = funcEnd.size(); i < nDashes; i++){
+	 funcEnd += "-";
       }
-
       funcEnd += ">";
-      (*os) << left << setw(9) << classTag << ": " << funcEnd << "\n";
+      (*os) << left << setw(9) << classTag << ": " << funcEnd << "\n";      
    }
 }
 
 #endif
 
 // =========================================================================
-// COIN Macros
+// COIN Macros       
 // TODO: anything that depends on COIN should probably not be in util lib
 // =========================================================================
 
@@ -162,39 +150,35 @@ inline void UtilPrintFuncEnd(ostream*       os,
 /**
  * Calculate gap: |(ub-lb)|/|lb|
  */
-inline double UtilCalculateGap(const double boundLB,
-                               const double boundUB)
-{
+inline double UtilCalculateGap(const double boundLB, 
+			       const double boundUB) {
    double gap = DecompInf;
-
-   if (boundLB > -DecompInf && boundUB < DecompInf) {
-      if (boundLB != 0.0) {
-         gap = fabs(boundUB - boundLB) / fabs(boundLB);
-      } else {
-         gap = fabs(boundUB);
-      }
+   if(boundLB > -DecompInf && boundUB < DecompInf){
+      if(boundLB != 0.0)
+	 gap = fabs(boundUB-boundLB)/fabs(boundLB);
+      else
+	 gap = fabs(boundUB);
    }
-
    return gap;
 }
 
 
 // ------------------------------------------------------------------------- //
-CoinPackedVector* UtilPackedVectorFromDense(const int      len,
-      const double* dense,
-      const double   etol);
+CoinPackedVector * UtilPackedVectorFromDense(const int      len,
+                                             const double * dense,
+                                             const double   etol);
 void UtilPackedVectorFromDense(const int          len,
-                               const double*      dense,
+                               const double     * dense,
                                const double       etol,
-                               CoinPackedVector& v);
+                               CoinPackedVector & v);
 
-void UtilPrintPackedVector(const CoinPackedVector& v,
-                           std::ostream*                 os  = &std::cout,
-                           DecompApp*               app = 0);
-void UtilPrintPackedVector(const CoinPackedVector& v,
-                           std::ostream*                 os,
+void UtilPrintPackedVector(const CoinPackedVector & v,
+                           std::ostream                * os  = &std::cout,
+                           DecompApp              * app = 0);
+void UtilPrintPackedVector(const CoinPackedVector & v,
+                           std::ostream                * os,
                            const std::vector<std::string>         & colNames,
-                           const double*            value = NULL);
+			   const double           * value = NULL);
 
 
 

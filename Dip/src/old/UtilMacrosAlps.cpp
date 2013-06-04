@@ -25,51 +25,60 @@
 //---
 
 //========================================================================== //
-int UtilAlpsEncodeWarmStart(AlpsEncoded*               encoded,
-                            const CoinWarmStartBasis* ws)
-{
-   int status = 0;
-   int numCols = ws->getNumStructural();
-   int numRows = ws->getNumArtificial();
-   encoded->writeRep(numCols);
-   encoded->writeRep(numRows);
-   // Pack structural.
-   int nint = (ws->getNumStructural() + 15) >> 4;
-   encoded->writeRep(ws->getStructuralStatus(), nint * 4);
-   // Pack artificial.
-   nint = (ws->getNumArtificial() + 15) >> 4;
-   encoded->writeRep(ws->getArtificialStatus(), nint * 4);
-   return status;
+int UtilAlpsEncodeWarmStart(AlpsEncoded              * encoded, 
+                            const CoinWarmStartBasis * ws) {
+
+  int status = 0;
+  int numCols = ws->getNumStructural();
+  int numRows = ws->getNumArtificial();
+  
+  encoded->writeRep(numCols);
+  encoded->writeRep(numRows);
+  
+  // Pack structural.
+  int nint = (ws->getNumStructural() + 15) >> 4;
+  encoded->writeRep(ws->getStructuralStatus(), nint * 4);
+  
+  // Pack artificial.
+  nint = (ws->getNumArtificial() + 15) >> 4;
+  encoded->writeRep(ws->getArtificialStatus(), nint * 4);
+  
+  return status;
 }
 
 //===========================================================================//
-CoinWarmStartBasis* UtilAlpsDecodeWarmStart(AlpsEncoded&       encoded,
-      AlpsReturnStatus* rc)
-{
-   //rc not used? not checked?
-   int numCols;
-   int numRows;
-   encoded.readRep(numCols);
-   encoded.readRep(numRows);
-   int tempInt;
-   // Structural
-   int nint = (numCols + 15) >> 4;
-   char* structuralStatus = new char[4 * nint];
-   encoded.readRep(structuralStatus, tempInt);
-   assert(tempInt == nint * 4);
-   // Artificial
-   nint = (numRows + 15) >> 4;
-   char* artificialStatus = new char[4 * nint];
-   encoded.readRep(artificialStatus, tempInt);
-   assert(tempInt == nint * 4);
-   CoinWarmStartBasis* ws = new CoinWarmStartBasis();
+CoinWarmStartBasis * UtilAlpsDecodeWarmStart(AlpsEncoded      & encoded,
+                                             AlpsReturnStatus * rc) {
+  //rc not used? not checked?
 
-   if (!ws) {
-      throw CoinError("Out of memory", "UtilAlpsDecodeWarmStart", "HELP");
-   }
-
-   ws->assignBasisStatus(numCols, numRows,
-                         structuralStatus, artificialStatus);
-   return ws;
+  int numCols;
+  int numRows;
+  
+  encoded.readRep(numCols);
+  encoded.readRep(numRows);
+  
+  int tempInt;
+  
+  // Structural
+  int nint = (numCols + 15) >> 4;
+  char *structuralStatus = new char[4 * nint];
+  encoded.readRep(structuralStatus, tempInt);
+  assert(tempInt == nint*4);
+  
+  // Artificial
+  nint = (numRows + 15) >> 4;
+  char *artificialStatus = new char[4 * nint];
+  encoded.readRep(artificialStatus, tempInt);
+  assert(tempInt == nint*4);
+  
+  CoinWarmStartBasis *ws = new CoinWarmStartBasis();
+  if (!ws) {
+    throw CoinError("Out of memory", "UtilAlpsDecodeWarmStart", "HELP");
+  }
+  
+  ws->assignBasisStatus(numCols, numRows, 
+                        structuralStatus, artificialStatus);
+  
+  return ws;    
 }
 

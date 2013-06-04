@@ -18,17 +18,17 @@
 using namespace std;
 
 string UtilCreateStringHash(const int      len,
-                            const double* els,
+                            const double * els,
                             const int      precision = 6);
 
 string UtilCreateStringHash(const int      len,
-                            const int*     ind,
-                            const double* els,
+                            const int    * ind,
+                            const double * els,
                             const int      precision = 6);
 
 string UtilCreateStringHash(const int      len,
-                            const int*     ind,
-                            const double* els,
+                            const int    * ind,
+                            const double * els,
                             const char     sense,
                             const double   rhs,
                             const int      precision = 6);

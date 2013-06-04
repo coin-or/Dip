@@ -17,15 +17,15 @@
 #include "DecompConstants.h"
 
 // --------------------------------------------------------------------- //
-class DecompParam {
+class DecompParam{
 private:
-   DecompParam(const DecompParam&);
-   DecompParam& operator=(const DecompParam&);
+   DecompParam(const DecompParam &);
+   DecompParam & operator=(const DecompParam &);
 
 public:
-
+   
    int    LogLevel;
-   int    LogAppLevel;
+   int    LogAppLevel; 
    int    LogDebugLevel;
    int    LogLpLevel;    //name? inner solver
    unsigned int    LimitInitVars; //?? specific to PC? make own section ??
@@ -43,10 +43,10 @@ public:
    int    CutCglFlowC;
    int    CutCglMir;
    int    CutCglClique;
-
+  
 public:
-   void getSettings(UtilParameters& utilParam) {
-      static const char* common = "DECOMP";
+   void getSettings(UtilParameters & utilParam){
+      static const char * common = "DECOMP";        
       LogLevel      = utilParam.GetSetting("LogLevel",      0,     common);
       LogAppLevel   = utilParam.GetSetting("LogAppLevel",   0,     common);
       LogDebugLevel = utilParam.GetSetting("LogDebugLevel", 0,     common);
@@ -54,52 +54,54 @@ public:
       LimitInitVars = utilParam.GetSetting("LimitInitVars", 1,     common);
       TolZero       = utilParam.GetSetting("TolZero",
                                            DecompEpsilon, common);
+    
       LimitTotalCutIters  = utilParam.GetSetting("LimitTotalCutIters",
-                            2000, common);
-      LimitTotalPriceIters = utilParam.GetSetting("LimitTotalPriceIters",
-                             2000, common);
+                                                 2000, common);
+      LimitTotalPriceIters= utilParam.GetSetting("LimitTotalPriceIters",
+                                                 2000, common);
       LimitRoundCutIters  = utilParam.GetSetting("LimitRoundCutIters",
-                            2000, common);
-      LimitRoundPriceIters = utilParam.GetSetting("LimitRoundPriceIters",
-                             2000, common);
+                                                 2000, common);
+      LimitRoundPriceIters= utilParam.GetSetting("LimitRoundPriceIters",
+                                                 2000, common);
       LimitTime           = utilParam.GetSetting("LimitTime",
-                            600, common);
+                                                 600, common);
+    
       //TODO: what if we want multi-poly on just 1st and 3rd - TODO
       PriceMultiPoly       = utilParam.GetSetting("PriceMultiPoly",
-                             0,     common);
+                                                  0,     common);
       CutDC                = utilParam.GetSetting("CutDC",
-                             0,     common);
+                                                  0,     common);
       CutCGL                = utilParam.GetSetting("CutCGL",
-                              0,     common);
+                                                  0,     common);
       CutCglKnapC                = utilParam.GetSetting("CutCglKnapC",
-                                   0,     common);
+                                                   0,     common);
       CutCglFlowC                = utilParam.GetSetting("CutCglFlowC",
-                                   0,     common);
+                                                   0,     common);
       CutCglMir                = utilParam.GetSetting("CutCglMir",
-                                 0,     common);
+                                                   0,     common);
       CutCglClique                = utilParam.GetSetting("CutCglClique",
-                                    0,     common);
+                                                      0,     common);      
    }
 
    //this should be a parameter method, should parameter be an object?
    //have user register parameters, so can set usage too
-   void dumpSettings(ostream* os = &cout) {
-      static const char* common = "DECOMP";
+   void dumpSettings(ostream * os = &cout){
+      static const char * common = "DECOMP";
       (*os) << "\n========================================================\n"
             << "DECOMP PARAMETER SETTINGS \n";
       (*os) << common << ": LogLevel      = " << LogLevel      << endl;
       (*os) << common << ": LogAppLevel   = " << LogAppLevel   << endl;
       (*os) << common << ": LogDebugLevel = " << LogDebugLevel << endl;
-      (*os) << common << ": LogLpLevel    = " << LogLpLevel    << endl;
+      (*os) << common << ": LogLpLevel    = " << LogLpLevel    << endl;    
       (*os) << common << ": LimitInitVars = " << LimitInitVars << endl;
       (*os) << common << ": TolZero       = " << TolZero       << endl;
-      (*os) << common << ": LimitTotalCutIters   = "
+      (*os) << common << ": LimitTotalCutIters   = " 
             << LimitTotalCutIters      << endl;
-      (*os) << common << ": LimitTotalPriceIters = "
+      (*os) << common << ": LimitTotalPriceIters = " 
             << LimitTotalPriceIters    << endl;
-      (*os) << common << ": LimitRoundCutIters   = "
+      (*os) << common << ": LimitRoundCutIters   = " 
             << LimitRoundCutIters      << endl;
-      (*os) << common << ": LimitRoundPriceIters = "
+      (*os) << common << ": LimitRoundPriceIters = " 
             << LimitRoundPriceIters    << endl;
       (*os) << common << ": PriceMultiPoly= " << PriceMultiPoly  << endl;
       (*os) << common << ": CutDC         = " << CutDC           << endl;
@@ -110,7 +112,7 @@ public:
       (*os) << common << ": CutCglClique  = " << CutCglClique    << endl;
       (*os) << "========================================================\n";
    }
-
+  
 public:
    DecompParam():
       LogLevel(0),
@@ -120,7 +122,7 @@ public:
       LimitInitVars(1),
       TolZero(DecompEpsilon),
       LimitTotalCutIters(2000),
-      LimitTotalPriceIters(2000),
+      LimitTotalPriceIters(2000), 
       LimitRoundCutIters(2000),
       LimitRoundPriceIters(2000),
       LimitTime(60),
@@ -131,7 +133,7 @@ public:
       CutCglFlowC(0),
       CutCglMir(0),
       CutCglClique(0)
-   {}
+      {}
 
    ~DecompParam() {};
 };

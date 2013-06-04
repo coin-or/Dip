@@ -17,15 +17,15 @@
 #include "CoinTime.hpp"
 #include "DecompPortable.h"
 
-class DecompStats {
+class DecompStats{
 
-public:
+ public:
    CoinTimer timerOverall;
    CoinTimer timerDecomp;
    CoinTimer timerOther1;
    CoinTimer timerOther2;
 
-public:
+ public:
    double totalOverall;
 
    double totalDecomp;
@@ -34,7 +34,7 @@ public:
    double totalSolUpdate;
    double totalGenCuts;
    double totalGenVars;
-
+   
    double maxDecomp;
    double maxSolveRelax;
    double maxSolveRelaxApp;
@@ -42,7 +42,7 @@ public:
    double maxGenCuts;
    double maxGenVars;
 
-public:
+ public:
    vector<double> thisDecomp;
    vector<double> thisSolveRelax;
    vector<double> thisSolveRelaxApp;
@@ -50,21 +50,21 @@ public:
    vector<double> thisGenCuts;
    vector<double> thisGenVars;
 
-public:
+ public:
    void calculateStats();
-   void printOverallStats (ostream* os = &cout); //ostream?
-   void printDetailedStats(ostream* os = &cout); //ostream?
-
-public:
+   void printOverallStats (ostream * os = &cout);//ostream?
+   void printDetailedStats(ostream * os = &cout);//ostream?
+   
+ public:
    DecompStats() :
-
+      
       timerOverall      (0),
       timerDecomp       (0),
       timerOther1       (0),
       timerOther2       (0),
 
       totalOverall      (0.0),
-
+      
       totalDecomp       (0.0),
       totalSolveRelax   (0.0),
       totalSolveRelaxApp(0.0),
@@ -78,10 +78,10 @@ public:
       maxSolUpdate      (0.0),
       maxGenCuts        (0.0),
       maxGenVars        (0.0)
-
-   {
-   }
-
+      
+      {
+      }
+   
    ~DecompStats() {}
 
 };

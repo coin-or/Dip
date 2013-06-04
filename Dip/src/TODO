@@ -12,7 +12,7 @@
 - really need multiple DecompModels? stored as a DecompApp?
 - if depend on COIN or Alps
 - UtilCoin, UtilAlps, ... others should be completely independent of COIN
- 
+
 
 The following are added by Jiadong
 
@@ -21,7 +21,7 @@ The following are added by Jiadong
 
 2. solution pool
 
-3. solveRelaxed to add ray part, recomposeSolution to add ray part
+
 Debug: 
 
 harp2 : on the part of block identification part

@@ -17,71 +17,67 @@
 #include "DecompPortable.h"
 
 // --------------------------------------------------------------------- //
-class DecompConstraintSet {
-private:
-   //need these if vector?
-   //DecompConstraintSet(const DecompConstraintSet &);
-   //DecompConstraintSet & operator=(const DecompConstraintSet &);
+class DecompConstraintSet{
+ private:
+  //need these if vector?
+  //DecompConstraintSet(const DecompConstraintSet &);
+  //DecompConstraintSet & operator=(const DecompConstraintSet &);
 
-   //THINK - better overall to store as sense!
-public:
-   //do we want this dependence on CoinPackedMatrix?
-   //do we want all this depenence on STL vectors?
+  //THINK - better overall to store as sense!
+ public:
+  //do we want this dependence on CoinPackedMatrix?
+  //do we want all this depenence on STL vectors?
+  
+  //how does this all work for removing cuts?? if using vector!?
 
-   //how does this all work for removing cuts?? if using vector!?
+  //must flip to row ordered? 
+  CoinPackedMatrix * M;
+  int                  nBaseRowsOrig;
+  int                  nBaseRows;
+  vector<string>       rowHash;
+  vector<char>         rowSense;
+  vector<double>       rowRhs; //ugh... have to carry around
+  //ranges? 
 
-   //must flip to row ordered?
-   CoinPackedMatrix* M;
-   int                  nBaseRowsOrig;
-   int                  nBaseRows;
-   vector<string>       rowHash;
-   vector<char>         rowSense;
-   vector<double>       rowRhs; //ugh... have to carry around
-   //ranges?
+  vector<double>       rowLB; //vector or double *?
+  vector<double>       rowUB;
+  vector<double>       colLB;
+  vector<double>       colUB;
+  vector<int>          integerVars;
+  //TODO: why not vector if rest are... nice if consistent
+  //double             * objCoeff; //only used for modelCore?
 
-   vector<double>       rowLB; //vector or double *?
-   vector<double>       rowUB;
-   vector<double>       colLB;
-   vector<double>       colUB;
-   vector<int>          integerVars;
-   //TODO: why not vector if rest are... nice if consistent
-   //double             * objCoeff; //only used for modelCore?
+  //TODO: colNames, rowNames
+  
 
-   //TODO: colNames, rowNames
-
-
-public:
-   inline const int getNumRows() const {
-      return M->getNumRows();
-   }
-   inline const int getNumCols() const {
-      return M->getNumCols();
-   }
+ public:
+  inline const int getNumRows() const { return M->getNumRows(); }
+  inline const int getNumCols() const { return M->getNumCols(); }
 
 public:
-   void createRowHash();
-   void checkSenseAndBound();
-   void sensesToBounds();
-   void boundsToSenses();
+  void createRowHash();
+  void checkSenseAndBound();
+  void sensesToBounds();
+  void boundsToSenses();
 
-public:
-   DecompConstraintSet() :
-      M(0),
-      nBaseRowsOrig(0),
-      nBaseRows(0),
-      rowSense(),
-      rowRhs(),
-      rowLB(),
-      rowUB(),
-      colLB(),
-      colUB(),
-      integerVars()
-      //objCoeff(0)
-   {};
-
-   ~DecompConstraintSet() {
-      UTIL_DELPTR(M);
-   };
+ public:
+  DecompConstraintSet() : 
+    M(0), 
+    nBaseRowsOrig(0),
+    nBaseRows(0),
+    rowSense(),
+    rowRhs(),
+    rowLB(), 
+    rowUB(), 
+    colLB(), 
+    colUB(), 
+    integerVars()
+    //objCoeff(0) 
+  {};
+  
+  ~DecompConstraintSet() {
+    UTIL_DELPTR(M);    
+  };
 };
 
 #endif

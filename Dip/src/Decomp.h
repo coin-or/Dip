@@ -54,7 +54,7 @@ class DecompCut;
 class DecompRay;
 typedef std::list<DecompVar*> DecompVarList;
 typedef std::list<DecompCut*> DecompCutList;
-typedef std::list<DecompRay*> DecompRayList;
+typedef std::list<DecompRay*> DecompRayList; 
 //===========================================================================//
 //---
 //--- DECOMP constants
@@ -69,18 +69,18 @@ const double DecompZero     = 1.0e-14;
 //---
 
 
-struct DecompMainParam {
-   bool doCut;
-   bool doPriceCut;
-   bool doDirect;
-   double timeSetupCpu ;
-   double timeSetupReal;
-   double timeSolveCpu ;
-   double timeSolveReal ;
+struct DecompMainParam{
+  bool doCut; 
+  bool doPriceCut; 
+  bool doDirect; 
+  double timeSetupCpu ; 
+  double timeSetupReal;
+  double timeSolveCpu ;
+  double timeSolveReal ;
 
 };
 
-enum DecompAlgoType {
+enum DecompAlgoType{
    CUT,
    PRICE_AND_CUT,
    RELAX_AND_CUT,
@@ -88,9 +88,9 @@ enum DecompAlgoType {
    DECOMP
 };
 const std::string DecompAlgoStr[5] = {
-   "CUT",
-   "PRICE_AND_CUT",
-   "RELAX_AND_CUT",
+   "CUT", 
+   "PRICE_AND_CUT", 
+   "RELAX_AND_CUT", 
    "VOL_AND_CUT",
    "DECOMP"
 };
@@ -98,7 +98,7 @@ const std::string DecompAlgoStr[5] = {
 //---
 //--- node stopping criteria
 //---
-enum DecompAlgoStop {
+enum DecompAlgoStop{
    DecompStopNo,
    DecompStopGap,
    DecompStopTailOff,
@@ -122,17 +122,17 @@ const std::string DecompAlgoStopStr[7] = {
 //---
 //--- DECOMP enums (for phases)
 //---
-enum DecompPhase {
-   PHASE_PRICE1,
-   PHASE_PRICE2,
-   PHASE_CUT,
+enum DecompPhase{
+   PHASE_PRICE1, 
+   PHASE_PRICE2, 
+   PHASE_CUT, 
    PHASE_DONE,
    PHASE_UNKNOWN
 };
 const std::string DecompPhaseStr[6] = {
-   "PHASE_PRICE1",
-   "PHASE_PRICE2",
-   "PHASE_CUT",
+   "PHASE_PRICE1", 
+   "PHASE_PRICE2", 
+   "PHASE_CUT", 
    "PHASE_DONE",
    "PHASE_UNKNOWN"
 };
@@ -141,24 +141,24 @@ const std::string DecompPhaseStr[6] = {
 //---
 //--- DECOMP enums (for status)
 //---
-enum DecompStatus {
-   STAT_FEASIBLE,
+enum DecompStatus{
+   STAT_FEASIBLE, 
    STAT_INFEASIBLE,
    STAT_UNKNOWN
 };
 const std::string DecompStatusStr[3] = {
-   "STAT_FEASIBLE",
+   "STAT_FEASIBLE", 
    "STAT_INFEASIBLE",
    "STAT_UNKNOWN"
 };
 
-enum DecompPriceCutStrategy {
-   Default,
+enum DecompPriceCutStrategy{
+   Default, 
    FavorPrice,
    FavorCut
 };
 const std::string DecompPriceCutStrategyStr[3] = {
-   "Default",
+   "Default", 
    "Favor Price",
    "Favor Cut"
 };
@@ -198,7 +198,7 @@ enum DecompFunction {
 };
 
 //===========================================================================//
-enum DecompRowType {
+enum DecompRowType{
    //original row
    DecompRow_Original,
    //branching row
@@ -208,9 +208,9 @@ enum DecompRowType {
    //row which is a cut
    DecompRow_Cut
 };
-const std::string DecompRowTypeStr[4] = {
+const std::string DecompRowTypeStr[4] = {     
    "DecompRow_Original",
-   "DecompRow_Branch",
+   "DecompRow_Branch",   
    "DecompRow_Convex",
    "DecompRow_Cut"
 };
@@ -221,7 +221,7 @@ enum DecompColType {
    DecompCol_Structural,
 
    //structural column that corresponds to extreme points
-   DecompCol_Structural_Point,
+   DecompCol_Structural_Point, 
    //structural column that corresponds to extreme rays
    DecompCol_Structural_Ray,
 

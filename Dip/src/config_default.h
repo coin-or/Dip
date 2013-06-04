@@ -31,7 +31,7 @@
 #include "CoinPragma.hpp"
 
 #if defined(_MSC_VER)
-// warning C4290: C++ exception specification ignored except to indicate
+// warning C4290: C++ exception specification ignored except to indicate 
 // a function is not __declspec(nothrow)
 # pragma warning(disable:4290)
 //warning C4996: 'std::xxx' was declared deprecated

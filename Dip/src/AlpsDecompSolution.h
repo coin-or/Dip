@@ -28,69 +28,64 @@ protected:
    int      m_size;
 
    /** Solution values. */
-   double* m_values;
+   double * m_values;
 
    /** Quality of solution (bound wrt to objective). */
    double   m_quality;
 
    /** Pointer to DecompApp for the print function. */
-   const DecompApp* m_app;
+   const DecompApp * m_app;
 
 public:
-   /** @name Helper functions (public). */
+   /** @name Helper functions (public). */   
 
    /** Get length of solution. */
-   inline const int getSize() const {
-      return m_size;
-   }
-
+   inline const int getSize() const {return m_size;}
+   
    /** Get solution values. */
-   inline const double* getValues() const {
-      return m_values;
-   }
-
+   inline const double * getValues() const {return m_values;}
+   
    /** Get quality of solution. */
-   inline const double getQuality() const {
-      return m_quality;
-   }
+   inline const double getQuality() const {return m_quality;}
 
-public:
+ public:
 
 
-   AlpsDecompSolution() :
+   AlpsDecompSolution() : 
       AlpsSolution(),
-      m_size      (0),
-      m_values    (0),
+      m_size      (0), 
+      m_values    (0), 
       m_quality   (1e75),
-      m_app       (0) {}
-
-   AlpsDecompSolution(const int             size,
-                      const double*         values,
+      m_app       (0){}
+   
+   AlpsDecompSolution(const int             size, 
+                      const double        * values, 
                       const double          quality,
-                      const DecompApp*      app = NULL,
-                      const int             depth = -1,
-                      const AlpsNodeIndex_t index = -1) :
+                      const DecompApp     * app = NULL,
+		      const int             depth = -1,
+		      const AlpsNodeIndex_t index = -1) : 
       AlpsSolution(index, depth),
       m_size      (size),
       m_values    (0),
       m_quality   (quality),
-      m_app       (app) {
+      m_app       (app)
+   { 
       CoinAssert(m_size > 0);
       m_values = new double[m_size];
-      CoinAssertHint(m_values, "Error: Out of Memory");
+      CoinAssertHint(m_values, "Error: Out of Memory"); 
       memcpy(m_values, values, sizeof(double) * m_size);
    }
-
-   virtual ~AlpsDecompSolution() {
+   
+   virtual ~AlpsDecompSolution() { 
       UTIL_DELARR(m_values);
    };
-
-   /** Print out the solution.*/
-   virtual void print(std::ostream& os) const {
-      if (m_app) {
-         DecompAlgo*           decompAlgo = m_app->getDecompAlgo();
-         DecompConstraintSet* modelCore
-         = decompAlgo->getModelCore().getModel();
+   
+    /** Print out the solution.*/
+   virtual void print(std::ostream & os) const {
+      if(m_app){
+         DecompAlgo          * decompAlgo = m_app->getDecompAlgo();
+         DecompConstraintSet * modelCore  
+            = decompAlgo->getModelCore().getModel();
          m_app->printOriginalSolution(m_size,
                                       modelCore->getColNames(),
                                       m_values);
@@ -99,12 +94,12 @@ public:
       /*int i;
       os << setiosflags(ios::fixed|ios::showpoint)
          << setw(14);
-
+      
       os << "-------------------------" << endl;
       os << "Quality = " << getQuality() << endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-       os << setw(6) << i << " " << m_values[i] << endl;
+	    os << setw(6) << i << " " << m_values[i] << endl;
          }
       }
       os << "-------------------------" << endl;
@@ -112,26 +107,35 @@ public:
    }
 
    /** The method that encodes the node into an encoded object **/
-   virtual AlpsEncoded* encode() const {
-      AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeSolution);
-      encoded->writeRep(m_size);
-      encoded->writeRep(m_values, m_size);
-      encoded->writeRep(m_quality);
-      return encoded;
+   virtual AlpsEncoded* encode() const{
+
+     AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeSolution); 
+     
+     encoded->writeRep(m_size);
+     encoded->writeRep(m_values, m_size);
+     encoded->writeRep(m_quality); 
+
+     return encoded; 
+     
    }
 
    /** The method that decodes the node from an encoded object **/
-   virtual AlpsKnowledge* decode(AlpsEncoded& encoded) const {
-      int s, q;
-      double* v = 0;
-      encoded.readRep(s);
-      encoded.readRep(v, s);
-      encoded.readRep(q);
-      //TODO: change of design of AlpsDecompSolution
-      //       constructor
-      return new AlpsDecompSolution(s, v, q, NULL,
-                                    -1,
-                                    -1);
+   virtual AlpsKnowledge* decode(AlpsEncoded& encoded) const{
+
+     int s, q; 
+     double* v = 0; 
+     
+     encoded.readRep(s); 
+     encoded.readRep(v,s);
+     encoded.readRep(q);
+
+
+     //TODO: change of design of AlpsDecompSolution
+     //       constructor
+     return new AlpsDecompSolution(s,v,q,NULL,
+				   -1,
+				   -1);
+     
    }
 
 

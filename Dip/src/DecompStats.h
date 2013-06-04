@@ -23,7 +23,8 @@
 //===========================================================================//
 
 //===========================================================================//
-class DecompObjBound {
+class DecompObjBound
+{
 public:
    /**
     * The phase when bound was recorded.
@@ -51,28 +52,27 @@ public:
    double thisBoundUB;
    /**
     * The best recorded continuous lower bound.
-    *   global LB = max{active node lower bounds}
+    *   global LB = max{active node lower bounds}   
     */
-   double bestBound;
+   double bestBound; 
    /**
     * The recorded integer upper bound.
-    */
+    */   
    double thisBoundIP;
    /**
     * The best recorded integer upper bound.
-    *   global UB = min{node integer upper bounds}
+    *   global UB = min{node integer upper bounds}   
     */
    double bestBoundIP;
 
    /**
     * Comparison operator for sorting on time.
     */
-   bool operator<(const DecompObjBound& objBound) const {
-      if (timeStamp < objBound.timeStamp) {
-         return true;
-      } else {
-         return false;
-      }
+   bool operator<(const DecompObjBound & objBound) const {
+      if(timeStamp < objBound.timeStamp)
+	 return true;
+      else 
+	 return false;
    }
 
 public:
@@ -87,11 +87,11 @@ public:
       thisBoundIP( DecompInf),
       bestBoundIP( DecompInf)
    {}
-
+      
 };
 
 //===========================================================================//
-class DecompNodeStats {
+class DecompNodeStats{
 public:
 
    //---
@@ -103,22 +103,22 @@ public:
     * Storage of the bounds.
     *
     * For the continuous part:
-    *   CPM  : Bounds on the objective of optimal master linear
+    *   CPM  : Bounds on the objective of optimal master linear 
     *          relaxation. Typically, this is an LP solved to optimality,
     *          so, LB = zCP = UB.
-    *   PC/RC: Given bounds on the objective of optimal restricted master
+    *   PC/RC: Given bounds on the objective of optimal restricted master 
     *          linear relaxation zPC_LB <= zPC* <= zPC_UB and a lower bound
-    *          on the most negative reduced cost (RC_LB) extreme point (ray)
+    *          on the most negative reduced cost (RC_LB) extreme point (ray) 
     *          from the subproblem polytope (for the associated master duals).
     *               LB = zPC_LB + RC_LB <= zPC* <= zPC_UB = UB
-    */
+    */ 
    std::vector< DecompObjBound > objHistoryBound;
-
+      
    /**
     * The global lower (.first) and upper (.second) bound.
     */
-   std::pair<double, double> objBest;
-
+   std::pair<double, double> objBest;      
+   
    /**
     * The node index (in the branch-and-bound tree).
     */
@@ -174,13 +174,13 @@ public:
     */
    int    raysThisRound;
 
-
+   
 public:
-   void init() {
+   void init(){
       objHistoryBound.clear();
       objBest.first   = -DecompInf;
       objBest.second  =  DecompInf;
-      nodeIndex       =  0;
+      nodeIndex       =  0;     
       cutsThisRound   =  0;
       varsThisRound   =  0;
       cutsThisCall    =  0;
@@ -192,7 +192,7 @@ public:
    }
 
 public:
-   void printObjHistoryBound  (std::ostream* os = &std::cout) const;
+   void printObjHistoryBound  (std::ostream * os = &std::cout) const;
    inline void resetCutRound() {
       cutCallsRound = 0;
       cutsThisRound = 0;
@@ -204,45 +204,42 @@ public:
    inline void resetBestLB() {
       objBest.first = -DecompInf;
    }
-   inline DecompObjBound* getLastBound() {
+   inline DecompObjBound * getLastBound(){
       int nHistorySize = static_cast<int>(objHistoryBound.size());
-
-      if (nHistorySize > 0) {
-         return &(objHistoryBound[nHistorySize-1]);
-      } else {
-         return 0;
+      if(nHistorySize > 0){
+	 return &(objHistoryBound[nHistorySize-1]);
       }
+      else
+	 return 0;
    }
-   inline double getLastBoundThis() {
+   inline double getLastBoundThis(){
       double           thisBound = -DecompInf;
-      DecompObjBound* lastBound = getLastBound();
-
-      if (lastBound) {
+      DecompObjBound * lastBound = getLastBound();
+      if(lastBound)
          thisBound = lastBound->thisBound;
-      }
-
       return thisBound;
    }
-
+   
 public:
    DecompNodeStats() :
       objHistoryBound(),
-      objBest        () {
+      objBest        ()
+   {
       init();
    }
 };
 
 
 //===========================================================================//
-class DecompStats {
+class DecompStats{
 
-public:
+ public:
    UtilTimer timerOverall;
    UtilTimer timerDecomp;
    UtilTimer timerOther1;
    UtilTimer timerOther2;
 
-public:
+ public:
    double totalOverall;
 
    double totalDecomp;
@@ -253,7 +250,7 @@ public:
    double totalGenCutsApp;
    double totalGenVars;
    double totalCompressCols;
-
+   
    double maxDecomp;
    double maxSolveRelax;
    double maxSolveRelaxApp;
@@ -263,11 +260,11 @@ public:
    double maxCompressCols;
 
    double maxGenRays;
-   double totalGenRays;
+   double totalGenRays; 
 
 
 
-public:
+ public:
    std::vector<double> thisDecomp;
    std::vector<double> thisSolveRelax;
    std::vector<double> thisSolveRelaxApp;
@@ -279,16 +276,16 @@ public:
 
    std::vector<double> thisGenRays;
 
-public:
+ public:
    void calculateStats();
-   void printOverallStats (std::ostream* os = &std::cout); //ostream?
-   void printDetailedStats(std::ostream* os = &std::cout); //ostream?
-
-public:
+   void printOverallStats (std::ostream * os = &std::cout);//ostream?
+   void printDetailedStats(std::ostream * os = &std::cout);//ostream?
+   
+ public:
    DecompStats() :
-
+      
       totalOverall      (0.0),
-
+      
       totalDecomp       (0.0),
       totalSolveRelax   (0.0),
       totalSolveRelaxApp(0.0),
@@ -309,9 +306,10 @@ public:
       maxGenRays        (0.0),
       totalGenRays      (0.0)
 
-   {
-   }
+      {
 
+      }
+   
    ~DecompStats() {}
 
 };

@@ -34,75 +34,72 @@ private:
    std::vector< std::pair<int, double> > downBranchUB_;
    std::vector< std::pair<int, double> > upBranchLB_;
    std::vector< std::pair<int, double> > upBranchUB_;
-
+  
 public:
    /** Default constructor. */
    AlpsDecompTreeNode() :
       AlpsTreeNode(),
       m_classTag  ("ALPSTN")
-
+     
    {
       //quality_ = -ALPS_OBJ_MAX;//MVG?
    }
 
+   
 
 
 
-
-
+    
    /** Destructor */
-   virtual ~AlpsDecompTreeNode() {
+   virtual ~AlpsDecompTreeNode(){
    }
 
-   void checkIncumbent(AlpsDecompModel*       model,
-                       const DecompSolution* decompSol);
-
+   void checkIncumbent(AlpsDecompModel      * model,
+                       const DecompSolution * decompSol);
+    
    //---
    //--- pure virtual functions from AlpsTreeNode or AlpsTreeNode
-   //---
-
+   //---  
+    
    /** Create a new node based on given desc. */
-   AlpsTreeNode* createNewTreeNode(AlpsNodeDesc *& desc) const;
+   AlpsTreeNode * createNewTreeNode(AlpsNodeDesc *& desc) const;
 
    /** To be defined.?? */
-   int chooseBranchingObject(AlpsModel* model);
+   int chooseBranchingObject(AlpsModel * model);
 
 
    //point direct to DECOMP?
    /** Performing the bounding operation. */
    int process(bool isRoot = false, bool rampUp = false);
-
-   /** Takes the explicit description of the current active node and
-       creates the children's descriptions, which contain information
+  
+   /** Takes the explicit description of the current active node and 
+       creates the children's descriptions, which contain information 
        about how the branching is to be done. The stati of the children
        are AlpsNodeStatusCandidate. */
-   std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > branch();
+   std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > branch(); 
 
 
-   inline std::vector< std::pair<int, double> >  getDownBranchLB() const {
-      return downBranchLB_;
-   }
-   inline std::vector< std::pair<int, double> >  getDownBranchUB() const {
-      return downBranchUB_;
-   }
-   inline std::vector< std::pair<int, double> >  getUpBranchLB() const {
-      return upBranchLB_;
-   }
-   inline std::vector< std::pair<int, double> >  getUpBranchUB() const {
-      return upBranchUB_;
-   }
+   inline std::vector< std::pair<int, double> >  getDownBranchLB() const {return downBranchLB_;}
+   inline std::vector< std::pair<int, double> >  getDownBranchUB() const {return downBranchUB_;}
+   inline std::vector< std::pair<int, double> >  getUpBranchLB() const {return upBranchLB_;}
+   inline std::vector< std::pair<int, double> >  getUpBranchUB() const {return upBranchUB_;}
 
-
+   
    inline void setBranchBound(int& BranchSize, int*& BranchIndices,
-                              double*& BranchValues,
-                              std::vector< std::pair<int, double> > & branchInfo) const {
-      if (BranchSize) {
-         for (int i = 0 ; i < BranchSize; ++i) {
-            branchInfo.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
-         }
-      } else {
-         branchInfo.clear();
-      }
+			      double*& BranchValues,
+			      std::vector< std::pair<int, double> > & branchInfo) const {
+
+     if(BranchSize)
+       {
+	 for(int i = 0 ; i < BranchSize; ++i){
+	   branchInfo.push_back(std::make_pair(BranchIndices[i], BranchValues[i])); 
+	 }
+
+       }
+     else 
+       branchInfo.clear();
+
+
    }
 
 
