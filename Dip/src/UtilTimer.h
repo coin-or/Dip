@@ -22,23 +22,25 @@
 //===========================================================================//
 /* A timer used to record cpu and wallclock time. */
 class UtilTimer {
-private:  
+private:
    /** Start, end markers. */
    double startCpu_;
    double finishCpu_;
    double startReal_;
    double finishReal_;
-    
+
    /** Cpu time. */
    double cpu_;
 
    /** Real clock time. */
    double real_;
-    
+
 public:
-   UtilTimer() { reset(); }
+   UtilTimer() {
+      reset();
+   }
    ~UtilTimer()  {}
-   
+
    /** Reset. */
    inline void reset() {
       start();
@@ -47,13 +49,13 @@ public:
       cpu_        = 0.0;
       real_       = 0.0;
    }
-   
+
    /** Start to count times. */
    inline void start() {
       startCpu_  = CoinCpuTime();
       startReal_ = CoinGetTimeOfDay();
    }
-    
+
    /** Stop timer and computing times. */
    inline void stop() {
       finishCpu_  = CoinCpuTime();
@@ -61,27 +63,27 @@ public:
       cpu_        = finishCpu_ - startCpu_;
       real_       = finishReal_ - startReal_;
    }
-    
+
    /** Get cpu timee. */
-   inline double getCpuTime() { 
+   inline double getCpuTime() {
       finishCpu_ = CoinCpuTime();
       cpu_       = finishCpu_ - startCpu_;
-      return cpu_; 
+      return cpu_;
    }
 
    /** Get cpu timee. */
-   inline double getRealTime() { 
+   inline double getRealTime() {
       finishReal_ = CoinGetTimeOfDay();
       real_       = finishReal_ - startReal_;
       return real_;
    }
 
-   /** Return whether the given amount of real time has 
+   /** Return whether the given amount of real time has
        elapsed since the timer was started */
    inline bool isPast(double limit) {
       return (getRealTime() > limit);
    }
-   
+
 };
 
 #endif

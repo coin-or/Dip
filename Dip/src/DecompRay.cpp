@@ -25,88 +25,103 @@ using namespace std;
 //This could be much faster if we are willing to do more accounting related
 // to branching.
 bool DecompRay::doesSatisfyBounds(int                     denseLen,
-				  double                * denseArr,
-				  const DecompAlgoModel & model,
-				  const double          * lbs,
-				  const double          * ubs){
-
+                                  double*                 denseArr,
+                                  const DecompAlgoModel& model,
+                                  const double*           lbs,
+                                  const double*           ubs)
+{
    int            j;
    double         xj;//, lb, ub;
    vector<int> ::const_iterator it;
-   map<int,int>::const_iterator mcit;
-   DecompConstraintSet * modelRelax    = model.getModel();
+   map<int, int>::const_iterator mcit;
+   DecompConstraintSet* modelRelax    = model.getModel();
    const vector<int>  & activeColumns  = modelRelax->getActiveColumns();
-
    //---
    //--- activeColumns are in original space
    //---    denseArr, lbs, ubs are all in original space
    //---
-   fillDenseArr(denseLen, denseArr);//TODO: expensive... 
-   for(it = activeColumns.begin(); it != activeColumns.end(); it++){
+   fillDenseArr(denseLen, denseArr);//TODO: expensive...
+
+   for (it = activeColumns.begin(); it != activeColumns.end(); it++) {
       j  = *it;
       xj = denseArr[j];
-      if(xj < (lbs[j] - DecompEpsilon) ||
-	 xj > (ubs[j] + DecompEpsilon)){
-	 return false;	 
+
+      if (xj < (lbs[j] - DecompEpsilon) ||
+            xj > (ubs[j] + DecompEpsilon)) {
+         return false;
       }
    }
+
    return true;
 }
 
 // --------------------------------------------------------------------- //
 void DecompRay::fillDenseArr(int      len,
-                             double * arr){
+                             double* arr)
+{
    CoinFillN(arr, len, 0.0);
    const int      sz    = m_s.getNumElements();
-   const int    * inds  = m_s.getIndices();
-   const double * elems = m_s.getElements();
-   for (int i = 0; i < sz; ++i)
+   const int*     inds  = m_s.getIndices();
+   const double* elems = m_s.getElements();
+
+   for (int i = 0; i < sz; ++i) {
       arr[inds[i]] = elems[i];
+   }
 }
 
 // --------------------------------------------------------------------- //
-void 
-DecompRay::print(ostream   * os,
-                 DecompApp * app) const {
-
+void
+DecompRay::print(ostream*    os,
+                 DecompApp* app) const
+{
    double lb = getLowerBound();
    double ub = getUpperBound();
-   (*os) << " rc: "       << m_redCost 
+   (*os) << " rc: "       << m_redCost
          << " eff: "      << m_effCnt
-	 << " block: "    << m_blockId
+         << " block: "    << m_blockId
          << " colIndex: " << m_colMasterIndex;
-   if(lb > -DecompInf)
+
+   if (lb > -DecompInf) {
       (*os) << " lb:  "    << getLowerBound();
-   else
+   } else {
       (*os) << " lb: -INF";
-   if(ub < DecompInf)
+   }
+
+   if (ub < DecompInf) {
       (*os) << " ub:  "    << getUpperBound();
-   else
+   } else {
       (*os) << " ub:  INF";
-   (*os) << "\n";   
+   }
+
+   (*os) << "\n";
    UtilPrintPackedVector(m_s, os, app);
 }
 
 // --------------------------------------------------------------------- //
-void 
-DecompRay::print(ostream              * os,
-		 const vector<string> & colNames,
-		 const double         * value) const {
-
+void
+DecompRay::print(ostream*               os,
+                 const vector<string> & colNames,
+                 const double*          value) const
+{
    double lb = getLowerBound();
    double ub = getUpperBound();
-   (*os) << " rc: "       << m_redCost 
+   (*os) << " rc: "       << m_redCost
          << " eff: "      << m_effCnt
-	 << " block: "    << m_blockId
+         << " block: "    << m_blockId
          << " colIndex: " << m_colMasterIndex;
-   if(lb > -DecompInf)
+
+   if (lb > -DecompInf) {
       (*os) << " lb:  "    << getLowerBound();
-   else
+   } else {
       (*os) << " lb: -INF";
-   if(ub < DecompInf)
+   }
+
+   if (ub < DecompInf) {
       (*os) << " ub:  "    << getUpperBound();
-   else
+   } else {
       (*os) << " ub:  INF";
-   (*os) << "\n";   
+   }
+
+   (*os) << "\n";
    UtilPrintPackedVector(m_s, os, colNames, value);
 }

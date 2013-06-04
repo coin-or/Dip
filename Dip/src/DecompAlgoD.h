@@ -27,7 +27,7 @@
 //===========================================================================//
 //THINK: derive from DecompAlgo or DecompAlgoPC?? THINK
 //THINK: how can we reuse this object since call many times?
-//   if init phase is feasible, we are done.... 
+//   if init phase is feasible, we are done....
 
 
 //===========================================================================//
@@ -49,9 +49,9 @@ private:
    std::string m_classTag;
 
    //TODO
-   double            * m_xhatD;
+   double*             m_xhatD;
    //TODO
-   DecompCutList     * m_newCuts;   
+   DecompCutList*      m_newCuts;
    //TODO
    int                 m_numOrigCols;
 
@@ -71,51 +71,51 @@ private:
    /**
     * Create the master problem (all algorithms must define this function).
     */
-   virtual void createMasterProblem(DecompVarList & initVars);
-   virtual void masterMatrixAddArtCols(CoinPackedMatrix * masterM,
-                               double           * colLB,
-                               double           * colUB,
-                               double           * objCoeff,
-                               std::vector<std::string>   & colNames,
-                               int                startRow,
-                               int                endRow,
-                               char               origOrBranch);
-   virtual void phaseUpdate(DecompPhase  & phase,
-                    DecompStatus & status);
+   virtual void createMasterProblem(DecompVarList& initVars);
+   virtual void masterMatrixAddArtCols(CoinPackedMatrix* masterM,
+                                       double*            colLB,
+                                       double*            colUB,
+                                       double*            objCoeff,
+                                       std::vector<std::string>   & colNames,
+                                       int                startRow,
+                                       int                endRow,
+                                       char               origOrBranch);
+   virtual void phaseUpdate(DecompPhase&   phase,
+                            DecompStatus& status);
    virtual void phaseDone();
 
    /**
     * Set the current integer bound and update best/history.
     */
-   virtual inline void setObjBoundIP(const double thisBound){
+   virtual inline void setObjBoundIP(const double thisBound) {
       UtilPrintFuncBegin(m_osLog, m_classTag,
-			 "setObjBoundIP()", m_param.LogDebugLevel, 2);
-      if(thisBound < m_nodeStats.objBest.second){
-	 UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
-		  (*m_osLog) << "New Global UB = " 
-		  << UtilDblToStr(thisBound) << std::endl;);
-	 //For DECOMP, don't update this object's global UB
-	 //  otherwise, we might stop to early, since it will
-	 //  compare to this object's lower bound.
-	 //m_nodeStats.objBest.second = thisBound;         
+                         "setObjBoundIP()", m_param.LogDebugLevel, 2);
+
+      if (thisBound < m_nodeStats.objBest.second) {
+         UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+                  (*m_osLog) << "New Global UB = "
+                  << UtilDblToStr(thisBound) << std::endl;);
+         //For DECOMP, don't update this object's global UB
+         //  otherwise, we might stop to early, since it will
+         //  compare to this object's lower bound.
+         //m_nodeStats.objBest.second = thisBound;
       }
+
       UtilPrintFuncEnd(m_osLog, m_classTag,
-		       "setObjBoundIP()", m_param.LogDebugLevel, 2);
+                       "setObjBoundIP()", m_param.LogDebugLevel, 2);
    }
 
-   
+
 
 public:
-   void solveD(DecompCutList * newCuts){
+   void solveD(DecompCutList* newCuts) {
       m_newCuts = newCuts;
-      
       //need to change parameters to price, no cut
       m_param.LimitTotalCutIters   = 0;
       m_param.LimitRoundCutIters   = 0;
       m_param.LimitTotalPriceIters = 1000;
-      m_param.LimitRoundPriceIters = 1000;    
+      m_param.LimitRoundPriceIters = 1000;
       m_param.SolveMasterAsIp      = 0;
-      
       processNode(NULL);
    }
 
@@ -133,42 +133,40 @@ private:
     * Disable copy constructors.
     */
    DecompAlgoD(const DecompAlgoD&);
-   DecompAlgoD & operator=(const DecompAlgoD&);
-   
+   DecompAlgoD& operator=(const DecompAlgoD&);
+
 public:
 
    /**
     * Default constructors.
-    */   
-   DecompAlgoD(DecompApp            * app,
-	       UtilParameters       * utilParam,
-	       double               * xhat,
-	       int                    numOrigCols) //need to pass this? :
+    */
+   DecompAlgoD(DecompApp*             app,
+               UtilParameters*        utilParam,
+               double*                xhat,
+               int                    numOrigCols) //need to pass this? :
       :
-   DecompAlgoPC(app, utilParam, 
-                const_cast<std::string&>(DecompAlgoStr[DECOMP]), false),
-   m_classTag   ("D-ALGOD"),
-   m_xhatD      (xhat),
-   m_newCuts    (0),
-   m_numOrigCols(numOrigCols) //need?
-   {
+      DecompAlgoPC(app, utilParam,
+                   const_cast<std::string&>(DecompAlgoStr[DECOMP]), false),
+      m_classTag   ("D-ALGOD"),
+      m_xhatD      (xhat),
+      m_newCuts    (0),
+      m_numOrigCols(numOrigCols) { //need?
       std::string paramSection = DecompAlgoStr[DECOMP];
       m_algo              = DECOMP;
       initSetup(utilParam, paramSection);
    }
-   
+
    //need this?
-   DecompAlgoD(DecompApp      * app,
-	       UtilParameters * utilParam,
-	       std::string         & paramSection,
-	       double         * xhat,
-	       int              numOrigCols):
+   DecompAlgoD(DecompApp*       app,
+               UtilParameters* utilParam,
+               std::string&          paramSection,
+               double*          xhat,
+               int              numOrigCols):
       DecompAlgoPC(app, utilParam, paramSection, false),
       m_classTag   ("D-ALGOD"),
       m_xhatD      (xhat),
       m_newCuts    (0),
-      m_numOrigCols(numOrigCols) //need?
-   {
+      m_numOrigCols(numOrigCols) { //need?
       m_algo = DECOMP;
       initSetup(utilParam, paramSection);
    }
@@ -176,7 +174,7 @@ public:
    /**
     * Destructor.
     */
-   ~DecompAlgoD(){}
+   ~DecompAlgoD() {}
    /**
     * @}
     */
