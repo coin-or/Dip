@@ -308,8 +308,16 @@ public:
     *  - C : this just copies over LP solution
     */
    //not pure?
-   virtual void recomposeSolution(const double * solution,
+
+   virtual void recomposeSolution(const double * solutions,
                                   double       * rsolution);
+
+
+   /*
+   virtual void recomposeSolution(const double * points,
+				  const double * rays,
+                                  double       * rsolution);
+   */
    /**
     * @}
     */
@@ -422,11 +430,11 @@ public:
    //TODO: should move out to PC
    //THINK - helper func?, or specific to PC - right? as is genInit
    std::vector<double*> getDualRays(int maxNumRays);
-   virtual int generateVarsFea(DecompVarList    & newVars, 
-			       DecompRayList    & newRays, 
-			       double           & mostNegReducedCost);
+   virtual void generateVarsFea(DecompVarList    & newVars, 
+				DecompRayList    & newRays, 
+				double           & mostNegReducedCost);
 
-   virtual int generateVars(const DecompStatus   stat,
+   virtual void generateVars(const DecompStatus   stat,
 			    DecompVarList    & newVars, 
 			    DecompRayList    & newRays, 
 			    double           & mostNegReducedCost);
@@ -437,8 +445,8 @@ public:
    virtual void addVarsToPool(DecompVarList & newVars);
    virtual void addVarsFromPool();
 
-   //  virtual void addRaysToPool(DecompRayList & newRays);
-   //  virtual void addRaysFromPool();
+   virtual void addRaysToPool(DecompRayList & newRays);
+   virtual void addRaysFromPool();
 
    virtual void addCutsToPool(const double  *  x,
 			      DecompCutList & newCuts,

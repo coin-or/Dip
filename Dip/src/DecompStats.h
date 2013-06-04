@@ -259,8 +259,9 @@ class DecompStats{
    double maxGenVars;
    double maxCompressCols;
 
-   double totalGenRays; 
    double maxGenRays;
+   double totalGenRays; 
+
 
 
  public:

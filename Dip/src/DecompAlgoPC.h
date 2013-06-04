@@ -83,11 +83,12 @@ private:
    virtual void createMasterProblem(DecompVarList & initVars, DecompRayList & initRays){
      DecompAlgo::createMasterProblem(initVars, initRays);
    }
-   virtual int generateVarsFea(DecompVarList    & newVars, 
+   virtual void generateVarsFea(DecompVarList    & newVars, 
 			       DecompRayList    & newRays,
 			       double           & mostNegReducedCost){
-     return DecompAlgo::generateVarsFea(newVars, newRays, mostNegReducedCost);
+     DecompAlgo::generateVarsFea(newVars, newRays, mostNegReducedCost);
    }
+
    virtual void phaseInit(DecompPhase & phase);
 
 
