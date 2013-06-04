@@ -25,7 +25,7 @@
 #include "DecompSolution.h"
 #include "DecompConstraintSet.h"
 #include "CoinMpsIO.hpp"
-
+#include "CoinLpIO.hpp"
 
 extern "C" {
 #if defined (COIN_HAS_METIS)
@@ -122,9 +122,11 @@ public:
     */
 
    /** MPS object for reading instances */
-
-
    CoinMpsIO m_mpsIO;
+
+
+   /** MPS object for reading instances */
+   CoinLpIO m_lpIO;
 
 
    /** Original constraint matrix for the instance */

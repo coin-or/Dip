@@ -248,13 +248,22 @@ public:
     *   <block id>  <num rows in block>
     *   <row ids...>
     *
-    * (2) "Pair" or "PAIR"
-    * Each line is a block id to row id pair.
-    *   <block id> <row id>
+    * (2) "ZIBList" or "ZIBLIST"
+    * The block file defines those rows in each block.
+    *   NBLOCKS
+    *   <numBlocks>
+    *   BLOCK <block id>
+    *   <row names...>
+    *   BLOCK  <block id>
+    *   <row names...>
     *
-    * (3) "PairName" or "PAIRNAME"
+    * (3) "Pair" or "PAIR"
+    * Each line is a block id to row id pair.
+    *   <block id> <row id> 
+    *
+    * (4) "PairName" or "PAIRNAME"
     * Each line is a block id to row name (matching mps) pair.
-    *   <block id> <row name>
+    *   <block id> <row name>     
     */
    std::string BlockFileFormat;
 
@@ -385,7 +394,7 @@ public:
       PARAM_getSetting("NumBlocks", NumBlocks);
       DataDir      = param.GetSetting("DataDir",      "",    "MILP");
       Instance     = param.GetSetting("Instance",     "",    "MILP");
-      Instance     = param.GetSetting("InstanceFormat","",   "MILP");
+      InstanceFormat     = param.GetSetting("InstanceFormat","",   "MILP");
       BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
       PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
       BlockFileFormat

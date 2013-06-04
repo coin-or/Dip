@@ -158,10 +158,6 @@ void UtilParameters::LoadParamFile(string& paramFileName)
    while (!is.eof()) {
       is.getline(buf, sizeof(buf) - 1);
 
-      if (is.eof()) {
-         break;
-      }
-
       lineNum++;
       ptr = strchr(buf, '#');
 
