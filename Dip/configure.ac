@@ -250,7 +250,7 @@ AC_SUBST(CLLCFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/Dippy/Makefile
+                 src/dippy/Makefile
                  examples/Makefile.Examples
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm

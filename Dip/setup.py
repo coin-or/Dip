@@ -23,8 +23,8 @@ def read_file(file_name):
 
 def get_libs(coin_install_dir):
        
-    link_line = read_file(join(coin_install_dir, 'doc', 'Dip', 
-                               'dip_addlibs.txt'))
+    link_line = read_file(join(coin_install_dir, 'share', 'coin',
+                               'doc', 'Dip', 'dip_addlibs.txt'))
 
     libs = [flag[:-4] for flag in link_line.split() if flag.endswith('.lib')]
 
@@ -52,6 +52,7 @@ sources = [join('src/dippy', f) for f in files]
 modules=[Extension('_dippy', 
                    sources, 
                    libraries=libraries,
+                   include_dirs=[join(coin_install_dir, 'include', 'coin')],
                    define_macros=macros)]
 
 setup(name=PROJECT,

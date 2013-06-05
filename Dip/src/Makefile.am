@@ -14,7 +14,7 @@
 
 SUBDIRS = .
 if HAVE_PYTHON
-SUBDIRS += Dippy
+SUBDIRS += dippy
 endif
 
 ########################################################################

@@ -65,7 +65,7 @@ host_triplet = @host@
 ########################################################################
 @CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_3 = -D__DECOMP_IP_CBC__
 @CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
-subdir = src/Dippy
+subdir = src/dippy
 DIST_COMMON = $(DIPPY_PYTHON) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in AUTHORS
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -404,9 +404,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Dippy/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/dippy/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/Dippy/Makefile
+	  $(AUTOMAKE) --gnu  src/dippy/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
