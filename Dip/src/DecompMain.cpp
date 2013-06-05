@@ -28,11 +28,14 @@
 #include "omp.h"
 
 using namespace std;
+void preprocessApp(UtilParameters& utilParam, 
+		   std::vector<int> &blockNums, 
+		   DecompApp& milp); 
 
-void* DecompSolve(DecompApp& milp,
-                  UtilParameters& utilParam,
-                  UtilTimer& timer,
-                  DecompMainParam& decompMainParam
+void* DecompAuto(DecompApp& milp,
+		 UtilParameters& utilParam,
+		 UtilTimer& timer,
+		 DecompMainParam& decompMainParam
                  );
 
 //===========================================================================//
@@ -59,7 +62,7 @@ int main(int argc, char** argv)
       DecompApp milp(utilParam);
       std::vector<int> blockNumCandidates;
       milp.startupLog();
-      milp.preprocessApp(utilParam, blockNumCandidates);
+      preprocessApp(utilParam, blockNumCandidates, milp);
 
       if (milp.m_param.Concurrent == 1 ) {
          // obtain the number of CPU (core)s on machines with operating
@@ -96,14 +99,14 @@ int main(int argc, char** argv)
             }
 
             milpArray[i].m_param.ThreadIndex = i;
-            DecompSolve(milpArray[i], utilParamArray[i],
+            DecompAuto(milpArray[i], utilParamArray[i],
                         timerArray[i], decompMainParamArray[i]);
          }
       } else {
          decompMainParam.doCut        = utilParam.GetSetting("doCut",        false);
          decompMainParam.doPriceCut   = utilParam.GetSetting("doPriceCut",   true);
          decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false);
-         DecompSolve(milp, utilParam, timer, decompMainParam);
+         DecompAuto(milp, utilParam, timer, decompMainParam);
       }
 
       printf("===== FINISH Concurrent Computations Process. =====\n");
@@ -119,11 +122,14 @@ int main(int argc, char** argv)
 
 
 
-void* DecompSolve(DecompApp& milp,
-                  UtilParameters& utilParam,
-                  UtilTimer& timer,
-                  DecompMainParam& decompMainParam)
+void* DecompAuto(DecompApp& milp,
+		 UtilParameters& utilParam,
+		 UtilTimer& timer,
+		 DecompMainParam& decompMainParam)
 {
+
+
+
    //---
    //--- put the one of the functions in the constructor into the main
    //---
@@ -291,4 +297,282 @@ void* DecompSolve(DecompApp& milp,
       //---
       delete algo;
    }
+}
+
+   /**
+    *  preprocessApp method takes the instances and performs the following
+    *  1. MILP preprocessing ( tighting the variable bounds, remove redundant
+    *                          constraints etc, on the TODO list)
+    *
+    *  2. determining the candidate block numbers based on the instance fequency
+    *     table
+    *
+    */
+
+void preprocessApp(UtilParameters& utilParam, 
+		   std::vector<int> &blockNums,
+		   DecompApp& milp)		 
+{
+   //---
+   //--- get application parameters
+   //---
+  
+   milp.m_param.getSettings(utilParam);
+
+   if (milp.m_param.LogLevel >= 1) {
+      milp.m_param.dumpSettings();
+   }
+
+   //---
+   //--- read MILP instance (mps format)
+   //---
+   string fileName = milp.m_param.DataDir
+                     + UtilDirSlash() + milp.m_param.Instance;
+
+   if (milp.m_param.Instance.empty()) {
+      cerr << "===========================================================" << std::endl
+           << "Users need to provide correct "
+           << "instance path and name" << std::endl
+           << "                                                     " << std::endl
+           << "Example: ./dip  --MILP:BlockFileFormat List" << std::endl
+           << "                --MILP:Instance /FilePath/ABC.mps" << std::endl
+           << "                --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "===========================================================" << std::endl
+           << std::endl;
+      throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+   }
+
+   
+
+   int rstatus = 0;
+   bool foundFormat = false;
+
+   if (milp.m_param.InstanceFormat == "") {
+      string::size_type idx = fileName.rfind('.');
+
+      if (idx != string::npos) {
+         string extension = fileName.substr(idx + 1);
+
+         if (extension == "MPS" || extension == "mps") {
+	   milp.m_param.InstanceFormat = "MPS";
+         } else if (extension == "LP" || extension == "lp") {
+	   milp.m_param.InstanceFormat = "LP";
+         }
+      } else {
+         cerr << "File format not specified and no file extension" << endl;
+         throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+      }
+   }
+
+   if(milp.m_param.InstanceFormat =="MPS"){
+     milp.m_mpsIO.messageHandler()->setLogLevel(milp.m_param.LogLpLevel);
+   } else if (milp.m_param.InstanceFormat == "LP"){
+     milp.m_lpIO.messageHandler()->setLogLevel(milp.m_param.LogLpLevel); 
+   }
+
+   if (milp.m_param.InstanceFormat == "MPS") {
+      rstatus = milp.m_mpsIO.readMps(fileName.c_str());
+      foundFormat = true;
+   } else if (milp.m_param.InstanceFormat == "LP") {
+      milp.m_lpIO.readLp(fileName.c_str());
+      foundFormat = true;
+   }
+
+   if (!foundFormat) {
+      cerr << "Error: Format = " << milp.m_param.InstanceFormat << " unknown."
+           << endl;
+      throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
+   }
+
+   if (rstatus < 0) {
+      cerr << "Error: Filename = " << fileName << " failed to open." << endl;
+      throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
+   }
+
+   /*
+   if (milp.m_param.LogLevel >= 2)
+     if(milp.m_param.InstanceFormat == "MPS"){
+       (*m_osLog) << "Objective Offset = "      
+		  << UtilDblToStr(milp.m_mpsIO.objectiveOffset()) << endl;
+     } else if (milp.m_param.InstanceFormat == "LP"){
+       (*m_osLog) << "Objective Offset = "      
+		  << UtilDblToStr(milp.m_lpIO.objectiveOffset()) << endl;       
+     }
+   */
+   //---
+   //--- set best known lb/ub
+   //---
+   double offset = 0;
+
+   if (milp.m_param.InstanceFormat == "MPS") {
+      offset = milp.m_mpsIO.objectiveOffset();
+   } else if (milp.m_param.InstanceFormat == "LP") {
+      offset = milp.m_lpIO.objectiveOffset();
+   }
+
+   milp.setBestKnownLB(milp.m_param.BestKnownLB + offset);
+   milp.setBestKnownUB(milp.m_param.BestKnownUB + offset);
+   milp.preprocess();
+
+   if (milp.m_param.Concurrent == 1) {
+
+     if (milp.m_param.InstanceFormat == "MPS"){
+       milp.m_matrix = milp.m_mpsIO.getMatrixByRow();
+     } else if (milp.m_param.InstanceFormat == "LP"){
+       milp.m_matrix = milp.m_lpIO.getMatrixByRow();
+     }
+     
+      const int* lengthRows = milp.m_matrix->getVectorLengths();
+
+      int numRows = 0;
+      if (milp.m_param.InstanceFormat == "MPS"){ 
+	numRows = milp.m_mpsIO.getNumRows();
+      } else if (milp.m_param.InstanceFormat == "LP"){
+	numRows = milp.m_lpIO.getNumRows(); 
+      }
+      // The following code creates a histogram table to store the
+      // nonzero counts and number of rows
+      std::map<int, int> histogram;
+
+      for (int i = 0 ; i < numRows; ++i) {
+         if (histogram.count(lengthRows[i]) > 0) {
+            histogram[lengthRows[i]] += 1;
+         } else {
+            histogram.insert(std::pair<int, int>(lengthRows[i], 1));
+         }
+      }
+
+      std::map<int, int>::iterator histIter;
+
+      if (milp.m_param.LogDebugLevel >= 1) {
+         std::ofstream histogramTable;
+         histogramTable.open("/home/jiw508/Dip-branch/build_test_main/bin/histogramTable.dat");
+
+         for (histIter = histogram.begin(); histIter != histogram.end();
+               ++histIter) {
+            histogramTable << histIter->first << " " << histIter->second << "\n";
+         }
+
+         histogramTable.close();
+      }
+
+      // Aggregation steps, aggregate the entries in the histogram
+      //     Number of nonzeros      Number of rows
+      //     4                          8
+      //     9                          8
+      // After aggregation:
+      //     9             8
+      std::map<int, int>::iterator histIter2;
+      std::map<int, int> histogram2(histogram);
+
+      for (histIter = histogram.begin(); histIter != histogram.end();
+            ++histIter) {
+         int keyvalue_pre = histIter->second ;
+
+         for (histIter2 = histogram2.begin(); histIter2 != histogram2.end();
+               ++histIter2) {
+            int keyvalue_curr = histIter2->second;
+            // std::cout << " The current value of key is " << keyvalue_curr
+            // <<std::endl;
+
+            if (keyvalue_pre == keyvalue_curr) {
+               if (histIter->first > histIter2->first) {
+                  histogram2.erase(histIter2);
+               }
+            }
+
+            // remove the entry with map values equal 1
+
+            if (keyvalue_curr == 1) {
+               histogram2.erase(histIter2);
+            }
+         }
+      }
+
+      if (milp.m_param.LogDebugLevel >= 1) {
+         std::ofstream histogramTable1;
+         histogramTable1.open("/home/jiw508/Dip-branch/build_test_ray/bin/histogramTable1.dat");
+
+         for (histIter = histogram2.begin(); histIter != histogram2.end();
+               ++histIter) {
+            histogramTable1 << histIter->first << " " << histIter->second << "\n";
+         }
+
+         histogramTable1.close();
+      }
+
+      int blockCands = std::min(milp.m_param.NumBlocksCand, static_cast<int>(histogram2.size()));
+      std::map<int, int>::iterator histIterLower  = histogram2.end();
+      std::advance(histIterLower, - blockCands);
+      histIter = histogram2.end();
+
+      for (--histIter; histIter != histIterLower;
+            --histIter) {
+         blockNums.push_back(histIter->second);
+      }
+   }
+
+   /*
+   if(histogram2.size() == 1){
+     histIter = histogram2.begin();
+     numBlocksCand = (++histIter)->second;
+
+     std::cout << "The block number is "
+        << numBlocksCand << std::endl;
+
+   }
+
+   else if(histogram2.size()<=3){
+
+     for(histIter = histogram2.begin(); histIter != histogram2.end();
+    ++histIter)
+       {
+    int nB = histIter->first;
+    histIter2 = ++histIter;
+    if (nB < histIter2->first)
+      {numBlocksCand = (++histIter)->second; }
+    else
+      {numBlocksCand = nB;}
+       }
+     std::cout << "The block number is "
+          << numBlocksCand << std::endl;
+
+     }
+
+   else
+
+     {
+       int gcd = (++histogram2.begin())->second;
+
+       for(histIter = histogram2.begin(); histIter != histogram2.end();
+      ++histIter)
+    {
+      if(gcd !=1)
+        gcd = UtilGcd(histIter->second, gcd);
+      else
+        {
+          histIter2 = histIter;
+          gcd = UtilGcd(histIter->second, (++histIter2)->second);
+        }
+
+    }
+
+       if(gcd != 1){
+
+    int mblockNum = (histogram2.find((histogram2.rbegin())->first))->second;
+
+    std::cout << "The single one is " << mblockNum
+   	   <<std::endl;
+
+    std::cout << "The block number is "
+   	   << gcd <<" " << gcd*2 << " "
+   	   << gcd*4 <<" " << gcd*8 <<std::endl;
+       }
+
+
+
+     }
+
+   */
+   //   UTIL_DELARR(lengthRows);
 }
