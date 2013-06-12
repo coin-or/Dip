@@ -438,6 +438,8 @@ public:
    /** Read block file */
    void readBlockFile();
 
+
+   const CoinPackedMatrix*  readProblem(UtilParameters& utilParam);
    /** Preprocess (standard ): on the TODO list*/
 
    void preprocess();

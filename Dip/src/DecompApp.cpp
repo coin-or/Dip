@@ -138,6 +138,120 @@ void DecompApp::printOriginalSolution(const int              n_cols,
    (*os) << resetiosflags(ios::fixed | ios::showpoint | ios::scientific);
 }
 
+
+const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
+
+   //---
+   //--- get application parameters
+   //---
+
+  m_param.getSettings(utilParam);
+
+  if (m_param.LogLevel >= 1) {
+    m_param.dumpSettings();
+  }
+
+   //---
+   //--- read MILP instance (mps format)
+   //---
+   string fileName = m_param.DataDir
+                     + UtilDirSlash() + m_param.Instance;
+
+   if (m_param.Instance.empty()) {
+      cerr << "===========================================================" << std::endl
+           << "Users need to provide correct "
+           << "instance path and name" << std::endl
+           << "                                                     " << std::endl
+           << "Example: ./dip  --MILP:BlockFileFormat List" << std::endl
+           << "                --MILP:Instance /FilePath/ABC.mps" << std::endl
+           << "                --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "===========================================================" << std::endl
+           << std::endl;
+      throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+   }
+
+   
+
+   int rstatus = 0;
+   bool foundFormat = false;
+
+   if (m_param.InstanceFormat == "") {
+      string::size_type idx = fileName.rfind('.');
+
+      if (idx != string::npos) {
+         string extension = fileName.substr(idx + 1);
+
+         if (extension == "MPS" || extension == "mps") {
+	   m_param.InstanceFormat = "MPS";
+         } else if (extension == "LP" || extension == "lp") {
+	   m_param.InstanceFormat = "LP";
+         }
+      } else {
+         cerr << "File format not specified and no file extension" << endl;
+         throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+      }
+   }
+
+   if(m_param.InstanceFormat =="MPS"){
+     m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
+   } else if (m_param.InstanceFormat == "LP"){
+     m_lpIO.messageHandler()->setLogLevel(m_param.LogLpLevel); 
+   }
+
+   if (m_param.InstanceFormat == "MPS") {
+      rstatus = m_mpsIO.readMps(fileName.c_str());
+      foundFormat = true;
+   } else if (m_param.InstanceFormat == "LP") {
+      m_lpIO.readLp(fileName.c_str());
+      foundFormat = true;
+   }
+
+   if (!foundFormat) {
+      cerr << "Error: Format = " << m_param.InstanceFormat << " unknown."
+           << endl;
+      throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
+   }
+
+   if (rstatus < 0) {
+      cerr << "Error: Filename = " << fileName << " failed to open." << endl;
+      throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
+   }
+
+   
+   if (m_param.LogLevel >= 2)
+     if(m_param.InstanceFormat == "MPS"){
+       (*m_osLog) << "Objective Offset = "      
+		  << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
+     } else if (m_param.InstanceFormat == "LP"){
+       (*m_osLog) << "Objective Offset = "      
+		  << UtilDblToStr(m_lpIO.objectiveOffset()) << endl;       
+     }
+   
+   //---
+   //--- set best known lb/ub
+   //---
+   double offset = 0;
+
+   if (m_param.InstanceFormat == "MPS") {
+      offset = m_mpsIO.objectiveOffset();
+   } else if (m_param.InstanceFormat == "LP") {
+      offset = m_lpIO.objectiveOffset();
+   }
+
+   setBestKnownLB(m_param.BestKnownLB + offset);
+   setBestKnownUB(m_param.BestKnownUB + offset);
+   preprocess();
+
+   if (m_param.InstanceFormat == "MPS"){
+     return m_mpsIO.getMatrixByRow();
+   } else if (m_param.InstanceFormat == "LP"){
+     return m_lpIO.getMatrixByRow();
+   }
+
+}
+
+
+
 /*
  *  The following methods are from MILPBlock_DecompApp
  */
@@ -780,7 +894,7 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
       colUB       = const_cast<double*>(m_mpsIO.getColUpper());
       integerVars = const_cast<char*>  (m_mpsIO.integerColumns());
    } else if (m_param.InstanceFormat == "LP") {
-      nCols = m_lpIO.getNumCols();
+      nCols       = m_lpIO.getNumCols();
       rowLB       = const_cast<double*>(m_lpIO.getRowLower());
       rowUB       = const_cast<double*>(m_lpIO.getRowUpper());
       colLB       = const_cast<double*>(m_lpIO.getColLower());
