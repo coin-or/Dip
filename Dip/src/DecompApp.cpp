@@ -139,17 +139,16 @@ void DecompApp::printOriginalSolution(const int              n_cols,
 }
 
 
-const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
-
+const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
+{
    //---
    //--- get application parameters
    //---
+   m_param.getSettings(utilParam);
 
-  m_param.getSettings(utilParam);
-
-  if (m_param.LogLevel >= 1) {
-    m_param.dumpSettings();
-  }
+   if (m_param.LogLevel >= 1) {
+      m_param.dumpSettings();
+   }
 
    //---
    //--- read MILP instance (mps format)
@@ -170,8 +169,6 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
       throw UtilException("I/O Error.", "initializeApp", "DecompApp");
    }
 
-   
-
    int rstatus = 0;
    bool foundFormat = false;
 
@@ -182,9 +179,9 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
          string extension = fileName.substr(idx + 1);
 
          if (extension == "MPS" || extension == "mps") {
-	   m_param.InstanceFormat = "MPS";
+            m_param.InstanceFormat = "MPS";
          } else if (extension == "LP" || extension == "lp") {
-	   m_param.InstanceFormat = "LP";
+            m_param.InstanceFormat = "LP";
          }
       } else {
          cerr << "File format not specified and no file extension" << endl;
@@ -192,10 +189,10 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
       }
    }
 
-   if(m_param.InstanceFormat =="MPS"){
-     m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
-   } else if (m_param.InstanceFormat == "LP"){
-     m_lpIO.messageHandler()->setLogLevel(m_param.LogLpLevel); 
+   if (m_param.InstanceFormat == "MPS") {
+      m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
+   } else if (m_param.InstanceFormat == "LP") {
+      m_lpIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
    }
 
    if (m_param.InstanceFormat == "MPS") {
@@ -217,16 +214,15 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
       throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
 
-   
    if (m_param.LogLevel >= 2)
-     if(m_param.InstanceFormat == "MPS"){
-       (*m_osLog) << "Objective Offset = "      
-		  << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
-     } else if (m_param.InstanceFormat == "LP"){
-       (*m_osLog) << "Objective Offset = "      
-		  << UtilDblToStr(m_lpIO.objectiveOffset()) << endl;       
-     }
-   
+      if (m_param.InstanceFormat == "MPS") {
+         (*m_osLog) << "Objective Offset = "
+                    << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
+      } else if (m_param.InstanceFormat == "LP") {
+         (*m_osLog) << "Objective Offset = "
+                    << UtilDblToStr(m_lpIO.objectiveOffset()) << endl;
+      }
+
    //---
    //--- set best known lb/ub
    //---
@@ -242,12 +238,11 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
    setBestKnownUB(m_param.BestKnownUB + offset);
    preprocess();
 
-   if (m_param.InstanceFormat == "MPS"){
-     return m_mpsIO.getMatrixByRow();
-   } else if (m_param.InstanceFormat == "LP"){
-     return m_lpIO.getMatrixByRow();
+   if (m_param.InstanceFormat == "MPS") {
+      return m_mpsIO.getMatrixByRow();
+   } else if (m_param.InstanceFormat == "LP") {
+      return m_lpIO.getMatrixByRow();
    }
-
 }
 
 

@@ -26,16 +26,16 @@
 #include "unistd.h"
 #include "omp.h"
 
-using namespace std; 
-void blockNumberFinder(DecompParam utilParam, 
-		       std::vector<int> &blockNums,
-		       const CoinPackedMatrix* matrix);
+using namespace std;
+void blockNumberFinder(DecompParam utilParam,
+                       std::vector<int> &blockNums,
+                       const CoinPackedMatrix* matrix);
 
 void* DecompAuto(DecompApp& milp,
-		 UtilParameters& utilParam,
-		 UtilTimer& timer,
-		 DecompMainParam& decompMainParam
-                 );
+                 UtilParameters& utilParam,
+                 UtilTimer& timer,
+                 DecompMainParam& decompMainParam
+                );
 
 
 //===========================================================================//
@@ -52,10 +52,7 @@ int main(int argc, char** argv)
       decompMainParam.timeSetupCpu  = 0.0;
       decompMainParam.timeSolveReal = 0.0;
       decompMainParam.timeSolveCpu  = 0.0;
-
-
-      //      std::string pathtry(UtilExecuPath(argv[0])); 
-
+      //      std::string pathtry(UtilExecuPath(argv[0]));
       //---
       //--- start overall timer
       //---
@@ -65,43 +62,47 @@ int main(int argc, char** argv)
       //---
       DecompApp milp(utilParam);
       std::vector<int> blockNumCandidates;
-
       milp.startupLog();
-
-      // get the current working Directory. 
+      // get the current working Directory.
       char the_path[256];
       std::string path(getcwd(the_path, 255));
-      milp.m_param.CurrentWorkingDir = path; 
-      if(milp.m_param.LogDebugLevel >= 1){
-	std::cout << path << std::endl; 
-	std::cout << milp.m_param.CurrentWorkingDir << std::endl; 
+      milp.m_param.CurrentWorkingDir = path;
+
+      if (milp.m_param.LogDebugLevel >= 1) {
+         std::cout << path << std::endl;
+         std::cout << milp.m_param.CurrentWorkingDir << std::endl;
       }
-      const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam); 
+
+      const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
+
       blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
-     
+
       int numCPU = sysconf( _SC_NPROCESSORS_ONLN );
+
       std::cout << "The number of cores in this node is "
-		<< numCPU << std::endl;
+                << numCPU << std::endl;
+
       int numThreads = min(numCPU, static_cast<int>(blockNumCandidates.size()));
-            
+
       std::vector<DecompApp> milpArray(static_cast<int>(numThreads + 1), milp);
+
       std::vector<DecompMainParam> decompMainParamArray(static_cast<int>(numThreads + 1),
-							decompMainParam);
-      std::vector<UtilTimer> timerArray(static_cast<int>(numThreads + 1),timer);
+            decompMainParam);
+
+      std::vector<UtilTimer> timerArray(static_cast<int>(numThreads + 1), timer);
+
       std::vector<UtilParameters> utilParamArray(static_cast<int>(numThreads + 1),
-						 utilParam);
-	
+            utilParam);
+
       if (milp.m_param.Concurrent == 1 ) {
          // obtain the number of CPU (core)s on machines with operating
          // system Linux, Solaris, & AIX and Mac OS X
          // (for all OS releases >= 10.4, i.e., Tiger onwards)
          // other systems has different syntax to obtain the core number
-      printf("===== START Concurrent Computations Process. =====\n");
+         printf("===== START Concurrent Computations Process. =====\n");
 #pragma omp parallel for
 
-	for (int i = 0 ; i < (numThreads + 1); i++) {
-	 
-	   
+         for (int i = 0 ; i < (numThreads + 1); i++) {
             if (i == 0) {
                decompMainParamArray[i].doCut = true;
                decompMainParamArray[i].doPriceCut = false;
@@ -114,43 +115,34 @@ int main(int argc, char** argv)
             }
 
             milpArray[i].m_param.ThreadIndex = i;
-	    DecompAuto(milpArray[i], utilParamArray[i],
-		       timerArray[i], decompMainParamArray[i]);
-	    
-	}
-	      } else {
-  
-	   decompMainParam.doCut        = utilParam.GetSetting("doCut",        false);
-	   decompMainParam.doPriceCut   = utilParam.GetSetting("doPriceCut",   true);
-	   decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false);
-	   DecompAuto(milp, utilParam, timer, decompMainParam);
-	 
-	 }
-        
+            DecompAuto(milpArray[i], utilParamArray[i],
+                       timerArray[i], decompMainParamArray[i]);
+         }
+      } else {
+         decompMainParam.doCut        = utilParam.GetSetting("doCut",        false);
+         decompMainParam.doPriceCut   = utilParam.GetSetting("doPriceCut",   true);
+         decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false);
+         DecompAuto(milp, utilParam, timer, decompMainParam);
+      }
+
       printf("===== FINISH Concurrent Computations Process. =====\n");
-   }
-	  catch (CoinError& ex) {
+   } catch (CoinError& ex) {
       cerr << "COIN Exception [ " << ex.message() << " ]"
            << " at " << ex.fileName()  << ":L" << ex.lineNumber()
            << " in " << ex.className() << "::" << ex.methodName() << endl;
       return 1;
    }
 
-
-   
    return 0;
 }
 
 
 
 void* DecompAuto(DecompApp& milp,
-		 UtilParameters& utilParam,
-		 UtilTimer& timer,
-		 DecompMainParam& decompMainParam)
+                 UtilParameters& utilParam,
+                 UtilTimer& timer,
+                 DecompMainParam& decompMainParam)
 {
-
-
-
    //---
    //--- put the one of the functions in the constructor into the main
    //---
@@ -207,7 +199,6 @@ void* DecompAuto(DecompApp& milp,
       timer.start();
       alpsModel.solve();
       timer.stop();
-      
       std::cout << "==========================================" << std::endl;
       std::cout << "======   The thread number is  ============= " << std::endl;
       std::cout << "============" << milp.m_param.ThreadIndex << "============= " << std::endl;
@@ -221,7 +212,6 @@ void* DecompAuto(DecompApp& milp,
       std::cout << "                                          " << std::endl;
       std::cout << "                                          " << std::endl;
       std::cout << "                                          " << std::endl;
-
       decompMainParam.timeSolveCpu  = timer.getCpuTime();
       decompMainParam.timeSolveReal = timer.getRealTime();
       //---
@@ -322,26 +312,23 @@ void* DecompAuto(DecompApp& milp,
    }
 }
 
-   /**
-    *  preprocessApp method takes the instances and performs the following
-    *  1. MILP preprocessing ( tighting the variable bounds, remove redundant
-    *                          constraints etc, on the TODO list)
-    *
-    *  2. determining the candidate block numbers based on the instance fequency
-    *     table
-    *
-    */
+/**
+ *  preprocessApp method takes the instances and performs the following
+ *  1. MILP preprocessing ( tighting the variable bounds, remove redundant
+ *                          constraints etc, on the TODO list)
+ *
+ *  2. determining the candidate block numbers based on the instance fequency
+ *     table
+ *
+ */
 
-void blockNumberFinder(DecompParam utilParam, 
-		       std::vector<int> &blockNums,
-		       const CoinPackedMatrix* matrix)		 
+void blockNumberFinder(DecompParam utilParam,
+                       std::vector<int> &blockNums,
+                       const CoinPackedMatrix* matrix)
 {
- 
    if (utilParam.Concurrent == 1) {
-     
       const int* lengthRows = matrix->getVectorLengths();
-
-      int numRows = matrix->getNumRows();       
+      int numRows = matrix->getNumRows();
       // The following code creates a histogram table to store the
       // nonzero counts and number of rows
       std::map<int, int> histogram;
@@ -358,7 +345,7 @@ void blockNumberFinder(DecompParam utilParam,
 
       if (utilParam.LogDebugLevel >= 1) {
          std::ofstream histogramTable;
-	 std::string path1 = utilParam.CurrentWorkingDir + UtilDirSlash() + "histogramTable.dat"; 
+         std::string path1 = utilParam.CurrentWorkingDir + UtilDirSlash() + "histogramTable.dat";
          histogramTable.open(path1.c_str());
 
          for (histIter = histogram.begin(); histIter != histogram.end();
@@ -376,49 +363,50 @@ void blockNumberFinder(DecompParam utilParam,
       // After aggregation:
       //     9             8
       // Then put the number of rows into the candidates queue
-
       std::map<int, int>::iterator histIter2;
       std::map<int, int> histogram2;
+      std::set<int> blocksNumTemp;
 
-      std::set<int> blocksNumTemp; 
       for (histIter = histogram.begin(); histIter != histogram.end();
             ++histIter) {
-	int keyvalue_pre = histIter->second ;	 
-	int max = 0; 
-	std::map<int, int>::iterator histIterTemp = histIter;
-	++histIterTemp;
-	for (histIter2 = histIterTemp; histIter2 != histogram.end();
-	     ++histIter2) {
-	  int keyvalue_curr = histIter2->second;
-	  // std::cout << " The current value of key is " << keyvalue_curr
-	  // <<std::endl;
-	  int max_inter = 0; 
-	  
-	  if (keyvalue_pre == keyvalue_curr) {
-	    max_inter = (histIter->first > histIter2->first) 
-	                ?   histIter->first: histIter2->first; 
-	  }
-	  max = (max_inter > max)? max_inter: max; 
-	  
-	  if (max && max != 1){
-	    blocksNumTemp.insert(max); 
-	    blockNums.push_back(max);
-	    histogram2.insert(std::pair<int, int>(histIter->second, max));
-	  }	 
-	}
+         int keyvalue_pre = histIter->second ;
+         int max = 0;
+         std::map<int, int>::iterator histIterTemp = histIter;
+         ++histIterTemp;
 
-	if (histogram2.find(histIter->second) == histogram2.end() ){
-	  histogram2.insert(std::pair<int, int>(histIter->second,
-						histIter->first));
-	}
+         for (histIter2 = histIterTemp; histIter2 != histogram.end();
+               ++histIter2) {
+            int keyvalue_curr = histIter2->second;
+            // std::cout << " The current value of key is " << keyvalue_curr
+            // <<std::endl;
+            int max_inter = 0;
+
+            if (keyvalue_pre == keyvalue_curr) {
+               max_inter = (histIter->first > histIter2->first)
+                           ?   histIter->first : histIter2->first;
+            }
+
+            max = (max_inter > max) ? max_inter : max;
+
+            if (max && max != 1) {
+               blocksNumTemp.insert(max);
+               blockNums.push_back(max);
+               histogram2.insert(std::pair<int, int>(histIter->second, max));
+            }
+         }
+
+         if (histogram2.find(histIter->second) == histogram2.end() ) {
+            histogram2.insert(std::pair<int, int>(histIter->second,
+                                                  histIter->first));
+         }
       }
 
       if (utilParam.LogDebugLevel >= 1) {
          std::ofstream histogramTable1;
-	 std::string path2 = utilParam.CurrentWorkingDir + UtilDirSlash() + "histogramTable1.dat"; 
+         std::string path2 = utilParam.CurrentWorkingDir + UtilDirSlash() + "histogramTable1.dat";
          histogramTable1.open(path2.c_str());
-	 
-	 std::map<int, int >::iterator histIter3;
+         std::map<int, int >::iterator histIter3;
+
          for (histIter3 = histogram2.begin(); histIter3 != histogram2.end();
                ++histIter3) {
             histogramTable1 << histIter3->second << " " << histIter3->first << "\n";
@@ -427,30 +415,31 @@ void blockNumberFinder(DecompParam utilParam,
          histogramTable1.close();
       }
 
-      int blockCands = std::min(utilParam.NumBlocksCand - static_cast<int>(blocksNumTemp.size()), 
-				static_cast<int>(histogram2.size()));
-      if(blockCands > 0){
-	std::map<int, int >::iterator histIterLower  = histogram2.end();
-	while(blockCands ){
-	  --histIterLower; 
-	  blockCands--; 
-	  if(blocksNumTemp.find(histIterLower->second)== blocksNumTemp.end()){
-	    blockNums.push_back(histIterLower->second);
-	  }
-	}
+      int blockCands = std::min(utilParam.NumBlocksCand - static_cast<int>(blocksNumTemp.size()),
+                                static_cast<int>(histogram2.size()));
 
-      }else{
-	int counter = utilParam.NumBlocksCand; 
-	std::set<int>:: iterator setIter = blocksNumTemp.begin(); 
-	while(counter){
-	  blockNums.push_back(*setIter); 
-	  setIter++ ; 
-	  --counter; 
-	}
-	
+      if (blockCands > 0) {
+         std::map<int, int >::iterator histIterLower  = histogram2.end();
+
+         while (blockCands ) {
+            --histIterLower;
+            blockCands--;
+
+            if (blocksNumTemp.find(histIterLower->second) == blocksNumTemp.end()) {
+               blockNums.push_back(histIterLower->second);
+            }
+         }
+      } else {
+         int counter = utilParam.NumBlocksCand;
+         std::set<int>:: iterator setIter = blocksNumTemp.begin();
+
+         while (counter) {
+            blockNums.push_back(*setIter);
+            setIter++ ;
+            --counter;
+         }
       }
    }
-
 }
 
 

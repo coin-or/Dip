@@ -315,7 +315,7 @@ public:
    int ThreadIndex;
 
 
-   std::string CurrentWorkingDir; 
+   std::string CurrentWorkingDir;
 
 
    /**
@@ -568,7 +568,7 @@ public:
       UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand);
       UtilPrintParameter(os, sec, "ConcurrentCufOffTime", ConcurrentCutOffTime);
       UtilPrintParameter(os, sec, "Concurrent", Concurrent);
-      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
+      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );
       (*os) << "========================================================\n";
    }
 
