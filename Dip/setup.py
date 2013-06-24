@@ -36,6 +36,9 @@ if coin_install_dir is None:
     raise Exception('Please set the environment variable COIN_INSTALL_DIR' +
                     'to the location of the COIN installation')
 
+if len(coin_install_dir.split(';')) > 1:
+    raise Exception('Error: More than one directory listed in COIN_INSTALL_DIR')
+
 libraries = get_libs(coin_install_dir)
 
 macros = [('__DECOMP_LP_CLP__', None)]
