@@ -223,7 +223,13 @@ includecoin_HEADERS +=             \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
 
+INSTALL_MANIFEST=
+if COIN_CXX_IS_CL
+INSTALL_MANIFEST += mt -manifest dip.exe.manifest -outputresource:dip.exe
+endif
+
 install-exec-local:
+	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
 
 uninstall-local:

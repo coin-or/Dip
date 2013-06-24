@@ -86,8 +86,7 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(DIPPYlibdir)" "$(DESTDIR)$(DIPPYdir)"
 DIPPYlibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(DIPPYlib_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-_dippy_la_DEPENDENCIES = ../libDecomp.la $(am__DEPENDENCIES_1)
+_dippy_la_DEPENDENCIES = ../libDecomp.la
 am__dippy_la_OBJECTS = _dippy_la-DippyDecompAlgo.lo \
 	_dippy_la-DippyDecompApp.lo _dippy_la-DippyPythonUtils.lo \
 	_dippy_la-DippyModule.lo _dippy_la-DippySolve.lo
@@ -311,10 +310,10 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_PKG_CONFIG = @ac_ct_PKG_CONFIG@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -386,8 +385,8 @@ _dippy_la_SOURCES = \
 # This is for libtool
 _dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_1) \
 	$(am__append_2) $(am__append_3) $(am__append_4)
-_dippy_la_LIBADD = ../libDecomp.la $(DIPLIB_LIBS)
-_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined
+_dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS)
+_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined 
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I.. -I`$(CYGPATH_W) $(srcdir)` -I`$(CYGPATH_W) $(srcdir)/../` 

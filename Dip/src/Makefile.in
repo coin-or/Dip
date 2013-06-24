@@ -67,6 +67,7 @@ bin_PROGRAMS = dip$(EXEEXT)
 ########################################################################
 @CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_6 = -D__DECOMP_IP_CBC__
 @CPLEX_IP_SOLVER_TRUE@am__append_7 = -D__DECOMP_IP_CPX__
+@COIN_CXX_IS_CL_TRUE@am__append_8 = mt -manifest dip.exe.manifest -outputresource:dip.exe
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -331,10 +332,10 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_PKG_CONFIG = @ac_ct_PKG_CONFIG@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -466,6 +467,7 @@ includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
 	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \
 	AlpsDecompModel.h AlpsDecompSolution.h AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h
+INSTALL_MANIFEST = $(am__append_8)
 all: config.h config_dip.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -953,6 +955,7 @@ uninstall-info: uninstall-info-recursive
 
 
 install-exec-local:
+	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
 
 uninstall-local:

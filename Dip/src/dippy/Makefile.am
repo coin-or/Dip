@@ -42,8 +42,8 @@ _dippy_la_SOURCES = \
 
 # This is for libtool
 _dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS)
-_dippy_la_LIBADD = ../libDecomp.la $(DIPLIB_LIBS)
-_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined
+_dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS)
+_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined 
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I.. -I`$(CYGPATH_W) $(srcdir)` -I`$(CYGPATH_W) $(srcdir)/../` 
