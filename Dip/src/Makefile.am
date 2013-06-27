@@ -223,13 +223,20 @@ includecoin_HEADERS +=             \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
 
-INSTALL_MANIFEST=
-if COIN_CXX_IS_CL
-INSTALL_MANIFEST += mt -manifest dip.exe.manifest -outputresource:dip.exe
-endif
+########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+install-exec-hook:
+	test -s dip.exe.manifest && \
+	mt -manifest dip.exe.manifest -outputresource:dip.exe;\
+	cp dip.exe $(bindir)/dip.exe
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
 
 install-exec-local:
-	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
 
 uninstall-local:

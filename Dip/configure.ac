@@ -118,16 +118,20 @@ if test "$PYTHON" != "" ; then
   echo $PY_PREFIX
   PY_PLATFORM=`$PYTHON -c 'import sys ; print sys.platform'`
   echo $PY_PLATFORM
-  AC_COIN_CHECK_HEADER([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],,
-		       [PYTHON=])
-fi
+  if test "$PY_PLATFORM" != "win32" ; then
+     AC_COIN_CHECK_HEADER([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],,
+			[PYTHON=])
+  else
+     PYTHON=""
+  fi
+fi		       
 AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
 if test "$PY_PLATFORM" != "win32" ; then
   PYTHON_LIBS="-lpython$PYTHON_VERSION"
   PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
 else
   PYTHON_LIBS="-lpython"
-  PYTHON_CFLAGS="-I$PY_PREFIX\include"
+  PYTHON_CFLAGS="-I$PY_PREFIX\\include"
 fi
 AC_SUBST([PYTHON_LIBS])
 AC_SUBST([PYTHON_CFLAGS])

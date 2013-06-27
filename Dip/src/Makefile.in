@@ -67,7 +67,6 @@ bin_PROGRAMS = dip$(EXEEXT)
 ########################################################################
 @CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_6 = -D__DECOMP_IP_CBC__
 @CPLEX_IP_SOLVER_TRUE@am__append_7 = -D__DECOMP_IP_CPX__
-@COIN_CXX_IS_CL_TRUE@am__append_8 = mt -manifest dip.exe.manifest -outputresource:dip.exe
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -467,7 +466,6 @@ includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
 	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \
 	AlpsDecompModel.h AlpsDecompSolution.h AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h
-INSTALL_MANIFEST = $(am__append_8)
 all: config.h config_dip.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -905,6 +903,8 @@ install-data-am: install-includecoinHEADERS
 
 install-exec-am: install-binPROGRAMS install-exec-local \
 	install-libLTLIBRARIES
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-info: install-info-recursive
 
@@ -942,10 +942,10 @@ uninstall-info: uninstall-info-recursive
 	distclean-libtool distclean-recursive distclean-tags distdir \
 	dvi dvi-am html html-am info info-am install install-am \
 	install-binPROGRAMS install-data install-data-am install-exec \
-	install-exec-am install-exec-local install-includecoinHEADERS \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
+	install-exec-am install-exec-hook install-exec-local \
+	install-includecoinHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic maintainer-clean-recursive \
 	mostlyclean mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
@@ -954,8 +954,20 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-am uninstall-libLTLIBRARIES uninstall-local
 
 
+########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+install-exec-hook:
+	test -s dip.exe.manifest && \
+	mt -manifest dip.exe.manifest -outputresource:dip.exe;\
+	cp dip.exe $(bindir)/dip.exe
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
+
 install-exec-local:
-	$(INSTALL_MANIFEST)
 	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h
 
 uninstall-local:

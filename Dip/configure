@@ -1761,6 +1761,7 @@ coin_projectdir=yes
 # Set the project's version numbers
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define DIP_VERSION "$PACKAGE_VERSION"
 _ACEOF
@@ -1846,7 +1847,8 @@ _ACEOF
 
 
 
-# Capture libtool library version, if given.
+ # Capture libtool library version, if given.
+
 
 
 
@@ -6192,7 +6194,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6195 "configure"' > conftest.$ac_ext
+  echo '#line 6197 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7326,7 +7328,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7329:" \
+echo "$as_me:7331:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8393,11 +8395,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8396: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8398: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8400: \$? = $ac_status" >&5
+   echo "$as_me:8402: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8661,11 +8663,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8664: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8666: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8668: \$? = $ac_status" >&5
+   echo "$as_me:8670: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8765,11 +8767,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8768: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8770: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8772: \$? = $ac_status" >&5
+   echo "$as_me:8774: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11110,7 +11112,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11113 "configure"
+#line 11115 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11210,7 +11212,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11213 "configure"
+#line 11215 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13554,11 +13556,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13557: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13559: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13561: \$? = $ac_status" >&5
+   echo "$as_me:13563: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13658,11 +13660,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13661: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13663: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13665: \$? = $ac_status" >&5
+   echo "$as_me:13667: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15228,11 +15230,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15231: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15233: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15235: \$? = $ac_status" >&5
+   echo "$as_me:15237: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15332,11 +15334,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15335: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15337: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15339: \$? = $ac_status" >&5
+   echo "$as_me:15341: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17539,11 +17541,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17542: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17544: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17546: \$? = $ac_status" >&5
+   echo "$as_me:17548: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17807,11 +17809,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17810: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17812: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17814: \$? = $ac_status" >&5
+   echo "$as_me:17816: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17911,11 +17913,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17914: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17916: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17918: \$? = $ac_status" >&5
+   echo "$as_me:17920: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -21232,6 +21234,8 @@ projtoprocess="coinutils osi alps"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -21749,6 +21753,8 @@ projtoprocess="osi-clp"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -22245,6 +22251,8 @@ projtoprocess="coindatasample"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -22741,6 +22749,8 @@ projtoprocess="cgl"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -23252,6 +23262,8 @@ projtoprocess="osi-cbc"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -23770,6 +23782,8 @@ projtoprocess="osi-cplex"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -24273,6 +24287,8 @@ projtoprocess="coinasl"
 allproj=""
 allpcfiles=""
 allpcifiles=""
+echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
+echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
