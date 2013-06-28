@@ -227,12 +227,12 @@ includecoin_HEADERS +=             \
 #                     Installing manifest (MSVC++)                     #
 ########################################################################
 
+if COIN_CXX_IS_CL
 install-exec-hook:
-	if COIN_CXX_IS_CL
-		test -s dip.exe.manifest && \
-		mt -manifest dip.exe.manifest -outputresource:dip.exe;\
-		cp dip.exe $(bindir)/dip.exe
-	endif
+	test -s dip.exe.manifest && \
+	mt -manifest dip.exe.manifest -outputresource:dip.exe;\
+	cp dip.exe $(bindir)/dip.exe
+endif
 
 #######################################################################
 # Create the Config.h file that has all public defines and install it #
