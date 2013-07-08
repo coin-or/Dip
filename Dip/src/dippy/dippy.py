@@ -627,11 +627,11 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 numNodes = len(self.Tree.get_node_list())
                 if parentInd == -1:
                     if self.layout == 'bak':
-                        self.Tree.AddOrUpdateNode(str(nodeInd), str(parentInd),
+                        self.Tree.AddOrUpdateNode(nodeInd, parentInd,
                                                   branch_direction, BAKstatus, 
                                                   nodeQuality, None, None)
                     else:
-                        self.Tree.add_root(str(nodeInd), label = label, 
+                        self.Tree.add_root(nodeInd, label = label, 
                                            status = 'C', obj = nodeQuality, 
                                            color = color, style = 'filled', 
                                            fillcolor = color)
@@ -647,9 +647,9 @@ class DipProblem(pulp.LpProblem, DipAPI):
                     numNodes += 1
                 else:
                     if branch_direction == 'L':
-                        n = self.Tree.get_left_child(str(parentInd))
+                        n = self.Tree.get_left_child(parentInd)
                     else:
-                        n = self.Tree.get_right_child(str(parentInd))
+                        n = self.Tree.get_right_child(parentInd)
                     edge_label = self.Tree.get_edge_attr(parentInd, n, 'label')
                     self.Tree.del_node(n)
                     if self.layout == 'bak':
@@ -657,7 +657,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                                   branch_direction, 'branched', 
                                                   nodeQuality, None, None)
                     elif branch_direction == 'L':
-                        self.Tree.add_left_child(str(nodeInd), str(parentInd), 
+                        self.Tree.add_left_child(nodeInd, parentInd, 
                                                  label = label, 
                                                  status = status, 
                                                  obj = nodeQuality, 
@@ -665,7 +665,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                                  style = 'filled', 
                                                  fillcolor = color)
                     else:
-                        self.Tree.add_right_child(str(nodeInd), str(parentInd), 
+                        self.Tree.add_right_child(nodeInd, parentInd, 
                                                   label = label, 
                                                   status = status, 
                                                   obj = nodeQuality, 
@@ -673,7 +673,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                                   style = 'filled', 
                                                   fillcolor = color)
                     if edge_label is not None:
-                        self.Tree.set_edge_attr(str(parentInd), str(nodeInd), 
+                        self.Tree.set_edge_attr(parentInd, nodeInd, 
                                                 'label', edge_label)
                     if self.Tree.attr['display'] == 'svg':
                         if self.display_interval is not None:
@@ -718,13 +718,13 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 for n in outputDict:
                     if n == 'pDownUB':
                         if self.layout == 'bak':
-                            self.Tree.AddOrUpdateNode(str(-numNodes), 
-                                                      str(nodeInd), 'L', 
+                            self.Tree.AddOrUpdateNode(-numNodes, 
+                                                      nodeInd, 'L', 
                                                       'candidate', 
                                                       nodeQuality, None, None)
                         else:
-                            self.Tree.add_left_child(str(-numNodes), 
-                                                     str(nodeInd), 
+                            self.Tree.add_left_child(-numNodes, 
+                                                     nodeInd, 
                                                      label = 'C', 
                                                      status = 'C', 
                                                      obj = nodeQuality, 
@@ -737,20 +737,20 @@ class DipProblem(pulp.LpProblem, DipAPI):
                             lbs = {}
                         ubs = outputDict['pDownUB']
                         labelStr = createBranchLabel(lbs, ubs)
-                        self.Tree.set_edge_attr(str(nodeInd), 
-                                                str(-numNodes), 
+                        self.Tree.set_edge_attr(nodeInd, 
+                                                -numNodes, 
                                                 'label', labelStr)
                         numNodes += 1
 
                     elif n == 'pUpLB':
                         if self.layout == 'bak':
-                            self.Tree.AddOrUpdateNode(str(-numNodes), 
-                                                      str(nodeInd), 'R', 
+                            self.Tree.AddOrUpdateNode(-numNodes, 
+                                                      nodeInd, 'R', 
                                                       'candidate', 
                                                       nodeQuality, None, None)
                         else:
-                            self.Tree.add_right_child(str(-numNodes), 
-                                                      str(nodeInd), 
+                            self.Tree.add_right_child(-numNodes, 
+                                                      nodeInd, 
                                                       label = 'C', 
                                                       status = 'C', 
                                                       obj = nodeQuality, 
@@ -763,13 +763,13 @@ class DipProblem(pulp.LpProblem, DipAPI):
                             ubs = {}
                         lbs = outputDict['pUpLB']
                         labelStr = createBranchLabel(lbs, ubs)
-                        self.Tree.set_edge_attr(str(nodeInd), 
-                                                str(-numNodes), 
+                        self.Tree.set_edge_attr(nodeInd, 
+                                                -numNodes, 
                                                 'label', labelStr)
                         numNodes += 1
 
-                self.Tree.set_node_attr(str(nodeInd), 'color', 'green')
-                self.Tree.set_node_attr(str(nodeInd), 'fillcolor', 'green')
+                self.Tree.set_node_attr(nodeInd, 'color', 'green')
+                self.Tree.set_node_attr(nodeInd, 'fillcolor', 'green')
         
             if self.post_process_branch is not None:
                 self.post_process_branch(self, outputDict)
