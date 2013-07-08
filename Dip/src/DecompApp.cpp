@@ -145,17 +145,19 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    //--- read MILP instance (mps format)
    //---
-   string fileName = m_param.DataDir 
-      + UtilDirSlash() + m_param.Instance;   
+   string fileName;
+   if (m_param.DataDir != ""){
+      fileName = m_param.DataDir + UtilDirSlash() + m_param.Instance;
+   }else{
+      fileName = m_param.Instance;
+   }      
 
    if(m_param.Instance.empty()){
      cerr << "==========================================================="<< std::endl
-	  << "Users need to provide correct "
-	  << "instance path and name" << std::endl
-          << "                                                     " << std::endl 
-	  << "Example: ./dip  --MILP:BlockFileFormat List" << std::endl
-	  << "                --MILP:Instance /FilePath/ABC.mps" << std::endl
-	  << "                --MILP:BlockFile /FilePath/ABC.block" << std::endl
+	  << "Usage:" << std::endl
+	  << "./dip  --MILP:BlockFileFormat List" << std::endl
+	  << "       --MILP:Instance /FilePath/ABC.mps" << std::endl
+	  << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
 	  << "==========================================================="<< std::endl
 	  << std::endl;
        throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
@@ -244,8 +246,12 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
 void DecompApp::readBlockFile(){
 
    ifstream is;
-   string   fileName = m_param.DataDir 
-      + UtilDirSlash() + m_param.BlockFile;
+   string fileName;
+   if (m_param.DataDir != ""){
+      fileName = m_param.DataDir + UtilDirSlash() + m_param.Instance;
+   }else{
+      fileName = m_param.BlockFile;
+   }
 
    //---
    //--- is there a permutation file?
@@ -254,10 +260,13 @@ void DecompApp::readBlockFile(){
    //---
    map<int,int>               permute;
    map<int,int>::iterator     mit;
-   string       fileNameP = m_param.DataDir 
-      + UtilDirSlash() + m_param.PermuteFile;
    
    if(m_param.PermuteFile.size() > 0){
+      if (m_param.DataDir != ""){
+	 fileName = m_param.DataDir + UtilDirSlash() + m_param.PermuteFile;
+      }else{
+	 fileName = m_param.PermuteFile;
+      }
       ifstream isP;
       int      rowIdOld, rowIdNew;
       //---
@@ -373,10 +382,10 @@ void DecompApp::readBlockFile(){
        }
        while(!is.eof() && rowName != "MASTERCONSS"){
 	   is >> blockId;
-	   if(is.eof()) break;
 	   vector<int> rowsInBlock;
 	   while (true){
 	       is >> rowName;
+	       if(is.eof()) break;
 	       if (rowName == "BLOCK" || rowName == "MASTERCONSS"){
 		   break;
 	       }
