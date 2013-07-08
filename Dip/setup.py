@@ -12,6 +12,8 @@ URL = 'https://projects.coin-or.org/Dip/wiki/Dippy'
 AUTHOR_EMAIL = u''
 DESC = 'DIP Python Interface'
 
+coin_install_dir = os.environ['COIN_INSTALL_DIR']
+
 def read_file(file_name):
 
     file_path = join(
@@ -21,14 +23,28 @@ def read_file(file_name):
 
     return open(file_path).read()
 
-def get_libs(coin_install_dir):
-       
-    link_line = read_file(join(coin_install_dir, 'share', 'coin',
-                               'doc', 'Dip', 'dip_addlibs.txt'))
-
-    libs = [flag[:-4] for flag in link_line.split() if flag.endswith('.lib')]
-
+def get_libs(dir):
+    '''
+    Return a list of distinct library names used by ``dependencies``.
+    '''
+    with open(join(dir, 'share', 'coin',
+                   'doc', 'Dip', 'dip_addlibs.txt')) as f:
+        link_line = f.read()
+        if operatingSystem == 'windows':
+            libs = [flag[:-4] for flag in link_line.split() if
+                    flag.endswith('.lib')]
+        else:
+            libs = [flag[2:] for flag in link_line.split() if
+                    flag.startswith('-l')]
     return libs
+
+operatingSystem = sys.platform
+if 'linux' in operatingSystem:
+    operatingSystem = 'linux'
+elif 'darwin' in operatingSystem:
+    operatingSystem = 'mac'
+elif 'win' in operatingSystem:
+    operatingSystem = 'windows'
 
 coin_install_dir = os.environ['COIN_INSTALL_DIR']
 
@@ -52,10 +68,14 @@ files = ['DippyDecompAlgo.cpp',
 
 sources = [join('src/dippy', f) for f in files]
 
+lib_dirs = [join(coin_install_dir, 'lib', 'intel'),
+            join(coin_install_dir, 'lib')]
+
 modules=[Extension('_dippy', 
                    sources, 
                    libraries=libraries,
                    include_dirs=[join(coin_install_dir, 'include', 'coin')],
+                   library_dirs=lib_dirs,
                    define_macros=macros)]
 
 setup(name=PROJECT,
