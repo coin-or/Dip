@@ -4401,7 +4401,7 @@ void DecompAlgo::generateVarsCalcRedCost(const double * u,
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 	      int nMasterRows   = m_masterSI->getNumRows();
 	      assert((nMasterRows - m_numConvexCon) == 
-		     modelCore->M->getNumCols());
+		     modelCore->M->getNumRows());
 	      );
    if(m_algo == DECOMP){
       for(i = 0; i < nCoreCols; i++)
