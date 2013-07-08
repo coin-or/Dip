@@ -160,7 +160,7 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
 	  << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
 	  << "==========================================================="<< std::endl
 	  << std::endl;
-       throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
+      exit(0);
    }
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
