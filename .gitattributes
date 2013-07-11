@@ -3,6 +3,7 @@
 /Dependencies -text
 Dip/AUTHORS -text
 Dip/LICENSE -text
+Dip/MSVisualStudio/v10/Decomp/Dip.vcxproj -text
 Dip/MSVisualStudio/v10/Decomp/libDecomp/libDecomp.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/ATM/ATM.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/DecompExamples.sln -text
