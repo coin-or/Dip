@@ -79,7 +79,7 @@ public:
       std::vector<DecompWaitingCol>::iterator vi;
       for(vi = begin(); vi != end(); vi++){
          (*vi).deleteRay();
-         (*vi).deleteCol();
+         (*vi).deleteColRay();
       }
    }
 

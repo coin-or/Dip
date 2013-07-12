@@ -44,20 +44,39 @@ private:
    double           m_norm;
   
 public:
-   inline double getOriginalCost()   const { return m_origCost;}
-   inline double getReducedCost()    const { return m_redCost; }
+   inline double getOriginalCost()   const { 
+     return m_origCost; 
+   } 
+   inline double getReducedCost()    const { 
+     return m_redCost; 
+   } 
    
-   inline int    getEffectiveness()  const { return m_effCnt;  }
-   inline double getLowerBound()     const { return 0.0;       }   //TODO
-   inline double getUpperBound()     const { return DecompInf; }   //TODO
-   inline std::string getStrHash()        const { return m_strHash; }
-   inline int    getBlockId()        const { return m_blockId; }
-   inline int    getColMasterIndex() const { return m_colMasterIndex; }
-   inline double getNorm()           const { return m_norm; }
+   inline int    getEffectiveness()  const { 
+     return m_effCnt; 
+   } 
+   inline double getLowerBound()     const { 
+     return 0.0;          //TODO 
+   } 
+   inline double getUpperBound()     const { 
+     return DecompInf;    //TODO 
+   } 
+   inline std::string getStrHash()        const { 
+     return m_strHash; 
+   } 
+   inline int    getBlockId()        const { 
+     return m_blockId; 
+   } 
+   inline int    getColMasterIndex() const { 
+     return m_colMasterIndex; 
+   } 
+   inline double getNorm()           const { 
+     return m_norm; 
+   } 
 
-   inline void   setColMasterIndex(const int colIndex)  {
-      m_colMasterIndex = colIndex;
-   }  
+   inline void   setColMasterIndex(const int colIndex) { 
+     m_colMasterIndex = colIndex; 
+   }   
+
    inline void   setBlockId (const int blockId)  {
       m_blockId = blockId;
    }  
@@ -110,7 +129,7 @@ public:
 			  const DecompAlgoModel & model,
 			  const double          * lbs,
 			  const double          * ubs);
-
+   
    void fillDenseArr(int      len,
                      double * arr);
   

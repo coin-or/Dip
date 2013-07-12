@@ -60,10 +60,15 @@ public :
     */
 
 public:
-   const double * getSolution(const int solIndex){
+   const double * getPoints(const int solIndex){
       std::vector<double> & solution = m_point[solIndex];
       return &solution[0];
    }
+
+   const double * getRays(const int solIndex){ 
+     std::vector<double> & solution = m_ray[solIndex]; 
+     return &solution[0]; 
+   } 
 
    /**
     * Default constructors.
