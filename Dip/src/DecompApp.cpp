@@ -22,7 +22,7 @@
 #include <string>
 #include "UtilMacros.h"
 #include "iterator"
-
+#include "omp.h"
 //#if defined(autoDecomp) && defined(PaToH)
 #if  defined(PaToH)
 
@@ -161,8 +161,14 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
      // automatic structure detection 
      {      
 #if defined (COIN_HAS_HMETIS) 
-       singlyBorderStructureDetection(); 
-       
+       if(m_param.Concurrent){ 
+	 
+#pragma omp critical 
+	 singlyBorderStructureDetection(); 	 	 
+       }   
+      else{ 
+	singlyBorderStructureDetection(); 
+      }        
 #endif 
      } 
    
