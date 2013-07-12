@@ -567,8 +567,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult * result,
      if(result->m_solStatus == CPXMIP_UNBOUNDED ||
 	result->m_solStatus == CPX_STAT_UNBOUNDED)
        status = CPXgetray (cpxEnv, cpxLp, solution);
-
      
+     osiCpx->switchToMIP(); 
+
      if(status)
        throw UtilException("CPXgetray failure", 
 			   "solveOsiAsIp", "DecompAlgoModel"); 
