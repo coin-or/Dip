@@ -67,6 +67,20 @@ const double DecompZero     = 1.0e-14;
 //---
 //--- DECOMP enums (for algorithms)
 //---
+
+
+struct DecompMainParam{ 
+  bool doCut;  
+  bool doPriceCut;  
+  bool doDirect;  
+  double timeSetupCpu ;  
+  double timeSetupReal; 
+  double timeSolveCpu ; 
+  double timeSolveReal ; 
+}; 
+
+
+
 enum DecompAlgoType{
    CUT,
    PRICE_AND_CUT,
