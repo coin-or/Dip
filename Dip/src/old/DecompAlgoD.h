@@ -20,59 +20,60 @@ class DecompApp;
 //?? this should probably be a base class for different stablization methods
 // --------------------------------------------------------------------- //
 //derive from DecompAlgo or DecompAlgoPC?? THINK
-class DecompAlgoD : public DecompAlgo {
-private:
-   DecompAlgoD(const DecompAlgoD&);
-   DecompAlgoD& operator=(const DecompAlgoD&);
+class DecompAlgoD : public DecompAlgo{
+ private:
+  DecompAlgoD(const DecompAlgoD &);
+  DecompAlgoD & operator=(const DecompAlgoD &);
 
-private:
-   static const char* classTag;
-   double*             m_xhatD;
-   DecompCutList*      m_newCuts;
+ private:
+  static const char * classTag; 
+  double            * m_xhatD;
+  DecompCutList     * m_newCuts;
 
-public:
-   void solveD(DecompCutList* newCuts) {
-      m_newCuts = newCuts;
-      //need to change parameters to price, no cut
-      m_app->m_param.LimitTotalCutIters = 0;
-      m_app->m_param.LimitRoundCutIters = 0;
-      m_app->m_param.LimitTotalPriceIters = 1000;
-      m_app->m_param.LimitRoundPriceIters = 1000;
-      DecompAlgo::solve();
-   }
+ public:
+  void solveD(DecompCutList * newCuts){
+    m_newCuts = newCuts;
+    //need to change parameters to price, no cut
+    m_app->m_param.LimitTotalCutIters = 0;
+    m_app->m_param.LimitRoundCutIters = 0;
+    m_app->m_param.LimitTotalPriceIters = 1000;
+    m_app->m_param.LimitRoundPriceIters = 1000;    
+    DecompAlgo::solve();
+  }
 
-   //inherited (from pure virtual) methods
-   void createMasterProblem(DecompVarList& initVars);
+  //inherited (from pure virtual) methods
+  void createMasterProblem(DecompVarList & initVars);
 
-   decompPhase phaseUpdate(const decompPhase   phase,
-                           const decompStat    stat,
-                           int&                n_newCuts,
-                           int&                n_newVars,
-                           int&                n_cutCalls,
-                           int&                n_priceCalls);
-   decompPhase phaseUpdate(const decompPhase   phase,
-                           const decompStat    stat);
+  decompPhase phaseUpdate(const decompPhase   phase,
+                          const decompStat    stat,
+                          int               & n_newCuts,
+                          int               & n_newVars,
+                          int               & n_cutCalls,
+                          int               & n_priceCalls);
+  decompPhase phaseUpdate(const decompPhase   phase,
+                          const decompStat    stat);
 
-   //=PO
-   void recomposeSolution(const double* solution,
-                          double*        rsolution);
+  //=PO
+  void recomposeSolution(const double * solution,
+                         double       * rsolution);
 
 
-public:
-   //can pass this all in... to save time, and since we might
-   //do francois idea of tightening P' as we go...
-   //              DecompConstraintSet * m_modelRelax)
-   DecompAlgoD(DecompApp*            app,
-               double*               xhat,
-               int                   numOrigCols) :
-      DecompAlgo(DECOMP, app),
-      m_newCuts(0) {
-      //that would change them all
-      //m_app->m_decompParam.CutIters = 0;
-      m_xhatD = xhat;
-      m_numOrigCols = numOrigCols;
-   };
-   ~DecompAlgoD() {};
+ public:
+  //can pass this all in... to save time, and since we might
+  //do francois idea of tightening P' as we go...
+  //              DecompConstraintSet * m_modelRelax)
+  DecompAlgoD(DecompApp           * app,
+              double              * xhat,
+              int                   numOrigCols) : 
+    DecompAlgo(DECOMP, app),
+    m_newCuts(0)
+  {
+    //that would change them all
+    //m_app->m_decompParam.CutIters = 0;
+    m_xhatD = xhat;
+    m_numOrigCols = numOrigCols;
+  };
+  ~DecompAlgoD(){};
 };
 
 #endif

@@ -26,65 +26,65 @@
 
 class DecompApp;
 // --------------------------------------------------------------------- //
-class DecompAlgoRC : public DecompAlgo {
+class DecompAlgoRC : public DecompAlgo{
 private:
-   DecompAlgoRC(const DecompAlgoRC&);
-   DecompAlgoRC& operator=(const DecompAlgoRC&);
-
-private:
-   static const char* m_classTag;
+  DecompAlgoRC(const DecompAlgoRC &);
+  DecompAlgoRC & operator=(const DecompAlgoRC &);
 
 private:
-   vector<double>   m_u;   //dual vector
-   double*          m_rc;  //reduced cost
-   double           m_UB;  //current best upper bound
-   double           m_LB;  //current best lower bound
+  static const char * m_classTag;
 
-   int              m_cntSameLB;
-   int              m_iter;
-   double           m_step;
-   bool             m_zeroSub;
+private:
+  vector<double>   m_u;   //dual vector
+  double         * m_rc;  //reduced cost
+  double           m_UB;  //current best upper bound
+  double           m_LB;  //current best lower bound
 
-   DecompVar*       m_shatVar;
-   //double         * m_shat;
+  int              m_cntSameLB;
+  int              m_iter;
+  double           m_step;
+  bool             m_zeroSub; 
+
+  DecompVar      * m_shatVar;
+  //double         * m_shat;
 
 public:
-   //inherited (from pure virtual) methods
-   void createMasterProblem(DecompVarList& initVars);
-   decompStat solutionUpdate(const decompPhase phase,
-                             const int         maxInnerIter,
-                             const int         maxOuterIter);
-   //void addCutsToPool(const double  *  x,
-   //                   DecompCutList & newCuts,
-   //                   int           & n_newCuts) {assert(0);};
-   int addCutsFromPool();
-   int generateVars(const decompStat   stat,
-                    DecompVarList&     newVars,
-                    double&            mostNegReducedCost);
+  //inherited (from pure virtual) methods
+  void createMasterProblem(DecompVarList & initVars);
+  decompStat solutionUpdate(const decompPhase phase,
+                            const int         maxInnerIter,
+                            const int         maxOuterIter);
+  //void addCutsToPool(const double  *  x,
+  //                   DecompCutList & newCuts,
+  //                   int           & n_newCuts) {assert(0);};
+  int addCutsFromPool();
+  int generateVars(const decompStat   stat,
+                   DecompVarList    & newVars, 
+                   double           & mostNegReducedCost);
+  
+  bool isDone();
 
-   bool isDone();
-
-   const double* getRowPrice() const {
-      return &m_u[0];
-   }
+  const double * getRowPrice() const {
+    return &m_u[0];
+  }
 
 public:
-   DecompAlgoRC(DecompApp* app)
-      : DecompAlgo(RELAX_AND_CUT, app),
-        m_u(),
-        m_rc(0),
-        m_UB(DecompInf),
-        m_LB(-DecompInf),
-        m_cntSameLB(0),
-        m_iter(0),
-        m_step(2.0), //(0, 2] param?
-        m_zeroSub(false),
-        m_shatVar(0)
-        //m_shat(0)
-   {};
-   ~DecompAlgoRC() {
-      UTIL_DELARR(m_rc);
-   };
+  DecompAlgoRC(DecompApp * app)
+    : DecompAlgo(RELAX_AND_CUT, app),
+      m_u(),
+      m_rc(0),
+      m_UB(DecompInf),
+      m_LB(-DecompInf),
+      m_cntSameLB(0),
+      m_iter(0),
+      m_step(2.0), //(0, 2] param?
+      m_zeroSub(false),
+      m_shatVar(0)
+      //m_shat(0)    
+  {};
+  ~DecompAlgoRC(){
+    UTIL_DELARR(m_rc);
+  };
 };
 
 #endif

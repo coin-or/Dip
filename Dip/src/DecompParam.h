@@ -25,7 +25,7 @@
 #define PARAM_getSetting(xstr, x) x = param.GetSetting(xstr, x, sec)
 
 //===========================================================================//
-class DecompParam {
+class DecompParam{
 
 
    //----------------------------------------------------------------------//
@@ -35,7 +35,7 @@ class DecompParam {
     */
    //----------------------------------------------------------------------//
 
-public:
+public:   
    int    LogLevel;
    int    LogDebugLevel;
    int    LogLpLevel;    //TODO: LpIpLevel separate
@@ -47,14 +47,14 @@ public:
    int    LogDumpModel;
 
    /**
-    * 0: print nothing
+    * 0: print nothing 
     * 1: print the node objective history
     */
 
    int    LogObjHistory;
 
 
-   int    LimitInitVars;
+   int    LimitInitVars; 
 
    int    DebugLevel;//=0 (default), =1 (extra checks on duals, etc)
 
@@ -68,11 +68,11 @@ public:
    /**
     * Max number of nodes (copied from Alps parameters)
     */
-
+   
    int    LimitNodes;
 
    //---
-   //--- tailing off when average bound over TailoffLength iterations
+   //--- tailing off when average bound over TailoffLength iterations 
    //--- has changed less than TailoffPercent
    //---
 
@@ -85,19 +85,19 @@ public:
    //--- 0 = Default
    //--- 1 = Favor column generation
    //--- 2 = Favor cut generation
-
+   
    int PCStrategy;
-
+   
    int    CompressColumns;
    //num iters between compress
-   int    CompressColumnsIterFreq;
+   int    CompressColumnsIterFreq;     
    //don't compress unless number of cols increased by this mult
    double CompressColumnsSizeMultLimit;
    //do not start compression until master gap is within this limit
    double CompressColumnsMasterGapStart;
    int    CutDC;
    int    CutCGL;
-
+   
    int    CutCglKnapC;
    int    CutCglFlowC;
    int    CutCglMir;
@@ -113,7 +113,7 @@ public:
    double SubProbTimeLimitInexact;
    int    SubProbNumThreads;
    int    SubProbNumSolLimit;
-
+   
    //This option only works with Cpx:
    // DecompDualSimplex = 0,
    // DecompPrimSimplex = 1,
@@ -149,14 +149,14 @@ public:
    // DecompBarrier     = 2
 
    int    SolveMasterUpdateAlgo;
-
-
+   
+   
    //0 = If a user function is defined, it will use the user function.
    //    If the user returns an exact solution, it will not run the built-in
    //    IP solve (default).
    //    If a user function is not defined, it will use the built-in IP solve.
    //1 = Use the built-in IP solve, even if there is a user defines a function.
-   //2 = Calls the user defined function (if exists) and then calls built-in
+   //2 = Calls the user defined function (if exists) and then calls built-in 
    //    IP solver (use this for debugging).
 
    int    SolveRelaxAsIp;
@@ -164,7 +164,7 @@ public:
    int    InitVarsWithCutDC;
    int    InitVarsWithIP;
    int    InitVarsWithIPLimitTime;
-
+   
    //solve compact formulation first before starting PhaseI
    //  hopefully identify infeasibiity in tree quicker
 
@@ -175,7 +175,7 @@ public:
    double DualStabAlphaOrig;
 
    int    BreakOutPartial; //DISABLED for now
-
+   
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
    //  options= dual, primal, barrier
@@ -200,10 +200,10 @@ public:
    int    BranchStrongIter;
 
    /**
-    * Number of threads to use in DIP.
+    * Number of threads to use in DIP. 
     *
-    * Currently, only used for solving the pricing problem for block
-    * angular models. The subproblems (each block) are independent and
+    * Currently, only used for solving the pricing problem for block 
+    * angular models. The subproblems (each block) are independent and 
     * can be solved in parallel.
     */
 
@@ -220,24 +220,24 @@ public:
    /*
     * The block number for automatic decomposition
     */
+    
+   int NumBlocks; 
 
-   int NumBlocks;
-
-
+   
    /*
-    * The following parameters are extended from MILPBlock
+    * The following parameters are extended from MILPBlock 
     * applications but changed to MILP domain
     *
     */
 
    std::string DataDir;
    std::string Instance;
-   std::string InstanceFormat;
-   /*
-       * The file defining which rows are in which blocks.
-       */
+   
+      /*
+    * The file defining which rows are in which blocks.
+    */
    std::string BlockFile;
-
+   
    /**
     * The format of BlockFile.
     *
@@ -248,81 +248,50 @@ public:
     *   <block id>  <num rows in block>
     *   <row ids...>
     *
-    * (2) "ZIBList" or "ZIBLIST"
-    * The block file defines those rows in each block.
-    *   NBLOCKS
-    *   <numBlocks>
-    *   BLOCK <block id>
-    *   <row names...>
-    *   BLOCK  <block id>
-    *   <row names...>
-    *
-    * (3) "Pair" or "PAIR"
+    * (2) "Pair" or "PAIR"
     * Each line is a block id to row id pair.
-    *   <block id> <row id>
+    *   <block id> <row id> 
     *
-    * (4) "PairName" or "PAIRNAME"
+    * (3) "PairName" or "PAIRNAME"
     * Each line is a block id to row name (matching mps) pair.
-    *   <block id> <row name>
+    *   <block id> <row name>     
     */
    std::string BlockFileFormat;
 
    std::string PermuteFile;
 
-   std::string InitSolutionFile;
-
-   int UseNames; // col/row names for debugging
+   std::string InitSolutionFile; 
+   
+   int UseNames; // col/row names for debugging 
    int UseSparse; // create all blocks sparsely
    int FullModel; // create full model for CPM or direct
-   double BestKnownLB;
+   double BestKnownLB; 
    double BestKnownUB;
    double ColumnUB; // hack since missing extreme rays
    double ColumnLB; //hack since missing extreme rays
 
    int ObjectiveSense; //1=min, -1=max
 
-   int AutoDecomp;
+   int AutoDecomp; 
 
+   
+   double MasterLB;  
+   
+   double MasterUB;  
+   
+   int setMasterBound;  
 
-   double MasterLB;
+   double MasterIPUB; 
 
-   double MasterUB;
+   int checkIlledColumns; 
 
-   int setMasterBound;
-
-   double MasterIPUB;
-
-   int checkIlledColumns;
-
-   int checkColumnThreshold;
-
-
-   // variable indicates whether to use
-   // multiple cores to compute concurrently
-
-   int Concurrent;
-
-
-   // number of block candidates
-   int NumBlocksCand;
-
-   // time of concurrent CutOffTime to finalize
-   // the choice of MILP solution method
-
-   double ConcurrentCutOffTime;
-
-
-   int ThreadIndex;
-
-
-   std::string CurrentWorkingDir;
-
+   int checkColumnThreshold; 
 
    /**
     * @}
     */
 
-
+   
    //-----------------------------------------------------------------------//
    /**
     * @name Helper functions.
@@ -332,10 +301,10 @@ public:
 
 public:
 
-   void getSettingsImpl(UtilParameters& param,
-                        const char*      sec) {
+   void getSettingsImpl(UtilParameters & param,
+			const char     * sec){
       /** \todo: think about putting these into sections of structs */
-      PARAM_getSetting("LogLevel",             LogLevel);
+      PARAM_getSetting("LogLevel",             LogLevel);      
       PARAM_getSetting("LogDebugLevel",        LogDebugLevel);
       PARAM_getSetting("LogLpLevel",           LogLpLevel);
       PARAM_getSetting("LogDumpModel",         LogDumpModel);
@@ -349,13 +318,14 @@ public:
       PARAM_getSetting("LimitRoundPriceIters", LimitRoundPriceIters);
       PARAM_getSetting("LimitTime",            LimitTime);
       PARAM_getSetting("LimitNodes",           LimitNodes);
+      
       PARAM_getSetting("TailoffLength",        TailoffLength);
-      PARAM_getSetting("TailoffPercent",       TailoffPercent);
+      PARAM_getSetting("TailoffPercent",       TailoffPercent);       
       PARAM_getSetting("MasterGapLimit",       MasterGapLimit);
       PARAM_getSetting("PCStrategy",           PCStrategy);
-      PARAM_getSetting("CompressColumns",      CompressColumns);
-      PARAM_getSetting("CompressColumnsIterFreq",       CompressColumnsIterFreq);
-      PARAM_getSetting("CompressColumnsSizeMultLimit",  CompressColumnsSizeMultLimit);
+      PARAM_getSetting("CompressColumns",      CompressColumns);       
+      PARAM_getSetting("CompressColumnsIterFreq",       CompressColumnsIterFreq);       
+      PARAM_getSetting("CompressColumnsSizeMultLimit",  CompressColumnsSizeMultLimit);       
       PARAM_getSetting("CompressColumnsMasterGapStart", CompressColumnsMasterGapStart);
       PARAM_getSetting("CutDC",                CutDC);
       PARAM_getSetting("CutCGL",               CutCGL);
@@ -367,17 +337,17 @@ public:
       PARAM_getSetting("CutCglGomory",         CutCglGomory);
       PARAM_getSetting("SubProbUseCutoff",     SubProbUseCutoff);
       PARAM_getSetting("SubProbGapLimitExact", SubProbGapLimitExact);
-      PARAM_getSetting("SubProbGapLimitInexact", SubProbGapLimitInexact);
+      PARAM_getSetting("SubProbGapLimitInexact",SubProbGapLimitInexact);
       PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
-      PARAM_getSetting("SubProbTimeLimitInexact", SubProbTimeLimitInexact);
+      PARAM_getSetting("SubProbTimeLimitInexact",SubProbTimeLimitInexact);
       PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
       PARAM_getSetting("SubProbNumSolLimit",     SubProbNumSolLimit);
-      PARAM_getSetting("SubProbSolverStartAlgo", SubProbSolverStartAlgo);
+      PARAM_getSetting("SubProbSolverStartAlgo",SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
-      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
-      PARAM_getSetting("SolveMasterAsIpFreqNode", SolveMasterAsIpFreqNode);
-      PARAM_getSetting("SolveMasterAsIpFreqPass", SolveMasterAsIpFreqPass);
+      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);      
+      PARAM_getSetting("SolveMasterAsIpFreqNode",SolveMasterAsIpFreqNode);
+      PARAM_getSetting("SolveMasterAsIpFreqPass",SolveMasterAsIpFreqPass);
       PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
       PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
       PARAM_getSetting("SolveMasterUpdateAlgo",    SolveMasterUpdateAlgo);
@@ -395,71 +365,84 @@ public:
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("NumThreads",              NumThreads);
+
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-      PARAM_getSetting("NumBlocks", NumBlocks);
+
+
+
+      PARAM_getSetting("NumBlocks",NumBlocks); 
       DataDir      = param.GetSetting("DataDir",      "",    "MILP");
-      Instance     = param.GetSetting("Instance",     "",    "MILP");
-      InstanceFormat     = param.GetSetting("InstanceFormat", "",   "MILP");
+      Instance     = param.GetSetting("Instance",     "",    "MILP");    
       BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
       PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
-      BlockFileFormat
-      = param.GetSetting("BlockFileFormat",    "",    "MILP");
+      BlockFileFormat 
+         = param.GetSetting("BlockFileFormat",    "",    "MILP");    
       InitSolutionFile
-      = param.GetSetting("InitSolutionFile",    "",    "MILP");
-      PARAM_getSetting("LogLevel", LogLevel);
+         = param.GetSetting("InitSolutionFile",    "",    "MILP");    
+
+
+
+      PARAM_getSetting("LogLevel",LogLevel);
       // PARAM_getSetting("DataDir",DataDir);
       //PARAM_getSetting("Instance",Instance);
-      //PARAM_getSetting("BlockFile",BlockFile);
+      //PARAM_getSetting("BlockFile",BlockFile); 
       //PARAM_getSetting("PermuteFile",PermuteFile);
       //PARAM_getSetting("BlockFileFormat",BlockFileFormat);
       //PARAM_getSetting("InitSolutionFile",InitSolutionFile);
-      PARAM_getSetting("UseNames", UseNames);
-      PARAM_getSetting("UseSparse", UseSparse);
-      PARAM_getSetting("FullModel", FullModel);
-      PARAM_getSetting("BestKnownLB", BestKnownLB);
-      PARAM_getSetting("BestKnownUB", BestKnownUB);
-      PARAM_getSetting("ColumnUB", ColumnUB);
-      PARAM_getSetting("ColumnLB", ColumnLB);
-      PARAM_getSetting("ObjectiveSense", ObjectiveSense);
-      PARAM_getSetting("AutoDecomp", AutoDecomp);
+      PARAM_getSetting("UseNames",UseNames);
+      PARAM_getSetting("UseSparse",UseSparse);
+
+      PARAM_getSetting("FullModel",FullModel);
+      PARAM_getSetting("BestKnownLB",BestKnownLB);
+      PARAM_getSetting("BestKnownUB",BestKnownUB);
+      PARAM_getSetting("ColumnUB",ColumnUB);
+      PARAM_getSetting("ColumnLB",ColumnLB);
+      PARAM_getSetting("ObjectiveSense",ObjectiveSense);
+
+      PARAM_getSetting("AutoDecomp", AutoDecomp); 
       //---
       //--- store the original setting for DualStabAlpha
       //---
-      PARAM_getSetting("MasterUB", MasterUB);
-      PARAM_getSetting("MasterLB", MasterLB);
-      PARAM_getSetting("setMasterBound", setMasterBound);
-      PARAM_getSetting("MasterUB", MasterIPUB);
+
+      
+      PARAM_getSetting("MasterUB", MasterUB); 
+      PARAM_getSetting("MasterLB", MasterLB); 
+      PARAM_getSetting("setMasterBound", setMasterBound); 
+      PARAM_getSetting("MasterUB", MasterIPUB); 
+
       PARAM_getSetting("checkIlledColumns", checkIlledColumns);
-      PARAM_getSetting("checkColumnThreshold", checkColumnThreshold);
-      PARAM_getSetting("Concurrent", Concurrent);
-      PARAM_getSetting("NumBlocksCand", NumBlocksCand);
-      PARAM_getSetting("ConcurrentCutOffTime", ConcurrentCutOffTime);
-      PARAM_getSetting("ThreadIndex", ThreadIndex);
+      PARAM_getSetting("checkColumnThreshold", checkColumnThreshold); 
+      
+
+
+
       DualStabAlphaOrig = DualStabAlpha;
    }
 
-   inline void getSettings(UtilParameters& param) {
+   inline void getSettings(UtilParameters & param){
       const std::string sec = "DECOMP";
       getSettingsImpl(param, sec.c_str());
    }
-
-   inline void getSettings(UtilParameters& param,
-                           const std::string& sec) {
+   
+   inline void getSettings(UtilParameters & param,
+			   const std::string & sec){
       //---
       //--- first get any settings that apply across any DECOMP algo
       //---    from the [DECOMP] section
       //---
       getSettingsImpl(param, "DECOMP");
+      
       //---
       //--- then get any settings that apply to this algo
       //---    from the [<sec>] section
       //---
       getSettingsImpl(param, sec.c_str());
+      
    }
 
    /** \todo this should be derived from utilparam? */
-   void dumpSettings(const std::string& sec,
-                     std::ostream*       os = &std::cout) {
+   void dumpSettings(const std::string & sec,
+		     std::ostream      * os = &std::cout){
       (*os) << "\n========================================================";
       (*os) << "\nDECOMP PARAMETER SETTINGS\n";
       UtilPrintParameter(os, sec, "LogLevel",            LogLevel);
@@ -471,22 +454,23 @@ public:
       UtilPrintParameter(os, sec, "DebugLevel",          DebugLevel);
       UtilPrintParameter(os, sec, "TolZero",             TolZero);
       UtilPrintParameter(os, sec, "LimitTotalCutIters",  LimitTotalCutIters);
-      UtilPrintParameter(os, sec, "LimitTotalPriceIters", LimitTotalPriceIters);
+      UtilPrintParameter(os, sec, "LimitTotalPriceIters",LimitTotalPriceIters);
       UtilPrintParameter(os, sec, "LimitRoundCutIters",  LimitRoundCutIters);
-      UtilPrintParameter(os, sec, "LimitRoundPriceIters", LimitRoundPriceIters);
+      UtilPrintParameter(os, sec, "LimitRoundPriceIters",LimitRoundPriceIters);
       UtilPrintParameter(os, sec, "LimitTime",           LimitTime);
       UtilPrintParameter(os, sec, "LimitNodes",          LimitNodes);
+      
       UtilPrintParameter(os, sec, "TailoffLength",       TailoffLength);
-      UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);
+      UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);      
       UtilPrintParameter(os, sec, "MasterGapLimit",      MasterGapLimit);
       UtilPrintParameter(os, sec, "PCStrategy",          PCStrategy);
       UtilPrintParameter(os, sec, "CompressColumns",     CompressColumns);
       UtilPrintParameter(os, sec, "CompressColumnsIterFreq",
-                         CompressColumnsIterFreq);
+			 CompressColumnsIterFreq);
       UtilPrintParameter(os, sec, "CompressColumnsSizeMultLimit",
-                         CompressColumnsSizeMultLimit);
+			 CompressColumnsSizeMultLimit);
       UtilPrintParameter(os, sec, "CompressColumnsMasterGapStart",
-                         CompressColumnsMasterGapStart);
+			 CompressColumnsMasterGapStart);
       UtilPrintParameter(os, sec, "CutDC",               CutDC);
       UtilPrintParameter(os, sec, "CutCGL",              CutCGL);
       UtilPrintParameter(os, sec, "CutCglKnapC",         CutCglKnapC);
@@ -496,83 +480,102 @@ public:
       UtilPrintParameter(os, sec, "CutCglOddHole",       CutCglOddHole);
       UtilPrintParameter(os, sec, "CutCglGomory",        CutCglGomory);
       UtilPrintParameter(os, sec, "SubProbUseCutoff",    SubProbUseCutoff);
-      UtilPrintParameter(os, sec, "SubProbGapLimitExact",
+      UtilPrintParameter(os, sec, "SubProbGapLimitExact",   
                          SubProbGapLimitExact);
-      UtilPrintParameter(os, sec, "SubProbGapLimitInexact",
+      UtilPrintParameter(os, sec, "SubProbGapLimitInexact", 
                          SubProbGapLimitInexact);
-      UtilPrintParameter(os, sec, "SubProbTimeLimitExact",
+      UtilPrintParameter(os, sec, "SubProbTimeLimitExact",   
                          SubProbTimeLimitExact);
-      UtilPrintParameter(os, sec, "SubProbTimeLimitInexact",
+      UtilPrintParameter(os, sec, "SubProbTimeLimitInexact", 
                          SubProbTimeLimitInexact);
       UtilPrintParameter(os, sec, "SubProbNumThreads",  SubProbNumThreads);
       UtilPrintParameter(os, sec, "SubProbNumSolLimit", SubProbNumSolLimit);
       UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
                          SubProbSolverStartAlgo);
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
-      UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);
+      UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);  
       UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",
-                         SolveMasterAsIpFreqNode);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",
-                         SolveMasterAsIpFreqPass);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime",
-                         SolveMasterAsIpLimitTime);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",
-                         SolveMasterAsIpLimitGap);
-      UtilPrintParameter(os, sec, "SolveMasterUpdateAlgo",
-                         SolveMasterUpdateAlgo);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",  
+			 SolveMasterAsIpFreqNode);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",  
+			 SolveMasterAsIpFreqPass);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime", 
+			 SolveMasterAsIpLimitTime);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",  
+			 SolveMasterAsIpLimitGap);
+      UtilPrintParameter(os, sec, "SolveMasterUpdateAlgo",   
+			 SolveMasterUpdateAlgo);
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
       UtilPrintParameter(os, sec, "InitVarsWithCutDC",   InitVarsWithCutDC);
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
-      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",
-                         InitVarsWithIPLimitTime);
+      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",   
+			 InitVarsWithIPLimitTime);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
       UtilPrintParameter(os, sec, "BreakOutPartial",   BreakOutPartial);
-      UtilPrintParameter(os, sec, "BranchEnforceInSubProb",
+      UtilPrintParameter(os, sec, "BranchEnforceInSubProb",   
                          BranchEnforceInSubProb);
-      UtilPrintParameter(os, sec, "BranchEnforceInMaster",
+      UtilPrintParameter(os, sec, "BranchEnforceInMaster",    
                          BranchEnforceInMaster);
-      UtilPrintParameter(os, sec, "MasterConvexityLessThan",
+      UtilPrintParameter(os, sec, "MasterConvexityLessThan", 
                          MasterConvexityLessThan);
       UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
       UtilPrintParameter(os, sec, "BranchStrongIter",  BranchStrongIter);
       UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
-      UtilPrintParameter(os, sec,
-                         "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
+      UtilPrintParameter(os, sec, 
+			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
+
       UtilPrintParameter(os, sec, "LogLevel",  LogLevel);
+
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
+      
       UtilPrintParameter(os, sec, "Instance",  Instance);
+
       UtilPrintParameter(os, sec, "BlockFile",  BlockFile);
+      
       UtilPrintParameter(os, sec, "PermuteFile",  PermuteFile);
+      
       UtilPrintParameter(os, sec, "BlockFileFormat",  BlockFileFormat);
+
       UtilPrintParameter(os, sec, "InitSolutionFile",  InitSolutionFile);
+
       UtilPrintParameter(os, sec, "UseNames",  UseNames);
+
       UtilPrintParameter(os, sec, "UseSparse",  UseSparse);
+
       UtilPrintParameter(os, sec, "FullModel",  FullModel);
+
       UtilPrintParameter(os, sec, "BestKnownLB",  BestKnownLB);
+
       UtilPrintParameter(os, sec, "BestKnownUB",  BestKnownUB);
+
       UtilPrintParameter(os, sec, "ColumnUB",  ColumnUB);
+
       UtilPrintParameter(os, sec, "ColumnLB",  ColumnLB);
+
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
-      UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp);
-      UtilPrintParameter(os, sec,  "MasterLB", MasterLB);
-      UtilPrintParameter(os, sec,  "MasterUB", MasterUB);
-      UtilPrintParameter(os, sec,  "MasterUB", MasterIPUB);
-      UtilPrintParameter(os, sec,  "setMasterBound", setMasterBound);
-      UtilPrintParameter(os, sec,  "checkIlledColumns", checkIlledColumns);
-      UtilPrintParameter(os, sec,  "checkColumnThreshold", checkColumnThreshold );
-      UtilPrintParameter(os, sec,  "checkColumnThreshold", Concurrent );
-      UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand);
-      UtilPrintParameter(os, sec, "ConcurrentCufOffTime", ConcurrentCutOffTime);
-      UtilPrintParameter(os, sec, "Concurrent", Concurrent);
-      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );
+
+      UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
+
+      UtilPrintParameter(os, sec,  "MasterLB", MasterLB); 
+      
+      UtilPrintParameter(os, sec,  "MasterUB", MasterUB); 
+      
+      UtilPrintParameter(os, sec,  "MasterUB", MasterIPUB); 
+      
+      UtilPrintParameter(os, sec,  "setMasterBound", setMasterBound); 
+      
+      UtilPrintParameter(os, sec,  "checkIlledColumns", checkIlledColumns); 
+
+      UtilPrintParameter(os, sec,  "checkColumnThreshold", checkColumnThreshold );     
+
+
       (*os) << "========================================================\n";
    }
-
-   void setDefaults() {
+   
+   void setDefaults(){
       LogLevel             = 0;
       LogDebugLevel        = 0;
       LogLpLevel           = 0;
@@ -585,12 +588,12 @@ public:
       LimitTotalPriceIters = COIN_INT_MAX;
       LimitRoundCutIters   = COIN_INT_MAX;
       LimitRoundPriceIters = COIN_INT_MAX;
-      LimitTime            = DecompBigNum;
+      LimitTime            = DecompBigNum;     
       LimitNodes           = COIN_INT_MAX;
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 1.0e-6;
-      PCStrategy           = 0;
+      PCStrategy           = 0; 
       CompressColumns      = 1;
       CompressColumnsIterFreq       = 2;
       CompressColumnsSizeMultLimit  = 1.20;
@@ -611,6 +614,7 @@ public:
       SubProbNumThreads       = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
+      
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
       SolveMasterAsIp          = 1;//TODO: turn off if one block
@@ -620,6 +624,7 @@ public:
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
+
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
@@ -634,40 +639,45 @@ public:
       BranchStrongIter         = 0;
       NumThreads               = 1;
       DebugCheckBlocksColumns  = true;
-      NumBlocks                = 3;
+      NumBlocks                = 3; 
+
       /*
        * parameters from MILPBlock and to be MILP
        */
       LogLevel                 = 0;
       DataDir                  = "";
       Instance                 = "";
-      BlockFile                = "";
+      BlockFile                = ""; 
       BlockFileFormat          = "";
-      PermuteFile              = "";
+      PermuteFile              = ""; 
       InitSolutionFile         = "";
       UseNames                 = 0 ;
-      UseSparse                = 1 ;
-      FullModel                = 0 ;
+      UseSparse                = 1 ; 
+      FullModel                = 0 ; 
       BestKnownLB              = -1.e100;
       BestKnownUB              = 1.e100;
       ColumnUB                 = 1.e20;
-      ColumnLB                 = -1.e20;
+      ColumnLB                 =-1.e20;
       ObjectiveSense           = 1;
-      AutoDecomp               = 0;
-      setMasterBound           = 0 ;
-      MasterUB                 = DecompInf;
-      MasterLB                 = -DecompInf;
-      MasterIPUB               = DecompInf;
-      checkIlledColumns        = 0 ;
-      checkColumnThreshold     = 1.e6;
-      Concurrent               = 0;
-      NumBlocksCand            = 10;
-      ConcurrentCutOffTime     = 100;
-      ThreadIndex              = 0;
-      CurrentWorkingDir        = "";
-   }
 
-   void dumpSettings(std::ostream* os = &std::cout) {
+      AutoDecomp               = 0;
+
+      setMasterBound           = 0 ;  
+      
+      MasterUB                 = DecompInf;  
+      
+      MasterLB                 = -DecompInf;  
+
+
+      MasterIPUB               = DecompInf;
+
+      checkIlledColumns        = 0 ; 
+
+      checkColumnThreshold     = 1.e6; 
+
+   }
+   
+   void dumpSettings(std::ostream * os = &std::cout){
       const std::string sec = "DECOMP";
       dumpSettings(sec, os);
    }
@@ -675,7 +685,7 @@ public:
     * @}
     */
 
-
+      
    //-----------------------------------------------------------------------//
    /**
     * @name Constructors and destructor.
@@ -685,15 +695,15 @@ public:
 public:
    /**
     * Default constructors.
-    */
+    */   
    DecompParam() {
       setDefaults();
    }
-
+   
    /**
     * Destructor
-    */
-   ~DecompParam() {}
+    */   
+   ~DecompParam() {}   
    /**
     * @}
     */

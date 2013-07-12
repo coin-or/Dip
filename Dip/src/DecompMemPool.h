@@ -22,29 +22,30 @@
 // --------------------------------------------------------------------- //
 class DecompMemPool {
 public:
-   double* dblArrNCoreCols;
-   double* dblArrNCoreRows;
-
+   double * dblArrNCoreCols;
+   double * dblArrNCoreRows;
+   
 public:
    void allocateMemory(const int nCoreCols,
                        const int nCoreRows) {
-      if (nCoreCols > 0) {
+      if(nCoreCols > 0){
          dblArrNCoreCols = new double[nCoreCols];
          CoinAssertHint(dblArrNCoreCols, "Error: Out of Memory");
       }
-
-      if (nCoreRows > 0) {
+      if(nCoreRows > 0){
          dblArrNCoreRows = new double[nCoreRows];
          CoinAssertHint(dblArrNCoreRows, "Error: Out of Memory");
       }
    }
-
+   
 public:
    DecompMemPool() :
       dblArrNCoreCols(0),
-      dblArrNCoreRows(0) {
+      dblArrNCoreRows(0)
+   {
    }
-   ~DecompMemPool() {
+   ~DecompMemPool()
+   {
       UTIL_DELARR(dblArrNCoreCols);
       UTIL_DELARR(dblArrNCoreRows);
    }
