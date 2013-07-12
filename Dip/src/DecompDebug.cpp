@@ -645,6 +645,19 @@ void DecompAlgo::printVars(ostream * os){
    (*os) << endl;
 }
 
+//===========================================================================// 
+void DecompAlgo::printRays(ostream * os){ 
+  
+  DecompRayList::iterator it; 
+  int ray_index = 0; 
+  for(it = m_rays.begin(); it != m_rays.end(); it++){ 
+    (*os) << "RAY " << ray_index++ << " : "; 
+    (*it)->print(os, m_app); 
+    (*os) << endl; 
+  } 
+  (*os) << endl; 
+} 
+
 //===========================================================================//
 void DecompAlgo::createFullMps(const string fileName){
    CoinAssert(m_algo == CUT);
