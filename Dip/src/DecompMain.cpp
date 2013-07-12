@@ -23,8 +23,15 @@
 //===========================================================================//
 #include "UtilTimer.h"
 #include <algorithm>
+#include "omp.h"
 
 using namespace std; 
+
+void* DecompSolve(DecompApp & milp, 
+		  UtilParameters & utilParam, 
+		  UtilTimer & timer, 
+		  DecompMainParam & decompMainParam 
+		  ); 
 
 //===========================================================================//
 int main(int argc, char ** argv){
@@ -72,20 +79,23 @@ int main(int argc, char ** argv){
 		    << numCPU << std::endl; 
 	  
 	  int numThreads = min(numCPU, static_cast<int>(blockNumCandidates.size()));  
-	  
-	  pthread_t* threads  = new pthread_t[numThreads +1] ;  
-	  CoinAssertHint(threads, "Error: Out of Memory");  
-	  
-	  
+	  	  	  
 	  printf("===== START Concurrent Computations Process. =====\n"); 
-	  
+
+#pragma omp parallel for
 	  for(int i = 0 ; i < (numThreads + 1); i++){ 
 	    
 	    std::vector<DecompApp> milpArray(static_cast<int>(numThreads + 1),milp); 
-	    
-	    
+	    	    
 	    std::vector<DecompMainParam> decompMainParamArray(static_cast<int>(numThreads + 1), 
 							      decompMainParam); 	    	     
+
+	    std::vector<UtilTimer> timerArray(static_cast<int>(numThreads + 1), 
+					      timer); 
+
+	    std::vector<UtilParameters> utilParamArray(static_cast<int>(numThreads + 1), 
+						       utilParam); 
+
 	    if (i == 0){ 
 	      decompMainParamArray[i].doCut = true;  
 	      decompMainParamArray[i].doPriceCut = false;  
@@ -98,43 +108,17 @@ int main(int argc, char ** argv){
 	      milpArray[i].m_param.NumBlocks = blockNumCandidates[i-1];  
 	    } 	    
 
-	    
-	      
-	    std::cout << "==========================================" << std::endl; 
-	    std::cout << "======   The thread try is  ============= " << std::endl; 
-	    std::cout << "============" << i <<      "============= " << std::endl; 
-	    std::cout << "======   The block number is ============ " << std::endl;      
-	    std::cout << "===========" << milpArray[i].m_param.NumBlocks <<"============" << std::endl; 
-	    std::cout << "=========== Branch-and-Cut  " << decompMainParamArray[i].doCut 
-				     <<"============" << std::endl; 
-	    std::cout << "=========== Branch-and-Price  " << decompMainParamArray[i].doPriceCut  
-				     <<"============" << std::endl; 
-	    
-	    std::cout << "                                          " << std::endl; 
-	    std::cout << "                                          " << std::endl; 
-	    std::cout << "                                          " << std::endl; 
-	    std::cout << "                                          " << std::endl; 
-	    
+	    milpArray[i].m_param.ThreadIndex = i; 
+
+	    DecompSolve(milpArray[i], utilParamArray[i], 
+			timerArray[i], decompMainParamArray[i]);	  	    	    	  	  	    	    
 	  } 
 	} 
       else{ 		  
 	  decompMainParam.doCut        = utilParam.GetSetting("doCut",        false); 	
 	  decompMainParam.doPriceCut   = utilParam.GetSetting("doPriceCut",   true); 	
 	  decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false); 
-      }
-      if(doCut && doDirect){
-	 timer.stop();
-	 timeSetupCpu  = timer.getCpuTime();
-	 timeSetupReal = timer.getRealTime();
-	 
-	 //---
-	 //--- solve
-	 //---
-	 timer.start();      
-	 algo->solveDirect();
-	 timer.stop();
-	 timeSolveCpu  = timer.getCpuTime();
-	 timeSolveReal = timer.getRealTime();
+	  DecompSolve(milp, utilParam, timer, decompMainParam); 
       }
       printf("===== FINISH Concurrent Computations Process. =====\n");
    }
@@ -146,3 +130,186 @@ int main(int argc, char ** argv){
    }
    return 0;
 } 
+
+void* DecompSolve(DecompApp & milp,
+			  UtilParameters & utilParam,
+			  UtilTimer & timer,
+			  DecompMainParam & decompMainParam){
+  
+
+       //---
+       //--- put the one of the functions in the constructor into the main
+      //---
+
+      milp.initializeApp(utilParam); 
+
+
+      //      milp.startupLog(); 
+
+      //---
+      //--- create the algorithm (a DecompAlgo)
+      //---
+      DecompAlgo * algo = NULL;
+      if((decompMainParam.doCut + decompMainParam.doPriceCut) != 1)
+         throw UtilException("doCut or doPriceCut must be set", 
+                             "main", "main");
+      //assert(doCut + doPriceCut == 1);
+
+      //---
+      //--- create the CPM algorithm object
+      //---      
+      if(decompMainParam.doCut)	 
+         algo = new DecompAlgoC(&milp, &utilParam);
+      
+      //---
+      //--- create the PC algorithm object
+      //---
+      if(decompMainParam.doPriceCut)
+         algo = new DecompAlgoPC(&milp, &utilParam);
+      
+      if(decompMainParam.doCut && decompMainParam.doDirect){
+	 timer.stop();
+	 decompMainParam.timeSetupCpu  = timer.getCpuTime();
+	 decompMainParam.timeSetupReal = timer.getRealTime();
+	 
+	 //---
+	 //--- solve
+	 //---
+	 timer.start();      
+	 algo->solveDirect();
+	 timer.stop();
+	 decompMainParam.timeSolveCpu  = timer.getCpuTime();
+	 decompMainParam.timeSolveReal = timer.getRealTime();
+      }
+      else{
+	 //---
+	 //--- create the driver AlpsDecomp model
+	 //---
+	 AlpsDecompModel alpsModel(utilParam, algo);
+	 
+	 timer.stop();
+	 decompMainParam.timeSetupCpu  = timer.getCpuTime();
+	 decompMainParam.timeSetupReal = timer.getRealTime();
+	 
+	 //---
+	 //--- solve
+	 //---
+	 timer.start();      
+	 alpsModel.solve();
+	 timer.stop();
+
+
+	 std::cout << "==========================================" << std::endl;
+	 std::cout << "======   The thread number is  ============= " << std::endl;
+	 std::cout << "============" << milp.m_param.ThreadIndex <<"============= " << std::endl;
+	 std::cout << "======   The block number is ============ " << std::endl;	
+	 std::cout << "===========" << milp.m_param.NumBlocks <<"============" << std::endl;
+	 std::cout << "=========== Branch-and-Cut  " << decompMainParam.doCut
+		   <<"============" << std::endl;
+	 std::cout << "=========== Branch-and-Price  " << decompMainParam.doPriceCut 
+		   <<"============" << std::endl;
+	 
+	 std::cout << "                                          " << std::endl;
+	 std::cout << "                                          " << std::endl;
+	 std::cout << "                                          " << std::endl;
+	 std::cout << "                                          " << std::endl;
+
+
+	 decompMainParam.timeSolveCpu  = timer.getCpuTime();
+	 decompMainParam.timeSolveReal = timer.getRealTime();
+
+	 //---
+	 //--- sanity check
+	 //---
+	 cout << setiosflags(ios::fixed|ios::showpoint);
+	 int statusCheck = alpsModel.getSolStatus(); 
+	 cout << "                                             "<< endl;
+	 cout << "\n ============== DECOMP Solution Info [Begin]: ============= \n";
+	 cout << " Status        = ";
+	 if ( !statusCheck)
+	   cout << "Optimal" << endl;
+	 else if (statusCheck == 1)
+	   cout << "TimeLimit" << endl;
+	 else if (statusCheck == 2)
+	   cout << "NodeLimit" << endl;
+	 else if (statusCheck == 3)
+	   cout << "SolLimit" << endl;
+	 else if (statusCheck == 4)
+	   cout << "Feasible" << endl;
+	 else if (statusCheck == 5)
+	   cout << "Infeasible" << endl;
+	 else if (statusCheck == 6)
+	   cout << "NoMemory" << endl;
+	 else if (statusCheck == 7)
+	   cout << "Failed" << endl;
+	 else if (statusCheck == 8)
+	   cout << "Unbounded" << endl;
+	 else 
+	   cout << "Unknown" << endl;
+	 
+	 cout << " BestLB        = " << setw(10) 
+	      << UtilDblToStr(alpsModel.getGlobalLB(),5) << endl
+	      << " BestUB        = " << setw(10)
+	      << UtilDblToStr(alpsModel.getGlobalUB(),5) << endl      
+	      << " Nodes         = " 
+	      << alpsModel.getNumNodesProcessed() << endl
+	      << " SetupCPU      = " << decompMainParam.timeSetupCpu << endl
+	      << " SolveCPU      = " << decompMainParam.timeSolveCpu << endl
+	      << " TotalCPU      = " << decompMainParam.timeSetupCpu + decompMainParam.timeSolveCpu << endl
+	      << " SetupWallclock= " << decompMainParam.timeSetupReal << endl
+	      << " SolveWallclock= " << decompMainParam.timeSolveReal << endl
+	      << " TotalWallclock= " << decompMainParam.timeSetupReal + decompMainParam.timeSolveReal    ; 
+	 cout << "\n ============== DECOMP Solution Info [END  ]: ============= \n";
+	 /* TODO: Add a global parameter to control the subproblem
+	          parallelization
+	 cout << "The parallel efficiency is "
+	      << timeSolveCpu/(milp.m_param.NumThreads*timeSolveReal)
+	      << endl;
+	 */
+
+	 //---
+         //--- sanity check
+         //---   if user defines bestLB==bestUB (i.e., known optimal)
+         //---   and solved claims we have optimal, check that they match
+         //---
+         double epsilon  = 0.01; //1%
+         double userLB   = milp.getBestKnownLB();
+         double userUB   = milp.getBestKnownUB();
+         double userDiff = fabs(userUB - userLB);
+         if(alpsModel.getSolStatus() == AlpsExitStatusOptimal &&
+            userDiff                  < epsilon){
+            double diff   = fabs(alpsModel.getGlobalUB() - userUB);
+	    double diffPer= userUB == 0 ? diff : diff / userUB;
+            if(diffPer > epsilon){
+	       cerr << setiosflags(ios::fixed|ios::showpoint);
+               cerr << "ERROR. BestKnownLB/UB= " 
+                    << UtilDblToStr(userUB,5) 
+		    << " but DIP claims GlobalUB= " 
+                    << UtilDblToStr(alpsModel.getGlobalUB(),5) 
+		    << endl;
+               throw UtilException("Invalid claim of optimal.",
+                                   "main", "MILPBlock");
+            }
+         }
+	 
+         //---
+         //--- get optimal solution
+         //---     
+         if(alpsModel.getSolStatus() == AlpsExitStatusOptimal){
+	    string   solutionFile = milp.getInstanceName() + ".sol";
+	    ofstream osSolution(solutionFile.c_str());
+            const DecompSolution * solution = alpsModel.getBestSolution();
+	    const vector<string> & colNames = alpsModel.getColNames();
+            cout << " Optimal Solution can be found in the file "
+		 << solutionFile  << endl;
+            solution->print(colNames, 8, osSolution);
+	    osSolution.close();
+         }
+
+	 //---
+	 //--- free local memory
+	 //---
+	 delete algo;      
+      }
+
+}
