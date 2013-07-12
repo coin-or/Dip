@@ -206,8 +206,8 @@ void DecompRayPool::reExpand(const DecompConstraintSet & modelCore,
          = UtilPackedVectorFromDense(modelCore.getNumRows() + 1,
                                      denseCol, tolZero);
     
-      (*vi).deleteCol();
-      (*vi).setCol(sparseCol);
+      (*vi).deleteColRay();
+      (*vi).setColRay(sparseCol);
    }
    setColsAreValid(true);
    UTIL_DELARR(denseCol);    

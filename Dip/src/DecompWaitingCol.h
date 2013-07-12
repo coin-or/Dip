@@ -54,7 +54,7 @@ class DecompWaitingCol {
   inline void   deleteColRay() { UTIL_DELPTR(m_col_ray); } 
 
 
-  inline void   deleteCol() { UTIL_DELPTR(m_col); }
+ 
   inline void   deleteVar() { UTIL_DELPTR(m_var); }
   inline void   deleteRay() { UTIL_DELPTR(m_ray); }
   inline void   clearVar()  { m_var = 0;          }

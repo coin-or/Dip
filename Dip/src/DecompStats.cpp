@@ -42,6 +42,9 @@ void DecompStats::calculateStats (){
    totalCompressCols    = accumulate(thisCompressCols.begin(), 
                                      thisCompressCols.end(), 0.0);
 
+   totalGenRays         = accumulate(thisGenRays.begin(),  
+				     thisGenRays.end(), 0.0); 
+
    //---
    //--- calculate stats max
    //---   
@@ -74,6 +77,12 @@ void DecompStats::calculateStats (){
       it = max_element(thisCompressCols.begin(), thisCompressCols.end());
       maxCompressCols = *it;
    }
+
+   if(thisGenRays.size() > 0){ 
+     it = max_element(thisGenRays.begin(), thisGenRays.end()); 
+     maxGenRays = *it; 
+   } 
+
 
 }
 
@@ -158,6 +167,14 @@ void DecompStats::printOverallStats (ostream * os){
          << setw(6)  << thisGenVars.size()
          << setw(6)  << maxGenVars
       ;
+
+   (*os) << setw(40) << "\nTotal Generate Rays   = "  
+	 << setw(10) << totalGenRays 
+	 << setw(10) << 100.0 * totalGenRays / totalOverall 
+	 << setw(6)  << thisGenRays.size() 
+	 << setw(6)  << maxGenRays 
+     ; 
+   
    (*os) << setw(40) << "\nTotal Compress Cols   = " 
          << setw(10) << totalCompressCols
          << setw(10) << 100.0 * totalCompressCols / totalOverall
