@@ -124,6 +124,9 @@ public:
    /** MPS object for reading instances */
    CoinMpsIO m_mpsIO; 
 
+   /** LP object for reading instances */ 
+   CoinLpIO m_lpIO; 
+
    /** Original constraint matrix for the instance */
 
    const CoinPackedMatrix * m_matrix; 
