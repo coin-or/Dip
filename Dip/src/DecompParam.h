@@ -303,6 +303,7 @@ public:
 
    int ThreadIndex; 
 
+   std::string CurrentWorkingDir;  
    /**
     * @}
     */
@@ -436,6 +437,8 @@ public:
       PARAM_getSetting("ConcurrentCutOffTime", ConcurrentCutOffTime);
 
       PARAM_getSetting("ThreadIndex", ThreadIndex);
+
+      PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
 
       DualStabAlphaOrig = DualStabAlpha;
    }
@@ -602,6 +605,8 @@ public:
 
       UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
 
+      UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);      
+
       (*os) << "========================================================\n";
    }
    
@@ -713,6 +718,7 @@ public:
       
       ThreadIndex              = 0; 
 
+      CurrentWorkingDir        = ""; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
