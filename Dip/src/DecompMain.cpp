@@ -61,7 +61,7 @@ int main(int argc, char ** argv){
 
       DecompApp milp(utilParam);  
 
-      std::vector<int> blockNumCandidates;  
+
       //---
       //--- put the one of the functions in the constructor into the main
       //---
