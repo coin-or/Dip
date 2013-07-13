@@ -336,7 +336,7 @@ void blockNumberFinder(DecompParam utilParam,
 		       const CoinPackedMatrix* matrix)            
 {
 
-   if (milp.m_param.Concurrent == 1) {
+   if (utilParam.Concurrent == 1) {
      
      const int* lengthRows = matrix->getVectorLengths(); 
      int numRows = matrix->getNumRows();  
