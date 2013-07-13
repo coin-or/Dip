@@ -66,7 +66,6 @@ int main(int argc, char ** argv){
       //--- put the one of the functions in the constructor into the main
       //---
 
-
       std::vector<int> blockNumCandidates;  
 
       milp.startupLog();
