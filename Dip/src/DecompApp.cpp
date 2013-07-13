@@ -142,7 +142,7 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    //--- get application parameters
    //---   
 
-   m_param.getSettings(utilParam);   
+
 
    if(m_param.LogLevel >= 1)
       m_param.dumpSettings();
