@@ -58,7 +58,9 @@ int main(int argc, char ** argv){
       //--- start overall timer
       //---
       timer.start();
-      
+
+      DecompApp milp(utilParam);  
+
       std::vector<int> blockNumCandidates;  
       //---
       //--- put the one of the functions in the constructor into the main
