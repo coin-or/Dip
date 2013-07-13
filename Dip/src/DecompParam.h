@@ -232,12 +232,8 @@ public:
 
    std::string DataDir;
    std::string Instance;
-   
-      /*
-    * The file defining which rows are in which blocks.
-    */
-   std::string BlockFile;
-   
+   std::string InstanceFormat; 
+
    /**
     * The format of BlockFile.
     *
@@ -248,14 +244,27 @@ public:
     *   <block id>  <num rows in block>
     *   <row ids...>
     *
-    * (2) "Pair" or "PAIR"
+    * (2) "ZIBList" or "ZIBLIST"
+    * The block file defines those rows in each block.
+    *   NBLOCKS
+    *   <numBlocks>
+    *   BLOCK <block id>
+    *   <row names...>
+    *   BLOCK  <block id>
+    *   <row names...>
+    *
+    * (3) "Pair" or "PAIR"
     * Each line is a block id to row id pair.
     *   <block id> <row id> 
     *
-    * (3) "PairName" or "PAIRNAME"
+    * (4) "PairName" or "PAIRNAME"
     * Each line is a block id to row name (matching mps) pair.
     *   <block id> <row name>     
     */
+
+   std::string BlockFile;
+
+   
    std::string BlockFileFormat;
 
    std::string PermuteFile;
@@ -307,6 +316,8 @@ public:
    /**
     * @}
     */
+   
+   
 
    
    //-----------------------------------------------------------------------//
@@ -390,6 +401,7 @@ public:
       PARAM_getSetting("NumBlocks",NumBlocks); 
       DataDir      = param.GetSetting("DataDir",      "",    "MILP");
       Instance     = param.GetSetting("Instance",     "",    "MILP");    
+      InstanceFormat = param.GetSetting("InstanceFormat","",   "MILP"); 
       BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
       PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
       BlockFileFormat 
@@ -556,6 +568,8 @@ public:
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
       
       UtilPrintParameter(os, sec, "Instance",  Instance);
+      
+      UtilPrintParameter(os, sec, "Instance",  InstanceFormat);
 
       UtilPrintParameter(os, sec, "BlockFile",  BlockFile);
       
