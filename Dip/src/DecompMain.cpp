@@ -65,6 +65,7 @@ int main(int argc, char ** argv){
       //---
       //--- put the one of the functions in the constructor into the main
       //---
+      milp.initializeApp(utilParam); 
 
       std::vector<int> blockNumCandidates;  
 
