@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, seed
 
 # The requirements for the products
 REQUIREMENT = {
@@ -15,11 +15,11 @@ PRODUCTS.sort()
 
 # Costs of the facilities
 FIXED_COST = {
-    1 : 10,
-    2 : 20,
-    3 : 16, 
+    1 : 1,
+    2 : 1,
+    3 : 1, 
     4 : 1, 
-    5 : 2
+    5 : 1
 }
 
 # Set of facilities
@@ -28,6 +28,7 @@ LOCATIONS.sort()
 
 ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
 
+seed(3)
 ASSIGNMENT_COSTS = {}
 for a in ASSIGNMENTS:
     ASSIGNMENT_COSTS[a] = randint(1, 10)

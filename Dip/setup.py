@@ -46,9 +46,9 @@ elif 'darwin' in operatingSystem:
 elif 'win' in operatingSystem:
     operatingSystem = 'windows'
 
-coin_install_dir = os.environ['COIN_INSTALL_DIR']
-
-if coin_install_dir is None:
+try:
+    coin_install_dir = os.environ['COIN_INSTALL_DIR']
+except KeyError:
     raise Exception('Please set the environment variable COIN_INSTALL_DIR' +
                     'to the location of the COIN installation')
 

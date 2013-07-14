@@ -12,7 +12,7 @@ except ImportError:
     pass
         
 if DEBUGGING:
-    from dippy import dippy
+    import dippy
 else:
     import coinor.dippy as dippy
 
@@ -40,7 +40,7 @@ except ImportError:
 display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
-                        layout = 'dot', display_interval = None)
+                        layout = 'dot', display_interval = 100)
 
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
@@ -66,10 +66,10 @@ for i in LOCATIONS:
 for i, j in ASSIGNMENTS:
     prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
 
-def solve_subproblem(prob, key, redCosts, convexDual):
+def solve_subproblem(prob, key, redCosts):
     if debug_print:
         print "solve_subproblem..."
-        print redCosts, convexDual
+        print redCosts
    
     loc = key
 
@@ -92,22 +92,22 @@ def solve_subproblem(prob, key, redCosts, convexDual):
     rc = redCosts[use_vars[loc]] - z
 
     if debug_print:
-        print "Fixed cost, rc, convexDual", FIXED_COST[loc], rc, convexDual
+        print "Fixed cost, rc", FIXED_COST[loc], rc
 
     if rc > tol: # ... or an empty location is "useful"
        
         var_values = {}
 
-        var_tuple = (0.0, -convexDual, var_values)
+        var_tuple = (0.0, 0.0, var_values)
         if debug_print:
-            print "Checking empty", convexDual, "should be > 0"
+            print "Zero solution is optimal"
             print var_tuple
         return [var_tuple]
 
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
 
-    var_tuple = (FIXED_COST[loc], rc - convexDual, var_values)
+    var_tuple = (FIXED_COST[loc], rc, var_values)
     rcCheck = 0.0
     for v in var_values.keys():
         rcCheck += redCosts[v] * var_values[v]
@@ -390,7 +390,7 @@ dippy.Solve(prob, {
 
 if prob.display_mode != 'off':
     numNodes = len(prob.Tree.get_node_list())
-    if prob.Tree.display_mode == 'svg':
+    if prob.Tree.attr['display'] == 'svg':
         prob.Tree.write_as_svg(filename = "facility_node%d" % (numNodes + 1), 
                                prevfile = "facility_node%d" % numNodes)
     prob.Tree.display()

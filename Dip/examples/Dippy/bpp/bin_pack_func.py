@@ -10,7 +10,7 @@ if DEBUGGING:
         import path
     except ImportError:
         pass
-    from dippy import dippy
+    import dippy
 else:
     import coinor.dippy as dippy
 
@@ -26,10 +26,9 @@ class BinPackProb:
 def formulate(bpp):
     prob = dippy.DipProblem("Bin Packing",
                             display_mode = 'xdot',
-#                           display_mode = 'xdot',
 #                           layout = 'bak',
-                            display_interval = None)
-#                           display_interval = 1000)
+                            display_interval = None,
+                            )
 
     assign_vars = LpVariable.dicts("x",
                                    [(i, j) for i in bpp.ITEMS
@@ -92,7 +91,7 @@ def my_heuristics(prob, xhat, cost):
 
 def solve(prob):
 
-    prob.branch_method = my_branch
+#    prob.branch_method = my_branch
     prob.heuristics = my_heuristics
     prob.is_root_node = True
     prob.root_heuristic = True
@@ -100,7 +99,12 @@ def solve(prob):
   
     dippyOpts = {'doPriceCut' : '1',
                  'CutCGL': '0',
+#                'SolveMasterAsIp': '0'
+#                'generateInitVars': '1',
+#                 'LogDebugLevel': 5,
+#                'LogDumpModel': 5,
                  }
+
     status, message, primals, duals = dippy.Solve(prob, dippyOpts)
   
     if status == LpStatusOptimal:

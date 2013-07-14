@@ -6627,20 +6627,34 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       list<DecompVar*> varsDebug;
       if(isNested)
          solverStatus 
-            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, varsDebug);
+            = m_app->solveRelaxedNest(whichBlock, redCostX, varsDebug);
       else
          solverStatus 
-            = m_app->solveRelaxed(whichBlock, redCostX, alpha, varsDebug);
+            = m_app->solveRelaxed(whichBlock, redCostX, varsDebug);
+	  DecompVarList::iterator it;
+	  for(it = varsDebug.begin(); it != varsDebug.end(); it++){
+		  if ((*it)->getBlockId() == whichBlock){
+			 (*it)->setReducedCost((*it)->getReducedCost() - alpha);
+		  }
+	  }
       solverStatus = DecompSolStatNoSolution;
    }
    
    if(m_param.SolveRelaxAsIp != 1){
-      if(isNested)
+      if(isNested){
          solverStatus 
-            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, vars);      
-      else
+            = m_app->solveRelaxedNest(whichBlock, redCostX, vars);      
+	  }else{
          solverStatus 
-            = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
+            = m_app->solveRelaxed(whichBlock, redCostX, vars);
+	  }
+	  DecompVarList::iterator it;
+	  for(it = vars.begin(); it != vars.end(); it++){
+		  if ((*it)->getBlockId() == whichBlock){
+			 (*it)->setReducedCost((*it)->getReducedCost() - alpha);
+		  }
+	  }
+
 #ifndef RELAXED_THREADED
       m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
 #endif

@@ -778,15 +778,13 @@ class DipProblem(pulp.LpProblem, DipAPI):
             errorStr = "Error in postProcessBranch\n%s" % ex
             raise DipError(errorStr)
 
-    def solveRelaxed(self, key, redCostX, convexDual):
+    def solveRelaxed(self, key, redCostX):
         """
         Returns solutions to the whichBlock relaxed subproblem
 
         Inputs: 
         key (Python Object) = key of relaxed subproblem to be solved
         redCostX (list of (LpVariable, value) tuples) = list of reduced costs
-        for all variables convexDual (float) = dual for convexity constraint
-        for this relaxed subproblem
 
         Output: 
         varList (list of (cost, reduced cost, (LpVariable, value)
@@ -805,7 +803,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 raise DipError("Reduced cost and variable list don't match in",
                                "solveRelaxed")
     
-            dvs = self.relaxed_solver(self, key, redCostDict, convexDual)
+            dvs = self.relaxed_solver(self, key, redCostDict)
             
             if dvs is not None:
                 if len(dvs) > 0:

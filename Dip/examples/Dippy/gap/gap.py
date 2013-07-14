@@ -75,10 +75,10 @@ for m in MACHINES:
 for t in TASKS:
     prob += lpSum(assignVars[m][t] for m in MACHINES) == 1
 
-def solve_subproblem(prob, machine, redCosts, convexDual):
+def solve_subproblem(prob, machine, redCosts):
     if debug_print:
         print "solve_subproblem..."
-        print redCosts, convexDual
+        print redCosts
    
     # get tasks which have negative reduced costs
     task_idx = [t for t in TASKS if redCosts[assignVars[machine][t]] < 0]
@@ -97,23 +97,23 @@ def solve_subproblem(prob, machine, redCosts, convexDual):
     rc = -z
 
     if debug_print:
-        print "rc, convexDual", rc, convexDual
+        print "rc", rc
     # Return the solution if the reduced cost is low enough
     # ...
     if rc > tol: # ... or an empty location is "useful"
        
         var_values = {}
 
-        var_tuple = (0.0, -convexDual, var_values)
+        var_tuple = (0.0, 0.0, var_values)
         if debug_print:
-            print "Checking empty", convexDual, "should be > 0"
+            print "Empty solution is optimal"
             print var_tuple
         return [var_tuple]
 
     orig_cost = sum(prob.objective.get(vars[idx]) for idx in solution)
     var_values = dict([(vars[i], 1) for i in solution])
 
-    var_tuple = (orig_cost, rc - convexDual, var_values)
+    var_tuple = (orig_cost, rc, var_values)
     rcCheck = 0.0
     for v in var_values.keys():
         rcCheck += redCosts[v] * var_values[v]
