@@ -569,7 +569,7 @@ public:
       
       UtilPrintParameter(os, sec, "Instance",  Instance);
       
-      UtilPrintParameter(os, sec, "Instance",  InstanceFormat);
+      UtilPrintParameter(os, sec, "InstanceFormat",  InstanceFormat);
 
       UtilPrintParameter(os, sec, "BlockFile",  BlockFile);
       
