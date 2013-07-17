@@ -42,7 +42,7 @@ public:
 
 public:
    /** Print solution. */
-   virtual void print(int       precision = 2,
+   virtual void print(int       precision = 4,
 		      std::ostream & os        = std::cout) const {
       int i;
       os << std::setprecision(precision);
