@@ -50,10 +50,11 @@ public:
          << std::setw(14);
       
       os << "-------------------------" << std::endl;
-      os << "Quality = " << getQuality() << std::endl;
+      os << "Quality  = " << getQuality() << std::endl;
+      os << "Solution = " << std::endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-	    os << std::setw(6) << i << " " << m_values[i] << std::endl;
+	    os << std::setw(15) << i << "   " << m_values[i] << std::endl;
          }
       }
       os << "-------------------------" << std::endl;
