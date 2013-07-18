@@ -216,13 +216,11 @@ public:
 
    int DebugCheckBlocksColumns;
 
-
    /*
     * The block number for automatic decomposition
     */
     
    int NumBlocks; 
-
    
    /*
     * The following parameters are extended from MILPBlock 
@@ -264,7 +262,6 @@ public:
 
    std::string BlockFile;
 
-   
    std::string BlockFileFormat;
 
    std::string PermuteFile;
@@ -282,7 +279,6 @@ public:
    int ObjectiveSense; //1=min, -1=max
 
    int AutoDecomp; 
-
    
    double MasterLB;  
    
@@ -301,7 +297,6 @@ public:
    
    int Concurrent;  
    
-   
    // number of block candidates 
    int NumBlocksCand;  
    
@@ -313,6 +308,10 @@ public:
    int ThreadIndex; 
 
    std::string CurrentWorkingDir;  
+
+   bool SubProbParallel; 
+
+
    /**
     * @}
     */
@@ -393,10 +392,7 @@ public:
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("NumThreads",              NumThreads);
-
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-
-
 
       PARAM_getSetting("NumBlocks",NumBlocks); 
       DataDir      = param.GetSetting("DataDir",      "",    "MILP");
@@ -404,10 +400,8 @@ public:
       InstanceFormat = param.GetSetting("InstanceFormat","",   "MILP"); 
       BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
       PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
-      BlockFileFormat 
-         = param.GetSetting("BlockFileFormat",    "",    "MILP");    
-      InitSolutionFile
-         = param.GetSetting("InitSolutionFile",    "",    "MILP");    
+      BlockFileFormat = param.GetSetting("BlockFileFormat",    "",    "MILP");    
+      InitSolutionFile = param.GetSetting("InitSolutionFile",    "",    "MILP");    
 
 
 
@@ -451,6 +445,8 @@ public:
       PARAM_getSetting("ThreadIndex", ThreadIndex);
 
       PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
+
+      PARAM_getSetting("SubProbParallel", SubProbParallel);
 
       DualStabAlphaOrig = DualStabAlpha;
    }
@@ -620,6 +616,8 @@ public:
       UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
 
       UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);      
+      
+      UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
 
       (*os) << "========================================================\n";
    }
@@ -686,7 +684,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      NumThreads               = 1;
+      NumThreads               = 2;
       DebugCheckBlocksColumns  = true;
       NumBlocks                = 3; 
 
@@ -733,6 +731,8 @@ public:
       ThreadIndex              = 0; 
 
       CurrentWorkingDir        = ""; 
+
+      SubProbParallel          = 1; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
