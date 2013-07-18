@@ -21,17 +21,9 @@
 #include "DecompCutOsi.h"
 #include "DecompAlgoCGL.h"
 #include "DecompSolverResult.h"
-
+#include "omp.h"
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
-//#define   RELAXED_THREADED
-
-
-
-std::queue<int> DecompAlgo::subprobQueue;
-
-
-
 
 //===========================================================================//
 //#define STAB_DUMERLE
@@ -52,18 +44,9 @@ std::queue<int> DecompAlgo::subprobQueue;
 using namespace std;
 
 //===========================================================================//
-#ifdef RELAXED_THREADED
-//#include "pfunc/pfunc.hpp"
-static void * solveRelaxedThread(void * args);
-#endif
-//typedef struct SolveRelaxedThreadArgs SolveRelaxedThreadArgs;
 
-/*
 struct SolveRelaxedThreadArgs {
    DecompAlgo         *  algo;
-   int                   threadId;
-   int                   batchSz;//blocks
-   int                 * batch;  //blocks
    vector<DecompAlgoModel*>  * algoModel;   
    int                   nBaseCoreRows;
    double              * u;
@@ -74,23 +57,7 @@ struct SolveRelaxedThreadArgs {
    bool                  doExact;
    bool                  doCutoff;
    list<DecompVar*>    * vars;
-};
-*/   
-
-struct SolveRelaxedThreadArgs {
-   DecompAlgo         *  algo;
-   int                   threadId;
-   vector<DecompAlgoModel*>  * algoModel;   
-   int                   nBaseCoreRows;
-   double              * u;
-   double              * redCostX;
-   const double        * origCost;
-   int                   n_origCols;
-   bool                  checkDup;
-   bool                  doExact;
-   bool                  doCutoff;
-   list<DecompVar*>    * vars;
-   pthread_mutex_t     * mutex_pointer;
+   list<DecompRay*>    * rays; 
 };
 
 
@@ -2049,22 +2016,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	 //--- attempt to generate some new variables with rc < 0
 	 //---
 	 mostNegRC                  = 0.0;
-
 	 
-	 #if defined RELAXED_THREADED
-
-	 
-	 assert(DecompAlgo::subprobQueue.empty());
-
-	 for (int i = 0 ; i < m_numConvexCon; i ++)
-
-	   DecompAlgo::subprobQueue.push(i); 
-
-	 assert(DecompAlgo::subprobQueue.size()== m_numConvexCon);
-	 
-	 #endif 
-
-
 	 generateVars(m_status,
 		      newVars,
 		      newRays,
@@ -4827,7 +4779,7 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int            whichBlock;
    double         varRedCost;
    DecompVarList::iterator it;
-
+   DecompRayList::iterator itRay; 
    assert(!m_masterSI->isProvenPrimalInfeasible());
 
    if(m_algo == DECOMP)
@@ -5127,245 +5079,124 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //--- here is where you would thread it
       //---
 
+     if(m_param.SubProbParallel == true){
 
-#ifdef RELAXED_THREADED
-   int            numThreads    = m_param.NumThreads;
-     
-   printf("===== START Threaded solve of subproblems. =====\n");
-     
-   pthread_t                * threads       = 0 ;
-
-   //   printf("pthread_t\n");
-   SolveRelaxedThreadArgs   * arg            = 0 ; 
-   //   printf("SolveRelaxedThreadArgs\n");
-   DecompVarList            * potentialVarsT = 0 ; 
-   //   printf("DecompVarList\n");
-     
-   potentialVarsT = new DecompVarList[numThreads];
-   //   printf("ptentialVarsT\n");
-   CoinAssertHint(potentialVarsT, "Error: Out of Memory");
-
-   arg = new SolveRelaxedThreadArgs[numThreads];
-   CoinAssertHint(arg, "Error: Out of Memory");
-   //   printf("arg\n");   
-   threads = new pthread_t[numThreads];
-   CoinAssertHint(threads, "Error: Out of Memory");
-   //   printf("threads\n");
-
-   pthread_mutex_t count_mutex;
-     
-   //   printf("pthreads_mutex\n");
-   // return condition of pthread_create method
-   int rc; 
+       omp_set_num_threads(m_param.NumThreads);
+       printf("===== START Threaded solve of subproblems. =====\n");
+       DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
+       DecompRayList* potentialRaysT = new DecompRayList[m_numConvexCon];
+ 
+       CoinAssertHint(potentialVarsT, "Error: Out of Memory");
+       CoinAssertHint(potentialRaysT, "Error: Out of Memory");
       
-   bool useCutoff = false;      
-   if(m_phase == PHASE_PRICE2)
-     useCutoff = m_param.SubProbUseCutoff;
-   m_isColGenExact = false; //so it goes to IP solver - ugh
+       bool useCutoff = false;      
+       if(m_phase == PHASE_PRICE2)
+	 useCutoff = m_param.SubProbUseCutoff;
+       m_isColGenExact = false; //so it goes to IP solver - ugh
+
+       SolveRelaxedThreadArgs* arg = new SolveRelaxedThreadArgs[m_numConvexCon];
    
+       for (int i = 0 ; i < m_numConvexCon; i ++){
+	 arg[i].algo          = this;  
+	 arg[i].nBaseCoreRows = nBaseCoreRows;
+	 arg[i].u             = const_cast<double*>(u); //duals (for alpha)
+	 arg[i].redCostX      = redCostX; 
+	 arg[i].origCost      = origObjective;
+	 arg[i].n_origCols    = nCoreCols;
+	 arg[i].vars          = &potentialVarsT[i];
+	 arg[i].rays          = &potentialRaysT[i]; 
+       }
+   	  
+       //---
+       //--- For pricing,
+       //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
+       //--- origCost: is the original cost for each original column c_e
+       //--- alpha:    is the dual for the convexity constraint 
+       //--- 
+       //--- The reduced cost of a new variable (column) is the sum of the 
+       //--- reduced cost on each of the original columns in the new variable
+       //--- minus alpha (this function is responsible for returning the reduced
+       //--- cost, which includes alpha).
+       //---
+       //--- NOTE, redCost does not include alpha as sent in
+       //---
 
-   //   pthread_attr_t attr;
-   //pthread_attr_init(&attr);
-
-   //pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE);
-
-	  
-   pthread_mutex_init(&count_mutex, NULL); 
-
-   printf("pthread_mutex_init\n");
-     
-     
-   for(int t = 0; t < numThreads;t++){
-
-     arg[t].algo          = this;
-     arg[t].threadId      = t;
-     arg[t].nBaseCoreRows = nBaseCoreRows;
-     arg[t].u             = const_cast<double*>(u); //duals (for alpha)
-     arg[t].redCostX      = redCostX; 
-     arg[t].origCost      = origObjective;
-     arg[t].n_origCols    = nCoreCols;
-     arg[t].vars          = &potentialVarsT[t];
-     arg[t].mutex_pointer = &count_mutex; 
-     //printf("pthread_create_before\n"); 
-     rc = pthread_create(&threads[t],
-			 NULL,
-			 solveRelaxedThread, (void*)&arg[t]);
-     //printf("pthread_create_after\n"); 
-     if(rc){
-       printf("Failed with %d at %s \n",rc,"pthread_create");
-     }
-       
-   }
-     
-     
-
-   pthread_mutex_destroy(&count_mutex);
-   //printf("pthread_mutex_destroy\n");
-   //  pthread_attr_destroy(&attr);
-     
-   for(int i=0; i< numThreads; i++){
+       //DecompApp * app = algo->getDecompAppMutable();
+#pragma omp parallel for schedule(dynamic)
+       for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++){
+	 
+	 DecompAlgo          * algo         = arg[subprobIndex].algo;
+	 int                   nBaseCoreRows= arg[subprobIndex].nBaseCoreRows;   
+	 double              * u            = arg[subprobIndex].u;
+	 double              * redCostX     = arg[subprobIndex].redCostX; //read-only
+	 const double        * origObjective= arg[subprobIndex].origCost; //read-only
+	 int                   nCoreCols    = arg[subprobIndex].n_origCols; 
+	 list<DecompVar*>    * vars         = arg[subprobIndex].vars;
+	 list<DecompRay*>    * rays         = arg[subprobIndex].rays;
 	
-     pthread_join(threads[i],NULL);
-     //   printf("pthread_join\n");
-   }
+	 DecompAlgoModel & algoModel = algo->getModelRelax(subprobIndex);
+	 double             alpha           = u[nBaseCoreRows + subprobIndex];
+	 DecompSolverResult solveResult;
 
-   m_isColGenExact = true;
+	 printf("THREAD %d solving subproblem %d\n",
+		omp_get_thread_num(), subprobIndex);                 	 
+		 
+	 algo->solveRelaxed(redCostX,
+			    origObjective,
+			    alpha,
+			    nCoreCols,
+			    false,//isNested
+			    algoModel,
+			    &solveResult,
+			    *vars,
+			    *rays);		 
+       }                       
+     
+   
+       m_isColGenExact = true;
 
        //clean-up memory
-   for(int t = 0; t < numThreads; t++){
-     printf("arg[%d].vars size=%d\n", 
-	    t, static_cast<int>(arg[t].vars->size()));
-     for(it  = arg[t].vars->begin();
-	 it != arg[t].vars->end(); it++){
-       varRedCost = (*it)->getReducedCost();
-       whichBlock = (*it)->getBlockId();
-       alpha      = u[nBaseCoreRows + whichBlock];
-       UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		  (*m_osLog) 
-		  << "alpha[block=" << whichBlock << "]:" << alpha 
-		  << " varRedCost: " << varRedCost << "\n";
-		  );
-     }
-   }
-   printf("===== END   Threaded solve of subproblems. =====\n");
-      
-   for(int t = 0; t < numThreads; t++){
-     //one function to do this?
-     for(it  = arg[t].vars->begin();
-	 it != arg[t].vars->end(); it++){	    
-       potentialVars.push_back(*it);
-     }
-   }
-   //put the vars from all threads into one vector
+       for(int t = 0; t < m_numConvexCon; t++){
+	 /*	 printf("arg[%d].vars size=%d\n", 
+		t, static_cast<int>(arg[t].vars->size()));
+	 */
+	 for(it  = arg[t].vars->begin();
+	     it != arg[t].vars->end(); it++){
+	   varRedCost = (*it)->getReducedCost();
+	   whichBlock = (*it)->getBlockId();
+	   alpha      = u[nBaseCoreRows + whichBlock];
+	   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		      (*m_osLog) 
+		      << "alpha[block=" << whichBlock << "]:" << alpha 
+		      << " varRedCost: " << varRedCost << "\n";
+		      );
+	 }
+       }
+       printf("===== END   Threaded solve of subproblems. =====\n");
+       
+       for(int t = 0; t < m_numConvexCon; t++){
+	 //one function to do this?
+	 for(it  = arg[t].vars->begin();
+	     it != arg[t].vars->end(); it++){	    
+	   potentialVars.push_back(*it);
+	 }
+	 for(itRay  = arg[t].rays->begin();
+	     itRay != arg[t].rays->end(); itRay++){	    
+	   potentialRays.push_back(*itRay);
+	 }
 
+       }
+   //put the vars from all threads into one vector
 
    //---
    //--- clean-up local memory
    //---
    UTIL_DELARR(potentialVarsT);
+   UTIL_DELARR(potentialRaysT);
    UTIL_DELARR(arg);
-   UTIL_DELARR(threads);
-
-
-   }
-
-
-
-     /*
-
-      //round-robin assign blocks to threads
-      printf("===== START Threaded solve of subproblems. =====\n");
-      pthread_attr_t             pthread_custom_attr;
-      pthread_t                * threads        = 0;
-      SolveRelaxedThreadArgs   * arg            = 0;
-      DecompVarList            * potentialVarsT = 0;
-      int                     ** batch          = 0;
-      int                      * batchSize      = 0;
-
-      batch     = new int*[numThreads];
-      CoinAssertHint(batch, "Error: Out of Memory");
-      
-      batchSize = new int[numThreads];
-      CoinAssertHint(batchSize, "Error: Out of Memory");
-
-      potentialVarsT = new DecompVarList[numThreads];
-      CoinAssertHint(potentialVarsT, "Error: Out of Memory");
-
-      arg = new SolveRelaxedThreadArgs[numThreads];
-      CoinAssertHint(arg, "Error: Out of Memory");
-      
-      threads = new pthread_t[numThreads];
-      CoinAssertHint(threads, "Error: Out of Memory");
-
-      int t, b;
-      for(t = 0; t < numThreads; t++){
-	 batchSize[t] = 0;
-	 batch[t]     = new int[m_numConvexCon];
-	 CoinAssertHint(batch[t], "Error: Out of Memory");
-      }
-      t = 0;
-      for(b = 0; b < m_numConvexCon; b++){
-	 batch[t][batchSize[t]++] = b;
-	 if((++t) % numThreads == 0)
-	    t = 0;
-      }
-
-      pthread_attr_init(&pthread_custom_attr);
-
-      bool useCutoff = false;      
-      if(m_phase == PHASE_PRICE2)
-	 useCutoff = m_param.SubProbUseCutoff;
-      m_isColGenExact = false; //so it goes to IP solver - ugh
-
-      for(t = 0; t < numThreads; t++){
-
-	 arg[t].algo          = this;
-	 arg[t].threadId      = t;
-	 arg[t].batchSz       = batchSize[t];
-	 arg[t].batch         = batch[t];	 
-	 arg[t].nBaseCoreRows = nBaseCoreRows;
-	 arg[t].u             = const_cast<double*>(u); //duals (for alpha)
-	 arg[t].redCostX      = redCostX; 
-	 arg[t].origCost      = origObjective;
-	 arg[t].n_origCols    = nCoreCols;
-	 arg[t].vars          = &potentialVarsT[t];
-
-	 pthread_create(&threads[t],
-			&pthread_custom_attr,
-			solveRelaxedThread, (void*)&arg[t]);
-      }
-
-
-
-      for(t = 0; t < numThreads; t++){
-	 pthread_join(threads[t], NULL);
-      }
-      m_isColGenExact = true;
-
-      //clean-up memory
-      for(t = 0; t < numThreads; t++){
-	 printf("arg[%d].vars size=%d\n", 
-		t, static_cast<int>(arg[t].vars->size()));
-	 for(it  = arg[t].vars->begin();
-	     it != arg[t].vars->end(); it++){
-	    varRedCost = (*it)->getReducedCost();
-	    whichBlock = (*it)->getBlockId();
-	    alpha      = u[nBaseCoreRows + whichBlock];
-	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		       (*m_osLog) 
-		       << "alpha[block=" << whichBlock << "]:" << alpha 
-		       << " varRedCost: " << varRedCost << "\n";
-		       );
-	    
-	    
-	 }
-      }
-      printf("===== END   Threaded solve of subproblems. =====\n");
-      for(t = 0; t < numThreads; t++){
-	 //one function to do this?
-	 for(it  = arg[t].vars->begin();
-	     it != arg[t].vars->end(); it++){	    
-	    potentialVars.push_back(*it);
-	 }
-      }
-      //put the vars from all threads into one vector
-
-
-      //---
-      //--- clean-up local memory
-      //---
-      for(t = 0; t < numThreads; t++){
-	 UTIL_DELARR(batch[t]);
-      }
-      UTIL_DELARR(batch);
-      UTIL_DELARR(batchSize);
-      UTIL_DELARR(potentialVarsT);
-      UTIL_DELARR(arg);
-      UTIL_DELARR(threads);
-     */
-
-#else
-
+     }
+else
+  {
       bool useCutoff = false;
       bool useExact  = true;
       if(m_phase == PHASE_PRICE2)
@@ -5435,7 +5266,7 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
             }            
          }
       } 
-#endif
+  }
       //} //END: if(doAllBlocks)
 }
   else{
@@ -7312,151 +7143,6 @@ bool DecompAlgo::isLPFeasible(const double * x,
 }
 
 //--------------------------------------------------------------------- //
-//TODO: also need to accept fixed variables (for consistency
-//and for branching), its possible this function can return more
-//than one var
-#ifdef RELAXED_THREADED
-
-static void * solveRelaxedThread(void * args){  
-
-    //printf("Before declare\n");
-   SolveRelaxedThreadArgs * targs 
-      = static_cast<SolveRelaxedThreadArgs*>(args);
-   
-   DecompAlgo          * algo         = targs->algo;
-   int                   threadId     = targs->threadId;
-   int                   nBaseCoreRows= targs->nBaseCoreRows;   
-   double              * u            = targs->u;
-   double              * redCostX     = targs->redCostX; //read-only
-   const double        * origObjective= targs->origCost; //read-only
-   int                   nCoreCols    = targs->n_origCols;  
-   list<DecompVar*>    * vars         = targs->vars;
-   //   printf("After declare\n");
-   
-   //---
-   //--- For pricing,
-   //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
-   //--- origCost: is the original cost for each original column c_e
-   //--- alpha:    is the dual for the convexity constraint 
-   //--- 
-   //--- The reduced cost of a new variable (column) is the sum of the 
-   //--- reduced cost on each of the original columns in the new variable
-   //--- minus alpha (this function is responsible for returning the reduced
-   //--- cost, which includes alpha).
-   //---
-   //--- NOTE, redCost does not include alpha as sent in
-   //---
-
-   //DecompApp * app = algo->getDecompAppMutable();
-
-
-
-   while (!DecompAlgo::subprobQueue.empty()){
-     
-     pthread_mutex_lock((targs->mutex_pointer));
-     
-     int subprobIndex = DecompAlgo::subprobQueue.front();
-     DecompAlgo::subprobQueue.pop();
-     
-     pthread_mutex_unlock((targs->mutex_pointer));     
-
-     DecompAlgoModel & algoModel = algo->getModelRelax(subprobIndex);
-
-     double             alpha        = u[nBaseCoreRows + subprobIndex];
-     
-     DecompSolverResult solveResult;
-
-     algo->solveRelaxed(redCostX,
-			origObjective,
-			alpha,
-			nCoreCols,
-			false,//isNested
-			algoModel,
-			&solveResult,
-			*vars,
-			*rays);
-     
-
-     printf("THREAD %d solving subproblem %d\n",
-	    threadId, subprobIndex);
-     
-     fflush(stdout);
-  
-     printf("THREAD %d: Done with work \n",
-	    threadId);     
-     
-     if(DecompAlgo::subprobQueue.empty())
-       pthread_exit(NULL);
-
-   }
-   
-}
-
-#endif
-/*
-static void * solveRelaxedThread(void * args){
-   SolveRelaxedThreadArgs * targs 
-      = static_cast<SolveRelaxedThreadArgs*>(args);
-
-   DecompAlgo          * algo         = targs->algo;
-   int                   threadId     = targs->threadId;
-   int                   batchSz      = targs->batchSz;
-   int                 * batch        = targs->batch;   
-   int                   nBaseCoreRows= targs->nBaseCoreRows;   
-   double              * u            = targs->u;
-   double              * redCostX     = targs->redCostX; //read-only
-   const double        * origObjective= targs->origCost; //read-only
-   int                   nCoreCols    = targs->n_origCols;  
-   list<DecompVar*>    * vars         = targs->vars;
-   
-   //---
-   //--- For pricing,
-   //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
-   //--- origCost: is the original cost for each original column c_e
-   //--- alpha:    is the dual for the convexity constraint 
-   //--- 
-   //--- The reduced cost of a new variable (column) is the sum of the 
-   //--- reduced cost on each of the original columns in the new variable
-   //--- minus alpha (this function is responsible for returning the reduced
-   //--- cost, which includes alpha).
-   //---
-   //--- NOTE, redCost does not include alpha as sent in
-   //---
-   int         i, b;
-   //DecompApp * app = algo->getDecompAppMutable();
-   for(i = 0; i < batchSz; i++){
-      b = batch[i];
-      printf("THREAD %d solving b %d\n", threadId, b); fflush(stdout);
-
-      //is this thread safe??
-      DecompAlgoModel & algoModel = algo->getModelRelax(b);
-
-      //int    isExact  = 0;
-      //int    nVars    = static_cast<int>(vars->size());
-      //int    nNewVars = 0;
-      double             alpha        = u[nBaseCoreRows + b];
-      //DecompSolverStatus solverStatus = DecompSolStatNoSolution;
-      
-      //bool useExact  = true;
-      //bool useCutoff = false;
-      DecompSolverResult solveResult;
-
-      //too many cases where ned locks - make threaded version
-      algo->solveRelaxed(redCostX,
-			 origObjective,
-			 alpha,
-			 nCoreCols,
-			 false,//isNested
-			 algoModel,
-			 &solveResult,
-			 *vars);
-   }
-   return NULL;
-}
-*/
-
-
-//--------------------------------------------------------------------- //
 DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
                                       const double        * origCost,
                                       const double          alpha,
@@ -7493,9 +7179,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 	      (*m_osLog) << "alpha         = " << alpha      << endl;
 	      (*m_osLog) << "isNested      = " << isNested   << endl;
 	      );
-#ifndef RELAXED_THREADED
-   m_stats.timerOther1.reset();
-#endif
+   if(m_param.SubProbParallel){
+     m_stats.timerOther1.reset();
+   }
 
 #ifndef DECOMP_MASTERONLY_DIRECT
    //---
@@ -7536,9 +7222,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
                  var->print(););
       vars.push_back(var);
       
-#ifndef RELAXED_THREADED   
-      m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
-#endif
+      if(m_param.SubProbParallel){
+	m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+      }
       UtilPrintFuncEnd(m_osLog, m_classTag,
                        "solveRelaxed()", m_param.LogDebugLevel, 2);
       return STAT_UNKNOWN;
@@ -7547,9 +7233,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 
 
 
-#ifndef RELAXED_THREADED
-   m_stats.timerOther2.reset();
-#endif
+   if(!m_param.SubProbParallel){
+     m_stats.timerOther2.reset();
+   }
 
    int nVars    = static_cast<int>(vars.size());
    int nNewVars = 0;
@@ -7592,9 +7278,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       else
          solverStatus 
             = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
-#ifndef RELAXED_THREADED
-      m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
-#endif
+
+      if(!m_param.SubProbParallel){
+	m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
+      }
       nNewVars        = static_cast<int>(vars.size()) - nVars;
    }
    m_isColGenExact = (solverStatus == DecompSolStatOptimal);
@@ -7819,9 +7506,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       UTIL_DELARR(xTemp);
    }   
    
-#ifndef RELAXED_THREADED   
-   m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
-#endif
+   if(!m_param.SubProbParallel){
+     m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
+   }
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "solveRelaxed()", m_param.LogDebugLevel, 2);
 
