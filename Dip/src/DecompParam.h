@@ -732,7 +732,7 @@ public:
 
       CurrentWorkingDir        = ""; 
 
-      SubProbParallel          = 1; 
+      SubProbParallel          = false; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
