@@ -311,7 +311,9 @@ public:
 
    bool SubProbParallel; 
 
+   int SubProbParallelType; 
 
+   int SubProbParallelChunksize; 
    /**
     * @}
     */
@@ -447,6 +449,9 @@ public:
       PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
 
       PARAM_getSetting("SubProbParallel", SubProbParallel);
+      PARAM_getSetting("SubProbParallelType", SubProbParallelType);
+
+      PARAM_getSetting("SubProbParallelType", SubProbParallelChunksize);
 
       DualStabAlphaOrig = DualStabAlpha;
    }
@@ -618,6 +623,7 @@ public:
       UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);      
       
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
+      UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType); 
 
       (*os) << "========================================================\n";
    }
@@ -733,6 +739,10 @@ public:
       CurrentWorkingDir        = ""; 
 
       SubProbParallel          = false; 
+      
+      SubProbParallelType      = SubProbScheduleDynamic;
+      
+      SubProbParallelChunksize = 1;
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
