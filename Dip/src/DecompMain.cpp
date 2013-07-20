@@ -97,9 +97,8 @@ int main(int argc, char ** argv){
       std::vector<UtilParameters> utilParamArray(static_cast<int>(numThreads + 1), 
 						 utilParam); 
 
-      if(milp.m_param.Concurrent == 1 ) 
-	{ 
-	  
+      if(milp.m_param.Concurrent == true ) 
+	{ 	  
 	  	  	  	  
 	  printf("===== START Concurrent Computations Process. =====\n"); 
 
@@ -130,7 +129,7 @@ int main(int argc, char ** argv){
 	  decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false); 
 	  DecompAuto(milp, utilParam, timer, decompMainParam); 
       }
-      if(milp.m_param.Concurrent == 1){
+      if(milp.m_param.Concurrent == true){
 	printf("===== FINISH Concurrent Computations Process. =====\n");
       }
    }
@@ -152,7 +151,7 @@ void blockNumberFinder(DecompParam utilParam,
 		       const CoinPackedMatrix* matrix)            
 {
 
-   if (utilParam.Concurrent == 1) {
+
      
      const int* lengthRows = matrix->getVectorLengths(); 
      int numRows = matrix->getNumRows();  
@@ -262,7 +261,7 @@ void blockNumberFinder(DecompParam utilParam,
 	} 
 	
       } 
-   } 
+
 
 }
 
