@@ -147,29 +147,17 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    if(m_param.LogLevel >= 1)
       m_param.dumpSettings();
 
-   if(!m_param.AutoDecomp) 
-     
+   if(!m_param.Concurrent){  
      //--- 
      //--- read block file 
-     //--- 
-     
+     //---      
      readBlockFile(); 
-   
-   
-   else  
-     
+   }
+   else       
      // automatic structure detection 
      {      
-#if defined (COIN_HAS_HMETIS) 
-       if(m_param.Concurrent){ 
-	 
 #pragma omp critical 
 	 singlyBorderStructureDetection(); 	 	 
-       }   
-      else{ 
-	singlyBorderStructureDetection(); 
-      }        
-#endif 
      } 
    
    
