@@ -689,7 +689,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                                           self.last_svg + 2), 
                                                        highlight = nodeInd)
                                 self.last_svg += 1
-                if self.display_interval is not None and nodeInd != 0:
+                if self.display_interval is not None:
                     if numNodes % self.display_interval in [0, 1]:
                         self.Tree.display()
 
@@ -768,8 +768,9 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                                 'label', labelStr)
                         numNodes += 1
 
-                self.Tree.set_node_attr(nodeInd, 'color', 'green')
-                self.Tree.set_node_attr(nodeInd, 'fillcolor', 'green')
+                if self.Tree.get_node_attr(nodeInd, 'color') == 'yellow':
+                    self.Tree.set_node_attr(nodeInd, 'color', 'green')
+                    self.Tree.set_node_attr(nodeInd, 'fillcolor', 'green')
         
             if self.post_process_branch is not None:
                 self.post_process_branch(self, outputDict)
