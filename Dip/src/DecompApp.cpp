@@ -20,7 +20,8 @@
 #include <set>
 #include <fstream>
 #include <string>
-
+#include "iterator"
+#include "omp.h"
 //#if defined(autoDecomp) && defined(PaToH)
 #if  defined(PaToH)
 
@@ -30,7 +31,7 @@
 #else 
 
 extern "C"{
-#if defined (COIN_HAS_METIS)
+#if defined (COIN_HAS_HMETIS)
 #include "hmetis.h"
 #endif
 }
@@ -137,111 +138,168 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    //--- get application parameters
    //---   
 
-   m_param.getSettings(utilParam);   
+
 
    if(m_param.LogLevel >= 1)
       m_param.dumpSettings();
 
+   if(!m_param.AutoDecomp) 
+     
+     //--- 
+     //--- read block file 
+     //--- 
+     
+     readBlockFile(); 
+   
+   
+   else  
+     
+     // automatic structure detection 
+     {      
+#if defined (COIN_HAS_HMETIS) 
+       if(m_param.Concurrent){ 
+	 
+#pragma omp critical 
+	 singlyBorderStructureDetection(); 	 	 
+       }   
+      else{ 
+	singlyBorderStructureDetection(); 
+      }        
+#endif 
+     } 
+   
+   
+   /* 
+    * After identifying the strucuture either through files or  
+    * automatic structure detection, call the method below to 
+    * create models  
+    * 
+    */ 
+   
+   
+   createModels(); 
+   
+   
+   
+   UtilPrintFuncEnd(m_osLog, m_classTag, 
+		    "initializeApp()", m_param.LogLevel, 2); 
+} 
+
+
+const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam){
+
+   //---
+   //--- get application parameters
+   //---
+
+  m_param.getSettings(utilParam);
+
+  if (m_param.LogLevel >= 1) {
+    m_param.dumpSettings();
+  }
+
    //---
    //--- read MILP instance (mps format)
    //---
-   string fileName;
-   if (m_param.DataDir != ""){
-      fileName = m_param.DataDir + UtilDirSlash() + m_param.Instance;
-   }else{
-      fileName = m_param.Instance;
-   }      
+   string fileName; 
+   if (m_param.DataDir != ""){ 
+      fileName = m_param.DataDir + UtilDirSlash() + m_param.Instance; 
+   }else{ 
+      fileName = m_param.Instance; 
+   }
 
-   if(m_param.Instance.empty()){
-     cerr << "==========================================================="<< std::endl
-	  << "Usage:" << std::endl
-	  << "./dip  --MILP:BlockFileFormat List" << std::endl
-	  << "       --MILP:Instance /FilePath/ABC.mps" << std::endl
-	  << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
-	  << "==========================================================="<< std::endl
-	  << std::endl;
+   if (m_param.Instance.empty()) {
+      cerr << "================================================" << std::endl
+           << "Usage:"
+           << "./dip  --MILP:BlockFileFormat List" << std::endl
+           << "       --MILP:Instance /FilePath/ABC.mps" << std::endl
+           << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "================================================" << std::endl
+           << std::endl;
       exit(0);
    }
-   m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
    int rstatus = 0;
    bool foundFormat = false;
-   if (m_param.InstanceFormat == ""){
-       string::size_type idx = fileName.rfind('.');
-       
-       if (idx != string::npos){
-	   string extension = fileName.substr(idx+1);
-	   if (extension == "MPS" || extension == "mps"){
-	       m_param.InstanceFormat = "MPS";
-	   }else if (extension == "LP" || extension == "lp"){ 
-	       m_param.InstanceFormat = "LP";
-	   }
-      }else{
-	   cerr << "File format not specified and no file extension" << endl;
-	   throw UtilException("I/O Error.", "initializeApp", "DecompApp"); 
-       }
+
+   if (m_param.InstanceFormat == "") {
+      string::size_type idx = fileName.rfind('.');
+
+      if (idx != string::npos) {
+         string extension = fileName.substr(idx + 1);
+
+         if (extension == "MPS" || extension == "mps") {
+	   m_param.InstanceFormat = "MPS";
+         } else if (extension == "LP" || extension == "lp") {
+	   m_param.InstanceFormat = "LP";
+         }
+      } else {
+         cerr << "File format not specified and no file extension" << endl;
+         throw UtilException("I/O Error.", "initializeApp", "DecompApp");
+      }
    }
 
-   if (m_param.InstanceFormat == "MPS"){
-     rstatus = m_mpsIO.readMps(fileName.c_str());
-     foundFormat = true;
-   }else if (m_param.InstanceFormat == "LP"){
-     m_lpIO.readLp(fileName.c_str());
-     foundFormat = true;
+   if(m_param.InstanceFormat =="MPS"){
+     m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
+   } else if (m_param.InstanceFormat == "LP"){
+     m_lpIO.messageHandler()->setLogLevel(m_param.LogLpLevel); 
    }
-   if (!foundFormat){
-      cerr << "Error: Format = " << m_param.InstanceFormat << " unknown." 
-	   << endl;
+
+   if (m_param.InstanceFormat == "MPS") {
+      rstatus = m_mpsIO.readMps(fileName.c_str());
+      foundFormat = true;
+   } else if (m_param.InstanceFormat == "LP") {
+      m_lpIO.readLp(fileName.c_str());
+      foundFormat = true;
+   }
+
+   if (!foundFormat) {
+      cerr << "Error: Format = " << m_param.InstanceFormat << " unknown."
+           << endl;
       throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
-   if (rstatus < 0){
+
+   if (rstatus < 0) {
       cerr << "Error: Filename = " << fileName << " failed to open." << endl;
       throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
-   if(m_param.LogLevel >= 2)
-      (*m_osLog) << "Objective Offset = " 
-                 << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
 
+   
+   if (m_param.LogLevel >= 2)
+     if(m_param.InstanceFormat == "MPS"){
+       (*m_osLog) << "Objective Offset = "      
+		  << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
+     } else if (m_param.InstanceFormat == "LP"){
+       (*m_osLog) << "Objective Offset = "      
+		  << UtilDblToStr(m_lpIO.objectiveOffset()) << endl;       
+     }
+   
    //---
    //--- set best known lb/ub
    //---
    double offset = 0;
-   if (m_param.InstanceFormat == "MPS"){
-     offset = m_mpsIO.objectiveOffset();
-   }else if (m_param.InstanceFormat == "LP"){
-     offset = m_lpIO.objectiveOffset();
+
+   if (m_param.InstanceFormat == "MPS") {
+      offset = m_mpsIO.objectiveOffset();
+   } else if (m_param.InstanceFormat == "LP") {
+      offset = m_lpIO.objectiveOffset();
    }
+
    setBestKnownLB(m_param.BestKnownLB + offset);
    setBestKnownUB(m_param.BestKnownUB + offset);
+   preprocess();
 
-   if(!m_param.AutoDecomp){
-   
-      //---
-      //--- read block file
-      //---
-
-      readBlockFile();
-   }else{     
-      //---
-      //--- automatic structure detection
-      //---
-     #if defined (COIN_HAS_METIS)
-     singlyBorderStructureDetection();
-     #endif
+   if (m_param.InstanceFormat == "MPS"){
+     return m_mpsIO.getMatrixByRow();
+   } else if (m_param.InstanceFormat == "LP"){
+     return m_lpIO.getMatrixByRow();
    }
 
-   /*
-    * After identifying the strucuture either through files or 
-    * automatic structure detection, call the method below to
-    * create models 
-    *
-    */
-
-    createModels();
-
-    UtilPrintFuncEnd(m_osLog, m_classTag,
-		     "initializeApp()", m_param.LogLevel, 2);
 }
+
+
+
+void DecompApp::preprocess(){} 
 
 void DecompApp::readBlockFile(){
 
@@ -1334,6 +1392,7 @@ void DecompApp::singlyBorderStructureDetection(){
 
    const int * lengthRows = m_matrix->getVectorLengths();
 
+
    /*
      assigning the pointer to hyperedges, indicating the number of 
      vertices in each hyperedge
@@ -1523,7 +1582,7 @@ void DecompApp::singlyBorderStructureDetection(){
    #else
 
    clock_t begin = clock();
-#if defined(COIN_HAS_METIS)     
+#if defined(COIN_HAS_HMETIS)     
    // maximum load imbalance (%)
    
    int ubfactor = 5; 

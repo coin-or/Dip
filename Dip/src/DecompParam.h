@@ -284,6 +284,23 @@ public:
 
    int AutoDecomp; 
 
+   // variable indicates whether to use  
+   // multiple cores to compute concurrently 
+   
+   int Concurrent;  
+   
+   
+   // number of block candidates 
+   int NumBlocksCand;  
+   
+   // time of concurrent CutOffTime to finalize 
+   // the choice of MILP solution method 
+   
+   double ConcurrentCutOffTime;  
+
+   int ThreadIndex; 
+
+   std::string CurrentWorkingDir;  
    /**
     * @}
     */
@@ -401,6 +418,8 @@ public:
       //---
       //--- store the original setting for DualStabAlpha
       //---
+      PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
+
       DualStabAlphaOrig = DualStabAlpha;
    }
 
@@ -517,6 +536,8 @@ public:
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
       
       UtilPrintParameter(os, sec, "Instance",  Instance);
+      
+      UtilPrintParameter(os, sec, "InstanceFormat",  InstanceFormat);
 
       UtilPrintParameter(os, sec, "BlockFile",  BlockFile);
       
@@ -543,6 +564,12 @@ public:
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
 
       UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
+
+      UtilPrintParameter(os, sec, "Concurrent", Concurrent);  
+
+      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
+
+      UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);      
 
       (*os) << "========================================================\n";
    }
@@ -631,6 +658,10 @@ public:
       ObjectiveSense           = 1;
 
       AutoDecomp               = 0;
+      
+      ThreadIndex              = 0; 
+
+      CurrentWorkingDir        = ""; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

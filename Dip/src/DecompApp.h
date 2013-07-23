@@ -113,9 +113,8 @@ public:
    /** MPS object for reading instances */
    CoinMpsIO m_mpsIO; 
 
-   /** LP object for reading instances */
+   /** LP object for reading instances */ 
    CoinLpIO m_lpIO; 
-
 
    /** Original constraint matrix for the instance */
 
@@ -139,6 +138,11 @@ public:
     * @name Helper functions.
     * @{
     */
+       
+    
+   /** Preprocess (standard ): on the TODO list*/ 
+   
+   void preprocess(); 
 
    /**
     * Print startup message to log.
@@ -391,7 +395,10 @@ public:
 
    /** Read block file */
    void readBlockFile();
-   
+
+   /** Read Problem */
+   const CoinPackedMatrix*  readProblem(UtilParameters& utilParam); 
+
 
    /** Automatically detect singly bordered structure */
 
