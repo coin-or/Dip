@@ -86,15 +86,25 @@ int main(int argc, char ** argv){
       // other systems has different syntax to obtain the core number 
      
       int numCPU = sysconf( _SC_NPROCESSORS_ONLN ); 
-      std::cout << "The number of cores in this node is " 
-		<< numCPU << std::endl; 
-      int numThreads = min(numCPU, static_cast<int>(blockNumCandidates.size())); 
-      
+      if(milp.m_param.LogDebugLevel > 1){
+	std::cout << "The number of cores is " 
+		  << numCPU << std::endl; 
+      }
+      // the actual thread number is the minimum of 
+      // number of cores, total block numbers and the thread number
+      // used in concurrent computations
+      int numThreads = min(min(numCPU, 
+			       static_cast<int>(blockNumCandidates.size())),
+			   milp.m_param.ConcurrentThreadsNum); 
+
       std::vector<DecompApp> milpArray(static_cast<int>(numThreads + 1), milp); 
-      std::vector<DecompMainParam> decompMainParamArray(static_cast<int>(numThreads + 1), 
+      std::vector<DecompMainParam> decompMainParamArray(static_cast<int>
+							(numThreads + 1), 
 							decompMainParam); 
-      std::vector<UtilTimer> timerArray(static_cast<int>(numThreads + 1),timer); 
-      std::vector<UtilParameters> utilParamArray(static_cast<int>(numThreads + 1), 
+      std::vector<UtilTimer> timerArray(static_cast<int>(numThreads + 1),
+					timer); 
+      std::vector<UtilParameters> utilParamArray(static_cast<int>
+						 (numThreads + 1), 
 						 utilParam); 
 
       if(milp.m_param.Concurrent == true ) 
