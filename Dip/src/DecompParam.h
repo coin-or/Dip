@@ -312,6 +312,10 @@ public:
    int SubProbParallelType; 
 
    int SubProbParallelChunksize; 
+
+   int ConcurrentThreadsNum; 
+
+   
    /**
     * @}
     */
@@ -449,6 +453,8 @@ public:
 
       PARAM_getSetting("SubProbParallelType", SubProbParallelChunksize);
 
+      PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
+     
       DualStabAlphaOrig = DualStabAlpha;
    }
 
@@ -619,6 +625,8 @@ public:
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
       UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType); 
 
+      UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum); 
+
       (*os) << "========================================================\n";
    }
    
@@ -735,6 +743,8 @@ public:
       SubProbParallelType      = SubProbScheduleDynamic;
       
       SubProbParallelChunksize = 1;
+
+      ConcurrentThreadsNum     = 4; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
