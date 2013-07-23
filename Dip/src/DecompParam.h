@@ -451,7 +451,7 @@ public:
       PARAM_getSetting("SubProbParallel", SubProbParallel);
       PARAM_getSetting("SubProbParallelType", SubProbParallelType);
 
-      PARAM_getSetting("SubProbParallelType", SubProbParallelChunksize);
+      PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
 
       PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
      
@@ -624,6 +624,7 @@ public:
       
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
       UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType); 
+      UtilPrintParameter(os, sec, "SubProbParallelChunksize", SubProbParallelChunksize); 
 
       UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum); 
 
