@@ -49,9 +49,11 @@
 //---
 //--- DECOMP typedefs
 //---
+
 class DecompVar;
 class DecompCut;
 class DecompRay;
+
 typedef std::list<DecompVar*> DecompVarList;
 typedef std::list<DecompCut*> DecompCutList;
 typedef std::list<DecompRay*> DecompRayList; 
