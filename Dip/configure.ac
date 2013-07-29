@@ -9,7 +9,7 @@
 # Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
 #                    Ted Ralphs, Lehigh University                           #
 #                                                                            #
-# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs     #
+# Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
@@ -107,6 +107,34 @@ AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 
 AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
+
+#############################################################################
+#                       Python Stuff (for Dippy)                            #
+#############################################################################
+
+AM_PATH_PYTHON([2.6],,[:])
+if test "$PYTHON" != "" ; then
+  PY_PREFIX=`$PYTHON -c 'import sys ; print sys.prefix'`
+  echo $PY_PREFIX
+  PY_PLATFORM=`$PYTHON -c 'import sys ; print sys.platform'`
+  echo $PY_PLATFORM
+  if test "$PY_PLATFORM" != "win32" ; then
+     AC_COIN_CHECK_HEADER([$PY_PREFIX/include/python$PYTHON_VERSION/Python.h],,
+			[PYTHON=])
+  else
+     PYTHON=""
+  fi
+fi		       
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != "" ])
+if test "$PY_PLATFORM" != "win32" ; then
+  PYTHON_LIBS="-lpython$PYTHON_VERSION"
+  PYTHON_CFLAGS="-I$PY_PREFIX/include/python$PYTHON_VERSION"
+else
+  PYTHON_LIBS="-lpython"
+  PYTHON_CFLAGS="-I$PY_PREFIX\\include"
+fi
+AC_SUBST([PYTHON_LIBS])
+AC_SUBST([PYTHON_CFLAGS])
 
 #############################################################################
 #                      Check for the LP solver                              #
@@ -226,6 +254,7 @@ AC_SUBST(CLLCFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 src/dippy/Makefile
                  examples/Makefile.Examples
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm

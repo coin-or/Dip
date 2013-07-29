@@ -25,7 +25,7 @@
 # Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
 #                    Ted Ralphs, Lehigh University                           #
 #                                                                            #
-# Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs     #
+# Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
@@ -75,8 +75,6 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/ATM/Makefile.in \
 	$(top_srcdir)/examples/ATM/atm.parm.in \
 	$(top_srcdir)/examples/ATM/data_extract.sh.in \
-	$(top_srcdir)/examples/DIP/Makefile.in \
-	$(top_srcdir)/examples/DIP/data_extract.sh.in \
 	$(top_srcdir)/examples/ExternalSolvers/Graph/get.boost.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in \
@@ -133,7 +131,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/VRP/get_concorde.sh.in \
 	$(top_srcdir)/examples/VRP/get_cvrpsep.sh.in \
 	$(top_srcdir)/examples/VRP/vrp.parm.in AUTHORS config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
+	config.sub depcomp install-sh ltmain.sh missing py-compile
 @HAVE_EXTERNALS_TRUE@am__append_2 = Dependencies
 @HAVE_EXTERNALS_TRUE@am__append_3 = .Dependencies-stamp
 subdir = .
@@ -173,7 +171,6 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/ATM/atm.parm examples/ATM/data_extract.sh \
 	examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm \
 	examples/SDPUC/data_extract.sh examples/SDPUC/README.txt \
-	examples/DIP/Makefile examples/DIP/data_extract.sh \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -343,6 +340,8 @@ F77 = @F77@
 FFLAGS = @FFLAGS@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
+HAVE_PYTHON_FALSE = @HAVE_PYTHON_FALSE@
+HAVE_PYTHON_TRUE = @HAVE_PYTHON_TRUE@
 HMETISINCDIR = @HMETISINCDIR@
 HMETISLIB = @HMETISLIB@
 INSTALL_DATA = @INSTALL_DATA@
@@ -375,6 +374,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PYTHON = @PYTHON@
+PYTHON_CFLAGS = @PYTHON_CFLAGS@
+PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
+PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_PLATFORM = @PYTHON_PLATFORM@
+PYTHON_PREFIX = @PYTHON_PREFIX@
+PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
 SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
@@ -398,10 +404,10 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_PKG_CONFIG = @ac_ct_PKG_CONFIG@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -437,8 +443,12 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pkgpyexecdir = @pkgpyexecdir@
+pkgpythondir = @pkgpythondir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+pyexecdir = @pyexecdir@
+pythondir = @pythondir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@
@@ -608,10 +618,6 @@ examples/SDPUC/sdpuc.parm: $(top_builddir)/config.status $(top_srcdir)/examples/
 examples/SDPUC/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/SDPUC/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/SDPUC/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/SDPUC/README.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/DIP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/DIP/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/DIP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/DIP/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/ExternalSolvers/Knapsack/Pisinger/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -794,7 +800,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/DIP $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -1061,7 +1067,7 @@ install-data-hook:
 	@$(mkdir_p) "$(addlibsdir)"
 @COIN_HAS_PKGCONFIG_TRUE@	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ \
 @COIN_HAS_PKGCONFIG_TRUE@	$(PKG_CONFIG) --libs dip > $(addlibsdir)/dip_addlibs.txt
-@COIN_CXX_IS_CL_TRUE@@COIN_HAS_PKGCONFIG_FALSE@	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libDip.lib @DIPLIB_LIBS_INSTALLED@" > $(addlibsdir)/dip_addlibs.txt
+@COIN_CXX_IS_CL_TRUE@@COIN_HAS_PKGCONFIG_FALSE@	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libDecomp.lib @DIPLIB_LIBS_INSTALLED@" > $(addlibsdir)/dip_addlibs.txt
 @COIN_CXX_IS_CL_FALSE@@COIN_HAS_PKGCONFIG_FALSE@	echo -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@ > $(addlibsdir)/dip_addlibs.txt
 
 uninstall-hook:

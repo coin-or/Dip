@@ -186,6 +186,8 @@ F77 = @F77@
 FFLAGS = @FFLAGS@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
+HAVE_PYTHON_FALSE = @HAVE_PYTHON_FALSE@
+HAVE_PYTHON_TRUE = @HAVE_PYTHON_TRUE@
 HMETISINCDIR = @HMETISINCDIR@
 HMETISLIB = @HMETISLIB@
 INSTALL_DATA = @INSTALL_DATA@
@@ -218,6 +220,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PYTHON = @PYTHON@
+PYTHON_CFLAGS = @PYTHON_CFLAGS@
+PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
+PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_PLATFORM = @PYTHON_PLATFORM@
+PYTHON_PREFIX = @PYTHON_PREFIX@
+PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
 RPATH_FLAGS = @RPATH_FLAGS@
 SAMPLE_CFLAGS = @SAMPLE_CFLAGS@
@@ -241,10 +250,10 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_PKG_CONFIG = @ac_ct_PKG_CONFIG@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -280,8 +289,12 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pkgpyexecdir = @pkgpyexecdir@
+pkgpythondir = @pkgpythondir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+pyexecdir = @pyexecdir@
+pythondir = @pythondir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@
@@ -451,7 +464,7 @@ uninstall-am: uninstall-info-am
 
 test: ../src/dip$(EXEEXT)
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
+	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
 
 	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
 

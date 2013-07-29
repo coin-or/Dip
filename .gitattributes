@@ -3,6 +3,8 @@
 /Dependencies -text
 Dip/AUTHORS -text
 Dip/LICENSE -text
+Dip/MSVisualStudio/v10/Decomp/Dip.sln -text
+Dip/MSVisualStudio/v10/Decomp/Dip.vcxproj -text
 Dip/MSVisualStudio/v10/Decomp/libDecomp/libDecomp.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/ATM/ATM.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/DecompExamples.sln -text
@@ -11,6 +13,8 @@ Dip/MSVisualStudio/v10/DecompExamples/MCF/MCF.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/Milp/Milp.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/MilpBlock/MilpBlock.vcxproj -text
 Dip/MSVisualStudio/v10/DecompExamples/SmallIP/SmallIP.vcxproj -text
+Dip/MSVisualStudio/v10/Dippy/Dippy.sln -text
+Dip/MSVisualStudio/v10/Dippy/Dippy.vcxproj -text
 Dip/MSVisualStudio/v9/Decomp/ExternalSolvers/Knapsack/Pisinger/Pisinger.sln -text
 Dip/MSVisualStudio/v9/Decomp/ExternalSolvers/Knapsack/Pisinger/Pisinger.vcproj -text
 Dip/MSVisualStudio/v9/Decomp/ExternalSolvers/TSP/libConcorde/libConcorde.vcproj -text
@@ -39,6 +43,7 @@ Dip/MSVisualStudio/v9/DecompExamples/VRP/vrp.parm -text
 Dip/Makefile.am -text
 Dip/Makefile.in -text
 Dip/README -text
+Dip/README.rst -text
 Dip/bugs/OsiCbc/main.cpp -text
 Dip/bugs/OsiCbc/tmp.mps -text
 Dip/bugs/PRICE_AND_CUT_subProb_relax0.n0.c0.p0.b0.lp -text
@@ -368,9 +373,11 @@ Dip/examples/scripts/random/forestry/run200.sh -text
 Dip/examples/scripts/random/forestry/run240.sh -text
 Dip/examples/scripts/random/forestry/run40.sh -text
 Dip/examples/scripts/report_decomp.py -text
+Dip/ez_setup.py -text
 Dip/install-sh -text
 Dip/ltmain.sh -text
 Dip/missing -text
+Dip/py-compile -text
 Dip/scripts/Copyright -text
 Dip/scripts/average.awk -text
 Dip/scripts/copyright_add.sh -text
@@ -384,6 +391,7 @@ Dip/scripts/parse.retail.sh -text
 Dip/scripts/parse2.awk.retail.sh -text
 Dip/scripts/parse2.awk.sh -text
 Dip/scripts/plot_bounds.py -text
+Dip/setup.py -text
 Dip/src/AlpsDecompModel.cpp -text
 Dip/src/AlpsDecompModel.h -text
 Dip/src/AlpsDecompNodeDesc.h -text
