@@ -9,13 +9,14 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
 #include "DecompApp.h"
 #include "DecompVar.h"
 #include "DecompConfig.h"
+
 #include <vector>
 #include <set>
 #include <fstream>
@@ -24,8 +25,15 @@
 #include "iterator"
 #include "omp.h"
 //#if defined(autoDecomp) && defined(PaToH)
-#if  defined(PaToH)
 
+#include <vector>
+#include <set>
+#include <fstream>
+#include <string>
+#include "iterator"
+#include "omp.h"
+//#if defined(autoDecomp) && defined(PaToH)
+#if  defined(PaToH)
 #include "patoh.h"
 
 //#elif defined(autoDecomp)
@@ -40,8 +48,6 @@ extern "C"{
 #endif
 
 
-
-
 using namespace std;
 
 // --------------------------------------------------------------------- //
@@ -51,7 +57,7 @@ void DecompApp::startupLog(){
 	 << "\n========================================================"
 	 << "\n========================================================"
 	 <<   "\nWelcome to the DIP Decomposition Framework"
-	 <<   "\nCopyright 2002-2011 Lehigh University and others"
+	 <<   "\nCopyright 2002-2013 Lehigh University and others"
 	 <<   "\nAll Rights Reserved"
 	 <<   "\nDistributed under the Eclipse Public License 1.0"
 	 <<   "\nVersion: " << DIP_VERSION
@@ -141,6 +147,7 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    //--- get application parameters
    //---   
+
 
 
 
@@ -1829,8 +1836,6 @@ void DecompApp::singlyBorderStructureDetection(){
     std::cout << "The number of blocks is " << nparts << std::endl; 
 	
 }
-
-
 
 
 #if 0

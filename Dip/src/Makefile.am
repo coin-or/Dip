@@ -12,6 +12,11 @@
 
 ## $Id: $
 
+SUBDIRS = .
+if HAVE_PYTHON
+SUBDIRS += dippy
+endif
+
 ########################################################################
 #                               libDecomp                              #
 ########################################################################
@@ -42,10 +47,10 @@ libDecomp_la_SOURCES +=   \
 	DecompCutOsi.h    \
 	DecompCutPool.cpp \
 	DecompCutPool.h   \
-	DecompRay.cpp     \
-        DecompRay.h       \
-	DecompRayPool.cpp \
-        DecompRayPool.h
+	DecompRay.cpp 	  \
+	DecompRay.h	  \
+	DecompRayPool.h   \
+	DecompRayPool.cpp 
 
 # DecompApp
 libDecomp_la_SOURCES +=  \
@@ -108,8 +113,6 @@ libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 #                            DIP binary                                #
 ########################################################################
 
-if COIN_HAS_HMETIS
-
 # Name of the executable compiled in this directory.  We want it to be
 # installed in the 'bin' directory
 bin_PROGRAMS = dip
@@ -118,10 +121,11 @@ bin_PROGRAMS = dip
 dip_SOURCES = DecompMain.cpp
 
 # Additional libraries
-dip_LDADD = libDecomp.la $(DIPLIB_LIBS) $(HMETISLIB)
-dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
-
+dip_LDADD = libDecomp.la $(DIPLIB_LIBS)
+if COIN_HAS_HMETIS
+dip_LDADD +=  $(HMETISLIB)
 endif
+dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
 
 ########################################################################
 #                            Additional flags                          #
@@ -133,9 +137,7 @@ endif
 AM_CPPFLAGS = $(DIPLIB_CFLAGS)
 
 if COIN_HAS_HMETIS
-
 AM_CPPFLAGS += -I`$(CYGPATH_W) $(HMETISINCDIR)`
-
 endif
 
 # This line is necessary to allow VPATH compilation
@@ -224,6 +226,21 @@ includecoin_HEADERS +=             \
 	AlpsDecompNodeDesc.h   \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
+
+########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+if COIN_CXX_IS_CL
+install-exec-hook:
+	test -s dip.exe.manifest && \
+	mt -manifest dip.exe.manifest -outputresource:dip.exe;\
+	cp dip.exe $(bindir)/dip.exe
+endif
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
 
 install-exec-local:
 	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h

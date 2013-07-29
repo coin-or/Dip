@@ -10,7 +10,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -28,12 +28,10 @@
 #include "CoinLpIO.hpp"
 
 extern "C"{
-#if defined (COIN_HAS_METIS)
+#if defined (COIN_HAS_HMETIS)
 #include "hmetis.h"
 #endif
 }
-
-
 
 //===========================================================================//
 class DecompAlgo;
@@ -91,9 +89,6 @@ public:
     */  
    const double * m_objective;
 
-
-
-   
    /**
     *  Model data: the core model (A'')
     */  
@@ -354,7 +349,6 @@ public:
       
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
                                            const double     * redCostX,
-                                           const double       convexDual,
                                            DecompVarList    & varList){
       return DecompSolStatNoSolution;
    }
@@ -370,7 +364,6 @@ public:
 
    virtual DecompSolverStatus solveRelaxedNest(const int          whichBlock,
                                                const double     * redCostX,
-                                               const double       convexDual,
                                                DecompVarList    & varList){
       return DecompSolStatNoSolution;
    }

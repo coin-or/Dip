@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -54,7 +54,7 @@ public:
    virtual ~AlpsDecompTreeNode(){
    }
 
-   void checkIncumbent(AlpsDecompModel      * model,
+   bool checkIncumbent(AlpsDecompModel      * model,
                        const DecompSolution * decompSol);
     
    //---
@@ -78,12 +78,10 @@ public:
        are AlpsNodeStatusCandidate. */
    std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > branch(); 
 
-
    inline std::vector< std::pair<int, double> >  getDownBranchLB() const {return downBranchLB_;}
    inline std::vector< std::pair<int, double> >  getDownBranchUB() const {return downBranchUB_;}
    inline std::vector< std::pair<int, double> >  getUpBranchLB() const {return upBranchLB_;}
    inline std::vector< std::pair<int, double> >  getUpBranchUB() const {return upBranchUB_;}
-
    
    inline void setBranchBound(int& BranchSize, int*& BranchIndices,
 			      double*& BranchValues,
@@ -110,7 +108,14 @@ public:
    /** Decode a node from an encoded object. */
    virtual AlpsKnowledge* decode(AlpsEncoded&) const;
 
-
+   //For now, we assume there is only one variable being branched on.
+   int getBranchedVar(){
+	   if (!downBranchLB_.empty()){
+		   return downBranchLB_[0].first;
+	   }else{
+		   return -1;
+	   }
+   }
 
 };
 

@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -216,6 +216,7 @@ public:
 
    int DebugCheckBlocksColumns;
 
+
    /*
     * The block number for automatic decomposition
     */
@@ -232,7 +233,11 @@ public:
    std::string Instance;
    std::string InstanceFormat; 
 
-   /**
+   
+   /*
+    * The file defining which rows are in which blocks.
+    */
+   /*
     * The format of BlockFile.
     *
     * (1) "List" or "LIST"
@@ -314,14 +319,6 @@ public:
    int SubProbParallelChunksize; 
 
    int ConcurrentThreadsNum; 
-
-   
-   /**
-    * @}
-    */
-   
-   
-
    
    //-----------------------------------------------------------------------//
    /**
@@ -425,10 +422,6 @@ public:
       PARAM_getSetting("ColumnUB",ColumnUB);
       PARAM_getSetting("ColumnLB",ColumnLB);
       PARAM_getSetting("ObjectiveSense",ObjectiveSense);
-
-      //---
-      //--- store the original setting for DualStabAlpha
-      //---
       
       PARAM_getSetting("MasterUB", MasterUB); 
       PARAM_getSetting("MasterLB", MasterLB); 
@@ -453,8 +446,8 @@ public:
 
       PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
 
-      PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
-     
+      PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);     
+
       DualStabAlphaOrig = DualStabAlpha;
    }
 
@@ -564,6 +557,7 @@ public:
       UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       UtilPrintParameter(os, sec, 
 			 "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
+
       UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
 
       UtilPrintParameter(os, sec, "LogLevel",  LogLevel);
@@ -695,6 +689,7 @@ public:
       BranchStrongIter         = 0;
       NumThreads               = 2;
       DebugCheckBlocksColumns  = true;
+
       NumBlocks                = 3; 
 
       /*
@@ -721,7 +716,6 @@ public:
       MasterUB                 = DecompInf;  
       
       MasterLB                 = -DecompInf;  
-
 
       MasterIPUB               = DecompInf;
 

@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -146,6 +146,7 @@ const std::string DecompPhaseStr[6] = {
 //---
 enum DecompStatus{
    STAT_FEASIBLE, 
+   STAT_IP_FEASIBLE,
    STAT_INFEASIBLE,
    STAT_UNKNOWN
 };

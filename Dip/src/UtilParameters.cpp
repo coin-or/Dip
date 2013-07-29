@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -152,7 +152,6 @@ void UtilParameters::LoadParamFile(string & paramFileName) {
    int lineNum = 0;
    while(!is.eof()) {
       is.getline(buf, sizeof(buf)-1);
-
       lineNum++;
     
       ptr = strchr(buf,'#');

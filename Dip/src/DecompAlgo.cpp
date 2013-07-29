@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2011, Lehigh University, Matthew Galati, and Ted Ralphs//
+// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, and Ted Ralphs//
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -22,6 +22,7 @@
 #include "DecompAlgoCGL.h"
 #include "DecompSolverResult.h"
 #include "omp.h"
+
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
 
@@ -44,7 +45,6 @@
 using namespace std;
 
 //===========================================================================//
-
 struct SolveRelaxedThreadArgs {
    DecompAlgo         *  algo;
    vector<DecompAlgoModel*>  * algoModel;   
@@ -2232,7 +2232,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	 //--- TODO: for nonexplicity, also check user app isfeasible
 	 //---
 	 //TODO: should this whole section be phaseDone?
-	 if(nChanges && m_status != STAT_INFEASIBLE){
+	 if(m_status != STAT_INFEASIBLE){
 	    recomposeSolution(getMasterPrimalSolution(), m_xhat);
 	    UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		       m_app->printOriginalSolution(modelCore->getNumCols(),
@@ -2376,7 +2376,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode * node,
 	       m_objNoChange = true;
                
                UTIL_DEBUG(m_param.LogDebugLevel, 3,
-                          (*m_osLog) << "No objective change" << endl;);           
+                          (*m_osLog) << "No objective change" << endl;);
 	       //0 1 2 3 4
 	       // w new vars
 	       //4x 3x 2 1 0
@@ -4558,10 +4558,6 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
    else{
       rays.push_back(raysT[0]);
    }
-   
-   
-
-      
 
 #if 1
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
@@ -4585,6 +4581,7 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays){
 		 printBasisInfo(m_masterSI, m_osLog);
 		 fflush(stdout);
 	      }
+
 	      assert(isDualRayInfProof(ray,
 				       m_masterSI->getMatrixByRow(),
 				       m_masterSI->getColLower(),
@@ -4621,23 +4618,29 @@ void DecompAlgo::generateVarsCalcRedCost(const double * u,
    //--- in D , we use (c-u   )x, we don't use the core matrix
    //---    u, in this case has dimension = #core cols
    //---
+   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+	      int nMasterRows   = m_masterSI->getNumRows();
+	      assert((nMasterRows - m_numConvexCon) == 
+		     modelCore->M->getNumRows());
+	      );
    if(m_algo == DECOMP){
+
      int nMasterRows   = m_masterSI->getNumRows();
      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 		assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumCols());
 		);
-
-      for(i = 0; i < nCoreCols; i++)
+     
+     for(i = 0; i < nCoreCols; i++)
 	 redCostX[i] = u[i];
    }
    else{
+
      int nMasterRows   = m_masterSI->getNumRows();
      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 		assert((nMasterRows - m_numConvexCon) == modelCore->M->getNumRows());
 		);
 
-
-      modelCore->M->transposeTimes(u, redCostX);
+     modelCore->M->transposeTimes(u, redCostX);
    }
 
    //--- 
@@ -7279,20 +7282,34 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       list<DecompVar*> varsDebug;
       if(isNested)
          solverStatus 
-            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, varsDebug);
+            = m_app->solveRelaxedNest(whichBlock, redCostX, varsDebug);
       else
          solverStatus 
-            = m_app->solveRelaxed(whichBlock, redCostX, alpha, varsDebug);
+            = m_app->solveRelaxed(whichBlock, redCostX, varsDebug);
+	  DecompVarList::iterator it;
+	  for(it = varsDebug.begin(); it != varsDebug.end(); it++){
+		  if ((*it)->getBlockId() == whichBlock){
+			 (*it)->setReducedCost((*it)->getReducedCost() - alpha);
+		  }
+	  }
       solverStatus = DecompSolStatNoSolution;
    }
    
    if(m_param.SolveRelaxAsIp != 1){
-      if(isNested)
+      if(isNested){
          solverStatus 
-            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, vars);      
-      else
+            = m_app->solveRelaxedNest(whichBlock, redCostX, vars);      
+	  }else{
          solverStatus 
-            = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
+            = m_app->solveRelaxed(whichBlock, redCostX, vars);
+	  }
+	  DecompVarList::iterator it;
+	  for(it = vars.begin(); it != vars.end(); it++){
+		  if ((*it)->getBlockId() == whichBlock){
+			 (*it)->setReducedCost((*it)->getReducedCost() - alpha);
+		  }
+	  }
+
 
       if(!m_param.SubProbParallel){
 	m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
@@ -7501,26 +7518,28 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
       for(it = vars.begin(); it != vars.end(); it++){
 	 int               whichBlock     = (*it)->getBlockId();
 	 if(whichBlock != -1){
-	    DecompAlgoModel & algoModelCheck = getModelRelax(whichBlock);
-	    UTIL_DEBUG(m_param.LogDebugLevel, 4,
+	   UTIL_DEBUG(m_param.LogDebugLevel, 4,
 		       (*m_osLog) << "Check that var satisifes relax matrix "
 		       << whichBlock << endl;
 		       (*it)->print();
 		       );
 	    (*it)->fillDenseArr(n_origCols, xTemp);
 	    //TODO: get rid of this function, use isPointFeasible
+	    
 
 	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-		       bool isRelaxFeas 
-		       = checkPointFeasible(algoModelCheck.getModel(), xTemp);
+		       DecompAlgoModel & algoModelCheck =
+		       getModelRelax(whichBlock); 
+		       bool isRelaxFeas =
+		       checkPointFeasible(algoModelCheck.getModel(), 
+					  xTemp);
 		       assert(isRelaxFeas);
-		       );
-
+		       );	    
 	 }
       }
-      UTIL_DELARR(xTemp);
-   }   
-   
+      UTIL_DELARR(xTemp); 
+   }
+
    if(!m_param.SubProbParallel){
      m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime()); 
    }
