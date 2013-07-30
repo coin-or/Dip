@@ -57,7 +57,6 @@ struct SolveRelaxedThreadArgs {
    bool                  doExact;
    bool                  doCutoff;
    list<DecompVar*>    * vars;
-   list<DecompRay*>    * rays; 
 };
 
 
@@ -4782,7 +4781,6 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    int            whichBlock;
    double         varRedCost;
    DecompVarList::iterator it;
-   DecompRayList::iterator itRay; 
    assert(!m_masterSI->isProvenPrimalInfeasible());
 
    if(m_algo == DECOMP)
@@ -5087,10 +5085,8 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
        omp_set_num_threads(m_param.NumThreads);
        printf("===== START Threaded solve of subproblems. =====\n");
        DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
-       DecompRayList* potentialRaysT = new DecompRayList[m_numConvexCon];
  
        CoinAssertHint(potentialVarsT, "Error: Out of Memory");
-       CoinAssertHint(potentialRaysT, "Error: Out of Memory");
       
        bool useCutoff = false;      
        if(m_phase == PHASE_PRICE2)
@@ -5107,7 +5103,6 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 arg[i].origCost      = origObjective;
 	 arg[i].n_origCols    = nCoreCols;
 	 arg[i].vars          = &potentialVarsT[i];
-	 arg[i].rays          = &potentialRaysT[i]; 
        }
    	  
        //---
@@ -5150,7 +5145,6 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 const double        * origObjective= arg[subprobIndex].origCost; //read-only
 	 int                   nCoreCols    = arg[subprobIndex].n_origCols; 
 	 list<DecompVar*>    * vars         = arg[subprobIndex].vars;
-	 list<DecompRay*>    * rays         = arg[subprobIndex].rays;
 	
 	 DecompAlgoModel & algoModel = algo->getModelRelax(subprobIndex);
 	 double             alpha           = u[nBaseCoreRows + subprobIndex];
@@ -5166,8 +5160,8 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 			    false,//isNested
 			    algoModel,
 			    &solveResult,
-			    *vars,
-			    *rays);		 
+			    *vars
+			    );
        }                       
      
    
@@ -5198,11 +5192,6 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	     it != arg[t].vars->end(); it++){	    
 	   potentialVars.push_back(*it);
 	 }
-	 for(itRay  = arg[t].rays->begin();
-	     itRay != arg[t].rays->end(); itRay++){	    
-	   potentialRays.push_back(*itRay);
-	 }
-
        }
    //put the vars from all threads into one vector
 
@@ -5210,7 +5199,6 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
    //--- clean-up local memory
    //---
    UTIL_DELARR(potentialVarsT);
-   UTIL_DELARR(potentialRaysT);
    UTIL_DELARR(arg);
      }
 else
@@ -7168,8 +7156,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double        * redCostX,
 				      const bool            isNested,
                                       DecompAlgoModel     & algoModel,
                                       DecompSolverResult  * solveResult,
-                                      list<DecompVar*>    & vars,
-				      list<DecompRay*>    & rays){
+                                      list<DecompVar*>    & vars
+				      ){
+				     
    
    //---
    //--- For pricing,
