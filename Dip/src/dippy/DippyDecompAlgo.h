@@ -77,11 +77,12 @@ public:
      * Call the algorithm's generateInitVars method if the 'generateInitVars' param is set to
      * true.
      */
-    virtual int generateInitVars(DecompAlgo *algo, DecompVarList & initVars) {
+    virtual int generateInitVars(DecompAlgo *algo, DecompVarList & initVars, DecompRayList
+				 & initRays) {
         bool gen = m_utilParam->GetSetting("generateInitVars", true);
 		bool inPy = m_utilParam->GetSetting("pyInitVars", true);
         if (gen && inPy) 
-            return algo->DecompAlgo::generateInitVars(initVars);
+ 	  return algo->DecompAlgo::generateInitVars(initVars, initRays);
         return 0;
     }
 };
@@ -155,8 +156,8 @@ public:
         return DippyAlgoMixin::generateCuts(this, xhat, newCuts);
     }
 
-    virtual int generateInitVars(DecompVarList & initVars) {
-        return DippyAlgoMixin::generateInitVars(this, initVars);
+   virtual int generateInitVars(DecompVarList & initVars, DecompRayList & initRays) {
+     return DippyAlgoMixin::generateInitVars(this, initVars, initRays);
     }
 };
 
@@ -191,8 +192,8 @@ public:
         return DippyAlgoMixin::generateCuts(this, xhat, newCuts);
     }
 
-    virtual int generateInitVars(DecompVarList & initVars) {
-        return DippyAlgoMixin::generateInitVars(this, initVars);
+   virtual int generateInitVars(DecompVarList & initVars, DecompRayList & initRays) {
+     return DippyAlgoMixin::generateInitVars(this, initVars, initRays);
     }
 };
 
