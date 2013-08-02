@@ -85,7 +85,8 @@ int main(int argc, char ** argv){
       // (for all OS releases >= 10.4, i.e., Tiger onwards)  
       // other systems has different syntax to obtain the core number 
      
-      int numCPU = sysconf( _SC_NPROCESSORS_ONLN ); 
+      int numCPU = omp_get_num_procs();
+
       std::cout << "The number of cores in this node is " 
 		<< numCPU << std::endl; 
       int numThreads = min(numCPU, static_cast<int>(blockNumCandidates.size())); 
