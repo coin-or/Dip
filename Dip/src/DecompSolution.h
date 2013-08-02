@@ -70,10 +70,10 @@ public:
       os << std::setiosflags(std::ios::fixed|std::ios::showpoint);
       
       //os << "-------------------------" << std::endl;
-      //os << "obj= " << getQuality() << std::endl;
+      os << "=obj= " << getQuality() << std::endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-	    os << std::setw(25) << colNames[i] << "   " << m_values[i] << std::endl;
+	    os << colNames[i] << " " << m_values[i] << std::endl;
          }
       }
       //os << "-------------------------" << std::endl;

@@ -216,13 +216,11 @@ public:
 
    int DebugCheckBlocksColumns;
 
-
    /*
     * The block number for automatic decomposition
     */
     
    int NumBlocks; 
-
    
    /*
     * The following parameters are extended from MILPBlock 
@@ -283,12 +281,10 @@ public:
    int ObjectiveSense; //1=min, -1=max
 
    int AutoDecomp; 
-
    // variable indicates whether to use  
    // multiple cores to compute concurrently 
    
    int Concurrent;  
-   
    
    // number of block candidates 
    int NumBlocksCand;  
@@ -301,6 +297,12 @@ public:
    int ThreadIndex; 
 
    std::string CurrentWorkingDir;  
+
+   bool SubProbParallel; 
+
+   int SubProbParallelType; 
+
+   int SubProbParallelChunksize; 
    /**
     * @}
     */
@@ -379,10 +381,7 @@ public:
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("NumThreads",              NumThreads);
-
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-
-
 
       PARAM_getSetting("NumBlocks",NumBlocks); 
       DataDir       = param.GetSetting("DataDir",       "",    "MILP");
@@ -419,6 +418,11 @@ public:
       //--- store the original setting for DualStabAlpha
       //---
       PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
+
+      PARAM_getSetting("SubProbParallel", SubProbParallel);
+      PARAM_getSetting("SubProbParallelType", SubProbParallelType);
+
+      PARAM_getSetting("SubProbParallelType", SubProbParallelChunksize);
 
       DualStabAlphaOrig = DualStabAlpha;
    }
@@ -570,6 +574,9 @@ public:
       UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
 
       UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);      
+      
+      UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
+      UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType); 
 
       (*os) << "========================================================\n";
    }
@@ -634,7 +641,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      NumThreads               = 1;
+      NumThreads               = 2;
       DebugCheckBlocksColumns  = true;
       NumBlocks                = 3; 
 
@@ -662,6 +669,12 @@ public:
       ThreadIndex              = 0; 
 
       CurrentWorkingDir        = ""; 
+
+      SubProbParallel          = false; 
+      
+      SubProbParallelType      = SubProbScheduleDynamic;
+      
+      SubProbParallelChunksize = 1;
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

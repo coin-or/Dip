@@ -197,6 +197,15 @@ enum DecompFunction {
    DecompFuncGenerateInitVars = 1
 };
 
+enum DecompSubProbParallelType{
+  SubProbScheduleStatic, 
+  SubProbScheduleDynamic, 
+  SubProbScheduleGuided, 
+  SubProbScheduleRuntime
+}; 
+
+
+
 //===========================================================================//
 enum DecompRowType{
    //original row
@@ -257,7 +266,13 @@ const std::string DecompColTypeStr[12] = {
    "DecompCol_ToBeDeleted"
 };
 
+/*
+enum DecompNumericErrorType {
 
+
+
+};
+*/
 
 //===========================================================================//
 // COIN Headers                                                              //
