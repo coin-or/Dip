@@ -85,7 +85,8 @@ int main(int argc, char ** argv){
       // (for all OS releases >= 10.4, i.e., Tiger onwards)  
       // other systems has different syntax to obtain the core number 
      
-      int numCPU = sysconf( _SC_NPROCESSORS_ONLN ); 
+      int numCPU = omp_get_num_procs();
+
       if(milp.m_param.LogDebugLevel > 1){
 	std::cout << "The number of cores is " 
 		  << numCPU << std::endl; 
