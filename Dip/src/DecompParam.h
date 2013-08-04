@@ -159,7 +159,7 @@ public:
    //2 = Calls the user defined function (if exists) and then calls built-in 
    //    IP solver (use this for debugging).
 
-   int    SolveRelaxAsIp;
+   bool    SolveRelaxAsIp;
 
    int    InitVarsWithCutDC;
    int    InitVarsWithIP;
@@ -170,11 +170,11 @@ public:
 
    int    InitCompactSolve;
 
-   int    DualStab;
+   bool    DualStab;
    double DualStabAlpha;
    double DualStabAlphaOrig;
 
-   int    BreakOutPartial; //DISABLED for now
+   bool    BreakOutPartial; //DISABLED for now
    
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
@@ -182,8 +182,8 @@ public:
    //string IpAlgoStart;
    //string IpAlgoSub;
 
-   int    BranchEnforceInSubProb;
-   int    BranchEnforceInMaster;
+   bool    BranchEnforceInSubProb;
+   bool    BranchEnforceInMaster;
    int    MasterConvexityLessThan; //0='E', 1='L'
    double ParallelColsLimit;       //cosine of angle >, then consider parallel
 
@@ -279,12 +279,10 @@ public:
    double ColumnLB; //hack since missing extreme rays
 
    int ObjectiveSense; //1=min, -1=max
-
-   int AutoDecomp; 
    // variable indicates whether to use  
    // multiple cores to compute concurrently 
    
-   int Concurrent;  
+   bool Concurrent;  
    
    // number of block candidates 
    int NumBlocksCand;  
@@ -303,6 +301,10 @@ public:
    int SubProbParallelType; 
 
    int SubProbParallelChunksize; 
+
+   int ConcurrentThreadsNum; 
+
+   
    /**
     * @}
     */
@@ -413,17 +415,19 @@ public:
       PARAM_getSetting("ColumnLB",ColumnLB);
       PARAM_getSetting("ObjectiveSense",ObjectiveSense);
 
-      PARAM_getSetting("AutoDecomp", AutoDecomp); 
       //---
       //--- store the original setting for DualStabAlpha
       //---
+
       PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
 
       PARAM_getSetting("SubProbParallel", SubProbParallel);
       PARAM_getSetting("SubProbParallelType", SubProbParallelType);
 
-      PARAM_getSetting("SubProbParallelType", SubProbParallelChunksize);
+      PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
 
+      PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
+     
       DualStabAlphaOrig = DualStabAlpha;
    }
 
@@ -567,8 +571,6 @@ public:
 
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
 
-      UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
-
       UtilPrintParameter(os, sec, "Concurrent", Concurrent);  
 
       UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
@@ -577,6 +579,9 @@ public:
       
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
       UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType); 
+      UtilPrintParameter(os, sec, "SubProbParallelChunksize", SubProbParallelChunksize); 
+
+      UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum); 
 
       (*os) << "========================================================\n";
    }
@@ -627,7 +632,7 @@ public:
       SolveMasterAsIpFreqPass  = 1000;
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
-      SolveRelaxAsIp           = 0;
+      SolveRelaxAsIp           = false;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
@@ -664,8 +669,6 @@ public:
       ColumnLB                 =-1.e20;
       ObjectiveSense           = 1;
 
-      AutoDecomp               = 0;
-      
       ThreadIndex              = 0; 
 
       CurrentWorkingDir        = ""; 
@@ -675,6 +678,8 @@ public:
       SubProbParallelType      = SubProbScheduleDynamic;
       
       SubProbParallelChunksize = 1;
+
+      ConcurrentThreadsNum     = 4; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){
