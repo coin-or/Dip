@@ -4879,7 +4879,6 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
        //---
 
        //DecompApp * app = algo->getDecompAppMutable();
-       /*
        DecompSubProbParallelType ParallelType 
 	 = static_cast<DecompSubProbParallelType>(m_param.SubProbParallelType); 
       
@@ -4895,8 +4894,7 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
        else if(ParallelType == SubProbScheduleStatic){
 	 omp_set_schedule(omp_sched_static, m_param.SubProbParallelChunksize);
        }
-       */
-#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)      
+#pragma omp parallel for       
        for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++){
 	 
 	 DecompAlgo          * algo         = arg[subprobIndex].algo;

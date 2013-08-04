@@ -143,17 +143,29 @@ void DecompApp::initializeApp(UtilParameters & utilParam)  {
    if(m_param.LogLevel >= 1)
       m_param.dumpSettings();
 
-   if(!m_param.Concurrent){  
+   if(!m_param.AutoDecomp) 
+     
      //--- 
      //--- read block file 
-     //---      
+     //--- 
+     
      readBlockFile(); 
-   }
-   else       
+   
+   
+   else  
+     
      // automatic structure detection 
      {      
+#if defined (COIN_HAS_HMETIS) 
+       if(m_param.Concurrent){ 
+	 
 #pragma omp critical 
 	 singlyBorderStructureDetection(); 	 	 
+       }   
+      else{ 
+	singlyBorderStructureDetection(); 
+      }        
+#endif 
      } 
    
    
@@ -528,7 +540,7 @@ void DecompApp::readBlockFile(){
    } else{
       cerr << "Error: BlockFileFormat = " 
 	   << m_param.BlockFileFormat 
-	   << " is an invalid type. Valid types = (List,ZIBlist,Pair,PairName)." 
+	   << " is an invalid type. Valid types = (List,Pair,PairName)." 
 	   << endl;
       throw UtilException("Invalid Parameter.", 
 			  "readBlockFile", "DecompApp");
