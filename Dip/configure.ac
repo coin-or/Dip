@@ -109,6 +109,40 @@ AC_COIN_CHECK_PACKAGE(ASL,  [coinasl])
 AC_COIN_CHECK_USER_LIBRARY([HMetis],[HMETIS],[hmetis.h],[HMETIS_PartRecursive])
 
 #############################################################################
+#                          OPENMP stuff                                     #
+#############################################################################
+AC_ARG_ENABLE([openmp],
+[AC_HELP_STRING([--enable-openmp],
+                [compile in OpenMP features])],
+[case "${enableval}" in
+   yes) dip_openmp=true
+   ;;
+   no)  dip_openmp=false
+   ;;
+   *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
+   ;;
+esac],
+[dip_openmp=false])
+
+if test $dip_openmp = true; then 
+   AC_MSG_CHECKING([G++ version])
+   fopenmp_version=4.2
+   gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
+   get_gcc_version=`$CXX -dumpversion`
+   gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
+   major_gcc_version=`echo ${gcc_version:0:3}`
+   AC_MSG_RESULT([$get_gcc_version])
+   if test ${major_gcc_version} -lt ${gcc_required_version}; then
+       AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
+   DipDEFS="$DipDEFS -D_OPENMP"
+   fi
+fi      
+
+AM_CONDITIONAL(OPENMP, [test $dip_openmp = true])
+
+
+
+#############################################################################
 #                       Python Stuff (for Dippy)                            #
 #############################################################################
 
@@ -243,6 +277,28 @@ DipSRCDIR=`cd $srcdir; pwd`/src
 AC_SUBST(DipDEFS)
 AC_SUBST(ARCH)
 AC_SUBST(COIN_HAS_CLP) 
+
+CLLCFLAGS=
+case "$CXX" in
+  cl* | *\cl* | */cl*)
+     CLLCFLAGS=$CXXFLAGS
+     CXXFLAGS="$CXXFLAGS -TP"
+  ;;
+  g++* | *\g++* | */g++*)
+     if test $dip_openmp = true; then
+         CXXFLAGS="$CXXFLAGS -fopenmp"
+     fi
+
+     #Ignore warnings about unrecognized pragma lines and                                                                                    
+     #deprecated string conversions                                                                                                          
+     CXXFLAGS="$CXXFLAGS -Wno-unknown-pragmas -Wno-write-strings"
+
+     #Ignore warnings about comparisons of signed and unsigned values and                                                                    
+     #casting const pointers to ordinary pointers                                                                                            
+     CXXFLAGS="$CXXFLAGS -Wno-sign-compare -Wno-cast-qual"
+   ;;
+esac
+
 
 #Set CFLAGS to CXXFLAGS since we are using g++
 CFLAGS=$CXXFLAGS
