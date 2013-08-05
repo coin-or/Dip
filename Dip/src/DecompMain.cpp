@@ -438,14 +438,24 @@ void* DecompAuto(DecompApp& milp,
       //--- get optimal solution
       //---
       if (alpsModel.getSolStatus() == AlpsExitStatusOptimal) {
-         string   solutionFile = milp.getInstanceName() + ".sol";
-         ofstream osSolution(solutionFile.c_str());
-         const DecompSolution* solution = alpsModel.getBestSolution();
-         const vector<string> & colNames = alpsModel.getColNames();
-         cout << " Optimal Solution can be found in the file "
-              << solutionFile  << endl;
-         solution->print(colNames, 8, osSolution);
-         osSolution.close();
+	string::size_type idx = milp.getInstanceName().rfind('/');
+	string intanceNameWoDir; 
+	if(idx !=string::npos){
+	  intanceNameWoDir = milp.getInstanceName().substr(idx+1); 
+	}
+	else{
+	  intanceNameWoDir = milp.getInstanceName();
+	}
+	string solutionFile = milp.m_param.CurrentWorkingDir + UtilDirSlash()
+	                      + intanceNameWoDir + ".sol";
+	ofstream osSolution(solutionFile.c_str());
+	const DecompSolution* solution = alpsModel.getBestSolution();
+	const vector<string> & colNames = alpsModel.getColNames();
+	std::cout << "Optimal Solution is " << std::endl;
+	solution->print(colNames, 8);
+	cout << " Optimal Solution can be found in the file "
+	     << solutionFile  << endl;
+	osSolution.close();
       }
 
       //---
