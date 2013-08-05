@@ -415,19 +415,22 @@ public:
       PARAM_getSetting("ColumnLB",ColumnLB);
       PARAM_getSetting("ObjectiveSense",ObjectiveSense);
 
-      //---
-      //--- store the original setting for DualStabAlpha
-      //---
+      PARAM_getSetting("Concurrent", Concurrent);
+      PARAM_getSetting("NumBlocksCand", NumBlocksCand);
+      PARAM_getSetting("CconcurrentCutOffTime", ConcurrentCutOffTime); 
 
       PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
 
       PARAM_getSetting("SubProbParallel", SubProbParallel);
       PARAM_getSetting("SubProbParallelType", SubProbParallelType);
-
       PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
 
       PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
      
+      //---
+      //--- store the original setting for DualStabAlpha
+      //---
+
       DualStabAlphaOrig = DualStabAlpha;
    }
 
@@ -572,6 +575,8 @@ public:
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
 
       UtilPrintParameter(os, sec, "Concurrent", Concurrent);  
+      UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand);  
+      UtilPrintParameter(os, sec, "ConcurrentCutOffTime", ConcurrentCutOffTime);  
 
       UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
 
@@ -670,6 +675,8 @@ public:
       ObjectiveSense           = 1;
 
       Concurrent               = false;
+      NumBlocksCand            = 10;
+      ConcurrentCutOffTime     = 100;
       
       ThreadIndex              = 0; 
 
