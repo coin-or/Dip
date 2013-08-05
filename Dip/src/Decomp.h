@@ -66,6 +66,20 @@ const double DecompZero     = 1.0e-14;
 //---
 //--- DECOMP enums (for algorithms)
 //---
+
+
+struct DecompMainParam{ 
+  bool doCut;  
+  bool doPriceCut;  
+  bool doDirect;  
+  double timeSetupCpu ;  
+  double timeSetupReal; 
+  double timeSolveCpu ; 
+  double timeSolveReal ; 
+}; 
+
+
+
 enum DecompAlgoType{
    CUT,
    PRICE_AND_CUT,
@@ -183,6 +197,15 @@ enum DecompFunction {
    DecompFuncGenerateInitVars = 1
 };
 
+enum DecompSubProbParallelType{
+  SubProbScheduleStatic, 
+  SubProbScheduleDynamic, 
+  SubProbScheduleGuided, 
+  SubProbScheduleRuntime
+}; 
+
+
+
 //===========================================================================//
 enum DecompRowType{
    //original row
@@ -243,7 +266,13 @@ const std::string DecompColTypeStr[12] = {
    "DecompCol_ToBeDeleted"
 };
 
+/*
+enum DecompNumericErrorType {
 
+
+
+};
+*/
 
 //===========================================================================//
 // COIN Headers                                                              //

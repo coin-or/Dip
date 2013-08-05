@@ -65,9 +65,9 @@ host_triplet = @host@
 ########################################################################
 @CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_3 = -D__DECOMP_IP_CBC__
 @CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
-subdir = src/Dippy
+subdir = src/dippy
 DIST_COMMON = $(DIPPY_PYTHON) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+	$(srcdir)/Makefile.in AUTHORS
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -83,11 +83,10 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(DIPPYdir)"
-pyexecLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(pyexec_LTLIBRARIES)
-am__DEPENDENCIES_1 =
-_dippy_la_DEPENDENCIES = ../libDecomp.la $(am__DEPENDENCIES_1)
+am__installdirs = "$(DESTDIR)$(DIPPYlibdir)" "$(DESTDIR)$(DIPPYdir)"
+DIPPYlibLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(DIPPYlib_LTLIBRARIES)
+_dippy_la_DEPENDENCIES = ../libDecomp.la
 am__dippy_la_OBJECTS = _dippy_la-DippyDecompAlgo.lo \
 	_dippy_la-DippyDecompApp.lo _dippy_la-DippyPythonUtils.lo \
 	_dippy_la-DippyModule.lo _dippy_la-DippySolve.lo
@@ -271,9 +270,11 @@ MAKEINFO = @MAKEINFO@
 MPICC = @MPICC@
 MPICXX = @MPICXX@
 OBJEXT = @OBJEXT@
+OPENMP_FALSE = @OPENMP_FALSE@
+OPENMP_TRUE = @OPENMP_TRUE@
 OPT_CFLAGS = @OPT_CFLAGS@
 OPT_CXXFLAGS = @OPT_CXXFLAGS@
-PACKAGE = dippy
+PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
@@ -311,10 +312,10 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
+ac_ct_PKG_CONFIG = @ac_ct_PKG_CONFIG@
 ac_ct_RANLIB = @ac_ct_RANLIB@
 ac_ct_STRIP = @ac_ct_STRIP@
 ac_cxx_preproc_warn_flag = @ac_cxx_preproc_warn_flag@
-ac_pt_PKG_CONFIG = @ac_pt_PKG_CONFIG@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -361,9 +362,10 @@ sharedstatedir = @sharedstatedir@
 sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-DIPPYdir = $(pkgpythondir)
+DIPPYdir = $(pythondir)/dippy
+DIPPYlibdir = $(pyexecdir)/dippy
 DIPPY_PYTHON = __init__.py dipapi.py dippy.py
-pyexec_LTLIBRARIES = _dippy.la
+DIPPYlib_LTLIBRARIES = _dippy.la
 
 # List all source files for this library, including headers
 _dippy_la_SOURCES = \
@@ -385,8 +387,8 @@ _dippy_la_SOURCES = \
 # This is for libtool
 _dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_1) \
 	$(am__append_2) $(am__append_3) $(am__append_4)
-_dippy_la_LIBADD = ../libDecomp.la $(DIPLIB_LIBS)
-_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined
+_dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS)
+_dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined 
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I.. -I`$(CYGPATH_W) $(srcdir)` -I`$(CYGPATH_W) $(srcdir)/../` 
@@ -403,9 +405,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Dippy/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/dippy/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/Dippy/Makefile
+	  $(AUTOMAKE) --gnu  src/dippy/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -423,35 +425,35 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-install-pyexecLTLIBRARIES: $(pyexec_LTLIBRARIES)
+install-DIPPYlibLTLIBRARIES: $(DIPPYlib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(pyexecdir)" || $(mkdir_p) "$(DESTDIR)$(pyexecdir)"
-	@list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
+	test -z "$(DIPPYlibdir)" || $(mkdir_p) "$(DESTDIR)$(DIPPYlibdir)"
+	@list='$(DIPPYlib_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) --mode=install $(pyexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(pyexecdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(pyexecLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(pyexecdir)/$$f"; \
+	    echo " $(LIBTOOL) --mode=install $(DIPPYlibLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(DIPPYlibdir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(DIPPYlibLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(DIPPYlibdir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-pyexecLTLIBRARIES:
+uninstall-DIPPYlibLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
+	@set -x; list='$(DIPPYlib_LTLIBRARIES)'; for p in $$list; do \
 	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(pyexecdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(pyexecdir)/$$p"; \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(DIPPYlibdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(DIPPYlibdir)/$$p"; \
 	done
 
-clean-pyexecLTLIBRARIES:
-	-test -z "$(pyexec_LTLIBRARIES)" || rm -f $(pyexec_LTLIBRARIES)
-	@list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
+clean-DIPPYlibLTLIBRARIES:
+	-test -z "$(DIPPYlib_LTLIBRARIES)" || rm -f $(DIPPYlib_LTLIBRARIES)
+	@list='$(DIPPYlib_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 _dippy.la: $(_dippy_la_OBJECTS) $(_dippy_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(pyexecdir) $(_dippy_la_LDFLAGS) $(_dippy_la_OBJECTS) $(_dippy_la_LIBADD) $(LIBS)
+	$(CXXLINK) -rpath $(DIPPYlibdir) $(_dippy_la_LDFLAGS) $(_dippy_la_OBJECTS) $(_dippy_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -638,7 +640,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(DIPPYdir)"; do \
+	for dir in "$(DESTDIR)$(DIPPYlibdir)" "$(DESTDIR)$(DIPPYdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -667,7 +669,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-pyexecLTLIBRARIES \
+clean-am: clean-DIPPYlibLTLIBRARIES clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -686,9 +688,9 @@ info: info-am
 
 info-am:
 
-install-data-am: install-DIPPYPYTHON
+install-data-am: install-DIPPYPYTHON install-DIPPYlibLTLIBRARIES
 
-install-exec-am: install-pyexecLTLIBRARIES
+install-exec-am:
 
 install-info: install-info-am
 
@@ -714,21 +716,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-DIPPYPYTHON uninstall-info-am \
-	uninstall-pyexecLTLIBRARIES
+uninstall-am: uninstall-DIPPYPYTHON uninstall-DIPPYlibLTLIBRARIES \
+	uninstall-info-am
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-pyexecLTLIBRARIES ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-DIPPYPYTHON install-am install-data \
+.PHONY: CTAGS GTAGS all all-am check check-am clean \
+	clean-DIPPYlibLTLIBRARIES clean-generic clean-libtool ctags \
+	distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-DIPPYPYTHON \
+	install-DIPPYlibLTLIBRARIES install-am install-data \
 	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-pyexecLTLIBRARIES \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-DIPPYPYTHON \
-	uninstall-am uninstall-info-am uninstall-pyexecLTLIBRARIES
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-DIPPYPYTHON \
+	uninstall-DIPPYlibLTLIBRARIES uninstall-am uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

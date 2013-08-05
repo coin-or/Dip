@@ -152,8 +152,6 @@ void UtilParameters::LoadParamFile(string & paramFileName) {
    int lineNum = 0;
    while(!is.eof()) {
       is.getline(buf, sizeof(buf)-1);
-      if(is.eof())
-         break;
     
       lineNum++;
     

@@ -42,7 +42,7 @@ public:
 
 public:
    /** Print solution. */
-   virtual void print(int       precision = 2,
+   virtual void print(int       precision = 4,
 		      std::ostream & os        = std::cout) const {
       int i;
       os << std::setprecision(precision);
@@ -50,10 +50,11 @@ public:
          << std::setw(14);
       
       os << "-------------------------" << std::endl;
-      os << "Quality = " << getQuality() << std::endl;
+      os << "Quality  = " << getQuality() << std::endl;
+      os << "Solution = " << std::endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-	    os << std::setw(6) << i << " " << m_values[i] << std::endl;
+	    os << std::setw(15) << i << "   " << m_values[i] << std::endl;
          }
       }
       os << "-------------------------" << std::endl;
@@ -69,10 +70,10 @@ public:
       os << std::setiosflags(std::ios::fixed|std::ios::showpoint);
       
       //os << "-------------------------" << std::endl;
-      os << "=obj= " << getQuality() << std::endl;
+      //os << "obj= " << getQuality() << std::endl;
       for (i = 0; i < m_size; i++) {
          if (!UtilIsZero(m_values[i])){
-	    os << colNames[i] << " " << m_values[i] << std::endl;
+	    os << std::setw(25) << colNames[i] << "   " << m_values[i] << std::endl;
          }
       }
       //os << "-------------------------" << std::endl;

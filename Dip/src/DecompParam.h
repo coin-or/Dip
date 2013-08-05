@@ -159,7 +159,7 @@ public:
    //2 = Calls the user defined function (if exists) and then calls built-in 
    //    IP solver (use this for debugging).
 
-   int    SolveRelaxAsIp;
+   bool    SolveRelaxAsIp;
 
    int    InitVarsWithCutDC;
    int    InitVarsWithIP;
@@ -170,11 +170,11 @@ public:
 
    int    InitCompactSolve;
 
-   int    DualStab;
+   bool    DualStab;
    double DualStabAlpha;
    double DualStabAlphaOrig;
 
-   int    BreakOutPartial; //DISABLED for now
+   bool    BreakOutPartial; //DISABLED for now
    
    //when solving using IP solver, algorithm for initial relaxation
    //when solving using IP solver, algorithm for subproblems
@@ -182,8 +182,8 @@ public:
    //string IpAlgoStart;
    //string IpAlgoSub;
 
-   int    BranchEnforceInSubProb;
-   int    BranchEnforceInMaster;
+   bool    BranchEnforceInSubProb;
+   bool    BranchEnforceInMaster;
    int    MasterConvexityLessThan; //0='E', 1='L'
    double ParallelColsLimit;       //cosine of angle >, then consider parallel
 
@@ -216,13 +216,11 @@ public:
 
    int DebugCheckBlocksColumns;
 
-
    /*
     * The block number for automatic decomposition
     */
     
    int NumBlocks; 
-
    
    /*
     * The following parameters are extended from MILPBlock 
@@ -232,6 +230,7 @@ public:
 
    std::string DataDir;
    std::string Instance;
+   std::string InstanceFormat;
    
       /*
     * The file defining which rows are in which blocks.
@@ -248,11 +247,20 @@ public:
     *   <block id>  <num rows in block>
     *   <row ids...>
     *
-    * (2) "Pair" or "PAIR"
+    * (2) "ZIBList" or "ZIBLIST"
+    * The block file defines those rows in each block.
+    *   NBLOCKS
+    *   <numBlocks>
+    *   BLOCK <block id>
+    *   <row names...>
+    *   BLOCK  <block id>
+    *   <row names...>
+    *
+    * (3) "Pair" or "PAIR"
     * Each line is a block id to row id pair.
     *   <block id> <row id> 
     *
-    * (3) "PairName" or "PAIRNAME"
+    * (4) "PairName" or "PAIRNAME"
     * Each line is a block id to row name (matching mps) pair.
     *   <block id> <row name>     
     */
@@ -271,9 +279,32 @@ public:
    double ColumnLB; //hack since missing extreme rays
 
    int ObjectiveSense; //1=min, -1=max
+   // variable indicates whether to use  
+   // multiple cores to compute concurrently 
+   
+   bool Concurrent;  
+   
+   // number of block candidates 
+   int NumBlocksCand;  
+   
+   // time of concurrent CutOffTime to finalize 
+   // the choice of MILP solution method 
+   
+   double ConcurrentCutOffTime;  
 
-   int AutoDecomp; 
+   int ThreadIndex; 
 
+   std::string CurrentWorkingDir;  
+
+   bool SubProbParallel; 
+
+   int SubProbParallelType; 
+
+   int SubProbParallelChunksize; 
+
+   int ConcurrentThreadsNum; 
+
+   
    /**
     * @}
     */
@@ -352,20 +383,18 @@ public:
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("NumThreads",              NumThreads);
-
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
 
-
-
       PARAM_getSetting("NumBlocks",NumBlocks); 
-      DataDir      = param.GetSetting("DataDir",      "",    "MILP");
-      Instance     = param.GetSetting("Instance",     "",    "MILP");    
-      BlockFile    = param.GetSetting("BlockFile",    "",    "MILP");
-      PermuteFile  = param.GetSetting("PermuteFile",  "",    "MILP");
+      DataDir       = param.GetSetting("DataDir",       "",    "MILP");
+      Instance      = param.GetSetting("Instance",      "",    "MILP");    
+      InstanceFormat= param.GetSetting("InstanceFormat","",    "MILP");    
+      BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
+      PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
       BlockFileFormat 
          = param.GetSetting("BlockFileFormat",    "",    "MILP");    
       InitSolutionFile
-         = param.GetSetting("InitSolutionFile",    "",    "MILP");    
+         = param.GetSetting("InitSolutionFile",   "",    "MILP");    
 
 
 
@@ -386,10 +415,22 @@ public:
       PARAM_getSetting("ColumnLB",ColumnLB);
       PARAM_getSetting("ObjectiveSense",ObjectiveSense);
 
-      PARAM_getSetting("AutoDecomp", AutoDecomp); 
+      PARAM_getSetting("Concurrent", Concurrent);
+      PARAM_getSetting("NumBlocksCand", NumBlocksCand);
+      PARAM_getSetting("CconcurrentCutOffTime", ConcurrentCutOffTime); 
+
+      PARAM_getSetting("CurrentWorkingDir", CurrentWorkingDir); 
+
+      PARAM_getSetting("SubProbParallel", SubProbParallel);
+      PARAM_getSetting("SubProbParallelType", SubProbParallelType);
+      PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
+
+      PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
+     
       //---
       //--- store the original setting for DualStabAlpha
       //---
+
       DualStabAlphaOrig = DualStabAlpha;
    }
 
@@ -506,6 +547,8 @@ public:
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
       
       UtilPrintParameter(os, sec, "Instance",  Instance);
+      
+      UtilPrintParameter(os, sec, "InstanceFormat",  InstanceFormat);
 
       UtilPrintParameter(os, sec, "BlockFile",  BlockFile);
       
@@ -531,7 +574,19 @@ public:
 
       UtilPrintParameter(os, sec, "ObjectiveSense",  ObjectiveSense);
 
-      UtilPrintParameter(os, sec, "AutoDecomp", AutoDecomp); 
+      UtilPrintParameter(os, sec, "Concurrent", Concurrent);  
+      UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand);  
+      UtilPrintParameter(os, sec, "ConcurrentCutOffTime", ConcurrentCutOffTime);  
+
+      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );      
+
+      UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);      
+      
+      UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel); 
+      UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType); 
+      UtilPrintParameter(os, sec, "SubProbParallelChunksize", SubProbParallelChunksize); 
+
+      UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum); 
 
       (*os) << "========================================================\n";
    }
@@ -582,7 +637,7 @@ public:
       SolveMasterAsIpFreqPass  = 1000;
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
-      SolveRelaxAsIp           = 0;
+      SolveRelaxAsIp           = false;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
@@ -596,7 +651,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      NumThreads               = 1;
+      NumThreads               = 2;
       DebugCheckBlocksColumns  = true;
       NumBlocks                = 3; 
 
@@ -619,7 +674,21 @@ public:
       ColumnLB                 =-1.e20;
       ObjectiveSense           = 1;
 
-      AutoDecomp               = 0;
+      Concurrent               = false;
+      NumBlocksCand            = 10;
+      ConcurrentCutOffTime     = 100;
+      
+      ThreadIndex              = 0; 
+
+      CurrentWorkingDir        = ""; 
+
+      SubProbParallel          = false; 
+      
+      SubProbParallelType      = SubProbScheduleDynamic;
+      
+      SubProbParallelChunksize = 1;
+
+      ConcurrentThreadsNum     = 4; 
    }
    
    void dumpSettings(std::ostream * os = &std::cout){

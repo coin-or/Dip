@@ -14,7 +14,7 @@
 
 SUBDIRS = .
 if HAVE_PYTHON
-SUBDIRS += Dippy
+SUBDIRS += dippy
 endif
 
 ########################################################################
@@ -222,6 +222,21 @@ includecoin_HEADERS +=             \
 	AlpsDecompNodeDesc.h   \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
+
+########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+if COIN_CXX_IS_CL
+install-exec-hook:
+	test -s dip.exe.manifest && \
+	mt -manifest dip.exe.manifest -outputresource:dip.exe;\
+	cp dip.exe $(bindir)/dip.exe
+endif
+
+#######################################################################
+# Create the Config.h file that has all public defines and install it #
+#######################################################################
 
 install-exec-local:
 	$(install_sh_DATA) config_dip.h $(DESTDIR)$(includecoindir)/DecompConfig.h

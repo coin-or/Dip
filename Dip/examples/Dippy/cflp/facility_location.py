@@ -6,9 +6,13 @@ import sys
 
 from pulp import *
 
+try:
+    import path
+except ImportError:
+    pass
+        
 if DEBUGGING:
-#    import path
-    from dippy import dippy
+    import dippy
 else:
     import coinor.dippy as dippy
 
@@ -16,28 +20,38 @@ from math import floor, ceil
 
 tol = pow(pow(2, -24), 2.0 / 3.0)
 
-from facility_ex1 import REQUIREMENT, PRODUCTS, LOCATIONS, CAPACITY
+from facility_ex2 import REQUIREMENT, PRODUCTS
+from facility_ex2 import LOCATIONS, CAPACITY
+try:
+    from facility_ex2 import FIXED_COST
+except ImportError:
+    FIXED_COST = [1 for i in LOCATIONS]
 
-display_mode = 'off'
+try:
+    from facility_ex2 import ASSIGNMENTS
+except ImportError:
+    ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
+
+try:
+    from facility_ex2 import ASSIGNMENT_COSTS
+except ImportError:
+    ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
+
+display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
-                        layout = 'dot', display_interval = 1)
+                        layout = 'dot', display_interval = 100)
 
-assign_vars = LpVariable.dicts("x",
-              [(i, j) for i in LOCATIONS
-                      for j in PRODUCTS],
-              0, 1, LpBinary)
-use_vars    = LpVariable.dicts("y",
-              LOCATIONS, 0, 1, LpBinary)
+assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
+use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
 debug_print = False
 
 debug_print_lp = False
 
-# objective: minimise waste
-prob += lpSum(CAPACITY * use_vars[i] - 
-              lpSum(assign_vars[(i, j)] * REQUIREMENT[j] for j in PRODUCTS) 
-              for i in LOCATIONS), "min"
+prob += (lpSum(use_vars[i] * FIXED_COST[i] for i in LOCATIONS) +
+         lpSum(assign_vars[j] * ASSIGNMENT_COSTS[j] for j in ASSIGNMENTS), 
+         "min")
 
 # assignment constraints
 for j in PRODUCTS:
@@ -49,48 +63,13 @@ for i in LOCATIONS:
                                 for j in PRODUCTS) <= CAPACITY * use_vars[i]
 
 # Disaggregate capacity constraints
-for i in LOCATIONS:
-    for j in PRODUCTS:
-        prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
-        
-# Ordering constraints
-for index, location in enumerate(LOCATIONS):
-    if index > 0:
-        prob += use_vars[LOCATIONS[index-1]] >= use_vars[location]
-        
-# Anti-symmetry branches
-def choose_antisymmetry_branch(prob, sol):
-    if debug_print:
-        print "In choose_antisymmetry_branch..."
-        print "sol =", sol
-    num_locations = sum(sol[use_vars[i]] for i in LOCATIONS)
-    up   = ceil(num_locations)  # Round up to next nearest integer 
-    down = floor(num_locations) # Round down
-    if  ((up - num_locations   > tol)             
-         and (num_locations - down > tol)): # Is fractional?
-        if debug_print:
-            print "New branching solution...!"
-            for i in LOCATIONS:
-                if sol[use_vars[i]] > tol:
-                    print "Location ", i, \
-                        " produces ", \
-                        [(j, sol[assign_vars[(i, j)]]) for j in PRODUCTS
-                         if sol[assign_vars[(i, j)]] > tol]
-        # Down branch: provide upper bounds, lower bounds are default
-        down_branch_ub = dict([(use_vars[LOCATIONS[n]], 0)
-                               for n in range(int(down), len(LOCATIONS))])
-        # Up branch: provide lower bounds, upper bounds are default
-        up_branch_lb = dict([(use_vars[LOCATIONS[n]], 1)
-                             for n in range(0, int(up))])
-        # Return the advanced branch to DIP
-        if debug_print:
-            print "branch sets =", {}, down_branch_ub, up_branch_lb, {}
-        return {}, down_branch_ub, up_branch_lb, {}
+for i, j in ASSIGNMENTS:
+    prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
 
-def solve_subproblem(prob, key, redCosts, convexDual):
+def solve_subproblem(prob, key, redCosts):
     if debug_print:
         print "solve_subproblem..."
-        print redCosts, convexDual
+        print redCosts
    
     loc = key
 
@@ -103,42 +82,39 @@ def solve_subproblem(prob, key, redCosts, convexDual):
     # Use 0-1 KP to max. total effective value of products at location
     z, solution = knapsack01(obj, weights, CAPACITY)
    
-    # Get the reduced cost of the knapsack solution and waste
+    # Get the reduced cost of the knapsack solution
     if debug_print:
         print [(v, redCosts[v]) for v in avars]
         print obj
         print "z, solution =", z, solution
         print "redCosts[use_vars[loc]] =", redCosts[use_vars[loc]]
 
-    waste = CAPACITY - sum(weights[i] for i in solution)
     rc = redCosts[use_vars[loc]] - z
 
     if debug_print:
-        print "waste, rc, convexDual", waste, rc, convexDual
-    # Return the solution if the reduced cost is low enough
-    # ...
-    if -convexDual < -tol and rc > tol: # ... or an empty location is "useful"
+        print "Fixed cost, rc", FIXED_COST[loc], rc
+
+    if rc > tol: # ... or an empty location is "useful"
        
         var_values = {}
 
-        var_tuple = (0.0, -convexDual, var_values)
+        var_tuple = (0.0, 0.0, var_values)
         if debug_print:
-            print "Checking empty", convexDual, "should be > 0"
+            print "Zero solution is optimal"
             print var_tuple
         return [var_tuple]
 
-    elif rc - convexDual < -tol:
-        var_values = dict([(avars[i], 1) for i in solution])
-        var_values[use_vars[loc]] = 1
+    var_values = dict([(avars[i], 1) for i in solution])
+    var_values[use_vars[loc]] = 1
 
-        var_tuple = (waste, rc - convexDual, var_values)
-        rcCheck = 0.0
-        for v in var_values.keys():
-            rcCheck += redCosts[v] * var_values[v]
-        if debug_print:
-            print "Checking rc calc", rc, rcCheck 
-            print var_tuple
-        return [var_tuple]
+    var_tuple = (FIXED_COST[loc], rc, var_values)
+    rcCheck = 0.0
+    for v in var_values.keys():
+        rcCheck += redCosts[v] * var_values[v]
+    if debug_print:
+        print "Checking rc calc", rc, rcCheck 
+        print var_tuple
+    return [var_tuple]
 
 
 def knapsack01(obj, weights, capacity):
@@ -391,34 +367,40 @@ if debug_print_lp:
     for n, i in enumerate(LOCATIONS):
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
-prob.branch_method = choose_antisymmetry_branch
-prob.relaxed_solver = solve_subproblem
+prob.writeFull('facility.lp', 'facility.dec')
+
+#prob.branch_method = choose_antisymmetry_branch
+#prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
-prob.init_vars = init_first_fit
+#prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
-prob.heuristics = heuristics
-prob.root_heuristic = True
-prob.node_heuristic = True
+#prob.heuristics = heuristics
+#prob.root_heuristic = True
+#prob.node_heuristic = True
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
     'doPriceCut': '1',
-    'generateInitVars': '1',
+    'CutCGL': '0',
+#    'SolveMasterAsIp': '0'
+#    'generateInitVars': '1',
 #    'LogDebugLevel': 5,
 #    'LogDumpModel': 5,
 })
 
 if prob.display_mode != 'off':
     numNodes = len(prob.Tree.get_node_list())
-    if prob.Tree.display_mode == 'svg':
+    if prob.Tree.attr['display'] == 'svg':
         prob.Tree.write_as_svg(filename = "facility_node%d" % (numNodes + 1), 
                                prevfile = "facility_node%d" % numNodes)
     prob.Tree.display()
 
 # print solution
+print "Optimal solution found!" 
+print "************************************"
 for i in LOCATIONS:
-    if use_vars[i].varValue > tol:
-        print "Location ", i, \
-              " is assigned ", \
-              [j for j in PRODUCTS
-               if assign_vars[(i, j)].varValue > tol]
+    if use_vars[i].varValue > 0:
+        print "Location ", i, " is assigned: ",
+        print [j for j in PRODUCTS if assign_vars[(i, j)].varValue > 0]
+print "************************************"
+print
