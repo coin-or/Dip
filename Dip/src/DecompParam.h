@@ -669,6 +669,8 @@ public:
       ColumnLB                 =-1.e20;
       ObjectiveSense           = 1;
 
+      Concurrent               = false;
+      
       ThreadIndex              = 0; 
 
       CurrentWorkingDir        = ""; 
