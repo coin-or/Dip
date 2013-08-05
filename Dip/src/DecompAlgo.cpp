@@ -21,8 +21,9 @@
 #include "DecompCutOsi.h"
 #include "DecompAlgoCGL.h"
 #include "DecompSolverResult.h"
+#ifdef _OPENMP
 #include "omp.h"
-
+#endif
 //===========================================================================//
 //#define DEBUG_SOLVE_RELAXED
 
@@ -3003,6 +3004,7 @@ int DecompAlgo::generateInitVars(DecompVarList & initVars, DecompRayList & initR
 	 double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          for(mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++){
             DecompAlgoModel & algoModel = (*mit).second;
+
             solveRelaxed(costeps,               //reduced cost (fake here)
                          objCoeff,              //original cost vector 
                          9e15,                  //alpha        (fake here)
@@ -5083,9 +5085,10 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //---
 
      if(m_param.SubProbParallel == true){
-
+#ifdef _OPENMP
        omp_set_num_threads(m_param.NumThreads);
        printf("===== START Threaded solve of subproblems. =====\n");
+#endif
        DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
        DecompRayList* potentialRaysT = new DecompRayList[m_numConvexCon]; 
 
@@ -5142,7 +5145,9 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 omp_set_schedule(omp_sched_static, m_param.SubProbParallelChunksize);
        }
        */
+#ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)      
+#endif
        for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++){
 	 
 	 DecompAlgo          * algo         = arg[subprobIndex].algo;
@@ -5157,10 +5162,10 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 	 DecompAlgoModel & algoModel = algo->getModelRelax(subprobIndex);
 	 double             alpha           = u[nBaseCoreRows + subprobIndex];
 	 DecompSolverResult solveResult;
-
+#ifdef _OPENMP
 	 printf("THREAD %d solving subproblem %d\n",
 		omp_get_thread_num(), subprobIndex);                 	 
-		 
+#endif		 
 	 algo->solveRelaxed(redCostX,
 			    origObjective,
 			    alpha,
@@ -5193,8 +5198,9 @@ void DecompAlgo::generateVarsFea(DecompVarList    & newVars,
 		      );
 	 }
        }
+#ifdef _OPENMP
        printf("===== END   Threaded solve of subproblems. =====\n");
-       
+#endif       
        for(int t = 0; t < m_numConvexCon; t++){
 	 //one function to do this?
 	 for(it  = arg[t].vars->begin();
