@@ -478,7 +478,9 @@ public:
    /**
     * Destructor.
     */
-   virtual ~DecompApp() {};
+   virtual ~DecompApp() { 
+     UTIL_DELARR(m_objective); 
+   };
 };
 
 #endif
