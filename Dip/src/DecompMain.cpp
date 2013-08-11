@@ -144,6 +144,9 @@ int main(int argc, char ** argv){
 	  decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false); 
 	  DecompAuto(milp, utilParam, timer, decompMainParam); 
       }
+      UTIL_DELPTR(milp.m_modelC);
+      UtilDeleteMapPtr(milp.m_modelR);
+
       if(milp.m_param.Concurrent == true){
 	printf("===== FINISH Concurrent Computations Process. =====\n");
       }
