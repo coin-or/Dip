@@ -457,13 +457,15 @@ public:
     * object (UtilParameters) and reads in the parameter settings into the 
     * DecompApp paramter object. 
     */
-   DecompApp(UtilParameters & utilParam) :
+   DecompApp() :
       m_classTag   ("D-APP"),
       m_osLog      (&std::cout  ), 
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
-      m_objective  (0      ),
-      m_decompAlgo (0      )
+      m_objective  ( 0     ),
+      m_matrix     ( 0     ),
+      m_modelC     ( 0     ),
+      m_modelR     ( )            
    {    
      //---
      //--- comment these functions, which were used in
@@ -479,7 +481,11 @@ public:
     * Destructor.
     */
    virtual ~DecompApp() { 
-     UTIL_DELARR(m_objective); 
+     UTIL_DELARR(m_objective);
+     UtilDeleteMapPtr(m_modelR);
+     UTIL_DELPTR(m_modelC);
+     UTIL_DELPTR(m_matrix);
+     //     std::cout << "destructor is called " << std::endl;     
    };
 };
 
