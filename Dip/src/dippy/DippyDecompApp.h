@@ -75,7 +75,7 @@ public:
 
 public:
     DippyDecompApp(UtilParameters & utilParam, PyObject *p) : 
-        DecompApp  (utilParam),
+        DecompApp  (),
         m_classTag ("SMALL-APP"),
         m_pProb(NULL)
     {
