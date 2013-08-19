@@ -30,12 +30,12 @@
 class DecompAppModel {
 protected:
    DecompConstraintSet * m_model;
-   std::string                m_modelName;
+   std::string           m_modelName;
    int                   m_blockId;
 
 public:
    DecompConstraintSet * getModel()     const { return m_model; }
-   const std::string        & getModelName() const { return m_modelName; }
+   const std::string     & getModelName() const { return m_modelName; }
    const int             getBlockId()   const { return m_blockId; }
 
 public:
