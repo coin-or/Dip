@@ -40,12 +40,14 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo *algo, std::vector< std::pair<in
         ret_val = algo->DecompAlgo::chooseBranchSet(downBranchLB, downBranchUB, upBranchLB, upBranchUB);
 		if (downBranchUB.size() > 0){
 			PyObject * downBranchVar, * upBranchVar;
+			pDownLB = PyDict_New(); // Down branch LBs is an empty dictionary
 			pDownUB = PyDict_New();
 			downBranchVar = PyList_GetItem(app->m_colList, downBranchUB[0].first);
 			PyDict_SetItem(pDownUB, downBranchVar, PyInt_FromLong(static_cast<int>(round(downBranchUB[0].second))));
 			pUpLB = PyDict_New();
 			upBranchVar = PyList_GetItem(app->m_colList, upBranchLB[0].first);
 			PyDict_SetItem(pUpLB, upBranchVar, PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
+			pUpUB = PyDict_New(); // Up branch UBs is an empty dictionary
 			assert(downBranchVar == upBranchVar);
 		}
 		return ret_val;
