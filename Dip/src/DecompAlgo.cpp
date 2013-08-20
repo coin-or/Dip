@@ -3046,14 +3046,8 @@ bool DecompAlgo::updateObjBound(const double mostNegRC){
    setObjBound(zDW_LB, zDW_UBPrimal);
 
    double actDiff = fabs(zDW_UBDual-zDW_UBPrimal);
-   double relDiff = actDiff;
-   if(UtilIsZero(zDW_UBPrimal)){
-      relDiff = actDiff;
-   }
-   else{
-      relDiff = fabs(actDiff) / fabs(zDW_UBPrimal);
-   }
-   if(!m_param.DualStab && !UtilIsZero(relDiff, 1.0e-4)){
+   double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
+   if(!m_param.DualStab && !UtilIsZero(unifDiff,1e-04)){
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal) 
                  << endl;
       (*m_osLog) << "MasterObj [dual]   = " << UtilDblToStr(zDW_UBDual) 
