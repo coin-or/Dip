@@ -273,6 +273,13 @@ def createBranchLabel(lbs, ubs):
         
     return labelStr
 
+import string
+def asCplexName(name):
+    #to remove illegal characters from the names
+    trans = string.maketrans("-+[] ->/","________")
+    
+    return str(name).translate(trans)
+
 class DipProblem(pulp.LpProblem, DipAPI):
 
     def __init__(self, *args, **kwargs):
@@ -436,10 +443,11 @@ class DipProblem(pulp.LpProblem, DipAPI):
         for k in self.constraints:
             f.write(self.constraints[k].asCplexLpConstraint(k))
         for r in self.relaxation.dict:
-            b.write("BLOCK %i\n" % r)
+            rname = asCplexName(str(r))
+            b.write("BLOCK %s\n" % rname)
             for k in self.relaxation.dict[r].constraints:
-                f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+str(r)))
-                b.write(str(k)+'_'+str(r)+'\n')
+                f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+rname))
+                b.write(str(k)+'_'+rname+'\n')
         vs = list(self.variables())
         # check if any names are longer than 100 characters
         long_names = [v.name for v in vs if len(v.name) > 100]
