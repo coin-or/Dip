@@ -643,7 +643,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                            status = 'C', obj = nodeQuality, 
                                            color = color, style = 'filled', 
                                            fillcolor = color)
-                    if self.Tree.attr['display'] == 'svg':
+                    if self.Tree.display_mode == 'svg':
                         if self.display_interval is not None:
                             if numNodes % self.display_interval in [0, 1]:
                                 self.Tree.write_as_svg(filename = "%s_0" 
@@ -683,7 +683,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                     if edge_label is not None:
                         self.Tree.set_edge_attr(parentInd, nodeInd, 
                                                 'label', edge_label)
-                    if self.Tree.attr['display'] == 'svg':
+                    if self.Tree.display_mode == 'svg':
                         if self.display_interval is not None:
                             if numNodes % self.display_interval in [0, 1]:
                                 self.Tree.write_as_svg(filename = "%s_%d" 
