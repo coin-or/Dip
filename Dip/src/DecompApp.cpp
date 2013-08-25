@@ -23,7 +23,6 @@
 #include <string>
 #include "UtilMacros.h"
 #include "iterator"
-#include "omp.h"
 //#if defined(autoDecomp) && defined(PaToH)
 
 #include <vector>
@@ -31,7 +30,9 @@
 #include <fstream>
 #include <string>
 #include "iterator"
+#if defined(_OPENMP)
 #include "omp.h"
+#endif 
 //#if defined(autoDecomp) && defined(PaToH)
 #if  defined(PaToH)
 #include "patoh.h"
