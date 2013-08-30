@@ -21,7 +21,16 @@
 #include <fstream>
 #include <string>
 #include "iterator"
+//#if defined(autoDecomp) && defined(PaToH)
+
+#include <vector>
+#include <set>
+#include <fstream>
+#include <string>
+#include "iterator"
+#if defined(_OPENMP)
 #include "omp.h"
+#endif 
 //#if defined(autoDecomp) && defined(PaToH)
 #if  defined(PaToH)
 

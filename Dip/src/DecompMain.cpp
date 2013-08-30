@@ -154,6 +154,7 @@ int main(int argc, char ** argv){
       for(int i = 0; i < (numThreads + 1); i++){
 	delete milpArray[i]; 
       }
+      delete [] milpArray; 
 
       if(milp.m_param.Concurrent == true){
 	printf("===== FINISH Concurrent Computations Process. =====\n");

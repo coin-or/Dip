@@ -4837,9 +4837,14 @@ int DecompAlgo::generateVarsFea(DecompVarList    & newVars,
       //---
 
      if(m_param.SubProbParallel == true){
-#ifdef _OPENMP
+
+#if defined(_OPENMP) && defined(__DECOMP_IP_CBC__)
+       omp_set_num_threads(1); 
+       std::cout << "hello thread " << std::endl; 
+#elif _OPENMP
        printf("===== START Threaded solve of subproblems. =====\n");
 #endif
+
        DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
  
        CoinAssertHint(potentialVarsT, "Error: Out of Memory");
