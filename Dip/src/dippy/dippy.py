@@ -273,6 +273,13 @@ def createBranchLabel(lbs, ubs):
         
     return labelStr
 
+import string
+def asCplexName(name):
+    #to remove illegal characters from the names
+    trans = string.maketrans("-+[] ->/","________")
+    
+    return str(name).translate(trans)
+
 class DipProblem(pulp.LpProblem, DipAPI):
 
     def __init__(self, *args, **kwargs):
@@ -436,10 +443,11 @@ class DipProblem(pulp.LpProblem, DipAPI):
         for k in self.constraints:
             f.write(self.constraints[k].asCplexLpConstraint(k))
         for r in self.relaxation.dict:
-            b.write("BLOCK %i\n" % r)
+            rname = asCplexName(str(r))
+            b.write("BLOCK %s\n" % rname)
             for k in self.relaxation.dict[r].constraints:
-                f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+str(r)))
-                b.write(str(k)+'_'+str(r)+'\n')
+                f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+rname))
+                b.write(str(k)+'_'+rname+'\n')
         vs = list(self.variables())
         # check if any names are longer than 100 characters
         long_names = [v.name for v in vs if len(v.name) > 100]
@@ -635,7 +643,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                            status = 'C', obj = nodeQuality, 
                                            color = color, style = 'filled', 
                                            fillcolor = color)
-                    if self.Tree.attr['display'] == 'svg':
+                    if self.Tree.display_mode == 'svg':
                         if self.display_interval is not None:
                             if numNodes % self.display_interval in [0, 1]:
                                 self.Tree.write_as_svg(filename = "%s_0" 
@@ -675,7 +683,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                     if edge_label is not None:
                         self.Tree.set_edge_attr(parentInd, nodeInd, 
                                                 'label', edge_label)
-                    if self.Tree.attr['display'] == 'svg':
+                    if self.Tree.display_mode == 'svg':
                         if self.display_interval is not None:
                             if numNodes % self.display_interval in [0, 1]:
                                 self.Tree.write_as_svg(filename = "%s_%d" 

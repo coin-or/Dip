@@ -1,0 +1,1 @@
+astyle --pad-oper --break-blocks --pad-header --delete-empty-lines --add-brackets --indent=spaces=3 --style=stroustrup --indent-col1-comments --align-pointer=type --recursive *.cpp *.h

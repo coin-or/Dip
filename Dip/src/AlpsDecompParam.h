@@ -24,7 +24,7 @@
 /**
  * \class AlpsDecompParam
  * \brief
- * Parameters passed through to Alps. 
+ * Parameters passed through to Alps.
 */
 //===========================================================================//
 
@@ -32,12 +32,12 @@
 class AlpsDecompParam {
 
    //----------------------------------------------------------------------//
-   /**      
+   /**
     * @name Data.
-    * @{      
+    * @{
     */
    //----------------------------------------------------------------------//
-   
+
 public:
    /** The level of log file.
     *  - 0: no print to screen (Default)
@@ -46,18 +46,18 @@ public:
     *  - 3: verbose
     */
    int logFileLevel;
-   
+
    /**
     * Print solution to screen and log if have a solution
     * and msgLevel and logFileLevel permits. Default: false.
     */
    bool printSolution;
-   
+
    /**
     * Check memory. Default: false
     */
    bool checkMemory;
-   
+
    /**
     * The level of printing messages on screen. Used to control master
     * and general messages.
@@ -67,12 +67,12 @@ public:
     *  - 3: verbose
     */
    int msgLevel;
-   
+
    /**
     * The max number of nodes can be processed. Default: ALPS_INT_MAX
    */
    int nodeLimit;
-   
+
    /**
     * Node log interval. Default: 100
     */
@@ -86,20 +86,22 @@ public:
     */
    //-----------------------------------------------------------------------//
 public:
-   void getSettings(UtilParameters & param){
-      static const char * sec = "ALPS";
+   void getSettings(UtilParameters& param) {
+      static const char* sec = "ALPS";
       logFileLevel    = param.GetSetting("logFileLevel",    0,            sec);
       printSolution   = param.GetSetting("printSolution",   false,        sec);
       checkMemory     = param.GetSetting("checkMemory",     false,        sec);
       msgLevel        = param.GetSetting("msgLevel",        2,            sec);
       nodeLimit       = param.GetSetting("nodeLimit",       ALPS_INT_MAX, sec);
       nodeLogInterval = param.GetSetting("nodeLogInterval", 10,           sec);
-      if(msgLevel > 2)
-	 dumpSettings();
+
+      if (msgLevel > 2) {
+         dumpSettings();
+      }
    }
-   
-   void dumpSettings(std::ostream * os = &std::cout){
-      static const char * sec = "ALPS";
+
+   void dumpSettings(std::ostream* os = &std::cout) {
+      static const char* sec = "ALPS";
       (*os) << "\n========================================================\n"
             << "ALPS PARAMETER SETTINGS \n";
       (*os) << sec << ": logFileLevel    = " << logFileLevel    << std::endl;
@@ -112,26 +114,26 @@ public:
    /**
     * @}
     */
-   
+
    //-----------------------------------------------------------------------//
    /**
     * @name Constructors and destructor.
     * @{
     */
    //-----------------------------------------------------------------------//
-public:   
+public:
    /**
     * Default constructors.
     */
    AlpsDecompParam() {}
-   
-   AlpsDecompParam(UtilParameters & utilParam) {
+
+   AlpsDecompParam(UtilParameters& utilParam) {
       getSettings(utilParam);
    }
 
    /**
     * Destructor
-    */   
+    */
    ~AlpsDecompParam() {}
    /**
     * @}

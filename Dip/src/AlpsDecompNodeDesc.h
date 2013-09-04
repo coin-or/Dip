@@ -55,21 +55,21 @@ class CoinWarmStartBasis;
 //===========================================================================//
 class AlpsDecompNodeDesc : public AlpsNodeDesc {
 
- private:
-   
+private:
+
    //----------------------------------------------------------------------//
-   /**      
+   /**
     * @name Data.
-    * @{      
+    * @{
     */
    //----------------------------------------------------------------------//
-   
+
    /**
     * Store the name of the class (for logging/debugging) - "who am I?"
     */
    std::string m_classTag;
 
- public:  
+public:
    /** lower bounds in original space */
    double* lowerBounds_;
    /** upper bounds in original space */
@@ -80,145 +80,155 @@ class AlpsDecompNodeDesc : public AlpsNodeDesc {
    int branchedDir_;
    /** Branched set of indices/values to create it. */
    std::vector< std::pair<int, double> > branched_;
-   
+
    //THINK: different derivations for different algos? need?
    /** Warm start. */
-   CoinWarmStartBasis *basis_;
-    
- public:
+   CoinWarmStartBasis* basis_;
+
+public:
 
    /** Default constructor. */
    AlpsDecompNodeDesc() :
       AlpsNodeDesc(),
       branchedDir_(0),
-      basis_(NULL)
-      {}
-
-   /** Useful constructor. */
-   AlpsDecompNodeDesc(AlpsModel * m) 
-      :
-      AlpsNodeDesc(m),
-      branchedDir_(0),
-      basis_(NULL)
-      {}
-
-   AlpsDecompNodeDesc(AlpsDecompModel * m, 
-		      const double    * lb, 
-		      const double    * ub) 
-      :
-      AlpsNodeDesc(m),
-      branchedDir_(0),
-      basis_(NULL)
-      {
-	 numberCols_ = m->getNumCoreCols();
-	 assert(numberCols_);
-	 lowerBounds_ = new double [numberCols_];
-	 upperBounds_ = new double [numberCols_];
-	 memcpy(lowerBounds_, lb, sizeof(double)*numberCols_);
-	 memcpy(upperBounds_, ub, sizeof(double)*numberCols_);
-      }
-
-   /** Destructor. */
-   virtual ~AlpsDecompNodeDesc() { 
-      if (lowerBounds_ != 0) {
-	 delete [] lowerBounds_;
-	 lowerBounds_ = 0;
-      }
-      if (upperBounds_ != 0) {
-	 delete [] upperBounds_;
-	 upperBounds_ = 0;
-      }
-      delete basis_; 
+      basis_(NULL) {
    }
 
-   /** Set basis. */ 
-   void setBasis(CoinWarmStartBasis *&ws) { 
-      if (basis_) { delete basis_; }
-      basis_= ws;
-      ws = NULL; 
+   /** Useful constructor. */
+   AlpsDecompNodeDesc(AlpsModel* m)
+      :
+      AlpsNodeDesc(m),
+      branchedDir_(0),
+      basis_(NULL) {
+   }
+
+   AlpsDecompNodeDesc(AlpsDecompModel* m,
+                      const double*     lb,
+                      const double*     ub)
+      :
+      AlpsNodeDesc(m),
+      branchedDir_(0),
+      basis_(NULL) {
+      numberCols_ = m->getNumCoreCols();
+      assert(numberCols_);
+      lowerBounds_ = new double [numberCols_];
+      upperBounds_ = new double [numberCols_];
+      memcpy(lowerBounds_, lb, sizeof(double)*numberCols_);
+      memcpy(upperBounds_, ub, sizeof(double)*numberCols_);
+   }
+
+   /** Destructor. */
+   virtual ~AlpsDecompNodeDesc() {
+      if (lowerBounds_ != 0) {
+         delete [] lowerBounds_;
+         lowerBounds_ = 0;
+      }
+
+      if (upperBounds_ != 0) {
+         delete [] upperBounds_;
+         upperBounds_ = 0;
+      }
+
+      delete basis_;
+   }
+
+   /** Set basis. */
+   void setBasis(CoinWarmStartBasis*& ws) {
+      if (basis_) {
+         delete basis_;
+      }
+
+      basis_ = ws;
+      ws = NULL;
    }
 
    /** Get warm start basis. */
-   CoinWarmStartBasis * getBasis() const { return basis_; }
+   CoinWarmStartBasis* getBasis() const {
+      return basis_;
+   }
 
    /** Set branching direction. */
-   void setBranchedDir(int d) { branchedDir_ = d; }
+   void setBranchedDir(int d) {
+      branchedDir_ = d;
+   }
 
    /** Get branching direction. */
-   int getBranchedDir() const { return branchedDir_; }
+   int getBranchedDir() const {
+      return branchedDir_;
+   }
 
    /** Set branching set. */
-   void setBranched(std::vector< std::pair<int, double> > b) { 
-      branched_ = b; }
+   void setBranched(std::vector< std::pair<int, double> > b) {
+      branched_ = b;
+   }
 
    /** Get branching set. */
-   std::vector< std::pair<int, double> > getBranched() const { 
-      return branched_; }
+   std::vector< std::pair<int, double> > getBranched() const {
+      return branched_;
+   }
 
- protected:
+protected:
 
    //---
    //--- helper functions for encode/decode
    //---
 
    /** Pack blis portion of node description into an encoded. */
-   AlpsReturnStatus encodeAlpsDecomp(AlpsEncoded *encoded) const {
+   AlpsReturnStatus encodeAlpsDecomp(AlpsEncoded* encoded) const {
       AlpsReturnStatus status = AlpsReturnStatusOk;
       encoded->writeRep(branchedDir_);
-
       // Basis
       int ava = 0;
+
       if (basis_) {
-	 ava = 1;
-	 encoded->writeRep(ava);
-	 //should this be a util func or blis func?
-	 //seems pretty standard, alps/coin util type stuff
-	 UtilAlpsEncodeWarmStart(encoded, basis_);
+         ava = 1;
+         encoded->writeRep(ava);
+         //should this be a util func or blis func?
+         //seems pretty standard, alps/coin util type stuff
+         UtilAlpsEncodeWarmStart(encoded, basis_);
+      } else {
+         encoded->writeRep(ava);
       }
-      else {
-	 encoded->writeRep(ava);
-      }
-	
+
       return status;
    }
 
    /** Unpack blis portion of node description from an encoded. */
-   AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded &encoded) {
-      AlpsReturnStatus status = AlpsReturnStatusOk;	
+   AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded) {
+      AlpsReturnStatus status = AlpsReturnStatusOk;
       encoded.readRep(branchedDir_);
-	
       // Basis
       int ava;
       encoded.readRep(ava);
+
       if (ava == 1) {
-	 basis_ = UtilAlpsDecodeWarmStart(encoded, &status);
+         basis_ = UtilAlpsDecodeWarmStart(encoded, &status);
+      } else {
+         basis_ = NULL;
       }
-      else {
-	 basis_ = NULL;
-      }
-	
+
       return status;
    }
 
- public:
+public:
 
    //---
    //--- pure virtual functions from AlpsNodeDesc or AlpsNodeDesc
-   //---  
-    
+   //---
+
    /** Pack node description into an encoded. */
-   virtual AlpsReturnStatus encode(AlpsEncoded *encoded) const {
-      AlpsReturnStatus status = AlpsReturnStatusOk;       
-      status = encodeAlpsDecomp(encoded);	
+   virtual AlpsReturnStatus encode(AlpsEncoded* encoded) const {
+      AlpsReturnStatus status = AlpsReturnStatusOk;
+      status = encodeAlpsDecomp(encoded);
       return status;
    }
 
    /** Unpack a node description from an encoded. Fill member data. */
-   virtual AlpsReturnStatus decode(AlpsEncoded &encoded) {	
+   virtual AlpsReturnStatus decode(AlpsEncoded& encoded) {
       AlpsReturnStatus status = AlpsReturnStatusOk;
       status = decodeAlpsDecomp(encoded);
       return status;
    }
-    
+
 };
 #endif

@@ -68,9 +68,9 @@ class AlpsDecompModel : public AlpsModel {
 private:
 
    //----------------------------------------------------------------------//
-   /**      
+   /**
     * @name Data.
-    * @{      
+    * @{
     */
    //----------------------------------------------------------------------//
    /**
@@ -82,11 +82,11 @@ private:
     * Parameters for Alps.
     */
    AlpsDecompParam m_param;
-   
+
    /**
     * Pointer to decomp algorithm used for bounding.
     */
-   DecompAlgo * m_decompAlgo;
+   DecompAlgo* m_decompAlgo;
 
    /**
     * Objective of best solution found.
@@ -98,7 +98,7 @@ private:
 
    /**
     * @}
-    */   
+    */
 
    //-----------------------------------------------------------------------//
    /**
@@ -112,28 +112,28 @@ public:
     */
    AlpsDecompModel() :
       AlpsModel    (),
-      m_classTag   ("ALPSM"), 
+      m_classTag   ("ALPSM"),
       m_param      (),
-      m_decompAlgo (NULL)
-   {}
+      m_decompAlgo (NULL) {
+   }
 
-   AlpsDecompModel(UtilParameters & utilParam,
-                   DecompAlgo     * decompAlgo) :		   
+   AlpsDecompModel(UtilParameters& utilParam,
+                   DecompAlgo*      decompAlgo) :
       AlpsModel   (),
       m_classTag  ("ALPSM"),
       m_param     (utilParam),
-      m_decompAlgo(decompAlgo)
-   {
-      if(decompAlgo == NULL)
+      m_decompAlgo(decompAlgo) {
+      if (decompAlgo == NULL)
          throw UtilException("No DecompAlgo algorithm has been set.",
-                             "AlpsDecompModel","AlpsDecompModel");
+                             "AlpsDecompModel", "AlpsDecompModel");
+
       setAlpsSettings();
    }
-   
+
    /**
     * Destructor.
     */
-   virtual ~AlpsDecompModel(){}
+   virtual ~AlpsDecompModel() {}
    /**
     * @}
     */
@@ -148,7 +148,7 @@ public:
    /**
     * Create the root node of the search tree.
     */
-   virtual AlpsTreeNode * createRoot();
+   virtual AlpsTreeNode* createRoot();
 
    /** Return true, if all nodes can be fathomed.*/
    virtual bool fathomAllNodes();
@@ -164,82 +164,90 @@ public:
    //-----------------------------------------------------------------------//
    /**
     * Solve with ALPS and DECOMP.
-    */   
-   AlpsExitStatus solve();   
+    */
+   AlpsExitStatus solve();
 
    /**
     * Set the ALPS parameters.
-    */   
+    */
    void setAlpsSettings();
 
    /**
     * Solve with ALPS and DECOMP.
-    */   
-   inline void setDecompAlgo(DecompAlgo * decompAlgo){
+    */
+   inline void setDecompAlgo(DecompAlgo* decompAlgo) {
       m_decompAlgo = decompAlgo;
    }
    /**
     * @}
     */
-  
+
    //-----------------------------------------------------------------------//
    /**
     * @name Set/get methods.
     * @{
     */
    //-----------------------------------------------------------------------//
-   /** 
+   /**
     * Get a ptr to the decomp algorithm vector.
     */
    //THINK: return ref?
-   inline DecompAlgo * getDecompAlgo() {
+   inline DecompAlgo* getDecompAlgo() {
       return m_decompAlgo;
    }
 
-   inline AlpsDecompParam & getParam() {
+   inline AlpsDecompParam& getParam() {
       return m_param;
    }
 
 
-   /** 
+   /**
     * Get number of rows in core decomp model.
     */
    inline const int getNumCoreRows() const {
       return m_decompAlgo->getModelCore().getModel()->getNumRows();
    }
 
-   /** 
+   /**
     * Get number of cols in core decomp model.
     */
    inline const int getNumCoreCols() const {
       return m_decompAlgo->getModelCore().getModel()->getNumCols();
    }
 
-   /** 
+   /**
     * Get the column names in core decomp model.
     */
-   inline const std::vector<std::string> & getColNames() const {
+   inline const std::vector<std::string>& getColNames() const {
       return m_decompAlgo->getModelCore().getModel()->getColNames();
    }
 
-   /** 
+   /**
     * Get the row names in core decomp model.
     */
-   inline const std::vector<std::string> & getRowNames() const {
+   inline const std::vector<std::string>& getRowNames() const {
       return m_decompAlgo->getModelCore().getModel()->getRowNames();
    }
 
    /**
     * Get the best solution found.
     */
-   inline const DecompSolution * getBestSolution() const {
+   inline const DecompSolution* getBestSolution() const {
       return m_decompAlgo->getXhatIPBest();
    }
 
-   const double getGlobalLB() const { return m_bestLB;}
-   const double getGlobalUB() const { return m_bestUB;}
-   const int    getSolStatus() const { return m_alpsStatus;}
-   const int    getNumNodesProcessed() const { return m_nodesProcessed;}
+   const double getGlobalLB() const {
+      return m_bestLB;
+   }
+   const double getGlobalUB() const {
+      return m_bestUB;
+   }
+   const int    getSolStatus() const {
+      return m_alpsStatus;
+   }
+   const int    getNumNodesProcessed() const {
+      return m_nodesProcessed;
+   }
 
    /**
     * @}
