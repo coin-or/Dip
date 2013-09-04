@@ -20,22 +20,22 @@
 #include <string>
 
 std::string UtilCreateStringHash(const int      len,
-                            const double * els,
-                            const int      precision = 6);
+                                 const double* els,
+                                 const int      precision = 6);
 
 std::string UtilCreateStringHash(const int      len,
-                            const int    * ind,
-                            const double * els,
-                            const int      precision = 6);
+                                 const int*     ind,
+                                 const double* els,
+                                 const int      precision = 6);
 std::string UtilCreateStringHash(const int      len,
-                            const int    * ind,
-                            const double   els,
-                            const int      precision = 6);
+                                 const int*     ind,
+                                 const double   els,
+                                 const int      precision = 6);
 std::string UtilCreateStringHash(const int      len,
-                            const int    * ind,
-                            const double * els,
-                            const char     sense,
-                            const double   rhs,
-                            const int      precision = 6);
+                                 const int*     ind,
+                                 const double* els,
+                                 const char     sense,
+                                 const double   rhs,
+                                 const int      precision = 6);
 
 #endif

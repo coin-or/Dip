@@ -45,7 +45,7 @@ public :
    double    m_objLB;
    double    m_objUB;
    bool      m_isOptimal;
-   bool      m_isCutoff;   
+   bool      m_isCutoff;
    int       m_nSolutions;
    std::vector< std::vector<double> > m_solution;
    /**
@@ -53,14 +53,14 @@ public :
     */
 
 public:
-   const double * getSolution(const int solIndex){
-      std::vector<double> & solution = m_solution[solIndex];
+   const double* getSolution(const int solIndex) {
+      std::vector<double>& solution = m_solution[solIndex];
       return &solution[0];
    }
 
    /**
     * Default constructors.
-    */   
+    */
    DecompSolverResult():
       m_solStatus (-1),
       m_solStatus2(-1),
@@ -68,32 +68,33 @@ public:
       m_objUB     ( DecompInf),
       m_isOptimal (false),
       m_isCutoff  (false),
-      m_nSolutions(0)
-   {
+      m_nSolutions(0) {
    }
 
-   DecompSolverResult(const DecompSolution * solution):
+   DecompSolverResult(const DecompSolution* solution):
       m_solStatus (-1),
       m_solStatus2(-1),
       m_objLB     (-DecompInf),
       m_objUB     ( DecompInf),
       m_isOptimal (false),
       m_isCutoff  (false),
-      m_nSolutions(0)
-   {
-      const double * values = solution->getValues();
-      if(!values)
-	 return;
+      m_nSolutions(0) {
+      const double* values = solution->getValues();
+
+      if (!values) {
+         return;
+      }
+
       m_nSolutions = 1;
       m_objUB      = solution->getQuality();
       std::vector<double> sol(values, values + solution->getSize());
       m_solution.push_back(sol);
    }
-   
+
    /**
     * Destructor.
     */
-   ~DecompSolverResult(){
+   ~DecompSolverResult() {
    }
    /**
     * @}

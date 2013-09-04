@@ -34,52 +34,52 @@ private:
    std::vector< std::pair<int, double> > downBranchUB_;
    std::vector< std::pair<int, double> > upBranchLB_;
    std::vector< std::pair<int, double> > upBranchUB_;
-  
+
 public:
    /** Default constructor. */
    AlpsDecompTreeNode() :
       AlpsTreeNode(),
       m_classTag  ("ALPSTN")
-     
+
    {
       //quality_ = -ALPS_OBJ_MAX;//MVG?
    }
-    
+
    /** Destructor */
-   virtual ~AlpsDecompTreeNode(){
+   virtual ~AlpsDecompTreeNode() {
    }
 
-   bool checkIncumbent(AlpsDecompModel      * model,
-                       const DecompSolution * decompSol);
-    
+   bool checkIncumbent(AlpsDecompModel*       model,
+                       const DecompSolution* decompSol);
+
    //---
    //--- pure virtual functions from AlpsTreeNode or AlpsTreeNode
-   //---  
-    
+   //---
+
    /** Create a new node based on given desc. */
-   AlpsTreeNode * createNewTreeNode(AlpsNodeDesc *& desc) const;
+   AlpsTreeNode* createNewTreeNode(AlpsNodeDesc*& desc) const;
 
    /** To be defined.?? */
-   int chooseBranchingObject(AlpsModel * model);
+   int chooseBranchingObject(AlpsModel* model);
 
 
    //point direct to DECOMP?
    /** Performing the bounding operation. */
    int process(bool isRoot = false, bool rampUp = false);
-  
-   /** Takes the explicit description of the current active node and 
-       creates the children's descriptions, which contain information 
+
+   /** Takes the explicit description of the current active node and
+       creates the children's descriptions, which contain information
        about how the branching is to be done. The stati of the children
        are AlpsNodeStatusCandidate. */
-   std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > branch(); 
+   std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> > branch();
 
    //For now, we assume there is only one variable being branched on.
-   int getBranchedVar(){
-	   if (!downBranchLB_.empty()){
-		   return downBranchLB_[0].first;
-	   }else{
-		   return -1;
-	   }
+   int getBranchedVar() {
+      if (!downBranchLB_.empty()) {
+         return downBranchLB_[0].first;
+      } else {
+         return -1;
+      }
    }
 };
 
