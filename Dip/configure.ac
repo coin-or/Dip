@@ -281,8 +281,9 @@ AC_SUBST(COIN_HAS_CLP)
 CLLCFLAGS=
 case "$CXX" in
   cl* | *\cl* | */cl*)
-     CLLCFLAGS=$CXXFLAGS
-     CXXFLAGS="$CXXFLAGS -TP"
+     if test $dip_openmp = true; then
+         CXXFLAGS="$CXXFLAGS -openmp"
+     fi
   ;;
   g++* | *\g++* | */g++*)
      if test $dip_openmp = true; then
@@ -299,12 +300,8 @@ case "$CXX" in
    ;;
 esac
 
-
-#Set CFLAGS to CXXFLAGS since we are using g++
-CFLAGS=$CXXFLAGS
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
-AC_SUBST(CLLCFLAGS)
 
 # Here list all the files that configure should create (except for the
 # configuration header file)

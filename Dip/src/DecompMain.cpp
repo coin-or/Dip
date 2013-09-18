@@ -32,11 +32,10 @@ void blockNumberFinder(DecompParam utilParam,
                        std::vector<int>& blockNums,
                        const CoinPackedMatrix* matrix);
 
-void* DecompAuto(DecompApp* milp,
-                 UtilParameters& utilParam,
-                 UtilTimer& timer,
-                 DecompMainParam& decompMainParam
-                );
+void DecompAuto(DecompApp* milp,
+                UtilParameters& utilParam,
+                UtilTimer& timer,
+                DecompMainParam& decompMainParam);
 
 //===========================================================================//
 int main(int argc, char** argv)
@@ -281,10 +280,10 @@ void blockNumberFinder(DecompParam utilParam,
    }
 }
 
-void* DecompAuto(DecompApp* milp,
-                 UtilParameters& utilParam,
-                 UtilTimer& timer,
-                 DecompMainParam& decompMainParam)
+void DecompAuto(DecompApp* milp,
+                UtilParameters& utilParam,
+                UtilTimer& timer,
+                DecompMainParam& decompMainParam)
 {
    //---
    //--- put the one of the functions in the constructor into the main
