@@ -27,19 +27,19 @@ Dip package in two ways:
    scheme". On Windows, it is recommended to get the source with the SVN
    client TortoiseSVN (http://tortoisesvn.net).
 
-   Assuming that you want to download a release version 0.82.0, as an example,
+   Assuming that you want to download a release version 0.9.0, as an example,
    you would execute the command
 
-   svn co https://projects.coin-or.org/svn/Cbc/releases/0.82.0 Cbc-0.82.0
+   svn co https://projects.coin-or.org/svn/Dip/releases/0.9.0 Dip-0.9.0
 
    You can similarly get source for the latest stable version or the trunk
    (development) version.
 
-2. Download the tarball from http://www.coin-or.org/download/source/Cbc 
-   and extract it. For example, for the release 0.82.0 you type
+2. Download the tarball from http://www.coin-or.org/download/source/Dip 
+   and extract it. For example, for the release 0.9.0 you type
 
-   gunzip Dip-0.82.0.tgz
-   tar xvf Dip-0.82.0.tar
+   gunzip Dip-0.9.0.tgz
+   tar xvf Dip-0.9.0.tar
 
    More detailed download instructions can be found at
 
@@ -47,7 +47,7 @@ Dip package in two ways:
 ***                        CONFIGURATION                           ***
 **********************************************************************
 
-Go into the directory that you just downloaded or extracted (e.g., Cbc-2.7.0).
+Go into the directory that you just downloaded or extracted (e.g., Dip-0.9.0).
 Then create a build directory and configure the package by typing
 
    mkdir build
@@ -60,7 +60,7 @@ compilers).  Please visit
 
    https://projects.coin-or.org/BuildTools/
 
-and the Cbc Trac page
+and the Dip Trac page
 
    https://projects.coin-or.org/Dip
 
@@ -94,6 +94,22 @@ In the directory where you ran the configure script:
 More information on the compilation and installation can be found at
 
    https://projects.coin-or.org/BuildTools/
+
+**********************************************************************
+***              BUILDING AND INSTALLING DIPPY                     ***
+**********************************************************************
+
+1. First, build and install Dip as above.
+
+2. Set the environment variable COIN_INSTALL_DIR to the location of the installation directory.
+
+3. Then either execute
+
+python setup.py install
+
+to build and install DipPy from source or
+
+pip install dippy
 
 **********************************************************************
 ***                  DIP EXAMPLES                                  ***
