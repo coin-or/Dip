@@ -494,6 +494,8 @@ ac_subdirs_all="$ac_subdirs_all Cgl"
 ac_subdirs_all="$ac_subdirs_all Cbc"
 ac_subdirs_all="$ac_subdirs_all Alps"
 ac_subdirs_all="$ac_subdirs_all Dip"
+ac_subdirs_all="$ac_subdirs_all GiMPy"
+ac_subdirs_all="$ac_subdirs_all GrUMPy"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX ADD_FFLAGS DBG_FFLAGS OPT_FFLAGS F77 ac_ct_F77 FFLAGS MPIF77 EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS LT_LDFLAGS COIN_SKIP_PROJECTS subdirs LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
@@ -1181,6 +1183,12 @@ Optional Packages:
   --with-dip-lib linker flags for using project Dip
   --with-dip-incdir directory with header files for using project Dip
   --with-dip-datadir directory with data files for using project Dip
+  --with-gimpy-lib linker flags for using project GiMPy
+  --with-gimpy-incdir directory with header files for using project GiMPy
+  --with-gimpy-datadir directory with data files for using project GiMPy
+  --with-grumpy-lib linker flags for using project GrUMPy
+  --with-grumpy-incdir directory with header files for using project GrUMPy
+  --with-grumpy-datadir directory with data files for using project GrUMPy
 
 Some influential environment variables:
   CDEFS       Additional -D flags to be used when compiling C code.
@@ -4358,7 +4366,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4361:" \
+echo "$as_me:4369:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6646,7 +6654,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6649 "configure"' > conftest.$ac_ext
+  echo '#line 6657 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8610,11 +8618,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8613: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8621: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8617: \$? = $ac_status" >&5
+   echo "$as_me:8625: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8878,11 +8886,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8881: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8889: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8885: \$? = $ac_status" >&5
+   echo "$as_me:8893: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8982,11 +8990,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8985: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8993: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8989: \$? = $ac_status" >&5
+   echo "$as_me:8997: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11327,7 +11335,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11330 "configure"
+#line 11338 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11427,7 +11435,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11430 "configure"
+#line 11438 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13771,11 +13779,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13774: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13782: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13778: \$? = $ac_status" >&5
+   echo "$as_me:13786: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13875,11 +13883,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13878: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13886: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13882: \$? = $ac_status" >&5
+   echo "$as_me:13890: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15445,11 +15453,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15448: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15456: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15452: \$? = $ac_status" >&5
+   echo "$as_me:15460: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15549,11 +15557,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15552: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15560: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15556: \$? = $ac_status" >&5
+   echo "$as_me:15564: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17756,11 +17764,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17759: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17767: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17763: \$? = $ac_status" >&5
+   echo "$as_me:17771: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18024,11 +18032,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18027: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18035: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18031: \$? = $ac_status" >&5
+   echo "$as_me:18039: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18128,11 +18136,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18131: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18139: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:18135: \$? = $ac_status" >&5
+   echo "$as_me:18143: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -22217,6 +22225,230 @@ if test "$coin_has_dip" = yes ; then
 
 
 subdirs="$subdirs Dip"
+
+  fi
+fi
+
+
+echo "$as_me:$LINENO: checking whether source of project GiMPy is available and should be compiled" >&5
+echo $ECHO_N "checking whether source of project GiMPy is available and should be compiled... $ECHO_C" >&6
+
+coin_has_gimpy=notGiven
+coin_reason=
+
+# check if user wants to skip project in any case
+
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "GiMPy"; then
+      coin_has_gimpy="no"
+      coin_reason="GiMPy has been specified in COIN_SKIP_PROJECTS"
+    fi
+
+  done
+fi
+
+if test "$coin_has_gimpy" != no; then
+
+# Check whether --with-m4_tolower(GiMPy) or --without-m4_tolower(GiMPy) was given.
+if test "${with_gimpy+set}" = set; then
+  withval="$with_gimpy"
+  if test "$withval" = no ; then
+       coin_has_gimpy="no"
+       coin_reason="--without-gimpy has been specified"
+     fi
+
+fi;
+fi
+
+if test "$coin_has_gimpy" != no; then
+
+# Check whether --with-m4_tolower(GiMPy)-lib or --without-m4_tolower(GiMPy)-lib was given.
+if test "${with_gimpy_lib+set}" = set; then
+  withval="$with_gimpy_lib"
+  if test "$withval" = no ; then
+       coin_has_gimpy="no"
+       coin_reason="--without-gimpy-lib has been specified"
+     else
+       coin_has_gimpy="no"
+       coin_reason="--with-gimpy-lib has been specified"
+     fi
+fi;
+fi
+
+if test "$coin_has_gimpy" != no; then
+
+# Check whether --with-m4_tolower(GiMPy)-incdir or --without-m4_tolower(GiMPy)-incdir was given.
+if test "${with_gimpy_incdir+set}" = set; then
+  withval="$with_gimpy_incdir"
+  if test "$withval" = no ; then
+       coin_has_gimpy="no"
+       coin_reason="--without-gimpy-incdir has been specified"
+     else
+       coin_has_gimpy="no"
+       coin_reason="--with-gimpy-incdir has been specified"
+     fi
+fi;
+fi
+
+if test "$coin_has_gimpy" != no; then
+
+# Check whether --with-m4_tolower(GiMPy)-datadir or --without-m4_tolower(GiMPy)-datadir was given.
+if test "${with_gimpy_datadir+set}" = set; then
+  withval="$with_gimpy_datadir"
+  if test "$withval" = no ; then
+       coin_has_gimpy="no"
+       coin_reason="--without-gimpy-datadir has been specified"
+     else
+       coin_has_gimpy="no"
+       coin_reason="--with-gimpy-datadir has been specified"
+     fi
+fi;
+fi
+
+
+
+
+
+# check if project is available in present directory
+if test "$coin_has_gimpy" = notGiven; then
+  coin_has_gimpy=no
+  if test -d $srcdir/GiMPy; then
+    coin_reason="source in GiMPy"
+    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
+    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
+    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
+     coin_has_gimpy="yes"
+
+  fi
+fi
+
+if test -z "$coin_reason" ; then
+  echo "$as_me:$LINENO: result: $coin_has_gimpy" >&5
+echo "${ECHO_T}$coin_has_gimpy" >&6
+else
+  echo "$as_me:$LINENO: result: $coin_has_gimpy, $coin_reason" >&5
+echo "${ECHO_T}$coin_has_gimpy, $coin_reason" >&6
+fi
+
+if test "$coin_has_gimpy" = yes ; then
+  if test -r $srcdir/GiMPy/configure; then
+    coin_subdirs="$coin_subdirs GiMPy"
+
+
+subdirs="$subdirs GiMPy"
+
+  fi
+fi
+
+
+echo "$as_me:$LINENO: checking whether source of project GrUMPy is available and should be compiled" >&5
+echo $ECHO_N "checking whether source of project GrUMPy is available and should be compiled... $ECHO_C" >&6
+
+coin_has_grumpy=notGiven
+coin_reason=
+
+# check if user wants to skip project in any case
+
+if test x"$COIN_SKIP_PROJECTS" != x; then
+  for dir in $COIN_SKIP_PROJECTS; do
+    if test $dir = "GrUMPy"; then
+      coin_has_grumpy="no"
+      coin_reason="GrUMPy has been specified in COIN_SKIP_PROJECTS"
+    fi
+
+  done
+fi
+
+if test "$coin_has_grumpy" != no; then
+
+# Check whether --with-m4_tolower(GrUMPy) or --without-m4_tolower(GrUMPy) was given.
+if test "${with_grumpy+set}" = set; then
+  withval="$with_grumpy"
+  if test "$withval" = no ; then
+       coin_has_grumpy="no"
+       coin_reason="--without-grumpy has been specified"
+     fi
+
+fi;
+fi
+
+if test "$coin_has_grumpy" != no; then
+
+# Check whether --with-m4_tolower(GrUMPy)-lib or --without-m4_tolower(GrUMPy)-lib was given.
+if test "${with_grumpy_lib+set}" = set; then
+  withval="$with_grumpy_lib"
+  if test "$withval" = no ; then
+       coin_has_grumpy="no"
+       coin_reason="--without-grumpy-lib has been specified"
+     else
+       coin_has_grumpy="no"
+       coin_reason="--with-grumpy-lib has been specified"
+     fi
+fi;
+fi
+
+if test "$coin_has_grumpy" != no; then
+
+# Check whether --with-m4_tolower(GrUMPy)-incdir or --without-m4_tolower(GrUMPy)-incdir was given.
+if test "${with_grumpy_incdir+set}" = set; then
+  withval="$with_grumpy_incdir"
+  if test "$withval" = no ; then
+       coin_has_grumpy="no"
+       coin_reason="--without-grumpy-incdir has been specified"
+     else
+       coin_has_grumpy="no"
+       coin_reason="--with-grumpy-incdir has been specified"
+     fi
+fi;
+fi
+
+if test "$coin_has_grumpy" != no; then
+
+# Check whether --with-m4_tolower(GrUMPy)-datadir or --without-m4_tolower(GrUMPy)-datadir was given.
+if test "${with_grumpy_datadir+set}" = set; then
+  withval="$with_grumpy_datadir"
+  if test "$withval" = no ; then
+       coin_has_grumpy="no"
+       coin_reason="--without-grumpy-datadir has been specified"
+     else
+       coin_has_grumpy="no"
+       coin_reason="--with-grumpy-datadir has been specified"
+     fi
+fi;
+fi
+
+
+
+
+
+# check if project is available in present directory
+if test "$coin_has_grumpy" = notGiven; then
+  coin_has_grumpy=no
+  if test -d $srcdir/GrUMPy; then
+    coin_reason="source in GrUMPy"
+    # If a third argument is given, then we have to check if one one the files given in that third argument is present.
+    # If none of the files in the third argument is available, then we consider the project directory as non-existing.
+    # However, if no third argument is given, then this means that there should be no check, and existence of the directory is sufficient.
+     coin_has_grumpy="yes"
+
+  fi
+fi
+
+if test -z "$coin_reason" ; then
+  echo "$as_me:$LINENO: result: $coin_has_grumpy" >&5
+echo "${ECHO_T}$coin_has_grumpy" >&6
+else
+  echo "$as_me:$LINENO: result: $coin_has_grumpy, $coin_reason" >&5
+echo "${ECHO_T}$coin_has_grumpy, $coin_reason" >&6
+fi
+
+if test "$coin_has_grumpy" = yes ; then
+  if test -r $srcdir/GrUMPy/configure; then
+    coin_subdirs="$coin_subdirs GrUMPy"
+
+
+subdirs="$subdirs GrUMPy"
 
   fi
 fi

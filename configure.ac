@@ -73,6 +73,8 @@ AC_COIN_MAIN_PACKAGEDIR(Cgl)
 AC_COIN_MAIN_PACKAGEDIR(Cbc)
 AC_COIN_MAIN_PACKAGEDIR(Alps)
 AC_COIN_MAIN_PACKAGEDIR(Dip)
+AC_COIN_MAIN_PACKAGEDIR(GiMPy)
+AC_COIN_MAIN_PACKAGEDIR(GrUMPy)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
