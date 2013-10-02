@@ -723,7 +723,7 @@ public:
 
       checkColumnThreshold     = 1.e6; 
       
-      Concurrent               = 0;  
+      Concurrent               = false;  
       
       NumBlocksCand            = 10;  
       
@@ -733,7 +733,7 @@ public:
 
       CurrentWorkingDir        = ""; 
 
-      SubProbParallel          = false; 
+      SubProbParallel          = true; 
       
       SubProbParallelType      = SubProbScheduleDynamic;
       

@@ -32,7 +32,7 @@ void blockNumberFinder(DecompParam utilParam,
 		       std::vector<int> &blockNums, 
 		       const CoinPackedMatrix* matrix); 
 
-void* DecompAuto(DecompApp * milp, 
+void* DecompAuto(DecompApp milp, 
 		  UtilParameters & utilParam, 
 		  UtilTimer & timer, 
 		  DecompMainParam & decompMainParam 
@@ -101,13 +101,8 @@ int main(int argc, char ** argv){
 			       static_cast<int>(blockNumCandidates.size())),
 			   milp.m_param.ConcurrentThreadsNum); 
 
-      //      std::vector<DecompApp> milpArray(static_cast<int>(numThreads + 1), milp); 
-      DecompApp** milpArray = new DecompApp*[numThreads+1];
-
-      for(int i = 0; i < (numThreads + 1); i++){
-         milpArray[i] = new DecompApp();
-      }
-
+      std::vector<DecompApp> milpArray(static_cast<int>(numThreads + 1), milp); 
+      
       std::vector<DecompMainParam> decompMainParamArray(static_cast<int>
 							(numThreads + 1), 
 							decompMainParam); 
@@ -135,10 +130,10 @@ int main(int argc, char ** argv){
 	      decompMainParamArray[i].doCut = false;  
 	      decompMainParamArray[i].doPriceCut = true;  
 	      decompMainParamArray[i].doDirect = false;                
-	      milpArray[i]->m_param.NumBlocks = blockNumCandidates[i-1];  
+	      milpArray[i].m_param.NumBlocks = blockNumCandidates[i-1];  
 	    } 	    
 
-	    milpArray[i]->m_param.ThreadIndex = i; 
+	    milpArray[i].m_param.ThreadIndex = i; 
 
 	    DecompAuto(milpArray[i], utilParamArray[i], 
 		       timerArray[i], decompMainParamArray[i]);	  	    	    	  	  	    	    
@@ -148,13 +143,9 @@ int main(int argc, char ** argv){
 	  decompMainParam.doCut        = utilParam.GetSetting("doCut",        false); 	
 	  decompMainParam.doPriceCut   = utilParam.GetSetting("doPriceCut",   true); 	
 	  decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false); 
-	  DecompAuto(&milp, utilParam, timer, decompMainParam); 
+	  DecompAuto(milp, utilParam, timer, decompMainParam); 
       }
 
-      for(int i = 0; i < (numThreads + 1); i++){
-	delete milpArray[i]; 
-      }
-      delete [] milpArray; 
 
       if(milp.m_param.Concurrent == true){
 	printf("===== FINISH Concurrent Computations Process. =====\n");
@@ -292,7 +283,7 @@ void blockNumberFinder(DecompParam utilParam,
 
 }
 
-void* DecompAuto(DecompApp* milp,
+void* DecompAuto(DecompApp milp,
                  UtilParameters& utilParam,
                  UtilTimer& timer,
                  DecompMainParam& decompMainParam)
@@ -300,7 +291,7 @@ void* DecompAuto(DecompApp* milp,
    //---
    //--- put the one of the functions in the constructor into the main
    //---
-   milp->initializeApp(utilParam);
+   milp.initializeApp(utilParam);
    //      milp.startupLog();
    //---
    //--- create the algorithm (a DecompAlgo)
@@ -317,14 +308,14 @@ void* DecompAuto(DecompApp* milp,
    //--- create the CPM algorithm object
    //---
    if (decompMainParam.doCut) {
-      algo = new DecompAlgoC(milp, &utilParam);
+      algo = new DecompAlgoC(&milp, &utilParam);
    }
 
    //---
    //--- create the PC algorithm object
    //---
    if (decompMainParam.doPriceCut) {
-      algo = new DecompAlgoPC(milp, &utilParam);
+      algo = new DecompAlgoPC(&milp, &utilParam);
    }
 
    if (decompMainParam.doCut && decompMainParam.doDirect) {
@@ -353,10 +344,10 @@ void* DecompAuto(DecompApp* milp,
       timer.start();
       alpsModel.solve();
       timer.stop();
-      if(milp->m_param.Concurrent == 1){
-      std::cout << "====== The thread number is "<< milp->m_param.ThreadIndex 
+      if(milp.m_param.Concurrent == 1){
+      std::cout << "====== The thread number is "<< milp.m_param.ThreadIndex 
 		<< "====" << std::endl;
-      std::cout << "====== The block number is  "<< milp->m_param.NumBlocks
+      std::cout << "====== The block number is  "<< milp.m_param.NumBlocks
 		<< "===="<< std::endl;	
       std::cout << "====== Branch-and-Cut       " << decompMainParam.doCut
 		<< "===="<< std::endl;
@@ -425,8 +416,8 @@ void* DecompAuto(DecompApp* milp,
       //---   and solved claims we have optimal, check that they match
       //---
       double epsilon  = 0.01; //1%
-      double userLB   = milp->getBestKnownLB();
-      double userUB   = milp->getBestKnownUB();
+      double userLB   = milp.getBestKnownLB();
+      double userUB   = milp.getBestKnownUB();
       double userDiff = fabs(userUB - userLB);
 
       if (alpsModel.getSolStatus() == AlpsExitStatusOptimal &&
@@ -450,15 +441,15 @@ void* DecompAuto(DecompApp* milp,
       //--- get optimal solution
       //---
       if (alpsModel.getSolStatus() == AlpsExitStatusOptimal) {
-	string::size_type idx = milp->getInstanceName().rfind('/');
+	string::size_type idx = milp.getInstanceName().rfind('/');
 	string intanceNameWoDir; 
 	if(idx !=string::npos){
-	  intanceNameWoDir = milp->getInstanceName().substr(idx+1); 
+	  intanceNameWoDir = milp.getInstanceName().substr(idx+1); 
 	}
 	else{
-	  intanceNameWoDir = milp->getInstanceName();
+	  intanceNameWoDir = milp.getInstanceName();
 	}
-	string solutionFile = milp->m_param.CurrentWorkingDir + UtilDirSlash()
+	string solutionFile = milp.m_param.CurrentWorkingDir + UtilDirSlash()
 	                      + intanceNameWoDir + ".sol";
 	ofstream osSolution(solutionFile.c_str());
 	const DecompSolution* solution = alpsModel.getBestSolution();
