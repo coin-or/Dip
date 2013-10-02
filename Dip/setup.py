@@ -89,7 +89,7 @@ setup(name=PROJECT,
 #      namespace_packages=['coinor'],
       packages=['dippy'],
       package_dir = {'': 'src'},
-      install_requires=['coinor.pulp'],
+      install_requires=['coinor.pulp','coinor.gimpy'],
       ext_modules=modules
      )
 
