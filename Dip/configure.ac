@@ -20,7 +20,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.9],[dip@lists.coin-or.org])
+AC_INIT([Dip],[0.9.1],[dip@lists.coin-or.org])
 
 # copyright for configure script
 AC_COPYRIGHT([
@@ -60,7 +60,7 @@ AC_CANONICAL_BUILD
 # the source root directory contains definition of where to find those
 # externals.  The following macro ensures that those externals are
 # retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(Dip)
+AC_COIN_PROJECTDIR_INIT(Dip,2:1:1)
 
 # Check if user wants to produce debugging code
 AC_COIN_DEBUG_COMPILE(Dip)
