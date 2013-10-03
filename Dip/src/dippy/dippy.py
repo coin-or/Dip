@@ -467,7 +467,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
         # Note: XPRESS and CPLEX do not interpret integer variables without 
         # explicit bounds
         if mip:
-            vg = [v for v in vs if not (v.isPositive() and v.cat == LpContinuous) \
+            vg = [v for v in vs if not (v.isPositive() and v.cat == pulp.LpContinuous) \
                 and not v.isBinary()]
         else:
             vg = [v for v in vs if not v.isPositive()]
