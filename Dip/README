@@ -21,6 +21,33 @@ http://projects.coin-or.org/Dip
 WHAT'S NEW
 ==========
 
+Release 0.9.0:
+
+1. DIP now includes DipPy, a Python-based modeling language.
+
+2. DIP is now a complete generic MILP solver, capable of automatically
+detecting block structure and applying a decomposition method.
+
+3. DIP and DipPy build out of the box in Windows, OSX, and Linux with a
+combination of the autotools and a Python setup script.
+
+4. There is now support for solving the subproblems in parallel when there is
+block structure using OpenMP.
+
+5. Numerous bug fixes and improvements. 
+
+Release 0.82.2:
+
+1. Fixes to build system
+
+2. Updates to dependencies
+
+Release 0.82.1:
+
+1. Fixes to build system
+
+2. Updates to dependencies
+
 Release 0.82.0:
 
 1. Support for MSVC++ version 10 added.

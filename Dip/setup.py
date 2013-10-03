@@ -7,7 +7,7 @@ import subprocess, os, sys
 from os.path import join, dirname
 
 PROJECT = 'dippy'
-VERSION = '1.9.0'
+VERSION = '1.9.1'
 URL = 'https://projects.coin-or.org/Dip/wiki/Dippy'
 AUTHOR_EMAIL = u''
 DESC = 'DIP Python Interface'
@@ -89,7 +89,7 @@ setup(name=PROJECT,
 #      namespace_packages=['coinor'],
       packages=['dippy'],
       package_dir = {'': 'src'},
-      install_requires=['coinor.pulp'],
+      install_requires=['coinor.pulp','coinor.gimpy'],
       ext_modules=modules
      )
 
