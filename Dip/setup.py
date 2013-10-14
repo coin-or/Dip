@@ -40,7 +40,7 @@ def get_libs(dir):
 
 def get_lib_dirs(dir):
     '''
-    Return a list of distinct library names used by ``dependencies``.
+    Return a list of library directories.
     '''
     with open(join(dir, 'share', 'coin',
                    'doc', 'Dip', 'dip_addlibs.txt')) as f:
