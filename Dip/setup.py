@@ -38,6 +38,17 @@ def get_libs(dir):
                     flag.startswith('-l')]
     return libs
 
+def get_lib_dirs(dir):
+    '''
+    Return a list of library directories.
+    '''
+    with open(join(dir, 'share', 'coin',
+                   'doc', 'Dip', 'dip_addlibs.txt')) as f:
+        link_line = f.read()
+        libs = [flag[2:] for flag in link_line.split() if
+                flag.startswith('-L')]
+    return libs
+
 operatingSystem = sys.platform
 if 'linux' in operatingSystem:
     operatingSystem = 'linux'
@@ -68,8 +79,10 @@ files = ['DippyDecompAlgo.cpp',
 
 sources = [join('src/dippy', f) for f in files]
 
-lib_dirs = [join(coin_install_dir, 'lib', 'intel'),
-            join(coin_install_dir, 'lib')]
+lib_dirs = get_lib_dirs(coin_install_dir)
+lib_dirs.append(join(coin_install_dir, 'lib'))
+if operatingSystem is 'windows':
+    lib_dirs.append(join(coin_install_dir, 'lib', 'intel'))
 
 modules=[Extension('_dippy', 
                    sources, 
