@@ -234,6 +234,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
+#if 0
    CbcMain0(cbc);
    //int i;
    //const double * colUB = cbc.getColUpper();
@@ -317,6 +318,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
     *    2  difficulties so run was abandoned
     *   (5  event user programmed event occurred)
    */
+   #endif
+   cbc.setLogLevel(0);
+   cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
    result->m_solStatus    = cbc.status();
 
