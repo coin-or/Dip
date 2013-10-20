@@ -319,6 +319,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
     *   (5  event user programmed event occurred)
    */
    #endif
+   cbc.setLogLevel(0);
    cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
    result->m_solStatus    = cbc.status();

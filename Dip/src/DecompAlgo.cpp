@@ -4930,6 +4930,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
          */
 #ifdef _OPENMP
+	 omp_set_num_threads(m_param.ConcurrentThreadsNum);
          #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
 
