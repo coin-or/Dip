@@ -166,6 +166,10 @@ if CPLEX_IP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_IP_CPX__
 endif
 
+if SYMPHONY_IP_SOLVER
+  AM_CPPFLAGS += -D__DECOMP_IP_SYMPHONY__
+endif
+
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
