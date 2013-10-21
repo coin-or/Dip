@@ -207,8 +207,6 @@ public:
     * can be solved in parallel.
     */
 
-   int NumThreads;
-
    /*
     * Check user columns for overlap. The default is true, but this
     * can be shut off to speed up the setup.
@@ -381,7 +379,6 @@ public:
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
-      PARAM_getSetting("NumThreads",              NumThreads);
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       PARAM_getSetting("NumBlocks", NumBlocks);
       DataDir       = param.GetSetting("DataDir",       "",    "MILP");
@@ -522,7 +519,6 @@ public:
                          MasterConvexityLessThan);
       UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
       UtilPrintParameter(os, sec, "BranchStrongIter",  BranchStrongIter);
-      UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       UtilPrintParameter(os, sec,
                          "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
@@ -590,7 +586,7 @@ public:
       SubProbGapLimitInexact = 0.1;    //10.00% gap
       SubProbTimeLimitExact   = DecompBigNum;
       SubProbTimeLimitInexact = DecompBigNum;
-      SubProbNumThreads       = 1;
+      SubProbNumThreads       = 4;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
@@ -614,7 +610,6 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      NumThreads               = 2;
       DebugCheckBlocksColumns  = true;
       NumBlocks                = 3;
       /*
@@ -640,7 +635,7 @@ public:
       ConcurrentCutOffTime     = 100;
       ThreadIndex              = 0;
       CurrentWorkingDir        = "";
-      SubProbParallel          = false;
+      SubProbParallel          = true;
       SubProbParallelType      = SubProbScheduleDynamic;
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
