@@ -215,7 +215,7 @@ test $coin_has_cpx != skipping])
 #                      Check for the IP solver                              #
 #############################################################################
 
-AC_MSG_CHECKING([for Dip default ip solver])
+AC_MSG_CHECKING([for DIP default ip solver])
 AC_ARG_WITH([dip-ip-solver],
 [AC_HELP_STRING([--with-dip-ip-solver@<:@=ipsolver@:>@],
                 [specify the IP solver in small
@@ -237,7 +237,7 @@ case $dip_ip_solver in
      fi
    ;; 
    symphony)
-     AC_MSG_RESULT(symphony)
+     AC_MSG_RESULT{symphony}
      if test $coin_has_symphony != yes; then
      	found_package=false
      fi

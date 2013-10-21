@@ -658,6 +658,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    }
 
 #endif
+
    if (m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
                           "masterProbRootIP",
@@ -666,101 +667,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           m_nodeStats.priceCallsTotal);
 
    DecompSolverResult    result;
-
-
-
-#ifdef __DECOMP_IP_SYMPHONY__
-
-   int numCols = m_masterSI->getNumCols(); 
-   OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
-   
-   const CoinPackedMatrix* matrix_sym = (m_masterSI->getMatrixByRow());
-   const double* col_lb = (m_masterSI->getColLower()); 
-   const double* col_up = (m_masterSI->getColUpper());
-   const double* row_lb = (m_masterSI->getRowLower());
-   const double* row_up = (m_masterSI->getRowUpper()); 
-   const double* obj_coef = (m_masterSI->getObjCoefficients());
-
-   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym), const_cast<double*&>(col_lb),
-			  const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
-			  const_cast<double*&>(row_lb), const_cast<double*&>(row_up));			
-   
-
-   for(i = 0; i < nMasterCols; i++){
-     if(isMasterColStructural(i)){
-       osi_Sym->setInteger(i);
-     }
-   }
-
-   //TODO: is this expensive? if so,                                                                                                         
-   //  better to use column type info                                                                                                        
-   //  like above                                                                                                                            
-
-   for(li = m_vars.begin(); li != m_vars.end(); li++){
-     b   = (*li)->getBlockId();
-     mit = m_modelRelax.find(b);
-     assert(mit != m_modelRelax.end());
-     DecompAlgoModel     & algoModel = (*mit).second;
-     DecompConstraintSet * model     = algoModel.getModel();
-     if(!model)
-       continue;
-     if(( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
-	(!model->m_masterOnly && model->getNumInts() == 0)){
-       osi_Sym->setContinuous((*li)->getColMasterIndex());
-       //printf("set back to continuous index=%d block=%d\n",                                                                              
-       //       b, (*li)->getColMasterIndex());                                                                                            
-       //       std::cout << "set continuous variables back " << std::endl;
-
-     }
-   }
-
-			  
-   assert(osi_Sym); 
-   sym_environment* env = osi_Sym->getSymphonyEnvironment(); 
-
-   assert(env); 
-   
-   osi_Sym->branchAndBound();
-
-   int status = sym_get_status(env); 
-
-   if((status == TM_OPTIMAL_SOLUTION_FOUND) || (status == TM_TARGET_GAP_ACHIEVED)){
-     result.m_isOptimal = true; 
-     double * solution = new double[numCols]; 
-     assert(solution); 
-     status = sym_get_col_solution(env, solution); 
-     result.m_nSolutions = 1; 
-     vector<double> solVec(solution, solution + numCols);
-     result.m_solution.push_back(solVec);
-     UTIL_DELARR(solution); 
-     if(status == FUNCTION_TERMINATED_ABNORMALLY)
-       throw UtilException("sym_get_col_solution failure", 
-			   "solveOsiAsIp", "DecompAlgoModel"); 
-   }
-   else{
-     if (sym_is_proven_primal_infeasible(env)){
-	 result.m_nSolutions = 0; 
-	 result.m_isOptimal = true;
-	 //	 result.m_isCutoff = doCutoff;
-       }
-       else{
-	 //	 result.m_isCutoff = doCutoff; 
-	 result.m_isOptimal = false ;
-       }
-    }
-
-     if (status == (TM_ERROR__USER || TM_ERROR__COMM_ERROR 
-		  || TM_ERROR__NUMERICAL_INSTABILITY
-		  || TM_ERROR__ILLEGAL_RETURN_CODE
-		  || TM_ERROR__NO_BRANCHING_CANDIDATE)){
-       std::cerr << "Error: SYPHONMY IP solver status =  " 
-		 << status << std::endl; 
-     }
-     
-     UTIL_DELPTR(osi_Sym); 
-
-#endif
-
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_masterSI);

@@ -313,13 +313,6 @@ typedef OsiClpSolverInterface OsiIpSolverInterface;
 typedef OsiCpxSolverInterface OsiIpSolverInterface;
 #endif
 
-#ifdef __DECOMP_IP_SYMPHONY__
-#include "symphony.h"
-#include "OsiSymSolverInterface.hpp"
-typedef OsiSymSolverInterface OsiIpSolverInterface;
-#endif
-
-
 //---
 //--- COIN vectors can do some extra checking if this is true,
 //---   but, it is expensive, so turn off when in optimized mode
