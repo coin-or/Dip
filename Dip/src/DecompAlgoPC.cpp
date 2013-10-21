@@ -721,7 +721,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    osi_Sym->branchAndBound();
    int status = sym_get_status(env);
 
-   if ((status == TM_OPTIMAL_SOLUTION_FOUND) || (status == TM_TARGET_GAP_ACHIEVED)) {
+   if ((status == PREP_OPTIMAL_SOLUTION_FOUND) || (status == TM_OPTIMAL_SOLUTION_FOUND)
+         || (status == TM_TARGET_GAP_ACHIEVED)) {
       result.m_isOptimal = true;
       double* solution = new double[numCols];
       assert(solution);

@@ -274,7 +274,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
                 << status << std::endl;
    }
 
-   if ((status == TM_OPTIMAL_SOLUTION_FOUND) || (status == TM_TARGET_GAP_ACHIEVED)) {
+   if ( (status == PREP_OPTIMAL_SOLUTION_FOUND ) || (status == TM_OPTIMAL_SOLUTION_FOUND)
+         || (status == TM_TARGET_GAP_ACHIEVED)) {
       result->m_isOptimal = true;
       double objective_value = 0.0;
       sym_get_obj_val(env, &objective_value);

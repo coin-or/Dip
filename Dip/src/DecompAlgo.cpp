@@ -464,6 +464,9 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
 #ifdef __DECOMP_IP_SYMPHONY__
    subprobSI = new OsiSymSolverInterface();
 #endif
+#ifdef __DECOMP_IP_CBC__
+   subprobSI = new OsiClpSolverInterface();
+#endif
    assert(subprobSI);
    subprobSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
    //TODO: use assign vs load? just pass pointers?
