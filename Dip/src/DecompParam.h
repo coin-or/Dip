@@ -586,7 +586,7 @@ public:
       SubProbGapLimitInexact = 0.1;    //10.00% gap
       SubProbTimeLimitExact   = DecompBigNum;
       SubProbTimeLimitInexact = DecompBigNum;
-      SubProbNumThreads       = 4;
+      SubProbNumThreads       = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
@@ -635,7 +635,7 @@ public:
       ConcurrentCutOffTime     = 100;
       ThreadIndex              = 0;
       CurrentWorkingDir        = "";
-      SubProbParallel          = true;
+      SubProbParallel          = false;
       SubProbParallelType      = SubProbScheduleDynamic;
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
