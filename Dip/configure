@@ -25630,8 +25630,8 @@ fi
 #                      Check for the IP solver                              #
 #############################################################################
 
-echo "$as_me:$LINENO: checking for DIP default ip solver" >&5
-echo $ECHO_N "checking for DIP default ip solver... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for Dip default ip solver" >&5
+echo $ECHO_N "checking for Dip default ip solver... $ECHO_C" >&6
 
 # Check whether --with-dip-ip-solver or --without-dip-ip-solver was given.
 if test "${with_dip_ip_solver+set}" = set; then
@@ -25658,8 +25658,8 @@ echo "${ECHO_T}Cplex" >&6
      fi
    ;;
    symphony)
-     echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6{symphony}
+     echo "$as_me:$LINENO: result: symphony" >&5
+echo "${ECHO_T}symphony" >&6
      if test $coin_has_symphony != yes; then
      	found_package=false
      fi

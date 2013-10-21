@@ -452,11 +452,21 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
    int nCols = model->getNumCols();
    int nRows = model->getNumRows();
 
+   /*
    if (nInts) {
       subprobSI = new OsiIpSolverInterface();
    } else {
       subprobSI = new OsiLpSolverInterface();
    }
+   */
+
+#if defined(__DECOMP_IP_CPX__) 
+   subprobSI = new OsiCpxSolverInterface();    
+#endif 
+
+#ifdef __DECOMP_IP_SYMPHONY__
+   subprobSI = new OsiSymSolverInterface(); 
+#endif 
 
    assert(subprobSI);
    subprobSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
@@ -474,10 +484,6 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
       OsiCpxSolverInterface* osiCpx
          = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
       osiCpx->switchToMIP();
-      //CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
-      //CPXLPptr  cpxLp  = osiCpx->getLpPtr();
-      //assert(cpxEnv && cpxLp);
-      //printf("probtype = %d\n", CPXgetprobtype(cpxEnv, cpxLp));
 #endif
    }
 
