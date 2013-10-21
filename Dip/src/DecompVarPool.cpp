@@ -89,10 +89,15 @@ bool DecompVarPool::isParallel(const DecompVarList&     vars,
       }
 
       const int*     ind2 = (*vi)->m_s.getIndices();
+
       const double* els2 = (*vi)->m_s.getElements();
+
       const double   norm2 = (*vi)->getNorm();
+
       index1              = 0;
+
       index2              = 0;
+
       cosine              = 0.0;
 
       //---
@@ -222,8 +227,8 @@ void DecompVarPool::reExpand(const DecompConstraintSet& modelCore,
       // --- create a sparse column from the dense column
       // ---
       CoinPackedVector* sparseCol
-         = UtilPackedVectorFromDense(modelCore.getNumRows() + 1,
-                                     denseCol, tolZero);
+      = UtilPackedVectorFromDense(modelCore.getNumRows() + 1,
+                                  denseCol, tolZero);
       (*vi).deleteCol();
       (*vi).setCol(sparseCol);
    }

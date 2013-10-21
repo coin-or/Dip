@@ -146,7 +146,6 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface* cutGenSI,
    //si->setRowPrice(act);//BAD NAME!
    bool            mustDeleteWS = true;
    CoinWarmStart* warmStart    = NULL;
-
    //TODO: check on crossover code - some speedups possible
    //  with a version that accepts memory - so not alloc/free
    //  too often
@@ -159,9 +158,9 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface* cutGenSI,
       warmStart = masterSI->getPointerToWarmStart(mustDeleteWS);
       cutGenClpSI->setWarmStart(warmStart);
       break;
-
    case PRICE_AND_CUT:
    case RELAX_AND_CUT:
+
       if (m_genGomory) {
          //---
          //--- crossover from xhat to basic solution
@@ -295,8 +294,8 @@ int DecompAlgoCGL::generateCuts(OsiSolverInterface* cutGenSI,
 
    if (osiCuts.sizeColCuts() > 0) {
    (*m_logStream)
-            << "WARNING: " << osiCuts.sizeColCuts()
-            << " CGL col cuts found." << endl;
+      << "WARNING: " << osiCuts.sizeColCuts()
+      << " CGL col cuts found." << endl;
    }
              );
 

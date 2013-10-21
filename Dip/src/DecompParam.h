@@ -387,9 +387,9 @@ public:
       BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
       PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
       BlockFileFormat
-         = param.GetSetting("BlockFileFormat",    "",    "MILP");
+      = param.GetSetting("BlockFileFormat",    "",    "MILP");
       InitSolutionFile
-         = param.GetSetting("InitSolutionFile",   "",    "MILP");
+      = param.GetSetting("InitSolutionFile",   "",    "MILP");
       PARAM_getSetting("LogLevel", LogLevel);
       // PARAM_getSetting("DataDir",DataDir);
       //PARAM_getSetting("Instance",Instance);

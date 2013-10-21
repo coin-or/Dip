@@ -152,7 +152,6 @@ void DecompAlgoPC::adjustMasterDualSolution()
    double         alpha  = m_param.DualStabAlpha;
    double         alpha1 = 1.0 - alpha;
    copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
-
    //---
    //--- for both the first PhaseI and first PhaseII calls,
    //---   be sure to set the dual vector to dualRM as dual=0
@@ -260,11 +259,11 @@ int DecompAlgoPC::compressColumns()
                       "compressColumns()", m_param.LogDebugLevel, 2);
    m_stats.timerOther1.reset();
    int nHistorySize
-      = static_cast<int>(m_nodeStats.objHistoryBound.size());
+   = static_cast<int>(m_nodeStats.objHistoryBound.size());
 
    if (nHistorySize > 0) {
       DecompObjBound& objBound
-         = m_nodeStats.objHistoryBound[nHistorySize - 1];
+      = m_nodeStats.objHistoryBound[nHistorySize - 1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = m_nodeStats.objBest.first;
       double masterGap = DecompInf;
@@ -286,16 +285,23 @@ int DecompAlgoPC::compressColumns()
    }
 
    const int      CompressColsIterFreq      = m_param.CompressColumnsIterFreq;
+
    const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
+
    const int      nMasterCols               = m_masterSI->getNumCols();
+
    const int      nMasterRows               = m_masterSI->getNumRows();
+
    int nColsSinceLast
-      = nMasterCols - m_compressColsLastNumCols;
+   = nMasterCols - m_compressColsLastNumCols;
+
    int nIterSinceLast
-      = m_nodeStats.priceCallsTotal - m_compressColsLastPrice;
+   = m_nodeStats.priceCallsTotal - m_compressColsLastPrice;
+
    int nColsSinceLastLimit
-      = static_cast<int>(ceil(m_compressColsLastNumCols *
-                              CompressColsSizeMultLimit));
+   = static_cast<int>(ceil(m_compressColsLastNumCols *
+                           CompressColsSizeMultLimit));
+
    UTIL_MSG(m_param.LogLevel, 4,
             (*m_osLog) << "nMasterCols              = "
             << nMasterCols << endl;
@@ -338,7 +344,7 @@ int DecompAlgoPC::compressColumns()
 #ifndef DO_INTERIOR
    bool            mustDeleteWS = false;
    CoinWarmStartBasis* warmStart
-      = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(mustDeleteWS));
+   = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(mustDeleteWS));
 
    for (c = 0; c < nMasterCols; c++) {
       if (warmStart->getStructStatus(c) == CoinWarmStartBasis::basic) {
@@ -461,7 +467,6 @@ int DecompAlgoPC::compressColumns()
                << " EffPos = " << nColsEffPos
                << endl;
               );
-
       //---
       //--- now, we must update the mapping between LP index and
       //---  the index in the var list objects - but we might have
@@ -667,6 +672,89 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           m_nodeStats.priceCallsTotal);
 
    DecompSolverResult    result;
+#ifdef __DECOMP_IP_SYMPHONY__
+   int numCols = m_masterSI->getNumCols();
+   OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
+   const CoinPackedMatrix* matrix_sym = (m_masterSI->getMatrixByRow());
+   const double* col_lb = (m_masterSI->getColLower());
+   const double* col_up = (m_masterSI->getColUpper());
+   const double* row_lb = (m_masterSI->getRowLower());
+   const double* row_up = (m_masterSI->getRowUpper());
+   const double* obj_coef = (m_masterSI->getObjCoefficients());
+   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym), const_cast<double*&>(col_lb),
+                          const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
+                          const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
+
+   for (i = 0; i < nMasterCols; i++) {
+      if (isMasterColStructural(i)) {
+         osi_Sym->setInteger(i);
+      }
+   }
+
+   //TODO: is this expensive? if so,
+   //  better to use column type info
+   //  like above
+
+   for (li = m_vars.begin(); li != m_vars.end(); li++) {
+      b   = (*li)->getBlockId();
+      mit = m_modelRelax.find(b);
+      assert(mit != m_modelRelax.end());
+      DecompAlgoModel&      algoModel = (*mit).second;
+      DecompConstraintSet* model     = algoModel.getModel();
+
+      if (!model) {
+         continue;
+      }
+
+      if (( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
+            (!model->m_masterOnly && model->getNumInts() == 0)) {
+         osi_Sym->setContinuous((*li)->getColMasterIndex());
+         //printf("set back to continuous index=%d block=%d\n",
+         //       b, (*li)->getColMasterIndex());
+         //       std::cout << "set continuous variables back " << std::endl;
+      }
+   }
+
+   assert(osi_Sym);
+   sym_environment* env = osi_Sym->getSymphonyEnvironment();
+   assert(env);
+   osi_Sym->branchAndBound();
+   int status = sym_get_status(env);
+
+   if ((status == TM_OPTIMAL_SOLUTION_FOUND) || (status == TM_TARGET_GAP_ACHIEVED)) {
+      result.m_isOptimal = true;
+      double* solution = new double[numCols];
+      assert(solution);
+      status = sym_get_col_solution(env, solution);
+      result.m_nSolutions = 1;
+      vector<double> solVec(solution, solution + numCols);
+      result.m_solution.push_back(solVec);
+      UTIL_DELARR(solution);
+
+      if (status == FUNCTION_TERMINATED_ABNORMALLY)
+         throw UtilException("sym_get_col_solution failure",
+                             "solveOsiAsIp", "DecompAlgoModel");
+   } else {
+      if (sym_is_proven_primal_infeasible(env)) {
+         result.m_nSolutions = 0;
+         result.m_isOptimal = true;
+         //	 result.m_isCutoff = doCutoff;
+      } else {
+         //	 result.m_isCutoff = doCutoff;
+         result.m_isOptimal = false ;
+      }
+   }
+
+   if (status == (TM_ERROR__USER || TM_ERROR__COMM_ERROR
+                  || TM_ERROR__NUMERICAL_INSTABILITY
+                  || TM_ERROR__ILLEGAL_RETURN_CODE
+                  || TM_ERROR__NO_BRANCHING_CANDIDATE)) {
+      std::cerr << "Error: SYPHONMY IP solver status =  "
+                << status << std::endl;
+   }
+
+   UTIL_DELPTR(osi_Sym);
+#endif
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_masterSI);
@@ -794,7 +882,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //--- get CPXLPptr   for use with internal methods
    //---
    OsiCpxSolverInterface* osiCpx
-      = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
    CPXLPptr  cpxLp  = osiCpx->getLpPtr();
    assert(cpxEnv && cpxLp);
@@ -982,7 +1070,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                vit != m_xhatIPFeas.end(); vit++) {
             const DecompSolution* xhatIPFeas = *vit;
             const double*          values
-               = xhatIPFeas->getValues();
+            = xhatIPFeas->getValues();
 
             for (int c = 0; c < modelCore->getNumCols(); c++) {
                if (!UtilIsZero(values[c] - rsolution[c])) {
@@ -998,9 +1086,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
                      << endl;);
          } else {
             DecompSolution* decompSol
-               = new DecompSolution(modelCore->getNumCols(),
-                                    rsolution,
-                                    getOrigObjective());
+            = new DecompSolution(modelCore->getNumCols(),
+                                 rsolution,
+                                 getOrigObjective());
             m_xhatIPFeas.push_back(decompSol);
             vector<DecompSolution*>::iterator vi;
             DecompSolution* viBest = NULL;
@@ -1241,9 +1329,9 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
          //--- create a row (in terms of reformulation, lambda), from row
          //---
          CoinPackedVector* rowReform
-            = m_cutpool.createRowReform(modelCore->getNumCols(),
-                                        row,
-                                        m_vars);
+         = m_cutpool.createRowReform(modelCore->getNumCols(),
+                                     row,
+                                     m_vars);
 
          if (!rowReform) {
             //TODO: need status return code for failure in -O
@@ -1405,7 +1493,6 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex++;
       }
       break;
-
       case 'G': {
          CoinPackedVector artCol;
          artCol.insert(rowIndex, 1.0);
@@ -1418,7 +1505,6 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex++;
       }
       break;
-
       case 'E': {
          CoinPackedVector artColL;
          CoinPackedVector artColG;
@@ -1439,7 +1525,6 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex += 2;
       }
       break;
-
       default:
          assert(0);
       }

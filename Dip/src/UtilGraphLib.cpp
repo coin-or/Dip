@@ -153,8 +153,8 @@ void UtilGraphLib::read_data(const char* datafile)
          this->name = tmp_str.substr(0, tmp_str.find_first_of("."));
          break;
       }
-
       case 3 : //DIMENSION (set n_vertices, n_edges)
+
          if (!sscanf(line, "%d", &k)) {
             cerr << "UtilGraphLib::read_data ERROR I/O : reading DIMENSION "
                  << k << ". Aborting." << endl;
@@ -164,8 +164,8 @@ void UtilGraphLib::read_data(const char* datafile)
          this->n_vertices = k;
          this->n_edges = ((n_vertices * n_vertices) - n_vertices) / 2;
          break;
-
       case 4 : //CAPACITY (set capacity)
+
          if (!sscanf(line, "%d", &k)) {
             cerr << "GrabLib:: read_data ERROR I/O : reading CAPACITY "
                  << k << ". Aborting." << endl;
@@ -174,7 +174,6 @@ void UtilGraphLib::read_data(const char* datafile)
 
          this->capacity = k;
          break;
-
       case 5 : //EDGE_WEIGHT_TYPE
          sscanf(line, "%s", tmp);
 
@@ -190,7 +189,6 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 6 : //EDGE_WEIGHT_FORMAT
          sscanf(line, "%s", tmp);
 
@@ -206,7 +204,6 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 7 : //DISPLAY_DATA_TYPE
          sscanf(line, "%s", tmp);
 
@@ -222,8 +219,8 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 8: //EDGE_WEIGHT_SECTION (open memory and set edge_wt)
+
          if (wtype != _EXPLICIT) {
             break;
          }
@@ -235,6 +232,7 @@ void UtilGraphLib::read_data(const char* datafile)
          case 4 : //UPPER_COL
          case 3 : //LOWER_DIAG_ROW
          case 6 : //UPPER_DIAG_COL
+
             for (i = 0, coef2 = edge_wt; i < n_vertices; i++) {
                for (j = 0; j  < i; j++, coef2++) {
                   if (!fscanf(f, "%lf", &fdummy)) {
@@ -263,11 +261,11 @@ void UtilGraphLib::read_data(const char* datafile)
             }
 
             break;
-
          case 0 : //UPPER_ROW
          case 5 : //LOWER_COL
          case 2 : //UPPER_DIAG_ROW
          case 7 : //LOWER_DIAG_COL
+
             for (i = 0, coef2 = edge_wt; i < n_vertices; i++) {
                if (wformat == 2 || wformat == 7)
                   if (!fscanf(f, "%lf", &fdummy)) {
@@ -297,8 +295,8 @@ void UtilGraphLib::read_data(const char* datafile)
             }
 
             break;
-
          case 8 : //FULL_MATRIX
+
             for (i = 0, coef2 = edge_wt; i < n_vertices; i++) {
                for (j = 0; j <= i; j++)
                   if (!fscanf(f, "%lf", &fdummy)) {
@@ -331,8 +329,8 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 9 : //DISPLAY_DATA_SECTION (open memory and set posx, posy)
+
          if (dtype != 1) {
             cerr << "UtilGraphLib::read_data ERROR I/O : DISPLAY_DATA_SECTION "
                  << "exists but not TWOD_DISPLAY. Aborting." << endl;
@@ -360,9 +358,7 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 10 : //NODE_COORD_SECTION (open memory and set posx,
-
          //posy, coordx, coordy, coordz)
          if (nctype == -1) {
             nctype = 0;   //if not given: TWOD_COORDS
@@ -433,7 +429,6 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 11: //NODE_COORD_TYPE
          sscanf(line, "%s", tmp);
 
@@ -449,7 +444,6 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 12: //DEPOT_SECTION
          fscanf(f, "%d", &k);
 
@@ -466,12 +460,10 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 13: //CAPACITY_VOL
          sscanf(line, "%d", &k);
          capacity_volume = true;
          break;
-
       case 14: //DEMAND_SECTION
          vertex_wt = new int[n_vertices];
 
@@ -498,7 +490,6 @@ void UtilGraphLib::read_data(const char* datafile)
          }
 
          break;
-
       case 18: //EOF
       default:
          break;
@@ -549,12 +540,10 @@ int UtilGraphLib::compute_icost(const int wtype, const int va, const int vb)
       case _EUC_2D :
          cost = (int) floor( sqrt( dx * dx + dy * dy ) + 0.5);
          break;
-
       case _EUC_3D :
          dz = coordz[va] - coordz[vb];
          cost = (int) floor( sqrt( dx * dx + dy * dy + dz * dz) + 0.5);
          break;
-
       case _MAX_2D :
          cost = (int) fabs(dx);
 
@@ -563,7 +552,6 @@ int UtilGraphLib::compute_icost(const int wtype, const int va, const int vb)
          }
 
          break;
-
       case _MAX_3D :
          dz = coordz[va] - coordz[vb];
          cost = (int) fabs(dx);
@@ -577,20 +565,16 @@ int UtilGraphLib::compute_icost(const int wtype, const int va, const int vb)
          }
 
          break;
-
       case _MAN_2D :
          cost = (int) floor( dx + dy + 0.5 );
          break;
-
       case _MAN_3D :
          dz = coordz[va] - coordz[vb];
          cost = (int) floor( dx + dy + dz + 0.5 );
          break;
-
       case _CEIL_2D:
          cost = (int)ceil( sqrt( dx * dx + dy * dy ) + 0.5);
          break;
-
       case _ATT:
          cost = (int)( sqrt( (dx * dx + dy * dy ) / 10 ) + 1);
          break;

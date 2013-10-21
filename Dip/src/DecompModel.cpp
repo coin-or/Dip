@@ -40,18 +40,31 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
    }
 
    const  vector<string>&   colNames = model->getColNames();
+
    const  vector<string>&   rowNames = model->getRowNames();
+
    int    c, r, i;
+
    bool   isFeas      = true;
+
    bool   hasColNames = false;
+
    bool   hasRowNames = false;
+
    double xj          = 0.0;
+
    double ax          = 0.0;
+
    double clb         = 0.0;
+
    double cub         = 0.0;
+
    double rlb         = 0.0;
+
    double rub         = 0.0;
+
    double actViol     = 0.0;
+
    double relViol     = 0.0;
 
    if (colNames.size()) {
@@ -98,9 +111,9 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
          }
 
          cout << " LB= " << UtilDblToStr(clb, precision)
-              << " x= "  << UtilDblToStr(xj, precision)
-              << " UB= " << UtilDblToStr(cub, precision)
-              << endl;
+         << " x= "  << UtilDblToStr(xj, precision)
+         << " UB= " << UtilDblToStr(cub, precision)
+         << endl;
       }
                 );
       actViol = std::max<double>(clb - xj, xj - cub);
@@ -231,6 +244,68 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- clear out any old solutions
    //---
    result->m_solution.clear();
+#ifdef __DECOMP_IP_SYMPHONY__
+   OsiSymSolverInterface* osiSym
+   = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+   assert(osiSym);
+   sym_environment* env = osiSym->getSymphonyEnvironment();
+   assert(env);
+   osiSym->branchAndBound();
+   int status = sym_get_status(env);
+
+   if (status == TM_OPTIMAL_SOLUTION_FOUND) {
+      std::cout << "Tree Manager(TM) found the "
+                << "optimal solution and stopped"
+                << std::endl;
+   } else if (status == TM_TIME_LIMIT_EXCEEDED) {
+      std::cout << "TM stopped after reaching the"
+                << " predefined time limit "
+                << std::endl;
+   } else if (status == TM_NODE_LIMIT_EXCEEDED) {
+      std::cout << "TM stopped after reading"
+                << " the predefined node limit "
+                << std::endl;
+   } else if (status == TM_TARGET_GAP_ACHIEVED) {
+      std::cout << "TM stopped after achieving "
+                << "the predened target gap"
+                << std::endl;
+   } else {
+      std::cerr << "Error: SYPHONMY IP solver status =  "
+                << status << std::endl;
+   }
+
+   if ((status == TM_OPTIMAL_SOLUTION_FOUND) || (status == TM_TARGET_GAP_ACHIEVED)) {
+      result->m_isOptimal = true;
+      double objective_value = 0.0;
+      sym_get_obj_val(env, &objective_value);
+      std::cout << "The optimal objective value is "
+                << objective_value << std::endl;
+      status = sym_get_col_solution(env, solution);
+
+      for (int i = 0 ; i < numCols; ++i) {
+         std::cout << "the solution is " << solution[i]
+                   << std::endl;
+      }
+
+      result->m_nSolutions = 1;
+      vector<double> solVec(solution, solution + numCols);
+      result->m_solution.push_back(solVec);
+      std::cout << "status is " << status << std::endl;
+      //  if(status == FUNCTION_TERMINATED_ABNORMALLY){
+      //       throw UtilException("sym_get_col_solution failure",
+      //			   "solveOsiAsIp", "DecompAlgoModel");
+   } else {
+      if (sym_is_proven_primal_infeasible(env)) {
+         result->m_nSolutions = 0;
+         result->m_isOptimal = true;
+         result->m_isCutoff = doCutoff;
+      } else {
+         result->m_isCutoff = doCutoff;
+         result->m_isOptimal = false ;
+      }
+   }
+
+#endif
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
@@ -318,7 +393,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
     *    2  difficulties so run was abandoned
     *   (5  event user programmed event occurred)
    */
-   #endif
+#endif
    cbc.setLogLevel(0);
    cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
@@ -420,7 +495,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- get CPXLPptr   for use with internal methods
    //---
    OsiCpxSolverInterface* osiCpx
-      = dynamic_cast<OsiCpxSolverInterface*>(m_osi);
+   = dynamic_cast<OsiCpxSolverInterface*>(m_osi);
    CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
    CPXLPptr  cpxLp  = osiCpx->getLpPtr();
    assert(cpxEnv && cpxLp);
@@ -504,11 +579,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    case DecompDualSimplex:
       startAlgo = CPX_ALG_DUAL;
       break;
-
    case DecompPrimSimplex:
       startAlgo = CPX_ALG_PRIMAL;
       break;
-
    case DecompBarrier:
       startAlgo = CPX_ALG_BARRIER;
       break;

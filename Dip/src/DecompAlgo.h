@@ -815,11 +815,11 @@ public:
     */
    inline const double getNodeLPGap() const {
       int nHistorySize
-         = static_cast<int>(m_nodeStats.objHistoryBound.size());
+      = static_cast<int>(m_nodeStats.objHistoryBound.size());
 
       if (nHistorySize > 0) {
          const DecompObjBound& objBound
-            = m_nodeStats.objHistoryBound[nHistorySize - 1];
+         = m_nodeStats.objHistoryBound[nHistorySize - 1];
          return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB);
       } else {
          return DecompInf;

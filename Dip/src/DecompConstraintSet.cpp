@@ -292,15 +292,15 @@ CoinPackedMatrix* DecompConstraintSet::sparseToOrigMatrix()
    }
 
    CoinPackedMatrix* MOrig
-      = new CoinPackedMatrix(false,
-                             nCols,
-                             nRows,
-                             nElems,
-                             matVal,
-                             matIndOrig,
-                             matBeg,
-                             matLen,
-                             0.0, 0.0);
+   = new CoinPackedMatrix(false,
+                          nCols,
+                          nRows,
+                          nElems,
+                          matVal,
+                          matIndOrig,
+                          matBeg,
+                          matLen,
+                          0.0, 0.0);
    CoinAssertHint(MOrig, "Error: Out of Memory");
    UTIL_DELPTR(MRow);
    UTIL_DELARR(matIndOrig);

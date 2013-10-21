@@ -151,7 +151,6 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
 {
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "initializeApp()", m_param.LogLevel, 2);
-
    //---
    //--- get application parameters
    //---
@@ -168,7 +167,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    } else
       // automatic structure detection
    {
-      #pragma omp critical
+#pragma omp critical
       singlyBorderStructureDetection();
    }
 
@@ -779,13 +778,18 @@ void DecompApp::findActiveColumns(const vector<int>& rowsPart,
    }
 
    const int*               ind  = M->getIndices();
+
    const int*               beg  = M->getVectorStarts();
+
    const int*               len  = M->getVectorLengths();
+
    const int*               indR = NULL;
+
    //---
    //--- which columns are present in this part's rows
    //---
    int k, r;
+
    vector<int>::const_iterator it;
 
    for (it = rowsPart.begin(); it != rowsPart.end(); it++) {
@@ -1114,16 +1118,27 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
    }
 
    const int*               matInd         = M->getIndices();
+
    const CoinBigIndex*      matBeg         = M->getVectorStarts();
+
    const int*               matLen         = M->getVectorLengths();
+
    const double*            matVal         = M->getElements();
+
    const int*               matIndI        = NULL;
+
    const double*            matValI        = NULL;
+
    vector<CoinBigIndex>&    rowBeg         = model->m_rowBeg;//used as temp
+
    vector<int         >&    rowInd         = model->m_rowInd;//used as temp
+
    vector<double      >&    rowVal         = model->m_rowVal;//used as temp
+
    map<int, int>::const_iterator mit;
+
    begInd = 0;
+
    rowBeg.push_back(0);
 
    for (i = 0; i < nRowsPart; i++) {
@@ -1575,7 +1590,6 @@ void DecompApp::singlyBorderStructureDetection()
    /*
     *  define the weight parameter in the hypergraph
     */
-
    // assign the weights on vertices
 
    for (int i = 0 ; i < numVertices ; i ++) {
@@ -1680,7 +1694,6 @@ void DecompApp::singlyBorderStructureDetection()
    index = 0 ;
    index_base = 0 ;
    int tempBase = 0 ;
-
    /*
     * Identify the coupling row in the matrix by storing
     * them in a net set

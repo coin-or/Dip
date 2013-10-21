@@ -14,33 +14,41 @@
 
 // --------------------------------------------------------------------- //
 void DecompVar::fillDenseArr(int      len,
-                             double * arr){
+                             double* arr)
+{
    CoinFillN(arr, len, 0.0);
    const int      sz    = m_s.getNumElements();
-   const int    * inds  = m_s.getIndices();
-   const double * elems = m_s.getElements();
-   for (int i = 0; i < sz; ++i)
+   const int*     inds  = m_s.getIndices();
+   const double* elems = m_s.getElements();
+
+   for (int i = 0; i < sz; ++i) {
       arr[inds[i]] = elems[i];
+   }
 }
 
 // --------------------------------------------------------------------- //
-void 
-DecompVar::print(ostream   * os,
-                 DecompApp * app) const {
-
+void
+DecompVar::print(ostream*    os,
+                 DecompApp* app) const
+{
    double lb = getLowerBound();
    double ub = getUpperBound();
-   (*os) << "\nVAR c: " << m_origCost 
-         << " rc: "     << m_redCost 
+   (*os) << "\nVAR c: " << m_origCost
+         << " rc: "     << m_redCost
          << " eff: "    << m_effCnt;
-   if(lb > -DecompInf)
+
+   if (lb > -DecompInf) {
       (*os) << " lb:  "    << getLowerBound();
-   else
+   } else {
       (*os) << " lb: -INF";
-   if(ub < DecompInf)
+   }
+
+   if (ub < DecompInf) {
       (*os) << " ub:  "    << getUpperBound();
-   else
+   } else {
       (*os) << " ub:  INF";
-   (*os) << "\n";   
+   }
+
+   (*os) << "\n";
    UtilPrintPackedVector(m_s, os, app);
 }

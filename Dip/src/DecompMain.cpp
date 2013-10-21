@@ -72,17 +72,20 @@ int main(int argc, char** argv)
       }
 
       const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
+
       blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
+
       // obtain the number of CPU (core)s on machines with operating
       // system Linux, Solaris, & AIX and Mac OS X
       // (for all OS releases >= 10.4, i.e., Tiger onwards)
       // other systems has different syntax to obtain the core number
 #ifdef _OPENMP
       int numCPU = omp_get_num_procs();
+
 #else
       int numCPU = 1;
-#endif
 
+#endif
       if (milp.m_param.LogDebugLevel > 1) {
          std::cout << "The number of cores is "
                    << numCPU << std::endl;
@@ -113,7 +116,7 @@ int main(int argc, char** argv)
       if (milp.m_param.Concurrent == true ) {
          printf("===== START Concurrent Computations Process. =====\n");
 #ifdef _openmp
-         #pragma omp parallel for
+#pragma omp parallel for
 #endif
 
          for (int i = 0 ; i < (numThreads + 1); i++) {
