@@ -91,7 +91,7 @@ void DecompAlgo::checkBlocksColumns()
       }
 
       set<int>&             activeCols1
-      = modelRelax1.getModel()->activeColumnsS;
+         = modelRelax1.getModel()->activeColumnsS;
 
       for (mid2 = m_modelRelax.begin(); mid2 != m_modelRelax.end(); mid2++) {
          if (mid1 == mid2) {
@@ -105,7 +105,7 @@ void DecompAlgo::checkBlocksColumns()
          }
 
          set<int>&         activeCols2
-         = modelRelax2.getModel()->activeColumnsS;
+            = modelRelax2.getModel()->activeColumnsS;
          set<int>          activeCols1inter2;
          //this is very expensive - can we improve?
          set_intersection(activeCols1.begin(), activeCols1.end(),
@@ -217,8 +217,8 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
 
    if (modelCore) {
    (*m_osLog) << "ModelCore   cols: " << modelCore->getNumCols()
-      << " rows: "            << modelCore->getNumRows()
-      << "\n";
+                 << " rows: "            << modelCore->getNumRows()
+                 << "\n";
    } else {
       (*m_osLog) << "ModelCore is Empty.\n";
    }
@@ -288,9 +288,9 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
 
       if (model && model->M) {
          (*m_osLog)
-         << "ModelRelax  cols: " << model->getNumCols()
-         << " rows: "            << model->getNumRows()
-         << endl;
+               << "ModelRelax  cols: " << model->getNumCols()
+               << " rows: "            << model->getNumRows()
+               << endl;
       }
    }
              );
@@ -322,7 +322,8 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
 #ifdef __DECOMP_LP_CLP__
-   OsiClpSolverInterface* masterSIClp = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
+   OsiClpSolverInterface* masterSIClp = dynamic_cast<OsiClpSolverInterface*>
+                                        (m_masterSI);
    masterSIClp->getModelPtr()->setLogLevel(m_param.LogLpLevel);
    masterSIClp->setupForRepeatedUse();
 #endif
@@ -481,7 +482,7 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
       subprobSI->setInteger(model->getIntegerVars(), nInts);
 #if defined(__DECOMP_IP_CPX__) || defined(__DECOMP_LP_CPX__)
       OsiCpxSolverInterface* osiCpx
-      = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
+         = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
       osiCpx->switchToMIP();
 #endif
    }
@@ -508,11 +509,11 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
 
    for (i = 0; i < nCols; i++) {
    (*m_osLog) << "User column name (" << i << ") = "
-      << colNames[i] << endl;
+                 << colNames[i] << endl;
    }
    for (i = 0; i < nCols; i++) {
    (*m_osLog) << "OSI  column name (" << i << ") = "
-      << subprobSI->getColName(i) << endl;
+                 << subprobSI->getColName(i) << endl;
    }
              );
    //---
@@ -620,7 +621,6 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface* si,
       }
 
       const vector<string>& rowNames = relax->getRowNames();
-
       nRowsR                          = relax->getNumRows();
 
       if (m_param.LogDumpModel >= 2) {
@@ -997,8 +997,8 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
       // THINK: do i need a DecompCol?
       // THINK: does this allocate memory for coinpackedvec twice?
       CoinPackedVector* sparseCol
-      = UtilPackedVectorFromDense(nRowsCore + m_numConvexCon,
-                                  denseCol, m_param.TolZero);
+         = UtilPackedVectorFromDense(nRowsCore + m_numConvexCon,
+                                     denseCol, m_param.TolZero);
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
                  (*m_osLog) << "\nSparse Col: \n";
                  UtilPrintPackedVector(*sparseCol, m_osLog);
@@ -1115,16 +1115,16 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    for (r = 0; r < m_masterSI->getNumRows(); r++) {
    const string rowN = m_masterSI->getRowName(r);
       (*m_osLog) << "Row[" << setw(4) << r << "] Name: "
-      << setw(30) << rowN << " Type: "
-      << setw(20) << DecompRowTypeStr[m_masterRowType[r]]
-      << endl;
+                 << setw(30) << rowN << " Type: "
+                 << setw(20) << DecompRowTypeStr[m_masterRowType[r]]
+                 << endl;
    }
    for (int c = 0; c < m_masterSI->getNumCols(); c++) {
    const string colN = m_masterSI->getColName(c);
       (*m_osLog) << "Col[" << setw(4) << c << "] Name: "
-      << setw(30) << colN << " Type: "
-      << setw(20) << DecompColTypeStr[m_masterColType[c]]
-      << endl;
+                 << setw(30) << colN << " Type: "
+                 << setw(20) << DecompColTypeStr[m_masterColType[c]]
+                 << endl;
    }
              );
    //---
@@ -1295,18 +1295,21 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix* masterM,
       colTypeL = DecompCol_ArtForRowL;
       colTypeG = DecompCol_ArtForRowG;
       break;
+
    case DecompRow_Branch:
       colNameL = "sBL(c_";
       colNameG = "sBG(c_";
       colTypeL = DecompCol_ArtForBranchL;
       colTypeG = DecompCol_ArtForBranchG;
       break;
+
    case DecompRow_Convex:
       colNameL = "sCL(c_";
       colNameG = "sCG(c_";
       colTypeL = DecompCol_ArtForConvexL;
       colTypeG = DecompCol_ArtForConvexG;
       break;
+
    default:
       throw UtilException("Bad row type",
                           "masterMatrixAddArtCols", "DecompAlgo");
@@ -1350,6 +1353,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix* masterM,
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
          colIndex++;
          break;
+
       case 'G':
          masterMatrixAddArtCol(colBeg, colInd, colVal,
                                'G', r, colIndex, colTypeG,
@@ -1364,6 +1368,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix* masterM,
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
          colIndex++;
          break;
+
       case 'E':
          masterMatrixAddArtCol(colBeg, colInd, colVal,
                                'L', r, colIndex, colTypeL,
@@ -1390,6 +1395,7 @@ void DecompAlgo::masterMatrixAddArtCols(CoinPackedMatrix* masterM,
          m_artColIndToRowInd.insert(make_pair(colIndex, r));
          colIndex++;
          break;
+
       default:
          throw UtilException("Range constraints are not yet supported. Please break up your range constraints into two constraints.",
                              "masterMatrixAddArtCols", "DecompAlgo");
@@ -1599,7 +1605,8 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                       "processNode()", m_param.LogDebugLevel, 1);
 
    if (m_algo == RELAX_AND_CUT) {
-      throw UtilException("In this version of DIP, Relax and Cut is currently disabled.", "processNode", "DecompAlgo");
+      throw UtilException("In this version of DIP, Relax and Cut is currently disabled.",
+                          "processNode", "DecompAlgo");
    }
 
    //---
@@ -1734,7 +1741,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                   vit != m_xhatIPFeas.end(); vit++) {
                const DecompSolution* xhatIPFeas = *vit;
                const double*          values
-               = xhatIPFeas->getValues();
+                  = xhatIPFeas->getValues();
 
                for (int c = 0; c < modelCore->getNumCols(); c++) {
                   if (!UtilIsZero(values[c] - m_xhat[c])) {
@@ -1748,9 +1755,9 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                //printf("IS DUP, not pushing\n");
             } else {
                DecompSolution* decompSol
-               = new DecompSolution(modelCore->getNumCols(),
-                                    m_xhat,
-                                    getOrigObjective());
+                  = new DecompSolution(modelCore->getNumCols(),
+                                       m_xhat,
+                                       getOrigObjective());
                //getMasterObjValue());
                //solution pool?
                m_xhatIPFeas.push_back(decompSol);
@@ -1799,36 +1806,36 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
 
       if (nHistorySize > 0) {
       DecompObjBound& objBound
-      = m_nodeStats.objHistoryBound[nHistorySize - 1];
+         = m_nodeStats.objHistoryBound[nHistorySize - 1];
          (*m_osLog) << setiosflags(ios::right);
          (*m_osLog)
-         << "Processing Node "
-         << setw(3)  << nodeIndex
-         << " algo= "
-         << setw(13) << DecompAlgoStr[m_algo]
-         << " phase= "
-         << setw(12) << DecompPhaseStr[m_phase]
-         << " c= " << setw(4)
-         << m_nodeStats.cutCallsTotal
-         << " p= " << setw(4)
-         << m_nodeStats.priceCallsTotal
-         << " LB= " << setw(10)
-         << UtilDblToStr(objBound.thisBound, 3)
-         << " UB= " << setw(10)
-         << UtilDblToStr(objBound.thisBoundUB, 3)
-         << " nodeLB= " << setw(10)
-         << UtilDblToStr(m_nodeStats.objBest.first, 3)
-         << " gLB= " << setw(10)
-         << UtilDblToStr(m_globalLB, 3)
-         << " gUB= " << setw(10)
-         << UtilDblToStr(m_nodeStats.objBest.second, 3)
-         << " lpGap= " << setw(10)
-         << UtilDblToStr(lpGap, 3)
-         << " ipGap= " << setw(10)
-         << UtilDblToStr(ipGap, 3)
-         << " time= " << setw(10)
-         << UtilDblToStr(globalTimer.getCpuTime(), 2)
-         << endl;
+               << "Processing Node "
+               << setw(3)  << nodeIndex
+               << " algo= "
+               << setw(13) << DecompAlgoStr[m_algo]
+               << " phase= "
+               << setw(12) << DecompPhaseStr[m_phase]
+               << " c= " << setw(4)
+               << m_nodeStats.cutCallsTotal
+               << " p= " << setw(4)
+               << m_nodeStats.priceCallsTotal
+               << " LB= " << setw(10)
+               << UtilDblToStr(objBound.thisBound, 3)
+               << " UB= " << setw(10)
+               << UtilDblToStr(objBound.thisBoundUB, 3)
+               << " nodeLB= " << setw(10)
+               << UtilDblToStr(m_nodeStats.objBest.first, 3)
+               << " gLB= " << setw(10)
+               << UtilDblToStr(m_globalLB, 3)
+               << " gUB= " << setw(10)
+               << UtilDblToStr(m_nodeStats.objBest.second, 3)
+               << " lpGap= " << setw(10)
+               << UtilDblToStr(lpGap, 3)
+               << " ipGap= " << setw(10)
+               << UtilDblToStr(ipGap, 3)
+               << " time= " << setw(10)
+               << UtilDblToStr(globalTimer.getCpuTime(), 2)
+               << endl;
       } else {
          //TODO
       }
@@ -1982,6 +1989,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          }
          #endif*/
          break;
+
       case PHASE_CUT:
          m_nodeStats.cutCallsRound++;
          m_nodeStats.cutCallsTotal++;
@@ -2023,8 +2031,10 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          }
 
          break;
+
       case PHASE_DONE:
          break;
+
       default:
          assert(0);
       }
@@ -2124,7 +2134,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                         vit != m_xhatIPFeas.end(); vit++) {
                      const DecompSolution* xhatIPFeas = *vit;
                      const double*          values
-                     = xhatIPFeas->getValues();
+                        = xhatIPFeas->getValues();
 
                      for (int c = 0; c < modelCore->getNumCols(); c++) {
                         if (!UtilIsZero(values[c] - m_xhat[c])) {
@@ -2138,9 +2148,9 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                      //printf("IS DUP, not pushing\n");
                   } else {
                      DecompSolution* decompSol
-                     = new DecompSolution(modelCore->getNumCols(),
-                                          m_xhat,
-                                          getOrigObjective());
+                        = new DecompSolution(modelCore->getNumCols(),
+                                             m_xhat,
+                                             getOrigObjective());
                      //solution pool?
                      m_xhatIPFeas.push_back(decompSol);
                   }
@@ -2179,7 +2189,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                   //--- update if any changes were made
                   //---
                   nChanges
-                  = m_nodeStats.cutsThisCall + m_nodeStats.varsThisCall;
+                     = m_nodeStats.cutsThisCall + m_nodeStats.varsThisCall;
                   (*m_osLog) << "BreakOutPartial newVars = "
                              << partialVars.size() << endl;
                }
@@ -2296,9 +2306,9 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                                       modelCore->getNumCols(),
                                       m_param.TolZero)) {
             DecompSolution* decompSol
-            = new DecompSolution(modelCore->getNumCols(),
-                                 m_xhat,
-                                 getOrigObjective());
+               = new DecompSolution(modelCore->getNumCols(),
+                                    m_xhat,
+                                    getOrigObjective());
             m_xhatIPFeas.push_back(decompSol);
             m_xhatIPBest = decompSol;
          }
@@ -2553,7 +2563,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #ifdef __DECOMP_LP_CPX__
    //int cpxStat=0, cpxMethod=0;
    OsiCpxSolverInterface* masterCpxSI
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr env = masterCpxSI->getEnvironmentPtr();
    //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
@@ -2596,6 +2606,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
 #endif
       break;
+
    case PHASE_CUT:
       m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
 
@@ -2606,6 +2617,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       }
 
       break;
+
    default:
       assert(0);
    }
@@ -2964,7 +2976,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                int               blockId       = (*mid).first;
                DecompAlgoModel& modelRelax    = (*mid).second;
                vector<int>&      activeColumns
-               = modelRelax.getModel()->activeColumns;
+                  = modelRelax.getModel()->activeColumns;
                vector<int>       ind;
                vector<double>    els;
                double            origCost = 0.0;
@@ -2980,7 +2992,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                }
 
                DecompVar* directVar
-               = new DecompVar(ind, els, 0.0, origCost);
+                  = new DecompVar(ind, els, 0.0, origCost);
                directVar->setBlockId(blockId);
                initVars.push_back(directVar);
             }
@@ -3023,9 +3035,9 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                                          modelCore->getNumCols(),
                                          m_param.TolZero)) {
                DecompSolution* decompSol
-               = new DecompSolution(modelCore->getNumCols(),
-                                    m_memPool.dblArrNCoreCols,
-                                    (*vli)->getOriginalCost());
+                  = new DecompSolution(modelCore->getNumCols(),
+                                       m_memPool.dblArrNCoreCols,
+                                       (*vli)->getOriginalCost());
                m_xhatIPBest = decompSol;
                m_xhatIPFeas.push_back(decompSol);
                //printf("var is ip feas with obj = %g\n",
@@ -3449,6 +3461,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
       }
    }//END: case PHASE_PRICE1
    break;
+
    case PHASE_PRICE2: {
       assert(status == STAT_FEASIBLE || status == STAT_UNKNOWN);
 
@@ -3563,6 +3576,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
          nextPhase = PHASE_PRICE2;
       }
    } //END: case PHASE_PRICE2
+
    //---
    //--- are we suggesting another price phase but gap is tight?
    //---
@@ -3628,6 +3642,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
    }
 
    break;
+
    case PHASE_CUT: {
       //---
       //--- if we want to always favor pricing, then just do it
@@ -3786,6 +3801,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
       }
    } //END: case PHASE_CUT
    break;
+
    default:
       assert(0);
       //UtilAssert(0, "Bad Phase in phaseUpdate!", m_osLog);
@@ -3812,7 +3828,7 @@ PHASE_UPDATE_FINISH:
 vector<double*> DecompAlgo::getDualRays(int maxNumRays)
 {
    OsiCpxSolverInterface* siCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    const int m = m_masterSI->getNumRows();
    const int n = m_masterSI->getNumCols();
    const double* rowRhs    = m_masterSI->getRightHandSide();
@@ -3828,7 +3844,7 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
 
    for (r = 0; r < m; r++) {
    (*m_osLog) << "Row r: " << r << " sense: " << rowSense[r]
-      << " rhs: " << rowRhs[r] << endl;
+                 << " rhs: " << rowRhs[r] << endl;
    }
              );
    m_masterSI->enableSimplexInterface(false);
@@ -3866,17 +3882,17 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
       for (b = 0; b < m; b++) {
          yb[r] += bInvRow[b] * rowRhs[b];
          (*m_osLog) << setw(6) << "bind: "
-         << setw(4) << basics[b]
-         << setw(12) << bInvRow[b]
-         << " ["
-         << setw(12) << rowRhs[b]
-         << "] "
-         << setw(8) << " +=: "
-         << setw(12) << bInvRow[b] * rowRhs[b]
-         << setw(8) << " yb: "
-         << setw(12) << yb[r]
-         << setw(8) << " tabRhs: "
-         << setw(12) << tabRhs[r] << endl;
+                    << setw(4) << basics[b]
+                    << setw(12) << bInvRow[b]
+                    << " ["
+                    << setw(12) << rowRhs[b]
+                    << "] "
+                    << setw(8) << " +=: "
+                    << setw(12) << bInvRow[b] * rowRhs[b]
+                    << setw(8) << " yb: "
+                    << setw(12) << yb[r]
+                    << setw(8) << " tabRhs: "
+                    << setw(12) << tabRhs[r] << endl;
       }
 
       if (!UtilIsZero(yb[r] - tabRhs[r])) {
@@ -4057,7 +4073,7 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
 vector<double*> DecompAlgo::getDualRays(int maxNumRays)
 {
    OsiCpxSolverInterface* siCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    const int m = m_masterSI->getNumRows();
    const int n = m_masterSI->getNumCols();
    double proof_p;
@@ -4065,9 +4081,9 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
    vector<double*> rays;
    double* ray = new double[m];
    int err
-   = CPXdualfarkas(siCpx->getEnvironmentPtr(),
-                   siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
-                   ray, &proof_p);//proof_p
+      = CPXdualfarkas(siCpx->getEnvironmentPtr(),
+                      siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
+                      ray, &proof_p);//proof_p
 
    if (err) {
       cerr << "CPXdualfarkas returns err " << err << endl;
@@ -4136,7 +4152,7 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
 
    for (r = 0; r < m; r++) {
    (*m_osLog) << "Row r: " << r << " sense: " << rowSense[r]
-      << " rhs: " << rowRhs[r] << endl;
+                 << " rhs: " << rowRhs[r] << endl;
    }
              );
    m_masterSI->enableSimplexInterface(false);
@@ -4186,18 +4202,18 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
       for (b = 0; b < m; b++) {
          yb[r] += bInvRow[b] * rowRhs[b];
          (*m_osLog) << setw(6) << "bind: "
-         << setw(4) << basics[b]
-         << setw(12) << bInvRow[b]
-         << " ["
-         << setw(12) << rowRhs[b]
-         << "] "
-         << setw(8) << " +=: "
-         << setw(12) << bInvRow[b] * rowRhs[b]
-         << setw(8) << " yb: "
-         << setw(12) << yb[r]
-         << setw(8) << " tabRhs: "
-         << setw(12) << tabRhs[r]
-         << endl;
+                    << setw(4) << basics[b]
+                    << setw(12) << bInvRow[b]
+                    << " ["
+                    << setw(12) << rowRhs[b]
+                    << "] "
+                    << setw(8) << " +=: "
+                    << setw(12) << bInvRow[b] * rowRhs[b]
+                    << setw(8) << " yb: "
+                    << setw(12) << yb[r]
+                    << setw(8) << " tabRhs: "
+                    << setw(12) << tabRhs[r]
+                    << endl;
       }
 
       if (!UtilIsZero(yb[r] - tabRhs[r])) {
@@ -4505,9 +4521,9 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
    for (int i = 0; i < nMasterRows; i++) {
    if (!UtilIsZero(uOld[i], DecompEpsilon)) {
          (*m_osLog) << "uOld[" << setw(5) << i << " ]: "
-         << setw(12) << UtilDblToStr(uOld[i], 3)
-         << " --> "
-         << DecompRowTypeStr[m_masterRowType[i]] << "\n";
+                    << setw(12) << UtilDblToStr(uOld[i], 3)
+                    << " --> "
+                    << DecompRowTypeStr[m_masterRowType[i]] << "\n";
       }
    }
              );
@@ -4516,8 +4532,8 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
    for (int i = 0; i < (nMasterRows - m_numConvexCon); i++) {
    if (!UtilIsZero(uNew[i], DecompEpsilon)) {
          (*m_osLog) << "uNew[" << setw(5) << i << " ]: "
-         << setw(12) << UtilDblToStr(uNew[i], 3)
-         << endl;
+                    << setw(12) << UtilDblToStr(uNew[i], 3)
+                    << endl;
       }
    }
              );
@@ -4813,30 +4829,21 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             }
 
             const CoinPackedMatrix* Mc = m_masterSI->getMatrixByCol();
-
             CoinShallowPackedVector vec
-            = Mc->getVector((*it)->getColMasterIndex());
-
+               = Mc->getVector((*it)->getColMasterIndex());
             UtilPrintPackedVector(vec, m_osLog, m_masterSI->getColNames(), u);
-
             double uA = vec.dotProduct(u);
-
             (*m_osLog) << " objLP: "
                        << UtilDblToStr(objC[(*it)->getColMasterIndex()], 4)
                        << endl;
-
             (*m_osLog) << " uA   : "   << UtilDblToStr(uA, 4) << endl;
-
             (*m_osLog) << " RC   : "
                        << UtilDblToStr(objC[(*it)->getColMasterIndex()] - uA,
                                        4) << endl;
-
             (*m_osLog) << " RCLP : "
                        << UtilDblToStr(rcLP[(*it)->getColMasterIndex()], 4)
                        << endl;
-
             assert(0);
-
             (*m_osLog) << endl;
          } //END: if(!UtilIsZero(rcLP[(*it)->getColMasterIndex()] ...
       } //END: for(it = m_vars.begin(); it != m_vars.end(); it++)
@@ -4929,7 +4936,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          */
 #ifdef _OPENMP
          omp_set_num_threads(m_param.SubProbNumThreads);
-#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
+         #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
 
          for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
@@ -5326,9 +5333,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                                          modelCore->getNumCols(),
                                          m_param.TolZero)) {
                DecompSolution* decompSol
-               = new DecompSolution(modelCore->getNumCols(),
-                                    m_memPool.dblArrNCoreCols,
-                                    (*it)->getOriginalCost());
+                  = new DecompSolution(modelCore->getNumCols(),
+                                       m_memPool.dblArrNCoreCols,
+                                       (*it)->getOriginalCost());
                //TODO: solution pool?
                m_xhatIPFeas.push_back(decompSol);
                setObjBoundIP((*it)->getOriginalCost());
@@ -5727,9 +5734,9 @@ void DecompAlgo::addVarsToPool(DecompVarList& newVars)
          //--- creat a sparse column from the dense column
          //---
          sparseCol
-         = UtilPackedVectorFromDense(modelCore->getNumRows() +
-                                     m_numConvexCon,
-                                     denseCol, m_app->m_param.TolZero);
+            = UtilPackedVectorFromDense(modelCore->getNumRows() +
+                                        m_numConvexCon,
+                                        denseCol, m_app->m_param.TolZero);
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
                     (*m_osLog) << "\nPRINT sparseCol\n";
                     UtilPrintPackedVector(*sparseCol);
@@ -5938,15 +5945,10 @@ void DecompAlgo::addVarsFromPool()
       }
 
       const CoinPackedVector* col = (*vi).getColPtr();
-
       DecompVar*               var = (*vi).getVarPtr();
-
       assert(col);
-
       colBlock[index] = col;
-
       clb[index]      = (*vi).getLowerBound();
-
       cub[index]      = (*vi).getUpperBound();
 
       if (m_phase == PHASE_PRICE1) {
@@ -6565,10 +6567,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 
       if (isNested)
          solverStatus
-         = m_app->solveRelaxedNest(whichBlock, redCostX, varsDebug);
+            = m_app->solveRelaxedNest(whichBlock, redCostX, varsDebug);
       else
          solverStatus
-         = m_app->solveRelaxed(whichBlock, redCostX, varsDebug);
+            = m_app->solveRelaxed(whichBlock, redCostX, varsDebug);
 
       DecompVarList::iterator it;
 
@@ -6584,10 +6586,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    if (m_param.SolveRelaxAsIp != 1) {
       if (isNested) {
          solverStatus
-         = m_app->solveRelaxedNest(whichBlock, redCostX, vars);
+            = m_app->solveRelaxedNest(whichBlock, redCostX, vars);
       } else {
          solverStatus
-         = m_app->solveRelaxed(whichBlock, redCostX, vars);
+            = m_app->solveRelaxed(whichBlock, redCostX, vars);
       }
 
       DecompVarList::iterator it;
@@ -6963,9 +6965,9 @@ void DecompAlgo::recomposeSolution(const double* solution,
          }
 
          (*m_osLog) << " ] = "  << UtilDblToStr(rsolution[i], 6)
-         << " LB = " << UtilDblToStr(cLB[i], 6)
-         << " UB = " << UtilDblToStr(cUB[i], 6)
-         << endl;
+                    << " LB = " << UtilDblToStr(cLB[i], 6)
+                    << " UB = " << UtilDblToStr(cUB[i], 6)
+                    << endl;
       }
    }
            );
@@ -7005,11 +7007,11 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    //--- TODO: get its own parameter?
    //---
    int nHistorySize
-   = static_cast<int>(m_nodeStats.objHistoryBound.size());
+      = static_cast<int>(m_nodeStats.objHistoryBound.size());
 
    if (nHistorySize > 0) {
       DecompObjBound& objBound
-      = m_nodeStats.objHistoryBound[nHistorySize - 1];
+         = m_nodeStats.objHistoryBound[nHistorySize - 1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = objBound.thisBound;
       //double masterLB  = m_nodeStats.objBest.first;
@@ -7023,7 +7025,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    }
 
    vector< DecompObjBound >::reverse_iterator it
-   = m_nodeStats.objHistoryBound.rbegin();
+      = m_nodeStats.objHistoryBound.rbegin();
    int    len       = 0;
    double prevBound = (*it).bestBound;
    double diff      =  DecompInf;

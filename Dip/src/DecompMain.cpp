@@ -72,20 +72,17 @@ int main(int argc, char** argv)
       }
 
       const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
-
       blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
-
       // obtain the number of CPU (core)s on machines with operating
       // system Linux, Solaris, & AIX and Mac OS X
       // (for all OS releases >= 10.4, i.e., Tiger onwards)
       // other systems has different syntax to obtain the core number
 #ifdef _OPENMP
       int numCPU = omp_get_num_procs();
-
 #else
       int numCPU = 1;
-
 #endif
+
       if (milp.m_param.LogDebugLevel > 1) {
          std::cout << "The number of cores is "
                    << numCPU << std::endl;
@@ -116,7 +113,7 @@ int main(int argc, char** argv)
       if (milp.m_param.Concurrent == true ) {
          printf("===== START Concurrent Computations Process. =====\n");
 #ifdef _openmp
-#pragma omp parallel for
+         #pragma omp parallel for
 #endif
 
          for (int i = 0 ; i < (numThreads + 1); i++) {
@@ -187,7 +184,8 @@ void blockNumberFinder(DecompParam utilParam,
 
    if (utilParam.LogDebugLevel >= 1) {
       std::ofstream histogramTable;
-      std::string path1 = utilParam.CurrentWorkingDir + UtilDirSlash() + "histogramTable.dat";
+      std::string path1 = utilParam.CurrentWorkingDir + UtilDirSlash() +
+                          "histogramTable.dat";
       histogramTable.open(path1.c_str());
 
       for (histIter = histogram.begin(); histIter != histogram.end();
@@ -245,7 +243,8 @@ void blockNumberFinder(DecompParam utilParam,
 
    if (utilParam.LogDebugLevel >= 1) {
       std::ofstream histogramTable1;
-      std::string path2 = utilParam.CurrentWorkingDir + UtilDirSlash() + "histogramTable1.dat";
+      std::string path2 = utilParam.CurrentWorkingDir + UtilDirSlash() +
+                          "histogramTable1.dat";
       histogramTable1.open(path2.c_str());
       std::map<int, int >::iterator histIter3;
 
@@ -257,7 +256,8 @@ void blockNumberFinder(DecompParam utilParam,
       histogramTable1.close();
    }
 
-   int blockCands = std::min(utilParam.NumBlocksCand - static_cast<int>(blocksNumTemp.size()),
+   int blockCands = std::min(utilParam.NumBlocksCand - static_cast<int>
+                             (blocksNumTemp.size()),
                              static_cast<int>(histogram2.size()));
 
    if (blockCands > 0) {
@@ -400,10 +400,12 @@ void DecompAuto(DecompApp* milp,
            << alpsModel.getNumNodesProcessed() << endl
            << " SetupCPU      = " << decompMainParam.timeSetupCpu << endl
            << " SolveCPU      = " << decompMainParam.timeSolveCpu << endl
-           << " TotalCPU      = " << decompMainParam.timeSetupCpu + decompMainParam.timeSolveCpu << endl
+           << " TotalCPU      = " << decompMainParam.timeSetupCpu +
+           decompMainParam.timeSolveCpu << endl
            << " SetupWallclock= " << decompMainParam.timeSetupReal << endl
            << " SolveWallclock= " << decompMainParam.timeSolveReal << endl
-           << " TotalWallclock= " << decompMainParam.timeSetupReal + decompMainParam.timeSolveReal    ;
+           << " TotalWallclock= " << decompMainParam.timeSetupReal +
+           decompMainParam.timeSolveReal    ;
       cout << "\n ============== DECOMP Solution Info [END  ]: ============= \n";
       /* TODO: Add a global parameter to control the subproblem
                parallelization

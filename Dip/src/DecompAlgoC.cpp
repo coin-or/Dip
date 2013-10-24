@@ -302,8 +302,10 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
       }
    }
    break;
+
    case PHASE_DONE:
       break;
+
    case PHASE_UNKNOWN:
    default:
       assert(0);

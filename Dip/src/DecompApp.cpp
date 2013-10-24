@@ -167,7 +167,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    } else
       // automatic structure detection
    {
-#pragma omp critical
+      #pragma omp critical
       singlyBorderStructureDetection();
    }
 
@@ -778,18 +778,13 @@ void DecompApp::findActiveColumns(const vector<int>& rowsPart,
    }
 
    const int*               ind  = M->getIndices();
-
    const int*               beg  = M->getVectorStarts();
-
    const int*               len  = M->getVectorLengths();
-
    const int*               indR = NULL;
-
    //---
    //--- which columns are present in this part's rows
    //---
    int k, r;
-
    vector<int>::const_iterator it;
 
    for (it = rowsPart.begin(); it != rowsPart.end(); it++) {
@@ -1118,27 +1113,16 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
    }
 
    const int*               matInd         = M->getIndices();
-
    const CoinBigIndex*      matBeg         = M->getVectorStarts();
-
    const int*               matLen         = M->getVectorLengths();
-
    const double*            matVal         = M->getElements();
-
    const int*               matIndI        = NULL;
-
    const double*            matValI        = NULL;
-
    vector<CoinBigIndex>&    rowBeg         = model->m_rowBeg;//used as temp
-
    vector<int         >&    rowInd         = model->m_rowInd;//used as temp
-
    vector<double      >&    rowVal         = model->m_rowVal;//used as temp
-
    map<int, int>::const_iterator mit;
-
    begInd = 0;
-
    rowBeg.push_back(0);
 
    for (i = 0; i < nRowsPart; i++) {
@@ -1415,7 +1399,8 @@ void DecompApp::createModels()
       if (m_param.LogLevel >= 2) {
          (*m_osLog) << "The number of master Only Cols is: "
                     << nMasterOnlyCols << std::endl;
-         (*m_osLog) << "(kappa) The percentage of Master Only Cols over total columns is "
+         (*m_osLog) <<
+                    "(kappa) The percentage of Master Only Cols over total columns is "
                     << double(nMasterOnlyCols) / nCols << std::endl;
       }
 

@@ -105,8 +105,8 @@ void DecompAlgoRC::phaseDone()
       // THINK: do i need a DecompCol?
       // THINK: does this allocate memory for coinpackedvec twice?
       CoinPackedVector* sparseCol
-      = UtilPackedVectorFromDense(nRowsCore + 1,
-                                  denseCol, m_param.TolZero);
+         = UtilPackedVectorFromDense(nRowsCore + 1,
+                                     denseCol, m_param.TolZero);
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
                  (*m_osLog) << "\nSparse Col: \n";
                  UtilPrintPackedVector(*sparseCol, m_osLog);
@@ -189,8 +189,8 @@ void DecompAlgoRC::phaseDone()
                                       modelCore->getNumCols(),
                                       m_param.TolZero)) {
             DecompSolution* decompSol
-            = new DecompSolution(modelCore->getNumCols(),
-                                 m_xhat, m_masterSI->getObjValue());
+               = new DecompSolution(modelCore->getNumCols(),
+                                    m_xhat, m_masterSI->getObjValue());
             m_xhatIPFeas.push_back(decompSol);
          }
       }
@@ -459,6 +459,7 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
       case 'E':
          //violation[i] = rhs[i] - activity[i];
          break;
+
       case 'G':
 
          //violation[i] = rhs[i] - activity[i];
@@ -468,6 +469,7 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
          }
 
          break;
+
       case 'L':
 
          //violation[i] = rhs[i] - activity[i];
@@ -556,14 +558,17 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
       case 'E':
          m_u[r] += theta * violation[r];
          break;
+
       case 'G':
          //u > 0, g_i > 0 for violations
          m_u[r] = max(0.0, m_u[r] + (theta * violation[r]));
          break;
+
       case 'L':
          //u < 0, g_i < 0 for violatoins
          m_u[r] = max(0.0, m_u[r] - (theta * violation[r]));
          break;
+
       default:
          assert(0);
       }

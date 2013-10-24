@@ -73,8 +73,8 @@ bool DecompCutPool::calcViolations(const double*             x,
       // --- return true
       // ---
       found_violated_cut
-      = (*vi).getCutPtr()->calcViolation((*vi).getRowPtr(), x) ?
-        true : found_violated_cut;
+         = (*vi).getCutPtr()->calcViolation((*vi).getRowPtr(), x) ?
+           true : found_violated_cut;
    }
 
    return found_violated_cut;

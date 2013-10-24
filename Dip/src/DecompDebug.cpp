@@ -290,7 +290,7 @@ bool DecompAlgo::isDualRayInfProof(const double*            dualRay,
    //sanity check
    if (!isProof)
       isProof
-      = isDualRayInfProofCpx(dualRay, rowMatrix, colLB, colUB, rowRhs, os);
+         = isDualRayInfProofCpx(dualRay, rowMatrix, colLB, colUB, rowRhs, os);
 
 #endif
    return isProof;
@@ -524,7 +524,7 @@ void DecompAlgo::printCurrentProblemDual(OsiSolverInterface* si,
                       "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
 #ifdef __DECOMP_LP_CPX__
    OsiCpxSolverInterface* siCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(si);
+      = dynamic_cast<OsiCpxSolverInterface*>(si);
    CPXENVptr env = siCpx->getEnvironmentPtr();
    CPXLPptr  lp  = siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    string filename = DecompAlgoStr[m_algo] + "_" + baseName

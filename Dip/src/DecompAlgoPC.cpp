@@ -152,6 +152,7 @@ void DecompAlgoPC::adjustMasterDualSolution()
    double         alpha  = m_param.DualStabAlpha;
    double         alpha1 = 1.0 - alpha;
    copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+
    //---
    //--- for both the first PhaseI and first PhaseII calls,
    //---   be sure to set the dual vector to dualRM as dual=0
@@ -259,11 +260,11 @@ int DecompAlgoPC::compressColumns()
                       "compressColumns()", m_param.LogDebugLevel, 2);
    m_stats.timerOther1.reset();
    int nHistorySize
-   = static_cast<int>(m_nodeStats.objHistoryBound.size());
+      = static_cast<int>(m_nodeStats.objHistoryBound.size());
 
    if (nHistorySize > 0) {
       DecompObjBound& objBound
-      = m_nodeStats.objHistoryBound[nHistorySize - 1];
+         = m_nodeStats.objHistoryBound[nHistorySize - 1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = m_nodeStats.objBest.first;
       double masterGap = DecompInf;
@@ -285,23 +286,16 @@ int DecompAlgoPC::compressColumns()
    }
 
    const int      CompressColsIterFreq      = m_param.CompressColumnsIterFreq;
-
    const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
-
    const int      nMasterCols               = m_masterSI->getNumCols();
-
    const int      nMasterRows               = m_masterSI->getNumRows();
-
    int nColsSinceLast
-   = nMasterCols - m_compressColsLastNumCols;
-
+      = nMasterCols - m_compressColsLastNumCols;
    int nIterSinceLast
-   = m_nodeStats.priceCallsTotal - m_compressColsLastPrice;
-
+      = m_nodeStats.priceCallsTotal - m_compressColsLastPrice;
    int nColsSinceLastLimit
-   = static_cast<int>(ceil(m_compressColsLastNumCols *
-                           CompressColsSizeMultLimit));
-
+      = static_cast<int>(ceil(m_compressColsLastNumCols *
+                              CompressColsSizeMultLimit));
    UTIL_MSG(m_param.LogLevel, 4,
             (*m_osLog) << "nMasterCols              = "
             << nMasterCols << endl;
@@ -344,7 +338,8 @@ int DecompAlgoPC::compressColumns()
 #ifndef DO_INTERIOR
    bool            mustDeleteWS = false;
    CoinWarmStartBasis* warmStart
-   = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(mustDeleteWS));
+      = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(
+            mustDeleteWS));
 
    for (c = 0; c < nMasterCols; c++) {
       if (warmStart->getStructStatus(c) == CoinWarmStartBasis::basic) {
@@ -681,7 +676,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    const double* row_lb = (m_masterSI->getRowLower());
    const double* row_up = (m_masterSI->getRowUpper());
    const double* obj_coef = (m_masterSI->getObjCoefficients());
-   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym), const_cast<double*&>(col_lb),
+   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
+                          const_cast<double*&>(col_lb),
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
 
@@ -721,7 +717,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    osi_Sym->branchAndBound();
    int status = sym_get_status(env);
 
-   if ((status == PREP_OPTIMAL_SOLUTION_FOUND) || (status == TM_OPTIMAL_SOLUTION_FOUND)
+   if ((status == PREP_OPTIMAL_SOLUTION_FOUND) ||
+         (status == TM_OPTIMAL_SOLUTION_FOUND)
          || (status == TM_TARGET_GAP_ACHIEVED)) {
       result.m_isOptimal = true;
       double* solution = new double[numCols];
@@ -883,7 +880,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //--- get CPXLPptr   for use with internal methods
    //---
    OsiCpxSolverInterface* osiCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
    CPXLPptr  cpxLp  = osiCpx->getLpPtr();
    assert(cpxEnv && cpxLp);
@@ -1071,7 +1068,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                vit != m_xhatIPFeas.end(); vit++) {
             const DecompSolution* xhatIPFeas = *vit;
             const double*          values
-            = xhatIPFeas->getValues();
+               = xhatIPFeas->getValues();
 
             for (int c = 0; c < modelCore->getNumCols(); c++) {
                if (!UtilIsZero(values[c] - rsolution[c])) {
@@ -1087,9 +1084,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
                      << endl;);
          } else {
             DecompSolution* decompSol
-            = new DecompSolution(modelCore->getNumCols(),
-                                 rsolution,
-                                 getOrigObjective());
+               = new DecompSolution(modelCore->getNumCols(),
+                                    rsolution,
+                                    getOrigObjective());
             m_xhatIPFeas.push_back(decompSol);
             vector<DecompSolution*>::iterator vi;
             DecompSolution* viBest = NULL;
@@ -1330,9 +1327,9 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
          //--- create a row (in terms of reformulation, lambda), from row
          //---
          CoinPackedVector* rowReform
-         = m_cutpool.createRowReform(modelCore->getNumCols(),
-                                     row,
-                                     m_vars);
+            = m_cutpool.createRowReform(modelCore->getNumCols(),
+                                        row,
+                                        m_vars);
 
          if (!rowReform) {
             //TODO: need status return code for failure in -O
@@ -1494,6 +1491,7 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex++;
       }
       break;
+
       case 'G': {
          CoinPackedVector artCol;
          artCol.insert(rowIndex, 1.0);
@@ -1506,6 +1504,7 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex++;
       }
       break;
+
       case 'E': {
          CoinPackedVector artColL;
          CoinPackedVector artColG;
@@ -1526,6 +1525,7 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex += 2;
       }
       break;
+
       default:
          assert(0);
       }

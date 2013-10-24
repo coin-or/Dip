@@ -341,7 +341,8 @@ public:
       PARAM_getSetting("CompressColumns",      CompressColumns);
       PARAM_getSetting("CompressColumnsIterFreq",       CompressColumnsIterFreq);
       PARAM_getSetting("CompressColumnsSizeMultLimit",  CompressColumnsSizeMultLimit);
-      PARAM_getSetting("CompressColumnsMasterGapStart", CompressColumnsMasterGapStart);
+      PARAM_getSetting("CompressColumnsMasterGapStart",
+                       CompressColumnsMasterGapStart);
       PARAM_getSetting("CutDC",                CutDC);
       PARAM_getSetting("CutCGL",               CutCGL);
       PARAM_getSetting("CutCglKnapC",          CutCglKnapC);
@@ -387,9 +388,9 @@ public:
       BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
       PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
       BlockFileFormat
-      = param.GetSetting("BlockFileFormat",    "",    "MILP");
+         = param.GetSetting("BlockFileFormat",    "",    "MILP");
       InitSolutionFile
-      = param.GetSetting("InitSolutionFile",   "",    "MILP");
+         = param.GetSetting("InitSolutionFile",   "",    "MILP");
       PARAM_getSetting("LogLevel", LogLevel);
       // PARAM_getSetting("DataDir",DataDir);
       //PARAM_getSetting("Instance",Instance);
@@ -545,7 +546,8 @@ public:
       UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel);
       UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType);
-      UtilPrintParameter(os, sec, "SubProbParallelChunksize", SubProbParallelChunksize);
+      UtilPrintParameter(os, sec, "SubProbParallelChunksize",
+                         SubProbParallelChunksize);
       UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum);
       (*os) << "========================================================\n";
    }

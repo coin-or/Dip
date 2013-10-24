@@ -40,31 +40,18 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
    }
 
    const  vector<string>&   colNames = model->getColNames();
-
    const  vector<string>&   rowNames = model->getRowNames();
-
    int    c, r, i;
-
    bool   isFeas      = true;
-
    bool   hasColNames = false;
-
    bool   hasRowNames = false;
-
    double xj          = 0.0;
-
    double ax          = 0.0;
-
    double clb         = 0.0;
-
    double cub         = 0.0;
-
    double rlb         = 0.0;
-
    double rub         = 0.0;
-
    double actViol     = 0.0;
-
    double relViol     = 0.0;
 
    if (colNames.size()) {
@@ -111,9 +98,9 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
          }
 
          cout << " LB= " << UtilDblToStr(clb, precision)
-         << " x= "  << UtilDblToStr(xj, precision)
-         << " UB= " << UtilDblToStr(cub, precision)
-         << endl;
+              << " x= "  << UtilDblToStr(xj, precision)
+              << " UB= " << UtilDblToStr(cub, precision)
+              << endl;
       }
                 );
       actViol = std::max<double>(clb - xj, xj - cub);
@@ -246,7 +233,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    result->m_solution.clear();
 #ifdef __DECOMP_IP_SYMPHONY__
    OsiSymSolverInterface* osiSym
-   = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      = dynamic_cast<OsiSymSolverInterface*>(m_osi);
    assert(osiSym);
    sym_environment* env = osiSym->getSymphonyEnvironment();
    assert(env);
@@ -274,7 +261,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
                 << status << std::endl;
    }
 
-   if ( (status == PREP_OPTIMAL_SOLUTION_FOUND ) || (status == TM_OPTIMAL_SOLUTION_FOUND)
+   if ( (status == PREP_OPTIMAL_SOLUTION_FOUND ) ||
+         (status == TM_OPTIMAL_SOLUTION_FOUND)
          || (status == TM_TARGET_GAP_ACHIEVED)) {
       result->m_isOptimal = true;
       double objective_value = 0.0;
@@ -496,7 +484,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- get CPXLPptr   for use with internal methods
    //---
    OsiCpxSolverInterface* osiCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_osi);
+      = dynamic_cast<OsiCpxSolverInterface*>(m_osi);
    CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
    CPXLPptr  cpxLp  = osiCpx->getLpPtr();
    assert(cpxEnv && cpxLp);
@@ -580,9 +568,11 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    case DecompDualSimplex:
       startAlgo = CPX_ALG_DUAL;
       break;
+
    case DecompPrimSimplex:
       startAlgo = CPX_ALG_PRIMAL;
       break;
+
    case DecompBarrier:
       startAlgo = CPX_ALG_BARRIER;
       break;
