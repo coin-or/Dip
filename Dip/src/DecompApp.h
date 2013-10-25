@@ -470,8 +470,7 @@ public:
       UTIL_DELARR(m_objective);
       UtilDeleteMapPtr(m_modelR);
       UTIL_DELPTR(m_modelC);
-      UTIL_DELPTR(m_matrix);
-      //     std::cout << "destructor is called " << std::endl;
+
    };
 };
 
