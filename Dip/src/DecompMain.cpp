@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 
       if (milp.m_param.Concurrent == true ) {
          printf("===== START Concurrent Computations Process. =====\n");
-#ifdef _openmp
+#ifdef _OPENMP
          #pragma omp parallel for
 #endif
 
