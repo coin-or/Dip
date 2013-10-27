@@ -72,6 +72,12 @@ int main(int argc, char** argv)
       }
 
       const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
+
+      if (milp.m_param.BlockNumInput > 0) {
+         milp.NumBlocks = milp.m_param.BlockNumInput;
+         milp.m_param.Concurrent = false ;
+      }
+
       blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
       // obtain the number of CPU (core)s on machines with operating
       // system Linux, Solaris, & AIX and Mac OS X
@@ -95,10 +101,9 @@ int main(int argc, char** argv)
                                static_cast<int>(blockNumCandidates.size())),
                            milp.m_param.ConcurrentThreadsNum);
       std::vector<DecompApp> milpArray(static_cast<int>(numThreads + 1), milp);
-
       std::vector<DecompMainParam> decompMainParamArray(static_cast<int>
-							(numThreads + 1),
-							decompMainParam);
+            (numThreads + 1),
+            decompMainParam);
       std::vector<UtilTimer> timerArray(static_cast<int>(numThreads + 1),
                                         timer);
       std::vector<UtilParameters> utilParamArray(static_cast<int>
@@ -120,7 +125,7 @@ int main(int argc, char** argv)
                decompMainParamArray[i].doCut = false;
                decompMainParamArray[i].doPriceCut = true;
                decompMainParamArray[i].doDirect = false;
-               milpArray[i].m_param.NumBlocks = blockNumCandidates[i - 1];
+               milpArray[i].NumBlocks = blockNumCandidates[i - 1];
             }
 
             milpArray[i].m_param.ThreadIndex = i;
@@ -337,7 +342,7 @@ void DecompAuto(DecompApp milp,
       if (milp.m_param.Concurrent == 1) {
          std::cout << "====== The thread number is " << milp.m_param.ThreadIndex
                    << "====" << std::endl;
-         std::cout << "====== The block number is  " << milp.m_param.NumBlocks
+         std::cout << "====== The block number is  " << milp.NumBlocks
                    << "====" << std::endl;
          std::cout << "====== Branch-and-Cut       " << decompMainParam.doCut
                    << "====" << std::endl;

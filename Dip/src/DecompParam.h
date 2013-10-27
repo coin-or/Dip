@@ -20,7 +20,7 @@
 #include "Decomp.h"
 #include "UtilMacros.h"
 #include "UtilParameters.h"
-#include "string"
+
 //===========================================================================//
 #define PARAM_getSetting(xstr, x) x = param.GetSetting(xstr, x, sec)
 
@@ -215,12 +215,6 @@ public:
    int DebugCheckBlocksColumns;
 
    /*
-    * The block number for automatic decomposition
-    */
-
-   int NumBlocks;
-
-   /*
     * The following parameters are extended from MILPBlock
     * applications but changed to MILP domain
     *
@@ -302,6 +296,7 @@ public:
 
    int ConcurrentThreadsNum;
 
+   int BlockNumInput;
 
    /**
     * @}
@@ -381,7 +376,6 @@ public:
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-      PARAM_getSetting("NumBlocks", NumBlocks);
       DataDir       = param.GetSetting("DataDir",       "",    "MILP");
       Instance      = param.GetSetting("Instance",      "",    "MILP");
       InstanceFormat = param.GetSetting("InstanceFormat", "",    "MILP");
@@ -392,12 +386,6 @@ public:
       InitSolutionFile
          = param.GetSetting("InitSolutionFile",   "",    "MILP");
       PARAM_getSetting("LogLevel", LogLevel);
-      // PARAM_getSetting("DataDir",DataDir);
-      //PARAM_getSetting("Instance",Instance);
-      //PARAM_getSetting("BlockFile",BlockFile);
-      //PARAM_getSetting("PermuteFile",PermuteFile);
-      //PARAM_getSetting("BlockFileFormat",BlockFileFormat);
-      //PARAM_getSetting("InitSolutionFile",InitSolutionFile);
       PARAM_getSetting("UseNames", UseNames);
       PARAM_getSetting("UseSparse", UseSparse);
       PARAM_getSetting("FullModel", FullModel);
@@ -406,6 +394,7 @@ public:
       PARAM_getSetting("ColumnUB", ColumnUB);
       PARAM_getSetting("ColumnLB", ColumnLB);
       PARAM_getSetting("ObjectiveSense", ObjectiveSense);
+      PARAM_getSetting("BlockNumInput", BlockNumInput);
       PARAM_getSetting("Concurrent", Concurrent);
       PARAM_getSetting("NumBlocksCand", NumBlocksCand);
       PARAM_getSetting("CconcurrentCutOffTime", ConcurrentCutOffTime);
@@ -522,7 +511,6 @@ public:
       UtilPrintParameter(os, sec, "BranchStrongIter",  BranchStrongIter);
       UtilPrintParameter(os, sec,
                          "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-      UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
       UtilPrintParameter(os, sec, "LogLevel",  LogLevel);
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
       UtilPrintParameter(os, sec, "Instance",  Instance);
@@ -549,6 +537,7 @@ public:
       UtilPrintParameter(os, sec, "SubProbParallelChunksize",
                          SubProbParallelChunksize);
       UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum);
+      UtilPrintParameter(os, sec, "BlockNumInput", BlockNumInput);
       (*os) << "========================================================\n";
    }
 
@@ -613,7 +602,6 @@ public:
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
       DebugCheckBlocksColumns  = true;
-      NumBlocks                = 3;
       /*
        * parameters from MILPBlock and to be MILP
        */
@@ -633,7 +621,7 @@ public:
       ColumnLB                 = -1.e20;
       ObjectiveSense           = 1;
       Concurrent               = false;
-      NumBlocksCand            = 10;
+      NumBlocksCand            = 4;
       ConcurrentCutOffTime     = 100;
       ThreadIndex              = 0;
       CurrentWorkingDir        = "";
@@ -641,6 +629,7 @@ public:
       SubProbParallelType      = SubProbScheduleDynamic;
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
+      BlockNumInput            = 0;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

@@ -159,7 +159,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
       m_param.dumpSettings();
    }
 
-   if (!m_param.Concurrent) {
+   if (!NumBlocks && !m_param.Concurrent) {
       //---
       //--- read block file
       //---
@@ -1513,7 +1513,7 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    // declaring the number of partitions
-   int nparts = m_param.NumBlocks;
+   int nparts = NumBlocks;
    // weights of vertices and hyperedges
    int* vwgts = new int[numVertices] ;
    int* hewgts = new int[numHyperedges] ;

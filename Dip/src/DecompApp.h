@@ -131,7 +131,11 @@ public:
 
    std::map<int, std::vector<int> > m_blocks;
 
-
+   /** Number of Blocks
+       defalut value 0
+       set by BlockNumInput parameter
+    **/
+   int NumBlocks ;
 
 public:
    /**
@@ -453,6 +457,7 @@ public:
       m_objective  ( 0     ),
       m_matrix     ( 0     ),
       m_modelC     ( 0     ),
+      NumBlocks    ( 0     ),
       m_modelR     ( ) {
       //---
       //--- comment these functions, which were used in
@@ -470,7 +475,6 @@ public:
       UTIL_DELARR(m_objective);
       UtilDeleteMapPtr(m_modelR);
       UTIL_DELPTR(m_modelC);
-
    };
 };
 
