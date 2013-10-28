@@ -261,7 +261,7 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
       throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
 
-   if (m_param.LogLevel >= 2)
+   if (m_param.LogLevel >= 2) {
       if (m_param.InstanceFormat == "MPS") {
          (*m_osLog) << "Objective Offset = "
                     << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
@@ -269,6 +269,7 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
          (*m_osLog) << "Objective Offset = "
                     << UtilDblToStr(m_lpIO.objectiveOffset()) << endl;
       }
+   }
 
    //---
    //--- set best known lb/ub
@@ -289,6 +290,9 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
       return m_mpsIO.getMatrixByRow();
    } else if (m_param.InstanceFormat == "LP") {
       return m_lpIO.getMatrixByRow();
+   } else {
+      std::cerr << "Unknown InstanceFormat" << std::endl;
+      return NULL;
    }
 }
 

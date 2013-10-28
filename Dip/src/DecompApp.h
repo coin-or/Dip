@@ -67,11 +67,14 @@ protected:
    double m_bestKnownLB;
    double m_bestKnownUB;
 
-
-
-
-
 public:
+
+   /** Number of Blocks
+       defalut value 0
+       set by BlockNumInput parameter
+   **/
+   int NumBlocks;
+
    /**
     *  Parameters.
     */
@@ -131,11 +134,6 @@ public:
 
    std::map<int, std::vector<int> > m_blocks;
 
-   /** Number of Blocks
-       defalut value 0
-       set by BlockNumInput parameter
-    **/
-   int NumBlocks ;
 
 public:
    /**
@@ -454,10 +452,10 @@ public:
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
+      NumBlocks    ( 0     ),
       m_objective  ( 0     ),
       m_matrix     ( 0     ),
       m_modelC     ( 0     ),
-      NumBlocks    ( 0     ),
       m_modelR     ( ) {
       //---
       //--- comment these functions, which were used in
