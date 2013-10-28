@@ -1434,6 +1434,15 @@ int DecompApp::generateInitVars(DecompVarList & initVars){
 
 void DecompApp::singlyBorderStructureDetection()
 {
+   std::ofstream blockdata;
+   std::string BlockFile;
+   BlockFile = m_param.Instance + '.' + "block";
+   std::cout << "BlockFile is " << BlockFile << std::endl;
+
+   if (m_param.BlockFileOutput) {
+      blockdata.open (BlockFile.c_str());
+   }
+
    //======================================================================
    // Using Row-net hypergraph model for automatic matrix decomposition
    //======================================================================
@@ -1744,11 +1753,15 @@ void DecompApp::singlyBorderStructureDetection()
       }
 
       if (numRowIndex.size() != 0) {
+         blockdata << truePartNum << " " << numRowIndex.size() << "\n" ;
+
          for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
                rowIter++) {
+            blockdata << *rowIter << " " ;
             rowsBlock.push_back(*rowIter);
          }
 
+         blockdata << "\n" ;
          m_blocks.insert(make_pair(truePartNum, rowsBlock));
          truePartNum ++;
       }
@@ -1758,6 +1771,7 @@ void DecompApp::singlyBorderStructureDetection()
       temp.clear();
    }
 
+   blockdata.close();
    UTIL_DELARR(eptr);
    UTIL_DELARR(eind);
    //UTIL_DELARR(minorIndex);

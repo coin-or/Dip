@@ -298,6 +298,8 @@ public:
 
    int BlockNumInput;
 
+   bool BlockFileOutput;
+
    /**
     * @}
     */
@@ -403,6 +405,7 @@ public:
       PARAM_getSetting("SubProbParallelType", SubProbParallelType);
       PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
       PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
+      PARAM_getSetting("BlockFileOutput", BlockFileOutput);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -538,6 +541,7 @@ public:
                          SubProbParallelChunksize);
       UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum);
       UtilPrintParameter(os, sec, "BlockNumInput", BlockNumInput);
+      UtilPrintParameter(os, sec, "BlockFileOutput", BlockFileOutput );
       (*os) << "========================================================\n";
    }
 
@@ -630,6 +634,7 @@ public:
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
       BlockNumInput            = 0;
+      BlockFileOutput          = false;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {
