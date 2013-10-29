@@ -760,7 +760,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    int           i, nNodes;
    double        objLB      = -DecompInf;
    double        objUB      =  DecompInf;
-   int           logIpLevel = m_param.LogLpLevel;
+   int           logIpLevel = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
    int                   numCols   = m_masterSI->getNumCols();

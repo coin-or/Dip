@@ -38,7 +38,9 @@ class DecompParam {
 public:
    int    LogLevel;
    int    LogDebugLevel;
-   int    LogLpLevel;    //TODO: LpIpLevel separate
+   int    LogLpLevel;   
+   int    LogIpLevel; 
+
 
    //=0 never
    //=1 only on error
@@ -320,6 +322,7 @@ public:
       PARAM_getSetting("LogLevel",             LogLevel);
       PARAM_getSetting("LogDebugLevel",        LogDebugLevel);
       PARAM_getSetting("LogLpLevel",           LogLpLevel);
+      PARAM_getSetting("LogIpLevel",           LogIpLevel);
       PARAM_getSetting("LogDumpModel",         LogDumpModel);
       PARAM_getSetting("LogObjHistory",        LogObjHistory);
       PARAM_getSetting("LimitInitVars",        LimitInitVars);
@@ -439,6 +442,7 @@ public:
       UtilPrintParameter(os, sec, "LogLevel",            LogLevel);
       UtilPrintParameter(os, sec, "LogDebugLevel",       LogDebugLevel);
       UtilPrintParameter(os, sec, "LogLpLevel",          LogLpLevel);
+      UtilPrintParameter(os, sec, "LogIpLevel",          LogIpLevel);
       UtilPrintParameter(os, sec, "LogDumpModel",        LogDumpModel);
       UtilPrintParameter(os, sec, "LogObjHistory",       LogObjHistory);
       UtilPrintParameter(os, sec, "LimitInitVars",       LimitInitVars);
@@ -549,6 +553,7 @@ public:
       LogLevel             = 0;
       LogDebugLevel        = 0;
       LogLpLevel           = 0;
+      LogIpLevel           = 0;
       LogDumpModel         = 0;
       LogObjHistory        = 0;
       LimitInitVars        = 5;

@@ -590,7 +590,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    assert(m_numConvexCon > 1);
    int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda
-   int  logIpLevel  = m_param.LogLpLevel;
+   int  logIpLevel  = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
 #ifdef DECOMP_MASTERONLY_DIRECT
    //---

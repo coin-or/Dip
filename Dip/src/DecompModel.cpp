@@ -224,7 +224,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
                                    double               cutoff)
 {
    const int numCols    = m_osi->getNumCols();
-   const int logIpLevel = param.LogLpLevel;
+   const int logIpLevel = param.LogIpLevel;
    double* solution = new double[numCols];
    assert(solution);
    //---
@@ -298,6 +298,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
+
+   cbc.setLogLevel(logIpLevel);
+
 #if 0
    CbcMain0(cbc);
    //int i;
@@ -383,7 +386,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
     *   (5  event user programmed event occurred)
    */
 #endif
-   cbc.setLogLevel(0);
    cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
    result->m_solStatus    = cbc.status();
