@@ -756,6 +756,13 @@ void DecompAlgoPC::solutionUpdateAsIP()
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_masterSI);
+   cbc.setLogLevel(logIpLevel);
+   cbc.setDblParam(CbcModel::CbcAllowableFractionGap,
+                   m_param.SolveMasterAsIpLimitGap);
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, m_param.SolveMasterAsIpLimitTime);
+   cbc.setDblParam(CbcModel::CbcCurrentCutoff, m_globalUB);
+   cbc.branchAndBound();
+#if 0
    CbcMain0(cbc);
    //---
    //--- build argument list
@@ -789,6 +796,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //--- solve IP using argument list
    //---
    CbcMain1(argc, argv, cbc);
+#endif
    //---
    //--- get solver status
    //---   comments based on Cbc2.3

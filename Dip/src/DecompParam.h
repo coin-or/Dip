@@ -38,8 +38,8 @@ class DecompParam {
 public:
    int    LogLevel;
    int    LogDebugLevel;
-   int    LogLpLevel;   
-   int    LogIpLevel; 
+   int    LogLpLevel;
+   int    LogIpLevel;
 
 
    //=0 never

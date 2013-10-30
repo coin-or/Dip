@@ -298,9 +298,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
-
    cbc.setLogLevel(logIpLevel);
-
 #if 0
    CbcMain0(cbc);
    //int i;
