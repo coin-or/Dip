@@ -23,7 +23,7 @@ using namespace std;
 //===========================================================================//
 /*!
  * \class MCF_Instance
- * A class to store an instance of the 
+ * A class to store an instance of the
  *     (Integer) Multi-Commodity Flow Problem (MCF).
  *
  *     min  sum{i in 1..n} v[i,j]   x[i,j]
@@ -36,7 +36,7 @@ using namespace std;
 //===========================================================================//
 class MCF_Instance {
 public:
-   /** MCF_Instance problem instance data */   
+   /** MCF_Instance problem instance data */
    struct arc {
       int    tail;
       int    head;
@@ -48,20 +48,20 @@ public:
       int    source;
       int    sink;
       int    demand;
-   };   
+   };
    string            m_problemName;
-   arc             * m_arcs;
-   commodity       * m_commodities;
+   arc*              m_arcs;
+   commodity*        m_commodities;
    int               m_numNodes;
    int               m_numArcs;
    int               m_numCommodities;
 
 public:
    /** @name Helper Methods. */
-   int readInstance(string & fileName,
+   int readInstance(string& fileName,
                     bool     addDummyArcs = true);
 
-   inline void initMembers(){
+   inline void initMembers() {
       m_problemName     = "";
       m_arcs            = NULL;
       m_commodities     = NULL;
@@ -74,16 +74,16 @@ public:
    /** @name Constructor and Destructor */
 
    /** Default constructor. */
-   MCF_Instance(){
+   MCF_Instance() {
       initMembers();
    };
-   
+
    /** Default constructor. Takes an instance of UtilParameters */
-   MCF_Instance(string & fileName) {
+   MCF_Instance(string& fileName) {
       initMembers();
       readInstance(fileName);
    }
-   
+
    /** Default destructor. */
    ~MCF_Instance() {
       UTIL_DELARR(m_arcs);

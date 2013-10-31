@@ -24,9 +24,9 @@
 //===========================================================================//
 /*!
  * \class MCF_DecompApp
- * A DecompApp for solving the 
+ * A DecompApp for solving the
  *     (Integer) Multi-Commodity Flow Problem (MCF)
- * 
+ *
  * \see
  * DecompApp
  *
@@ -39,46 +39,52 @@ private:
    const string m_classTag;
 
    /** Application specific parameters. */
-   MCF_Param m_appParam;  
+   MCF_Param m_appParam;
 
    /** MCF problem instance data */
    MCF_Instance m_instance;
 
    /** The model objective coefficients (original space). */
-   double * m_objective;
+   double* objective;
 
    /** Model constraint systems. */
    vector<DecompConstraintSet*> m_models;
 
+   DecompConstraintSet* modelRelax;
+   DecompConstraintSet* modelCore;
+
 public:
-   /** @name Helper functions (public). */   
+   /** @name Helper functions (public). */
+
 
    /** Initialize application. */
-   void initializeApp(UtilParameters & utilParam);
+   void initializeApp(UtilParameters& utilParam);
 
    /* Create models. */
    void createModels();
-   void createModelCore(DecompConstraintSet * model);
-   void createModelRelax(DecompConstraintSet * model,
+   void createModelCore(DecompConstraintSet* model);
+   void createModelRelax(DecompConstraintSet* model,
                          int                   commId);
-   void createModelRelaxSparse(DecompConstraintSet * model,
+   void createModelRelaxSparse(DecompConstraintSet* model,
                                int                   commId);
 
 public:
    /** @name Constructor and Destructor */
-   
+
    /** Default constructor. Takes an instance of UtilParameters */
-   MCF_DecompApp(UtilParameters & utilParam) :
+   MCF_DecompApp(UtilParameters& utilParam) :
       DecompApp   (utilParam),
       m_classTag  ("MCF-APP"),
-      m_objective (NULL)
-   {
-      initializeApp(utilParam);                    
+      objective   (   NULL  ),
+      modelRelax  (   NULL  ),
+      modelCore   (   NULL  ) {
+      initializeApp(utilParam);
    }
-   
+
    virtual ~MCF_DecompApp() {
-      UTIL_DELARR(m_objective);
+      UTIL_DELARR(objective);
       UtilDeleteVectorPtr(m_models);
+      UTIL_DELPTR(modelCore);
    };
 };
 
