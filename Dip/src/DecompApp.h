@@ -178,9 +178,16 @@ public:
     *
     * NOTE: The user application MUST call this method.
     */
-   inline void setModelObjective(const double* objective) {
+   inline void setModelObjective(const double* objective, const
+                                 int length) {
       assert(objective);
-      m_objective = objective;
+      double* obj = new double[length];
+
+      for (int i = 0; i < length; ++i) {
+         obj[i] = objective[i];
+      }
+
+      m_objective = obj;
    }
 
    /**
@@ -447,16 +454,32 @@ public:
     * object (UtilParameters) and reads in the parameter settings into the
     * DecompApp paramter object.
     */
+
+
+   DecompApp(UtilParameters& utilParam) :
+      m_classTag   ("D-APP"),
+      m_osLog      (&std::cout  ),
+      m_bestKnownLB(-1e75  ),
+      m_bestKnownUB( 1e75  ),
+      NumBlocks    (  0    ),
+      m_objective  ( NULL  ),
+      m_matrix     ( NULL  ),
+      m_modelC     ( NULL  ) {
+      m_param.getSettings(utilParam);
+      startupLog();
+   };
+
+
+
    DecompApp() :
       m_classTag   ("D-APP"),
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
       NumBlocks    ( 0     ),
-      m_objective  ( 0     ),
-      m_matrix     ( 0     ),
-      m_modelC     ( 0     ),
-      m_modelR     ( ) {
+      m_objective  ( NULL  ),
+      m_matrix     ( NULL  ),
+      m_modelC     ( NULL  ) {
       //---
       //--- comment these functions, which were used in
       //--- MILPBlock, otherwise, conflict occurs in building

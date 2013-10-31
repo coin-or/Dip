@@ -1266,7 +1266,7 @@ void DecompApp::createModels()
       }
    }
 
-   setModelObjective(objective);
+   setModelObjective(objective, nCols);
    //---
    //--- Construct the core matrix.
    //---
@@ -1414,6 +1414,7 @@ void DecompApp::createModels()
    //---
    //--- free up local memory
    //---
+   UTIL_DELARR(objective);
    UTIL_DELARR(rowsMarker);
    UTIL_DELARR(rowsCore);
    UTIL_DELARR(colMarker);
