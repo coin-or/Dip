@@ -606,9 +606,9 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 branchedDir = nodeDict["branchedDir"]
                 nodeStatus = nodeDict["nodeStatus"]
                 if branchedDir == -1:
-                    branch_direction = 'R'
-                else:
                     branch_direction = 'L'
+                else:
+                    branch_direction = 'R'
                     
                 if nodeStatus == 'Infeasible':
                     status = 'I'
