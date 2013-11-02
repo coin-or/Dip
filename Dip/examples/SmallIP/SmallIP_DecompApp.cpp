@@ -69,7 +69,7 @@ void SmallIP_DecompApp::createModels(){
       throw UtilExceptionMemory("createModels", "SmallIP_DecompApp");      
    m_objective[0] = 1.0;
    m_objective[1] = 0.0;
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, numCols);
 
    //---
    //--- build matrix part 1 (4.5 -10,16)
