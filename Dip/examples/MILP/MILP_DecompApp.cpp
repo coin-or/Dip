@@ -138,7 +138,7 @@ void MILP_DecompApp::createModels(){
       throw UtilExceptionMemory("createModels", "MMKP_DecompApp");
    memcpy(m_objective, 
           m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, nCols);
 
    //---
    //--- Construct the core matrix.
