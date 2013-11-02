@@ -164,7 +164,7 @@ void MMKP_DecompApp::createModels(){
       throw UtilExceptionMemory("createModels", "MMKP_DecompApp");
    for(i = 0; i < numCols; i++)
       m_objective[i] = -value[i];
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, numCols);
    
    //---
    //--- Model
