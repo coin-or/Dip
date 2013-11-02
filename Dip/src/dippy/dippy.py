@@ -186,9 +186,9 @@ def createBranchLabel(lbs, ubs):
                          if x not in '()_') \
                  + '<=' + str(int(ubs[l]))
         if first:
-          newWidth = len(addStr) + currWidth
+            newWidth = len(addStr) + currWidth
         else:
-          newWidth = len(addStr) + currWidth + 2
+            newWidth = len(addStr) + currWidth + 2
         if newWidth <= maxLabelWidth:
             if first:
                 first = False
@@ -211,9 +211,9 @@ def createBranchLabel(lbs, ubs):
                  ''.join(x for x in str(l) 
                          if x not in '()_')
         if first:
-          newWidth = len(addStr) + currWidth
+            newWidth = len(addStr) + currWidth
         else:
-          newWidth = len(addStr) + currWidth + 2
+            newWidth = len(addStr) + currWidth + 2
         if newWidth <= maxLabelWidth:
             if first:
                 first = False
@@ -236,9 +236,9 @@ def createBranchLabel(lbs, ubs):
                          if x not in '()_') \
                  + '<=' + str(int(ubs[l]))
         if first:
-          newWidth = len(addStr) + currWidth
+            newWidth = len(addStr) + currWidth
         else:
-          newWidth = len(addStr) + currWidth + 2
+            newWidth = len(addStr) + currWidth + 2
         if newWidth <= maxLabelWidth:
             if first:
                 first = False
@@ -606,9 +606,9 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 branchedDir = nodeDict["branchedDir"]
                 nodeStatus = nodeDict["nodeStatus"]
                 if branchedDir == -1:
-                    branch_direction = 'R'
-                else:
                     branch_direction = 'L'
+                else:
+                    branch_direction = 'R'
                     
                 if nodeStatus == 'Infeasible':
                     status = 'I'
@@ -643,7 +643,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                            status = 'C', obj = nodeQuality, 
                                            color = color, style = 'filled', 
                                            fillcolor = color)
-                    if self.Tree.display_mode == 'svg':
+                    if self.Tree.attr['display'] == 'svg':
                         if self.display_interval is not None:
                             if numNodes % self.display_interval in [0, 1]:
                                 self.Tree.write_as_svg(filename = "%s_0" 
@@ -683,7 +683,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                     if edge_label is not None:
                         self.Tree.set_edge_attr(parentInd, nodeInd, 
                                                 'label', edge_label)
-                    if self.Tree.display_mode == 'svg':
+                    if self.Tree.attr['display'] == 'svg':
                         if self.display_interval is not None:
                             if numNodes % self.display_interval in [0, 1]:
                                 self.Tree.write_as_svg(filename = "%s_%d" 
