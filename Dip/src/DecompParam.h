@@ -161,7 +161,7 @@ public:
    //2 = Calls the user defined function (if exists) and then calls built-in
    //    IP solver (use this for debugging).
 
-   bool    SolveRelaxAsIp;
+   int    SolveRelaxAsIp;
 
    int    InitVarsWithCutDC;
    int    InitVarsWithIP;
@@ -596,7 +596,7 @@ public:
       SolveMasterAsIpFreqPass  = 1000;
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
-      SolveRelaxAsIp           = false;
+      SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;

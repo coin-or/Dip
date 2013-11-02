@@ -442,7 +442,7 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
       //--- if not using built-in solver, make sure user has
       //---   provided a solver function
       //--- TODO: how?
-      //---
+      //--- 
       //const DecompApp * app = getDecompApp();
       return;
    }
