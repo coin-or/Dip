@@ -6,8 +6,8 @@ from setuptools import setup, Extension
 import subprocess, os, sys
 from os.path import join, dirname
 
-PROJECT = 'dippy'
-VERSION = '1.9.2'
+PROJECT = 'coinor.dippy'
+VERSION = '1.9.6'
 URL = 'https://projects.coin-or.org/Dip/wiki/Dippy'
 AUTHOR_EMAIL = u''
 DESC = 'DIP Python Interface'
