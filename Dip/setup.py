@@ -49,6 +49,24 @@ def get_lib_dirs(dir):
                 flag.startswith('-L')]
     return libs
 
+def get_frameworks(dir):
+    '''
+    On OS X, return a list of linked frameworks.
+    '''
+    with open(join(dir, 'share', 'coin',
+                   'doc', 'Dip', 'dip_addlibs.txt')) as f:
+        link_line = f.read()
+        add_framework = False
+        frameworks = ''
+        for flag in link_line.split():
+            if add_framework:
+                frameworks += '-framework ' + flag + ' '
+                add_framework = False
+            if flag == '-framework':
+                add_framework = True
+                
+    return frameworks
+
 operatingSystem = sys.platform
 if 'linux' in operatingSystem:
     operatingSystem = 'linux'
@@ -83,6 +101,8 @@ lib_dirs = get_lib_dirs(coin_install_dir)
 lib_dirs.append(join(coin_install_dir, 'lib'))
 if operatingSystem is 'windows':
     lib_dirs.append(join(coin_install_dir, 'lib', 'intel'))
+if operatingSystem is 'mac':
+    os.environ['LDFLAGS'] = get_frameworks(coin_install_dir)
 
 modules=[Extension('_dippy', 
                    sources, 
