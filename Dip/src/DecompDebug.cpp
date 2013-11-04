@@ -983,6 +983,11 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //---
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
 
+   //---
+   //--- set the thread limit, otherwise CPLEX will use all the resources
+   //---
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, m_param.SubProbNumThreads); 
+   
    if (status)
       throw UtilException("CPXsetdblparam failure",
                           "solveDirect", "DecompAlgoC");
