@@ -159,7 +159,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
       m_param.dumpSettings();
    }
 
-   if (!NumBlocks && !m_param.Concurrent) {
+   if (!m_param.Concurrent) {
       //---
       //--- read block file
       //---
