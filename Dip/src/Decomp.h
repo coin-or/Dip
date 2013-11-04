@@ -78,6 +78,8 @@ struct DecompMainParam {
    double timeSetupReal;
    double timeSolveCpu ;
    double timeSolveReal ;
+   double bestLB;
+   double bestUB;
 };
 
 

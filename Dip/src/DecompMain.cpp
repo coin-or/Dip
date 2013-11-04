@@ -141,6 +141,38 @@ int main(int argc, char** argv)
 
       if (milp.m_param.Concurrent == true) {
          printf("===== FINISH Concurrent Computations Process. =====\n");
+         printf("======== SUMMARY OF CONCURRENT COMPUTATIONS =======\n");
+         cout << "Method" << setw(20) << "BlockNumber" << setw(20)
+              << "WallClockTime" << setw(20) << "CPUTime" << setw(20)
+              << "BestLB" << setw(25) << "BestUB" << endl;
+
+         for (int i = 0 ; i < (numThreads + 1); i++) {
+            if (i == 0) {
+               cout << "B&C ";
+            } else {
+               cout << "B&P";
+            }
+
+            cout << setw(15);
+
+            if (i == 0) {
+               cout << "NA";
+            } else {
+               cout << milpArray[i].NumBlocks;
+            }
+
+            cout << setw(25) << setprecision(7)
+                 << decompMainParamArray[i].timeSetupReal +
+                 decompMainParamArray[i].timeSolveReal
+                 << setw(23) << setprecision(7)
+                 << decompMainParamArray[i].timeSetupCpu +
+                 decompMainParamArray[i].timeSolveCpu
+                 << setw(23) << setprecision(7)
+                 << decompMainParamArray[i].bestLB
+                 << setw(25) << setprecision(7)
+                 << decompMainParamArray[i].bestUB
+                 << endl;
+         }
       }
    } catch (CoinError& ex) {
       cerr << "COIN Exception [ " << ex.message() << " ]"
@@ -320,8 +352,10 @@ void DecompAuto(DecompApp milp,
       //--- solve
       //---
       timer.start();
-      algo->solveDirect();
+      DecompSolverResult* result = algo->solveDirect();
       timer.stop();
+      decompMainParam.bestLB = result->m_objLB;
+      decompMainParam.bestUB = result->m_objUB;
       decompMainParam.timeSolveCpu  = timer.getCpuTime();
       decompMainParam.timeSolveReal = timer.getRealTime();
    } else {
@@ -386,6 +420,8 @@ void DecompAuto(DecompApp milp,
          cout << "Unknown" << endl;
       }
 
+      decompMainParam.bestLB = alpsModel.getGlobalLB();
+      decompMainParam.bestUB = alpsModel.getGlobalUB();
       cout << " BestLB        = " << setw(10)
            << UtilDblToStr(alpsModel.getGlobalLB(), 5) << endl
            << " BestUB        = " << setw(10)
