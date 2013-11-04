@@ -193,6 +193,6 @@ for m in MACHINES:
             print "%d" %t,
             
 if prob.display_mode != 'off':
-    if (prob.Tree.display_mode == 'pygame') or (prob.Tree.display_mode == 'xdot'):
+    if (prob.Tree.attr['display'] == 'pygame') or (prob.Tree.attr['display'] == 'xdot'):
         prob.Tree.display()
 
