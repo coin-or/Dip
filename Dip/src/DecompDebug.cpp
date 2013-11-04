@@ -883,34 +883,9 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
 
 #ifdef __DECOMP_IP_CBC__
    CbcModel cbc(*m_masterSI);
-   CbcMain0(cbc);
-   //---
-   //--- build argument list
-   //---
-   const char* argv[20];
-   int    argc         = 0;
-   string cbcExe       = "cbc";
-   string cbcSolve     = "-solve";
-   string cbcQuit      = "-quit";
-   string cbcLog       = "-log";
-   string cbcLogSet    = UtilIntToStr(logIpLevel);
-   string cbcTime      = "-seconds";
-   string cbcTimeSet   = UtilIntToStr(timeLimit);
-   argv[argc++] = cbcExe.c_str();
-   argv[argc++] = cbcLog.c_str();
-   argv[argc++] = cbcLogSet.c_str();
-   argv[argc++] = cbcTime.c_str();
-   argv[argc++] = cbcTimeSet.c_str();
-   argv[argc++] = cbcSolve.c_str();
-   argv[argc++] = cbcQuit.c_str();
-   //---
-   //--- solve IP using argument list
-   //---
-   CbcMain1(argc, argv, cbc);
-   //---
-   //--- get solver status
-   //---   comments based on Cbc2.3
-   //---
+   cbc.setLogLevel(logIpLevel);
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
+   cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
    int       solStatus    = cbc.status();
    int       solStatus2   = cbc.secondaryStatus();
