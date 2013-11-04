@@ -1441,8 +1441,7 @@ void DecompApp::singlyBorderStructureDetection()
 {
    std::ofstream blockdata;
    std::string BlockFile;
-   BlockFile = m_param.Instance + '.' + "block";
-   std::cout << "BlockFile is " << BlockFile << std::endl;
+   BlockFile = m_param.Instance + '.' + "block";     
 
    if (m_param.BlockFileOutput) {
       blockdata.open (BlockFile.c_str());
