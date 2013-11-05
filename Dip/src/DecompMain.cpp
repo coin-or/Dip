@@ -76,6 +76,7 @@ int main(int argc, char** argv)
       if (milp.m_param.BlockNumInput > 0) {
          milp.NumBlocks = milp.m_param.BlockNumInput;
          milp.m_param.Concurrent = false ;
+         milp.m_param.NumBlocksCand = 0;
       }
 
       blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
@@ -314,6 +315,10 @@ void DecompAuto(DecompApp milp,
                 UtilTimer& timer,
                 DecompMainParam& decompMainParam)
 {
+   if (milp.NumBlocks == 0 && milp.m_param.Concurrent) {
+      milp.NumBlocks = 3;
+   }
+
    //---
    //--- put the one of the functions in the constructor into the main
    //---

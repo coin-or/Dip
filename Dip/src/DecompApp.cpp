@@ -159,7 +159,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
       m_param.dumpSettings();
    }
 
-   if (!m_param.Concurrent) {
+   if (!m_param.Concurrent && !NumBlocks) {
       //---
       //--- read block file
       //---
@@ -1793,7 +1793,9 @@ void DecompApp::singlyBorderStructureDetection()
 #ifdef PaToH
    PaToH_Free();
 #endif
-   std::cout << "The number of blocks is " << nparts << std::endl;
+   if(m_param.ThreadIndex!=0){
+     std::cout << "The number of blocks is " << truePartNum << std::endl;
+   }
 }
 
 

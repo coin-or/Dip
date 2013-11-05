@@ -461,7 +461,7 @@ public:
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
-      NumBlocks    (  3    ),
+      NumBlocks    (  0    ),
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ) {
@@ -476,7 +476,7 @@ public:
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
-      NumBlocks    ( 3     ),
+      NumBlocks    ( 0     ),
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ) {
