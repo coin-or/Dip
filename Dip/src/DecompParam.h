@@ -286,7 +286,6 @@ public:
 
    double ConcurrentCutOffTime;
 
-   int ThreadIndex;
 
    std::string CurrentWorkingDir;
 
@@ -537,7 +536,6 @@ public:
       UtilPrintParameter(os, sec, "Concurrent", Concurrent);
       UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand);
       UtilPrintParameter(os, sec, "ConcurrentCutOffTime", ConcurrentCutOffTime);
-      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );
       UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel);
       UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType);
@@ -632,7 +630,6 @@ public:
       Concurrent               = false;
       NumBlocksCand            = 4;
       ConcurrentCutOffTime     = 100;
-      ThreadIndex              = 0;
       CurrentWorkingDir        = "";
       SubProbParallel          = false;
       SubProbParallelType      = SubProbScheduleDynamic;

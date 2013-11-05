@@ -969,7 +969,18 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //---
    //--- solve the MILP
    //---
+
+   UtilTimer timer1; 
+
+   timer1.start();
+
    m_masterSI->branchAndBound();
+
+   timer1.stop(); 
+   cout << "just after solving" << endl;
+   cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
+	<< " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
+
    //---
    //--- get solver status
    //---

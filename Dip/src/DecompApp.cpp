@@ -1793,7 +1793,7 @@ void DecompApp::singlyBorderStructureDetection()
 #ifdef PaToH
    PaToH_Free();
 #endif
-   if(m_param.ThreadIndex!=0){
+   if(m_threadIndex!=0){
      std::cout << "The number of blocks is " << truePartNum << std::endl;
    }
 }

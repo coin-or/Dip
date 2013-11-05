@@ -129,7 +129,7 @@ int main(int argc, char** argv)
                milpArray[i].NumBlocks = blockNumCandidates[i - 1];
             }
 
-            milpArray[i].m_param.ThreadIndex = i;
+            milpArray[i].m_threadIndex = i;
             DecompAuto(milpArray[i], utilParamArray[i],
                        timerArray[i], decompMainParamArray[i]);
          }
@@ -379,7 +379,7 @@ void DecompAuto(DecompApp milp,
       timer.stop();
 
       if (milp.m_param.Concurrent == 1) {
-         std::cout << "====== The thread number is " << milp.m_param.ThreadIndex
+         std::cout << "====== The thread number is " << milp.m_threadIndex
                    << "====" << std::endl;
          std::cout << "====== The block number is  " << milp.NumBlocks
                    << "====" << std::endl;
