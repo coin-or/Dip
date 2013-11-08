@@ -146,7 +146,7 @@ void DippyDecompApp::createModels()
       obj[m_colIndices[pCol]] = PyFloat_AsDouble(pCoeff);
    }
 
-   setModelObjective(obj);
+   setModelObjective(obj, m_numCols);
    // set constraint matrix
    modelCore->M = pyConstraints_AsPackedMatrix(pRowList, m_rowIndices, m_colIndices);
    modelCore->M->setDimensions(modelCore->rowLB.size(), modelCore->colLB.size());
