@@ -1,3 +1,4 @@
+
 //===========================================================================//
 // This file is part of the Decomp Solver Framework.                         //
 //                                                                           //
@@ -37,6 +38,7 @@ void DecompAuto(DecompApp milp,
                 UtilTimer& timer,
                 DecompMainParam& decompMainParam);
 
+DecompSolverResult* solveDirect(const DecompApp& decompApp);
 //===========================================================================//
 int main(int argc, char** argv)
 {
@@ -193,6 +195,10 @@ void blockNumberFinder(DecompParam utilParam,
                        std::vector<int>& blockNums,
                        const CoinPackedMatrix* matrix)
 {
+   if (utilParam.NumBlocksCand == 0) {
+      return ;
+   }
+
    const int* lengthRows = matrix->getVectorLengths();
    int numRows = matrix->getNumRows();
    // The following code creates a histogram table to store the
@@ -319,6 +325,23 @@ void DecompAuto(DecompApp milp,
       milp.NumBlocks = 3;
    }
 
+   if (milp.m_threadIndex == 0 && milp.m_param.Concurrent) {
+      decompMainParam.timeSetupCpu  = timer.getCpuTime();
+      decompMainParam.timeSetupReal = timer.getRealTime();
+      //---
+      //--- solve
+      //---
+      timer.start();
+      DecompSolverResult* result = solveDirect(milp);
+      timer.stop();
+      decompMainParam.bestLB = result->m_objLB;
+      decompMainParam.bestUB = result->m_objUB;
+      decompMainParam.timeSolveCpu  = timer.getCpuTime();
+      decompMainParam.timeSolveReal = timer.getRealTime();
+      UTIL_DELPTR(result);
+      return ;
+   }
+
    //---
    //--- put the one of the functions in the constructor into the main
    //---
@@ -363,6 +386,7 @@ void DecompAuto(DecompApp milp,
       decompMainParam.bestUB = result->m_objUB;
       decompMainParam.timeSolveCpu  = timer.getCpuTime();
       decompMainParam.timeSolveReal = timer.getRealTime();
+      UTIL_DELPTR(result);
    } else {
       //---
       //--- create the driver AlpsDecomp model
@@ -505,4 +529,203 @@ void DecompAuto(DecompApp milp,
       //---
       delete algo;
    }
+}
+
+DecompSolverResult* solveDirect(const DecompApp& decompApp)
+{
+   //---
+   //--- Solve the original IP with a generic IP solver
+   //--- without going through the decomposition phase
+   //--- this function is created such that the DIP can serves
+   //--- as an interface to call standalone branch-and-cut solver
+   //---
+   OsiSolverInterface* m_problemSI = new OsiIpSolverInterface();
+   string fileName;
+
+   if (decompApp.m_param.DataDir != "") {
+      fileName = decompApp.m_param.DataDir + UtilDirSlash() +
+                 decompApp.m_param.Instance;
+   } else {
+      fileName = decompApp.m_param.Instance;
+   }
+
+   std::cout << "The file name is " << fileName << std::endl;
+
+   if (decompApp.m_param.Instance.empty()) {
+      cerr << "================================================" << std::endl
+           << "Usage:"
+           << "./dip  --MILP:BlockFileFormat List" << std::endl
+           << "       --MILP:Instance /FilePath/ABC.mps" << std::endl
+           << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "================================================" << std::endl
+           << std::endl;
+      exit(0);
+   }
+
+   m_problemSI->readMps(fileName.c_str());
+   int numCols    = decompApp.m_mpsIO.getNumCols();
+   int nNodes;
+   double objLB   = -DecompInf;
+   double objUB   = DecompInf;
+   int logIpLevel = decompApp.m_param.LogLpLevel;
+   double timeLimit = decompApp.m_param.LimitTime;
+   UtilTimer timer;
+   timer.start();
+   DecompSolverResult* result = new DecompSolverResult();
+#ifdef __DECOMP_IP_CBC__
+   CbcModel cbc(*m_problemSI);
+   cbc.setLogLevel(0);
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
+   cbc.branchAndBound();
+   const int statusSet[2] = {0, 1};
+   int       solStatus    = cbc.status();
+   int       solStatus2   = cbc.secondaryStatus();
+
+   if (!UtilIsInSet(solStatus, statusSet, 2)) {
+      cerr << "Error: CBC IP solver status = "
+           << solStatus << endl;
+      throw UtilException("CBC solver status", "solveDirect", "solveDirect");
+   }
+
+   //---
+   //--- get number of nodes
+   //---
+   nNodes = cbc.getNodeCount();
+   //---
+   //--- get objective and solution
+   //---
+   objLB = cbc.getBestPossibleObjValue();
+
+   if (cbc.isProvenOptimal() || cbc.isSecondsLimitReached()) {
+      objUB = cbc.getObjValue();
+
+      if (result && cbc.getSolutionCount()) {
+         const double* solDbl = cbc.getColSolution();
+         vector<double> solVec(solDbl, solDbl + numCols);
+         result->m_solution.push_back(solVec);
+         result->m_nSolutions++;
+         assert(result->m_nSolutions ==
+                static_cast<int>(result->m_solution.size()));
+         //copy(solution, solution+numCols, result->m_solution);
+      }
+   }
+
+   //---
+   //--- copy sol status into result
+   //---
+   if (result) {
+      result->m_solStatus  = solStatus;
+      result->m_solStatus2 = solStatus2;
+   }
+
+#endif
+#ifdef __DECOMP_IP_CPX__
+   OsiIpSolverInterface* masterSICpx
+      = dynamic_cast<OsiCpxSolverInterface*>(m_problemSI);
+   CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
+   CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
+   int       status = 0;
+   masterSICpx->switchToMIP();//need?
+   //---
+   //--- set the time limit
+   //---
+   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
+   //---
+   //--- set the thread limit, otherwise CPLEX will use all the resources
+   //---
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS,
+                           decompApp.m_param.SubProbNumThreads);
+
+   if (status)
+      throw UtilException("CPXsetdblparam failure",
+                          "solveDirect", "DecompAlgoC");
+
+   //---
+   //--- solve the MILP
+   //---
+   UtilTimer timer1;
+   timer1.start();
+   masterSICpx->branchAndBound();
+   timer1.stop();
+   cout << "just after solving" << endl;
+   cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
+        << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
+   //---
+   //--- get solver status
+   //---
+   //---
+   int solStatus = CPXgetstat(cpxEnv, cpxLp);
+
+   if (result) {
+      result->m_solStatus  = solStatus;
+      result->m_solStatus2 = 0;
+   }
+
+   //---
+   //--- get number of nodes
+   //---
+   nNodes  = CPXgetnodecnt(cpxEnv, cpxLp);
+   //---
+   //--- get objective and solution
+   //---
+   status = CPXgetbestobjval(cpxEnv, cpxLp, &objLB);
+
+   if (status)
+      throw UtilException("CPXgetbestobjval failure",
+                          "solveDirect", "DecompAlgoC");
+
+   //---
+   //--- get objective and solution
+   //---
+   if (solStatus == CPXMIP_OPTIMAL     ||
+         solStatus == CPXMIP_OPTIMAL_TOL ||
+         solStatus == CPXMIP_TIME_LIM_FEAS) {
+      status = CPXgetmipobjval(cpxEnv, cpxLp, &objUB);
+
+      if (status)
+         throw UtilException("CPXgetmipobjval failure",
+                             "solveDirect", "DecompAlgoC");
+
+      if (result) {
+         const double* solDbl = masterSICpx->getColSolution();
+         vector<double> solVec(solDbl, solDbl + numCols);
+         result->m_solution.push_back(solVec);
+         result->m_nSolutions++;
+         assert(result->m_nSolutions ==
+                static_cast<int>(result->m_solution.size()));
+         //copy(solution, solution+numCols, result->m_solution);
+      }
+   }
+
+   //---
+   //--- copy sol status into result
+   //---
+   if (result) {
+      result->m_solStatus  = solStatus;
+      result->m_solStatus2 = 0;
+   }
+
+#endif
+
+   //---
+   //--- copy bounds into result
+   //---
+   if (result) {
+      result->m_objUB = objUB;
+      result->m_objLB = objLB;
+   }
+
+   //---
+   //--- stop the timer, dump time to solve
+   //---
+   timer.stop();
+   cout << "DIRECT SOLVE"
+        << " Real=" << setw(10) << UtilDblToStr(timer.getRealTime(), 5)
+        << " Cpu= " << setw(10) << UtilDblToStr(timer.getCpuTime() , 5)
+        << " Nodes= " << setw(8) << nNodes
+        << " objLB= " << setw(10) << UtilDblToStr(objLB, 3)
+        << " objUB= " << setw(10) << UtilDblToStr(objUB, 3)
+        << endl;
+   UTIL_DELPTR( m_problemSI);
+   return result;
 }

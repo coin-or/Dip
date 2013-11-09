@@ -151,10 +151,10 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
 {
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "initializeApp()", m_param.LogLevel, 2);
+
    //---
    //--- get application parameters
    //---
-
    if (m_param.LogLevel >= 1) {
       m_param.dumpSettings();
    }
@@ -1793,8 +1793,9 @@ void DecompApp::singlyBorderStructureDetection()
 #ifdef PaToH
    PaToH_Free();
 #endif
-   if(m_threadIndex!=0){
-     std::cout << "The number of blocks is " << truePartNum << std::endl;
+
+   if (m_threadIndex != 0) {
+      std::cout << "The number of blocks is " << truePartNum << std::endl;
    }
 }
 

@@ -137,14 +137,14 @@ public:
 
    /**
     * serves as an index to track different DecompApp
-    * object during Concurrent process, where 
+    * object during Concurrent process, where
     * when m_threadIndex is 0, problem is solved by
-    * cutting plance from standalone solver, when it 
+    * cutting plance from standalone solver, when it
     * is greater than 0, it is solved by branch-and-price,
-    * 
+    *
     **/
 
-   int m_threadIndex; 
+   int m_threadIndex;
 
 public:
    /**
@@ -476,7 +476,7 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ){
+      m_threadIndex(  0    ) {
       m_param.getSettings(utilParam);
       startupLog();
    };
@@ -491,7 +491,7 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ){
+      m_threadIndex(  0    ) {
       //---
       //--- comment these functions, which were used in
       //--- MILPBlock, otherwise, conflict occurs in building

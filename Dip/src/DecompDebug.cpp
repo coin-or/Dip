@@ -745,6 +745,8 @@ void DecompAlgo::printCuts(ostream* os)
    (*os) << endl;
 }
 
+
+
 //===========================================================================//
 DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
 {
@@ -893,7 +895,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    if (!UtilIsInSet(solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = "
            << solStatus << endl;
-      throw UtilException("CBC solver status", "solveDirect", m_classTag);
+      throw UtilException("CBC solver status", "solveDirect", "solveDirect");
    }
 
    //---
@@ -969,18 +971,13 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //---
    //--- solve the MILP
    //---
-
-   UtilTimer timer1; 
-
+   UtilTimer timer1;
    timer1.start();
-
    m_masterSI->branchAndBound();
-
-   timer1.stop(); 
+   timer1.stop();
    cout << "just after solving" << endl;
    cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
-	<< " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
-
+        << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
    //---
    //--- get solver status
    //---
