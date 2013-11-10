@@ -17,26 +17,25 @@
 #include "DecompVar.h"
 
 //===========================================================================//
-void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
-   
-
+void GAP_DecompApp::initializeApp(UtilParameters& utilParam)
+{
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "initializeApp()", m_appParam.LogLevel, 2);
-   
+                      "initializeApp()", m_appParam.LogLevel, 2);
    //---
    //--- get application parameters
    //---
    m_appParam.getSettings(utilParam);
-   if(m_appParam.LogLevel >= 1)
+
+   if (m_appParam.LogLevel >= 1) {
       m_appParam.dumpSettings(m_osLog);
-   
+   }
+
    //---
    //--- read instance
    //
    string instanceFile = m_appParam.DataDir
-      + UtilDirSlash() + m_appParam.Instance;
+                         + UtilDirSlash() + m_appParam.Instance;
    m_instance.readInstance(instanceFile);
-
    //---
    //--- read best known lb/ub
    //---
@@ -44,24 +43,23 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
    m_instance.readBestKnown(bestKnownFile, m_appParam.Instance);
    setBestKnownLB(m_instance.getBestKnownLB());
    setBestKnownUB(m_instance.getBestKnownUB());
-
    //---
    //--- open space for GAP_Knapsack objects
    //---
    int          k;
    const int    nTasks    = m_instance.getNTasks();
    const int    nMachines = m_instance.getNMachines();
-   const int  * capacity  = m_instance.getCapacity();
-   const int  * weight    = m_instance.getWeight();
-   const int  * profit    = m_instance.getProfit();
-   GAP_KnapPisinger * knapK  = 0;
-   
+   const int*   capacity  = m_instance.getCapacity();
+   const int*   weight    = m_instance.getWeight();
+   const int*   profit    = m_instance.getProfit();
+   GAP_KnapPisinger* knapK  = 0;
    m_knap.reserve(nMachines);
-   for(k = 0; k < nMachines; k++){
-      knapK = new GAP_KnapPisinger(nTasks, 
-				   capacity[k], 
-				   weight + (k * nTasks),
-				   profit + (k * nTasks));      
+
+   for (k = 0; k < nMachines; k++) {
+      knapK = new GAP_KnapPisinger(nTasks,
+                                   capacity[k],
+                                   weight + (k * nTasks),
+                                   profit + (k * nTasks));
       m_knap.push_back(knapK);
    }
 
@@ -69,24 +67,21 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
    //--- create models
    //---
    createModels();
-   
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "initializeApp()", m_appParam.LogLevel, 2);
 }
 
 // --------------------------------------------------------------------- //
-int GAP_DecompApp::createModelPartAP(DecompConstraintSet * model){
-   
+int GAP_DecompApp::createModelPartAP(DecompConstraintSet* model)
+{
    int             i, j, colIndex;
    int             status     = GAPStatusOk;
    int             nTasks     = m_instance.getNTasks();    //n
    int             nMachines  = m_instance.getNMachines(); //m
    int             nCols      = nTasks * nMachines;
    int             nRows      = nTasks;
-   
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModelPartAP()", m_appParam.LogLevel, 2);
-   
+                      "createModelPartAP()", m_appParam.LogLevel, 2);
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
    CoinAssertHint(model->M, "Error: Out of Memory");
    model->M->setDimensions(0, nCols);
@@ -104,60 +99,57 @@ int GAP_DecompApp::createModelPartAP(DecompConstraintSet * model){
    //---    x   x   x   = 1 [j=3]
    //---     x   x   x  = 1 [j=4]
    //---
-   for(j = 0; j < nTasks; j++){
+   for (j = 0; j < nTasks; j++) {
       CoinPackedVector row;
       string           rowName = "a(j_" + UtilIntToStr(j) + ")";
-      for(i = 0; i < nMachines; i++){
-         colIndex = getIndexIJ(i,j);
+
+      for (i = 0; i < nMachines; i++) {
+         colIndex = getIndexIJ(i, j);
          row.insert(colIndex, 1.0);
       }
+
       model->appendRow(row, 1.0, 1.0, rowName);
    }
-      
-   //---   
+
+   //---
    //--- set the col upper and lower bounds
    //---
    UtilFillN(model->colLB, nCols,  0.0);
    UtilFillN(model->colUB, nCols,  1.0);
-
    //---
    //--- set column names for debugging
    //---
    colIndex = 0;
-   for(i = 0; i < nMachines; i++){
-      for(j = 0; j < nTasks; j++){
+
+   for (i = 0; i < nMachines; i++) {
+      for (j = 0; j < nTasks; j++) {
          string colName = "x("
-            + UtilIntToStr(colIndex) + "_"
-            + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
+                          + UtilIntToStr(colIndex) + "_"
+                          + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
          model->colNames.push_back(colName);
          colIndex++;
-      }      
+      }
    }
-   
+
    //---
    //--- set the indices of the integer variables of model
    //---
    UtilIotaN(model->integerVars, nCols, 0);
-   
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModelPartAP()", m_appParam.LogLevel, 2);
-
    return status;
 }
 
 // --------------------------------------------------------------------- //
-int GAP_DecompApp::createModels(){
-
+int GAP_DecompApp::createModels()
+{
    //---
-   //--- This function does the work to create the different models 
+   //--- This function does the work to create the different models
    //---  that will be used. This memory is owned by the user. It will
    //---  be passed to the application interface and used by the algorithms.
    //---
-
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModels()", m_appParam.LogLevel, 2);
-   
-
+                      "createModels()", m_appParam.LogLevel, 2);
    //---
    //--- Generalized Assignment Problem (GAP)
    //---   m is number of machines (index i)
@@ -177,7 +169,6 @@ int GAP_DecompApp::createModels(){
    //---    x   x   x   = 1 [j=3]
    //---     x   x   x  = 1 [j=4]
    //---
-
    //---
    //--- Get information about this problem instance.
    //--
@@ -186,19 +177,22 @@ int GAP_DecompApp::createModels(){
    int          status     = GAPStatusOk;
    int          nTasks     = m_instance.getNTasks();    //n
    int          nMachines  = m_instance.getNMachines(); //m
-   const int *  profit     = m_instance.getProfit();
+   const int*   profit     = m_instance.getProfit();
    int          nCols      = nTasks * nMachines;
-
    //---
-   //--- Construct the objective function (the original problem is 
+   //--- Construct the objective function (the original problem is
    //---  a maximization, so we flip the sign to make it minimization).
    //---
    m_objective = new double[nCols];
    assert(m_objective);
-   if(!m_objective)
+
+   if (!m_objective) {
       return GAPStatusOutOfMemory;
-   for(i = 0; i < nCols; i++)
+   }
+
+   for (i = 0; i < nCols; i++) {
       m_objective[i] = profit[i];
+   }
 
    //---
    //--- A'[i] for i=1..m: m independent knapsacks
@@ -222,17 +216,18 @@ int GAP_DecompApp::createModels(){
    //---    x   x   x   = 1 [j=3]
    //---     x   x   x  = 1 [j=4]
    //---
-   setModelObjective(m_objective);
-   
-   DecompConstraintSet * modelCore = new DecompConstraintSet();
+   setModelObjective(m_objective, nCols);
+   DecompConstraintSet* modelCore = new DecompConstraintSet();
    status = createModelPartAP(modelCore);
-   if(status) return status;
-   
+
+   if (status) {
+      return status;
+   }
+
    setModelCore(modelCore, "AP");
    m_models.insert(make_pair("AP", modelCore));
-   
-   
-   for(i = 0; i < nMachines; i++){
+
+   for (i = 0; i < nMachines; i++) {
       modelName = "KP" + UtilIntToStr(i);
       setModelRelax(NULL, modelName, i);
    }
@@ -243,71 +238,62 @@ int GAP_DecompApp::createModels(){
 }
 
 //--------------------------------------------------------------------- //
-DecompSolverStatus 
+DecompSolverStatus
 GAP_DecompApp::solveRelaxed(const int             whichBlock,
-                            const double        * redCostX,
-                            const double          convexDual,
-                            list<DecompVar*>    & vars){
-
-   if(!m_appParam.UsePisinger)
+                            const double*         redCostX,
+                            list<DecompVar*>&     vars)
+{
+   if (!m_appParam.UsePisinger) {
       return DecompSolStatNoSolution;
-   
+   }
+
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "solveRelaxed()", m_appParam.LogLevel, 2);
-   
+                      "solveRelaxed()", m_appParam.LogLevel, 2);
    vector<int>      solInd;
    vector<double>   solEls;
    double           varRedCost  = 0.0;
-   double           varOrigCost = 0.0;         
-   double         * origCost    = m_objective;
-   const double   * redCostXB   = redCostX + getOffsetI(whichBlock);
-   const double   * origCostB   = origCost + getOffsetI(whichBlock);
-   
-  
-      
+   double           varOrigCost = 0.0;
+   double*          origCost    = m_objective;
+   const double*    redCostXB   = redCostX + getOffsetI(whichBlock);
+   const double*    origCostB   = origCost + getOffsetI(whichBlock);
    //---
-   //--- print out red cost 
+   //--- print out red cost
    //---
    /*{
-     int j;	    
+     int j;
      const int    nTasks    = m_instance.getNTasks();
      const int *  weight    = m_instance.getWeight() + getOffsetI(b);
-     for(j = 0; j < nTasks; j++){	    
+     for(j = 0; j < nTasks; j++){
      printf("RedCost[j=%d, wt=%d]: %g\n", j, weight[j], redCostXB[j]);
-     }      
+     }
      }*/
-
-   m_knap[whichBlock]->solve(whichBlock, 
+   m_knap[whichBlock]->solve(whichBlock,
                              redCostXB,
                              origCostB,
                              solInd,
                              solEls,
                              varRedCost,
                              varOrigCost);
-   
    //printf("b=%d alpha              = %g\n", b, alpha);
    //printf("b=%d varRedCost - alpha = %g\n", b, varRedCost - alpha);
    //printf("b=%d varOrigCost        = %g\n", b, varOrigCost);
-
-   
    UTIL_DEBUG(m_appParam.LogLevel, 4,
-	      printf("PUSH var with RC = %g\n", varRedCost - convexDual);
-	      );
-   
-   DecompVar * var = new DecompVar(solInd, solEls, 
-				   varRedCost - convexDual, varOrigCost);
+              printf("PUSH var with RC = %g\n", varRedCost);
+             );
+   DecompVar* var = new DecompVar(solInd, solEls,
+                                  varRedCost, varOrigCost);
    var->setBlockId(whichBlock);
    vars.push_back(var);
-   
    UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "APPsolveRelaxed()", m_appParam.LogLevel, 2);   
+                    "APPsolveRelaxed()", m_appParam.LogLevel, 2);
    return DecompSolStatOptimal;
 }
 
 
 //--------------------------------------------------------------------- //
-void GAP_DecompApp::printOriginalColumn(const int   index, 
-					ostream   * os) const {
-   pair<int,int> p = m_instance.getIndexInv(index);
+void GAP_DecompApp::printOriginalColumn(const int   index,
+                                        ostream*    os) const
+{
+   pair<int, int> p = m_instance.getIndexInv(index);
    (*os) << "x[ " << index << " : " << p.first << " , " << p.second << " ]";
 }

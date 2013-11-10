@@ -19,30 +19,30 @@
 //===========================================================================//
 /*!
  * \class GAP_DecompParam
- * Storage for parameters for the 
+ * Storage for parameters for the
  *   Generalized Assignment Problem (GAP).
- * 
+ *
  */
 
 //===========================================================================//
 class GAP_DecompParam {
- public:
+public:
    int    LogLevel;
    string DataDir;
    string Instance;
    bool   UsePisinger;
 
- public:
-   void getSettings(UtilParameters & utilParam){
-      static const char * common = "GAP";
+public:
+   void getSettings(UtilParameters& utilParam) {
+      static const char* common = "GAP";
       LogLevel    = utilParam.GetSetting("LogLevel",       0, common);
       DataDir     = utilParam.GetSetting("DataDir",       "",  common);
-      Instance    = utilParam.GetSetting("Instance",      "",  common);    
+      Instance    = utilParam.GetSetting("Instance",      "",  common);
       UsePisinger = utilParam.GetSetting("UsePisinger", true,  common);
    }
-   
-   void dumpSettings(ostream * os = &cout){
-      static const char * common = "GAP";
+
+   void dumpSettings(ostream* os = &cout) {
+      static const char* common = "GAP";
       (*os) << "\n=====================================================\n"
             << "GAP_DECOMP PARAMETER SETTINGS \n";
       (*os) << common << ": LogLevel    : " << LogLevel    << endl;
@@ -51,14 +51,14 @@ class GAP_DecompParam {
       (*os) << common << ": UsePisinger : " << UsePisinger << endl;
       (*os) <<   "=====================================================\n";
    }
-   
- public:
-   GAP_DecompParam():    
+
+public:
+   GAP_DecompParam():
       LogLevel   (0 ),
       DataDir    (""),
       Instance   (""),
-      UsePisinger(true)
-         {};
+      UsePisinger(true) {
+   };
    ~GAP_DecompParam() {};
 };
 

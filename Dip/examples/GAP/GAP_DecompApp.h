@@ -24,9 +24,9 @@
 // --------------------------------------------------------------------- //
 /*!
  * \class GAP_DecompApp
- * A DecompApp for solving the 
+ * A DecompApp for solving the
  *     Generalized Assignment Problem (GAP).
- * 
+ *
  * \see
  * DecompApp
  *
@@ -42,36 +42,35 @@ private:
    GAP_Instance m_instance;
 
    /** Application specific parameters. */
-   GAP_DecompParam m_appParam;  
+   GAP_DecompParam m_appParam;
 
    /** GAP_Knapsack object for each knapsack row. */
    vector<GAP_KnapPisinger*> m_knap;
-   
+
    /** The model objective coefficients (original space). */
-   double * m_objective;
-   
-   /** The various model constraint systems used for different 
+   double* m_objective;
+
+   /** The various model constraint systems used for different
        algorithms, keyed by a unique string (model name). */
    map<string, DecompConstraintSet*> m_models;
-   
+
 
 public:
    /* @name Inherited (from virtual) methods. */
    /** Solve the relaxed problem. */
    DecompSolverStatus solveRelaxed(const int             whichBlock,
-				   const double        * redCostX,
-				   const double          convexDual,
-				   list<DecompVar*>    & vars);   
+                                   const double*         redCostX,
+                                   list<DecompVar*>&     vars);
 
    /** Print an original column (format for this app). */
-   void printOriginalColumn(const int   index, 
-                            ostream   * os = &cout) const;
+   void printOriginalColumn(const int   index,
+                            ostream*    os = &cout) const;
 
 public:
-   /** @name Helper functions (public). */   
+   /** @name Helper functions (public). */
 
    /** Guts of constructor. */
-   void initializeApp(UtilParameters & utilParam);
+   void initializeApp(UtilParameters& utilParam);
 
    /** TODO comment */
    inline const int getOffsetI(const int i) const {
@@ -81,51 +80,52 @@ public:
                                const int j) const {
       return (i * m_instance.getNTasks()) + j;
    }
-   
-   inline pair<int,int> getIndexInv(const int index) const {      
-      return make_pair(index / m_instance.getNTasks(), 
+
+   inline pair<int, int> getIndexInv(const int index) const {
+      return make_pair(index / m_instance.getNTasks(),
                        index % m_instance.getNTasks());
    }
 
    /** TODO comment */
    int createModels();
-   int createModelPartAP(DecompConstraintSet * model);
+   int createModelPartAP(DecompConstraintSet* model);
 
 public:
-   inline const GAP_Instance & getInstance() const {
+   inline const GAP_Instance& getInstance() const {
       return m_instance;
    }
-   inline const GAP_DecompParam & getParam() const {
+   inline const GAP_DecompParam& getParam() const {
       return m_appParam;
    }
-   inline const double * getObjective() const {
+   inline const double* getObjective() const {
       return m_objective;
    }
-   inline DecompConstraintSet * getModel(string modelName) const {
+   inline DecompConstraintSet* getModel(string modelName) const {
       map<string, DecompConstraintSet*>::const_iterator it;
       it = m_models.find(modelName);
-      if(it == m_models.end()){
+
+      if (it == m_models.end()) {
          cout << "Error: model with name " << modelName << " not defined."
               << endl;
          assert(it != m_models.end());
          return NULL;
       }
+
       return it->second;
    }
 
- 
+
 public:
    /** @name Constructor and Destructor */
 
    /** Default constructor. Takes an instance of UtilParameters */
-   GAP_DecompApp(UtilParameters & utilParam) : 
+   GAP_DecompApp(UtilParameters& utilParam) :
       DecompApp   (utilParam),
       m_classTag  ("GAP-APP"),
-      m_objective (NULL)
-   {
+      m_objective (NULL) {
       initializeApp(utilParam);
    }
-   
+
    virtual ~GAP_DecompApp() {
       UtilDeleteVectorPtr(m_knap);
       UTIL_DELARR(m_objective);
