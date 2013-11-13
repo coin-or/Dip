@@ -252,12 +252,12 @@ protected:
    //NOTE:
    // this should be found by framework
    //   for first pass, have it set by user (MILPBlock)
-   vector<int>  m_masterOnlyCols;
+   std:: vector<int>  m_masterOnlyCols;
    //vector<bool> m_isColMasterOnly;
    /**
     *  Map from original index to master index for master-only vars.
     */
-   map<int, int> m_masterOnlyColsMap;
+   std::map<int, int> m_masterOnlyColsMap;
 #endif
 
 public:
@@ -583,7 +583,7 @@ public:
                               double*            colLB,
                               double*            colUB,
                               double*            objCoeff,
-                              std::vector<string>&    colNames);
+                              std::vector<std::string>&    colNames);
 #endif
 
    void masterMatrixAddArtCol(std::vector<CoinBigIndex>& colBeg,
