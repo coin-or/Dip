@@ -113,6 +113,11 @@ public:
    double SubProbGapLimitInexact;
    double SubProbTimeLimitExact;
    double SubProbTimeLimitInexact;
+   // Notice:
+   // SubProbNumThreadsParallel:  thread number for parallelizing subproblems
+   // SubProbNumThreads :  thread number for solving each subproblem
+   //   
+   int    SubProbNumThreadsParallel;
    int    SubProbNumThreads;
    int    SubProbNumSolLimit;
 
@@ -355,6 +360,7 @@ public:
       PARAM_getSetting("SubProbGapLimitInexact", SubProbGapLimitInexact);
       PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
       PARAM_getSetting("SubProbTimeLimitInexact", SubProbTimeLimitInexact);
+      PARAM_getSetting("SubProbNumThreadsParallel",      SubProbNumThreadsParallel);
       PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
       PARAM_getSetting("SubProbNumSolLimit",     SubProbNumSolLimit);
       PARAM_getSetting("SubProbSolverStartAlgo", SubProbSolverStartAlgo);
@@ -481,6 +487,7 @@ public:
                          SubProbTimeLimitExact);
       UtilPrintParameter(os, sec, "SubProbTimeLimitInexact",
                          SubProbTimeLimitInexact);
+      UtilPrintParameter(os, sec, "SubProbNumThreadsParallel",  SubProbNumThreadsParallel);
       UtilPrintParameter(os, sec, "SubProbNumThreads",  SubProbNumThreads);
       UtilPrintParameter(os, sec, "SubProbNumSolLimit", SubProbNumSolLimit);
       UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
@@ -584,7 +591,8 @@ public:
       SubProbGapLimitInexact = 0.1;    //10.00% gap
       SubProbTimeLimitExact   = DecompBigNum;
       SubProbTimeLimitInexact = DecompBigNum;
-      SubProbNumThreads       = 1;
+      SubProbNumThreadsParallel       = 4;
+      SubProbNumThreads               = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;

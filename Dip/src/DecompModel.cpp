@@ -553,9 +553,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    //--- starting with CPX12, parallel MIP is on by default
    //---   we do not want that (usually)
-   //--- TODO: make this a user option
+   //--- Provide a user option
    //---
-#if CPX_VERSION >= 1100
+#if CPX_VERSION >=1200
    status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, param.SubProbNumThreads);
 
    if (status)
@@ -724,7 +724,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          throw UtilException("CPXgetmipobjval failure",
                              "solveOsiAsIp", "DecompAlgoModel");
    }
-
 #endif
    UTIL_DELARR(solution);
 }
