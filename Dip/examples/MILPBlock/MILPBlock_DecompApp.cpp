@@ -742,7 +742,7 @@ void MILPBlock_DecompApp::createModels(){
       for(i = 0; i < nCols; i++)
 	 m_objective[i] *= -1;
    }
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, nCols);
 
    //---
    //--- Construct the core matrix.
