@@ -8,6 +8,6 @@ Alps        https://projects.coin-or.org/svn/CHiPPS/Alps/trunk/Alps
 Data/Sample https://projects.coin-or.org/svn/Data/Sample/trunk
 ThirdParty/Blas   https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/trunk
 ThirdParty/Lapack https://projects.coin-or.org/svn/BuildTools/ThirdParty/Lapack/trunk
-Symphony    https://projects.coin-or.org/svn/SYMPHONY/trunk/SYMPHONY
-GiMPy             https://projects.coin-or.org/svn/CoinBazaar/projects/GIMPy/trunk
-GrUMPy            https://projects.coin-or.org/svn/CoinBazaar/projects/GIMPy/GrUMPy/trunk
+SYMPHONY    https://projects.coin-or.org/svn/SYMPHONY/trunk/SYMPHONY
+GiMPy       https://projects.coin-or.org/svn/CoinBazaar/projects/GIMPy/trunk
+GrUMPy      https://projects.coin-or.org/svn/CoinBazaar/projects/GIMPy/GrUMPy/trunk
