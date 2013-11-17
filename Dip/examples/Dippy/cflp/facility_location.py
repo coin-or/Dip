@@ -40,7 +40,7 @@ except ImportError:
 display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
-                        layout = 'dot', display_interval = 100)
+                        layout = 'dot', display_interval = 0)
 
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
@@ -107,7 +107,8 @@ def solve_subproblem(prob, key, redCosts):
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
 
-    var_tuple = (FIXED_COST[loc], rc, var_values)
+    cost = FIXED_COST[loc] + sum([ASSIGNMENT_COSTS[(loc, PRODUCTS[j])] for j in solution])    
+    var_tuple = (cost, rc, var_values)
     rcCheck = 0.0
     for v in var_values.keys():
         rcCheck += redCosts[v] * var_values[v]
@@ -382,10 +383,12 @@ dippy.Solve(prob, {
     'TolZero': '%s' % tol,
     'doPriceCut': '1',
     'CutCGL': '0',
-#    'SolveMasterAsIp': '0'
+#    'SolveMasterAsIp': '0',
 #    'generateInitVars': '1',
-#    'LogDebugLevel': 5,
+#    'LogDebugLevel': 3,
 #    'LogDumpModel': 5,
+#    'ALPS' :
+#    {'msgLevel' : 3}
 })
 
 if prob.display_mode != 'off':
