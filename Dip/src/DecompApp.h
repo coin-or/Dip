@@ -192,11 +192,8 @@ public:
    inline void setModelObjective(const double* objective, const
                                  int length) {
       assert(objective);
-
       double* obj = new double[length];
-
-      memcpy(obj, objective, length*sizeof(double));       
-
+      memcpy(obj, objective, length * sizeof(double));
       m_objective = obj;
    }
 

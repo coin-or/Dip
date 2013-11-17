@@ -830,22 +830,18 @@ inline void UtilSenseToBound(const char     sense,
       lb = rhs;
       ub = rhs;
       break;
-
    case 'L':
       lb = -inf;
       ub = rhs;
       break;
-
    case 'G':
       lb = rhs;
       ub = inf;
       break;
-
    case 'R':
       lb = rhs - range;
       ub = rhs;
       break;
-
    case 'N':
       lb = -inf;
       ub = inf;

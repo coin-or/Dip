@@ -207,6 +207,7 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
             (*m_osLog) << "BestUB         : "
             << UtilDblToStr(objBest.second) << "\n";
            );
+
    //---
    //--- if the lower bound meets the global ub, we are done
    //---
@@ -215,7 +216,6 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
    // goto PHASE_UPDATE_FINISH;
    //}
    //TODO: check infeasible case
-
    //---
    //--- if no cuts, then jump to finish
    //---
@@ -271,7 +271,6 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
       //printf("isCutPossible =%d\n", isCutPossible);
       //printf("mustSwitch    =%d\n", mustSwitch);
       //printf("considerSwitch=%d\n", considerSwitch);
-
       if (mustSwitch) {
          //---
          //--- we must switch from cutting
@@ -302,10 +301,8 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
       }
    }
    break;
-
    case PHASE_DONE:
       break;
-
    case PHASE_UNKNOWN:
    default:
       assert(0);

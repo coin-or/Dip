@@ -449,6 +449,7 @@ void UtilParameters::Dump(std::ostream& os) const
       }
 
       const NV_MAP& nv = iSection->second;
+
       //
       //        -----           foreach parameter in the section
       //

@@ -167,7 +167,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    } else
       // automatic structure detection
    {
-      #pragma omp critical
+#pragma omp critical
       singlyBorderStructureDetection();
    }
 
@@ -782,13 +782,18 @@ void DecompApp::findActiveColumns(const vector<int>& rowsPart,
    }
 
    const int*               ind  = M->getIndices();
+
    const int*               beg  = M->getVectorStarts();
+
    const int*               len  = M->getVectorLengths();
+
    const int*               indR = NULL;
+
    //---
    //--- which columns are present in this part's rows
    //---
    int k, r;
+
    vector<int>::const_iterator it;
 
    for (it = rowsPart.begin(); it != rowsPart.end(); it++) {
@@ -1117,16 +1122,27 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
    }
 
    const int*               matInd         = M->getIndices();
+
    const CoinBigIndex*      matBeg         = M->getVectorStarts();
+
    const int*               matLen         = M->getVectorLengths();
+
    const double*            matVal         = M->getElements();
+
    const int*               matIndI        = NULL;
+
    const double*            matValI        = NULL;
+
    vector<CoinBigIndex>&    rowBeg         = model->m_rowBeg;//used as temp
+
    vector<int         >&    rowInd         = model->m_rowInd;//used as temp
+
    vector<double      >&    rowVal         = model->m_rowVal;//used as temp
+
    map<int, int>::const_iterator mit;
+
    begInd = 0;
+
    rowBeg.push_back(0);
 
    for (i = 0; i < nRowsPart; i++) {
@@ -1341,6 +1357,7 @@ void DecompApp::createModels()
       }
    }
 
+   // find master Only Cols
    for (i = 0; i < nCols; i++) {
       if (!colMarker[i]) {
          if (m_param.LogLevel >= 3) {
@@ -1361,6 +1378,11 @@ void DecompApp::createModels()
       if (modelCore->getColNames().size() > 0)
          UtilPrintVector(modelCore->masterOnlyCols,
                          modelCore->getColNames(), m_osLog);
+   }
+
+   if (m_param.LogLevel >= 3) {
+      std::cout << "the number of masterOnlyCols is " << modelCore->masterOnlyCols.size()
+                << std::endl ;
    }
 
    //---
@@ -1393,6 +1415,7 @@ void DecompApp::createModels()
    //---   we will make column bounds explicity rows
    //---
    ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
+#ifndef DECOMP_MASTERONLY_DIRECT
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
 
    if (nMasterOnlyCols) {
@@ -1411,6 +1434,7 @@ void DecompApp::createModels()
       createModelMasterOnlys(modelCore->masterOnlyCols);
    }
 
+#endif
    //---
    //--- free up local memory
    //---
@@ -1563,9 +1587,9 @@ void DecompApp::singlyBorderStructureDetection()
 
       for ( int j = 0 ; j < lengthRows[i] ; j ++ ) {
          index = index_base + j ;
+
          // determine whether the corresponding column is
          // integer or not
-
          if (m_param.InstanceFormat == "MPS") {
             isInteger = m_mpsIO.isInteger(minorIndex[index]);
          } else if (m_param.InstanceFormat == "LP") {
@@ -1589,7 +1613,6 @@ void DecompApp::singlyBorderStructureDetection()
     *  define the weight parameter in the hypergraph
     */
    // assign the weights on vertices
-
    for (int i = 0 ; i < numVertices ; i ++) {
 #ifdef VARIABLE_WEIGHT
 
@@ -1605,7 +1628,6 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    // assign the weights on hyperedges
-
    for (int i = 0 ; i < numHyperedges; i ++) {
 #ifdef VARIABLE_WEIGHT
 
@@ -1692,11 +1714,11 @@ void DecompApp::singlyBorderStructureDetection()
    index = 0 ;
    index_base = 0 ;
    int tempBase = 0 ;
+
    /*
     * Identify the coupling row in the matrix by storing
     * them in a net set
     */
-
    for ( int i = 0 ; i < numRows ; i ++) {
       for ( int j = 0 ; j < lengthRows[i] ; j ++ ) {
          index = index_base + j ;

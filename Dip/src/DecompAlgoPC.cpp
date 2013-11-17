@@ -152,7 +152,6 @@ void DecompAlgoPC::adjustMasterDualSolution()
    double         alpha  = m_param.DualStabAlpha;
    double         alpha1 = 1.0 - alpha;
    copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
-
    //---
    //--- for both the first PhaseI and first PhaseII calls,
    //---   be sure to set the dual vector to dualRM as dual=0
@@ -260,11 +259,11 @@ int DecompAlgoPC::compressColumns()
                       "compressColumns()", m_param.LogDebugLevel, 2);
    m_stats.timerOther1.reset();
    int nHistorySize
-      = static_cast<int>(m_nodeStats.objHistoryBound.size());
+   = static_cast<int>(m_nodeStats.objHistoryBound.size());
 
    if (nHistorySize > 0) {
       DecompObjBound& objBound
-         = m_nodeStats.objHistoryBound[nHistorySize - 1];
+      = m_nodeStats.objHistoryBound[nHistorySize - 1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = m_nodeStats.objBest.first;
       double masterGap = DecompInf;
@@ -286,16 +285,23 @@ int DecompAlgoPC::compressColumns()
    }
 
    const int      CompressColsIterFreq      = m_param.CompressColumnsIterFreq;
+
    const double   CompressColsSizeMultLimit = m_param.CompressColumnsSizeMultLimit;
+
    const int      nMasterCols               = m_masterSI->getNumCols();
+
    const int      nMasterRows               = m_masterSI->getNumRows();
+
    int nColsSinceLast
-      = nMasterCols - m_compressColsLastNumCols;
+   = nMasterCols - m_compressColsLastNumCols;
+
    int nIterSinceLast
-      = m_nodeStats.priceCallsTotal - m_compressColsLastPrice;
+   = m_nodeStats.priceCallsTotal - m_compressColsLastPrice;
+
    int nColsSinceLastLimit
-      = static_cast<int>(ceil(m_compressColsLastNumCols *
-                              CompressColsSizeMultLimit));
+   = static_cast<int>(ceil(m_compressColsLastNumCols *
+                           CompressColsSizeMultLimit));
+
    UTIL_MSG(m_param.LogLevel, 4,
             (*m_osLog) << "nMasterCols              = "
             << nMasterCols << endl;
@@ -329,17 +335,17 @@ int DecompAlgoPC::compressColumns()
    //---  this, we will use the warm start object to get basis status
    //---  of variables
    //---
-   //m_masterSI->getBasics(basics);
-   //for(r = 0; r < nMasterRows; r++){
-   //   c = basics[r];
-   //   if(c < nMasterCols)
-   //	 isBasic[c] = true;
+   //    m_masterSI->getBasics(basics);
+   //    for(r = 0; r < nMasterRows; r++){
+   //      c = basics[r];
+   //      if(c < nMasterCols)
+   //	   isBasic[c] = true;
    //}
 #ifndef DO_INTERIOR
    bool            mustDeleteWS = false;
    CoinWarmStartBasis* warmStart
-      = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(
-            mustDeleteWS));
+   = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(
+                                          mustDeleteWS));
 
    for (c = 0; c < nMasterCols; c++) {
       if (warmStart->getStructStatus(c) == CoinWarmStartBasis::basic) {
@@ -462,6 +468,7 @@ int DecompAlgoPC::compressColumns()
                << " EffPos = " << nColsEffPos
                << endl;
               );
+
       //---
       //--- now, we must update the mapping between LP index and
       //---  the index in the var list objects - but we might have
@@ -484,7 +491,6 @@ int DecompAlgoPC::compressColumns()
       //---     00000..22222222.33
       //---
       //---
-
       //---
       //--- reset the master index in m_vars
       //---
@@ -690,7 +696,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //TODO: is this expensive? if so,
    //  better to use column type info
    //  like above
-
    for (li = m_vars.begin(); li != m_vars.end(); li++) {
       b   = (*li)->getBlockId();
       mit = m_modelRelax.find(b);
@@ -888,7 +893,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //--- get CPXLPptr   for use with internal methods
    //---
    OsiCpxSolverInterface* osiCpx
-      = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
    CPXLPptr  cpxLp  = osiCpx->getLpPtr();
    assert(cpxEnv && cpxLp);
@@ -969,8 +974,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //---
    result.m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result.m_solStatus2 = 0;
-   //cout << "CPX IP solver status = " << result.m_solStatus << endl;
 
+   //cout << "CPX IP solver status = " << result.m_solStatus << endl;
    //TEMP FIX?
    //THINK: if CPXMIP_INForUNBD, change to CPXMIP_INFEASIBLE,
    // I don't think there is anyway the price+branch heur could
@@ -1076,7 +1081,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                vit != m_xhatIPFeas.end(); vit++) {
             const DecompSolution* xhatIPFeas = *vit;
             const double*          values
-               = xhatIPFeas->getValues();
+            = xhatIPFeas->getValues();
 
             for (int c = 0; c < modelCore->getNumCols(); c++) {
                if (!UtilIsZero(values[c] - rsolution[c])) {
@@ -1092,9 +1097,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
                      << endl;);
          } else {
             DecompSolution* decompSol
-               = new DecompSolution(modelCore->getNumCols(),
-                                    rsolution,
-                                    getOrigObjective());
+            = new DecompSolution(modelCore->getNumCols(),
+                                 rsolution,
+                                 getOrigObjective());
             m_xhatIPFeas.push_back(decompSol);
             vector<DecompSolution*>::iterator vi;
             DecompSolution* viBest = NULL;
@@ -1257,7 +1262,6 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
             }
 
             //TODO: need status return not just assert
-
             //---
             //--- since it is already in LP core, the violation
             //---  should be very small
@@ -1335,9 +1339,9 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
          //--- create a row (in terms of reformulation, lambda), from row
          //---
          CoinPackedVector* rowReform
-            = m_cutpool.createRowReform(modelCore->getNumCols(),
-                                        row,
-                                        m_vars);
+         = m_cutpool.createRowReform(modelCore->getNumCols(),
+                                     row,
+                                     m_vars);
 
          if (!rowReform) {
             //TODO: need status return code for failure in -O
@@ -1499,7 +1503,6 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex++;
       }
       break;
-
       case 'G': {
          CoinPackedVector artCol;
          artCol.insert(rowIndex, 1.0);
@@ -1512,7 +1515,6 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex++;
       }
       break;
-
       case 'E': {
          CoinPackedVector artColL;
          CoinPackedVector artColG;
@@ -1533,7 +1535,6 @@ int DecompAlgoPC::addCutsFromPool()
          colIndex += 2;
       }
       break;
-
       default:
          assert(0);
       }

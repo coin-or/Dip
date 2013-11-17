@@ -116,7 +116,7 @@ int main(int argc, char** argv)
       if (milp.m_param.Concurrent == true ) {
          printf("===== START Concurrent Computations Process. =====\n");
 #ifdef _OPENMP
-         #pragma omp parallel for
+#pragma omp parallel for
 #endif
 
          for (int i = 0 ; i < (numThreads + 1); i++) {
@@ -200,7 +200,9 @@ void blockNumberFinder(DecompParam utilParam,
    }
 
    const int* lengthRows = matrix->getVectorLengths();
+
    int numRows = matrix->getNumRows();
+
    // The following code creates a histogram table to store the
    // nonzero counts and number of rows
    std::map<int, int> histogram;
@@ -620,15 +622,11 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
 #endif
 #ifdef __DECOMP_IP_CPX__
    OsiIpSolverInterface* masterSICpx
-      = dynamic_cast<OsiCpxSolverInterface*>(m_problemSI);
+   = dynamic_cast<OsiCpxSolverInterface*>(m_problemSI);
    CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
    CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
    int       status = 0;
    masterSICpx->switchToMIP();//need?
-
-
-
-
    //---
    //--- set the time limit
    //---

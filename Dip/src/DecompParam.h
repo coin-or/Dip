@@ -118,7 +118,7 @@ public:
    // NumThreadsIPSolver:  thread number for solving each IP subproblem
    //
    int    NumConcurrentThreadsSubProb;
-   int    NumThreadsIPSolver; 
+   int    NumThreadsIPSolver;
 
    int    SubProbNumSolLimit;
 
@@ -393,9 +393,9 @@ public:
       BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
       PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
       BlockFileFormat
-         = param.GetSetting("BlockFileFormat",    "",    "MILP");
+      = param.GetSetting("BlockFileFormat",    "",    "MILP");
       InitSolutionFile
-         = param.GetSetting("InitSolutionFile",   "",    "MILP");
+      = param.GetSetting("InitSolutionFile",   "",    "MILP");
       PARAM_getSetting("LogLevel", LogLevel);
       PARAM_getSetting("UseNames", UseNames);
       PARAM_getSetting("UseSparse", UseSparse);
