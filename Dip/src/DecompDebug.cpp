@@ -793,6 +793,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    }
 
    //#define PERMUTE_STUFF
+
    /*#ifdef  PERMUTE_STUFF
 
    //---
@@ -874,7 +875,6 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    }
    }
    #endif   */
-
    //---
    //--- dump full milp
    //---
@@ -962,7 +962,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //---
    //--- set the thread limit, otherwise CPLEX will use all the resources
    //---
-   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, m_param.SubProbNumThreads);
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, m_param.NumThreadsIPSolver);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",

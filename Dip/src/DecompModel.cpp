@@ -556,7 +556,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- Provide a user option
    //---
 #if CPX_VERSION >=1200
-   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, param.SubProbNumThreads);
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, param.NumThreadsIPSolver);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
@@ -724,6 +724,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          throw UtilException("CPXgetmipobjval failure",
                              "solveOsiAsIp", "DecompAlgoModel");
    }
+
 #endif
    UTIL_DELARR(solution);
 }

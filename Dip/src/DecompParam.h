@@ -114,11 +114,12 @@ public:
    double SubProbTimeLimitExact;
    double SubProbTimeLimitInexact;
    // Notice:
-   // SubProbNumThreadsParallel:  thread number for parallelizing subproblems
-   // SubProbNumThreads :  thread number for solving each subproblem
-   //   
-   int    SubProbNumThreadsParallel;
-   int    SubProbNumThreads;
+   // NumConcurrentThreadsSubProb:  available thread number for parallelizing subproblems
+   // NumThreadsIPSolver:  thread number for solving each IP subproblem
+   //
+   int    NumConcurrentThreadsSubProb;
+   int    NumThreadsIPSolver; 
+
    int    SubProbNumSolLimit;
 
    //This option only works with Cpx:
@@ -360,8 +361,8 @@ public:
       PARAM_getSetting("SubProbGapLimitInexact", SubProbGapLimitInexact);
       PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
       PARAM_getSetting("SubProbTimeLimitInexact", SubProbTimeLimitInexact);
-      PARAM_getSetting("SubProbNumThreadsParallel",      SubProbNumThreadsParallel);
-      PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
+      PARAM_getSetting("NumConcurrentThreadsSubProb", NumConcurrentThreadsSubProb);
+      PARAM_getSetting("NumThreadsIPSolver", NumThreadsIPSolver);
       PARAM_getSetting("SubProbNumSolLimit",     SubProbNumSolLimit);
       PARAM_getSetting("SubProbSolverStartAlgo", SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
@@ -487,8 +488,9 @@ public:
                          SubProbTimeLimitExact);
       UtilPrintParameter(os, sec, "SubProbTimeLimitInexact",
                          SubProbTimeLimitInexact);
-      UtilPrintParameter(os, sec, "SubProbNumThreadsParallel",  SubProbNumThreadsParallel);
-      UtilPrintParameter(os, sec, "SubProbNumThreads",  SubProbNumThreads);
+      UtilPrintParameter(os, sec, "NumConcurrentThreadsSubProb",
+                         NumConcurrentThreadsSubProb);
+      UtilPrintParameter(os, sec, "NumThreadsIPSolver",  NumThreadsIPSolver);
       UtilPrintParameter(os, sec, "SubProbNumSolLimit", SubProbNumSolLimit);
       UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
                          SubProbSolverStartAlgo);
@@ -591,8 +593,8 @@ public:
       SubProbGapLimitInexact = 0.1;    //10.00% gap
       SubProbTimeLimitExact   = DecompBigNum;
       SubProbTimeLimitInexact = DecompBigNum;
-      SubProbNumThreadsParallel       = 4;
-      SubProbNumThreads               = 1;
+      NumConcurrentThreadsSubProb       = 4;
+      NumThreadsIPSolver             = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;

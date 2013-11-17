@@ -357,7 +357,6 @@ void DecompAuto(DecompApp milp,
                           "main", "main");
 
    //assert(doCut + doPriceCut == 1);
-
    //---
    //--- create the CPM algorithm object
    //---
@@ -567,14 +566,14 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    int nNodes;
    double objLB   = -DecompInf;
    double objUB   = DecompInf;
-   int logIpLevel = decompApp.m_param.LogLpLevel;
    double timeLimit = decompApp.m_param.LimitTime;
    UtilTimer timer;
    timer.start();
    DecompSolverResult* result = new DecompSolverResult();
 #ifdef __DECOMP_IP_CBC__
    CbcModel cbc(*m_problemSI);
-   cbc.setLogLevel(0);
+   int logIpLevel = decompApp.m_param.LogIpLevel;
+   cbc.setLogLevel(logIpLevel);
    cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
    cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
@@ -626,6 +625,10 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
    int       status = 0;
    masterSICpx->switchToMIP();//need?
+
+
+
+
    //---
    //--- set the time limit
    //---
@@ -634,7 +637,7 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    //--- set the thread limit, otherwise CPLEX will use all the resources
    //---
    status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS,
-                           decompApp.m_param.SubProbNumThreads);
+                           decompApp.m_param.NumThreadsIPSolver);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
