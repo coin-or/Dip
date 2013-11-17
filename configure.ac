@@ -72,7 +72,7 @@ AC_COIN_MAIN_PACKAGEDIR(Clp)
 AC_COIN_MAIN_PACKAGEDIR(Cgl)
 AC_COIN_MAIN_PACKAGEDIR(Cbc)
 AC_COIN_MAIN_PACKAGEDIR(Alps)
-AC_COIN_MAIN_PACKAGEDIR(Symphony)
+AC_COIN_MAIN_PACKAGEDIR(SYMPHONY)
 AC_COIN_MAIN_PACKAGEDIR(Dip)
 
 ##############################################################################
