@@ -89,7 +89,9 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(includecoindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libDecomp_la_LIBADD =
+am__DEPENDENCIES_1 =
+@DEPENDENCY_LINKING_TRUE@libDecomp_la_DEPENDENCIES =  \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1)
 am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	DecompAlgoPC.lo DecompAlgoRC.lo DecompAlgoCGL.lo DecompCut.lo \
 	DecompCutPool.lo DecompApp.lo DecompStats.lo DecompDebug.lo \
@@ -103,7 +105,6 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_dip_OBJECTS = DecompMain.$(OBJEXT)
 dip_OBJECTS = $(am_dip_OBJECTS)
-am__DEPENDENCIES_1 =
 @COIN_HAS_HMETIS_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -245,6 +246,8 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEPENDENCY_LINKING_FALSE = @DEPENDENCY_LINKING_FALSE@
+DEPENDENCY_LINKING_TRUE = @DEPENDENCY_LINKING_TRUE@
 DIPINCDIR = @DIPINCDIR@
 DIPLIB_CFLAGS = @DIPLIB_CFLAGS@
 DIPLIB_CFLAGS_INSTALLED = @DIPLIB_CFLAGS_INSTALLED@
@@ -420,6 +423,9 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	AlpsDecompTreeNode.cpp AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
 	UtilMacrosAlps.h
+
+# List all additionally required libraries
+@DEPENDENCY_LINKING_TRUE@libDecomp_la_LIBADD = $(DIPLIB_LIBS)
 
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
