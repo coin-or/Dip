@@ -18,7 +18,7 @@
 #define Decomp_h_
 
 
-//#define  DECOMP_MASTERONLY_DIRECT
+#define  DECOMP_MASTERONLY_DIRECT
 //===========================================================================//
 // Standard Headers                                                          //
 //===========================================================================//
@@ -227,6 +227,17 @@ const std::string DecompRowTypeStr[4] = {
    "DecompRow_Convex",
    "DecompRow_Cut"
 };
+
+//===========================================================================//
+//Corresponding to the class DecompVar
+enum DecompVarType {
+   // points generated from bounded subproblem
+   DecompVar_Point,
+   // rays generated from unbounded subproblem
+   DecompVar_Ray
+};
+
+
 
 //===========================================================================//
 enum DecompColType {

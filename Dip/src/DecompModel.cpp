@@ -625,36 +625,100 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    result->m_solStatus2 = 0;
    //printf("cplex status  = %d\n", result->m_solStatus);
    //printf("cplex status2 = %d\n", result->m_solStatus2);
-   const int statusSet1[3] = {CPXMIP_OPTIMAL,
-                              CPXMIP_OPTIMAL_TOL, //for stopping on gap
-                              CPXMIP_TIME_LIM_FEAS
-                             };
-   const int statusSet2[4] = {CPXMIP_OPTIMAL,
+   const int statusSet1[6] = {CPXMIP_OPTIMAL,
                               CPXMIP_OPTIMAL_TOL, //for stopping on gap
                               CPXMIP_TIME_LIM_FEAS,
-                              CPXMIP_INFEASIBLE
+                              CPX_STAT_OPTIMAL,
+                              CPX_STAT_UNBOUNDED,
+                              CPXMIP_UNBOUNDED
                              };
+   const int statusSet2[9] = {CPXMIP_OPTIMAL,
+                              CPXMIP_OPTIMAL_TOL, //for stopping on gap
+                              CPXMIP_TIME_LIM_FEAS,
+                              CPXMIP_INFEASIBLE,
+                              CPXMIP_INForUNBD,
+                              CPX_STAT_UNBOUNDED,
+                              CPX_STAT_INForUNBD,
+                              CPX_STAT_OPTIMAL,
+                              CPXMIP_UNBOUNDED//newly added status
+                             };
+   // Update result object
+   result->m_nSolutions = 0;
+   result->m_isUnbounded = false;
+   result->m_isOptimal   = false;
+   result->m_isCutoff    = false;
 
-   if (!UtilIsInSet(result->m_solStatus, statusSet2, 4)) {
-      cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
-      throw UtilException("CPX solver status",
-                          "solveOsiAsIp", "DecompAlgoModel");
+   if (result->m_solStatus == CPXMIP_INForUNBD ||
+         result->m_solStatus == CPX_STAT_UNBOUNDED ||
+         result->m_solStatus == CPXMIP_UNBOUNDED ||
+         result->m_solStatus == CPX_STAT_INForUNBD ) {
+      std::cout << "There might be extreme rays in the subproblems "
+                << std::endl;
+      /*
+      std::cout << "The solution statu is "
+      << result->m_solStatus << std::endl;
+      */
+      // turn off the presolve and solve the relaxtion of the subproblem
+      // at the root
+      status = CPXsetintparam(cpxEnv, CPX_PARAM_PREIND, CPX_OFF);
+
+      if (status) {
+         throw UtilException("XPXsetintparam failure",
+                             "solveOsiAsIp", "DecompAlgoModel");
+      }
+
+      osiCpx->initialSolve();
+      result->m_solStatus = CPXgetstat(cpxEnv, cpxLp);
+
+      if (result->m_solStatus == CPXMIP_UNBOUNDED ||
+            result->m_solStatus == CPX_STAT_UNBOUNDED) {
+         /*
+         	std::cout << "The status of the problem is "
+                    << result->m_solStatus
+                    << std::endl;
+         	*/
+         status = CPXgetray (cpxEnv, cpxLp, solution);
+      }
+
+      osiCpx->switchToMIP();
+
+      if (status) {
+         throw UtilException("CPXgetray failure",
+                             "solveOsiAsIp", "DecompAlgoModel");
+      }
+
+      vector<double> solVec(solution, solution + numCols);
+      //      std::cout << "The ray of the solution is " << std::endl;
+      /*
+      for (int i = 0 ; i < numCols ; i ++) {
+         std::cout << solution[i] << std::endl;
+      }
+      */
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+   } else {
+      if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
+         cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
+         throw UtilException("CPX solver status",
+                             "solveOsiAsIp", "DecompAlgoModel");
+      }
    }
 
    //---
    //--- In root the subproblem should not be infeasible
    //---   unless due to cutoff. But, after branching it
    //---   can be infeasible.
-   //---
+   //--- The problem infeasibility can be detected if any
+   //--- subproblem at the rootnode is infeasible
    if (!doCutoff && isRoot) {
-      if (!UtilIsInSet(result->m_solStatus, statusSet1, 3)) {
+      if (!UtilIsInSet(result->m_solStatus, statusSet1, 6)) {
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
                              "solveOsiAsIp", "DecompAlgoModel");
       }
    } else {
-      if (!UtilIsInSet(result->m_solStatus, statusSet2, 4)) {
+      if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
@@ -665,11 +729,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    //--- update results object
    //---
-   result->m_nSolutions = 0;
-   result->m_isOptimal  = false;
-   result->m_isCutoff   = false;
 
-   if (UtilIsInSet(result->m_solStatus, statusSet1, 3)) {
+   if (UtilIsInSet(result->m_solStatus, statusSet1, 4)) {
       int    i;
       int    nSols = CPXgetsolnpoolnumsolns(cpxEnv, cpxLp);
       double objVal;
@@ -702,9 +763,15 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    }
 
    //printf("solStatus = %d\n", result->m_solStatus);
+
    if (result->m_solStatus == CPXMIP_OPTIMAL ||
          result->m_solStatus == CPXMIP_OPTIMAL_TOL) {
       result->m_isOptimal  = true;
+   } else if (result->m_solStatus == CPXMIP_UNBOUNDED ||
+              result->m_solStatus == CPX_STAT_UNBOUNDED) {
+      //      std::cout << "We are generating extreme rays " << std::endl;
+      result->m_isUnbounded = true;
+      result->m_isOptimal = false;
    } else {
       if (result->m_solStatus == CPXMIP_INFEASIBLE) {
          result->m_nSolutions = 0;
@@ -717,23 +784,23 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;
       }
-   }
 
-   //---
-   //--- get copy of solution
-   //---
-   status = CPXgetbestobjval(cpxEnv, cpxLp, &result->m_objLB);
-
-   if (status)
-      throw UtilException("CPXgetbestobjval failure",
-                          "solveOsiAsIp", "DecompAlgoModel");
-
-   if (result->m_nSolutions >= 1) {
-      status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
+      //---
+      //--- get copy of solution
+      //---
+      status = CPXgetbestobjval(cpxEnv, cpxLp, &result->m_objLB);
 
       if (status)
-         throw UtilException("CPXgetmipobjval failure",
+         throw UtilException("CPXgetbestobjval failure",
                              "solveOsiAsIp", "DecompAlgoModel");
+
+      if (result->m_nSolutions >= 1 && !result->m_isUnbounded) {
+         status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
+
+         if (status)
+            throw UtilException("CPXgetmipobjval failure",
+                                "solveOsiAsIp", "DecompAlgoModel");
+      }
    }
 
 #endif

@@ -980,8 +980,20 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
       //---
       //--- give the column a name
       //---
-      string colName = "lam(c_" + UtilIntToStr(m_colIndexUnique)
-                       + ",b_" + UtilIntToStr(blockIndex) + ")";
+      string colName;
+
+      if ((*li)->getVarType() == DecompVar_Point) {
+         //         std::cout << "The generated variable type is "
+         //           << DecompVar_Point << std::endl;
+         colName = "lam(c_" + UtilIntToStr(m_colIndexUnique)
+                   + ",b_" + UtilIntToStr(blockIndex) + ")";
+      } else if ((*li)->getVarType() == DecompVar_Ray) {
+         //         std::cout << "The generated variable type is "
+         //           << DecompVar_Ray << std::endl;
+         colName = "theta(c_" + UtilIntToStr(m_colIndexUnique)
+                   + ",b_" + UtilIntToStr(blockIndex) + ")";
+      }
+
       colNames.push_back(colName);
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
                  (*li)->print(m_osLog, m_app);
@@ -1000,6 +1012,11 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
       assert(blockIndex >= 0);
       assert(blockIndex < m_numConvexCon);
       denseCol[nRowsCore + blockIndex] = 1.0;
+
+      if ((*li)->getVarType() == DecompVar_Ray) {
+         denseCol[nRowsCore + blockIndex] = 0.0;
+      }
+
       //---
       //--- create a sparse column from the dense column
       //---
@@ -2727,6 +2744,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //for interior, if infeasible, the status is not
       //  getting picked up properly by OSI
       status = STAT_INFEASIBLE;
+      std::cout << "the problem is infeasible" << std::endl;
       //---
       //--- it is possible that presolver determined infeasibility
       //--- but, we will need a dual ray, so we should resolve with
@@ -2962,11 +2980,12 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          //---
          //TODO: safe to assume 0th is the best
          const double* solution = result->getSolution(0);
+         const DecompVarType varType = result->m_isUnbounded ? DecompVar_Ray : DecompVar_Point;
 
          if (m_numConvexCon == 1) {
             DecompVar* directVar = new DecompVar(nCoreCols,
                                                  solution,
-                                                 0.0, result->m_objUB);
+                                                 0.0, result->m_objUB, varType);
             initVars.push_back(directVar);
          } else {
             map<int, DecompAlgoModel>::iterator mid;
@@ -2991,7 +3010,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                }
 
                DecompVar* directVar
-               = new DecompVar(ind, els, 0.0, origCost);
+               = new DecompVar(ind, els, 0.0, origCost, varType);
                directVar->setBlockId(blockId);
                initVars.push_back(directVar);
             }
@@ -3467,12 +3486,15 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
             nextPhase = PHASE_PRICE1;
             goto PHASE_UPDATE_FINISH;
          } else {
+            std::cout << "varsThis CAll is " << varsThisCall << std::endl;
+            std::cout << "priceCallsTotal " << priceCallsTotal << std::endl;
             UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                      (*m_osLog)
                      << "Node " << getNodeIndex()
                      << " is Infeasible." << endl;);
             m_stopCriteria = DecompStopInfeasible;
             nextPhase      = PHASE_DONE;
+            std::cout << "STATUS is INFEASIBLE" << std::endl;
             nextStatus     = STAT_INFEASIBLE;
             goto PHASE_UPDATE_FINISH;
          }
@@ -4712,7 +4734,13 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          //redCostX is a dense  vector in x-space (the cost in subproblem)
          b       = (*it)->getBlockId();
          redCost = (*it)->m_s.dotProduct(redCostX);//??
-         alpha   = u[nBaseCoreRows + b];
+
+         if ( (*it)->getVarType() == DecompVar_Point) {
+            alpha   = u[nBaseCoreRows + b];
+         } else if ((*it)->getVarType() == DecompVar_Ray) {
+            alpha = 0;
+         }
+
          assert(m_masterRowType[nBaseCoreRows + b] == DecompRow_Convex);
          assert(isMasterColStructural((*it)->getColMasterIndex()));
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
@@ -4889,7 +4917,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       m_rrIterSinceAll = 0;
    }
 
-   vector<double>       mostNegRCvec(m_numConvexCon, DecompInf);
+   //   vector<double>       mostNegRCvec(m_numConvexCon, DecompInf);
+   vector<double>       mostNegRCvec(m_numConvexCon, 0);
    DecompSolverResult   solveResult;
    OsiSolverInterface* subprobSI   = NULL;
 
@@ -5008,7 +5037,13 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                   it != arg[t].vars->end(); it++) {
                varRedCost = (*it)->getReducedCost();
                whichBlock = (*it)->getBlockId();
-               alpha      = u[nBaseCoreRows + whichBlock];
+
+               if ((*it)->getVarType() == DecompVar_Point) {
+                  alpha = u[nBaseCoreRows + whichBlock];
+               } else if ( (*it)->getVarType() == DecompVar_Ray) {
+                  alpha = 0;
+               }
+
                UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
                           (*m_osLog)
                           << "alpha[block=" << whichBlock << "]:" << alpha
@@ -5761,6 +5796,11 @@ void DecompAlgo::addVarsToPool(DecompVarList& newVars)
          }
 
          denseCol[convexity_index + (*li)->getBlockId()] = 1.0;
+
+         if ((*li)->getVarType() == DecompVar_Ray) {
+            denseCol[convexity_index + (*li)->getBlockId()] = 0.0;
+         }
+
          //---
          //--- creat a sparse column from the dense column
          //---
@@ -6366,7 +6406,7 @@ bool DecompAlgo::isIPFeasible(const double* x,
                       "isIPFeasible()", m_param.LogDebugLevel, 2);
    DecompConstraintSet*    modelCore   = m_modelCore.getModel();
    const int               nInts       = modelCore->getNumInts();
-   const int*              integerVars = modelCore->getIntegerVars();
+   const int*              integerVars = (nInt > 0) ? modelCore->getIntegerVars() : NULL;
    const double            intTol10    = 10 * intTol;
    const  vector<string>& colNames    = modelCore->getColNames();
    bool                    hasColNames = false;
@@ -6632,7 +6672,11 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 
       for (it = vars.begin(); it != vars.end(); it++) {
          if ((*it)->getBlockId() == whichBlock) {
-            (*it)->setReducedCost((*it)->getReducedCost() - alpha);
+            if ((*it)->getVarType() == DecompVar_Point) {
+               (*it)->setReducedCost((*it)->getReducedCost() - alpha);
+            } else if ( (*it)->getVarType() == DecompVar_Ray) {
+               (*it)->setReducedCost( (*it)->getReducedCost());
+            }
          }
       }
 
@@ -6763,7 +6807,11 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
             int    i, c;
             double varRedCost  = 0.0; //stupid - == obj ??
             double varOrigCost = 0.0;
+            // defaut assume it is bounded and generating extreme points
+            DecompVarType varType = !solveResult->m_isUnbounded ?
+                                    DecompVar_Point : DecompVar_Ray;
 
+            //	    std::cout << "The variable Type is " << varType << std::endl;
             if (model->isSparse()) {
                //TODO: this can just be a vector? ever need arb access?
                map<int, int>::const_iterator mcit;
@@ -6808,13 +6856,16 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                }
             }
 
-            varRedCost -= alpha;//RC = c-uA''s - alpha
+            if (varType == DecompVar_Point ) {
+               varRedCost -= alpha;//RC = c-uA''s - alpha
+            }
+
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
                        (*m_osLog) << "alpha      = " << alpha << "\n";
                        (*m_osLog) << "varRedCost = " << varRedCost << "\n";
                        (*m_osLog) << "varOrigCost = " << varOrigCost << "\n";
                       );
-            DecompVar* var = new DecompVar(ind, els, varRedCost, varOrigCost);
+            DecompVar* var = new DecompVar(ind, els, varRedCost, varOrigCost, varType);
             var->setBlockId(whichBlock);
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
                        var->print(););
