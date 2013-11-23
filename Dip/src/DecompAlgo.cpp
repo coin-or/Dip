@@ -6406,7 +6406,7 @@ bool DecompAlgo::isIPFeasible(const double* x,
                       "isIPFeasible()", m_param.LogDebugLevel, 2);
    DecompConstraintSet*    modelCore   = m_modelCore.getModel();
    const int               nInts       = modelCore->getNumInts();
-   const int*              integerVars = (nInt > 0) ? modelCore->getIntegerVars() : NULL;
+   const int*              integerVars = (nInts > 0) ? modelCore->getIntegerVars() : NULL;
    const double            intTol10    = 10 * intTol;
    const  vector<string>& colNames    = modelCore->getColNames();
    bool                    hasColNames = false;
