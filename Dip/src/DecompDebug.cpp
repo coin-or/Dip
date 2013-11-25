@@ -102,10 +102,11 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet* model,
    //--- M * x = ax
    //---
    M->times(x, ax);
-
    //---
    //--- check row bounds
    //---
+   //--- Need to deal with masterOnly variable
+
    for (i = 0; i < nRows; i++) {
       actViol = std::max<double>(rowLB[i] - ax[i], ax[i] - rowUB[i]);
       //printf("ax=%12.10f, actViol=%12.10f\n", ax[i], actViol);

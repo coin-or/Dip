@@ -155,6 +155,8 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
    //---         we can actually get away with just checking the
    //---         original base rows
    //---
+   //--- TODO: masterOnly variable
+   
    for (r = 0; r < model->getNumRows(); r++) {
       if (isSparse) {
          if (isXSparse) {
@@ -220,7 +222,7 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
          }
       }
    }
-
+   
 FUNC_EXIT:
    UTIL_DEBUG(logLevel, 4,
               cout << "isPointFeasible = " << isFeas << endl;

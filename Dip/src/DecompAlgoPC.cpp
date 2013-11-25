@@ -980,7 +980,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //THINK: if CPXMIP_INForUNBD, change to CPXMIP_INFEASIBLE,
    // I don't think there is anyway the price+branch heur could
    // be unbounded. But, what if the original full problem is unbounded?
-   if (result.m_solStatus == CPXMIP_INForUNBD) {
+   if (result.m_solStatus == CPXMIP_INForUNBD ) {
       result.m_solStatus = CPXMIP_INFEASIBLE;
    }
 
