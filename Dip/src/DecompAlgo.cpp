@@ -1174,7 +1174,6 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
    const double*          colLBCore    = modelCore->getColLB();
    const double*          colUBCore    = modelCore->getColUB();
    const vector<string>& colNamesCore = modelCore->getColNames();
-   const double*          origObj      = getOrigObjective();
    //---
    //--- add the submatrix for core rows cross master-only columns
    //---     to the master formulation (this will be a col-ordered matrix)
@@ -1217,7 +1216,7 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
    int j, k;
    int nMasterCols = masterM->getNumCols();
 
-   for (i = 0; i < nMOVars; i++) {
+   for (int i = 0; i < nMOVars; i++) {
       k           = nMasterCols + i - nMOVars ;
       j           = m_masterOnlyCols[i];
       colLB[k]    = colLBCore[j];
@@ -1229,7 +1228,7 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
    }
 
    //free local memory
-   for (i = 0; i < nMOVars; i++) {
+   for (int i = 0; i < nMOVars; i++) {
       UTIL_DELPTR(colBlock[i]);
    }
 
