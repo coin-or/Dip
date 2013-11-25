@@ -31,8 +31,6 @@
 //  DecompNull : public DecompInterface -->
 //     wrapper for all OSI methods in RC (no OSI)
 
-//#define DECOMP_MASTERONLY_DIRECT
-
 //===========================================================================//
 #ifndef DecompAlgo_h_
 #define DecompAlgo_h_
@@ -125,8 +123,6 @@ protected:
    /**
     * Pointer (and label) to current active model core/relax.
     */
-
-
 
 
    std::vector<double>        m_origColLB;
@@ -248,17 +244,11 @@ protected:
 
    const AlpsDecompTreeNode* m_curNode;
 
-#ifdef DECOMP_MASTERONLY_DIRECT
-   //NOTE:
-   // this should be found by framework
-   //   for first pass, have it set by user (MILPBlock)
    std:: vector<int>  m_masterOnlyCols;
-   //vector<bool> m_isColMasterOnly;
    /**
     *  Map from original index to master index for master-only vars.
     */
    std::map<int, int> m_masterOnlyColsMap;
-#endif
 
 public:
    /**
@@ -578,13 +568,12 @@ public:
       return NULL;
    }
 
-#ifdef DECOMP_MASTERONLY_DIRECT
+
    void masterMatrixAddMOCols(CoinPackedMatrix* masterM,
                               double*            colLB,
                               double*            colUB,
                               double*            objCoeff,
                               std::vector<std::string>&    colNames);
-#endif
 
    void masterMatrixAddArtCol(std::vector<CoinBigIndex>& colBeg,
                               std::vector<int         >& colInd,
@@ -1008,11 +997,8 @@ public:
       m_stopCriteria(DecompStopNo),
       m_masterObjLast(DecompInf),
       m_firstPhase2Call(false),
-      m_isStrongBranch(false)
-#ifdef DECOMP_MASTERONLY_DIRECT
-      ,
+      m_isStrongBranch(false),
       m_masterOnlyCols()
-#endif
    {
       m_app->m_decompAlgo = this;
    }

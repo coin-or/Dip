@@ -806,87 +806,6 @@ void DecompApp::findActiveColumns(const vector<int>& rowsPart,
    }
 }
 
-void DecompApp::createModelMasterOnlys(vector<int>& masterOnlyCols)
-{
-   int            nBlocks     = static_cast<int>(m_blocks.size());
-   int      nCols       = 0;
-   double* colLB       = NULL;
-   double* colUB       = NULL;
-   char*    integerVars = NULL;
-
-   if (m_param.InstanceFormat == "MPS") {
-      nCols       = m_mpsIO.getNumCols();
-      colLB       = const_cast <double*>(m_mpsIO.getColLower());
-      colUB       = const_cast <double*>(m_mpsIO.getColUpper());
-      integerVars = const_cast <char*>  (m_mpsIO.integerColumns());
-   } else if (m_param.InstanceFormat == "LP") {
-      nCols       = m_lpIO.getNumCols();
-      colLB       = const_cast <double*>(m_lpIO.getColLower());
-      colUB       = const_cast <double*>(m_lpIO.getColUpper());
-      integerVars = const_cast <char*>  (m_lpIO.integerColumns());
-   }
-
-   int            nMasterOnlyCols =
-      static_cast<int>(masterOnlyCols.size());
-
-   if (m_param.LogLevel >= 1) {
-      (*m_osLog) << "nCols           = " << nCols << endl;
-      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
-   }
-
-   if (nMasterOnlyCols == 0) {
-      return;
-   }
-
-   int i;
-   vector<int>::iterator vit;
-
-   for (vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++) {
-      i = *vit;
-      //THINK:
-      //  what-if master-only var is integer and bound is not at integer
-      DecompConstraintSet* model = new DecompConstraintSet();
-      model->m_masterOnly      = true;
-      model->m_masterOnlyIndex = i;
-      model->m_masterOnlyLB    = colLB[i];
-      model->m_masterOnlyUB    = colUB[i];
-      //0=cont, 1=integer
-      model->m_masterOnlyIsInt =
-         (integerVars && integerVars[i]) ? true : false;
-
-      if (colUB[i]            >  1.0e15 &&
-            m_param.ColumnUB >= 1.0e15)
-         (*m_osLog) << "WARNING: Master-only column " << i
-                    << " has unbounded upper bound. DIP does not"
-                    << " yet support extreme rays. Please bound all"
-                    << " variables or use the ColumnUB parameter." << endl;
-
-      if (colLB[i]            <  -1.0e15 &&
-            m_param.ColumnLB <= -1.0e15)
-         (*m_osLog) << "WARNING: Master-only column " << i
-                    << " has unbounded lower bound. DIP does not"
-                    << " yet support extreme rays. Please bound all"
-                    << " variables or use the ColumnLB parameter." << endl;
-
-      if (m_param.ColumnUB <  1.0e15)
-         if (colUB[i] >  1.0e15) {
-            model->m_masterOnlyUB = m_param.ColumnUB;
-         }
-
-      if (m_param.ColumnLB > -1.0e15)
-         if (colLB[i] < -1.0e15) {
-            model->m_masterOnlyLB = m_param.ColumnLB;
-         }
-
-      m_modelR.insert(make_pair(nBlocks, model));
-      setModelRelax(model,
-                    "master_only" + UtilIntToStr(i), nBlocks);
-      nBlocks++;
-   }
-
-   return;
-}
-
 void DecompApp::createModelPart(DecompConstraintSet* model,
                                 const int             nRowsPart,
                                 const int*            rowsPart)
@@ -1409,32 +1328,6 @@ void DecompApp::createModels()
       }
    }
 
-   //---
-   //--- create an extra "empty" block for the master-only vars
-   //---   since I don't know what OSI will do with empty problem
-   //---   we will make column bounds explicity rows
-   //---
-   ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
-#ifndef DECOMP_MASTERONLY_DIRECT
-   int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
-
-   if (nMasterOnlyCols) {
-      if (m_param.LogLevel >= 1) {
-         (*m_osLog) << "Create model part Master-Only." << endl;
-      }
-
-      if (m_param.LogLevel >= 2) {
-         (*m_osLog) << "The number of master Only Cols is: "
-                    << nMasterOnlyCols << std::endl;
-         (*m_osLog) <<
-                    "(kappa) The percentage of Master Only Cols over total columns is "
-                    << double(nMasterOnlyCols) / nCols << std::endl;
-      }
-
-      createModelMasterOnlys(modelCore->masterOnlyCols);
-   }
-
-#endif
    //---
    //--- free up local memory
    //---

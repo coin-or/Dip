@@ -598,7 +598,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    int  nMasterCols = m_masterSI->getNumCols();//lambda
    int  logIpLevel  = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
-#ifdef DECOMP_MASTERONLY_DIRECT
+
    //---
    //--- set the master (generated) columns (lambda) to integer
    //--- set the master-onlys (that are integral) to integer
@@ -623,47 +623,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
    }
 
-#else
-
-   //---
-   //--- set master columns (lambda) to integer
-   //---  for those columns which blocks that have
-   //---  only continuous variables, do NOT set to
-   //---  integer (this will happen often with master-only
-   //---  variables)
-   //---
-   for (i = 0; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
-         m_masterSI->setInteger(i);
-      }
-   }
-
-   //TODO: is this expensive? if so,
-   //  better to use column type info
-   //  like above
-   DecompVarList            ::iterator li;
-   map<int, DecompAlgoModel>::iterator mit;
-
-   for (li = m_vars.begin(); li != m_vars.end(); li++) {
-      b   = (*li)->getBlockId();
-      mit = m_modelRelax.find(b);
-      assert(mit != m_modelRelax.end());
-      DecompAlgoModel&      algoModel = (*mit).second;
-      DecompConstraintSet* model     = algoModel.getModel();
-
-      if (!model) {
-         continue;
-      }
-
-      if (( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
-            (!model->m_masterOnly && model->getNumInts() == 0)) {
-         m_masterSI->setContinuous((*li)->getColMasterIndex());
-         //printf("set back to continuous index=%d block=%d\n",
-         //       b, (*li)->getColMasterIndex());
-      }
-   }
-
-#endif
 
    if (m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
@@ -1141,7 +1100,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
       UTIL_DELARR(rsolution);
    }
 
-#ifdef DECOMP_MASTERONLY_DIRECT
 
    //---
    //--- set the master columns back to continuous
@@ -1153,18 +1111,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
    }
 
-#else
 
-   //---
-   //--- set master columns (lambda) to continuous
-   //---
-   for (i = 0; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
-         m_masterSI->setContinuous(i);
-      }
-   }
-
-#endif
 #ifdef __DECOMP_IP_CPX__
    //---
    //--- set time back

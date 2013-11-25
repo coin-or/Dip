@@ -158,11 +158,19 @@ void DecompAlgo::checkBlocksColumns()
                 inserter(activeColsUnion, activeColsUnion.begin()));
    }
 
-   int                     i;
-   const DecompAlgoModel& modelCore      = getModelCore();
-   bool                    allColsCovered = true;
 
-   for (i = 0; i < modelCore.getModel()->getNumCols(); i++) {
+   const DecompAlgoModel& modelCore      = getModelCore();
+
+   // add the master-only variables ot the set union 
+   const vector<int>& masterOnlyCols = modelCore.getModel()->getMasterOnlyCols();
+   set<int> masterOnlyColsSet(masterOnlyCols.begin(),masterOnlyCols.end()); 
+   
+   set_union(masterOnlyColsSet.begin(), masterOnlyColsSet.end(),
+	     activeColsUnion.begin(), activeColsUnion.end(),
+	     inserter(activeColsUnion, activeColsUnion.begin()));	   
+
+   bool                    allColsCovered = true;
+   for (int i = 0; i < modelCore.getModel()->getNumCols(); i++) {
       sit = activeColsUnion.find(i);
 
       if (sit == activeColsUnion.end()) {
@@ -173,13 +181,10 @@ void DecompAlgo::checkBlocksColumns()
       }
    }
 
-#ifndef DECOMP_MASTERONLY_DIRECT
-
    if (!allColsCovered)
       throw UtilException("Some columns not covered in blocks",
                           "checkBlocksColumns", "DecompAlgo");
 
-#endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "checkBlocksColumns()", m_param.LogDebugLevel, 2);
 }
@@ -226,13 +231,12 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //---
    //--- copy master-only columns from modelCore
    //---
-#ifdef DECOMP_MASTERONLY_DIRECT
-   int i;
+
    const vector<int>& masterOnlyCols = modelCore->getMasterOnlyCols();
    m_masterOnlyCols.clear();
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
    std::copy(masterOnlyCols.begin(), masterOnlyCols.end(), m_masterOnlyCols.begin());
-#endif
+
 
    //---
    //--- sanity checks on user input
@@ -829,14 +833,15 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    assert(initVars.size() > 0);//TODO: this should be OK
    double* dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
-#ifdef DECOMP_MASTERONLY_DIRECT
+
+
    //---
    //--- TODO:
    //--- MO vars do not need an explicit row in master even if
    //---   BranchEnforceInMaster (these are enforced directly by
    //---   MO column bounds)
    //---
-#endif
+
    //---
    //--- set the row counts
    //---
@@ -885,16 +890,11 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
       nRows += m_nRowsBranch;
    }
 
-#ifdef DECOMP_MASTERONLY_DIRECT
    int nMOVars   = static_cast<int>(m_masterOnlyCols.size());
    int                nColsMax = nInitVars
                                  + 2 * (m_nRowsOrig + m_nRowsBranch + m_nRowsConvex)
                                  + nMOVars;
-#endif
-#ifndef DECOMP_MASTERONLY_DIRECT
-   int                nColsMax = nInitVars
-                                 + 2 * (m_nRowsOrig + m_nRowsBranch + m_nRowsConvex);
-#endif
+
    double*            colLB    = new double[nColsMax];
    double*            colUB    = new double[nColsMax];
    double*            objCoeff = new double[nColsMax];
@@ -920,13 +920,14 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
                           objCoeff,
                           colNames,
                           startRow, endRow, DecompRow_Original);
-#ifdef DECOMP_MASTERONLY_DIRECT
+   
+   // create columns for master only variables
    masterMatrixAddMOCols(masterM,
                          colLB,
                          colUB,
                          objCoeff,
                          colNames);
-#endif
+   
 
    if (m_nRowsBranch > 0) {
       startRow = m_nRowsOrig;
@@ -1166,7 +1167,7 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
 }
 
 //===========================================================================//
-#ifdef DECOMP_MASTERONLY_DIRECT
+
 void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
                                        double*            colLB,
                                        double*            colUB,
@@ -1247,7 +1248,6 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
 
    UTIL_DELARR(colBlock);
 }
-#endif
 
 //===========================================================================//
 void DecompAlgo::masterMatrixAddArtCol(vector<CoinBigIndex>& colBeg,
@@ -3284,7 +3284,7 @@ void DecompAlgo::masterPhaseItoII()
                               (*li)->getOriginalCost());
    }
 
-#if defined  DECOMP_MASTERONLY_DIRECT
+
    // restore the objective value of the masterOnly variables
    int nMOVars = static_cast<int>(m_masterOnlyCols.size());
    map<int, int >:: iterator mit;
@@ -3300,8 +3300,6 @@ void DecompAlgo::masterPhaseItoII()
       assert(isMasterColMasterOnly(colIndex));
       m_masterSI->setObjCoeff(colIndex, objCoeff[j]);
    }
-
-#endif
 
    if (m_param.LogDumpModel > 1) {
       string baseName = "masterProb_switchItoII";
@@ -6566,55 +6564,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       m_stats.timerOther1.reset();
    }
 
-#ifndef DECOMP_MASTERONLY_DIRECT
-
-   //---
-   //--- deal with the special case of master-only variables
-   //---
-   if (model && model->isMasterOnly()) {
-      //---
-      //--- In this case, we simply have a one-variable problem with
-      //---  uppper and lower column bounds. Just check to see if the
-      //---  cost is positive (choose lower bound) or negative (choose upper
-      //---  bound).
-      //---
-      m_isColGenExact          = true;
-      solveResult->m_isOptimal = true;
-      solveResult->m_isCutoff  = false;
-      vector<int>    ind;
-      vector<double> els;
-      double varRedCost      = 0.0;
-      double varOrigCost     = 0.0;
-      int    masterOnlyIndex = model->m_masterOnlyIndex;
-      ind.push_back(masterOnlyIndex);
-
-      if (redCostX[masterOnlyIndex] >= 0) {
-         els.push_back(model->m_masterOnlyLB);
-         varRedCost  = redCostX[masterOnlyIndex] * model->m_masterOnlyLB;
-         varOrigCost = origCost[masterOnlyIndex] * model->m_masterOnlyLB;
-      } else {
-         els.push_back(model->m_masterOnlyUB);
-         varRedCost  = redCostX[masterOnlyIndex] * model->m_masterOnlyUB;
-         varOrigCost = origCost[masterOnlyIndex] * model->m_masterOnlyUB;
-      }
-
-      varRedCost -= alpha;
-      DecompVar* var = new DecompVar(ind, els, varRedCost, varOrigCost);
-      var->setBlockId(whichBlock);
-      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                 var->print(););
-      vars.push_back(var);
-
-      if (m_param.SubProbParallel) {
-         m_stats.thisSolveRelax.push_back(m_stats.timerOther1.getRealTime());
-      }
-
-      UtilPrintFuncEnd(m_osLog, m_classTag,
-                       "solveRelaxed()", m_param.LogDebugLevel, 2);
-      return STAT_UNKNOWN;
-   }
-
-#endif
 
    if (!m_param.SubProbParallel) {
       m_stats.timerOther2.reset();
@@ -7027,7 +6976,6 @@ void DecompAlgo::recomposeSolution(const double* solution,
       }
    }
 
-#ifdef DECOMP_MASTERONLY_DIRECT
    //---
    //--- now set the master-only variable assignments
    //---
@@ -7039,17 +6987,10 @@ void DecompAlgo::recomposeSolution(const double* solution,
       mit      = m_masterOnlyColsMap.find(j);
       assert(mit != m_masterOnlyColsMap.end());
       colIndex = mit->second;
-      /*
-        std::cout << "the col index of masterOnly  is "
-                << colIndex << std::endl;
-      */
-      //        std::cout << "the j index of masterOnly  is "
-      //          << j << std::endl;
       assert(isMasterColMasterOnly(colIndex));
       rsolution[j] = solution[colIndex];
    }
 
-#endif
    UTIL_MSG(m_param.LogDebugLevel, 4,
             const double* cLB = modelCore->getColLB();
             const double* cUB = modelCore->getColUB();

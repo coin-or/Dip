@@ -418,7 +418,6 @@ public:
                               const int             nRowsPart,
                               const int*            rowsPart);
 
-   void createModelMasterOnlys(std::vector<int>& masterOnlyCols);
 
    void readInitSolutionFile(DecompVarList& initVars);
 
