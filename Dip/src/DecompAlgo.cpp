@@ -1187,11 +1187,11 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
    }
 
    //////STOP
-   int i;
+
    const CoinPackedVectorBase** colBlock =
       new const CoinPackedVectorBase*[nMOVars];
 
-   for (i = 0; i < nMOVars; i++) {
+   for (int i = 0; i < nMOVars; i++) {
       CoinShallowPackedVector colS = matrixCoreTmp.getVector(i);
       CoinPackedVector*         col = new CoinPackedVector(colS.getNumElements(),
             colS.getIndices(),
@@ -1222,7 +1222,6 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
       j           = m_masterOnlyCols[i];
       colLB[k]    = colLBCore[j];
       colUB[k]    = colUBCore[j];
-      //      objCoeff[k] = origObj[j];
       objCoeff[k] = 0;
       colNames.push_back(colNamesCore[j]);
       m_masterColType.push_back(DecompCol_MasterOnly);
