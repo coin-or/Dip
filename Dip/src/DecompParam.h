@@ -581,7 +581,7 @@ public:
       CompressColumnsSizeMultLimit  = 1.20;
       CompressColumnsMasterGapStart = 0.20;
       CutDC                = 0;
-      CutCGL               = 1;
+      CutCGL               = 0;
       CutCglKnapC          = 1;
       CutCglFlowC          = 1;
       CutCglMir            = 1;
