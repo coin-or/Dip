@@ -998,8 +998,7 @@ public:
       m_masterObjLast(DecompInf),
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
-      m_masterOnlyCols()
-   {
+      m_masterOnlyCols() {
       m_app->m_decompAlgo = this;
    }
 

@@ -598,7 +598,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
    int  nMasterCols = m_masterSI->getNumCols();//lambda
    int  logIpLevel  = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
-
    //---
    //--- set the master (generated) columns (lambda) to integer
    //--- set the master-onlys (that are integral) to integer
@@ -622,7 +621,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
          m_masterSI->setInteger(colIndex);
       }
    }
-
 
    if (m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
@@ -1100,7 +1098,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
       UTIL_DELARR(rsolution);
    }
 
-
    //---
    //--- set the master columns back to continuous
    //---
@@ -1110,7 +1107,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
          m_masterSI->setContinuous(colIndex);
       }
    }
-
 
 #ifdef __DECOMP_IP_CPX__
    //---

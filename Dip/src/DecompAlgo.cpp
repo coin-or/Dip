@@ -84,7 +84,7 @@ void DecompAlgo::checkBlocksColumns()
       DecompAlgoModel&      modelRelax1 = (*mid1).second;
       DecompConstraintSet* model       = modelRelax1.getModel();
 
-      if (!model || model->m_masterOnly || !model->getMatrix()) {
+      if (!model || !model->getMatrix()) {
          UtilPrintFuncEnd(m_osLog, m_classTag,
                           "checkBlocksColumns()", m_param.LogDebugLevel, 2);
          return;
@@ -99,11 +99,6 @@ void DecompAlgo::checkBlocksColumns()
          }
 
          DecompAlgoModel& modelRelax2 = (*mid2).second;
-
-         if (modelRelax2.getModel()->m_masterOnly) {
-            continue;
-         }
-
          set<int>&         activeCols2
          = modelRelax2.getModel()->activeColumnsS;
          set<int>          activeCols1inter2;
@@ -158,18 +153,19 @@ void DecompAlgo::checkBlocksColumns()
                 inserter(activeColsUnion, activeColsUnion.begin()));
    }
 
-
    const DecompAlgoModel& modelCore      = getModelCore();
 
-   // add the master-only variables ot the set union 
+   // add the master-only variables ot the set union
    const vector<int>& masterOnlyCols = modelCore.getModel()->getMasterOnlyCols();
-   set<int> masterOnlyColsSet(masterOnlyCols.begin(),masterOnlyCols.end()); 
-   
+
+   set<int> masterOnlyColsSet(masterOnlyCols.begin(), masterOnlyCols.end());
+
    set_union(masterOnlyColsSet.begin(), masterOnlyColsSet.end(),
-	     activeColsUnion.begin(), activeColsUnion.end(),
-	     inserter(activeColsUnion, activeColsUnion.begin()));	   
+             activeColsUnion.begin(), activeColsUnion.end(),
+             inserter(activeColsUnion, activeColsUnion.begin()));
 
    bool                    allColsCovered = true;
+
    for (int i = 0; i < modelCore.getModel()->getNumCols(); i++) {
       sit = activeColsUnion.find(i);
 
@@ -231,12 +227,10 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //---
    //--- copy master-only columns from modelCore
    //---
-
    const vector<int>& masterOnlyCols = modelCore->getMasterOnlyCols();
    m_masterOnlyCols.clear();
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
    std::copy(masterOnlyCols.begin(), masterOnlyCols.end(), m_masterOnlyCols.begin());
-
 
    //---
    //--- sanity checks on user input
@@ -833,15 +827,12 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    assert(initVars.size() > 0);//TODO: this should be OK
    double* dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
-
-
    //---
    //--- TODO:
    //--- MO vars do not need an explicit row in master even if
    //---   BranchEnforceInMaster (these are enforced directly by
    //---   MO column bounds)
    //---
-
    //---
    //--- set the row counts
    //---
@@ -894,7 +885,6 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    int                nColsMax = nInitVars
                                  + 2 * (m_nRowsOrig + m_nRowsBranch + m_nRowsConvex)
                                  + nMOVars;
-
    double*            colLB    = new double[nColsMax];
    double*            colUB    = new double[nColsMax];
    double*            objCoeff = new double[nColsMax];
@@ -920,14 +910,12 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
                           objCoeff,
                           colNames,
                           startRow, endRow, DecompRow_Original);
-   
    // create columns for master only variables
    masterMatrixAddMOCols(masterM,
                          colLB,
                          colUB,
                          objCoeff,
                          colNames);
-   
 
    if (m_nRowsBranch > 0) {
       startRow = m_nRowsOrig;
@@ -1554,11 +1542,6 @@ void DecompAlgo::breakOutPartial(const double*   xHat,
    for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
       DecompAlgoModel&      algoModel  = (*mit).second;
       DecompConstraintSet* model      = algoModel.getModel();
-
-      if (model->isMasterOnly()) {
-         continue;
-      }
-
       int                   b          = algoModel.getBlockId();
       const vector<int>&    activeCols = model->getActiveColumns();
       bool blockFeasible = true;
@@ -3283,7 +3266,6 @@ void DecompAlgo::masterPhaseItoII()
       m_masterSI->setObjCoeff((*li)->getColMasterIndex(),
                               (*li)->getOriginalCost());
    }
-
 
    // restore the objective value of the masterOnly variables
    int nMOVars = static_cast<int>(m_masterOnlyCols.size());
@@ -6563,7 +6545,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    if (m_param.SubProbParallel) {
       m_stats.timerOther1.reset();
    }
-
 
    if (!m_param.SubProbParallel) {
       m_stats.timerOther2.reset();

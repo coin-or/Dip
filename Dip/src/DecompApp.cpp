@@ -662,17 +662,11 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
    for (mit = m_modelR.begin(); mit != m_modelR.end(); mit++) {
       int                   blockIndex = mit->first;
       DecompConstraintSet* model      = mit->second;
+      const vector<int>& activeColumns = model->getActiveColumns();
+      vector<int>::const_iterator vit;
 
-      if (model->m_masterOnly) {
-         colIndexToBlockIndex.insert(make_pair(model->m_masterOnlyIndex,
-                                               blockIndex));
-      } else {
-         const vector<int>& activeColumns = model->getActiveColumns();
-         vector<int>::const_iterator vit;
-
-         for (vit = activeColumns.begin(); vit != activeColumns.end(); vit++) {
-            colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
-         }
+      for (vit = activeColumns.begin(); vit != activeColumns.end(); vit++) {
+         colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
       }
    }
 
@@ -712,7 +706,7 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
       colIndex        = colNameToIndex[colName];
       blockIndex      = colIndexToBlockIndex[colIndex];
       DecompConstraintSet* model = m_modelR[blockIndex];
-
+      /*
       if (model->m_masterOnly) {
          printf("MasterOnly col=%s value=%g lb=%g ub=%g",
                 colName.c_str(), colValue, colLB[colIndex], colUB[colIndex]);
@@ -725,7 +719,7 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
 
          printf("\n");
       }
-
+      */
       pair<int, int> p = make_pair(solutionIndex, blockIndex);
       it = varTemp.find(p);
 
