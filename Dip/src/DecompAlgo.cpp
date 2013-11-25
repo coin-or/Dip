@@ -231,13 +231,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    const vector<int>& masterOnlyCols = modelCore->getMasterOnlyCols();
    m_masterOnlyCols.clear();
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
-
-   for (i = 0; i < UtilGetSize<int>(masterOnlyCols); i++) {
-      m_masterOnlyCols.push_back(masterOnlyCols[i]);
-   }
-
-   //m_masterOnlyCols.resize(masterOnlyCols.size());
-   //std::copy(masterOnlyCols.begin(), masterOnlyCols.end(), m_masterOnlyCols.begin());
+   std::copy(masterOnlyCols.begin(), masterOnlyCols.end(), m_masterOnlyCols.begin());
 #endif
 
    //---
@@ -2690,6 +2684,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       const int      nCols   = m_masterSI->getNumCols();
       const int      nRows   = m_masterSI->getNumRows();
       const double* primSol = m_masterSI->getColSolution();
+      // Need to distinguish the primSol after we added master-only variables
       const double* dualSol = m_masterSI->getRowPrice();
       m_primSolution.clear();
       m_primSolution.reserve(nCols);
@@ -2733,7 +2728,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //---  it meant to return infeasible.
       //---
       for (i = 0; i < nCols; i++) {
-         if (primSol[i] < -1) {
+         // If there is master only variables, primSol will contain values of those master Only variables
+         // the the notation of LAMBDA is a little bit abused...
+         if (primSol[i] < m_masterSI->getColLower()[i] - 1) {
+            std::cout << "The bad upper bound is " << m_masterSI->getColUpper()[i] << std::endl;
+            std::cout << "primSol[ " << i << "] is" << primSol[i] << std::endl;
+            std::cout << "The bad lower bound is " << m_masterSI->getColLower()[i] << std::endl;
             (*m_osLog) << "ERROR: NEGATIVE LAMBDA, but Osi returns as optimal"
                        << " assume it was meant to be infeasible." << endl;
             status = STAT_INFEASIBLE;
@@ -2786,7 +2786,9 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    double       aveC;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    const int      limit      = m_param.LimitInitVars;
+   // Need to get the different strategies for generating initial Vars
    const int      limit2     = 2 * limit;
+   //const int      limit2     = 1;
    const int      nCoreCols  = modelCore->getNumCols();
    const double* objCoeff   = getOrigObjective();
    UtilPrintFuncBegin(m_osLog, m_classTag,
@@ -3112,7 +3114,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
-
+   /*
    if (!m_param.DualStab && !UtilIsZero(unifDiff, 1e-04)) {
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal)
                  << endl;
@@ -3121,7 +3123,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
       throw UtilException("Primal and Dual Master Obj Not Matching.",
                           "updateObjBoundLB", "DecompAlgo");
    }
-
+   */
    //TODO: stats - we want to play zDW_LB vs UB...
    UTIL_MSG(m_param.LogDebugLevel, 3,
             (*m_osLog)
@@ -7040,9 +7042,9 @@ void DecompAlgo::recomposeSolution(const double* solution,
       /*
         std::cout << "the col index of masterOnly  is "
                 << colIndex << std::endl;
-        std::cout << "the j index of masterOnly  is "
-                << j << std::endl;
       */
+      //        std::cout << "the j index of masterOnly  is "
+      //          << j << std::endl;
       assert(isMasterColMasterOnly(colIndex));
       rsolution[j] = solution[colIndex];
    }
