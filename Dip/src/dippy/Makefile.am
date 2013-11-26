@@ -45,6 +45,10 @@ _dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS)
 _dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS)
 _dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined 
 
+if DEPENDENCY_LINKING
+_dippy_la_LIBADD += $(PYTHON_LIBS) $(DIPLIB_LIBS)
+endif
+
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I.. -I`$(CYGPATH_W) $(srcdir)` -I`$(CYGPATH_W) $(srcdir)/../` 
 
