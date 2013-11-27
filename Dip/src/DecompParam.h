@@ -307,6 +307,12 @@ public:
 
    bool BlockFileOutput;
 
+   // The tolerance for checking negative reduced cost
+   // Typically a small number approaching zero
+   double RedCostEpsilon;
+
+   double PhaseIObjTol;
+
    /**
     * @}
     */
@@ -415,6 +421,8 @@ public:
       PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
       PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
       PARAM_getSetting("BlockFileOutput", BlockFileOutput);
+      PARAM_getSetting("RedCostEpsilon", RedCostEpsilon);
+      PARAM_getSetting("PhaseIObjTol", PhaseIObjTol);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -553,6 +561,8 @@ public:
       UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum);
       UtilPrintParameter(os, sec, "BlockNumInput", BlockNumInput);
       UtilPrintParameter(os, sec, "BlockFileOutput", BlockFileOutput );
+      UtilPrintParameter(os, sec, "RedCostEpsilon", RedCostEpsilon);
+      UtilPrintParameter(os, sec, "PhaseIObjTol", PhaseIObjTol);
       (*os) << "========================================================\n";
    }
 
@@ -647,6 +657,8 @@ public:
       ConcurrentThreadsNum     = 4;
       BlockNumInput            = 0;
       BlockFileOutput          = false;
+      RedCostEpsilon           = 0.0001;
+      PhaseIObjTol             = 0.0005;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

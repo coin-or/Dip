@@ -1186,7 +1186,6 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
    }
 
    //////STOP
-
    const CoinPackedVectorBase** colBlock =
       new const CoinPackedVectorBase*[nMOVars];
 
@@ -3095,7 +3094,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
-   /*
+
    if (!m_param.DualStab && !UtilIsZero(unifDiff, 1e-04)) {
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal)
                  << endl;
@@ -3104,7 +3103,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
       throw UtilException("Primal and Dual Master Obj Not Matching.",
                           "updateObjBoundLB", "DecompAlgo");
    }
-   */
+
    //TODO: stats - we want to play zDW_LB vs UB...
    UTIL_MSG(m_param.LogDebugLevel, 3,
             (*m_osLog)
@@ -3432,7 +3431,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
 
       //if(phaseIObj <= DecompZero){
       //if(phaseIObj <= DecompEpsilon){ //11/09/09
-      if (phaseIObj <= 1.0e-9) { //01/22/10 - forestry
+      if (phaseIObj <= m_param.PhaseIObjTol) { //01/22/10 - forestry
          //---
          //--- switch to PHASE II (art=0)
          //---
@@ -4598,7 +4597,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
    const int      nCoreCols     = modelCore->getNumCols();
    const double* u             = NULL;
    const double* userU         = NULL;
-   const double   epsilonRedCost = 1.0e-4; //make option
    const double* origObjective = getOrigObjective();
    double*        redCostX      = NULL;
    double         alpha         = 0.0;
@@ -4748,7 +4746,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          int            index = (*it)->getColMasterIndex();
          double         rcLPi = rcLP[index];
 
-         if (rcLPi        < -epsilonRedCost &&
+         if (rcLPi        < - m_param.RedCostEpsilon &&
                colUB[index] > DecompEpsilon) {
             (*m_osLog) << "VAR v-index:" << var_index++
                        << " m-index: " << (*it)->getColMasterIndex()
@@ -5248,7 +5246,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          for (it = potentialVars.begin(); it != potentialVars.end(); it++) {
             varRedCost = (*it)->getReducedCost();
 
-            if (varRedCost < -epsilonRedCost) { //TODO: strict, -dualTOL?
+            if (varRedCost < - m_param.RedCostEpsilon) { //TODO: strict, -dualTOL?
                foundNegRC = true;
             }
          }
@@ -5410,7 +5408,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          mostNegRCvec[whichBlock] = varRedCost;
       }
 
-      if (varRedCost < -epsilonRedCost) { //TODO: strict, -dualTOL?
+      if (varRedCost < - m_param.RedCostEpsilon) { //TODO: strict, -dualTOL?
          UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                   (*m_osLog) << "PUSHING new var with varRedCost= "
                   << UtilDblToStr(varRedCost, 5) << endl;);
