@@ -2781,7 +2781,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    const int      limit      = m_param.LimitInitVars;
    // Need to get the different strategies for generating initial Vars
    const int      limit2     = 2 * limit;
-   //const int      limit2     = 1;
+   // const int      limit2     = 1;
    const int      nCoreCols  = modelCore->getNumCols();
    const double* objCoeff   = getOrigObjective();
    UtilPrintFuncBegin(m_osLog, m_classTag,

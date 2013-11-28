@@ -639,7 +639,7 @@ public:
       BlockFileFormat          = "";
       PermuteFile              = "";
       InitSolutionFile         = "";
-      UseNames                 = 1 ;
+      UseNames                 = 0 ;
       UseSparse                = 1 ;
       FullModel                = 0 ;
       BestKnownLB              = -1.e100;
