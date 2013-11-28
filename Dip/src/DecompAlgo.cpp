@@ -230,7 +230,8 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    const vector<int>& masterOnlyCols = modelCore->getMasterOnlyCols();
    m_masterOnlyCols.clear();
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
-   std::copy(masterOnlyCols.begin(), masterOnlyCols.end(), m_masterOnlyCols.begin());
+   std::copy(masterOnlyCols.begin(), masterOnlyCols.end(),
+             std::back_inserter(m_masterOnlyCols));
 
    //---
    //--- sanity checks on user input
@@ -1190,11 +1191,23 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
       new const CoinPackedVectorBase*[nMOVars];
 
    for (int i = 0; i < nMOVars; i++) {
-      CoinShallowPackedVector colS = matrixCoreTmp.getVector(i);
-      CoinPackedVector*         col = new CoinPackedVector(colS.getNumElements(),
+      CoinShallowPackedVector colS =
+         matrixCoreTmp.getVector(modelCore->getMasterOnlyCols()[i]);
+      CoinPackedVector*  col = new CoinPackedVector(colS.getNumElements(),
             colS.getIndices(),
             colS.getElements());
       colBlock[i] = col;
+      /*
+      for(int j = 0 ; j < colS.getNumElements(); j++){
+
+      	  std::cout << "The column vector of masterOnly "
+          << j << " contains " << j << " th element is "
+          <<  col->getElements()[j] << std::endl;
+      	  std::cout << "The index is " << col->getIndices()[j]
+          << std::endl;
+
+      	}
+      */
    }
 
    //todo - use ptrs, allocate only if need transpose
