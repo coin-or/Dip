@@ -2683,17 +2683,8 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       m_primSolution.reserve(nCols);
       m_dualSolution.clear();
       m_dualSolution.reserve(nRows);
-      //      std::cout << "the primal solution is " << std::endl;
-
-      for (i = 0; i < nCols; i++) {
-         m_primSolution.push_back(primSol[i]);
-         //         std::cout << primSol[i] << std::endl;
-      }
-
-      for (i = 0; i < nRows; i++) {
-         m_dualSolution.push_back(dualSol[i]);
-      }
-
+      m_primSolution.assign(primSol, primSol + nCols);
+      m_dualSolution.assign(dualSol, dualSol + nRows);
       assert((int)m_primSolution.size() == nCols);
       assert((int)m_dualSolution.size() == nRows);
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
@@ -2781,7 +2772,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    const int      limit      = m_param.LimitInitVars;
    // Need to get the different strategies for generating initial Vars
    const int      limit2     = 2 * limit;
-   // const int      limit2     = 1;
+   //const int      limit2     = 1;
    const int      nCoreCols  = modelCore->getNumCols();
    const double* objCoeff   = getOrigObjective();
    UtilPrintFuncBegin(m_osLog, m_classTag,
