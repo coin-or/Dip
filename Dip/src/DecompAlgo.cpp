@@ -3320,7 +3320,7 @@ void DecompAlgo::masterPhaseIItoI()
    assert(nMasterCols == static_cast<int>(m_masterColType.size()));
 
    for (i = 0; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
+      if (isMasterColStructural(i) || isMasterColMasterOnly(i)) {
          m_masterSI->setObjCoeff(i, 0.0);
       } else {
          m_masterSI->setObjCoeff(i, 1.0);
