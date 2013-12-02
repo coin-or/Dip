@@ -83,10 +83,10 @@ public:
    }
 
    /** Encode this node for message passing. *\/ */
-   //    virtual AlpsEncoded* encode() const; 
+   //    virtual AlpsEncoded* encode() const;
 
    /* /\** Decode a node from an encoded object. *\/ */
-   //    virtual AlpsKnowledge* decode(AlpsEncoded&) const; 
+   //    virtual AlpsKnowledge* decode(AlpsEncoded&) const;
 
 };
 

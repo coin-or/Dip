@@ -1666,15 +1666,16 @@ void DecompApp::singlyBorderStructureDetection()
       }
 
       if (numRowIndex.size() != 0) {
-         blockdata << truePartNum << " " << numRowIndex.size() << "\n" ;
+         //GCG defaults 1 as starting block number, DIP had default value 0 but
+         // 1 should be fine, which is why we add 1
+         blockdata << "BLOCK " << (truePartNum + 1) << "\n";
 
          for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
                rowIter++) {
-            blockdata << *rowIter << " " ;
+            blockdata << m_mpsIO.rowName(*rowIter) << "\n";
             rowsBlock.push_back(*rowIter);
          }
 
-         blockdata << "\n" ;
          m_blocks.insert(make_pair(truePartNum, rowsBlock));
          truePartNum ++;
       }
@@ -1685,6 +1686,25 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    blockdata.close();
+
+   if (m_param.BlockFileOutput) {
+      fstream input_file;
+      input_file.open(BlockFile.c_str(), ios::in);
+      std::ofstream blockdata2;
+      std::string BlockFile2;
+      BlockFile2 = m_param.Instance + '.' + "dec";
+      blockdata2.open(BlockFile2.c_str());
+      blockdata2 << "NBLOCKS " << truePartNum << "\n";
+      string line;
+
+      while (!input_file.eof()) {
+         getline(input_file, line);
+         blockdata2 << line << "\n";
+      }
+
+      blockdata2.close();
+   }
+
    UTIL_DELARR(eptr);
    UTIL_DELARR(eind);
    //UTIL_DELARR(minorIndex);
