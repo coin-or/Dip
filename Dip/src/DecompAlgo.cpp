@@ -2728,7 +2728,6 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //for interior, if infeasible, the status is not
       //  getting picked up properly by OSI
       status = STAT_INFEASIBLE;
-      std::cout << "the problem is infeasible" << std::endl;
       //---
       //--- it is possible that presolver determined infeasibility
       //--- but, we will need a dual ray, so we should resolve with
