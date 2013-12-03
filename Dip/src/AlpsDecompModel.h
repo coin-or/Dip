@@ -254,27 +254,27 @@ public:
 public:
 
    /* /\** Pack Blis portion of the model into an encoded object. *\/ */
-   /* AlpsReturnStatus encodeAlpsDecomp(AlpsEncoded* encoded) const; */
+   AlpsReturnStatus encodeAlpsDecomp(AlpsEncoded* encoded) const;
 
    /* /\** Unpack Blis portion of the model from an encoded object. *\/ */
-   /* AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded); */
+   AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded);
 
    /* /\** Register knowledge. *\/ */
    /* virtual void registerKnowledge(); */
 
    /* using AlpsKnowledge::encode ; */
    /* /\** The method that encodes the model into an encoded object. *\/ */
-   /* virtual AlpsEncoded* encode() const; */
+   virtual AlpsEncoded* encode() const;
 
    /* /\** The method that decodes the model from an encoded object. *\/ */
-   /* virtual void decodeToSelf(AlpsEncoded&); */
+   virtual void decodeToSelf(AlpsEncoded&);
 
    /* /\** Pack knowledge to be shared with others into an encoded object. */
    /*     Return NULL means that no knowledge can be shared. *\/ */
-   /* virtual AlpsEncoded* packSharedKnowlege(); */
+   virtual AlpsEncoded* packSharedKnowlege();
 
    /* /\** Unpack and store shared knowledge from an encoded object. *\/ */
-   /* virtual void unpackSharedKnowledge(AlpsEncoded&); */
+   virtual void unpackSharedKnowledge(AlpsEncoded&);
 
 
 

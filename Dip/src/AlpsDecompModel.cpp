@@ -190,3 +190,46 @@ AlpsExitStatus AlpsDecompModel::solve()
    return alpsBroker.getSolStatus();
 }
 
+AlpsEncoded*
+AlpsDecompModel::encode() const
+{
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   // NOTE: "AlpsKnowledgeTypeModel" is the type name.
+   AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeModel);
+   status = encodeAlps(encoded);
+   status = encodeAlpsDecomp(encoded);
+   return encoded;
+}
+
+void
+AlpsDecompModel::decodeToSelf(AlpsEncoded& encoded)
+{
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   status = decodeAlps(encoded);
+   status = decodeAlpsDecomp(encoded);
+}
+
+AlpsReturnStatus
+AlpsDecompModel::encodeAlpsDecomp(AlpsEncoded* encoded) const
+{
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   return status;
+}
+
+AlpsReturnStatus
+AlpsDecompModel::decodeAlpsDecomp(AlpsEncoded& encoded)
+{
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   return status;
+}
+
+
+AlpsEncoded*
+AlpsDecompModel::packSharedKnowlege()
+{
+}
+
+void
+AlpsDecompModel::unpackSharedKnowledge(AlpsEncoded&)
+{
+}

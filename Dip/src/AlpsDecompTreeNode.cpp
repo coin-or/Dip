@@ -619,169 +619,122 @@ AlpsDecompTreeNode::branch()
 AlpsEncoded*
 AlpsDecompTreeNode::encode() const
 {
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   // NOTE: "AlpsKnowledgeTypeNode" is used as type name.
+   AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeNode);
+   AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   int numCols = desc->numberCols_;
+   assert(numCols);
+   // Encode decription.
+   const double* lb = desc->lowerBounds_;
+   const double* ub = desc->upperBounds_;
+   const int branchDir = desc->branchedDir_;
+   //  encoded->writeRep(explicit_);
+   encoded->writeRep(numCols);
+   encoded->writeRep(lb, numCols);
+   encoded->writeRep(ub, numCols);
+   encoded->writeRep(branchDir);
+   UtilAlpsEncodeWarmStart( encoded,
+                            desc->basis_);
+   std::vector< std::pair<int, double> > downBranchLB = getDownBranchLB();
+   const int downBranchLBSize = downBranchLB.size();
+   int* downBranchLBIndices;
+   double* downBranchLBValues;
 
+   if (downBranchLBSize) {
+      downBranchLBIndices = new int[downBranchLBSize];
+      downBranchLBValues = new double[downBranchLBSize];
 
-  AlpsReturnStatus status = AlpsReturnStatusOk;
+      for (int i = 0 ; i < downBranchLBSize; ++i) {
+         downBranchLBIndices[i] = downBranchLB[i].first;
+         downBranchLBValues[i] = downBranchLB[i].second;
+      }
+   } else {
+      downBranchLBIndices = 0 ;
+      downBranchLBValues = 0;
+   }
 
-  // NOTE: "AlpsKnowledgeTypeNode" is used as type name.                                                                                                    
-  AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeNode);
+   std::vector< std::pair<int, double> > downBranchUB = getDownBranchUB();
+   const int downBranchUBSize = downBranchUB.size();
+   int* downBranchUBIndices;
+   double* downBranchUBValues;
 
-  AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   if (downBranchUBSize) {
+      downBranchUBIndices = new int[downBranchUBSize];
+      downBranchUBValues = new double[downBranchUBSize];
 
+      for (int i = 0 ; i < downBranchUBSize; ++i) {
+         downBranchUBIndices[i] = downBranchUB[i].first;
+         downBranchUBValues[i] = downBranchUB[i].second;
+      }
+   } else {
+      downBranchUBIndices = 0 ;
+      downBranchUBValues = 0;
+   }
 
-  int numCols = desc->numberCols_; 
-  
-  assert(numCols); 
-  
-  // Encode decription.                                                                                                                       
-  const double* lb = desc->lowerBounds_; 
-  const double* ub = desc->upperBounds_; 
+   std::vector< std::pair<int, double> > upBranchLB = getUpBranchLB();
+   const int upBranchLBSize = upBranchLB.size();
+   int* upBranchLBIndices;
+   double* upBranchLBValues;
 
-  const int branchDir = desc->branchedDir_; 
+   if (upBranchLBSize) {
+      upBranchLBIndices = new int[upBranchLBSize];
+      upBranchLBValues = new double[upBranchLBSize];
 
-  //  encoded->writeRep(explicit_); 
-  encoded->writeRep(numCols); 
-  
-  encoded->writeRep(lb, numCols); 
-  encoded->writeRep(ub, numCols);
+      for (int i = 0 ; i < upBranchLBSize; ++i) {
+         upBranchLBIndices[i] = upBranchLB[i].first;
+         upBranchLBValues[i] = upBranchLB[i].second;
+      }
+   } else {
+      upBranchLBIndices = 0 ;
+      upBranchLBValues = 0;
+   }
 
-  encoded->writeRep(branchDir); 
-  
-  UtilAlpsEncodeWarmStart( encoded,
-			   desc->basis_); 
-  
+   std::vector< std::pair<int, double> > upBranchUB = getUpBranchUB();
+   const int upBranchUBSize = upBranchUB.size();
+   int* upBranchUBIndices;
+   double* upBranchUBValues;
 
-  std::vector< std::pair<int, double> > downBranchLB = getDownBranchLB(); 
-               
-  const int downBranchLBSize = downBranchLB.size();
+   if (upBranchUBSize) {
+      upBranchUBIndices = new int[upBranchUBSize];
+      upBranchUBValues = new double[upBranchUBSize];
 
-  int* downBranchLBIndices; 
-  double* downBranchLBValues; 
+      for (int i = 0 ; i < upBranchUBSize; ++i) {
+         upBranchUBIndices[i] = upBranchUB[i].first;
+         upBranchUBValues[i] = upBranchUB[i].second;
+      }
+   } else {
+      upBranchUBIndices = 0 ;
+      upBranchUBValues = 0;
+   }
 
-  if(downBranchLBSize){
-    
-    downBranchLBIndices = new int[downBranchLBSize]; 
-    downBranchLBValues = new double[downBranchLBSize]; 
-
-    for(int i = 0 ; i < downBranchLBSize; ++i){
-      downBranchLBIndices[i] = downBranchLB[i].first; 
-      downBranchLBValues[i] = downBranchLB[i].second;
-      }    
-  }
-  else {
-    downBranchLBIndices = 0 ; 
-    downBranchLBValues = 0; 
-  }
- 
- 
-  std::vector< std::pair<int, double> > downBranchUB = getDownBranchUB(); 
-               
-  const int downBranchUBSize = downBranchUB.size();
-
-  int* downBranchUBIndices; 
-  double* downBranchUBValues; 
-
-  if(downBranchUBSize){
-    
-    downBranchUBIndices = new int[downBranchUBSize]; 
-    downBranchUBValues = new double[downBranchUBSize]; 
-
-    for(int i = 0 ; i < downBranchUBSize; ++i){
-      downBranchUBIndices[i] = downBranchUB[i].first; 
-      downBranchUBValues[i] = downBranchUB[i].second;
-      }    
-  }
-  else {
-    downBranchUBIndices = 0 ; 
-    downBranchUBValues = 0; 
-  }
- 
- std::vector< std::pair<int, double> > upBranchLB = getUpBranchLB(); 
-               
- const int upBranchLBSize = upBranchLB.size();
-
- int* upBranchLBIndices; 
- double* upBranchLBValues; 
-
- if(upBranchLBSize){
-    
-    upBranchLBIndices = new int[upBranchLBSize]; 
-    upBranchLBValues = new double[upBranchLBSize]; 
-
-    for(int i = 0 ; i < upBranchLBSize; ++i){
-      upBranchLBIndices[i] = upBranchLB[i].first; 
-      upBranchLBValues[i] = upBranchLB[i].second;
-      }    
-  }
-  else {
-    upBranchLBIndices = 0 ; 
-    upBranchLBValues = 0; 
-  }
- 
-  std::vector< std::pair<int, double> > upBranchUB = getUpBranchUB(); 
-              
-  const int upBranchUBSize = upBranchUB.size();
-
-  int* upBranchUBIndices; 
-  double* upBranchUBValues; 
-
-  if(upBranchUBSize){
-    
-    upBranchUBIndices = new int[upBranchUBSize]; 
-    upBranchUBValues = new double[upBranchUBSize]; 
-
-    for(int i = 0 ; i < upBranchUBSize; ++i){
-      upBranchUBIndices[i] = upBranchUB[i].first; 
-      upBranchUBValues[i] = upBranchUB[i].second;
-      }    
-  }
-  else {
-    upBranchUBIndices = 0 ; 
-    upBranchUBValues = 0; 
-  }
-
-
-  encoded->writeRep(downBranchLBIndices, downBranchUBSize);
-  encoded->writeRep(downBranchLBValues, downBranchUBSize);
-
-  encoded->writeRep(downBranchUBIndices, downBranchUBSize);
-  encoded->writeRep(downBranchUBValues,downBranchUBSize );
-
-  encoded->writeRep(upBranchLBIndices, upBranchLBSize);
-  encoded->writeRep(upBranchLBValues,upBranchLBSize );
- 
-  encoded->writeRep(upBranchUBIndices, upBranchUBSize);
-  encoded->writeRep(upBranchUBValues,upBranchUBSize );
-
-  // free memory 
-
-  delete [] downBranchLBValues; 
-  downBranchLBValues = NULL; 
-
-  delete [] downBranchLBIndices; 
-  downBranchLBIndices = NULL; 
-
-  delete [] downBranchUBIndices; 
-  downBranchUBIndices = NULL; 
-
-  delete [] downBranchUBIndices; 
-  downBranchUBIndices = NULL; 
-  
-  delete [] upBranchLBIndices; 
-  upBranchLBIndices = NULL; 
-
-  delete [] upBranchLBValues;
-  upBranchLBValues = NULL; 
-
-  delete [] upBranchUBIndices;
-  upBranchUBIndices = NULL;
-
-  delete [] upBranchLBValues;
-  upBranchLBValues = NULL;
-
-
-  // Encode Alps portion.                                                                                                                               
-  return encoded;
+   encoded->writeRep(downBranchLBIndices, downBranchUBSize);
+   encoded->writeRep(downBranchLBValues, downBranchUBSize);
+   encoded->writeRep(downBranchUBIndices, downBranchUBSize);
+   encoded->writeRep(downBranchUBValues, downBranchUBSize );
+   encoded->writeRep(upBranchLBIndices, upBranchLBSize);
+   encoded->writeRep(upBranchLBValues, upBranchLBSize );
+   encoded->writeRep(upBranchUBIndices, upBranchUBSize);
+   encoded->writeRep(upBranchUBValues, upBranchUBSize );
+   // free memory
+   delete [] downBranchLBValues;
+   downBranchLBValues = NULL;
+   delete [] downBranchLBIndices;
+   downBranchLBIndices = NULL;
+   delete [] downBranchUBIndices;
+   downBranchUBIndices = NULL;
+   delete [] downBranchUBIndices;
+   downBranchUBIndices = NULL;
+   delete [] upBranchLBIndices;
+   upBranchLBIndices = NULL;
+   delete [] upBranchLBValues;
+   upBranchLBValues = NULL;
+   delete [] upBranchUBIndices;
+   upBranchUBIndices = NULL;
+   delete [] upBranchLBValues;
+   upBranchLBValues = NULL;
+   // Encode Alps portion.
+   return encoded;
 }
 
 
@@ -789,90 +742,55 @@ AlpsDecompTreeNode::encode() const
 AlpsKnowledge*
 AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
 {
-  
-  int numCols; 
-  double* lb; 
-  double* ub; 
-  int branchDir;
-
-  encoded.readRep(numCols); 
-  encoded.readRep(lb, numCols); 
-  encoded.readRep(ub, numCols); 
-  encoded.readRep(branchDir); 
-
-  int downBranchLBSize;
-  int* downBranchLBIndices; 
-  double* downBranchLBValues; 
-
-  encoded.readRep(downBranchLBIndices, downBranchLBSize);
-  encoded.readRep(downBranchLBValues, downBranchLBSize); 
-
-  int downBranchUBSize;
-  int* downBranchUBIndices; 
-  double* downBranchUBValues; 
-
-  encoded.readRep(downBranchUBIndices, downBranchUBSize);
-  encoded.readRep(downBranchUBValues, downBranchUBSize); 
-
-  int upBranchLBSize;
-  int* upBranchLBIndices;
-  double* upBranchLBValues;
-
-  encoded.readRep(upBranchLBIndices, upBranchLBSize);
-  encoded.readRep(upBranchLBValues, upBranchLBSize);
-
-  int upBranchUBSize;
-  int* upBranchUBIndices; 
-  double* upBranchUBValues; 
-
-  encoded.readRep(upBranchUBIndices, upBranchUBSize);
-  encoded.readRep(upBranchUBValues, upBranchUBSize);
-
-  
-
-  std::vector< std::pair<int, double> > upBranchUB;						
-  std::vector< std::pair<int, double> > upBranchLB ;   
-  std::vector< std::pair<int, double> > downBranchLB ;   
-  std::vector< std::pair<int, double> > downBranchUB ;   
-  
-  AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode();
-
-
-  treeNode->setBranchBound(upBranchUBSize, upBranchUBIndices, 
-				     upBranchUBValues, upBranchUB); 
-  
-  treeNode->setBranchBound(upBranchLBSize, upBranchLBIndices,
-				     upBranchUBValues, upBranchLB); 
-
-  treeNode->setBranchBound(downBranchLBSize, downBranchLBIndices,
-				     downBranchLBValues, downBranchLB);
-
-  treeNode->setBranchBound(downBranchUBSize, downBranchUBIndices,
-				     downBranchUBValues, downBranchUB); 
-
-  
-
-  
-  
-
-  AlpsReturnStatus *status ;
-  
-
+   int numCols;
+   double* lb;
+   double* ub;
+   int branchDir;
+   encoded.readRep(numCols);
+   encoded.readRep(lb, numCols);
+   encoded.readRep(ub, numCols);
+   encoded.readRep(branchDir);
+   int downBranchLBSize;
+   int* downBranchLBIndices;
+   double* downBranchLBValues;
+   encoded.readRep(downBranchLBIndices, downBranchLBSize);
+   encoded.readRep(downBranchLBValues, downBranchLBSize);
+   int downBranchUBSize;
+   int* downBranchUBIndices;
+   double* downBranchUBValues;
+   encoded.readRep(downBranchUBIndices, downBranchUBSize);
+   encoded.readRep(downBranchUBValues, downBranchUBSize);
+   int upBranchLBSize;
+   int* upBranchLBIndices;
+   double* upBranchLBValues;
+   encoded.readRep(upBranchLBIndices, upBranchLBSize);
+   encoded.readRep(upBranchLBValues, upBranchLBSize);
+   int upBranchUBSize;
+   int* upBranchUBIndices;
+   double* upBranchUBValues;
+   encoded.readRep(upBranchUBIndices, upBranchUBSize);
+   encoded.readRep(upBranchUBValues, upBranchUBSize);
+   std::vector< std::pair<int, double> > upBranchUB;
+   std::vector< std::pair<int, double> > upBranchLB ;
+   std::vector< std::pair<int, double> > downBranchLB ;
+   std::vector< std::pair<int, double> > downBranchUB ;
+   AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode();
+   treeNode->setBranchBound(upBranchUBSize, upBranchUBIndices,
+                            upBranchUBValues, upBranchUB);
+   treeNode->setBranchBound(upBranchLBSize, upBranchLBIndices,
+                            upBranchUBValues, upBranchLB);
+   treeNode->setBranchBound(downBranchLBSize, downBranchLBIndices,
+                            downBranchLBValues, downBranchLB);
+   treeNode->setBranchBound(downBranchUBSize, downBranchUBIndices,
+                            downBranchUBValues, downBranchUB);
+   AlpsReturnStatus* status ;
    AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   desc->basis_= UtilAlpsDecodeWarmStart(encoded,status); 
-
-  //  AlpsDecompModel *model = dynamic_cast<AlpsDecompModel*>(desc_->getModel());
-
-  //  AlpsDecompNodeDesc* nodeDesc = new AlpsDecompNodeDesc(model);
-
-  
-
-  //------------------------------------------------------                                                                                                                         
-  // Unpack node.                                                                                                                                                                  
-  //------------------------------------------------------                                                                                                                         
-
-                                                     
-
-  return treeNode;
+   desc->basis_ = UtilAlpsDecodeWarmStart(encoded, status);
+   //  AlpsDecompModel *model = dynamic_cast<AlpsDecompModel*>(desc_->getModel());
+   //  AlpsDecompNodeDesc* nodeDesc = new AlpsDecompNodeDesc(model);
+   //------------------------------------------------------
+   // Unpack node.
+   //------------------------------------------------------
+   return treeNode;
 }
 
