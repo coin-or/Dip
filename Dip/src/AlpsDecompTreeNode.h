@@ -82,11 +82,32 @@ public:
       }
    }
 
+
+   inline std::vector< std::pair<int, double> >  getDownBranchLB() const {return downBranchLB_;}
+   inline std::vector< std::pair<int, double> >  getDownBranchUB() const {return downBranchUB_;}
+   inline std::vector< std::pair<int, double> >  getUpBranchLB() const {return upBranchLB_;}
+   inline std::vector< std::pair<int, double> >  getUpBranchUB() const {return upBranchUB_;}
+
+   inline void setBranchBound(int& BranchSize, int*& BranchIndices,
+                              double*& BranchValues,
+                              std::vector< std::pair<int, double> > & branchInfo) const {
+
+     if(BranchSize)
+       {
+         for(int i = 0 ; i < BranchSize; ++i){
+           branchInfo.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
+         }
+       }
+     else{
+       branchInfo.clear();
+     }
+   }
+
    /** Encode this node for message passing. *\/ */
-   //    virtual AlpsEncoded* encode() const;
+   virtual AlpsEncoded* encode() const;
 
    /* /\** Decode a node from an encoded object. *\/ */
-   //    virtual AlpsKnowledge* decode(AlpsEncoded&) const;
+   virtual AlpsKnowledge* decode(AlpsEncoded&) const;
 
 };
 
