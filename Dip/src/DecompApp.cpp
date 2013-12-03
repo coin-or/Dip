@@ -1672,7 +1672,12 @@ void DecompApp::singlyBorderStructureDetection()
 
          for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
                rowIter++) {
-            blockdata << m_mpsIO.rowName(*rowIter) << "\n";
+            if (m_param.InstanceFormat == "MPS") {
+               blockdata << m_mpsIO.rowName(*rowIter) << "\n";
+            } else if (m_param.InstanceFormat == "LP") {
+               blockdata << m_lpIO.rowName(*rowIter) << "\n";
+            }
+
             rowsBlock.push_back(*rowIter);
          }
 
