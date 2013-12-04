@@ -17,8 +17,6 @@
 #include "DecompAlgo.h"
 #include "DecompApp.h"
 
-using namespace std;
-
 // --------------------------------------------------------------------- //
 bool DecompAlgo::
 chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
@@ -32,7 +30,7 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
    //--- Default branching in DIP is the most simple approach possible.
    //---   Choose variables farthest from integer - based on x formulation.
    //---
-   vector<int>::iterator intIt;
+   std::vector<int>::iterator intIt;
    int    branchedOnIndex, j;
    double branchedOnValue, x, dist, maxDist;
    double obj              = 0.0;
