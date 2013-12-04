@@ -18,7 +18,7 @@
 #include "AlpsDecompNodeDesc.h"
 #include "AlpsDecompTreeNode.h"
 
-#ifdef DIP_HAS_MPI
+#ifdef COIN_HAS_MPI
 #include "AlpsKnowledgeBrokerMPI.h"
 #else
 #include "AlpsKnowledgeBrokerSerial.h"
@@ -146,7 +146,7 @@ AlpsExitStatus AlpsDecompModel::solve()
    //--- copy relevant parameters to DecompParam from AlpsParam
    //---
    decompParam.LimitNodes = m_param.nodeLimit;
-#ifdef DIP_HAS_MPI
+#ifdef COIN_HAS_MPI
    //---
    //--- declare an AlpsKnowledgeBroker for paralell application
    //---
