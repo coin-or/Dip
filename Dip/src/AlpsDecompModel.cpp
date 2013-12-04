@@ -233,3 +233,30 @@ void
 AlpsDecompModel::unpackSharedKnowledge(AlpsEncoded&)
 {
 }
+
+
+/** Register knowledge. */
+void
+AlpsDecompModel::registerKnowledge()
+{
+   // Register model, solution, and tree node
+   assert(broker_);
+   broker_->registerClass(AlpsKnowledgeTypeModel, new AlpsDecompModel);
+
+   if (broker_->getMsgLevel() > 100) {
+      std::cout << "AlpsDecomp: Register Alps model." << std::endl;
+   }
+
+   broker_->registerClass(AlpsKnowledgeTypeNode, new AlpsDecompTreeNode);
+
+   if (broker_->getMsgLevel() > 100) {
+      std::cout << "AlpsDecomp: Register Alps node." << std::endl;
+   }
+
+   /*
+   broker_->registerClass(AlpsKnowledgeTypeSolution, new AlpsDecompSolution);
+   if (broker_->getMsgLevel() > 100) {
+     std::cout << "AlpsDecomp: Register Alps solution." << std::endl;
+   }
+   */
+}

@@ -260,7 +260,7 @@ public:
    AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded);
 
    /* /\** Register knowledge. *\/ */
-   /* virtual void registerKnowledge(); */
+   virtual void registerKnowledge();
 
    /* using AlpsKnowledge::encode ; */
    /* /\** The method that encodes the model into an encoded object. *\/ */
