@@ -313,6 +313,9 @@ public:
 
    double PhaseIObjTol;
 
+
+
+   bool CheckSpecialStructure; 
    /**
     * @}
     */
@@ -423,6 +426,7 @@ public:
       PARAM_getSetting("BlockFileOutput", BlockFileOutput);
       PARAM_getSetting("RedCostEpsilon", RedCostEpsilon);
       PARAM_getSetting("PhaseIObjTol", PhaseIObjTol);
+      PARAM_getSetting("CheckSpecialStructure", CheckSpecialStructure);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -563,6 +567,7 @@ public:
       UtilPrintParameter(os, sec, "BlockFileOutput", BlockFileOutput );
       UtilPrintParameter(os, sec, "RedCostEpsilon", RedCostEpsilon);
       UtilPrintParameter(os, sec, "PhaseIObjTol", PhaseIObjTol);
+      UtilPrintParameter(os, sec, "CheckSpecialStructure", CheckSpecialStructure);
       (*os) << "========================================================\n";
    }
 
@@ -659,6 +664,8 @@ public:
       BlockFileOutput          = false;
       RedCostEpsilon           = 0.0001;
       PhaseIObjTol             = 0.0005;
+
+      CheckSpecialStructure    = false; 
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {
