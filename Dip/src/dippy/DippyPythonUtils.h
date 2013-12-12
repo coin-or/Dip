@@ -51,6 +51,8 @@ void pyColDict_AsPairedVector(PyObject* pColDict, vector< pair<int, double> >& v
  */
 int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, int** inds, double** vals);
 
+int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, int** inds, double** vals, DecompVarType & varType);
+
 /**
  * Convert a list of Python constraints to a CoinPackedMatrix
  *

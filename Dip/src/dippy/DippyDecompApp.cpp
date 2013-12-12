@@ -279,48 +279,6 @@ void DippyDecompApp::createModels()
 
    printf("Num master-only cols: %d\n", modelCore->masterOnlyCols.size());
 
-   if (modelCore->masterOnlyCols.size() > 0) {
-      //MVG: taken from MILPBlock_DecompApp::createModelMasterOnlys2
-      int nBlocks       = nRelaxed;
-      int numMasterOnly = modelCore->masterOnlyCols.size();
-      vector<int>::iterator vit;
-
-      for (int j = 0; j < numMasterOnly; j++) {
-         i = modelCore->masterOnlyCols[j];
-         DecompConstraintSet* model = new DecompConstraintSet();
-         model->m_masterOnly      = true;
-         model->m_masterOnlyIndex = i;
-         model->m_masterOnlyLB    = modelCore->colLB[i];
-         model->m_masterOnlyUB    = modelCore->colUB[i];
-         vit = std::find(modelCore->integerVars.begin(), modelCore->integerVars.end(), i);
-
-         if (vit == modelCore->integerVars.end()) { // Index i not in modelCore->integerVars
-            model->m_masterOnlyIsInt = false;
-         } else {
-            model->m_masterOnlyIsInt = true;
-         }
-
-         // adjust +/- infinity to DecompInf
-         if (modelCore->colUB[i] > DecompInf) {
-            model->m_masterOnlyUB = DecompInf;
-         }
-
-         if (modelCore->colLB[i] < -DecompInf) {
-            model->m_masterOnlyLB = -DecompInf;
-         }
-
-         UTIL_MSG(m_param.LogDebugLevel, 3,
-                  (*m_osLog)
-                  << "master-only col j=" << j
-                  << " i=" << i
-                  << ", bounds = (" << model->m_masterOnlyLB
-                  << ", " << model->m_masterOnlyUB
-                  << "), is integer = " << model->m_masterOnlyIsInt << endl;);
-         setModelRelax(model, "master_only" + UtilIntToStr(i), nBlocks);
-         nBlocks++;
-      }
-   }
-
    // set the core problem
    setModelCore(modelCore, "CORE");
 }
@@ -575,9 +533,11 @@ int DippyDecompApp::generateInitVars(DecompVarList& initVars)
       pColDict = PyTuple_GetItem(pVarTuple, 1);
       int*     varInds = NULL;
       double* varVals = NULL;
-      int numPairs = pyColDict_AsPackedArrays(pColDict, m_colIndices, &varInds, &varVals);
+      DecompVarType varType; 
+      
+      int numPairs = pyColDict_AsPackedArrays(pColDict, m_colIndices, &varInds, &varVals, varType);
       assert(numPairs == PyObject_Length(pColDict));
-      DecompVar* var =  new DecompVar(numPairs, varInds, varVals, cost);
+      DecompVar* var =  new DecompVar(numPairs, varInds, varVals, cost, varType);
       var->setBlockId(whichBlock);
       initVars.push_back(var);
    }
