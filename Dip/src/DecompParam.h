@@ -665,7 +665,7 @@ public:
       RedCostEpsilon           = 0.0001;
       PhaseIObjTol             = 0.0005;
 
-      CheckSpecialStructure    = false; 
+      CheckSpecialStructure    = true; 
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

@@ -80,7 +80,11 @@ struct DecompMainParam {
    double bestUB;
 };
 
-
+enum DecompMasterRowType{
+  SET_PARTITIONING,
+  SET_COVERING, 
+  OTHER
+};
 
 enum DecompAlgoType {
    CUT,

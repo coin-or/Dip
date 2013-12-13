@@ -422,7 +422,7 @@ public:
    void readInitSolutionFile(DecompVarList& initVars);
 
    /** Read block file */
-   void readBlockFile();
+   bool readBlockFile();
 
    /** Read Problem */
    const CoinPackedMatrix*  readProblem(UtilParameters& utilParam);
@@ -431,6 +431,12 @@ public:
    /** Automatically detect singly bordered structure */
 
    void singlyBorderStructureDetection();
+
+   /** map the matrix into graph and find disconnected components 
+       (BFS or DFS) to find the block structure 
+    **/
+   void disconComponentsDetection(); 
+   
 
    /** Find the active columns for some block */
    void findActiveColumns(const std::vector<int>& rowsPart,
