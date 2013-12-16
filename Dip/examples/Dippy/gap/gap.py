@@ -4,7 +4,7 @@
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
 
-DEBUGGING = True
+DEBUGGING = False
 
 import sys
 
