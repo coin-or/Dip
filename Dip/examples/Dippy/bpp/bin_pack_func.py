@@ -1,4 +1,4 @@
-DEBUGGING = True
+DEBUGGING = False
 
 import sys
 

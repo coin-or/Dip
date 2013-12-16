@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-DEBUGGING = True
+DEBUGGING = False
 
 import sys
 
