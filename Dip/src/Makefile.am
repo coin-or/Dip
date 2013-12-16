@@ -102,6 +102,11 @@ libDecomp_la_SOURCES +=        \
 	UtilMacrosAlps.cpp     \
 	UtilMacrosAlps.h       
 
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libDecomp_la_LIBADD = $(DIPLIB_LIBS)
+endif
+
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
