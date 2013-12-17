@@ -27,6 +27,7 @@
 #include <set>
 #include <fstream>
 #include <string>
+#include <queue>
 #include "iterator"
 #if defined(_OPENMP)
 #include "omp.h"
@@ -172,7 +173,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    if ( m_param.CheckSpecialStructure 
 	      && !getBlockSuccess){
       
-     disconComponentsDetection(); 
+     connectedComponentsDetection(); 
 
    }
    else if(!getBlockSuccess)
@@ -193,7 +194,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
                     "initializeApp()", m_param.LogLevel, 2);
 }
 
-void DecompApp::disconComponentsDetection()
+void DecompApp::connectedComponentsDetection()
 {
   int numRows; 
   int numCols; 
@@ -201,7 +202,8 @@ void DecompApp::disconComponentsDetection()
   int* vectorLengths; 
   int* indices; 
   const double* rhs; 
-  const char* rowSense; 
+  const char* rowSense;  
+  const CoinPackedMatrix m_matrixByColumn; 
 
   if (m_param.InstanceFormat == "MPS") {
     m_matrix =  m_mpsIO.getMatrixByRow();
@@ -209,12 +211,14 @@ void DecompApp::disconComponentsDetection()
     numCols = m_mpsIO.getNumCols();
     rhs = m_mpsIO.getRightHandSide();     
     rowSense = m_mpsIO.getRowSense(); 
+    (const_cast<CoinPackedMatrix*>(m_matrix))->reverseOrderedCopyOf(m_matrixByColumn); 
   } else if (m_param.InstanceFormat == "LP") {
     m_matrix =  m_lpIO.getMatrixByRow();
     numRows  = m_lpIO.getNumRows(); 
     numCols  = m_lpIO.getNumCols(); 
     rhs      = m_lpIO.getRightHandSide();  
     rowSense = m_lpIO.getRowSense(); 
+    (const_cast<CoinPackedMatrix*>(m_matrix))->reverseOrderedCopyOf(m_matrixByColumn); 
   }
 
   int index = 0; 
@@ -263,6 +267,26 @@ void DecompApp::disconComponentsDetection()
 	    <<masterRowTypeCount.at(SET_PARTITIONING) << std::endl; 
   std::cout << "The number of set-covering constraints is " 
 	    <<masterRowTypeCount.at(SET_COVERING) << std::endl; 
+  /** 
+   ** Find the disconnected components on the submatrix of the original 
+   ** matrix minus the master rows by the tree search 
+   **/
+  index = 0; 
+  queue<int> columnQueue;
+  std::map<int,DecompMasterRowType>::iterator it;
+  for(int i = 0 ; i < numRows; i++){
+    if(masterRowTypeMap.find(i) != masterRowTypeMap.end()){      
+      columnQueue.push(m_matrix->getIndices()[index]);      
+      index += 1; 
+    }
+    else {
+      index += m_matrix->getVectorSize(i);       
+    }
+    
+  }
+
+
+
 
 }
 
