@@ -612,16 +612,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
    }
 
-   for (i = 0; i < numMOs; i++) {
-      j        = m_masterOnlyCols[i];
-
-      if (intMarkerCore[j] != 'C') {
-         colIndex = m_masterOnlyColsMap[j];
-         assert(isMasterColMasterOnly(colIndex));
-         m_masterSI->setInteger(colIndex);
-      }
-   }
-
    if (m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
                           "masterProbRootIP",
@@ -631,19 +621,20 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    DecompSolverResult    result;
 #ifdef __DECOMP_IP_SYMPHONY__
-   int numCols = m_masterSI->getNumCols();
+   OsiSolverInterface * m_masterClone = m_masterSI->clone();
+ 
+   int numCols = m_masterClone->getNumCols();
    OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
-   const CoinPackedMatrix* matrix_sym = (m_masterSI->getMatrixByRow());
-   const double* col_lb = (m_masterSI->getColLower());
-   const double* col_up = (m_masterSI->getColUpper());
-   const double* row_lb = (m_masterSI->getRowLower());
-   const double* row_up = (m_masterSI->getRowUpper());
-   const double* obj_coef = (m_masterSI->getObjCoefficients());
+   const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
+   const double* col_lb = (m_masterClone->getColLower());
+   const double* col_up = (m_masterClone->getColUpper());
+   const double* row_lb = (m_masterClone->getRowLower());
+   const double* row_up = (m_masterClone->getRowUpper());
+   const double* obj_coef = (m_masterClone->getObjCoefficients());
    osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
                           const_cast<double*&>(col_lb),
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
-
    for (i = 0; i < nMasterCols; i++) {
       if (isMasterColStructural(i)) {
          osi_Sym->setInteger(i);
@@ -653,6 +644,10 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //TODO: is this expensive? if so,
    //  better to use column type info
    //  like above
+   /*
+   DecompVarList::iterator li; 
+   map<int, DecompAlgoModel>::iterator mit; 
+
    for (li = m_vars.begin(); li != m_vars.end(); li++) {
       b   = (*li)->getBlockId();
       mit = m_modelRelax.find(b);
@@ -664,14 +659,15 @@ void DecompAlgoPC::solutionUpdateAsIP()
          continue;
       }
 
-      if (( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
-            (!model->m_masterOnly && model->getNumInts() == 0)) {
+      if ( model->masterOnlyCols.size() ||
+	  (!model->masterOnlyCols.size() && model->getNumInts() == 0)) {
          osi_Sym->setContinuous((*li)->getColMasterIndex());
          //printf("set back to continuous index=%d block=%d\n",
          //       b, (*li)->getColMasterIndex());
          //       std::cout << "set continuous variables back " << std::endl;
       }
    }
+   */
 
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
@@ -1107,6 +1103,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
          m_masterSI->setContinuous(colIndex);
       }
    }
+
 
 #ifdef __DECOMP_IP_CPX__
    //---

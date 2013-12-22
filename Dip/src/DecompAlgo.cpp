@@ -2601,7 +2601,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #else
 
       if (resolve) {
-         //         m_masterSI->writeMps("temp");
+	//	m_masterSI->writeMps("temp");
          m_masterSI->resolve();
       } else {
          m_masterSI->initialSolve();
