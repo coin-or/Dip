@@ -274,7 +274,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
    if(logIpLevel == 0 ){
-     sym_set_int_param(env, "verbosity", -1);
+     sym_set_int_param(env, "verbosity", -10);
    }
    else{
      sym_set_int_param(env, "verbosity", logIpLevel);
