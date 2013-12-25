@@ -247,12 +247,34 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    result->m_solution.clear();
 #ifdef __DECOMP_IP_SYMPHONY__
+   /*
    OsiSymSolverInterface* osiSym
    = dynamic_cast<OsiSymSolverInterface*>(m_osi);
-   assert(osiSym);
-   sym_environment* env = osiSym->getSymphonyEnvironment();
+   */
+   OsiSolverInterface * m_submodelClone = m_osi->clone();
+
+   OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
+   const CoinPackedMatrix* matrix_sym = (m_submodelClone->getMatrixByRow());
+   const double* col_lb = (m_submodelClone->getColLower());
+   const double* col_up = (m_submodelClone->getColUpper());
+   const double* row_lb = (m_submodelClone->getRowLower());
+   const double* row_up = (m_submodelClone->getRowUpper());
+   const double* obj_coef = (m_submodelClone->getObjCoefficients());
+   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
+                          const_cast<double*&>(col_lb),
+                          const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
+                          const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
+   int nMasterCols = m_submodelClone->getNumCols();
+   for (int i = 0; i < nMasterCols; i++) {
+     if (m_submodelClone->isInteger(i)) {
+       osi_Sym->setInteger(i);
+     }
+   }
+
+   assert(osi_Sym);
+   sym_environment* env = osi_Sym->getSymphonyEnvironment();
    assert(env);
-   osiSym->branchAndBound();
+   osi_Sym->branchAndBound();
    int status = sym_get_status(env);
 
    if (status == TM_OPTIMAL_SOLUTION_FOUND) {
@@ -308,7 +330,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal = false ;
       }
    }
-
+   UTIL_DELPTR(osi_Sym);
 #endif
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
