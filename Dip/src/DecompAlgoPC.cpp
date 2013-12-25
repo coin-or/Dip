@@ -671,6 +671,13 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
+   if (logIpLevel == 0){
+     sym_set_int_param(env, "verbosity", -1);
+   }
+   else{
+     sym_set_int_param(env, "verbosity", logIpLevel);
+   }
+
    assert(env);
    osi_Sym->branchAndBound();
    int status = sym_get_status(env);

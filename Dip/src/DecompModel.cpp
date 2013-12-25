@@ -273,6 +273,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
+   if(logIpLevel == 0 ){
+     sym_set_int_param(env, "verbosity", -1);
+   }
+   else{
+     sym_set_int_param(env, "verbosity", logIpLevel);
+   }
    assert(env);
    osi_Sym->branchAndBound();
    int status = sym_get_status(env);
@@ -308,11 +314,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
                 << objective_value << std::endl;
       status = sym_get_col_solution(env, solution);
 
+      /*
       for (int i = 0 ; i < numCols; ++i) {
          std::cout << "the solution is " << solution[i]
                    << std::endl;
       }
-
+      */
       result->m_nSolutions = 1;
       vector<double> solVec(solution, solution + numCols);
       result->m_solution.push_back(solVec);
