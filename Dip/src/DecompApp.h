@@ -350,8 +350,9 @@ public:
    virtual int generateCuts(const double*   x,
                             DecompCutList& newCuts);
 
-   virtual void solveRelaxedWhich(std::vector<int>&                blocksToSolve,
-                                  std::map< int, std::vector<double> >& userDualsByBlock) {
+   virtual void solveRelaxedWhich(std::vector<int>& blocksToSolve,
+                                  std::map< int,
+				  std::vector<double> >& userDualsByBlock) {
    };
 
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,

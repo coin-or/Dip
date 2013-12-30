@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-DEBUGGING = False
-
 import sys
 
 from pulp import *
@@ -11,10 +9,18 @@ try:
 except ImportError:
     pass
         
-if DEBUGGING:
+try:
+    import path
+except ImportError:
+    pass
+        
+try:
     import dippy
-else:
-    import coinor.dippy as dippy
+except ImportError:
+    try:
+        import src.dippy as dippy
+    except ImportError:
+        import coinor.dippy as dippy
 
 from math import floor, ceil
 
@@ -371,7 +377,7 @@ if debug_print_lp:
 prob.writeFull('facility.lp', 'facility.dec')
 
 #prob.branch_method = choose_antisymmetry_branch
-#prob.relaxed_solver = solve_subproblem
+prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
@@ -382,7 +388,7 @@ prob.writeFull('facility.lp', 'facility.dec')
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
     'doPriceCut': '1',
-    'CutCGL': '0',
+    'CutCGL': '1',
 #    'SolveMasterAsIp': '0',
 #    'generateInitVars': '1',
 #    'LogDebugLevel': 3,
