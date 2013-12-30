@@ -12,7 +12,7 @@ from dipapi import DipAPI
 from _dippy import *
 
 try:
-    from gimpy import BinaryTree
+    from coinor.gimpy import BinaryTree
 except ImportError:
     gimpy_installed = False
 else:
@@ -20,7 +20,7 @@ else:
 
 if gimpy_installed:
     try:
-        from grumpy import BBTree
+        from coinor.grumpy import BBTree
     except ImportError:
         grumpy_installed = False
     else:

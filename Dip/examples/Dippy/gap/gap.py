@@ -4,21 +4,23 @@
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
 
-DEBUGGING = False
-
-import sys
-
-from pulp import *
-
 try:
     import path
 except ImportError:
     pass
         
-if DEBUGGING:
-    from dippy import dippy
-else:
-    import coinor.dippy as dippy
+try:
+    import path
+except ImportError:
+    pass
+        
+try:
+    import dippy
+except ImportError:
+    try:
+        import src.dippy as dippy
+    except ImportError:
+        import coinor.dippy as dippy
 
 debug_print = False
 
