@@ -56,7 +56,7 @@ for m in MACHINES:
     assignVars.append(v)
 
 prob = dippy.DipProblem("GAP",
-                        display_mode = 'xdot', 
+                        display_mode = 'off', 
                         layout = 'dot',
                         display_interval = None,
                         )
@@ -177,7 +177,7 @@ prob.relaxed_solver = solve_subproblem
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
-    'doCut': '1',
+    'doPriceCut': '1',
 #    'logLevel': '3', 
 })
 
