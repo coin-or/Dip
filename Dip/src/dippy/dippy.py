@@ -816,7 +816,15 @@ class DipProblem(pulp.LpProblem, DipAPI):
             
             if dvs is not None:
                 if len(dvs) > 0:
-                    return dvs
+                    dvs_with_costs = []
+                    for var in dvs:
+                        if isinstance(var, dict):
+                            cost = sum(self.objective[i]*var[i] for i in var)
+                            red_cost = sum(redCostDict[i]*var[i] for i in var)
+                            dvs_with_costs.append((cost, red_cost, var))
+                        else:
+                            return dvs
+                    return dvs_with_costs
                 else:
                     print "Empty variable list in solveRelaxed, returning None"
   
