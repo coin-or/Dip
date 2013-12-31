@@ -2,7 +2,7 @@
 
 import sys
 
-from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
 try:
     import path
@@ -119,7 +119,7 @@ def knapsack01(obj, weights, capacity):
         return 0, []
 
     if (debug_subproblem):
-        relaxation = pulp.LpProblem('relaxation', pulp.LpMaximize)
+        relaxation = LpProblem('relaxation', LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
         relaxation += (lpSum(var_dict[str(i)] * weights[i] for i in range(n)) 
