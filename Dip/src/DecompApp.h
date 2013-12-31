@@ -357,12 +357,14 @@ public:
 
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
                                            const double*      redCostX,
+					   const double       convexDual,
                                            DecompVarList&     varList) {
       return DecompSolStatNoSolution;
    }
    virtual DecompSolverStatus solveRelaxedNest(const int          whichBlock,
-         const double*      redCostX,
-         DecompVarList&     varList) {
+					       const double*      redCostX,
+					       const double       convexDual,
+					       DecompVarList&     varList) {
       return DecompSolStatNoSolution;
    }
 

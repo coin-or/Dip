@@ -787,7 +787,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
             errorStr = "Error in postProcessBranch\n%s" % ex
             raise DipError(errorStr)
 
-    def solveRelaxed(self, key, redCostX):
+    def solveRelaxed(self, key, redCostX, target):
         """
         Returns solutions to the whichBlock relaxed subproblem
 
@@ -812,7 +812,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 raise DipError("Reduced cost and variable list don't match in",
                                "solveRelaxed")
     
-            dvs = self.relaxed_solver(self, key, redCostDict)
+            dvs = self.relaxed_solver(self, key, redCostDict, target)
             
             if dvs is not None:
                 if len(dvs) > 0:

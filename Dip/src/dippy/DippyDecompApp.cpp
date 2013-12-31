@@ -335,7 +335,9 @@ void DippyDecompApp::createModels()
  * return the status of the subproblem solver.
  */
 DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
-      const double* redCostX, DecompVarList& varList)
+						const double* redCostX, 
+						const double convexDual, 
+						DecompVarList& varList)
 {
    if (!m_pySolveRelaxed) {
       return DecompSolStatNoSolution;
@@ -344,8 +346,10 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
    PyObject* pRelaxKey = PyList_GetItem(m_relaxedKeys, whichBlock);
    PyObject* pRedCostList = pyTupleList_FromDoubleArray(redCostX, m_colList);
    // call solveRelaxed on DipProblem
-   PyObject* pVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OO", pRelaxKey,
-                        pRedCostList);
+   PyObject* pVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OOd", 
+					    pRelaxKey,
+					    pRedCostList,
+					    convexDual);
 
    if (pVarList == NULL) {
       throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
