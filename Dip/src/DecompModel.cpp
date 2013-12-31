@@ -247,29 +247,11 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    result->m_solution.clear();
 #ifdef __DECOMP_IP_SYMPHONY__
-   /*
-   OsiSymSolverInterface* osiSym
-   = dynamic_cast<OsiSymSolverInterface*>(m_osi);
-   */
-   OsiSolverInterface * m_submodelClone = m_osi->clone();
+   
+   OsiSolverInterface * m_subModelClone = m_osi->clone();
 
-   OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
-   const CoinPackedMatrix* matrix_sym = (m_submodelClone->getMatrixByRow());
-   const double* col_lb = (m_submodelClone->getColLower());
-   const double* col_up = (m_submodelClone->getColUpper());
-   const double* row_lb = (m_submodelClone->getRowLower());
-   const double* row_up = (m_submodelClone->getRowUpper());
-   const double* obj_coef = (m_submodelClone->getObjCoefficients());
-   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
-                          const_cast<double*&>(col_lb),
-                          const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
-                          const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
-   int nMasterCols = m_submodelClone->getNumCols();
-   for (int i = 0; i < nMasterCols; i++) {
-     if (m_submodelClone->isInteger(i)) {
-       osi_Sym->setInteger(i);
-     }
-   }
+   OsiSymSolverInterface* osi_Sym
+     = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
 
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
