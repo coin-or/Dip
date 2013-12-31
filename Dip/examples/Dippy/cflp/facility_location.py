@@ -103,7 +103,7 @@ def solve_subproblem(prob, key, redCosts, target):
         rcCheck = 0.0
         for v in var_values.keys():
             rcCheck += redCosts[v] * var_values[v]
-        print "Checking rc calc", rc, rcCheck 
+        print "Checking rc calc", redCosts[use_vars[loc]] - z, rcCheck 
         print var_values
 
     return [var_values]
