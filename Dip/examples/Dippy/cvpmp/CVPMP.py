@@ -8,7 +8,7 @@ __email__     = 'dago@yalma.fime.uanl.mx'
 
 
 import  sys
-from    pulp import *
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 from    math import *
 try:
     import path

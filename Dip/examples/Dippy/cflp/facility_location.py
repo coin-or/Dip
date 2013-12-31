@@ -2,7 +2,7 @@
 
 import sys
 
-from pulp import *
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 
 try:
     import path
