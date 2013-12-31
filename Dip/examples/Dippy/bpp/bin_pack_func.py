@@ -21,7 +21,8 @@ class BinPackProb:
     def __init__(self, ITEMS, volume, capacity):
         self.ITEMS = ITEMS
         self.volume = volume
-        self.BINS = range(len(ITEMS)) # Create 1 bin for each item, indices start at 0
+        self.BINS = range(len(ITEMS)) # Create 1 bin for each item, indices 
+                                      # start at 0
         self.capacity = capacity
     
 def formulate(bpp):
@@ -99,7 +100,7 @@ def solve(prob):
     prob.node_heuristic = True
   
     dippyOpts = {'doPriceCut' : '1',
-                 'CutCGL': '0',
+                 'CutCGL': '1',
 #                'SolveMasterAsIp': '0'
 #                'generateInitVars': '1',
 #                 'LogDebugLevel': 5,

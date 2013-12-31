@@ -4,6 +4,10 @@
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
 
+import sys
+
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
+
 try:
     import path
 except ImportError:
@@ -72,14 +76,14 @@ for m in MACHINES:
 for t in TASKS:
     prob += lpSum(assignVars[m][t] for m in MACHINES) == 1
 
-def solve_subproblem(prob, machine, redCosts):
+def solve_subproblem(prob, machine, redCosts, target):
     if debug_print:
         print "solve_subproblem..."
         print redCosts
    
     # get tasks which have negative reduced costs
     task_idx = [t for t in TASKS if redCosts[assignVars[machine][t]] < 0]
-    vars = [assignVars[machine][t] for t in task_idx]
+    var = [assignVars[machine][t] for t in task_idx]
     obj = [-redCosts[assignVars[machine][t]] for t in task_idx]
     weights = [RESOURCE_USE[machine][t] for t in task_idx]
 
@@ -87,38 +91,26 @@ def solve_subproblem(prob, machine, redCosts):
 
     # Get the reduced cost of the knapsack solution and waste
     if debug_print:
-        print [(v, redCosts[v]) for v in vars]
+        print [(v, redCosts[v]) for v in var]
         print obj
         print "z, solution =", z, solution
-
-    rc = -z
-
-    if debug_print:
-        print "rc", rc
+        print "rc", -z
     # Return the solution if the reduced cost is low enough
     # ...
-    if rc > tol: # ... or an empty location is "useful"
-       
-        var_values = {}
-
-        var_tuple = (0.0, 0.0, var_values)
+    if z < -tol: # ... or an empty location is "useful"
         if debug_print:
             print "Empty solution is optimal"
-            print var_tuple
-        return [var_tuple]
+        return [{}]
 
-    orig_cost = sum(prob.objective.get(vars[idx]) for idx in solution)
     var_values = dict([(vars[i], 1) for i in solution])
 
-    var_tuple = (orig_cost, rc, var_values)
-    rcCheck = 0.0
-    for v in var_values.keys():
-        rcCheck += redCosts[v] * var_values[v]
     if debug_print:
-        print "Checking rc calc", rc, rcCheck 
-        print var_tuple
-    return [var_tuple]
-    return None
+        rcCheck = 0.0
+        for v in var_values.keys():
+            rcCheck += redCosts[v] * var_values[v]
+        print "Checking rc calc", -z, rcCheck 
+        print var_values
+    return [var_values]
 
 def knapsack01(obj, weights, capacity):
     """ 0/1 knapsack solver, maximizes profit. weights and capacity integer """
@@ -131,7 +123,7 @@ def knapsack01(obj, weights, capacity):
         return 0, []
 
     if (debug_subproblem):
-        relaxation = pulp.LpProblem('relaxation', pulp.LpMaximize)
+        relaxation = LpProblem('relaxation', LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
         relaxation += lpSum(var_dict[str(i)] * weights[i] for i in range(n)) <= capacity
