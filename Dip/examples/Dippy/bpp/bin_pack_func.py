@@ -1,6 +1,6 @@
 import sys
 
-from pulp import *
+from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
 try:
     import path
@@ -64,7 +64,6 @@ def formulate(bpp):
     return prob
 
 def my_branch(prob, sol):
-    bounds = None
    
     bounds = symmetry(prob, sol)
   
