@@ -264,7 +264,7 @@ public:
 
    /* using AlpsKnowledge::encode ; */
    /* /\** The method that encodes the model into an encoded object. *\/ */
-   virtual AlpsEncoded* encode() const;
+   virtual AlpsEncoded* encode() const ;
 
    /* /\** The method that decodes the model from an encoded object. *\/ */
    virtual void decodeToSelf(AlpsEncoded&);
