@@ -160,23 +160,19 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
       m_param.dumpSettings();
    }
 
-   bool getBlockSuccess(false); 
+   bool getBlockSuccess(false);
 
    if (!m_param.Concurrent && !NumBlocks) {
       //---
       //--- read block file
       //---
-     getBlockSuccess = readBlockFile();
-
-   } 
-
-   if ( m_param.CheckSpecialStructure 
-	      && !getBlockSuccess){
-      
-     connectedComponentsDetection(); 
-
+      getBlockSuccess = readBlockFile();
    }
-   else if(!getBlockSuccess)
+
+   if ( m_param.CheckSpecialStructure
+         && !getBlockSuccess) {
+      connectedComponentsDetection();
+   } else if (!getBlockSuccess)
       // automatic structure detection
    {
 #pragma omp critical
@@ -196,98 +192,92 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
 
 void DecompApp::connectedComponentsDetection()
 {
-  int numRows; 
-  int numCols; 
-  int* vectorStarts; 
-  int* vectorLengths; 
-  int* indices; 
-  const double* rhs; 
-  const char* rowSense;  
-  const CoinPackedMatrix m_matrixByColumn; 
+   int numRows;
+   int numCols;
+   int* vectorStarts;
+   int* vectorLengths;
+   int* indices;
+   const double* rhs;
+   const char* rowSense;
+   const CoinPackedMatrix m_matrixByColumn;
 
-  if (m_param.InstanceFormat == "MPS") {
-    m_matrix =  m_mpsIO.getMatrixByRow();
-    numRows = m_mpsIO.getNumRows();
-    numCols = m_mpsIO.getNumCols();
-    rhs = m_mpsIO.getRightHandSide();     
-    rowSense = m_mpsIO.getRowSense(); 
-    (const_cast<CoinPackedMatrix*>(m_matrix))->reverseOrderedCopyOf(m_matrixByColumn); 
-  } else if (m_param.InstanceFormat == "LP") {
-    m_matrix =  m_lpIO.getMatrixByRow();
-    numRows  = m_lpIO.getNumRows(); 
-    numCols  = m_lpIO.getNumCols(); 
-    rhs      = m_lpIO.getRightHandSide();  
-    rowSense = m_lpIO.getRowSense(); 
-    (const_cast<CoinPackedMatrix*>(m_matrix))->reverseOrderedCopyOf(m_matrixByColumn); 
-  }
+   if (m_param.InstanceFormat == "MPS") {
+      m_matrix =  m_mpsIO.getMatrixByRow();
+      numRows = m_mpsIO.getNumRows();
+      numCols = m_mpsIO.getNumCols();
+      rhs = m_mpsIO.getRightHandSide();
+      rowSense = m_mpsIO.getRowSense();
+      (const_cast<CoinPackedMatrix*>(m_matrix))->reverseOrderedCopyOf(m_matrixByColumn);
+   } else if (m_param.InstanceFormat == "LP") {
+      m_matrix =  m_lpIO.getMatrixByRow();
+      numRows  = m_lpIO.getNumRows();
+      numCols  = m_lpIO.getNumCols();
+      rhs      = m_lpIO.getRightHandSide();
+      rowSense = m_lpIO.getRowSense();
+      (const_cast<CoinPackedMatrix*>(m_matrix))->reverseOrderedCopyOf(m_matrixByColumn);
+   }
 
-  int index = 0; 
-  bool setPartitionOrCover(true); 
-  //map to store the row type
-  std::map<int, DecompMasterRowType> masterRowTypeMap; 
-  // map count to store the row type count
-  std::map<DecompMasterRowType, int> masterRowTypeCount;
-  masterRowTypeCount.insert(std::pair<DecompMasterRowType,int>
-			    (SET_COVERING, 0)); 
-  masterRowTypeCount.insert(std::pair<DecompMasterRowType,int>
-			    (SET_PARTITIONING, 0)); 
+   int index = 0;
+   bool setPartitionOrCover(true);
+   //map to store the row type
+   std::map<int, DecompMasterRowType> masterRowTypeMap;
+   // map count to store the row type count
+   std::map<DecompMasterRowType, int> masterRowTypeCount;
+   masterRowTypeCount.insert(std::pair<DecompMasterRowType, int>
+                             (SET_COVERING, 0));
+   masterRowTypeCount.insert(std::pair<DecompMasterRowType, int>
+                             (SET_PARTITIONING, 0));
 
-  
-  for(int i = 0 ; i < numRows; i ++){
-    for(int j = 0; j < m_matrix->getVectorSize(i); j ++ ){
-      if(m_matrix->getElements()[index] != 1){
-	j = m_matrix->getVectorSize(i); 
-	setPartitionOrCover = false; 
-      }
-      ++index; 
-    }
-    
-    if(setPartitionOrCover == true ){
-      setPartitionOrCover = (rhs[i] == 1)? true : false; 
-    }
+   for (int i = 0 ; i < numRows; i ++) {
+      for (int j = 0; j < m_matrix->getVectorSize(i); j ++ ) {
+         if (m_matrix->getElements()[index] != 1) {
+            j = m_matrix->getVectorSize(i);
+            setPartitionOrCover = false;
+         }
 
-    if(setPartitionOrCover == true ) {
-      if (rowSense[i] == 'G'){
-	masterRowTypeMap.insert(std::make_pair<int,
-				DecompMasterRowType>(i,SET_COVERING)); 
-	masterRowTypeCount.at(SET_COVERING)+=1; 
+         ++index;
       }
 
-      else if (rowSense[i] == 'E'){
-	masterRowTypeMap.insert(std::make_pair<int,
-				DecompMasterRowType>(i,
-						     SET_PARTITIONING));
-	masterRowTypeCount.at(SET_PARTITIONING)+=1; 
-      }      
-    }        
-    setPartitionOrCover = true;
-  }
-  
-  std::cout << "The number of set-partitioning constraints is " 
-	    <<masterRowTypeCount.at(SET_PARTITIONING) << std::endl; 
-  std::cout << "The number of set-covering constraints is " 
-	    <<masterRowTypeCount.at(SET_COVERING) << std::endl; 
-  /** 
-   ** Find the disconnected components on the submatrix of the original 
-   ** matrix minus the master rows by the tree search 
-   **/
-  index = 0; 
-  queue<int> columnQueue;
-  std::map<int,DecompMasterRowType>::iterator it;
-  for(int i = 0 ; i < numRows; i++){
-    if(masterRowTypeMap.find(i) != masterRowTypeMap.end()){      
-      columnQueue.push(m_matrix->getIndices()[index]);      
-      index += 1; 
-    }
-    else {
-      index += m_matrix->getVectorSize(i);       
-    }
-    
-  }
+      if (setPartitionOrCover == true ) {
+         setPartitionOrCover = (rhs[i] == 1) ? true : false;
+      }
 
+      if (setPartitionOrCover == true ) {
+         if (rowSense[i] == 'G') {
+            masterRowTypeMap.insert(std::make_pair < int,
+                                    DecompMasterRowType > (i, SET_COVERING));
+            masterRowTypeCount.at(SET_COVERING) += 1;
+         } else if (rowSense[i] == 'E') {
+            masterRowTypeMap.insert(std::make_pair < int,
+                                    DecompMasterRowType > (i,
+                                          SET_PARTITIONING));
+            masterRowTypeCount.at(SET_PARTITIONING) += 1;
+         }
+      }
 
+      setPartitionOrCover = true;
+   }
 
+   std::cout << "The number of set-partitioning constraints is "
+             << masterRowTypeCount.at(SET_PARTITIONING) << std::endl;
+   std::cout << "The number of set-covering constraints is "
+             << masterRowTypeCount.at(SET_COVERING) << std::endl;
+   /**
+    ** Find the disconnected components on the submatrix of the original
+    ** matrix minus the master rows by the tree search
+    **/
+   index = 0;
+   queue<int> columnQueue;
+   std::map<int, DecompMasterRowType>::iterator it;
 
+   for (int i = 0 ; i < numRows; i++) {
+      if (masterRowTypeMap.find(i) != masterRowTypeMap.end()) {
+         columnQueue.push(m_matrix->getIndices()[index]);
+         index += 1;
+      } else {
+         index += m_matrix->getVectorSize(i);
+      }
+   }
 }
 
 const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
@@ -418,10 +408,12 @@ bool DecompApp::readBlockFile()
       fileName = m_param.BlockFile;
    }
 
-   std::cout<< "The file name is " << fileName << std::endl; 
-   if(fileName ==""){     
-     return false;
-   } 
+   std::cout << "The file name is " << fileName << std::endl;
+
+   if (fileName == "") {
+      return false;
+   }
+
    //---
    //--- is there a permutation file?
    //---  this file just remaps the row ids
@@ -720,7 +712,9 @@ bool DecompApp::readBlockFile()
       blockId++;
    }
 
-   if (m_blocks.size() >0) {return true; }
+   if (m_blocks.size() > 0) {
+      return true;
+   }
 
    if (m_param.LogLevel >= 3) {
       map<int, vector<int> >::iterator mit;
@@ -739,7 +733,6 @@ bool DecompApp::readBlockFile()
 
    //exit(1);
    is.close();
-
 }
 
 
@@ -1779,24 +1772,47 @@ void DecompApp::singlyBorderStructureDetection()
          numRowIndex.erase(temp.at(s));
       }
 
-      if (numRowIndex.size() != 0) {
-         //GCG defaults 1 as starting block number, DIP had default value 0 but
-         // 1 should be fine, which is why we add 1
-         blockdata << "BLOCK " << (truePartNum + 1) << "\n";
+      if (m_param.BlockFileOutputFormat == GCG_BLOCKFILE) {
+         if (numRowIndex.size() != 0) {
+            //GCG defaults 1 as starting block number, DIP had default value 0 but
+            // 1 should be fine, which is why we add 1
+            blockdata << "BLOCK " << (truePartNum + 1) << "\n";
 
-         for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
-               rowIter++) {
-            if (m_param.InstanceFormat == "MPS") {
-               blockdata << m_mpsIO.rowName(*rowIter) << "\n";
-            } else if (m_param.InstanceFormat == "LP") {
-               blockdata << m_lpIO.rowName(*rowIter) << "\n";
+            for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
+                  rowIter++) {
+               if (m_param.InstanceFormat == "MPS") {
+                  blockdata << m_mpsIO.rowName(*rowIter) << "\n";
+               } else if (m_param.InstanceFormat == "LP") {
+                  blockdata << m_lpIO.rowName(*rowIter) << "\n";
+               }
+
+               rowsBlock.push_back(*rowIter);
             }
 
-            rowsBlock.push_back(*rowIter);
+            m_blocks.insert(make_pair(truePartNum, rowsBlock));
+            truePartNum ++;
          }
+      } else if (m_param.BlockFileOutputFormat == SAS_BLOCKFILE) {
+         if (numRowIndex.size() != 0) {
+            //GCG defaults 1 as starting block number, DIP had default value 0 but
+            // 1 should be fine, which is why we add 1
+            for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
+                  rowIter++) {
+               if (m_param.InstanceFormat == "MPS") {
+                  blockdata << m_mpsIO.rowName(*rowIter) << " ";
+               } else if (m_param.InstanceFormat == "LP") {
+                  blockdata << m_lpIO.rowName(*rowIter) << " ";
+               }
 
-         m_blocks.insert(make_pair(truePartNum, rowsBlock));
-         truePartNum ++;
+               blockdata << (truePartNum ) << "\n";
+               rowsBlock.push_back(*rowIter);
+            }
+
+            m_blocks.insert(make_pair(truePartNum, rowsBlock));
+            truePartNum ++;
+         }
+      } else {
+         cerr << "Wrong block file output Format" << endl;
       }
 
       numRowIndex.clear();
@@ -1806,7 +1822,7 @@ void DecompApp::singlyBorderStructureDetection()
 
    blockdata.close();
 
-   if (m_param.BlockFileOutput) {
+   if (m_param.BlockFileOutput && (m_param.BlockFileOutputFormat == GCG_BLOCKFILE)) {
       fstream input_file;
       input_file.open(BlockFile.c_str(), ios::in);
       std::ofstream blockdata2;
@@ -1821,6 +1837,7 @@ void DecompApp::singlyBorderStructureDetection()
          blockdata2 << line << "\n";
       }
 
+      remove(BlockFile.c_str());
       blockdata2.close();
    }
 

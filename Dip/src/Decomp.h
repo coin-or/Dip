@@ -80,10 +80,10 @@ struct DecompMainParam {
    double bestUB;
 };
 
-enum DecompMasterRowType{
-  SET_PARTITIONING,
-  SET_COVERING, 
-  OTHER
+enum DecompMasterRowType {
+   SET_PARTITIONING,
+   SET_COVERING,
+   OTHER
 };
 
 enum DecompAlgoType {
@@ -281,6 +281,11 @@ const std::string DecompColTypeStr[12] = {
    "DecompCol_ArtForCutL",
    "DecompCol_ArtForCutG",
    "DecompCol_ToBeDeleted"
+};
+
+enum BlockFileOutputFormat {
+   SAS_BLOCKFILE,
+   GCG_BLOCKFILE
 };
 
 /*
