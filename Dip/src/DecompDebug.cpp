@@ -186,14 +186,30 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet* model,
 //===========================================================================//
 void DecompAlgo::checkMasterDualObj()
 {
-   int    r;
    const int      nRows     = m_masterSI->getNumRows();
    const double* rowRhs    = m_masterSI->getRightHandSide();
    const double* dual      = m_masterSI->getRowPrice();
    const double   primalObj = m_masterSI->getObjValue();
    double dualObj = 0.0;
+   const int nCols = m_masterSI->getNumCols();
+   const double* rc = m_masterSI->getReducedCost();
+   const double* colLower = m_masterSI->getColLower();
+   const double* colUpper = m_masterSI->getColUpper();
+   //rStat might not be needed now, but will be needed
+   // when we support ranged rows.
+   int* rStat = new int[nRows];
+   int* cStat = new int[nCols];
+   m_masterSI->getBasisStatus(cStat, rStat);
 
-   for (r = 0; r < nRows; r++) {
+   for (int c = 0; c < nCols; c++) {
+      if (cStat[c] == 3) {
+         dualObj += rc[c] * colLower[c];
+      } else if (cStat[c] == 2 ) {
+         dualObj += rc[c] * colUpper[c];
+      }
+   }
+
+   for (int r = 0; r < nRows; r++) {
       dualObj += dual[r] * rowRhs[r];
    }
 
@@ -205,6 +221,8 @@ void DecompAlgo::checkMasterDualObj()
               << setw(10) << "dualObj="
               << setw(10) << UtilDblToStr(dualObj, 3) << endl;
              );
+   std::cout << "The primalObj is " << primalObj << std::endl;
+   std::cout << "The dualObj is " << dualObj     << std::endl;
    double actViol = std::fabs(primalObj - dualObj);
    double relViol = actViol;
 
@@ -221,6 +239,9 @@ void DecompAlgo::checkMasterDualObj()
       throw UtilException("primal and dual obj do not match",
                           "checkMasterDualObj", "DecompAlgo");
    }
+
+   UTIL_DELPTR(rStat);
+   UTIL_DELPTR(cStat);
 }
 
 //===========================================================================//
