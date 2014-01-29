@@ -141,6 +141,9 @@ protected:
     */
    OsiSolverInterface* m_masterSI;
 
+#ifdef __DECOMP_IP_SYMPHONY__
+   OsiSymSolverInterface* osi_Sym;
+#endif
    /**
     * Solver interface(s) for entire problem (Q'').
     *   CPM: not used (use m_masterSI)
@@ -851,7 +854,7 @@ public:
       UtilPrintFuncBegin(m_osLog, m_classTag,
                          "setObjBound()", m_param.LogDebugLevel, 2);
 
-      if (thisBound > m_nodeStats.objBest.first) {
+      if (thisBound > m_nodeStats.objBest.first && getNodeIndex() !=0) {
          m_nodeStats.objBest.first = thisBound;
 
          if (getNodeIndex() == 0) {
