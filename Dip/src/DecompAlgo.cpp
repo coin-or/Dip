@@ -1,3 +1,4 @@
+
 //===========================================================================//
 // This file is part of the DIP Solver Framework.                            //
 //                                                                           //
@@ -311,10 +312,14 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //---
    //--- create the master OSI interface
    //---
+#ifdef __DECOMP_IP_SYMPHONY__
+   m_masterSI = new OsiSymSolverInterface();
+#else
    m_masterSI = new OsiLpSolverInterface();
+#endif
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
-#ifdef __DECOMP_LP_CLP__
+#if defined ( __DECOMP_LP_CLP__) && !defined ( __DECOMP_IP_SYMPHONY__)
    OsiClpSolverInterface* masterSIClp = dynamic_cast<OsiClpSolverInterface*>
                                         (m_masterSI);
    masterSIClp->getModelPtr()->setLogLevel(m_param.LogLpLevel);
@@ -1934,6 +1939,8 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                                       newVars, mostNegRC);
          m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
          m_nodeStats.cutsThisCall   = 0;
+         // Store the m_numCols and use it in updateObjBound function
+         m_numCols = m_masterSI->getNumCols();
 
          if (m_nodeStats.varsThisCall > 0) {
             //---
@@ -2575,6 +2582,13 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
    //printf("preind=%d\n",preInd);
 #endif
+   const int nMasterCols = m_masterSI->getNumCols();
+
+   for (int i = 0 ; i < nMasterCols; i++) {
+      if (isMasterColStructural(i)) {
+         m_masterSI->setContinuous(i);
+      }
+   }
 
    switch (phase) {
    case PHASE_PRICE1:
@@ -2601,7 +2615,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #else
 
       if (resolve) {
-	//	m_masterSI->writeMps("temp");
+         //	m_masterSI->writeMps("temp");
          m_masterSI->resolve();
       } else {
          m_masterSI->initialSolve();
@@ -2679,6 +2693,11 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       const double* primSol = m_masterSI->getColSolution();
       // Need to distinguish the primSol after we added master-only variables
       const double* dualSol = m_masterSI->getRowPrice();
+      const double* rc      = m_masterSI->getReducedCost();
+      m_reducedCost.clear();
+      m_reducedCost.reserve(nCols);
+      m_reducedCost.assign(rc, rc + nCols);
+      assert((int)m_reducedCost.size() == nCols);
       m_primSolution.clear();
       m_primSolution.reserve(nCols);
       m_dualSolution.clear();
@@ -3088,12 +3107,33 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    double         zDW_UBDual   = 0.0;
    double         zDW_UB       = 0.0;
    double         zDW_LB       = 0.0;
+   const int nCols = m_masterSI->getNumCols();
+   const double* rc = getMasterColReducedCost();
+   const double* colLower = m_masterSI->getColLower();
+   const double* colUpper = m_masterSI->getColUpper();
+   const double* dual      = m_masterSI->getRowPrice();
+   //rStat might not be needed now, but will be needed
+   // when we support ranged rows.
+   int* rStat = new int[m_numCols];
+   int* cStat = new int[m_numCols];
+   m_masterSI->getBasisStatus(cStat, rStat);
 
-   for (r = 0; r < m_masterSI->getNumRows(); r++) {
+   for (int c = 0; c < m_numCols; c++) {
+      if (cStat[c] == 3) {
+         zDW_UBDual += rc[c] * colLower[c];
+      } else if (cStat[c] == 2 ) {
+         zDW_UBDual += rc[c] * colUpper[c];
+      }
+   }
+
+   int nRows = m_masterSI->getNumRows();
+
+   for (r = 0; r < nRows; r++) {
       zDW_UBDual += dualSol[r] * rowRhs[r];
    }
 
-   zDW_LB = zDW_UBDual + mostNegRC;
+   //zDW_LB = zDW_UBDual + mostNegRC;
+   zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
@@ -3153,6 +3193,8 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
                  << " isTight = " << isGapTight << "\n";
    }
 
+   UTIL_DELPTR(rStat);
+   UTIL_DELPTR(cStat);
    m_relGap = relGap;
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "updateObjBound()", m_param.LogDebugLevel, 2);
@@ -3476,7 +3518,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
                      << " is Infeasible." << endl;);
             m_stopCriteria = DecompStopInfeasible;
             nextPhase      = PHASE_DONE;
-            std::cout << "STATUS is INFEASIBLE" << std::endl;
+            //            std::cout << "STATUS is INFEASIBLE" << std::endl;
             nextStatus     = STAT_INFEASIBLE;
             goto PHASE_UPDATE_FINISH;
          }
@@ -6684,6 +6726,13 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                baseName += "_SB";
             }
 
+            std::cout << "problem name is "
+                      << baseName
+                      << m_nodeStats.nodeIndex
+                      << m_nodeStats.cutCallsTotal
+                      << m_nodeStats.priceCallsTotal
+                      << whichBlock
+                      << std::endl;
             printCurrentProblem(subprobSI,
                                 baseName,
                                 m_nodeStats.nodeIndex,
