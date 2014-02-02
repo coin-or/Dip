@@ -191,6 +191,8 @@ protected:
    //for cpx
    std::vector<double> m_primSolution;
    std::vector<double> m_dualSolution;
+   std::vector<double> m_reducedCost;
+   int m_numCols;
 
    bool m_isColGenExact;
 
@@ -753,6 +755,9 @@ public:
       return &m_primSolution[0];
    }
 
+   inline const double* getMasterColReducedCost() const {
+      return &m_reducedCost[0];
+   }
    /**
     * Get current dual solution for master problem.
     */
@@ -854,7 +859,7 @@ public:
       UtilPrintFuncBegin(m_osLog, m_classTag,
                          "setObjBound()", m_param.LogDebugLevel, 2);
 
-      if (thisBound > m_nodeStats.objBest.first && getNodeIndex() !=0) {
+      if (thisBound > m_nodeStats.objBest.first) {
          m_nodeStats.objBest.first = thisBound;
 
          if (getNodeIndex() == 0) {
