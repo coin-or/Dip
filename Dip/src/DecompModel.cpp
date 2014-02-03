@@ -156,7 +156,7 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
    //---         original base rows
    //---
    //--- TODO: masterOnly variable
-   
+
    for (r = 0; r < model->getNumRows(); r++) {
       if (isSparse) {
          if (isXSparse) {
@@ -222,7 +222,7 @@ bool DecompAlgoModel::isPointFeasible(const double* x,
          }
       }
    }
-   
+
 FUNC_EXIT:
    UTIL_DEBUG(logLevel, 4,
               cout << "isPointFeasible = " << isFeas << endl;
@@ -247,20 +247,18 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    result->m_solution.clear();
 #ifdef __DECOMP_IP_SYMPHONY__
-   
-   OsiSolverInterface * m_subModelClone = m_osi->clone();
-
+   OsiSolverInterface* m_subModelClone = m_osi->clone();
    OsiSymSolverInterface* osi_Sym
-     = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
-
+   = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
-   if(logIpLevel == 0 ){
-     sym_set_int_param(env, "verbosity", -10);
+
+   if (logIpLevel == 0 ) {
+      sym_set_int_param(env, "verbosity", -10);
+   } else {
+      sym_set_int_param(env, "verbosity", logIpLevel);
    }
-   else{
-     sym_set_int_param(env, "verbosity", logIpLevel);
-   }
+
    assert(env);
    osi_Sym->branchAndBound();
    int status = sym_get_status(env);
@@ -295,7 +293,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       std::cout << "The optimal objective value is "
                 << objective_value << std::endl;
       status = sym_get_col_solution(env, solution);
-
       /*
       for (int i = 0 ; i < numCols; ++i) {
          std::cout << "the solution is " << solution[i]
@@ -319,6 +316,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal = false ;
       }
    }
+
    UTIL_DELPTR(osi_Sym);
 #endif
 #ifdef __DECOMP_IP_CBC__
@@ -777,8 +775,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    //printf("solStatus = %d\n", result->m_solStatus);
 
-   if (result->m_solStatus == CPXMIP_OPTIMAL ||
-         result->m_solStatus == CPXMIP_OPTIMAL_TOL) {
+   if (result->m_solStatus == CPXMIP_OPTIMAL || 
+       result->m_solStatus == CPX_STAT_OPTIMAL ||
+       result->m_solStatus == CPXMIP_OPTIMAL_TOL) {
       result->m_isOptimal  = true;
    } else if (result->m_solStatus == CPXMIP_UNBOUNDED ||
               result->m_solStatus == CPX_STAT_UNBOUNDED) {
@@ -798,6 +797,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal  = false;
       }
 
+      std::cout << "the sol status is " << result->m_solStatus << std::endl; 
       //---
       //--- get copy of solution
       //---
