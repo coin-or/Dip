@@ -3114,8 +3114,8 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    const double* dual      = m_masterSI->getRowPrice();
    //rStat might not be needed now, but will be needed
    // when we support ranged rows.
-   int* rStat = new int[m_numCols];
-   int* cStat = new int[m_numCols];
+   int* rStat = new int[m_masterSI->getNumRows()];
+   int* cStat = new int[m_masterSI->getNumCols()];
    m_masterSI->getBasisStatus(cStat, rStat);
 
    for (int c = 0; c < m_numCols; c++) {
