@@ -456,6 +456,10 @@ void DecompAuto(DecompApp milp,
            << UtilDblToStr(alpsModel.getGlobalLB(), 5) << endl
            << " BestUB        = " << setw(10)
            << UtilDblToStr(alpsModel.getGlobalUB(), 5) << endl
+           << " OptiGap       = " << setw(10)
+           << UtilDblToStr(UtilCalculateGap(alpsModel.getGlobalLB(),
+                                            alpsModel.getGlobalUB()), 5)
+           << endl
            << " Nodes         = "
            << alpsModel.getNumNodesProcessed() << endl
            << " SetupCPU      = " << decompMainParam.timeSetupCpu << endl
