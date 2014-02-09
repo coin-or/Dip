@@ -318,13 +318,17 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
 
    if (m_param.InstanceFormat == "") {
       string::size_type idx = fileName.rfind('.');
+      string extension = fileName.substr(idx + 1);
+      std::size_t found = fileName.substr(0, idx).rfind('.');
+
+      if (found != std::string::npos) {
+         extension = fileName.substr(found + 1);
+      }
 
       if (idx != string::npos) {
-         string extension = fileName.substr(idx + 1);
-
-         if (extension == "MPS" || extension == "mps") {
+         if (extension == "MPS" || extension == "mps" || extension == "mps.gz") {
             m_param.InstanceFormat = "MPS";
-         } else if (extension == "LP" || extension == "lp") {
+         } else if (extension == "LP" || extension == "lp" || extension == "lp.gz") {
             m_param.InstanceFormat = "LP";
          }
       } else {
