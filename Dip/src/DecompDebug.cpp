@@ -221,8 +221,6 @@ void DecompAlgo::checkMasterDualObj()
               << setw(10) << "dualObj="
               << setw(10) << UtilDblToStr(dualObj, 3) << endl;
              );
-   std::cout << "The primalObj is " << primalObj << std::endl;
-   std::cout << "The dualObj is " << dualObj     << std::endl;
    double actViol = std::fabs(primalObj - dualObj);
    double relViol = actViol;
 
