@@ -425,8 +425,8 @@ void DecompAuto(DecompApp milp,
       cout << setiosflags(ios::fixed | ios::showpoint);
       int statusCheck = alpsModel.getSolStatus();
       cout << "                                             " << endl;
-      cout << "\n ============== DECOMP Solution Info [Begin]: ============= \n";
-      cout << " Status        = ";
+      cout << "============== DECOMP Solution Info [Begin]: ============== \n";
+      cout << "Status        = ";
 
       if ( !statusCheck) {
          cout << "Optimal" << endl;
@@ -452,25 +452,25 @@ void DecompAuto(DecompApp milp,
 
       decompMainParam.bestLB = alpsModel.getGlobalLB();
       decompMainParam.bestUB = alpsModel.getGlobalUB();
-      cout << " BestLB        = " << setw(10)
+      cout << "BestLB        = " << setw(10)
            << UtilDblToStr(alpsModel.getGlobalLB(), 5) << endl
-           << " BestUB        = " << setw(10)
+           << "BestUB        = " << setw(10)
            << UtilDblToStr(alpsModel.getGlobalUB(), 5) << endl
-           << " OptiGap       = " << setw(10)
+           << "OptiGap       = " << setw(10)
            << UtilDblToStr(UtilCalculateGap(alpsModel.getGlobalLB(),
                                             alpsModel.getGlobalUB()), 5)
            << endl
-           << " Nodes         = "
+           << "Nodes         = "
            << alpsModel.getNumNodesProcessed() << endl
-           << " SetupCPU      = " << decompMainParam.timeSetupCpu << endl
-           << " SolveCPU      = " << decompMainParam.timeSolveCpu << endl
-           << " TotalCPU      = " << decompMainParam.timeSetupCpu +
+           << "SetupCPU      = " << decompMainParam.timeSetupCpu << endl
+           << "SolveCPU      = " << decompMainParam.timeSolveCpu << endl
+           << "TotalCPU      = " << decompMainParam.timeSetupCpu +
            decompMainParam.timeSolveCpu << endl
-           << " SetupWallclock= " << decompMainParam.timeSetupReal << endl
-           << " SolveWallclock= " << decompMainParam.timeSolveReal << endl
-           << " TotalWallclock= " << decompMainParam.timeSetupReal +
-           decompMainParam.timeSolveReal    ;
-      cout << "\n ============== DECOMP Solution Info [END  ]: ============= \n";
+           << "SetupWallclock= " << decompMainParam.timeSetupReal << endl
+           << "SolveWallclock= " << decompMainParam.timeSolveReal << endl
+           << "TotalWallclock= " << decompMainParam.timeSetupReal
+           + decompMainParam.timeSolveReal << endl   ;
+      cout << "============== DECOMP Solution Info [END  ]: ============== \n";
       /* TODO: Add a global parameter to control the subproblem
                parallelization
       cout << "The parallel efficiency is "
