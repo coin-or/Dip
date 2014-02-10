@@ -3193,8 +3193,8 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
                  << " isTight = " << isGapTight << "\n";
    }
 
-   UTIL_DELPTR(rStat);
-   UTIL_DELPTR(cStat);
+   UTIL_DELARR(rStat);
+   UTIL_DELARR(cStat);
    m_relGap = relGap;
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "updateObjBound()", m_param.LogDebugLevel, 2);
