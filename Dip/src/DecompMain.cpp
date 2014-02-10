@@ -507,26 +507,52 @@ void DecompAuto(DecompApp milp,
       //---
       //--- get optimal solution
       //---
-      if (alpsModel.getSolStatus() == AlpsExitStatusOptimal) {
-         string::size_type idx = milp.getInstanceName().rfind('/');
-         string intanceNameWoDir;
 
-         if (idx != string::npos) {
-            intanceNameWoDir = milp.getInstanceName().substr(idx + 1);
-         } else {
-            intanceNameWoDir = milp.getInstanceName();
-         }
-
-         string solutionFile = milp.m_param.CurrentWorkingDir + UtilDirSlash()
-                               + intanceNameWoDir + ".sol";
-         ofstream osSolution(solutionFile.c_str());
+      if (milp.m_param.SolutionOutputToFile
+            && alpsModel.getGlobalUB() < 1.e100) {
          const DecompSolution* solution = alpsModel.getBestSolution();
          const vector<string>& colNames = alpsModel.getColNames();
-         std::cout << "Optimal Solution is " << std::endl;
-         solution->print(colNames, 8);
-         cout << " Optimal Solution can be found in the file "
-              << solutionFile  << endl;
+         string solutionFile;
+
+         if (milp.m_param.SolutionOutputFileName == "") {
+            string::size_type idx = milp.getInstanceName().rfind('/');
+            string intanceNameWoDir;
+
+            if (idx != string::npos) {
+               intanceNameWoDir = milp.getInstanceName().substr(idx + 1);
+            } else {
+               intanceNameWoDir = milp.getInstanceName();
+            }
+
+            solutionFile = milp.m_param.CurrentWorkingDir + UtilDirSlash()
+                           + intanceNameWoDir + ".sol";
+         } else {
+            solutionFile = milp.m_param.SolutionOutputFileName;
+         }
+
+         ofstream osSolution(solutionFile.c_str());
+         const double* sol = solution->getValues();
+         osSolution << "=obj=" << setw(10) << alpsModel.getGlobalUB()
+                    << std::endl;
+
+         for (int i = 0; i < solution->getSize(); i++) {
+            if (!UtilIsZero(sol[i])) {
+               osSolution << colNames[i] << setw(10)
+                          << sol[i] << std::endl;
+            } else {
+               osSolution << colNames[i] << setw(10)
+                          << 0.0000 << std::endl;
+            }
+         }
+
          osSolution.close();
+
+         if (alpsModel.getSolStatus() == AlpsExitStatusOptimal) {
+            std::cout << "Optimal Solution is " << std::endl;
+            solution->print(colNames, 8);
+            cout << " Optimal Solution can be found in the file "
+                 << solutionFile  << endl;
+         }
       }
 
       //---
@@ -535,7 +561,6 @@ void DecompAuto(DecompApp milp,
       delete algo;
    }
 }
-
 DecompSolverResult* solveDirect(const DecompApp& decompApp)
 {
    //---

@@ -313,11 +313,14 @@ public:
 
    double PhaseIObjTol;
 
-
-
    bool CheckSpecialStructure;
 
    int BlockFileOutputFormat;
+
+   bool SolutionOutputToFile;
+
+   std::string SolutionOutputFileName;
+
    /**
     * @}
     */
@@ -430,6 +433,8 @@ public:
       PARAM_getSetting("PhaseIObjTol", PhaseIObjTol);
       PARAM_getSetting("CheckSpecialStructure", CheckSpecialStructure);
       PARAM_getSetting("BlockFileOutputFormat", BlockFileOutputFormat);
+      PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
+      PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -572,6 +577,8 @@ public:
       UtilPrintParameter(os, sec, "PhaseIObjTol", PhaseIObjTol);
       UtilPrintParameter(os, sec, "CheckSpecialStructure", CheckSpecialStructure);
       UtilPrintParameter(os, sec, "BlockFileOutputFormat", BlockFileOutputFormat);
+      UtilPrintParameter(os, sec, "SolutionOutputToFile", SolutionOutputToFile);
+      UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
       (*os) << "========================================================\n";
    }
 
@@ -673,6 +680,8 @@ public:
       PhaseIObjTol             = 0.0005;
       CheckSpecialStructure    = false;
       BlockFileOutputFormat    = 0;
+      SolutionOutputToFile     = true;
+      SolutionOutputFileName   = "";
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {
