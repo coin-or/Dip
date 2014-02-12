@@ -312,11 +312,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //---
    //--- create the master OSI interface
    //---
-#ifdef __DECOMP_IP_SYMPHONY__
-   m_masterSI = new OsiSymSolverInterface();
-#else
    m_masterSI = new OsiLpSolverInterface();
-#endif
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
 #if defined ( __DECOMP_LP_CLP__) && !defined ( __DECOMP_IP_SYMPHONY__)
@@ -478,7 +474,7 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
 
    if (nInts > 0) {
       subprobSI->setInteger(model->getIntegerVars(), nInts);
-#if defined(__DECOMP_IP_CPX__) || defined(__DECOMP_LP_CPX__)
+#if defined(__DECOMP_IP_CPX__) && defined (__DECOMP_LP_CPX__)
       OsiCpxSolverInterface* osiCpx
       = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
       osiCpx->switchToMIP();
