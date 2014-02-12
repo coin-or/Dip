@@ -532,7 +532,7 @@ void DecompAuto(DecompApp milp,
 
          ofstream osSolution(solutionFile.c_str());
          const double* sol = solution->getValues();
-         osSolution << "=obj=" << setw(10) << alpsModel.getGlobalUB()
+         osSolution << "=obj=" << setw(8) << " " << setw(2) << alpsModel.getGlobalUB()
                     << std::endl;
 
          for (int i = 0; i < solution->getSize(); i++) {
