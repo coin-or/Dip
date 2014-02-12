@@ -432,11 +432,11 @@ public:
 
    void singlyBorderStructureDetection();
 
-   /** map the matrix into graph and find connected components 
-       (BFS or DFS) to detect block structure 
+   /** map the matrix into graph and find connected components
+       (BFS or DFS) to detect block structure
     **/
-   void connectedComponentsDetection(); 
-   
+   void connectedComponentsDetection();
+
 
    /** Find the active columns for some block */
    void findActiveColumns(const std::vector<int>& rowsPart,

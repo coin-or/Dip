@@ -594,7 +594,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //---  new column to see if it is feasible to original already
    //---
    assert(m_numConvexCon > 1);
-   int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda
    int  logIpLevel  = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
@@ -602,11 +601,10 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //--- set the master (generated) columns (lambda) to integer
    //--- set the master-onlys (that are integral) to integer
    //---
-   int          j, colIndex;
-   int          numMOs         = UtilGetSize(m_masterOnlyCols);
-   const char* intMarkerCore  = modelCore->getIntegerMark();
+   //   int          numMOs         = UtilGetSize(m_masterOnlyCols);
+   //   const char* intMarkerCore  = modelCore->getIntegerMark();
 
-   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
+   for (int colIndex = 0; colIndex < nMasterCols; colIndex++) {
       if (isMasterColStructural(colIndex)) {
          m_masterSI->setInteger(colIndex);
       }
@@ -621,8 +619,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    DecompSolverResult    result;
 #ifdef __DECOMP_IP_SYMPHONY__
-   OsiSolverInterface * m_masterClone = m_masterSI->clone();
- 
+   OsiSolverInterface* m_masterClone = m_masterSI->clone();
    int numCols = m_masterClone->getNumCols();
    OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
    const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
@@ -635,6 +632,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           const_cast<double*&>(col_lb),
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
+
    for (i = 0; i < nMasterCols; i++) {
       if (isMasterColStructural(i)) {
          osi_Sym->setInteger(i);
@@ -645,8 +643,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //  better to use column type info
    //  like above
    /*
-   DecompVarList::iterator li; 
-   map<int, DecompAlgoModel>::iterator mit; 
+   DecompVarList::iterator li;
+   map<int, DecompAlgoModel>::iterator mit;
 
    for (li = m_vars.begin(); li != m_vars.end(); li++) {
       b   = (*li)->getBlockId();
@@ -660,7 +658,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
 
       if ( model->masterOnlyCols.size() ||
-	  (!model->masterOnlyCols.size() && model->getNumInts() == 0)) {
+     (!model->masterOnlyCols.size() && model->getNumInts() == 0)) {
          osi_Sym->setContinuous((*li)->getColMasterIndex());
          //printf("set back to continuous index=%d block=%d\n",
          //       b, (*li)->getColMasterIndex());
@@ -668,14 +666,13 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
    }
    */
-
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
-   if (logIpLevel == 0){
-     sym_set_int_param(env, "verbosity", -10);
-   }
-   else{
-     sym_set_int_param(env, "verbosity", logIpLevel);
+
+   if (logIpLevel == 0) {
+      sym_set_int_param(env, "verbosity", -10);
+   } else {
+      sym_set_int_param(env, "verbosity", logIpLevel);
    }
 
    assert(env);
@@ -1104,13 +1101,12 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //---
    //--- set the master columns back to continuous
    //---
-   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
+   for (int colIndex = 0; colIndex < nMasterCols; colIndex++) {
       if (isMasterColStructural(colIndex) ||
             isMasterColMasterOnly(colIndex)) {
          m_masterSI->setContinuous(colIndex);
       }
    }
-
 
 #ifdef __DECOMP_IP_CPX__
    //---

@@ -131,30 +131,30 @@ public:
       getSettings(utilParam);
    }
 
-   /** Pack the parameter set into the buffer (AlpsEncoded is used                                                                           
+   /** Pack the parameter set into the buffer (AlpsEncoded is used
       as buffer Here).
    */
    void pack(AlpsEncoded* buf) const {
-     buf->writeRep(logFileLevel); 
-     buf->writeRep(printSolution); 
-     buf->writeRep(checkMemory); 
-     buf->writeRep(msgLevel); 
-     buf->writeRep(nodeLimit); 
-     buf->writeRep(nodeLogInterval);      
+      buf->writeRep(logFileLevel);
+      buf->writeRep(printSolution);
+      buf->writeRep(checkMemory);
+      buf->writeRep(msgLevel);
+      buf->writeRep(nodeLimit);
+      buf->writeRep(nodeLogInterval);
    }
 
 
    /** Unpack the parameter set from the buffer. */
    void unpack(AlpsEncoded& buf) {
-     buf.readRep(logFileLevel); 
-     buf.readRep(printSolution); 
-     buf.readRep(checkMemory); 
-     buf.readRep(msgLevel); 
-     buf.readRep(nodeLimit); 
-     buf.readRep(nodeLogInterval); 
+      buf.readRep(logFileLevel);
+      buf.readRep(printSolution);
+      buf.readRep(checkMemory);
+      buf.readRep(msgLevel);
+      buf.readRep(nodeLimit);
+      buf.readRep(nodeLogInterval);
    }
 
-    
+
 
 
    /**

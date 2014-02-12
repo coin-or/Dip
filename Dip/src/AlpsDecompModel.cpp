@@ -191,7 +191,7 @@ AlpsExitStatus AlpsDecompModel::solve()
 }
 
 AlpsEncoded*
-AlpsDecompModel::encode() const 
+AlpsDecompModel::encode() const
 {
    AlpsReturnStatus status = AlpsReturnStatusOk;
    // NOTE: "AlpsKnowledgeTypeModel" is the type name.
@@ -213,15 +213,12 @@ AlpsReturnStatus
 AlpsDecompModel::encodeAlpsDecomp(AlpsEncoded* encoded) const
 {
    AlpsReturnStatus status = AlpsReturnStatusOk;
-   
    // write the model data into representation
    encoded->writeRep(m_bestLB);
    encoded->writeRep(m_bestUB);
    encoded->writeRep(m_nodesProcessed);
    encoded->writeRep(m_alpsStatus);
-
-   m_param.pack(encoded); 
-
+   m_param.pack(encoded);
    return status;
 }
 
@@ -229,21 +226,17 @@ AlpsReturnStatus
 AlpsDecompModel::decodeAlpsDecomp(AlpsEncoded& encoded)
 {
    AlpsReturnStatus status = AlpsReturnStatusOk;
-   
-   double d_m_bestLB, d_m_bestUB; 
-   int d_m_nodesProcessed, d_m_alpsStatus; 
-   
-   encoded.readRep(d_m_bestLB); 
-   encoded.readRep(d_m_bestUB); 
-   encoded.readRep(d_m_nodesProcessed); 
-   encoded.readRep(d_m_alpsStatus); 
-   m_param.unpack(encoded); 
-   
-   m_bestLB = d_m_bestLB; 
-   m_bestUB = d_m_bestUB; 
-   m_nodesProcessed = d_m_nodesProcessed; 
-   m_alpsStatus = d_m_alpsStatus; 
-
+   double d_m_bestLB, d_m_bestUB;
+   int d_m_nodesProcessed, d_m_alpsStatus;
+   encoded.readRep(d_m_bestLB);
+   encoded.readRep(d_m_bestUB);
+   encoded.readRep(d_m_nodesProcessed);
+   encoded.readRep(d_m_alpsStatus);
+   m_param.unpack(encoded);
+   m_bestLB = d_m_bestLB;
+   m_bestUB = d_m_bestUB;
+   m_nodesProcessed = d_m_nodesProcessed;
+   m_alpsStatus = d_m_alpsStatus;
    return status;
 }
 

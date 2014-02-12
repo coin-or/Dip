@@ -194,9 +194,6 @@ void DecompApp::connectedComponentsDetection()
 {
    int numRows;
    int numCols;
-   int* vectorStarts;
-   int* vectorLengths;
-   int* indices;
    const double* rhs;
    const char* rowSense;
    const CoinPackedMatrix m_matrixByColumn;
@@ -767,8 +764,8 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
    //---
    map<int, int> colIndexToBlockIndex;
    map<int, DecompConstraintSet*>::iterator mit;
-   const double* colLB = m_modelC->getColLB();
-   const double* colUB = m_modelC->getColUB();
+   //   const double* colLB = m_modelC->getColLB();
+   //   const double* colUB = m_modelC->getColUB();
 
    for (mit = m_modelR.begin(); mit != m_modelR.end(); mit++) {
       int                   blockIndex = mit->first;
@@ -816,7 +813,7 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
 
       colIndex        = colNameToIndex[colName];
       blockIndex      = colIndexToBlockIndex[colIndex];
-      DecompConstraintSet* model = m_modelR[blockIndex];
+      //      DecompConstraintSet* model = m_modelR[blockIndex];
       /*
       if (model->m_masterOnly) {
          printf("MasterOnly col=%s value=%g lb=%g ub=%g",
