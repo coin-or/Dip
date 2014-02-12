@@ -3103,11 +3103,9 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    double         zDW_UBDual   = 0.0;
    double         zDW_UB       = 0.0;
    double         zDW_LB       = 0.0;
-   const int nCols = m_masterSI->getNumCols();
    const double* rc = getMasterColReducedCost();
    const double* colLower = m_masterSI->getColLower();
    const double* colUpper = m_masterSI->getColUpper();
-   const double* dual      = m_masterSI->getRowPrice();
    //rStat might not be needed now, but will be needed
    // when we support ranged rows.
    int* rStat = new int[m_masterSI->getNumRows()];
