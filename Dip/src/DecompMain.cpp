@@ -1,4 +1,3 @@
-
 //===========================================================================//
 // This file is part of the Decomp Solver Framework.                         //
 //                                                                           //
@@ -531,17 +530,22 @@ void DecompAuto(DecompApp milp,
          }
 
          ofstream osSolution(solutionFile.c_str());
+         osSolution.precision(16);
          const double* sol = solution->getValues();
-         osSolution << "=obj=" << setw(8) << " " << setw(2) << alpsModel.getGlobalUB()
+         osSolution << "=obj=" << setw(10);
+         osSolution.precision(8);
+         osSolution << " " << alpsModel.getGlobalUB()
                     << std::endl;
 
          for (int i = 0; i < solution->getSize(); i++) {
             if (!UtilIsZero(sol[i])) {
-               osSolution << colNames[i] << setw(10)
-                          << sol[i] << std::endl;
+               osSolution << colNames[i] << setw(10);
+               osSolution.precision(8);
+               osSolution << " " << sol[i] << std::endl;
             } else {
-               osSolution << colNames[i] << setw(10)
-                          << 0.0000 << std::endl;
+               osSolution << colNames[i] << setw(10);
+               osSolution.precision(8);
+               osSolution << " " << 0.0000000 << std::endl;
             }
          }
 
