@@ -52,19 +52,20 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@DEPENDENCY_LINKING_TRUE@am__append_1 = $(PYTHON_LIBS) $(DIPLIB_LIBS)
 
 ########################################################################
 #                     Includes for LP Solver                           #
 ########################################################################
 #because CGL depends on CLP, we need this in any case
-@CLP_LP_SOLVER_TRUE@am__append_1 = -D__DECOMP_LP_CLP__
-@CPLEX_LP_SOLVER_TRUE@am__append_2 = -D__DECOMP_LP_CPX__
+@CLP_LP_SOLVER_TRUE@am__append_2 = -D__DECOMP_LP_CLP__
+@CPLEX_LP_SOLVER_TRUE@am__append_3 = -D__DECOMP_LP_CPX__
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_3 = -D__DECOMP_IP_CBC__
-@CPLEX_IP_SOLVER_TRUE@am__append_4 = -D__DECOMP_IP_CPX__
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_4 = -D__DECOMP_IP_CBC__
+@CPLEX_IP_SOLVER_TRUE@am__append_5 = -D__DECOMP_IP_CPX__
 subdir = src/dippy
 DIST_COMMON = $(DIPPY_PYTHON) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in AUTHORS
@@ -86,7 +87,10 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(DIPPYlibdir)" "$(DESTDIR)$(DIPPYdir)"
 DIPPYlibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(DIPPYlib_LTLIBRARIES)
-_dippy_la_DEPENDENCIES = ../libDecomp.la
+am__DEPENDENCIES_1 =
+@DEPENDENCY_LINKING_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1)
+_dippy_la_DEPENDENCIES = ../libDecomp.la $(am__DEPENDENCIES_2)
 am__dippy_la_OBJECTS = _dippy_la-DippyDecompAlgo.lo \
 	_dippy_la-DippyDecompApp.lo _dippy_la-DippyPythonUtils.lo \
 	_dippy_la-DippyModule.lo _dippy_la-DippySolve.lo
@@ -395,9 +399,9 @@ _dippy_la_SOURCES = \
 ########################################################################
 
 # This is for libtool
-_dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_1) \
-	$(am__append_2) $(am__append_3) $(am__append_4)
-_dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS)
+_dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5)
+_dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS) $(am__append_1)
 _dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined 
 
 # This line is necessary to allow VPATH compilation
