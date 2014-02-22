@@ -378,6 +378,7 @@ Dip/scripts/Copyright -text
 Dip/scripts/average.awk -text
 Dip/scripts/copyright_add.sh -text
 Dip/scripts/formatCode.sh -text
+Dip/scripts/get.dip_test.sh -text
 Dip/scripts/get.hmetis.sh -text
 Dip/scripts/get.patoh.sh -text
 Dip/scripts/get.test_data.sh -text
