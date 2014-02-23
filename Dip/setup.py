@@ -7,7 +7,7 @@ import subprocess, os, sys
 from os.path import join, dirname
 
 PROJECT = 'coinor.dippy'
-VERSION = '1.9.7'
+VERSION = '1.9.8'
 URL = 'https://projects.coin-or.org/Dip/wiki/Dippy'
 AUTHOR_EMAIL = u''
 DESC = 'DIP Python Interface'
