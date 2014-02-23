@@ -455,6 +455,7 @@ Dip/src/UtilMacrosDecomp.h -text
 Dip/src/UtilParameters.cpp -text
 Dip/src/UtilParameters.h -text
 Dip/src/UtilTimer.h -text
+Dip/src/__init__.py -text
 Dip/src/config.h.in -text
 Dip/src/config_default.h -text
 Dip/src/config_dip.h.in -text
