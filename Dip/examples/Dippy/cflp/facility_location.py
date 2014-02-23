@@ -2,7 +2,7 @@
 
 import sys
 
-from pulp import *
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
 try:
     import path
@@ -103,7 +103,7 @@ def solve_subproblem(prob, key, redCosts, target):
         rcCheck = 0.0
         for v in var_values.keys():
             rcCheck += redCosts[v] * var_values[v]
-        print "Checking rc calc", rc, rcCheck 
+        print "Checking rc calc", redCosts[use_vars[loc]] - z, rcCheck 
         print var_values
 
     return [var_values]
@@ -119,7 +119,7 @@ def knapsack01(obj, weights, capacity):
         return 0, []
 
     if (debug_subproblem):
-        relaxation = pulp.LpProblem('relaxation', pulp.LpMaximize)
+        relaxation = LpProblem('relaxation', LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
         relaxation += (lpSum(var_dict[str(i)] * weights[i] for i in range(n)) 
@@ -361,8 +361,7 @@ if debug_print_lp:
 
 prob.writeFull('facility.lp', 'facility.dec')
 
-#prob.branch_method = choose_antisymmetry_branch
-prob.relaxed_solver = solve_subproblem
+#prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
