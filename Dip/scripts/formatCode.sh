@@ -1,2 +1,2 @@
 # This script with astyle v1.24 is for formatting DIP C++ source code
-astyle --pad-oper --break-blocks --pad-header --delete-empty-lines --add-brackets --indent=spaces=3 --style=stroustrup --indent-col1-comments --align-pointer=type *.cpp *.h
+astyle --pad-oper --break-blocks --pad-header --delete-empty-lines --add-brackets --indent=spaces=3 --style=stroustrup --indent-col1-comments --align-pointer=type *.cpp *.h *.hpp
