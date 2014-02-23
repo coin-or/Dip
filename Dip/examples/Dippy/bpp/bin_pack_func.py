@@ -8,11 +8,6 @@ except ImportError:
     pass
         
 try:
-    import path
-except ImportError:
-    pass
-        
-try:
     import dippy
 except ImportError:
     try:
