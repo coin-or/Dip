@@ -476,7 +476,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       vector<double> solVec(solDbl2, solDbl2 + numCols);
       result->m_solution.push_back(solVec);
       m_osi->switchToMIP();
-      result->m_nSolutions++
+      result->m_nSolutions++;
+      result->m_isUnbounded = true;
    }
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
    else if (cbc.isProvenOptimal()) {
