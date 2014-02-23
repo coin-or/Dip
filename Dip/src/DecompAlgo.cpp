@@ -5395,7 +5395,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       //---
       //--- unlikey to happen - but we should check ALL columns
       //---  to see if they are IP feasible - whether or not the
-      //---  column has negative red-cost or not
+      //---  column has negative red-cost
       //---
       //THINK: in blocks case, these are partial columns
       //  and this check can be relatively expensive for
@@ -6610,10 +6610,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 
       if (isNested)
          solverStatus
-         = m_app->solveRelaxedNest(whichBlock, redCostX, varsDebug);
+	   = m_app->solveRelaxedNest(whichBlock, redCostX, alpha,  varsDebug);
       else
          solverStatus
-         = m_app->solveRelaxed(whichBlock, redCostX, varsDebug);
+	   = m_app->solveRelaxed(whichBlock, redCostX, alpha, varsDebug);
 
       DecompVarList::iterator it;
 
@@ -6629,10 +6629,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    if (m_param.SolveRelaxAsIp != 1) {
       if (isNested) {
          solverStatus
-         = m_app->solveRelaxedNest(whichBlock, redCostX, vars);
+	   = m_app->solveRelaxedNest(whichBlock, redCostX, alpha,  vars);
       } else {
          solverStatus
-         = m_app->solveRelaxed(whichBlock, redCostX, vars);
+	   = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
       }
 
       DecompVarList::iterator it;

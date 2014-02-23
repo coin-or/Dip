@@ -55,7 +55,9 @@ public:
    void createModels();
 
    virtual DecompSolverStatus solveRelaxed(const int whichBlock,
-                                           const double* redCostX, DecompVarList& varList);
+                                           const double* redCostX,
+					   const double convexDual,
+					   DecompVarList& varList);
 
    bool APPisUserFeasible(const double* x, const int n_cols, const double tolZero);
 
