@@ -43,7 +43,7 @@ try:
 except ImportError:
     ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
-display_mode = 'xdot'
+display_mode = 'off'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
                         layout = 'dot', display_interval = 0)
