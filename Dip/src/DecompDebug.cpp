@@ -105,7 +105,7 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet* model,
    //---
    //--- check row bounds
    //---
-   //--- Need to deal with masterOnly variable 
+   //--- Need to deal with masterOnly variable
 
    for (i = 0; i < nRows; i++) {
       actViol = std::max<double>(rowLB[i] - ax[i], ax[i] - rowUB[i]);

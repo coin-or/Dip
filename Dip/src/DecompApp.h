@@ -367,20 +367,20 @@ public:
                             DecompCutList& newCuts);
 
    virtual void solveRelaxedWhich(std::vector<int>& blocksToSolve,
-                                  std::map< int,
-				  std::vector<double> >& userDualsByBlock) {
+                                  std::map < int,
+                                  std::vector<double> > & userDualsByBlock) {
    };
 
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
                                            const double*      redCostX,
-					   const double       convexDual,
+                                           const double       convexDual,
                                            DecompVarList&     varList) {
       return DecompSolStatNoSolution;
    }
    virtual DecompSolverStatus solveRelaxedNest(const int          whichBlock,
-					       const double*      redCostX,
-					       const double       convexDual,
-					       DecompVarList&     varList) {
+         const double*      redCostX,
+         const double       convexDual,
+         DecompVarList&     varList) {
       return DecompSolStatNoSolution;
    }
 

@@ -428,20 +428,21 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
     *    5 stopped on user event
     *    6 stopped on solutions
     *    7 linear relaxation unbounded
+    *    8 stopped on iteration limit
    */
    int       nSeta = 0;
    int       nSetb = 0;
-   const int statusSet2a[4] = {0, 2, 3, 4};
-   nSeta = 4;
-   const int statusSet2b[5] = {0, 1, 2, 4, 5};
-   nSetb = 5;
+   const int statusSet2a[5] = {0, 2, 3, 4, 7};
+   nSeta = 5;
+   const int statusSet2b[6] = {0, 1, 2, 4, 5, 7};
+   nSetb = 6;
    result->m_solStatus2 = cbc.secondaryStatus();
-
    //---
    //--- In root the subproblem should not be infeasible
    //---   unless due to cutoff. But, after branching it
    //---   can be infeasible.
    //---
+
    if (!doCutoff && isRoot) {
       if (!UtilIsInSet(result->m_solStatus2, statusSet2a, nSeta)) {
          cerr << "Error: CBC IP solver 2nd status = "
@@ -465,8 +466,20 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
 
+   if (cbc.isContinuousUnbounded()) {
+      OsiClpSolverInterface* m_relax = dynamic_cast<OsiClpSolverInterface*>(m_osi);
+      m_relax->initialSolve();
+      std::vector<double*> solDbl;
+      //ToDo: To add parameter of number of rays in the getPrimalRays()
+      solDbl = m_relax->getPrimalRays(1);
+      const double* solDbl2 = solDbl.front();
+      vector<double> solVec(solDbl2, solDbl2 + numCols);
+      result->m_solution.push_back(solVec);
+      m_osi->switchToMIP();
+      result->m_nSolutions++
+   }
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
-   if (cbc.isProvenOptimal()) {
+   else if (cbc.isProvenOptimal()) {
       result->m_nSolutions = 1;
       result->m_isOptimal  = true;
    } else {

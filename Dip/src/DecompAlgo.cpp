@@ -6610,10 +6610,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 
       if (isNested)
          solverStatus
-	   = m_app->solveRelaxedNest(whichBlock, redCostX, alpha,  varsDebug);
+         = m_app->solveRelaxedNest(whichBlock, redCostX, alpha,  varsDebug);
       else
          solverStatus
-	   = m_app->solveRelaxed(whichBlock, redCostX, alpha, varsDebug);
+         = m_app->solveRelaxed(whichBlock, redCostX, alpha, varsDebug);
 
       DecompVarList::iterator it;
 
@@ -6629,10 +6629,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    if (m_param.SolveRelaxAsIp != 1) {
       if (isNested) {
          solverStatus
-	   = m_app->solveRelaxedNest(whichBlock, redCostX, alpha,  vars);
+         = m_app->solveRelaxedNest(whichBlock, redCostX, alpha,  vars);
       } else {
          solverStatus
-	   = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
+         = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
       }
 
       DecompVarList::iterator it;
