@@ -50,7 +50,7 @@ def init(_n,_p,_d,_s,_w,_V):
     V   = _V
 
 
-def solve_subproblem(prob, i, redCosts):
+def solve_subproblem(prob, i, redCosts, target):
     
     vars   = [x[(i, j)] for j in V]
     obj    = [max(-redCosts[x[(i, j)]], 0) for j in V]
@@ -61,9 +61,7 @@ def solve_subproblem(prob, i, redCosts):
     rc = redCosts[y[i]] - z
     
     if rc > tol:
-        var_val  = {}
-        var_tup  = (0.0, 0.0, var_val)
-        return [var_tup]
+        return [{}]
 
     #Cost
     cost           = sum([d[i,V[j]] for j in solution])
@@ -71,9 +69,8 @@ def solve_subproblem(prob, i, redCosts):
     #Cluster of customers for i
     var_val        = dict([(vars[j], 1) for j in solution])
     var_val[y[i]]  = 1
-    var_tup        = (cost, rc, var_val)
 
-    return [var_tup]
+    return [var_val]
 
 
 def KP01(obj, weights, capacity):

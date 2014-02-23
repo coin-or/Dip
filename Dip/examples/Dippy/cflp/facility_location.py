@@ -67,7 +67,7 @@ for i in LOCATIONS:
 for i, j in ASSIGNMENTS:
     prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
 
-def solve_subproblem(prob, key, redCosts):
+def solve_subproblem(prob, key, redCosts, target):
     if debug_print:
         print "solve_subproblem..."
         print redCosts
@@ -89,36 +89,24 @@ def solve_subproblem(prob, key, redCosts):
         print obj
         print "z, solution =", z, solution
         print "redCosts[use_vars[loc]] =", redCosts[use_vars[loc]]
+        print "Fixed cost, rc", FIXED_COST[loc], redCosts[use_vars[loc]] - z
 
-    rc = redCosts[use_vars[loc]] - z
-
-    if debug_print:
-        print "Fixed cost, rc", FIXED_COST[loc], rc
-
-    if rc > tol: # ... or an empty location is "useful"
-       
-        var_values = {}
-
-        var_tuple = (0.0, 0.0, var_values)
+    if redCosts[use_vars[loc]] > z + tol: # ... or an empty location is "useful"
         if debug_print:
             print "Zero solution is optimal"
-            print var_tuple
-        return [var_tuple]
+        return [{}]
 
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
 
-    cost = FIXED_COST[loc] + sum([ASSIGNMENT_COSTS[(loc, PRODUCTS[j])] 
-                                  for j in solution]) 
-    var_tuple = (cost, rc, var_values)
-    rcCheck = 0.0
-    for v in var_values.keys():
-        rcCheck += redCosts[v] * var_values[v]
     if debug_print:
+        rcCheck = 0.0
+        for v in var_values.keys():
+            rcCheck += redCosts[v] * var_values[v]
         print "Checking rc calc", rc, rcCheck 
-        print var_tuple
-    return [var_tuple]
+        print var_values
 
+    return [var_values]
 
 def knapsack01(obj, weights, capacity):
     """ 0/1 knapsack solver, maximizes profit. weights and capacity integer """
@@ -134,7 +122,8 @@ def knapsack01(obj, weights, capacity):
         relaxation = pulp.LpProblem('relaxation', pulp.LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
-        relaxation += lpSum(var_dict[str(i)] * weights[i] for i in range(n)) <= capacity
+        relaxation += (lpSum(var_dict[str(i)] * weights[i] for i in range(n)) 
+                       <= capacity)
         relaxation += lpSum(var_dict[str(i)] * obj[i] for i in range(n))
         relaxation.solve()
         relax_obj = value(relaxation.objective)
