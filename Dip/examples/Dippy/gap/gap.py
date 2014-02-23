@@ -102,7 +102,7 @@ def solve_subproblem(prob, machine, redCosts, target):
             print "Empty solution is optimal"
         return [{}]
 
-    var_values = dict([(vars[i], 1) for i in solution])
+    var_values = dict([(var[i], 1) for i in solution])
 
     if debug_print:
         rcCheck = 0.0
