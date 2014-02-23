@@ -64,39 +64,6 @@ public:
 
    void postProcessNode(DecompAlgo* algo, DecompStatus decompStatus);
 
-   /**
-    * Generate Cuts
-    *
-    * Call the algorithm's generateCuts method if the 'generateCuts' param is set to
-    * true.
-    */
-   virtual int generateCuts(DecompAlgo* algo, double* xhat, DecompCutList& newCuts) {
-      bool gen = m_utilParam->GetSetting("generateCuts", true);
-      bool inPy = m_utilParam->GetSetting("pyGenerateCuts", true);
-
-      if (gen && inPy) {
-         return algo->DecompAlgo::generateCuts(xhat, newCuts);
-      }
-
-      return 0;
-   }
-
-   /**
-    * Generate Initial Variables
-    *
-    * Call the algorithm's generateInitVars method if the 'generateInitVars' param is set to
-    * true.
-    */
-   virtual int generateInitVars(DecompAlgo* algo, DecompVarList& initVars) {
-      bool gen = m_utilParam->GetSetting("generateInitVars", true);
-      bool inPy = m_utilParam->GetSetting("pyInitVars", true);
-
-      if (gen && inPy) {
-         return algo->DecompAlgo::generateInitVars(initVars);
-      }
-
-      return 0;
-   }
 };
 
 /**
@@ -127,13 +94,6 @@ public:
       DippyAlgoMixin::postProcessNode(this, decompStatus);
    }
 
-   virtual int generateCuts(double* xhat, DecompCutList& newCuts) {
-      return DippyAlgoMixin::generateCuts(this, xhat, newCuts);
-   }
-
-   //    virtual int generateInitVars(DecompVarList & initVars) {
-   //	      return priceInitVars(initVars);
-   //    }
 };
 
 /**
@@ -162,13 +122,6 @@ public:
       DippyAlgoMixin::postProcessNode(this, decompStatus);
    }
 
-   virtual int generateCuts(double* xhat, DecompCutList& newCuts) {
-      return DippyAlgoMixin::generateCuts(this, xhat, newCuts);
-   }
-
-   virtual int generateInitVars(DecompVarList& initVars) {
-      return DippyAlgoMixin::generateInitVars(this, initVars);
-   }
 };
 
 /**
@@ -197,13 +150,6 @@ public:
       DippyAlgoMixin::postProcessNode(this, decompStatus);
    }
 
-   virtual int generateCuts(double* xhat, DecompCutList& newCuts) {
-      return DippyAlgoMixin::generateCuts(this, xhat, newCuts);
-   }
-
-   virtual int generateInitVars(DecompVarList& initVars) {
-      return DippyAlgoMixin::generateInitVars(this, initVars);
-   }
 };
 
 #endif

@@ -1,18 +1,24 @@
-DEBUGGING = False
-
 import sys
 
 from pulp import *
 
-if DEBUGGING:
-
-    try:
-        import path
-    except ImportError:
-        pass
+try:
+    import path
+except ImportError:
+    pass
+        
+try:
+    import path
+except ImportError:
+    pass
+        
+try:
     import dippy
-else:
-    import coinor.dippy as dippy
+except ImportError:
+    try:
+        import src.dippy as dippy
+    except ImportError:
+        import coinor.dippy as dippy
 
 from math import floor, ceil
 
