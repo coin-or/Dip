@@ -108,7 +108,8 @@ def solve_subproblem(prob, key, redCosts):
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
 
-    cost = FIXED_COST[loc] + sum([ASSIGNMENT_COSTS[(loc, PRODUCTS[j])] for j in solution])    
+    cost = FIXED_COST[loc] + sum([ASSIGNMENT_COSTS[(loc, PRODUCTS[j])] 
+                                  for j in solution]) 
     var_tuple = (cost, rc, var_values)
     rcCheck = 0.0
     for v in var_values.keys():
