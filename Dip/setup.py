@@ -122,7 +122,7 @@ setup(name=PROJECT,
       namespace_packages=['coinor'],
       packages=['coinor.dippy', 'coinor'],
       package_dir = {'coinor': 'src'},
-      install_requires=['coinor.pulp','coinor.gimpy'],
+      install_requires=['pulp>=1.5.4','coinor.gimpy'],
       ext_modules=modules
      )
 
