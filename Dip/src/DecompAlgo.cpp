@@ -40,6 +40,9 @@
 #include "CglFlowCover.hpp"
 #include "CglMixedIntegerRounding2.hpp"
 
+#include "DecompBranchStrategy.h"
+#include "DecompBranchStrategyMaxInf.h"
+
 #ifdef __DECOMP_LP_CPX__
 #define USE_MULTI_RAY
 #endif
@@ -387,6 +390,13 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
       m_auxSI = new OsiLpSolverInterface();
       assert(m_auxSI);
       loadSIFromModel(m_auxSI);
+   }
+
+   int brStrategy = m_param.BranchingStrategy;
+
+   if (brStrategy == DecompBranchingStrategyMaxInfeasibility) {
+      // Max inf
+      // branchStrategy_ = new DecompBranchStrategyMaxInf();
    }
 
    /*#ifdef STAB_DUMERLE

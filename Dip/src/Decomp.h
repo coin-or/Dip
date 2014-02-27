@@ -288,6 +288,16 @@ enum BlockFileOutputFormat {
    GCG_BLOCKFILE
 };
 
+enum DecompBranchingStrategy {
+   DecompBranchingStrategyMaxInfeasibility,
+   DecompBranchingStrategyPseudoCost,
+   DecompBranchingStrategyRyanFoster,
+   DecompBranchingStrategyVanderbeck,
+   DecompBranchingStrategyReliability,
+   DecompBranchingStrategyStrong
+};
+
+
 /*
 enum DecompNumericErrorType {
 

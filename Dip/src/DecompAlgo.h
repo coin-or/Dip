@@ -55,6 +55,9 @@
 #include "DecompAlgoCGL.h"
 #include "AlpsDecompTreeNode.h"
 #include "OsiClpSolverInterface.hpp"
+//#include "DecompBranchStrategy.h"
+#include "DecompBranchStrategyMaxInf.h"
+class DecompBranchStrategy;
 class OsiSolverInterface;
 class DecompConstraintSet;
 class DecompSolverResult;
@@ -254,6 +257,12 @@ protected:
     *  Map from original index to master index for master-only vars.
     */
    std::map<int, int> m_masterOnlyColsMap;
+
+
+   // branching strategy
+   DecompBranchStrategy* branchStrategy_;
+   DecompBranchStrategy* rampUpBranchStrategy_;
+
 
 public:
    /**
@@ -950,8 +959,17 @@ public:
    //be careful here that we don't stop due to mLB>=m_UB in the case where
    //user gives optimal UB as cutoff, but we don't yet have integral solution
 
+   inline DecompBranchStrategy* getBranchStrategy() const {
+      return branchStrategy_;
+   }
 
+   inline DecompBranchStrategy* getRampUpBranchStrategy() const {
+      return rampUpBranchStrategy_;
+   }
 
+   inline void setBranchingMethod(DecompBranchStrategy* method) {
+      branchStrategy_ = method;
+   }
 
    //-----------------------------------------------------------------------//
    /**
@@ -963,6 +981,7 @@ public:
    /**
     * Default constructors.
     */
+
    DecompAlgo(const DecompAlgoType   algo,
               DecompApp*             app,
               UtilParameters*        utilParam):
@@ -998,7 +1017,6 @@ public:
       m_numConvexCon (1),
       m_rrLastBlock (-1),
       m_rrIterSinceAll(0),
-
       m_colLBNode(NULL),
       m_colUBNode(NULL),
       m_relGap(DecompInf),
@@ -1006,9 +1024,12 @@ public:
       m_masterObjLast(DecompInf),
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
-      m_masterOnlyCols() {
+      m_masterOnlyCols(),
+      branchStrategy_(NULL),
+      rampUpBranchStrategy_(NULL) {
       m_app->m_decompAlgo = this;
    }
+
 
 
    /**

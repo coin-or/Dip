@@ -28,6 +28,7 @@
 #include "AlpsDecompSolution.h"
 #include "AlpsDecompModel.h"
 
+#include "DecompBranchStrategy.h"
 //===========================================================================//
 #include "CoinUtility.hpp"
 
@@ -374,6 +375,11 @@ TERM_PROCESS:
    return status;
 }
 
+
+
+
+
+
 //===========================================================================//
 int AlpsDecompTreeNode::chooseBranchingObject(AlpsModel* model)
 {
@@ -616,10 +622,51 @@ AlpsDecompTreeNode::branch()
 
 
 
+int AlpsDecompTreeNode::selectBranchObject(AlpsDecompModel* model,
+      bool& foundSol,
+      int numPassesLeft)
+{
+   int branchStatus = 0;
+   DecompBranchStrategy* strategy = 0;
+   AlpsPhase phase = knowledgeBroker_->getPhase();
+   //-------------------------
+   //get branching strategy
+   //-------------------------
+
+   if (phase == AlpsPhaseRampup) {
+      strategy = model->getDecompAlgo()->getRampUpBranchStrategy();
+   } else {
+      strategy = model->getDecompAlgo()->getBranchStrategy();
+   }
+
+   branchStatus = strategy->createCandBranchObjects(numPassesLeft,
+                  model->getDecompAlgo()->getCutoffUB());
+   DecompBranchObject* branchObject_;
+
+   if (branchStatus >= 0) {
+      branchObject_ = strategy->getBestBranchObject();
+
+      if (branchObject_) {
+         // move best branching object to node
+      } else {
+         std::cout << "Error: Can't find branching object" << std::endl;
+         assert(0);
+      }
+   }
+
+   if (!model->getDecompAlgo()->getBranchStrategy()) {
+      delete strategy;
+   }
+
+   return branchStatus;
+}
+
+
+
 AlpsEncoded*
 AlpsDecompTreeNode::encode() const
 {
-   AlpsReturnStatus status = AlpsReturnStatusOk;
+   //   AlpsReturnStatus status = AlpsReturnStatusOk;
    // NOTE: "AlpsKnowledgeTypeNode" is used as type name.
    AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeNode);
    AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);

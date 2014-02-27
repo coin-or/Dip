@@ -321,6 +321,8 @@ public:
 
    std::string SolutionOutputFileName;
 
+   int BranchingStrategy;
+
    /**
     * @}
     */
@@ -435,6 +437,7 @@ public:
       PARAM_getSetting("BlockFileOutputFormat", BlockFileOutputFormat);
       PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
       PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
+      PARAM_getSetting("BranchingStrategy", BranchingStrategy);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -579,6 +582,7 @@ public:
       UtilPrintParameter(os, sec, "BlockFileOutputFormat", BlockFileOutputFormat);
       UtilPrintParameter(os, sec, "SolutionOutputToFile", SolutionOutputToFile);
       UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
+      UtilPrintParameter(os, sec, "BranchingStrategy", BranchingStrategy);
       (*os) << "========================================================\n";
    }
 
@@ -682,6 +686,7 @@ public:
       BlockFileOutputFormat    = 0;
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
+      BranchingStrategy        = 0;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

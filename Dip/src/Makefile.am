@@ -102,6 +102,15 @@ libDecomp_la_SOURCES +=        \
 	UtilMacrosAlps.cpp     \
 	UtilMacrosAlps.h       
 
+# branching
+libDecomp_la_SOURCES += 	\
+	DecompBranchObject.h	\
+	DecompBranchObject.cpp 	\
+	DecompBranchStrategy.h	\
+	DecompBranchStrategy.cpp \
+	DecompBranchStrategyMaxInf.h \
+	DecompBranchStrategyMaxInf.cpp
+
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
 
@@ -226,6 +235,13 @@ includecoin_HEADERS +=             \
 	AlpsDecompNodeDesc.h   \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
+
+# Braching
+
+includecoin_HEADERS +=   	\	
+	DecompBranchObject.h	\
+	DecompBranchStrategy.h	\		
+	DecompBranchStrategyMaxInf.h 
 
 ########################################################################
 #                     Installing manifest (MSVC++)                     #

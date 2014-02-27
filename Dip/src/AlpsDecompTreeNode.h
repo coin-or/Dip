@@ -63,6 +63,12 @@ public:
    int chooseBranchingObject(AlpsModel* model);
 
 
+
+   /** Select a branching object based on give branching strategy. */
+   int selectBranchObject(AlpsDecompModel* model,
+                          bool& foundSol,
+                          int numPassesLeft);
+
    //point direct to DECOMP?
    /** Performing the bounding operation. */
    int process(bool isRoot = false, bool rampUp = false);
@@ -107,6 +113,7 @@ public:
          branchInfo.clear();
       }
    }
+
 
    /** Encode this node for message passing. *\/ */
    virtual AlpsEncoded* encode() const;
