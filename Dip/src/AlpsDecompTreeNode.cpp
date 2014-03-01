@@ -670,19 +670,7 @@ AlpsDecompTreeNode::encode() const
    // NOTE: "AlpsKnowledgeTypeNode" is used as type name.
    AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeNode);
    AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   int numCols = desc->numberCols_;
-   assert(numCols);
-   // Encode decription.
-   const double* lb = desc->lowerBounds_;
-   const double* ub = desc->upperBounds_;
-   const int branchDir = desc->branchedDir_;
-   //  encoded->writeRep(explicit_);
-   encoded->writeRep(numCols);
-   encoded->writeRep(lb, numCols);
-   encoded->writeRep(ub, numCols);
-   encoded->writeRep(branchDir);
-   UtilAlpsEncodeWarmStart( encoded,
-                            desc->basis_);
+   desc->encodeAlpsDecomp(encoded);
    std::vector< std::pair<int, double> > downBranchLB = getDownBranchLB();
    const int downBranchLBSize = downBranchLB.size();
    int* downBranchLBIndices;
@@ -789,14 +777,8 @@ AlpsDecompTreeNode::encode() const
 AlpsKnowledge*
 AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
 {
-   int numCols;
-   double* lb;
-   double* ub;
-   int branchDir;
-   encoded.readRep(numCols);
-   encoded.readRep(lb, numCols);
-   encoded.readRep(ub, numCols);
-   encoded.readRep(branchDir);
+   AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   AlpsReturnStatus status = desc->decodeAlpsDecomp(encoded);
    int downBranchLBSize;
    int* downBranchLBIndices;
    double* downBranchLBValues;
@@ -830,14 +812,6 @@ AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
                             downBranchLBValues, downBranchLB);
    treeNode->setBranchBound(downBranchUBSize, downBranchUBIndices,
                             downBranchUBValues, downBranchUB);
-   AlpsReturnStatus* status ;
-   AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   desc->basis_ = UtilAlpsDecodeWarmStart(encoded, status);
-   //  AlpsDecompModel *model = dynamic_cast<AlpsDecompModel*>(desc_->getModel());
-   //  AlpsDecompNodeDesc* nodeDesc = new AlpsDecompNodeDesc(model);
-   //------------------------------------------------------
-   // Unpack node.
-   //------------------------------------------------------
    return treeNode;
 }
 

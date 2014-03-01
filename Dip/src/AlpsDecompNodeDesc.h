@@ -83,23 +83,26 @@ public:
 
    //THINK: different derivations for different algos? need?
    /** Warm start. */
-   CoinWarmStartBasis* basis_;
+   // not needed I think
+   //   CoinWarmStartBasis* basis_;
 
 public:
 
    /** Default constructor. */
    AlpsDecompNodeDesc() :
       AlpsNodeDesc(),
-      branchedDir_(0),
-      basis_(NULL) {
+      branchedDir_(0)
+      //      basis_(NULL)
+   {
    }
 
    /** Useful constructor. */
    AlpsDecompNodeDesc(AlpsModel* m)
       :
       AlpsNodeDesc(m),
-      branchedDir_(0),
-      basis_(NULL) {
+      branchedDir_(0)
+      //      basis_(NULL)
+   {
    }
 
    AlpsDecompNodeDesc(AlpsDecompModel* m,
@@ -107,8 +110,9 @@ public:
                       const double*     ub)
       :
       AlpsNodeDesc(m),
-      branchedDir_(0),
-      basis_(NULL) {
+      branchedDir_(0)
+      //    basis_(NULL)
+   {
       numberCols_ = m->getNumCoreCols();
       assert(numberCols_);
       lowerBounds_ = new double [numberCols_];
@@ -129,24 +133,27 @@ public:
          upperBounds_ = 0;
       }
 
-      delete basis_;
+      //      delete basis_;
    }
 
    /** Set basis. */
-   void setBasis(CoinWarmStartBasis*& ws) {
-      if (basis_) {
-         delete basis_;
+   /*
+      void setBasis(CoinWarmStartBasis*& ws) {
+
+         if (basis_) {
+            delete basis_;
+         }
+
+         basis_ = ws;
+         ws = NULL;
       }
-
-      basis_ = ws;
-      ws = NULL;
-   }
-
+   */
    /** Get warm start basis. */
-   CoinWarmStartBasis* getBasis() const {
-      return basis_;
-   }
-
+   /*
+      CoinWarmStartBasis* getBasis() const {
+         return basis_;
+      }
+   */
    /** Set branching direction. */
    void setBranchedDir(int d) {
       branchedDir_ = d;
@@ -167,50 +174,36 @@ public:
       return branched_;
    }
 
-protected:
-
+public:
    //---
    //--- helper functions for encode/decode
    //---
 
-   /** Pack blis portion of node description into an encoded. */
+   /** Pack AlpsDecomp portion of node description into an encoded. */
    AlpsReturnStatus encodeAlpsDecomp(AlpsEncoded* encoded) const {
       AlpsReturnStatus status = AlpsReturnStatusOk;
+      double* lb = new double[numberCols_];
+      double* ub = new double[numberCols_];
+      memcpy( lb, lowerBounds_, numberCols_ * sizeof(double) );
+      memcpy( ub, upperBounds_, numberCols_ * sizeof(double) );
+      encoded->writeRep(lb, numberCols_);
+      encoded->writeRep(ub, numberCols_);
+      encoded->writeRep(numberCols_);
       encoded->writeRep(branchedDir_);
-      // Basis
-      int ava = 0;
-
-      if (basis_) {
-         ava = 1;
-         encoded->writeRep(ava);
-         //should this be a util func or blis func?
-         //seems pretty standard, alps/coin util type stuff
-         UtilAlpsEncodeWarmStart(encoded, basis_);
-      } else {
-         encoded->writeRep(ava);
-      }
-
+      delete [] lb;
+      delete [] ub;
       return status;
    }
 
-   /** Unpack blis portion of node description from an encoded. */
+   /** Unpack AlpsDecompNodeDesc portion of node description from an encoded. */
    AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded) {
       AlpsReturnStatus status = AlpsReturnStatusOk;
+      encoded.readRep(lowerBounds_, numberCols_);
+      encoded.readRep(upperBounds_, numberCols_);
+      encoded.readRep(numberCols_);
       encoded.readRep(branchedDir_);
-      // Basis
-      int ava;
-      encoded.readRep(ava);
-
-      if (ava == 1) {
-         basis_ = UtilAlpsDecodeWarmStart(encoded, &status);
-      } else {
-         basis_ = NULL;
-      }
-
       return status;
    }
-
-public:
 
    //---
    //--- pure virtual functions from AlpsNodeDesc or AlpsNodeDesc
