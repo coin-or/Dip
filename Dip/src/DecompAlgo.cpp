@@ -1909,7 +1909,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
 
       switch (m_phase) {
       case PHASE_PRICE1:
-      case PHASE_PRICE2:
+      case PHASE_PRICE2: {
          m_nodeStats.priceCallsRound++;
          m_nodeStats.priceCallsTotal++;
 
@@ -1945,6 +1945,12 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                                       newVars, mostNegRC);
          m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
          m_nodeStats.cutsThisCall   = 0;
+         map<int, DecompAlgoModel>::iterator mit;
+
+         for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
+            (*mit).second.setCounter((*mit).second.getCounter() + 1);
+         }
+
          // Store the m_numCols and use it in updateObjBound function
          m_numCols = m_masterSI->getNumCols();
 
@@ -2008,7 +2014,8 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          }
          }
          #endif*/
-         break;
+      }
+      break;
       case PHASE_CUT:
          m_nodeStats.cutCallsRound++;
          m_nodeStats.cutCallsTotal++;
@@ -2050,8 +2057,14 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          }
 
          break;
-      case PHASE_DONE:
-         break;
+      case PHASE_DONE: {
+         map<int, DecompAlgoModel>::iterator mit;
+
+         for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
+            (*mit).second.setCounter(0);
+         }
+      }
+      break;
       default:
          assert(0);
       }

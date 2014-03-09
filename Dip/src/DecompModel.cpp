@@ -260,7 +260,22 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    }
 
    assert(env);
-   osi_Sym->branchAndBound();
+
+   if (param.WarmStart) {
+      osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+
+      if (getCounter() == 0) {
+         osi_Sym->initialSolve();
+         ws = osi_Sym->getWarmStart();
+         osi_Sym->branchAndBound();
+      } else {
+         osi_Sym->setWarmStart(ws);
+         osi_Sym->resolve();
+      }
+   } else {
+      osi_Sym->branchAndBound();
+   }
+
    int status = sym_get_status(env);
 
    if (status == TM_OPTIMAL_SOLUTION_FOUND) {
@@ -475,7 +490,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       const double* solDbl2 = solDbl.front();
       vector<double> solVec(solDbl2, solDbl2 + numCols);
       result->m_solution.push_back(solVec);
-      m_osi->switchToMIP();
       result->m_nSolutions++;
       result->m_isUnbounded = true;
    }

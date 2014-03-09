@@ -86,6 +86,10 @@ private:
    OsiSolverInterface*   m_osi;
    int                   m_numCols;
    int*                  m_colIndices;
+   int                   m_counter;
+#ifdef __DECOMP_IP_SYMPHONY__
+   CoinWarmStart* ws;
+#endif
 
 public:
    void setOsi(OsiSolverInterface* osi) {
@@ -127,6 +131,14 @@ public:
       } else
          m_osi->setObjCoeffSet(m_colIndices,
                                m_colIndices + m_numCols, objCoeff);
+   }
+
+   void setCounter(int num) {
+      m_counter = num;
+   }
+
+   int getCounter() {
+      return m_counter;
    }
 
    void setActiveColBounds(const double* colLB,
@@ -193,7 +205,8 @@ public:
       DecompAppModel(appModel),
       m_osi         (NULL),
       m_numCols     (0   ),
-      m_colIndices  (NULL) {
+      m_colIndices  (NULL),
+      m_counter     (  0 ) {
    }
 
    DecompAlgoModel& operator=(const DecompAppModel& rhs) {
@@ -205,14 +218,17 @@ public:
       DecompAppModel(),
       m_osi         (NULL),
       m_numCols     (0   ),
-      m_colIndices  (NULL) {};
+      m_colIndices  (NULL),
+      m_counter     (0)
+   {};
    DecompAlgoModel(DecompConstraintSet* model,
                    std::string                modelName,
                    int                   blockId) :
       DecompAppModel(model, modelName, blockId),
       m_osi         (NULL),
       m_numCols     (0   ),
-      m_colIndices  (NULL) {
+      m_colIndices  (NULL),
+      m_counter     (0) {
    };
    ~DecompAlgoModel() {
       if (m_osi) {
