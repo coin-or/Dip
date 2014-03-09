@@ -633,7 +633,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
 
-   for (i = 0; i < nMasterCols; i++) {
+   for (int i = 0; i < nMasterCols; i++) {
       if (isMasterColStructural(i)) {
          osi_Sym->setInteger(i);
       }
