@@ -323,6 +323,8 @@ public:
 
    int BranchingStrategy;
 
+   bool WarmStart;
+
    /**
     * @}
     */
@@ -438,6 +440,7 @@ public:
       PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
       PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
       PARAM_getSetting("BranchingStrategy", BranchingStrategy);
+      PARAM_getSetting("WarmStart", WarmStart);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -583,6 +586,7 @@ public:
       UtilPrintParameter(os, sec, "SolutionOutputToFile", SolutionOutputToFile);
       UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
       UtilPrintParameter(os, sec, "BranchingStrategy", BranchingStrategy);
+      UtilPrintParameter(os, sec, "WarmStart", WarmStart);
       (*os) << "========================================================\n";
    }
 
@@ -687,6 +691,7 @@ public:
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
       BranchingStrategy        = 0;
+      WarmStart                = false;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {
