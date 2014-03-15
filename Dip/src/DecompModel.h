@@ -23,6 +23,7 @@
 #include "DecompConstraintSet.h"
 #include "DecompSolverResult.h"
 #include "OsiSolverInterface.hpp"
+#include "OsiSymSolverInterface.hpp"
 //===========================================================================//
 
 //naming convention - usually would do DecompModelXx, DecompModelYy
@@ -87,10 +88,8 @@ private:
    int                   m_numCols;
    int*                  m_colIndices;
    int                   m_counter;
-#ifdef __DECOMP_IP_SYMPHONY__
-   CoinWarmStart* ws;
-#endif
-
+   CoinWarmStart*        m_ws;
+   OsiSymSolverInterface* osi_Sym;
 public:
    void setOsi(OsiSolverInterface* osi) {
       m_osi = osi;
@@ -206,7 +205,9 @@ public:
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter     (  0 ) {
+      m_counter     (  0 ),
+      m_ws          (NULL),
+      osi_Sym     (NULL) {
    }
 
    DecompAlgoModel& operator=(const DecompAppModel& rhs) {
@@ -219,7 +220,9 @@ public:
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter     (0)
+      m_counter     (0),
+      m_ws          (NULL),
+      osi_Sym       (NULL)
    {};
    DecompAlgoModel(DecompConstraintSet* model,
                    std::string                modelName,
@@ -228,7 +231,9 @@ public:
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter     (0) {
+      m_counter     (0),
+      m_ws          (NULL),
+      osi_Sym       (NULL) {
    };
    ~DecompAlgoModel() {
       if (m_osi) {
