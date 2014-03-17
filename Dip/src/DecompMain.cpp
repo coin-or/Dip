@@ -26,6 +26,8 @@
 #ifdef _OPENMP
 #include "omp.h"
 #endif
+
+
 using namespace std;
 
 void blockNumberFinder(DecompParam utilParam,
@@ -35,7 +37,7 @@ void blockNumberFinder(DecompParam utilParam,
 void DecompAuto(DecompApp milp,
                 UtilParameters& utilParam,
                 UtilTimer& timer,
-                DecompMainParam& decompMainParam);
+                DecompMainParam& decompMainParam, int argc, char* argv[]);
 
 DecompSolverResult* solveDirect(const DecompApp& decompApp);
 //===========================================================================//
@@ -56,17 +58,21 @@ int main(int argc, char** argv)
       //--- start overall timer
       //---
       timer.start();
+      ///      char hostname[256];
+      //      printf("PID %d on %s ready for attach\n", getpid(), hostname);
       DecompApp milp;
+      char the_path[256];
+      std::string path(getcwd(the_path, 255));
+      milp.m_param.CurrentWorkingDir = path;
+#ifndef COIN_HAS_MPI
+      milp.startupLog();
+#endif
       //---
       //--- put the one of the functions in the constructor into the main
       //---
       std::vector<int> blockNumCandidates;
-      milp.startupLog();
-      // get the current working Directory.
-      char the_path[256];
-      std::string path(getcwd(the_path, 255));
-      milp.m_param.CurrentWorkingDir = path;
 
+      // get the current working Directory.
       if (milp.m_param.LogDebugLevel >= 1) {
          std::cout << path << std::endl;
          std::cout << milp.m_param.CurrentWorkingDir << std::endl;
@@ -132,13 +138,13 @@ int main(int argc, char** argv)
 
             milpArray[i].m_threadIndex = i;
             DecompAuto(milpArray[i], utilParamArray[i],
-                       timerArray[i], decompMainParamArray[i]);
+                       timerArray[i], decompMainParamArray[i], argc, argv);
          }
       } else {
          decompMainParam.doCut        = utilParam.GetSetting("doCut",        false);
          decompMainParam.doPriceCut   = utilParam.GetSetting("doPriceCut",   true);
          decompMainParam.doDirect     = utilParam.GetSetting("doDirect",     false);
-         DecompAuto(milp, utilParam, timer, decompMainParam);
+         DecompAuto(milp, utilParam, timer, decompMainParam, argc, argv);
       }
 
       if (milp.m_param.Concurrent == true) {
@@ -320,7 +326,7 @@ void blockNumberFinder(DecompParam utilParam,
 void DecompAuto(DecompApp milp,
                 UtilParameters& utilParam,
                 UtilTimer& timer,
-                DecompMainParam& decompMainParam)
+                DecompMainParam& decompMainParam, int argc = 0, char* argv[] = NULL)
 {
    if (milp.NumBlocks == 0 && milp.m_param.Concurrent) {
       milp.NumBlocks = 3;
@@ -399,7 +405,7 @@ void DecompAuto(DecompApp milp,
       //--- solve
       //---
       timer.start();
-      alpsModel.solve();
+      alpsModel.solve( argc,  argv);
       timer.stop();
 
       if (milp.m_param.Concurrent == 1) {
@@ -583,7 +589,9 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
       fileName = decompApp.m_param.Instance;
    }
 
+#ifndef COIN_HAS_MPI
    std::cout << "The file name is " << fileName << std::endl;
+#endif
 
    if (decompApp.m_param.Instance.empty()) {
       cerr << "================================================" << std::endl

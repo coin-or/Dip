@@ -409,8 +409,6 @@ bool DecompApp::readBlockFile()
       fileName = m_param.BlockFile;
    }
 
-   std::cout << "The file name is " << fileName << std::endl;
-
    if (fileName == "") {
       return false;
    }
@@ -734,6 +732,7 @@ bool DecompApp::readBlockFile()
 
    //exit(1);
    is.close();
+   return true;
 }
 
 

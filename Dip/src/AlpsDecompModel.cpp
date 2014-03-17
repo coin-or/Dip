@@ -17,6 +17,7 @@
 #include "AlpsDecompModel.h"
 #include "AlpsDecompNodeDesc.h"
 #include "AlpsDecompTreeNode.h"
+#include "AlpsDecompSolution.h"
 
 #ifdef COIN_HAS_MPI
 #include "AlpsKnowledgeBrokerMPI.h"
@@ -122,7 +123,7 @@ bool AlpsDecompModel::fathomAllNodes()
 
 
 //===========================================================================//
-AlpsExitStatus AlpsDecompModel::solve()
+AlpsExitStatus AlpsDecompModel::solve(int argc, char* argv[])
 {
    /** \todo Parallel version. */
 #ifdef UTIL_USE_TIMERS
@@ -150,7 +151,7 @@ AlpsExitStatus AlpsDecompModel::solve()
    //---
    //--- declare an AlpsKnowledgeBroker for paralell application
    //---
-   AlpsKnowledgeBrokerMPI alpsBroker(0, NULL, *this);
+   AlpsKnowledgeBrokerMPI alpsBroker(argc, argv, *this);
 #else
    //---
    //--- declare an AlpsKnowledgeBroker for serial application
@@ -218,7 +219,7 @@ AlpsDecompModel::encodeAlpsDecomp(AlpsEncoded* encoded) const
    encoded->writeRep(m_bestUB);
    encoded->writeRep(m_nodesProcessed);
    encoded->writeRep(m_alpsStatus);
-   m_param.pack(encoded);
+   //   m_param.pack(encoded);
    return status;
 }
 
@@ -232,7 +233,7 @@ AlpsDecompModel::decodeAlpsDecomp(AlpsEncoded& encoded)
    encoded.readRep(d_m_bestUB);
    encoded.readRep(d_m_nodesProcessed);
    encoded.readRep(d_m_alpsStatus);
-   m_param.unpack(encoded);
+   //   m_param.unpack(encoded);
    m_bestLB = d_m_bestLB;
    m_bestUB = d_m_bestUB;
    m_nodesProcessed = d_m_nodesProcessed;
@@ -244,6 +245,7 @@ AlpsDecompModel::decodeAlpsDecomp(AlpsEncoded& encoded)
 AlpsEncoded*
 AlpsDecompModel::packSharedKnowlege()
 {
+   return NULL;
 }
 
 void
@@ -270,10 +272,9 @@ AlpsDecompModel::registerKnowledge()
       std::cout << "AlpsDecomp: Register Alps node." << std::endl;
    }
 
-   /*
-   broker_->registerClass(AlpsKnowledgeTypeSolution, new AlpsDecompSolution);
+   broker_->registerClass(AlpsKnowledgeTypeSolution, new AlpsDecompSolution());
+
    if (broker_->getMsgLevel() > 100) {
-     std::cout << "AlpsDecomp: Register Alps solution." << std::endl;
+      std::cout << "AlpsDecomp: Register Alps solution." << std::endl;
    }
-   */
 }

@@ -85,7 +85,7 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
       }
 
       AlpsDecompModel alpsModel(utilParam, algo);
-      alpsModel.solve();
+      alpsModel.solve(0, NULL);
       // TODO: Python exception needs to be set here or higher
       int status = alpsModel.getSolStatus();
       PyObject* pStatus;

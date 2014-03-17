@@ -33,6 +33,7 @@
 //===========================================================================//
 class AlpsTreeNode;
 
+
 //===========================================================================//
 /**
  * \class AlpsDecompModel
@@ -165,7 +166,7 @@ public:
    /**
     * Solve with ALPS and DECOMP.
     */
-   AlpsExitStatus solve();
+   AlpsExitStatus solve(int argc, char* argv[] );
 
    /**
     * Set the ALPS parameters.
