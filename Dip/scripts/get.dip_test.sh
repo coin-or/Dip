@@ -1,3 +1,1 @@
-wget http://coral.ie.lehigh.edu/~jiadongwang/miplib2010-1.0.4.tgz
-
-tar -xvzf miplib2010-1.0.4.tgz
+git clone git@github.com:jiadongwang/DIP-TESTING.git DIP-testing
