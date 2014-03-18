@@ -58,9 +58,11 @@ int main(int argc, char** argv)
       //--- start overall timer
       //---
       timer.start();
+#ifdef COIN_HAS_MPI
       char hostname[1000];
       gethostname(hostname, sizeof(hostname));
       printf("PID %d on %s ready for attach\n", getpid(), hostname);
+#endif
       DecompApp milp;
       char the_path[256];
       std::string path(getcwd(the_path, 255));
