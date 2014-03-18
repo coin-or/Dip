@@ -56,7 +56,7 @@
 #include "AlpsDecompTreeNode.h"
 #include "OsiClpSolverInterface.hpp"
 //#include "DecompBranchStrategy.h"
-#include "DecompBranchStrategyMaxInf.h"
+//#include "DecompBranchStrategyMaxInf.h"
 class DecompBranchStrategy;
 class OsiSolverInterface;
 class DecompConstraintSet;
@@ -134,7 +134,7 @@ protected:
    /**
     * Solver interface(s) for subproblems (P').
     */
-   //vector<OsiSolverInterface*> m_subprobSI;
+   //   vector<OsiSolverInterface*> m_subprobSI;
 
    /**
     * Solver interface(s) for master problem (Q'').
