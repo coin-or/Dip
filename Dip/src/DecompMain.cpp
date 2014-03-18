@@ -58,8 +58,9 @@ int main(int argc, char** argv)
       //--- start overall timer
       //---
       timer.start();
-      ///      char hostname[256];
-      //      printf("PID %d on %s ready for attach\n", getpid(), hostname);
+      char hostname[1000];
+      gethostname(hostname, sizeof(hostname));
+      printf("PID %d on %s ready for attach\n", getpid(), hostname);
       DecompApp milp;
       char the_path[256];
       std::string path(getcwd(the_path, 255));
@@ -537,13 +538,23 @@ void DecompAuto(DecompApp milp,
 
          ofstream osSolution(solutionFile.c_str());
          osSolution.precision(16);
-         const double* sol = solution->getValues();
+         const double* sol ;
+         int size ;
+
+         if (alpsModel.getSolStatus() == AlpsExitStatusInfeasible) {
+            sol = NULL;
+            size = 0;
+         } else {
+            sol = solution->getValues();
+            size = solution->getSize();
+         }
+
          osSolution << "=obj=" << setw(10);
          osSolution.precision(8);
          osSolution << " " << alpsModel.getGlobalUB()
                     << std::endl;
 
-         for (int i = 0; i < solution->getSize(); i++) {
+         for (int i = 0; i < size; i++) {
             if (!UtilIsZero(sol[i])) {
                osSolution << colNames[i] << setw(10);
                osSolution.precision(8);
