@@ -1,1 +1,1 @@
-git clone git@github.com:jiadongwang/DIP-TESTING.git ~/DIP-testing
+git clone https://github.com/jiadongwang/DIP-TESTING.git ~/DIP-testing1
