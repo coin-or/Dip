@@ -31,8 +31,6 @@
 //  DecompNull : public DecompInterface -->
 //     wrapper for all OSI methods in RC (no OSI)
 
-//#define DECOMP_MASTERONLY_DIRECT
-
 //===========================================================================//
 #ifndef DecompAlgo_h_
 #define DecompAlgo_h_
@@ -127,8 +125,6 @@ protected:
     */
 
 
-
-
    std::vector<double>        m_origColLB;
    std::vector<double>        m_origColUB;
 
@@ -145,6 +141,9 @@ protected:
     */
    OsiSolverInterface* m_masterSI;
 
+#ifdef __DECOMP_IP_SYMPHONY__
+   OsiSymSolverInterface* osi_Sym;
+#endif
    /**
     * Solver interface(s) for entire problem (Q'').
     *   CPM: not used (use m_masterSI)
@@ -192,6 +191,8 @@ protected:
    //for cpx
    std::vector<double> m_primSolution;
    std::vector<double> m_dualSolution;
+   std::vector<double> m_reducedCost;
+   int m_numCols;
 
    bool m_isColGenExact;
 
@@ -248,17 +249,11 @@ protected:
 
    const AlpsDecompTreeNode* m_curNode;
 
-#ifdef DECOMP_MASTERONLY_DIRECT
-   //NOTE:
-   // this should be found by framework
-   //   for first pass, have it set by user (MILPBlock)
-   vector<int>  m_masterOnlyCols;
-   //vector<bool> m_isColMasterOnly;
+   std:: vector<int>  m_masterOnlyCols;
    /**
     *  Map from original index to master index for master-only vars.
     */
-   map<int, int> m_masterOnlyColsMap;
-#endif
+   std::map<int, int> m_masterOnlyColsMap;
 
 public:
    /**
@@ -578,13 +573,12 @@ public:
       return NULL;
    }
 
-#ifdef DECOMP_MASTERONLY_DIRECT
+
    void masterMatrixAddMOCols(CoinPackedMatrix* masterM,
                               double*            colLB,
                               double*            colUB,
                               double*            objCoeff,
-                              std::vector<string>&    colNames);
-#endif
+                              std::vector<std::string>&    colNames);
 
    void masterMatrixAddArtCol(std::vector<CoinBigIndex>& colBeg,
                               std::vector<int         >& colInd,
@@ -761,6 +755,9 @@ public:
       return &m_primSolution[0];
    }
 
+   inline const double* getMasterColReducedCost() const {
+      return &m_reducedCost[0];
+   }
    /**
     * Get current dual solution for master problem.
     */
@@ -815,11 +812,11 @@ public:
     */
    inline const double getNodeLPGap() const {
       int nHistorySize
-         = static_cast<int>(m_nodeStats.objHistoryBound.size());
+      = static_cast<int>(m_nodeStats.objHistoryBound.size());
 
       if (nHistorySize > 0) {
          const DecompObjBound& objBound
-            = m_nodeStats.objHistoryBound[nHistorySize - 1];
+         = m_nodeStats.objHistoryBound[nHistorySize - 1];
          return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB);
       } else {
          return DecompInf;
@@ -1008,12 +1005,8 @@ public:
       m_stopCriteria(DecompStopNo),
       m_masterObjLast(DecompInf),
       m_firstPhase2Call(false),
-      m_isStrongBranch(false)
-#ifdef DECOMP_MASTERONLY_DIRECT
-      ,
-      m_masterOnlyCols()
-#endif
-   {
+      m_isStrongBranch(false),
+      m_masterOnlyCols() {
       m_app->m_decompAlgo = this;
    }
 

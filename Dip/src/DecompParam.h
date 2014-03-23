@@ -20,7 +20,7 @@
 #include "Decomp.h"
 #include "UtilMacros.h"
 #include "UtilParameters.h"
-#include "string"
+
 //===========================================================================//
 #define PARAM_getSetting(xstr, x) x = param.GetSetting(xstr, x, sec)
 
@@ -38,7 +38,9 @@ class DecompParam {
 public:
    int    LogLevel;
    int    LogDebugLevel;
-   int    LogLpLevel;    //TODO: LpIpLevel separate
+   int    LogLpLevel;
+   int    LogIpLevel;
+
 
    //=0 never
    //=1 only on error
@@ -111,7 +113,13 @@ public:
    double SubProbGapLimitInexact;
    double SubProbTimeLimitExact;
    double SubProbTimeLimitInexact;
-   int    SubProbNumThreads;
+   // Notice:
+   // NumConcurrentThreadsSubProb:  available thread number for parallelizing subproblems
+   // NumThreadsIPSolver:  thread number for solving each IP subproblem
+   //
+   int    NumConcurrentThreadsSubProb;
+   int    NumThreadsIPSolver;
+
    int    SubProbNumSolLimit;
 
    //This option only works with Cpx:
@@ -159,7 +167,7 @@ public:
    //2 = Calls the user defined function (if exists) and then calls built-in
    //    IP solver (use this for debugging).
 
-   bool    SolveRelaxAsIp;
+   int    SolveRelaxAsIp;
 
    int    InitVarsWithCutDC;
    int    InitVarsWithIP;
@@ -207,20 +215,12 @@ public:
     * can be solved in parallel.
     */
 
-   int NumThreads;
-
    /*
     * Check user columns for overlap. The default is true, but this
     * can be shut off to speed up the setup.
     */
 
    int DebugCheckBlocksColumns;
-
-   /*
-    * The block number for automatic decomposition
-    */
-
-   int NumBlocks;
 
    /*
     * The following parameters are extended from MILPBlock
@@ -292,7 +292,6 @@ public:
 
    double ConcurrentCutOffTime;
 
-   int ThreadIndex;
 
    std::string CurrentWorkingDir;
 
@@ -304,6 +303,23 @@ public:
 
    int ConcurrentThreadsNum;
 
+   int BlockNumInput;
+
+   bool BlockFileOutput;
+
+   // The tolerance for checking negative reduced cost
+   // Typically a small number approaching zero
+   double RedCostEpsilon;
+
+   double PhaseIObjTol;
+
+   bool CheckSpecialStructure;
+
+   int BlockFileOutputFormat;
+
+   bool SolutionOutputToFile;
+
+   std::string SolutionOutputFileName;
 
    /**
     * @}
@@ -325,6 +341,7 @@ public:
       PARAM_getSetting("LogLevel",             LogLevel);
       PARAM_getSetting("LogDebugLevel",        LogDebugLevel);
       PARAM_getSetting("LogLpLevel",           LogLpLevel);
+      PARAM_getSetting("LogIpLevel",           LogIpLevel);
       PARAM_getSetting("LogDumpModel",         LogDumpModel);
       PARAM_getSetting("LogObjHistory",        LogObjHistory);
       PARAM_getSetting("LimitInitVars",        LimitInitVars);
@@ -343,7 +360,8 @@ public:
       PARAM_getSetting("CompressColumns",      CompressColumns);
       PARAM_getSetting("CompressColumnsIterFreq",       CompressColumnsIterFreq);
       PARAM_getSetting("CompressColumnsSizeMultLimit",  CompressColumnsSizeMultLimit);
-      PARAM_getSetting("CompressColumnsMasterGapStart", CompressColumnsMasterGapStart);
+      PARAM_getSetting("CompressColumnsMasterGapStart",
+                       CompressColumnsMasterGapStart);
       PARAM_getSetting("CutDC",                CutDC);
       PARAM_getSetting("CutCGL",               CutCGL);
       PARAM_getSetting("CutCglKnapC",          CutCglKnapC);
@@ -357,7 +375,8 @@ public:
       PARAM_getSetting("SubProbGapLimitInexact", SubProbGapLimitInexact);
       PARAM_getSetting("SubProbTimeLimitExact",  SubProbTimeLimitExact);
       PARAM_getSetting("SubProbTimeLimitInexact", SubProbTimeLimitInexact);
-      PARAM_getSetting("SubProbNumThreads",      SubProbNumThreads);
+      PARAM_getSetting("NumConcurrentThreadsSubProb", NumConcurrentThreadsSubProb);
+      PARAM_getSetting("NumThreadsIPSolver", NumThreadsIPSolver);
       PARAM_getSetting("SubProbNumSolLimit",     SubProbNumSolLimit);
       PARAM_getSetting("SubProbSolverStartAlgo", SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
@@ -381,25 +400,17 @@ public:
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
-      PARAM_getSetting("NumThreads",              NumThreads);
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-      PARAM_getSetting("NumBlocks", NumBlocks);
       DataDir       = param.GetSetting("DataDir",       "",    "MILP");
       Instance      = param.GetSetting("Instance",      "",    "MILP");
       InstanceFormat = param.GetSetting("InstanceFormat", "",    "MILP");
       BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
       PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
       BlockFileFormat
-         = param.GetSetting("BlockFileFormat",    "",    "MILP");
+      = param.GetSetting("BlockFileFormat",    "",    "MILP");
       InitSolutionFile
-         = param.GetSetting("InitSolutionFile",   "",    "MILP");
+      = param.GetSetting("InitSolutionFile",   "",    "MILP");
       PARAM_getSetting("LogLevel", LogLevel);
-      // PARAM_getSetting("DataDir",DataDir);
-      //PARAM_getSetting("Instance",Instance);
-      //PARAM_getSetting("BlockFile",BlockFile);
-      //PARAM_getSetting("PermuteFile",PermuteFile);
-      //PARAM_getSetting("BlockFileFormat",BlockFileFormat);
-      //PARAM_getSetting("InitSolutionFile",InitSolutionFile);
       PARAM_getSetting("UseNames", UseNames);
       PARAM_getSetting("UseSparse", UseSparse);
       PARAM_getSetting("FullModel", FullModel);
@@ -408,6 +419,7 @@ public:
       PARAM_getSetting("ColumnUB", ColumnUB);
       PARAM_getSetting("ColumnLB", ColumnLB);
       PARAM_getSetting("ObjectiveSense", ObjectiveSense);
+      PARAM_getSetting("BlockNumInput", BlockNumInput);
       PARAM_getSetting("Concurrent", Concurrent);
       PARAM_getSetting("NumBlocksCand", NumBlocksCand);
       PARAM_getSetting("CconcurrentCutOffTime", ConcurrentCutOffTime);
@@ -416,6 +428,13 @@ public:
       PARAM_getSetting("SubProbParallelType", SubProbParallelType);
       PARAM_getSetting("SubProbParallelChunksize", SubProbParallelChunksize);
       PARAM_getSetting("ConcurrentThreadsNum", ConcurrentThreadsNum);
+      PARAM_getSetting("BlockFileOutput", BlockFileOutput);
+      PARAM_getSetting("RedCostEpsilon", RedCostEpsilon);
+      PARAM_getSetting("PhaseIObjTol", PhaseIObjTol);
+      PARAM_getSetting("CheckSpecialStructure", CheckSpecialStructure);
+      PARAM_getSetting("BlockFileOutputFormat", BlockFileOutputFormat);
+      PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
+      PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -449,6 +468,7 @@ public:
       UtilPrintParameter(os, sec, "LogLevel",            LogLevel);
       UtilPrintParameter(os, sec, "LogDebugLevel",       LogDebugLevel);
       UtilPrintParameter(os, sec, "LogLpLevel",          LogLpLevel);
+      UtilPrintParameter(os, sec, "LogIpLevel",          LogIpLevel);
       UtilPrintParameter(os, sec, "LogDumpModel",        LogDumpModel);
       UtilPrintParameter(os, sec, "LogObjHistory",       LogObjHistory);
       UtilPrintParameter(os, sec, "LimitInitVars",       LimitInitVars);
@@ -488,7 +508,9 @@ public:
                          SubProbTimeLimitExact);
       UtilPrintParameter(os, sec, "SubProbTimeLimitInexact",
                          SubProbTimeLimitInexact);
-      UtilPrintParameter(os, sec, "SubProbNumThreads",  SubProbNumThreads);
+      UtilPrintParameter(os, sec, "NumConcurrentThreadsSubProb",
+                         NumConcurrentThreadsSubProb);
+      UtilPrintParameter(os, sec, "NumThreadsIPSolver",  NumThreadsIPSolver);
       UtilPrintParameter(os, sec, "SubProbNumSolLimit", SubProbNumSolLimit);
       UtilPrintParameter(os, sec, "SubProbSolverStartAlgo",
                          SubProbSolverStartAlgo);
@@ -522,10 +544,8 @@ public:
                          MasterConvexityLessThan);
       UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
       UtilPrintParameter(os, sec, "BranchStrongIter",  BranchStrongIter);
-      UtilPrintParameter(os, sec, "NumThreads",        NumThreads);
       UtilPrintParameter(os, sec,
                          "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-      UtilPrintParameter(os, sec, "NumBlocks",  NumBlocks);
       UtilPrintParameter(os, sec, "LogLevel",  LogLevel);
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
       UtilPrintParameter(os, sec, "Instance",  Instance);
@@ -545,12 +565,20 @@ public:
       UtilPrintParameter(os, sec, "Concurrent", Concurrent);
       UtilPrintParameter(os, sec, "NumBlocksCand", NumBlocksCand);
       UtilPrintParameter(os, sec, "ConcurrentCutOffTime", ConcurrentCutOffTime);
-      UtilPrintParameter(os, sec,  "ThreadIndex", ThreadIndex );
       UtilPrintParameter(os, sec,  "CurrentWorkingDir", CurrentWorkingDir);
       UtilPrintParameter(os, sec, "SubProbParallel", SubProbParallel);
       UtilPrintParameter(os, sec, "SubProbParallelType", SubProbParallelType);
-      UtilPrintParameter(os, sec, "SubProbParallelChunksize", SubProbParallelChunksize);
+      UtilPrintParameter(os, sec, "SubProbParallelChunksize",
+                         SubProbParallelChunksize);
       UtilPrintParameter(os, sec, "ConcurrentThreadsNum", ConcurrentThreadsNum);
+      UtilPrintParameter(os, sec, "BlockNumInput", BlockNumInput);
+      UtilPrintParameter(os, sec, "BlockFileOutput", BlockFileOutput );
+      UtilPrintParameter(os, sec, "RedCostEpsilon", RedCostEpsilon);
+      UtilPrintParameter(os, sec, "PhaseIObjTol", PhaseIObjTol);
+      UtilPrintParameter(os, sec, "CheckSpecialStructure", CheckSpecialStructure);
+      UtilPrintParameter(os, sec, "BlockFileOutputFormat", BlockFileOutputFormat);
+      UtilPrintParameter(os, sec, "SolutionOutputToFile", SolutionOutputToFile);
+      UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
       (*os) << "========================================================\n";
    }
 
@@ -558,6 +586,10 @@ public:
       LogLevel             = 0;
       LogDebugLevel        = 0;
       LogLpLevel           = 0;
+      //verbosity in Symphony allows negative value and 0 is really verbose
+      // so -1 was set as the default value for Symphony, adjustment is made
+      // in the corresponding code
+      LogIpLevel           = 0;
       LogDumpModel         = 0;
       LogObjHistory        = 0;
       LimitInitVars        = 5;
@@ -578,7 +610,7 @@ public:
       CompressColumnsSizeMultLimit  = 1.20;
       CompressColumnsMasterGapStart = 0.20;
       CutDC                = 0;
-      CutCGL               = 1;
+      CutCGL               = 0;
       CutCglKnapC          = 1;
       CutCglFlowC          = 1;
       CutCglMir            = 1;
@@ -590,7 +622,8 @@ public:
       SubProbGapLimitInexact = 0.1;    //10.00% gap
       SubProbTimeLimitExact   = DecompBigNum;
       SubProbTimeLimitInexact = DecompBigNum;
-      SubProbNumThreads       = 1;
+      NumConcurrentThreadsSubProb       = 4;
+      NumThreadsIPSolver             = 1;
       SubProbNumSolLimit      = 1;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
@@ -600,7 +633,7 @@ public:
       SolveMasterAsIpFreqPass  = 1000;
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
-      SolveRelaxAsIp           = false;
+      SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
@@ -614,9 +647,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      NumThreads               = 2;
       DebugCheckBlocksColumns  = true;
-      NumBlocks                = 3;
       /*
        * parameters from MILPBlock and to be MILP
        */
@@ -627,7 +658,7 @@ public:
       BlockFileFormat          = "";
       PermuteFile              = "";
       InitSolutionFile         = "";
-      UseNames                 = 0 ;
+      UseNames                 = 1 ;
       UseSparse                = 1 ;
       FullModel                = 0 ;
       BestKnownLB              = -1.e100;
@@ -636,14 +667,21 @@ public:
       ColumnLB                 = -1.e20;
       ObjectiveSense           = 1;
       Concurrent               = false;
-      NumBlocksCand            = 10;
+      NumBlocksCand            = 4;
       ConcurrentCutOffTime     = 100;
-      ThreadIndex              = 0;
       CurrentWorkingDir        = "";
       SubProbParallel          = false;
       SubProbParallelType      = SubProbScheduleDynamic;
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
+      BlockNumInput            = 0;
+      BlockFileOutput          = false;
+      RedCostEpsilon           = 0.0001;
+      PhaseIObjTol             = 0.0005;
+      CheckSpecialStructure    = false;
+      BlockFileOutputFormat    = 0;
+      SolutionOutputToFile     = true;
+      SolutionOutputFileName   = "";
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

@@ -19,7 +19,7 @@
 //---   for relaxation solver, use built-in MILP solver and dense format
 //--- Version 4:
 //---   for relaxation solver, use built-in MILP solver and sparse format
-//--- 
+//---
 //===========================================================================//
 
 
@@ -33,9 +33,9 @@
 //===========================================================================//
 /*!
  * \class GAP_DecompApp
- * A DecompApp for solving the 
+ * A DecompApp for solving the
  *     Generalized Assignment Problem (GAP).
- * 
+ *
  * \see
  * DecompApp
  *
@@ -51,27 +51,27 @@ private:
    GAP_Instance m_instance;
 
    /** Application specific parameters. */
-   GAP_DecompParam m_appParam;  
+   GAP_DecompParam m_appParam;
 
    /** The model objective coefficients (original space). */
-   double * m_objective;
-   
+   double* m_objective;
+
    /** Store pointers to the various model constraint systems,
        so their memory can be deleted. */
    vector<DecompConstraintSet*> m_models;
-   
+
 
 public:
    /* @name Inherited (from virtual) methods. */
    /** Print an original column (format for this app). */
-   void printOriginalColumn(const int   index, 
-                            ostream   * os = &cout) const;
+   void printOriginalColumn(const int   index,
+                            ostream*    os = &cout) const;
 
 public:
-   /** @name Helper functions (public). */   
+   /** @name Helper functions (public). */
 
    /** Guts of constructor. */
-   void initializeApp(UtilParameters & utilParam);
+   void initializeApp(UtilParameters& utilParam);
 
    /** Helper methods for indexing. */
    inline const int getOffsetI(const int i) const {
@@ -81,45 +81,44 @@ public:
                                const int j) const {
       return (i * m_instance.getNTasks()) + j;
    }
-   
-   inline pair<int,int> getIndexInv(const int index) const {      
-      return make_pair(index / m_instance.getNTasks(), 
+
+   inline pair<int, int> getIndexInv(const int index) const {
+      return make_pair(index / m_instance.getNTasks(),
                        index % m_instance.getNTasks());
    }
 
-   /** Creation of the various model constraint systems. */ 
+   /** Creation of the various model constraint systems. */
    int createModels();
-   int createModelPartAP(DecompConstraintSet * model);
-   int createModelPartKP(DecompConstraintSet * model);
-   int createModelPartKP(DecompConstraintSet * model, 
+   int createModelPartAP(DecompConstraintSet* model);
+   int createModelPartKP(DecompConstraintSet* model);
+   int createModelPartKP(DecompConstraintSet* model,
                          int                   whichKnap);
-   int createModelPartKP(DecompConstraintSet * model, 
-                         vector<int>         & whichKnaps);
+   int createModelPartKP(DecompConstraintSet* model,
+                         vector<int>&          whichKnaps);
 
 public:
    /** Some access methods to private data. */
-   inline const GAP_Instance & getInstance() const {
+   inline const GAP_Instance& getInstance() const {
       return m_instance;
    }
-   inline const GAP_DecompParam & getParam() const {
+   inline const GAP_DecompParam& getParam() const {
       return m_appParam;
    }
-   inline const double * getObjective() const {
+   inline const double* getObjective() const {
       return m_objective;
    }
- 
+
 public:
    /** @name Constructor and Destructor */
 
    /** Default constructor. Takes an instance of UtilParameters */
-   GAP_DecompApp(UtilParameters & utilParam) : 
+   GAP_DecompApp(UtilParameters& utilParam) :
       DecompApp   (utilParam),
       m_classTag  ("GAP-APP"),
-      m_objective (NULL)
-   {
+      m_objective (NULL) {
       initializeApp(utilParam);
    }
-   
+
    virtual ~GAP_DecompApp() {
       UTIL_DELARR(m_objective);
       UtilDeleteVectorPtr(m_models);

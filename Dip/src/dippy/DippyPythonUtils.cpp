@@ -245,6 +245,41 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
    return len;
 }
 
+int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, int** inds, double** vals, DecompVarType& varType)
+{
+   int len = PyObject_Length(pColDict);
+   *inds = new int[len];
+   *vals = new double[len];
+   PyObject* pKeys = PyDict_Keys(pColDict);
+   PyObject* pCol;
+   double value;
+   int index;
+
+   for (int i = 0; i < len; i++) {
+      pCol = PyList_GetItem(pKeys, i);
+      value = PyFloat_AsDouble(PyDict_GetItem(pColDict, pCol));
+      index = indices[pCol];
+
+      if ( (index < 0) || (index >= indices.size()) ) {
+         PyObject* pColName = PyObject_CallMethod(pCol, "getName", NULL);
+
+         if (pColName == NULL) {
+            throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
+         }
+
+         string name = PyString_AsString(pColName);
+         throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays", "DippyPythonUtils");
+      }
+
+      PyObject* pColType = PyObject_CallMethod(pCol, "getVarType", NULL);      
+     
+      (*inds)[i] = index;
+      (*vals)[i] = value;
+   }
+
+   return len;
+}
+
 /**
  * Convert a list of Python constraints to a CoinPackedMatrix
  *

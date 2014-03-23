@@ -105,8 +105,8 @@ void DecompAlgoRC::phaseDone()
       // THINK: do i need a DecompCol?
       // THINK: does this allocate memory for coinpackedvec twice?
       CoinPackedVector* sparseCol
-         = UtilPackedVectorFromDense(nRowsCore + 1,
-                                     denseCol, m_param.TolZero);
+      = UtilPackedVectorFromDense(nRowsCore + 1,
+                                  denseCol, m_param.TolZero);
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
                  (*m_osLog) << "\nSparse Col: \n";
                  UtilPrintPackedVector(*sparseCol, m_osLog);
@@ -189,8 +189,8 @@ void DecompAlgoRC::phaseDone()
                                       modelCore->getNumCols(),
                                       m_param.TolZero)) {
             DecompSolution* decompSol
-               = new DecompSolution(modelCore->getNumCols(),
-                                    m_xhat, m_masterSI->getObjValue());
+            = new DecompSolution(modelCore->getNumCols(),
+                                 m_xhat, m_masterSI->getObjValue());
             m_xhatIPFeas.push_back(decompSol);
          }
       }
@@ -276,7 +276,6 @@ bool DecompAlgoRC::isDone()
    //iter count is checked by phaseUpdate
    //need to check step limit in here
    //need to check if ub-lb gap is small? isn't that always checked?
-
    //printf("\nm_UB: %12.10f, m_LB: %12.10f", m_UB, m_LB);
    if ((m_step < 1.0e-3) ||             //step length too small
          m_zeroSub         ||              //0 subgradient
@@ -300,7 +299,6 @@ int DecompAlgoRC::addCutsFromPool()
    //we were pricing out, then cutting, but when we price out,
    //step=0, so we need to start over with step size
    //best place for this would be in phaseUpdatE?
-
    if (nNewRows > 0) {
       m_step = 2.0;
    }
@@ -460,7 +458,6 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
       case 'E':
          //violation[i] = rhs[i] - activity[i];
          break;
-
       case 'G':
 
          //violation[i] = rhs[i] - activity[i];
@@ -470,7 +467,6 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
          }
 
          break;
-
       case 'L':
 
          //violation[i] = rhs[i] - activity[i];
@@ -504,20 +500,15 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
    //needs rhs from OSI - this is why it was better to fake it
    //and have the information in OSI... but then carrying around
    //modelCore and OSI for no good reason... but... this is messier
-
    //LR Bound = (c - uA)shat + ub, assumes u >= 0
-
    //first iter, LR Bound = cshat - is that a valid LB?
    //yes, actually is a LB for any u >= 0
    //this assumes u is optimal? or just dual feasible
    //is u = 0 dual feasible?
-
    //but only a valid bound if shat has the lowest reduced cost
    //for a given u... so, for first iter of smallip, should have given
    //(2,1) with LB = 2... RC don't do genInitVars?
-
    //TODO: think initial dual vector - solve an LP to get started?
-
    if (bound + constant > m_LB + m_app->m_param.TolZero) {
       m_LB  = bound + constant;
       m_cntSameLB  = 0;
@@ -558,23 +549,19 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
 
    //STOP 10/6/07
    //How do we deal with range constraints? What does volume do, for example?
-
    for (r = 0; r < n_coreRows; r++) {
       switch (sense[r]) {
       case 'E':
          m_u[r] += theta * violation[r];
          break;
-
       case 'G':
          //u > 0, g_i > 0 for violations
          m_u[r] = max(0.0, m_u[r] + (theta * violation[r]));
          break;
-
       case 'L':
          //u < 0, g_i < 0 for violatoins
          m_u[r] = max(0.0, m_u[r] - (theta * violation[r]));
          break;
-
       default:
          assert(0);
       }

@@ -24986,8 +24986,8 @@ fi
 #                      Check for the IP solver                              #
 #############################################################################
 
-echo "$as_me:$LINENO: checking for DIP default ip solver" >&5
-echo $ECHO_N "checking for DIP default ip solver... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for Dip default ip solver" >&5
+echo $ECHO_N "checking for Dip default ip solver... $ECHO_C" >&6
 
 # Check whether --with-ip-solver or --without-ip-solver was given.
 if test "${with_ip_solver+set}" = set; then

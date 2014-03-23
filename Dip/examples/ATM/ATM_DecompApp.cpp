@@ -1238,7 +1238,7 @@ void ATM_DecompApp::createModels(){
    UtilFillN(m_objective, numCols, 0.0);
    for(i = getColOffset_fp(); i < getColOffset_x2(); i++)
       m_objective[i] = 1.0;
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, numCols);
    
    
    //---

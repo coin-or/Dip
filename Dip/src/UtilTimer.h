@@ -64,14 +64,14 @@ public:
       real_       = finishReal_ - startReal_;
    }
 
-   /** Get cpu timee. */
+   /** Get cpu time. */
    inline double getCpuTime() {
       finishCpu_ = CoinCpuTime();
       cpu_       = finishCpu_ - startCpu_;
       return cpu_;
    }
 
-   /** Get cpu timee. */
+   /** Get wallClock time. */
    inline double getRealTime() {
       finishReal_ = CoinGetTimeOfDay();
       real_       = finishReal_ - startReal_;

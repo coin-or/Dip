@@ -45,6 +45,7 @@ public :
    double    m_objLB;
    double    m_objUB;
    bool      m_isOptimal;
+   bool      m_isUnbounded;
    bool      m_isCutoff;
    int       m_nSolutions;
    std::vector< std::vector<double> > m_solution;
@@ -67,6 +68,7 @@ public:
       m_objLB     (-DecompInf),
       m_objUB     ( DecompInf),
       m_isOptimal (false),
+      m_isUnbounded (false),
       m_isCutoff  (false),
       m_nSolutions(0) {
    }
@@ -77,6 +79,7 @@ public:
       m_objLB     (-DecompInf),
       m_objUB     ( DecompInf),
       m_isOptimal (false),
+      m_isUnbounded (false),
       m_isCutoff  (false),
       m_nSolutions(0) {
       const double* values = solution->getValues();

@@ -87,7 +87,7 @@ public:
       if (m_app) {
          DecompAlgo*           decompAlgo = m_app->getDecompAlgo();
          DecompConstraintSet* modelCore
-            = decompAlgo->getModelCore().getModel();
+         = decompAlgo->getModelCore().getModel();
          m_app->printOriginalSolution(m_size,
                                       modelCore->getColNames(),
                                       m_values);

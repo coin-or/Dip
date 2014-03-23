@@ -239,7 +239,8 @@ inline void UtilPrintEdge(const int   index,
                           std::ostream*    os = &std::cout)
 {
    std::pair<int, int> uv = UtilBothEndsU(index);
-   (*os) << "(" << std::setw(2) << uv.first << "," << std::setw(2) << uv.second << ") ";
+   (*os) << "(" << std::setw(2) << uv.first << "," << std::setw(
+            2) << uv.second << ") ";
 }
 
 /*-----------------------------------------------------------------------*/
@@ -247,7 +248,8 @@ inline std::string UtilEdgeToStr(const int index)
 {
    std::stringstream  ss;
    std::pair<int, int> uv = UtilBothEndsU(index);
-   ss << "(" << std::setw(2) << uv.first << "," << std::setw(2) << uv.second << ") ";
+   ss << "(" << std::setw(2) << uv.first << "," << std::setw(
+         2) << uv.second << ") ";
    return ss.str();
 }
 
@@ -828,22 +830,18 @@ inline void UtilSenseToBound(const char     sense,
       lb = rhs;
       ub = rhs;
       break;
-
    case 'L':
       lb = -inf;
       ub = rhs;
       break;
-
    case 'G':
       lb = rhs;
       ub = inf;
       break;
-
    case 'R':
       lb = rhs - range;
       ub = rhs;
       break;
-
    case 'N':
       lb = -inf;
       ub = inf;
