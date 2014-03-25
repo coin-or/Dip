@@ -149,7 +149,7 @@ void SDPUC_DecompApp::createModels(){
    //---
    //--- set the objective 
    //---        
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, numCols);
    /*cout << "obj = " ;
      for(i = 0; i < numCols; i++){
      cout << m_objective[i] << " ";
@@ -182,13 +182,6 @@ void SDPUC_DecompApp::createModels(){
    //---   since I don't know what OSI will do with empty problem
    //---   we will make column bounds explicity rows
    //---
-   int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
-   if(nMasterOnlyCols){
-      if(m_appParam.LogLevel >= 1)
-         (*m_osLog) << "Create model part Master-Only." << endl;
-
-      createModelMasterOnlys(modelCore->masterOnlyCols);
-   }
    
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModels()", m_appParam.LogLevel, 2);
@@ -744,69 +737,6 @@ void SDPUC_DecompApp::createModelRelaxSparse(DecompConstraintSet * model,
 }
 
 //===========================================================================//
-void
-SDPUC_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
-
-   int   numTimeperiods = m_instance.m_numTimeperiods;
-   int   numArcs        = m_instance.m_numArcs;
-   int	 numNodes		= m_instance.m_numNodes;
-   int   numCols        = numArcs						//y1-vars
-      + 3 * numTimeperiods * numArcs	//y2-, z-, and x-vars
-      + numTimeperiods * numNodes;		//theta-vars
-   SDPUC_Instance::arc * arcs = m_instance.m_arcs;
-   
-   int            nBlocks     = m_instance.m_numTimeperiods; //static_cast<int>(m_blocks.size());
-   const int      nCols       = numCols;
-   //const double * colLB[nCols]	;//	  = ;
-   //const double * colUB[nCols]; //       = m_mpsIO.getColUpper();
-   //const char   * integerVars = m_mpsIO.integerColumns();
-   int            nMasterOnlyCols =     numArcs * (1 + numTimeperiods); //static_cast<int>(m_instance.m_numArcs);
-   
-
-   if(m_appParam.LogLevel >= 1){
-      (*m_osLog) << "nCols           = " << nCols << endl;
-      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
-   }
-
-   if(nMasterOnlyCols == 0)
-      return;
-
-
-   int i;
-   vector<int>::iterator vit;
-   for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++){
-      i = *vit;
-
-      //set upper and lower bounds 
-      //	  colUB[i] = 1;
-      //	  colLB[i] = 0;
-
-      //THINK:
-      //  what-if master-only var is integer and bound is not at integer
-            
-      DecompConstraintSet * model = new DecompConstraintSet();
-      model->m_masterOnly      = true;
-      model->m_masterOnlyIndex = i;
-      model->m_masterOnlyLB    = 0; //colLB[i];
-      model->m_masterOnlyUB    = 1; //colUB[i];
-      //0=cont, 1=integer
-      model->m_masterOnlyIsInt = true; //integerVars[i] ? true : false;
-
-      /*   if(m_appParam.ColumnUB <  1.0e15)
-	   if(colUB[i] >  1.0e15)
-	   model->m_masterOnlyUB = m_appParam.ColumnUB;
-	   if(m_appParam.ColumnLB > -1.0e15)
-	   if(colLB[i] < -1.0e15)
-	   model->m_masterOnlyLB = m_appParam.ColumnLB;
-      */
-      //m_modelR.insert(make_pair(nBlocks, model));
-      setModelRelax(model, 
-                    "master_only" + UtilIntToStr(i), nBlocks);
-      nBlocks++;
-   }
-
-   return;   
-}
 
 
 //===========================================================================//
