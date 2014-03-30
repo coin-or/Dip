@@ -241,6 +241,7 @@ int GAP_DecompApp::createModels()
 DecompSolverStatus
 GAP_DecompApp::solveRelaxed(const int             whichBlock,
                             const double*         redCostX,
+			    const double convexDual,
                             list<DecompVar*>&     vars)
 {
    if (!m_appParam.UsePisinger) {
@@ -278,10 +279,10 @@ GAP_DecompApp::solveRelaxed(const int             whichBlock,
    //printf("b=%d varRedCost - alpha = %g\n", b, varRedCost - alpha);
    //printf("b=%d varOrigCost        = %g\n", b, varOrigCost);
    UTIL_DEBUG(m_appParam.LogLevel, 4,
-              printf("PUSH var with RC = %g\n", varRedCost);
+              printf("PUSH var with RC = %g\n", varRedCost -convexDual);
              );
    DecompVar* var = new DecompVar(solInd, solEls,
-                                  varRedCost, varOrigCost);
+                                  varRedCost-convexDual, varOrigCost);
    var->setBlockId(whichBlock);
    vars.push_back(var);
    UtilPrintFuncEnd(m_osLog, m_classTag,

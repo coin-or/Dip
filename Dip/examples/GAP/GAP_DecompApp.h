@@ -60,6 +60,7 @@ public:
    /** Solve the relaxed problem. */
    DecompSolverStatus solveRelaxed(const int             whichBlock,
                                    const double*         redCostX,
+				   const double          convexDual,
                                    list<DecompVar*>&     vars);
 
    /** Print an original column (format for this app). */

@@ -95,7 +95,7 @@ int main(int argc, char** argv)
          //--- solve
          //---
          timer.start();
-         status = alpsModel.solve();
+         status = alpsModel.solve(0, NULL);
          timer.stop();
          timeSolveCpu  = timer.getCpuTime();
          timeSolveReal = timer.getRealTime();
