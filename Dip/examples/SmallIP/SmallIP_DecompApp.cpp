@@ -180,8 +180,8 @@ int SmallIP_DecompApp::generateInitVars(DecompVarList & initVars){
    int    ind [2] = {0,1};
    double els1[2] = {4.0,1.0};
    double els2[2] = {5.0,5.0};
-   initVars.push_back(new DecompVar(2, ind, els1, 4.0));
-   initVars.push_back(new DecompVar(2, ind, els2, 5.0));
+   initVars.push_back(new DecompVar(2, ind, els1, 4.0,DecompVar_Point));
+   initVars.push_back(new DecompVar(2, ind, els2, 5.0,DecompVar_Point));
    
    UtilPrintFuncEnd(m_osLog, m_classTag, "generateInitVars()", LogLevel, 2);
    return static_cast<int>(initVars.size());

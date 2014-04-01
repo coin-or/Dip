@@ -74,7 +74,7 @@ int main(int argc, char ** argv){
       //---
       //--- solve
       //---          
-      alpsModel.solve();
+      alpsModel.solve(0, NULL);
 
       //---
       //--- sanity check that optimal solution is 3.0
