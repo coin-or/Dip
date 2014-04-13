@@ -266,7 +266,7 @@ AlpsDecompModel::registerKnowledge()
       std::cout << "AlpsDecomp: Register Alps model." << std::endl;
    }
 
-   broker_->registerClass(AlpsKnowledgeTypeNode, new AlpsDecompTreeNode);
+   broker_->registerClass(AlpsKnowledgeTypeNode, new AlpsDecompTreeNode(this));
 
    if (broker_->getMsgLevel() > 100) {
       std::cout << "AlpsDecomp: Register Alps node." << std::endl;
