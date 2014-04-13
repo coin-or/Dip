@@ -19,8 +19,8 @@
 //===========================================================================//
 #include "Alps.h"
 #include "AlpsTreeNode.h"
+#include "AlpsDecompNodeDesc.h"
 
-//===========================================================================//
 class AlpsNodeDesc;
 class AlpsDecompModel;
 
@@ -40,10 +40,16 @@ public:
    AlpsDecompTreeNode() :
       AlpsTreeNode(),
       m_classTag  ("ALPSTN")
-
    {
       //quality_ = -ALPS_OBJ_MAX;//MVG?
    }
+
+
+    AlpsDecompTreeNode(AlpsDecompModel *m ){
+	
+      desc_ = new AlpsDecompNodeDesc(m); 
+    }      
+
 
    /** Destructor */
    virtual ~AlpsDecompTreeNode() {
@@ -102,18 +108,72 @@ public:
       return upBranchUB_;
    }
 
+   inline void setBranchBound_upUB(int& BranchSize, int*& BranchIndices,
+                                   double*& BranchValues) {
+      if (BranchSize) {
+         upBranchUB_.clear();
+
+         for (int i = 0 ; i < BranchSize; ++i) {
+            upBranchUB_.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
+         }
+      } else {
+         upBranchUB_.clear();
+      }
+   }
+
+   inline void setBranchBound_upLB(int& BranchSize, int*& BranchIndices,
+                                   double*& BranchValues) {
+      if (BranchSize) {
+         upBranchLB_.clear();
+
+         for (int i = 0 ; i < BranchSize; ++i) {
+            upBranchLB_.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
+         }
+      } else {
+         upBranchLB_.clear();
+      }
+   }
+
+   inline void setBranchBound_downLB(int& BranchSize, int*& BranchIndices,
+                                     double*& BranchValues) {
+      if (BranchSize) {
+         downBranchLB_.clear();
+
+         for (int i = 0 ; i < BranchSize; ++i) {
+            downBranchLB_.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
+         }
+      } else {
+         downBranchLB_.clear();
+      }
+   }
+
+   inline void setBranchBound_downUB(int& BranchSize, int*& BranchIndices,
+                                     double*& BranchValues) {
+      if (BranchSize) {
+         downBranchUB_.clear();
+
+         for (int i = 0 ; i < BranchSize; ++i) {
+            downBranchUB_.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
+         }
+      } else {
+         downBranchUB_.clear();
+      }
+   }
+
+
+   /*
    inline void setBranchBound(int& BranchSize, int*& BranchIndices,
                               double*& BranchValues,
-                              std::vector< std::pair<int, double> > & branchInfo) const {
+                              std::vector< std::pair<int, double> > & branchInfo) {
       if (BranchSize) {
          for (int i = 0 ; i < BranchSize; ++i) {
-            branchInfo.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
-         }
+      branchInfo.push_back(std::make_pair(BranchIndices[i], BranchValues[i]));
+    }
       } else {
          branchInfo.clear();
       }
    }
-
+   */
 
    /** Encode this node for message passing. *\/ */
    virtual AlpsEncoded* encode() const;
