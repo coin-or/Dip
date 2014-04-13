@@ -24,7 +24,9 @@
 #include "UtilMacrosAlps.h"
 
 //===========================================================================//
+//class AlpsDecompModel; 
 class CoinWarmStartBasis;
+
 
 //===========================================================================//
 /**
@@ -70,12 +72,13 @@ private:
    std::string m_classTag;
 
 public:
+
+   /** number of columns in original space */
+   int numberCols_;
    /** lower bounds in original space */
    double* lowerBounds_;
    /** upper bounds in original space */
    double* upperBounds_;
-   /** number of columns in original space */
-   int numberCols_;
    /** Branched direction to create it. */
    int branchedDir_;
    /** Branched set of indices/values to create it. */
@@ -100,7 +103,10 @@ public:
    AlpsDecompNodeDesc(AlpsModel* m)
       :
       AlpsNodeDesc(m),
-      branchedDir_(0)
+      numberCols_(0),
+      lowerBounds_(NULL),
+      upperBounds_(NULL),
+      branchedDir_(0)      
       //      basis_(NULL)
    {
    }
@@ -186,9 +192,9 @@ public:
       double* ub = new double[numberCols_];
       memcpy( lb, lowerBounds_, numberCols_ * sizeof(double) );
       memcpy( ub, upperBounds_, numberCols_ * sizeof(double) );
+      encoded->writeRep(numberCols_);
       encoded->writeRep(lb, numberCols_);
       encoded->writeRep(ub, numberCols_);
-      encoded->writeRep(numberCols_);
       encoded->writeRep(branchedDir_);
       delete [] lb;
       delete [] ub;
@@ -198,9 +204,10 @@ public:
    /** Unpack AlpsDecompNodeDesc portion of node description from an encoded. */
    AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded) {
       AlpsReturnStatus status = AlpsReturnStatusOk;
+      std::cout << "the numbercols is " << numberCols_ << std::endl;
+      encoded.readRep(numberCols_);
       encoded.readRep(lowerBounds_, numberCols_);
       encoded.readRep(upperBounds_, numberCols_);
-      encoded.readRep(numberCols_);
       encoded.readRep(branchedDir_);
       return status;
    }
