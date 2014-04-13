@@ -59,9 +59,13 @@ int main(int argc, char** argv)
       //---
       timer.start();
 #ifdef COIN_HAS_MPI
+      int i = 0;
       char hostname[1000];
       gethostname(hostname, sizeof(hostname));
       printf("PID %d on %s ready for attach\n", getpid(), hostname);
+      /*      if (i == 0)
+	sleep(50); 
+      */
 #endif
       DecompApp milp;
       char the_path[256];
