@@ -53,7 +53,6 @@
 #include "DecompMemPool.h"
 #include "DecompSolution.h"
 #include "DecompAlgoCGL.h"
-#include "AlpsDecompTreeNode.h"
 #include "OsiClpSolverInterface.hpp"
 //#include "DecompBranchStrategy.h"
 //#include "DecompBranchStrategyMaxInf.h"
@@ -61,8 +60,9 @@ class DecompBranchStrategy;
 class OsiSolverInterface;
 class DecompConstraintSet;
 class DecompSolverResult;
+class AlpsDecompTreeNode;
 
-//===========================================================================//
+
 class DecompAlgo {
 
 protected:
@@ -802,6 +802,20 @@ public:
    inline const int getStopCriteria() const {
       return m_stopCriteria;
    }
+
+
+   inline const double getGlobalLB() const {
+     return m_globalLB; 
+   }
+
+   inline const double getGlobalUB() const {
+     return m_globalUB; 
+   }
+
+   inline const DecompNodeStats getNodeStats() const {
+     return m_nodeStats; 
+   }
+   
 
    /**
     * Get the current global (integrality) gap.
