@@ -1,0 +1,118 @@
+Using Dippy it is easy to transform a problem into a form that can be solved by either branch and cut or branch, price and cut. Branch, price and cut decomposes a problem into a master problem and a number of distinct subproblems. We can identify subproblems using the \texttt{relaxation} member of the \texttt{DipProblem} class (remember the constraints restricting how patterns can be cut in \sbsref{sbs:sponge}). Once the subproblems have been identified, then they can either be ignored (when using branch and cut -- the default method for \ac{DIP}) or utilised (when using branch, price and cut -- specified by turning on the \texttt{doPriceCut} option).
+
+\vfill
+\newpage
+
+In branch, price and cut, the original problem is decomposed into a master problem and multiple subproblems:
+\begin{equation}
+\begin{array}{rr@{\ }r@{\ }r@{\ }r@{\ }l}
+             \min & c_1^\top x_1 & + \ c_2^\top x_2 & + \ \cdots & + \ c_k^\top x_k \\
+\text{subject to} & A_1 x_1      & + \ A_2 x_2      & + \ \cdots & + \ A_k x_k      & = b \\
+                  &              &   F_2 x_2      &          &                & = f_2 \\
+                  &              &                &  \ddots  &                & \ \ \vdots \\
+                  &              &                &          &   F_k x_k      & = f_k \\
+                  & x_1 \in \mathbb{Z}^{+}_{n_1} &, x_2 \in \mathbb{Z}^{+}_{n_2}&, \ldots, x_k & \in \mathbb{Z}^{+}_{n_k} \quad
+\end{array}
+\label{eqn:decomp}
+\end{equation}
+
+Then, given a subset of extreme points for each subproblem, the \textit{restricted} master problem (RMP) finds an optimal solution and corresponding duals ($\pi$, $\gamma_1, \ldots, \gamma_k$):
+\begin{equation}
+\begin{array}{rr@{\ }r@{\ }r@{\ }r@{\ }ll}
+             \min & c_1^\top x_1 & + \displaystyle\sum_{l_2=1}^{L_2} \left(c_2^\top y^2_{l_2} \right) \lambda^2_{l_2} & + \ \cdots & + \displaystyle\sum_{l_k=1}^{L_k} \left(c_k^\top y^k_{l_k} \right) \lambda^k_{l_k} \\
+\text{subject to} & A_1 x_1      & + \displaystyle\sum_{l_2=1}^{L_2} \left(A_2 y^2_{l_2} \right) \lambda^2_{l_2} & + \ \cdots & + \displaystyle\sum_{l_k=1}^{L_k} \left( A_k y^k_{l_k} \right) \lambda^k_{l_k}      & = b & : \pi \\
+                  &              &   \displaystyle\sum_{l_2=1}^{L_2} \lambda^2_{l_2}      &          &                & = 1 & : \gamma_1 \\
+                  &              &                &  \ddots  &                & \ \ \vdots \\
+                  &              &                &          &   \displaystyle\sum_{l_k=1}^{L_k} \lambda^k_{l_k}      & = 1 & : \gamma_k \\
+                  &          x_1 & \in \mathbb{Z}^{+}_{n_1}, \lambda^2 \in \{0, 1\}_{L_2}, & \ldots, \lambda^k & \in \{0, 1\}_{L_k} \hspace{1.25cm} &
+\end{array}
+\label{eqn:rmp}
+\end{equation}
+
+New extreme points (columns for the RMP) are found by solving the subproblems ${\cal S}_j, j = 1, \ldots, k$ with the objective of minimising the reduced cost of a column in the RMP:
+\begin{equation}
+\begin{array}{rrl}
+{\cal S}_j: \min & (c_j - \pi^\top A_j)^\top x_j + \gamma_j \\
+\text{subject to} & F_j x_j      & = f_j \\
+                  & x_j \in \mathbb{Z}^{+}_{n_j}
+\end{array}
+\label{eqn:subprob}
+\end{equation}
+If the objective value of ${\cal S}_j$ is $< 0$, then the column will improve the objective value of the RMP and is added.
+
+The subproblems can either be solved using the default \ac{MILP} solver (Cbc) or a customised solver. A customised solver can be defined by the \texttt{relaxed\_solver} function. This function has 4 inputs:
+\begin{enumerate}
+\item \texttt{prob} -- the \texttt{DipProblem} being solved;
+\item \texttt{index} -- the index $j$ of the subproblem being solved;
+\item \texttt{redCosts} -- $c_j - \pi^\top A_j$, the reduced costs for the $x_j$ variables;
+\item \texttt{convexDual} -- $\gamma_j$, the dual value for the convexity constraint for this subproblem.
+\end{enumerate}
+In addition to subproblem solutions using dual values, initial columns for subproblems can also be generated either automatically using Cbc or using a customised approach. A customised approach to initial variable generation can be defined by the \texttt{init\_vars} function. This function has only 1 input, \texttt{prob}, the \texttt{DipProblem} being solved.
+
+\subsection{Customised Column Generation for the Capacitated Facility Location problem} \label{sbs:fac_cols}
+
+Starting from the original capacitated facility location problem (see \sbsref{sbs:facility}), we can define subproblems for each facility location that define the capacity constraints at that location:
+\lstinputlisting[firstnumber=35,linerange=35-44]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+All remaining constraints (the assignment constraints - ensuring each product is assigned to a facility) form the master problem when using branch, price and cut. To use branch, price and cut we turn on the \texttt{doPricCut} option:
+\lstinputlisting[firstnumber=162,linerange=162-166]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+Note that symmetry is also present in the decomposed problem, so we add the ordering constraints to the RMP (see \sbsref{sbs:fac_brch}):
+\lstinputlisting[firstnumber=46,linerange=46-49]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+In branch, price and cut, the RMP requires 10.39s of CPU times and creates a tree with 27 nodes (compared with 0.28s and 76 nodes for the original branch and cut approach with ordering constraints). Note that the \texttt{generateInitVars} option uses Cbc by default to find initial columns for the RMP and then Cbc is also used (by default) to solve the subproblems that generate facilities at locations along with products produced at that facility. However, we may be able to speed up the overall solution process by providing our own approaches to solving the pricing subproblems and generating initial variables.
+
+In the pricing subproblem, we are looking to assign products to a facility in order to provide negative reduced cost. Producing a product at a facility provides the reduced cost of $x_{ij}$ (\texttt{assign\_vars[(i, j)]}), but will decrease the wasted capacity and hence reduce the contribution of the reduced cost of $w_i$ (\texttt{waste\_vars[i]}). Here, we calculate the total contribution to reduced cost of adding an item (= reduced cost of $x_{ij} -$ reduced cost of $w_i \times r_j$) and then calculate an items efficiency by dividing this contribution by its weight. Then, we build a minimum reduced cost facility by using a greedy algorithm to choose items in order of best efficiency. Since we can access the problem data, variables and their reduced cost, this is straightforward to implement in Dippy:
+\lstinputlisting[firstnumber=69,linerange=69-105]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+Adding this customised solver reduces the solution time to 1.61s of CPU time and the search tree to 7 nodes.
+
+To generate initial facilities (complete with assigned products) we implemented two approaches. The first approach used a first-fit approach and considered the products in order of decreasing requirement:
+\lstinputlisting[firstnumber=107,linerange=107-138]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+The second approach simply assigned one product to each facility:
+\lstinputlisting[firstnumber=140,linerange=140-153]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+\newpage
+
+Using Dippy we can define both approaches at once and then define which one to use by setting the \texttt{init\_vars} method:
+\lstinputlisting[firstnumber=155,linerange=155-156]{C:/COIN/Dippy/examples/facility_decomp.py}
+
+The effects of column generation, included a customised subproblem solver and initial variable generator are shown in \scnref{scn:concl}.
+
+\subsection{Customised Column Generation for the Cutting Stock problem} \label{sbs:cut_cols}
+
+For the Sponge Roll Production problem (see \sbsref{sbs:sponge}), the subproblem consists of the cutting pattern constraint:
+\lstinputlisting[firstnumber=55,linerange=55-59]{C:/COIN/Dippy/examples/cutting_stock.py}
+
+To generate cutting patterns with negative reduced cost in the customised \texttt{relaxed\_solver} function, we first set ``profit'' coefficients to be $-$ reduced cost and ``size'' coefficients to be the length of the required items:
+\lstinputlisting[firstnumber=62,linerange=62-68]{C:/COIN/Dippy/examples/cutting_stock.py}
+
+Then, we use \ac{DP} to find a maximum profit knapsack. The \ac{DP} recursion is:
+\[\begin{array}{rcl}
+I &=& \text{set of possible items to include}; \\
+W &=& \text{capacity of knapsack}; \\
+w_i &=& \text{``size'' of item } i; \\
+p_i &=& \text{``profit'' of including item} i; \\
+V(I, W) &=& \text{maximum profit when considering items from $I$} \\
+& &\text{for inclusion in a knapsack of capacity $W$} \\
+V(\emptyset, W) &=& 0 \\
+V(I, 0) &=& 0 \\
+V(I, W) &=& \max\big[\underset{\text{\begin{tabular}{c}don't include any \\[-3pt] item, consider \\[-3pt] smaller knapsack \end{tabular}}}{\underbrace{V(I, W - 1)}}, \max_{i \in I} \underset{\text{include item $i$}}{\underbrace{p_i + V(I, W - w_i)}} \big].
+\end{array}\]
+
+\newpage
+
+The \texttt{kp} function implements the \ac{DP} recursion:
+\lstinputlisting[firstnumber=97,linerange=97-122]{C:/COIN/Dippy/examples/cutting_stock.py}
+
+The customised \texttt{relaxed\_solver} function calls \texttt{kp} to find the maximum profit (= most negative reduced cost) cutting pattern:
+\lstinputlisting[firstnumber=70,linerange=70-70]{C:/COIN/Dippy/examples/cutting_stock.py}
+checks it is valid and adds it to the restricted master problem if the total reduced cost is negative (cutting pattern reduced cost + pattern use reduced cost $-$ convexity constraint dual $< 0$).
+\lstinputlisting[firstnumber=79,linerange=79-93]{C:/COIN/Dippy/examples/cutting_stock.py}
+
+The effect of the customised subproblem solver is a reduction from 33.31s to 28.30s of CPU time and 175 to 131 nodes.
+
+\begin{comment}
+\subsection{Customised Column Generation for the Wedding Planner problem} \label{sbs:wed_cols}
+\end{comment}

@@ -1,0 +1,52 @@
+In \scnref{sbs:callbacks} we explained the modifications to \ac{DIP} (\texttt{chooseBranchVar} to \\ \texttt{chooseBranchSet}) and also how to implement a simple variable branch using \texttt{chooseBranchSet}. However, other branching methods may use advanced branching techniques such as the ones demonstrated in the remainder of this section.
+
+From \ac{DIP}, \texttt{chooseBranchSet} calls \texttt{branch\_method} in Dippy. In Dippy, we can implement customised branching by defining a \texttt{branch\_method}. The function \texttt{branch\_method} has two inputs supplied by \ac{DIP}:
+\begin{enumerate}
+\item \texttt{prob} -- the \texttt{DipProblem} being solved;
+\item \texttt{sol} -- an indexable object representing the solution at the current node.
+\end{enumerate}
+We define \texttt{branch\_method} using these inputs in the same Python file as the model definition. Note that Dippy can access the variables from the original formulation. Due to Python's scoping rules, no complicated indexing or searching is required (also note Python starts its array indexing at 0 -- cf. C/C++).
+
+\subsection{Advanced Branching in the Capacitated Facility Location problem} \label{sbs:fac_brch}
+
+When solving the facility location problem (see \sbsref{sbs:facility}) one difficulty is symmetry in the solution space. Since the facilities are identical, solvers consider multiple solutions that differ only in the labelling of the facility locations. To overcome this constraints for ordering the facility locations can be included:
+\[ y_i \geq y_{i+1}, i = 1, \ldots, m-1 \]
+\lstinputlisting[firstnumber=44,linerange=44-47]{C:/COIN/Dippy/examples/facility.py}
+
+These ordering constraints also introduce the opportunity to implement an effective branch on the number of facilities. If $\displaystyle\sum_{i=1}^m y_i = \alpha \notin \mathbb{Z}$, then:
+\vspace*{-6pt}
+\begin{center}
+\begin{tabular}{l|l}
+the branch down restricts & the branch up restricts \\
+$\displaystyle\sum_{i=1}^m y_i \leq \lfloor \alpha \rfloor$ &
+$\displaystyle\sum_{i=1}^m y_i \geq \lceil \alpha \rceil$ \\
+and the ordering means that & and the ordering means that \\
+$y_i = 0, i = \lceil \alpha \rceil, \ldots, m$ &
+$y_i = 1, i = 1, \ldots, \lceil \alpha \rceil$
+\end{tabular}
+\end{center}
+
+To implement this branch in Dippy simply requires the definition of the \\ \texttt{branch\_method}. Remember Python's scoping rules allow the model structures to be accessed directly within our customised branching function, no complicated indexing or searching is necessary.
+\lstinputlisting[firstnumber=49,linerange=49-65]{C:/COIN/Dippy/examples/facility.py}
+
+By only adding the ordering constraints we improve the solution time from 1.17s to 0.28s of CPU time and decrease the tree size from 375 to 76 nodes. By adding the advanced branching we decrease the solution time further to 0.05s of CPU time and the tree size decreases to 3 nodes. A full summary of the effect of advanced \ac{MILP} methods, including branching is given in \scnref{scn:concl}.
+
+\subsection{Advanced Branching in the Coke Supply Chain problem}
+
+In the Coke Supply Chain problem, the main source of fractionality is the size of the plant facilities. If the necessary size to process coal to coke is between the given sizes then the \texttt{buildVars} variable will be fractional. We can define a branch that forces the plant to be either less than the nearest given size below or greater than the nearest given size above. For example, if the size = 210, then it lies between the given sizes of 150 and 225, so the branch down keeps the size $\leq$ 150 and the branch up keeps the size $\geq$ 225. However, branching on the size of the plant itself does not help reduce fractionality as the fractional amounts simply change to match the new plant size. The most effective way to enforce the branch and reduce fractionality is by banning infeasible variables. In our example, in the down branch all buildVars for the location with capacity $>$ 150 are set to 0 (by setting the upper bound to 0) and in the up branch all buildVars for the location with capacity $<$ 255 are set to 0 (also by setting the upper bound to 0). We can define this branching in Dippy.
+\lstinputlisting[firstnumber=135,linerange=135-158]{C:/COIN/Dippy/examples/coke.py}
+
+With this advanced branching the solution time decreases from 1.09s to 0.62s of CPU time and the tree reduces from 201 nodes to 76 nodes.
+
+\begin{comment}
+
+\subsection{Advanced Branching in the Wedding Planner problem} \label{sbs:wed_brch}
+
+When solving the Wedding Planner problem using \ac{MILP}, guests will often be ``split'' between tables. Branching a particular $x_{gt}$ to 0 is not effective as linear programming can simply swap entire tables and maintain the split on a different table. One way to strengthen branching if some $x_{gt}$ is fractional is to: 1) find the minimum index table $t$ with $x_{gt} > 0$; 2) define a ``down'' branch that restricts guest $g$ to sit at tables with index $t$ or smaller; 3) define a ``up'' branch that restricts guest $g$ to sit at tables with index $t + 1$ or bigger. This method creates more balanced branches and reduces the size of the branch-and-bound tree.
+\lstinputlisting[firstnumber=77,linerange=77-90]{C:/COIN/Dippy/examples/wedding_dip.py}
+
+With this advanced branching the solution times get worse and the tree size increases! Not a good branch...
+
+\end{comment}
+
+

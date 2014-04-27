@@ -1,0 +1,175 @@
+%%
+%% This is file `acronym.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% acronym.dtx  (with options: `acronym')
+%% 
+%% Copyright (C) 1994,1999 by Tobias Oetiker.
+%% All rights reserved.
+%% 
+%%  This package is distributed in the hope that it will be useful,
+%%  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+%% 
+%%  It may be distributed under the conditions of the LaTeX Project Public
+%%  License, either version 1.2 of this license or (at your option) any
+%%  later version.  The latest version of this license is in
+%%     http://www.latex-project.org/lppl.txt
+%%  and version 1.2 or later is part of all distributions of LaTeX
+%%  version 1999/12/01 or later.
+%% 
+%%  The list of all files belonging to the `acronym' package is
+%%  given in the file `readme'.
+%% 
+\def\filename{acronym}
+\def\fileversion{v1.6}
+\def\filedate{2000/05/21}
+\def\docdate {2000/05/21}
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{myacronym}
+  [\filedate\space\fileversion\space Support for acronyms]
+\newcommand{\AC@dblargafter}[2]{%
+  \@ifnextchar[{#2{#1}}{\AC@@dblargafter{#1}{#2}}%
+}
+\newcommand\AC@@dblargafter{}
+\def\AC@@dblargafter#1#2{#2{#1}[#1]}
+\newcommand*{\newacro}[1]{\AC@dblargafter{#1}\AC@newacro}
+\newcommand\AC@newacro{}
+\def\AC@newacro#1[#2]#3{%
+  \begingroup
+    \def\reserved@a{#1}%
+    \def\reserved@b{#2}%
+    \ifx\reserved@a\reserved@b
+      \expandafter\gdef\csname fn@#1\endcsname{{#3}}%
+    \else
+      \expandafter\gdef\csname fn@#1\endcsname{{#3}{#2}}%
+    \fi
+  \endgroup
+}
+\newcommand*{\acrodef}[1]{\AC@dblargafter{#1}\AC@acrodef}
+\newcommand\AC@acrodef{}
+\def\AC@acrodef#1[#2]#3{%
+  \newacro{#1}[{#2}]{#3}%
+  \if@filesw
+    \begingroup
+      \def\reserved@a{#1}%
+      \def\reserved@b{#2}%
+      \ifx\reserved@a\reserved@b
+        \protected@write\@auxout{}{\protect\newacro{#1}{#3}}%
+      \else
+        \protected@write\@auxout{}{\protect\newacro{#1}[{#2}]{#3}}%
+      \fi
+    \endgroup
+  \fi
+}
+\newcommand*{\acroinit}[1]{\AC@dblargafter{#1}\AC@acroinit}
+\newcommand\AC@acroinit{}
+\def\AC@acroinit#1[#2]#3{%
+  \newacro{#1}[{#2}]{#3}%
+  \if@filesw
+    \begingroup
+      \def\reserved@a{#1}%
+      \def\reserved@b{#2}%
+      \ifx\reserved@a\reserved@b
+        \protected@write\@auxout{}{\protect\newacro{#1}{#3}}%
+      \else
+        \protected@write\@auxout{}{\protect\newacro{#1}[{#2}]{#3}}%
+      \fi
+    \endgroup
+  \fi
+  \global\expandafter\let\csname ac@#1\endcsname\@empty
+}
+\newenvironment{acronym}{%
+  \begin{description}
+    \providecommand*{\acro}[1]{\AC@dblargafter{##1}\AC@acro}%
+}{%
+  \end{description}%
+}
+\newcommand\AC@acro{}
+\def\AC@acro#1[#2]#3{%
+  \acrodef{#1}[{#2}]{#3}%
+  \item[{#2}] #3%
+}
+\newcommand*{\AC@check}[1]{%
+  \expandafter\ifx\csname fn@#1\endcsname\relax
+    \PackageWarning{acronym}{Acronym `#1' is not defined}%
+    \expandafter\gdef\csname fn@#1\endcsname
+      {{\textbf{#1!}}}%
+  \fi
+}
+\newcommand*{\acsfont}[1]{#1}
+\newcommand*{\acffont}[1]{#1}
+\newcommand*{\acfsfont}[1]{#1}
+\newcommand*{\acs}[1]{%
+  \AC@check{#1}%
+  \acsfont{%
+    \expandafter\expandafter\expandafter\AC@getsecond
+      \csname fn@#1\endcsname{#1}\@nil
+  }%
+}
+\newcommand\AC@getsecond{}
+\long\def\AC@getsecond#1#2#3\@nil{#2}
+\newcommand*{\acl}[1]{%
+  \AC@check{#1}%
+  \expandafter\expandafter\expandafter\@car
+    \csname fn@#1\endcsname\@nil
+}
+\newcommand*{\acf}[1]{%
+  \acffont{%
+    \acl{#1}%
+    \nolinebreak[3] %
+    \acfsfont{(\acs{#1})}%
+  }%
+}
+\newcommand{\ac}[1]{%
+  \expandafter\ifx\csname ac@#1\endcsname\relax
+    \acf{#1}%
+    \global\expandafter\let\csname ac@#1\endcsname\@empty
+  \else
+    \acs{#1}%
+  \fi
+}
+\newcommand*{\acsp}[1]{%
+  \acs{#1}s%
+}%
+\newcommand*{\aclp}[1]{%
+  \acl{#1}s%
+}%
+\newcommand*{\acfp}[1]{%
+  \acffont{%
+    \aclp{#1}%
+    \nolinebreak[3] %
+    \acfsfont{(\acsp{#1})}%
+  }%
+}
+\newcommand{\acp}[1]{%
+  \expandafter\ifx\csname ac@#1\endcsname\relax
+    \acfp{#1}%
+    \global\expandafter\let\csname ac@#1\endcsname\@empty
+  \else
+    \acsp{#1}%
+  \fi
+}
+\DeclareOption{footnote}{%
+  \renewcommand*{\acf}[1]{%
+    \acs{#1}%
+    \footnote{\acl{#1}{}}%
+  }%
+  \renewcommand*{\acfp}[1]{%
+    \acsp{#1}%
+    \footnote{\aclp{#1}{}}%
+  }%
+}
+\newif\if@ac@smaller
+\@ac@smallerfalse
+\DeclareOption{smaller}{\@ac@smallertrue}
+\ProcessOptions\relax
+\if@ac@smaller
+  \RequirePackage{relsize}
+  \renewcommand*{\acsfont}[1]{\textsmaller{#1}}
+\fi
+\endinput
+%%
+%% End of file `acronym.sty'.

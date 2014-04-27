@@ -1,0 +1,110 @@
+\documentclass[12pt,a4paper,onecolumn,twoside]{article}
+
+\usepackage{vmargin, xspace}
+
+\usepackage{url}
+\usepackage[english]{babel}
+
+\usepackage[absolute]{textpos}
+\usepackage{setspace}
+
+\include{commands}
+
+\begin{document}
+
+\begin{titlepage}
+\ 
+\setlength{\TPHorizModule}{1cm}
+\setlength{\TPVertModule}{1cm}
+\begin{textblock}{8.79}(8.655,11.5)
+\begin{center}
+\textbf{
+\begin{Large}
+\begin{onehalfspace}
+Dippy -- a simplified interface\\[-6pt] for advanced mixed-integer \\[-6pt] programming\\[3pt]
+\end{onehalfspace}
+\end{Large}
+By Dr Michael O'Sullivan, Dr Cameron Walker, Qi-Shan Lim, Dr Stuart Mitchell and Assoc Prof Ted Ralphs\\[3pt]
+April 2014\\
+%Report, University of Auckland Faculty of Engineering, no. 685 \\
+Report, University of Auckland Faculty of Engineering, no. ??? \\
+%ISSN 1179-528X % Print version
+ISSN 1178-3680 % Electronic version
+}
+\end{center}
+\end{textblock}
+\vfill
+\end{titlepage}
+
+\title{
+Dippy -- a simplified interface for advanced mixed-integer programming
+}
+
+%for single author (just remove % characters)
+\author{
+{\rm Michael O'Sullivan, Qi-Shan Lim and Cameron Walker}\\
+Department of Engineering Science, University of Auckland
+\and
+{\rm Stu Mitchell}\\
+Stuart Mitchell Consultants
+{\rm Ted Ralphs}\\
+Department of Industrial Engineering, Lehigh University
+% copy the following lines to add more authors
+% \and
+% {\rm Name}\\
+%Name Institution
+} % end author
+
+\date{\today}
+
+\maketitle
+
+\acrodef{MILP}{mixed-integer linear programming}
+\acrodef{DIP}{Decomposition for Integer Programming}
+\acrodef{CGL}{Cut Generator Library}
+\acrodef{OSI}{Open Solver Interface}
+\acrodef{DP}{dynamic programming}
+\acrodef{TSP}{travelling salesperson}
+
+\subsection*{Abstract}
+\input{abstract}
+
+\section{Introduction} \label{scn:intro}
+\input{intro}
+
+\section{Combining \ac{DIP} and PuLP} \label{scn:overview}
+\input{overview}
+
+\section{Getting Started with Dippy}
+\input{starting}
+
+\section{Case Studies} \label{scn:define}
+\input{define}
+
+\section{Adding Customised Branching} \label{scn:branch}
+\input{branch}
+
+\section{Adding Customised Cut Generation} \label{scn:cuts}
+\input{cuts}
+
+\section{Adding Customised Column Generation} \label{scn:column}
+\input{column}
+
+\section{Adding Customised Heuristics} \label{scn:heuristics}
+\input{heuristics}
+
+\section{Conclusions} \label{scn:concl}
+\input{concl}
+
+\section{Acknowledgments}
+
+The authors would like to thank the authors of \ac{DIP}, Ted Ralphs and Matt Galati, for their help throughout this project and the Department of Engineering Science at the University of Auckland for their support of Qi-Shan during this research project.
+
+\vspace*{-0.5\baselineskip}
+\bibliographystyle{amsalpha}
+\bibliography{master}
+
+\end{document}
+
+
+
