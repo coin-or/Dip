@@ -2,11 +2,15 @@ import sys
 
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
+# Import any customised paths
 try:
     import path
 except ImportError:
     pass
-        
+
+# Import dippy (local copy first,
+# then a development copy - if python setup.py develop used,
+# then the coinor.dippy package
 try:
     import dippy
 except ImportError:
