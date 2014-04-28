@@ -26,6 +26,8 @@
 #ifdef _OPENMP
 #include "omp.h"
 #endif
+
+#include "AlpsDecompTreeNode.h"
 //#define DEBUG_SOLVE_RELAXED
 
 //===========================================================================//
@@ -89,7 +91,7 @@ void DecompAlgo::checkBlocksColumns()
       DecompConstraintSet* model       = modelRelax1.getModel();
 
       if (!model || !model->getMatrix()) {
-         UtilPrintFuncEnd(m_osLog, m_classTag,
+	 UtilPrintFuncEnd(m_osLog, m_classTag,
                           "checkBlocksColumns()", m_param.LogDebugLevel, 2);
          return;
       }
@@ -159,7 +161,7 @@ void DecompAlgo::checkBlocksColumns()
 
    const DecompAlgoModel& modelCore      = getModelCore();
 
-   // add the master-only variables ot the set union
+   // add the master-only variables to the set union
    const vector<int>& masterOnlyCols = modelCore.getModel()->getMasterOnlyCols();
 
    set<int> masterOnlyColsSet(masterOnlyCols.begin(), masterOnlyCols.end());
@@ -239,10 +241,10 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
 
    //---
    //--- sanity checks on user input
-   //---
-   if (m_param.DebugCheckBlocksColumns) {
-      checkBlocksColumns();
-   }
+   //--- and check master-only variables 
+
+   checkBlocksColumns();
+
 
    //---
    //--- if we have a core, allocate a pool of memory for re-use
@@ -2868,6 +2870,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
 
             if (attempts != 0) {
                r = UtilURand(-aveC, aveC);
+	       r = -1; 
             }
 
             costeps[c] = objCoeff[c] + r;
@@ -3149,10 +3152,11 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
       zDW_UBDual += dualSol[r] * rowRhs[r];
    }
 
-   //zDW_LB = zDW_UBDual + mostNegRC;
-   zDW_LB = zDW_UBPrimal + mostNegRC;
+   zDW_LB = zDW_UBDual + mostNegRC;
+   //   zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
+
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
 
    if (!m_param.DualStab && !UtilIsZero(unifDiff, 1e-04)) {
@@ -4594,6 +4598,8 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
                      uNew        + nBaseCoreRows);                  //to
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 
+
+
    for (int i = 0; i < nMasterRows; i++) {
    if (!UtilIsZero(uOld[i], DecompEpsilon)) {
          (*m_osLog) << "uOld[" << setw(5) << i << " ]: "
@@ -4603,6 +4609,17 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
       }
    }
              );
+
+   /*
+   for (int i = 0; i < (nMasterRows - m_numConvexCon); i++) {
+   if (!UtilIsZero(uNew[i], DecompEpsilon)) {
+         (*m_osLog) << "uNew[" << setw(5) << i << " ]: "
+         << setw(12) << UtilDblToStr(uNew[i], 3)
+         << endl;
+      }
+   }
+   */
+
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 
    for (int i = 0; i < (nMasterRows - m_numConvexCon); i++) {
@@ -5137,6 +5154,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- NOTE: the variables coming back include alpha in
             //---       calculation of reduced cost
             //---
+
             solveRelaxed(redCostX,
                          origObjective,
                          alpha,
@@ -5282,6 +5300,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- calculate reduced costs
             //---
             generateVarsCalcRedCost(uBlockAdj, redCostXb);
+
             //---
             //--- solve relaxed problem
             //---
@@ -6743,13 +6762,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                baseName += "_SB";
             }
 
-            std::cout << "problem name is "
-                      << baseName
-                      << m_nodeStats.nodeIndex
-                      << m_nodeStats.cutCallsTotal
-                      << m_nodeStats.priceCallsTotal
-                      << whichBlock
-                      << std::endl;
             printCurrentProblem(subprobSI,
                                 baseName,
                                 m_nodeStats.nodeIndex,

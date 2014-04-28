@@ -216,13 +216,6 @@ public:
     */
 
    /*
-    * Check user columns for overlap. The default is true, but this
-    * can be shut off to speed up the setup.
-    */
-
-   int DebugCheckBlocksColumns;
-
-   /*
     * The following parameters are extended from MILPBlock
     * applications but changed to MILP domain
     *
@@ -404,7 +397,6 @@ public:
       PARAM_getSetting("MasterConvexityLessThan", MasterConvexityLessThan);
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
-      PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       DataDir       = param.GetSetting("DataDir",       "",    "MILP");
       Instance      = param.GetSetting("Instance",      "",    "MILP");
       InstanceFormat = param.GetSetting("InstanceFormat", "",    "MILP");
@@ -550,8 +542,6 @@ public:
                          MasterConvexityLessThan);
       UtilPrintParameter(os, sec, "ParallelColsLimit", ParallelColsLimit);
       UtilPrintParameter(os, sec, "BranchStrongIter",  BranchStrongIter);
-      UtilPrintParameter(os, sec,
-                         "DebugCheckBlocksColumns", DebugCheckBlocksColumns);
       UtilPrintParameter(os, sec, "LogLevel",  LogLevel);
       UtilPrintParameter(os, sec, "DataDir",  DataDir);
       UtilPrintParameter(os, sec, "Instance",  Instance);
@@ -612,6 +602,7 @@ public:
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 1.0e-6;
+      //MasterGapLimit       = 0.01;
       PCStrategy           = 0;
       CompressColumns      = 1;
       CompressColumnsIterFreq       = 2;
@@ -655,7 +646,6 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      DebugCheckBlocksColumns  = true;
       /*
        * parameters from MILPBlock and to be MILP
        */
