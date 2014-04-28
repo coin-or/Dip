@@ -26,45 +26,45 @@ To get this problem into Dippy we use the PuLP modelling language. The entire in
 
 \begin{enumerate}
 \item Load PuLP and Dippy;
-\lstinputlisting[firstnumber=5,linerange=5-6]{../../examples/coke.py}
+\lstinputlisting[firstnumber=5,linerange=5-6]{../../examples/Dippy/coke/coke.py}
 
 \item Define the coke-from-coal conversion rate and a big-$M$ variable for use in later constraints;
-\lstinputlisting[firstnumber=8,linerange=8-9]{C:/COIN/Dippy/examples/coke.py}
+\lstinputlisting[firstnumber=8,linerange=8-9]{../../examples/Dippy/coke/coke.py}
 
 \item Define the supply of coal at the mines, the possible locations and construction costs of the coke-making plants and the demand for coke from the customers.
-\lstinputlisting[firstnumber=11,linerange=11-22]{../../examples/coke.py}
+\lstinputlisting[firstnumber=11,linerange=11-22]{../../examples/Dippy/coke/coke.py}
 \newpage
-\lstinputlisting[firstnumber=24,linerange=24-45]{../../examples/coke.py}
+\lstinputlisting[firstnumber=24,linerange=24-45]{../../examples/Dippy/coke/coke.py}
 
 \item Define the transportation costs from the mines to the coke-making plants and the coke-making plants to the customers in two tables (we also define a function {\tt read\_table} to read these tables, but this function is omitted for brevity);
-\lstinputlisting[firstnumber=47,linerange=47-65]{../../examples/coke.py}
+\lstinputlisting[firstnumber=47,linerange=47-65]{../../examples/Dippy/coke/coke.py}
 
 \item Read the data from the tables;
-\lstinputlisting[firstnumber=79,linerange=79-81]{../../examples/coke.py}
+\lstinputlisting[firstnumber=79,linerange=79-81]{../../examples/Dippy/coke/coke.py}
 
 \item Define the arcs and their costs from the mine $\rightarrow$ plant and plant $\rightarrow$ customer costs;
-\lstinputlisting[firstnumber=83,linerange=83-86]{../../examples/coke.py}
+\lstinputlisting[firstnumber=83,linerange=83-86]{../../examples/Dippy/coke/coke.py}
 
 \item \label{itm:2d} Define a 2-dimensional set for the plant sizes at each location;
-\lstinputlisting[firstnumber=88,linerange=88-89]{../../examples/coke.py}
+\lstinputlisting[firstnumber=88,linerange=88-89]{../../examples/Dippy/coke/coke.py}
 
 \item Create a \texttt{DipProblem} (extended from \texttt{LpProblem} in PuLP). Add binary variables that determine the plant sizes at each location and (non-negative) integer variables that determine the flow (in coal from the mines to the plants and coke from the plants to the customers) transported through the network;
-\lstinputlisting[firstnumber=91,linerange=91-99]{../../examples/coke/coke.py}
+\lstinputlisting[firstnumber=91,linerange=91-99]{../../examples/Dippy/coke/coke.py}
 
 \item Add the objective of minimising total cost = building costs (converted from MRMB to RMB) + transportation costs;
-\lstinputlisting[firstnumber=101,linerange=101-106]{../../examples/coke.py}
+\lstinputlisting[firstnumber=101,linerange=101-106]{../../examples/Dippy/coke/coke.py}
 
 \item Add constraints that limit the flow of coke out of a coke-making plant depending on the capacity plant constructed;
-\lstinputlisting[firstnumber=108,linerange=108-113]{../../examples/coke.py}
+\lstinputlisting[firstnumber=108,linerange=108-113]{../../examples/Dippy/coke/coke.py}
 
 \item Add constraints that limit the number of coke-making plants built at any single location to be one (Note. there is a size with capacity 0 if no plant will be built);
-\lstinputlisting[firstnumber=115,linerange=115-118]{../../examples/coke.py}
+\lstinputlisting[firstnumber=115,linerange=115-118]{../../examples/Dippy/coke/coke.py}
 
 \item Add constraints to conserve flow at the mines ($\leq$ supply), coke-making plants (flow in = coke-from-coal conversion rate $\times$ flow out) and customers ($\geq$ demand);
-\lstinputlisting[firstnumber=120,linerange=120-133]{../../examples/coke.py}
+\lstinputlisting[firstnumber=120,linerange=120-133]{../../examples/Dippy/coke/coke.py}
 
 \item Solve the \ac{MILP} problem using \ac{DIP} and display the solution in tabular form;
-\lstinputlisting[firstnumber=160,linerange=160-178]{../../examples/coke.py}
+\lstinputlisting[firstnumber=160,linerange=160-178]{../../examples/Dippy/coke/coke.py}
 \end{enumerate}
 
 The preceding Python code defines and solves the Coke Supply Chain Problem. The solution takes 1.09s of CPU time and creates a tree using 201 nodes. The output defines plants to be built at locations 1, 5 and 6 and also defines shipments of coal and coke between the mines, plants and customers:

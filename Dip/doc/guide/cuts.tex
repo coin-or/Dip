@@ -16,9 +16,9 @@ which forms a valid inequality for the facility location problem.
 To get the subsets $S_i$ for each location from a fractional solution to the facility location problem we have assigned items to locations in a greedy way depending on their $x_{ij}$ values. Once the subsets are determined, we generate a set of weighted inequality cuts.
 
 For brevity we have omitted the generation of $S_i$, but have shown how to build the set of cuts. Again, note that Python's scoping rules allow us to easily access the solution values of variables in our problem.
-\lstinputlisting[firstnumber=70,linerange=70-72]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=70,linerange=70-72]{../../examples/Dippy/bpp/bin_pack_func.py}
 $\vdots$
-\lstinputlisting[firstnumber=102,linerange=102-115]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=102,linerange=102-115]{../../examples/Dippy/bpp/bin_pack_func.py}
 
 The effect of the weighted inequality cuts is shown in \scnref{scn:concl}.
 
@@ -27,10 +27,10 @@ The effect of the weighted inequality cuts is shown in \scnref{scn:concl}.
 To add user-defined cuts for the \ac{TSP} in Dippy, we define a new procedure for generating cuts (as in \sbsref{sbs:fac_cuts}). For the \ac{TSP} (see \sbsref{sbs:tsp}) we generate cuts to eliminate subtours. In addition, as subtour elimination is not enforced by the original formulation (see \sbsref{sbs:tsp}), we also define \texttt{is\_solution\_feasible} to make sure a feasible solution contains no subtours.
 
 The function for generating subtour elimination cuts finds all subtours in the current solution using the function \texttt{get\_subtour} (omitted here for brevity, \\ \texttt{get\_subtour} finds a subtour from a given node in \texttt{sol}) and adds a cut to eliminate them:
-\lstinputlisting[firstnumber=55,linerange=55-75]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=55,linerange=55-75]{../../examples/Dippy/tsp/tsp.py}
 
 The \texttt{get\_subtour} function can also be used to check if a solution contains any subtours (hence is infeasible):
-\lstinputlisting[firstnumber=77,linerange=77-84]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=77,linerange=77-84]{../../examples/Dippy/tsp/tsp.py}
 
 \Figref{fig:tsp_prob} shows an example \ac{TSP} problem. \Figref{fig:tsp_cuts1} shows the subtours present in the initial solution. After \texttt{is\_solution\_feasible} identifies that there are subtours present in the solution, they are eliminated by cuts created in \\ \texttt{generate\_cuts}. \Figref{fig:tsp_cuts2} shows subtours present in a later solution that are similarly eliminated. After eliminating the necessary subtours, the optimal tour is found -- see \figref{fig:tsp_soln}.
 \begin{figure}[ht]

@@ -9,23 +9,23 @@ Multiple heuristics can be executed and all heuristic solutions can be returned 
 \subsection{Customised Heuristics for the Capacitated Facility Location problem} \label{sbs:fac_heur}
 
 An initial allocation of production to locations can be found heuristically using the same first-fit heuristic that provided initial solutions for the column generation approach (see \sbsref{sbs:fac_cols}). The first-fit heuristic iterates through the items requiring production and the facility locations allocating production at the first facility that has sufficient capacity to produce the item.
-\lstinputlisting[firstnumber=116,linerange=116-127]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=116,linerange=116-127]{../../examples/Dippy/bpp/bin_pack_func.py}
 
 \vfill
 \newpage
-\lstinputlisting[firstnumber=129,linerange=129-144]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=129,linerange=129-144]{../../examples/Dippy/bpp/bin_pack_func.py}
 
 The first-fit heuristic can then be used to provide an initial, feasible solution at the root node within the customised \texttt{heuristics} function (see lines 215-220):
-\lstinputlisting[firstnumber=211,linerange=211-230]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=211,linerange=211-230]{../../examples/Dippy/bpp/bin_pack_func.py}
 
 Running the first-fit heuristic before starting the branching process increases the solution time from 1.17s to 1.48s of CPU time and the number of nodes in the search tree from 375 nodes to 399 nodes.
 
 \newpage
 
 At each node in the branch-and-bound tree, the fractional solution (provided by \texttt{xhat}) gives an indication of the best allocation of production, albeit fractional. One heuristic approach to ``fixing'' the fractional solution is to consider each allocation (of an item's production to a facility) in order of decreasing fractionality and use a first-fit approach:
-\lstinputlisting[firstnumber=146,linerange=146-192]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=146,linerange=146-192]{../../examples/Dippy/bpp/bin_pack_func.py}
 \newpage
-\lstinputlisting[firstnumber=194,linerange=194-209]{C:/COIN/Dippy/examples/facility.py}
+\lstinputlisting[firstnumber=194,linerange=194-209]{../../examples/Dippy/bpp/bin_pack_func.py}
 
 The first-fit approach that is guided by fractional values can then be used within the \texttt{heuristics} function (see lines 225-229 in the previous listing) to create integer solutions from fractional solutions at each node.
 

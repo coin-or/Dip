@@ -5,29 +5,29 @@ This case study is a small \acf{TSP} example. This problem differs from the prev
 
 \begin{enumerate}
 \item Load PuLP, Dippy and the square root function from the math module;
-\lstinputlisting[linerange=1-3]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[linerange=1-3]{../../examples/Dippy/tsp/tsp.py}
 
 \newpage
 
 \item Define the cities and their locations in the $xy$-plane. Also, define empty structures for arcs between each pair of cities and int/out of cities;
-\lstinputlisting[firstnumber=7,linerange=7-17]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=7,linerange=7-17]{../../examples/Dippy/tsp/tsp.py}
 
 \item Define the Euclidean distance using {\tt sqrt};
-\lstinputlisting[firstnumber=19,linerange=19-21]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=19,linerange=19-21]{../../examples/Dippy/tsp/tsp.py}
 
 \item Define the arcs between cities, the arcs in/out of a city and the cost of the arcs as the distance between cities;
-\lstinputlisting[firstnumber=21,linerange=23-31]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=21,linerange=23-31]{../../examples/Dippy/tsp/tsp.py}
 
 \item Use the standard \ac{TSP} \ac{MILP} formulation without any subtour constraints. The standard formulation is:
 \begin{align*}
 \min & \sum_{(i, j) \in A} c_{ij} x_{ij} \\
      & \sum_{\twosubs{(i, j) \in A}{i = k \text{ or } j = k}} x_{ij} = 2, k \in N.
 \end{align*}
-\lstinputlisting[firstnumber=33,linerange=33-38]{C:/COIN/Dippy/examples/tsp.py}
-\lstinputlisting[firstnumber=40,linerange=40-42]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=33,linerange=33-38]{../../examples/Dippy/tsp/tsp.py}
+\lstinputlisting[firstnumber=40,linerange=40-42]{../../examples/Dippy/tsp/tsp.py}
 
 \item  Solve the \ac{TSP} using \ac{DIP} and display the minimum cost tour;
-\lstinputlisting[firstnumber=118,linerange=118-124]{C:/COIN/Dippy/examples/tsp.py}
+\lstinputlisting[firstnumber=118,linerange=118-124]{../../examples/Dippy/tsp/tsp.py}
 
 \end{enumerate}
 
