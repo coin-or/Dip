@@ -24,7 +24,7 @@
 #include <string.h>
 /*#include <values.h>*/
 #include <limits.h>
-#include <malloc.h>
+#include <memory.h>
 #define _INCLUDE_POSIX_SOURCE
 #ifndef _MSC_VER
 #include <sys/times.h>
