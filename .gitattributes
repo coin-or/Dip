@@ -222,6 +222,8 @@ Dip/examples/Dippy/cflp/facility_ex1.py -text
 Dip/examples/Dippy/cflp/facility_ex2.py -text
 Dip/examples/Dippy/cflp/facility_location.py -text
 Dip/examples/Dippy/coke/coke.py -text
+Dip/examples/Dippy/coke/coke_func.py -text
+Dip/examples/Dippy/coke/coke_instance.py -text
 Dip/examples/Dippy/csp/cutting_stock.py -text
 Dip/examples/Dippy/cvpmp/CVPMP.py -text
 Dip/examples/Dippy/cvpmp/Global.py -text
