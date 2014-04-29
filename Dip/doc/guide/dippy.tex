@@ -1,12 +1,17 @@
+%\documentclass[12pt,a4paper,onecolumn,twoside]{elsarticle}
 \documentclass[12pt,a4paper,onecolumn,twoside]{article}
 
 \usepackage{vmargin, xspace}
+\usepackage[numbers]{natbib}
 
 \usepackage{url}
 \usepackage[english]{babel}
 
 \usepackage[absolute]{textpos}
 \usepackage{setspace}
+
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.eps,.png,.pdf}
 
 \include{commands}
 
@@ -24,10 +29,10 @@
 Dippy -- a simplified interface\\[-6pt] for advanced mixed-integer \\[-6pt] programming\\[3pt]
 \end{onehalfspace}
 \end{Large}
-By Dr Michael O'Sullivan, Dr Cameron Walker, Qi-Shan Lim, Dr Stuart Mitchell and Assoc Prof Ted Ralphs\\[3pt]
-April 2014\\
-%Report, University of Auckland Faculty of Engineering, no. 685 \\
-Report, University of Auckland Faculty of Engineering, no. ??? \\
+By Dr Michael O'Sullivan, Dr Cameron Walker, Qi-Shan Lim,%
+Iain Dunning, Dr Stuart Mitchell and Assoc Prof Ted Ralphs\\[3pt]
+February 2011\\
+Report, University of Auckland Faculty of Engineering, no. ???\\
 %ISSN 1179-528X % Print version
 ISSN 1178-3680 % Electronic version
 }
@@ -40,24 +45,29 @@ ISSN 1178-3680 % Electronic version
 Dippy -- a simplified interface for advanced mixed-integer programming
 }
 
-%for single author (just remove % characters)
-\author{
-{\rm Michael O'Sullivan, Qi-Shan Lim and Cameron Walker}\\
-Department of Engineering Science, University of Auckland
-\and
-{\rm Stu Mitchell}\\
-Stuart Mitchell Consultants
-{\rm Ted Ralphs}\\
-Department of Industrial Engineering, Lehigh University
-% copy the following lines to add more authors
-% \and
-% {\rm Name}\\
-%Name Institution
-} % end author
+\author{Michael O'Sullivan\footnotemark, \ 
+				Qi-Shan Lim, \
+        Cameron Walker, \
+        Iain Dunning\\
+        {\it \small Department of Engineering Science, The University of Auckland, Auckland, New Zealand}\\
+        Stuart Mitchell\\
+        {\it \small Stuart Mitchell Consulting, Auckland, New Zealand}\\
+        Ted Ralphs\\
+        {\it \small Department of Industrial Engineering, Lehigh University, Pennsylvania, USA}}
 
 \date{\today}
 
 \maketitle
+
+\def\thefootnote{\fnsymbol{footnote}}
+\footnotetext[1]{\begin{tabular}[t]{@{}l}
+                 \,Corresponding author.\\
+                 {\it E-mail address:} michael.osullivan@auckland.ac.nz (M. J. O'Sullivan)
+                 \end{tabular}}
+\def\thefootnote{\arabic{footnote}}
+          
+\pagestyle{plain} \thispagestyle{empty}
+\pagenumbering{arabic}
 
 \acrodef{MILP}{mixed-integer linear programming}
 \acrodef{DIP}{Decomposition for Integer Programming}
@@ -75,33 +85,23 @@ Department of Industrial Engineering, Lehigh University
 \section{Combining \ac{DIP} and PuLP} \label{scn:overview}
 \input{overview}
 
-\section{Getting Started with Dippy}
-\input{starting}
+\section{Dippy in Practice} \label{scn:techs}
+\input{techs}
 
-\section{Case Studies} \label{scn:define}
-\input{define}
-
-\section{Adding Customised Branching} \label{scn:branch}
-\input{branch}
-
-\section{Adding Customised Cut Generation} \label{scn:cuts}
-\input{cuts}
-
-\section{Adding Customised Column Generation} \label{scn:column}
-\input{column}
-
-\section{Adding Customised Heuristics} \label{scn:heuristics}
-\input{heuristics}
-
-\section{Conclusions} \label{scn:concl}
+\section{Performance and Conclusions} \label{scn:concl}
 \input{concl}
 
+\newpage
 \section{Acknowledgments}
 
-The authors would like to thank the authors of \ac{DIP}, Ted Ralphs and Matt Galati, for their help throughout this project and the Department of Engineering Science at the University of Auckland for their support of Qi-Shan during this research project.
-
+The authors would like to thank Matt Galati, one of the authors of \ac{DIP}, for his help throughout this project and the Department of Engineering Science at the University of Auckland for their support of Qi-Shan and Iain during this research project.
+\\
+\\
+\\
 \vspace*{-0.5\baselineskip}
-\bibliographystyle{amsalpha}
+%\bibliographystyle{amsalpha}
+%\bibliographystyle{plainnat}
+\bibliographystyle{plain}
 \bibliography{master}
 
 \end{document}

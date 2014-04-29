@@ -6,7 +6,7 @@ Version=4
 MainFile=dippy.tex
 UseBibTeX=1
 UseMakeIndex=0
-ActiveProfile=LaTeX => PS
-ProjectLanguage=
-ProjectDialect=
+ActiveProfile=LaTeX => PS => PDF
+ProjectLanguage=en
+ProjectDialect=US
 

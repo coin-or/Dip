@@ -1,121 +1,112 @@
-In this paper we have presented Dippy, a simplified interface to advanced \acl{MILP} techniques.The main motivation for the development of Dippy was to alleviate obstacles to experimentation with and customisation of advanced \ac{MILP} frameworks. We have shown using case studies that Dippy is relatively simple to experiment with and customise. Using Dippy we have improved the solution performance of:
-\begin{itemize}
-\item The Coke Supply Chain problem by adding advanced branching, reducing the solution CPU time from 1.09s to 0.62s of CPU time and branch-and-bound tree from 201 nodes to 76 nodes;
-\item The Travelling Salesperson problem by adding subtour elimination cuts to create an optimal tour without adding all subtour elimination constraints;
-\item The Cutting Stock problem by adding a customised subproblem solver, reducing the solution CPU time from 33.31s to 28.30s and the branch-and-bound tree from 175 to 131 nodes.
-\end{itemize}
-We have experimented with advanced branching, customised cuts, customised column generation and heuristics for the Capacitated Facility Location problem and Dippy enables us to quickly obtain a table of experimental results, see \tabref{tab:fac_exp}.
-\begin{table}[htp]
-\begin{minipage}[l]{\textwidth}
-\begin{small}
-\begin{tabular}{|lll|}
-\hline
-\textbf{Strategies} & \textbf{Time (s)}   & \textbf{Nodes} \\ \hline & &\\[-10pt]
-Default (branch and cut)                           & 1.17 & 375 \\
-+ ordering constraints (OC)                        & 0.28 & 76 \\
-+ OC \& advanced branching (AB)                    & 0.05 & 3 \\
-+ weighted inequalities (WI)                       & 1.11 & 43 \\
-+ OC \& WI                                         & 0.61 & 17 \\
-+ OC \& AB \& WI                                   & 0.27 & 4 \\
-+ first-fit heuristic (FF) at root node            & 1.52 & 399 \\
-+ OC \& FF                                         & 0.30 & 76 \\
-+ OC \& AB \& FF                                   & 0.02 & 3 \\
-+ WI \& FF                                         & 1.17 & 43 \\
-+ OC \& WI \& FF                                   & 0.77 & 19 \\
-+ OC \& AB \& WI \& FF                             & 0.20 & 3 \\
-+ fractional-fit heuristic (RF) at nodes           & 1.70 & 399 \\
-+ OC \& RF                                         & 0.36 & 76 \\
-+ OC \& AB \& RF                                   & 0.02 & 3 \\
-+ WI \& RF                                         & 1.23 & 43 \\
-+ OC \& WI \& RF                                   & 0.80 & 19 \\
-+ OC \& AB \& WI \& RF                             & 0.20 & 3 \\
-+ FF \& RF                                         & 1.70 & 399 \\
-+ OC \& FF \& RF                                   & 0.34 & 76 \\
-+ OC \& AB \& FF \& RF                             & 0.02 & 3 \\
-+ WI \& FF \& RF                                   & 1.25 & 43 \\
-+ OC \& WI \& FF \& RF                             & 0.80 & 19 \\
-+ OC \& AB \& WI \& FF \& RF                       & 0.22 & 3 \\
-+ column generation (CG)                           & 13.48 & 33 \\
-+ CG \& OC                                         & 10.27 & 27 \\
-+ CG \& OC \& AB                                   & \multicolumn{2}{l|}{AB fails in Phase 1 with CG. \footnote{If there are insufficient columns to build a feasible solution, i.e., in Phase 1, then our advanced branching introduces constraints that cause infeasibility. However, with columns that provide a feasible solution or our customised subproblem solver, our advanced branching does not cause infeasibility.}}\\
-+ CG \& customised subproblem solver (CS)          & 7.59  & 35 \\
-+ CG \& CS \& OC                                   & 1.63  & 7 \\
-+ CG \& CS \& OC \& AB                             & 1.66  & 8 \\
-+ CG \& first-fit initial variable generation (FV) & 11.92 & 31 \\
-+ CG \& CS \& FV                                   & 0.33  & 1 \\
-+ CG \& CS \& FV \& OC                             & 7.59  & 17 \\
-+ CG \& CS \& FV \& OC \& AB                       & 1.23  & 3\\
-+ CG \& one-each initial variable generation (OV)  & 10.23 & 25 \\
-+ CG \& CS \& OV                                   & 15.61 & 57 \\
-+ CG \& CS \& OV \& OC                             & 5.30  & 21 \\
-+ CG \& CS \& OV \& OC \& AB                       & 0.91  & 3 \\
-\hline
-\end{tabular} 
-\end{small}
-\end{minipage}
-\caption{Experiments for the Capacitated Facility Location Problem} \label{tab:fac_exp}
-\end{table}
+In \scnref{scn:techs} we showed how Dippy works in practice by making customisations to the solver framework for an example problem.
+We will use the Wedding Planner problem from the PuLP documentation \cite{pulp} to compare Dippy to two leading solvers that utilise branch-and-cut: the open-source CBC and the commercial Gurobi.
+This particular problem is useful for comparing performance because it has a natural column generation formulation and can be scaled-up in a simple way, unlike the Facility Location problem which is strongly dependent on the specific instance being tested.
 
-\Tabref{tab:fac_exp} shows that it is possible to quickly and easily test many approaches for a particular problem, including combinations of approaches. Looking at the results shows that the heuristics (from \scnref{scn:heuristics}) only help when the size of the branch-and-bound tree has been reduced with other approaches, e.g., ordering constraints and advanced branching. Other good approaches to test further for the Capacitated Facility Location problem use column generation, the customised solver and either ordering constraints or the first-fit heuristic to generate initial variables. As we shall see later in this section, the solution time for branch, price and cut doesn't increase with problem size as quickly as for branch and cut, so the column generation approaches are worth considering for larger problems.
+The Wedding Planner problem is as follows: given a list of wedding attendees, a wedding planner must come up with a seating plan to minimise the unhappiness of all of the guests.
+The unhappiness of guest is defined as their maximum unhappiness at being seated with each of the other guests at their table, making it a pairwise function.
+The unhappiness of a table is the maximum unhappiness of all the guests at the table.
+All guests must be seated and there is a limited number of seats at each table.
 
-The one case study not utilised earlier in this paper is the Wedding Planner problem. We used this case study to compare the branch, price and cut framework in \ac{DIP} to the leading open source branch and cut framework, Cbc. Since \ac{DIP}, hence Dippy, doesn't require a problem to be explicitly formulated as a Dantzig-Wolfe decomposition, the change from \ac{DIP} to Cbc is trivial. The only differences are that:
+This is a set partitioning problem, as the set of guests $G$ must be partitioned into multiple subsets, with the members of each subset seated at the same table.
+The cardinality of the subsets is determined by the number of seats at a table and the unhappiness of a table can be determined by the subset.
+The \ac{MILP} formulation is:
+\[
+\begin{array}{rrl}
+& x_{gt} &= \begin{cases} 1 & \text{if guest $g$ sits at table $t$} \\
+ 0 & \text{otherwise} \end{cases} \\
+& u_t &= \text{unhappiness of table $t$} \\
+& S &= \text{number of seats at a table} \\
+& U(g, h) &= \text{unhappiness of guests $g$ and $h$ if they are seated at the same table}
+\end{array}
+\]\[
+\begin{array}{rrl}
+\min & \displaystyle \sum_{t \in T} u_t & \text{(total unhappiness of the tables)} \\
+& \displaystyle \sum_{g \in G} x_{gt} &\leq S, t \in T \\
+& \displaystyle \sum_{t \in T} x_{gt} &=1, g \in G \\
+& u_t &\geq U(g, h) (x_{gt} + x_{ht} - 1), t \in T, g < h \in G
+\end{array}
+\]
+
+Since \ac{DIP}, and thus Dippy, doesn't require a problem to be explicitly formulated as a Dantzig-Wolfe decomposition, a change from \ac{DIP} to CBC is trivial.
+The only differences are that:
 \begin{enumerate}
-\item A \texttt{LpProblem} is created instead of a \texttt{DipProblem};
-\item No \texttt{.relaxation} statements are used;
-\item The \texttt{LpProblem.solve} method uses Cbc to solve the problem.
+\item A \lstinline{LpProblem} is created instead of a \lstinline{DipProblem};
+\item No \lstinline{.relaxation} statements are used;
+\item The \lstinline{LpProblem.solve} method uses CBC to solve the problem.
 \end{enumerate}
-
-To see if Cbc would perform well solving a column-based approach, we also formulated the a problem equivalent to the restricted master problem from the branch, price and cut approach and a priori generated and added all possible columns. Finally, we developed a customised solver and initial variable generation for the branch, price and cut formulation in \ac{DIP}. We tested these six approaches, i.e.,
+To see if CBC and Gurobi would perform well with a column-based approach, we also formulated a problem equivalent to the restricted master problem from the branch-price-and-cut approach and generated and added all possible columns before the solving the \ac{MILP}.
+Finally we used to Dippy to develop a customised solver and initial variable generation function for the branch-price-and-cut formulation in \ac{DIP}.
+In total, six approaches were tested on problem instances of increasing size:
 \begin{enumerate}
-\item Cbc called from PuLP;
-\item Cbc called from PuLP using a columnwise formulation and generating all columns a priori;
+\item CBC called from PuLP;
+\item CBC called from PuLP using a columnwise formulation and generating all columns a priori;
 \item Gurobi called from PuLP;
 \item Gurobi called from PuLP using a columnwise formulation and generating all columns a priori;
-\item \ac{DIP} called from Dippy using branch, price and cut without customisation;
-\item \ac{DIP} called from Dippy using customised branch, cut and price;
+\item \ac{DIP} called from Dippy using branch-price-and-cut without customisation;
+\item \ac{DIP} called from Dippy using customised branching, cuts and column generation callback functions.
 \end{enumerate}
-on problem instances of increasing size. All tests were run using Python 2.7.1 on A Dell Precision M4300 laptop with Intel Core 2 Duo CPU T9500@2.60GHz chipset and 777MHz, 3.50GB of RAM.  We used Cbc version 2.30.00, Gurobi version 4.0.1, \ac{DIP} version 0.8.7 and Dippy version 1.0.8. In \Tabref{tab:wed_exp} and \figref{fig:compare} we see that:
+
+In \Tabref{tab:wed_exp} and \Figref{fig:compare} we see that\footnote{All tests were run using Python 2.7.1 on a Dell XPS1530 laptop with an Intel Core~2~Duo CPU T9500@2.60GHz and 4~GB of RAM. We used CBC version~2.30.00, Gurobi version~4.5.1, and Dippy version~1.0.10.}:
 \begin{itemize}
-\item Gurobi is faster for small problems;
-\item The symmetry present in the Capacitated Facility Location problem means the solution time of Cbc and Gurobi for the original problem deteriorate quickly;
-\item The time taken to solve the columnwise formulation also deteriorates, but at a lesser rate than when using Cbc or Gurobi on the original problem;
-\item Gurobi (using the original formulation) and the column generation approach in \ac{DIP} are less predictable than the Cbc approaches, e.g., the solution time drops for both approaches in a couple of places;
-\item Both \ac{DIP} and customised \ac{DIP} solution times grow at a lesser rate than any of the Cbc/Gurobi approaches;
+\item Gurobi is fastest for small problems;
+\item The symmetry present in the problem means the solution time of CBC and Gurobi for the original problem deteriorate quickly;
+\item The time taken to solve the columnwise formulation also deteriorates, but at a lesser rate than when using CBC or Gurobi on the original problem;
+\item Both \ac{DIP} and customised \ac{DIP} solution times grow at a lesser rate than any of the CBC/Gurobi approaches;
 \item For large problems, \ac{DIP} becomes the preferred approach.
 \end{itemize}
+
+The main motivation for the development of Dippy was to alleviate obstacles to experimentation with and customisation of advanced \ac{MILP} frameworks.
+These obstacles arose from an inability to use the description of a problem in a high-level modelling languag integrated with the callback functions in leading solvers.
+This is mitigated with Dippy by using the Python-based modelling language PuLP to describe the problem and then exploiting Python's variable scoping rules to implement the callback functions.
+
+Using the Capacitated Facility Location problem we have shown that Dippy is relatively simple to experiment with and customise, enabling the user to quickly and easily test many approaches for a particular problem, including combinations of approaches.
+In practice Dippy has been used successfully to enable final year undergraduate students to experiment with advanced branching, cut generation, column generation and root/node heuristics.
+%Given the demonstrated ease of the implementation of advanced \ac{MILP} techniques and the flexibility of a high-level mathematical modelling language, the above evidence that Dippy can be highly competitive solver for problems in which column generation is the preferred approach suggests that Dippy is effective as more than just an experimental ``toy'' or educational tool.
+The Wedding Planner problem shows that Dippy can be a highly competitive solver for problems in which column generation is the preferred approach.
+Given the demonstrated ease of the implementation of advanced \ac{MILP} techniques and the flexibility of a high-level mathematical modelling language, this suggests that Dippy is effective as more than just an experimental ``toy'' or educational tool.
+It enables users to concentrate on furthering Operations Research knowledge and solving hard problems instead of spending time worrying about implementation details.
+Dippy breaks down the barriers to experimentation with advanced \ac{MILP} approaches for both practitioners and researchers.
+
+
 \begin{table}[htp]
 \begin{minipage}[l]{\textwidth}
 \begin{small}
-\begin{tabular}{|l@{\,}|c@{\ }c@{\ }c@{\ }c@{\ }c@{\ }c@{\ }c@{\ }c@{\,}|}
+\begin{tabular}{|l@{\,}|c@{\ }|c@{\ }c@{\ }|c@{\ }|c@{\ }c@{\ }|c@{\ }c@{\,}|}
 \hline
-\textbf{Guest List} & \multicolumn{8}{|c|}{\textbf{Time (s)}} \\
-\textbf{A to $\ldots$} & Cbc & \multicolumn{2}{c}{Cbc \& columns} & Gurobi & \multicolumn{2}{c}{Gurobi \& columns} & \ac{DIP} & Customised \\
-\textbf{(\# guests)} & & gen vars & solve & & gen vars & solve & & \ac{DIP} \\ \hline & & & & \\[-10pt]
-F	(6) &     0.234&     0.032&     0.234&     0.094&     0.016&     0.203&     3.281&     5.594 \\
-G	(7) &     0.297&     0.031&     0.594&     0.156&     0.015&     0.532&     3.984&     8.719 \\
-H	(8) &     3.375&     0.015&     1.141&     0.313&     0.031&     1.094&    24.078&    22.688 \\
-I	(9) &    14.063&     0.031&     2.547&     0.344&     0.031&     2.422&     7.547&    18.360 \\
-J	(10)&   17.047 &    0.016 &    5.422 &    0.406 &    0.031 &    5.344 &   35.250 &   33.828  \\
-K	(11)&   25.922 &    0.015 &   10.750 &    0.547 &    0.016 &   10.578 &   64.516 &   59.312  \\
-L	(12)&  148.938 &    0.031 &   20.125 &    1.547 &    0.016 &   20.156 &   60.687 &   87.157  \\
-M	(13)&  396.141 &    0.031 &   37.250 &    1.890 &    0.031 &   37.422 &   80.079 &  114.515  \\
-N	(14)&  398.859 &    0.031 &   66.281 &    1.297 &    0.032 &   65.656 &  142.937 &  142.922  \\
-O	(15)&  421.985 &    0.031 &  111.703 &    1.734 &    0.031 &  112.765 &  162.390 &  226.797  \\
-P	(16)&14768.676 &    0.031 &  184.016 &  387.641 &    0.047 &  184.734 &  311.218 &  226.875  \\
-Q	(17)&      -- &    0.047 &  297.344 &  525.688 &    0.047 &  296.406 &  205.968 &  311.797  \\
-R	(18)&      -- &    0.047 &  463.453 &  347.407 &    0.109 &  464.453 &  276.437 &  364.344  \\
-S	(19)&      -- &    0.063 &  714.500 &  501.891 &    0.047 &  725.719 &  551.672 &  408.171  \\
-T	(20)&      -- &    0.063 & 1077.812 &      --\,\footnote{Gurobi runs out of memory solving this problem.} &    0.062 & 1086.281 &  395.797 &  431.016  \\
-U	(21)&      -- &    0.063 &      -- &      -- &    0.062 & 1611.063 &  392.703 &  929.531
+\textbf{\# guests} & \multicolumn{8}{|c|}{\textbf{Time (s)}} \\
+                   & CBC & \multicolumn{2}{c|}{CBC \& columns} & Gurobi & \multicolumn{2}{c|}{Gurobi \& columns} & \ac{DIP} & Customised \\
+                   &     & gen vars & solve                    &        & gen vars & solve                       &          & \ac{DIP}   \\ 
+\hline 
+ 6 &  0.07 & 0.01 &   0.06 &   0.04 & 0.01 &   0.05 &   0.90 &  0.33 \\
+ 7 &  0.07 & 0.01 &   0.12 &   0.04 & 0.01 &   0.11 &   1.77 &  0.57 \\
+ 8 &  0.90 & 0.01 &   0.27 &   0.07 & 0.01 &   0.25 &   4.78 &  0.57 \\
+ 9 &  2.54 & 0.01 &   0.57 &   0.09 & 0.01 &   0.55 &   2.11 &  0.78 \\
+10 &  3.83 & 0.01 &   1.23 &   0.13 & 0.01 &   1.15 &   5.60 &  0.94 \\
+11 &  6.48 & 0.01 &   2.46 &   0.14 & 0.01 &   2.36 &   8.62 &  0.91 \\
+12 & 26.73 & 0.01 &   4.64 &   0.34 & 0.01 &   4.55 &  25.17 &  2.80 \\
+13 & 53.18 & 0.01 &   8.57 &   0.39 & 0.01 &   8.28 &  14.86 &  1.40 \\
+14 & 70.51 & 0.01 &  15.27 &   0.38 & 0.01 &  14.65 &  20.09 &  2.66 \\
+15 & 97.79 & 0.01 &  26.26 &   0.47 & 0.01 &  25.07 &  33.52 &  1.59 \\
+16 &$>$1000& 0.01 &  43.86 &  68.08 & 0.01 &  42.11 &  26.73 &  2.09 \\
+17 &    -- & 0.01 &  72.07 &  79.71 & 0.01 &  68.87 &  50.48 &  3.92 \\
+18 &    -- & 0.01 & 115.64 &  96.03 & 0.01 & 110.52 &  40.80 &  4.67 \\
+19 &    -- & 0.01 & 181.39 & 113.01 & 0.01 & 173.13 &  78.20 &  2.64 \\
+20 &    -- & 0.02 & 283.16 &$>$6000 & 0.01 & 270.08 &  61.86 &  5.31 \\
+21 &    -- & 0.02 & 434.60 &     -- & 0.02 & 418.04 &  77.66 &  4.23 \\
+22 &    -- & 0.02 & 664.87 &     -- & 0.02 & 639.04 & 134.76 &  4.63 \\
+23 &    -- &   -- &$>$1000 &     -- &   -- &$>$1000 & 149.82 &  9.16 \\
+24 &    -- &   -- &     -- &     -- &   -- &     -- & 110.24 &  6.51 \\
+25 &    -- &   -- &     -- &     -- &   -- &     -- & 202.59 &  8.80 \\
+26 &    -- &   -- &     -- &     -- &   -- &     -- & 185.21 & 18.47 \\
+\hline
 \end{tabular}
 \end{small}
 \end{minipage}
 \caption{Experiments for the Wedding Planner Problem} \label{tab:wed_exp}
 \end{table}
-\begin{figure}[htp]
-\includegraphics[bb=0 0 1201 901,scale=0.335]{compare.png}
-\caption{Comparing solver performance on the Wedding Planner problem} \label{fig:compare}
-\end{figure}
-Thus, Dippy and \ac{DIP} not only provide a vastly simplified way to experiment with advanced \ac{MILP} techniques, they provide a better solver for problems in which column generation is the preferred approach.
 
-Dippy presents the best of both worlds. It provides a mathematical modelling framework that makes it easy to quickly formulate \ac{MILP} problems. It also makes it easy to quickly customise the \ac{MILP} solution framework to experiment with the effectiveness of advanced \ac{MILP} techniques for the problem being solved. We have used Dippy successfully to enable final year undergraduate students to experiment with advanced branching, cut generation, column generation and root/node heuristics. Dippy also provides a simple interface to \ac{DIP}, a state of the art, ``out of the box'' column generation solver. Dippy breaks down the barrier to the experimentation with and use of advanced \ac{MILP} approaches for both practitioners and researchers. This enables them to concentrate on furthering Operations Research knowledge and solve hard problems instead of spending time programming \ac{MILP} formulations in a low-level language.
+\begin{figure}[htp]
+\includegraphics[scale=0.600]{img/wedbench.eps}
+\caption{Comparing solver performance on the Wedding Planner problem. 
+In this figure the times for generating the columns for ``CBC with columns'' and ``Gurobi with columns'' have been included in the total solve time. The time required for solving the original formulation sharply increases for both Gurobi and CBC (marked with crosses) but at different problem sizes. However the time for the column-wise formulation is similar for Gurobi and CBC. The time for DIP does not smoothly increase with problem size, but is consistently lower than Gurobi for instances with 16 or more guests.} \label{fig:compare}
+\end{figure}
