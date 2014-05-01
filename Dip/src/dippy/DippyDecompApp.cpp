@@ -303,11 +303,13 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
 
    PyObject* pRelaxKey = PyList_GetItem(m_relaxedKeys, whichBlock);
    PyObject* pRedCostList = pyTupleList_FromDoubleArray(redCostX, m_colList);
+   PyObject* pConvexDual = PyFloat_FromDouble(convexDual);
    // call solveRelaxed on DipProblem
+
    PyObject* pVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OOd", 
 					    pRelaxKey,
 					    pRedCostList,
-					    convexDual);
+					    pConvexDual);
 
    if (pVarList == NULL) {
       throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
@@ -363,12 +365,13 @@ bool DippyDecompApp::APPisUserFeasible(const double* x, const int n_cols, const 
 {
    assert(n_cols == m_modelCore.getModel()->getColNames().size());
    PyObject* pSolutionList = pyTupleList_FromDoubleArray(x, m_colList);
+   PyObject* pTolZero = PyFloat_FromDouble(tolZero);
 
    if (!m_pyIsUserFeasible) {
       return true;
    }
 
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "isUserFeasible", "Od", pSolutionList, tolZero);
+   PyObject* pResult = PyObject_CallMethod(m_pProb, "isUserFeasible", "Od", pSolutionList, pTolZero);
 
    if (pResult == NULL) {
       throw UtilException("Error calling method prob.isUserFeasible()", "APPisUserFeasible", "DippyDecompApp");
