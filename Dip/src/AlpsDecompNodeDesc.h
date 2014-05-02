@@ -100,7 +100,7 @@ public:
    }
 
    /** Useful constructor. */
-   AlpsDecompNodeDesc(AlpsModel* m)
+   AlpsDecompNodeDesc(AlpsDecompModel* m)
       :
       AlpsNodeDesc(m),
       numberCols_(0),
@@ -204,7 +204,6 @@ public:
    /** Unpack AlpsDecompNodeDesc portion of node description from an encoded. */
    AlpsReturnStatus decodeAlpsDecomp(AlpsEncoded& encoded) {
       AlpsReturnStatus status = AlpsReturnStatusOk;
-      std::cout << "the numbercols is " << numberCols_ << std::endl;
       encoded.readRep(numberCols_);
       encoded.readRep(lowerBounds_, numberCols_);
       encoded.readRep(upperBounds_, numberCols_);
