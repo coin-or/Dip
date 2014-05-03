@@ -24,7 +24,7 @@
 #include "UtilMacrosAlps.h"
 
 //===========================================================================//
-//class AlpsDecompModel; 
+//class AlpsDecompModel;
 class CoinWarmStartBasis;
 
 
@@ -103,12 +103,20 @@ public:
    AlpsDecompNodeDesc(AlpsDecompModel* m)
       :
       AlpsNodeDesc(m),
-      numberCols_(0),
-      lowerBounds_(NULL),
-      upperBounds_(NULL),
-      branchedDir_(0)      
+      branchedDir_(0)
       //      basis_(NULL)
    {
+      numberCols_ = m->getNumCoreCols();
+      assert(numberCols_);
+      lowerBounds_ = new double[numberCols_];
+      upperBounds_ = new double[numberCols_];
+
+      for (int i = 0 ; i < numberCols_ ; i ++) {
+         lowerBounds_[i] = -DecompInf;
+         upperBounds_[i] = DecompInf;
+      }
+
+      branchedDir_ = 0 ;
    }
 
    AlpsDecompNodeDesc(AlpsDecompModel* m,
