@@ -271,7 +271,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
       }
    }
 
-   assert(m_numConvexCon >= 1);
+   //assert(m_numConvexCon >= 1);
    UTIL_DEBUG(m_param.LogDebugLevel, 1,
               (*m_osLog) << "Number of Convexity Constraints: "
               << m_numConvexCon << endl;
@@ -2582,13 +2582,6 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
    //printf("preind=%d\n",preInd);
 #endif
-   const int nMasterCols = m_masterSI->getNumCols();
-
-   for (int i = 0 ; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
-         m_masterSI->setContinuous(i);
-      }
-   }
 
    switch (phase) {
    case PHASE_PRICE1:
