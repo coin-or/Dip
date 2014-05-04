@@ -70,7 +70,7 @@ def generate_cuts(prob, sol):
     return cons
 prob.generate_cuts = generate_cuts
 
-def is_solution_feasible(prob, sol):
+def is_solution_feasible(prob, sol, tol):
     nodes, arcs = get_subtour(sol, 0)
 
     return len(nodes) == len(arcs) and \
@@ -104,8 +104,7 @@ def get_subtour(sol, node):
 
     return nodes, arcs
 
-dippy.Solve(prob, {
-})
+dippy.Solve(prob, {'doCut': '1'})
 
 # print solution
 for arc, var in arc_vars.items():
