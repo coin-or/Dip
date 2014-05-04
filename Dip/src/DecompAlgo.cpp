@@ -91,7 +91,7 @@ void DecompAlgo::checkBlocksColumns()
       DecompConstraintSet* model       = modelRelax1.getModel();
 
       if (!model || !model->getMatrix()) {
-	 UtilPrintFuncEnd(m_osLog, m_classTag,
+         UtilPrintFuncEnd(m_osLog, m_classTag,
                           "checkBlocksColumns()", m_param.LogDebugLevel, 2);
          return;
       }
@@ -238,13 +238,10 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
    std::copy(masterOnlyCols.begin(), masterOnlyCols.end(),
              std::back_inserter(m_masterOnlyCols));
-
    //---
    //--- sanity checks on user input
-   //--- and check master-only variables 
-
+   //--- and check master-only variables
    checkBlocksColumns();
-
 
    //---
    //--- if we have a core, allocate a pool of memory for re-use
@@ -276,7 +273,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
       }
    }
 
-   assert(m_numConvexCon >= 1);
+   //   assert(m_numConvexCon >= 1);
    UTIL_DEBUG(m_param.LogDebugLevel, 1,
               (*m_osLog) << "Number of Convexity Constraints: "
               << m_numConvexCon << endl;
@@ -2603,13 +2600,6 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
    //printf("preind=%d\n",preInd);
 #endif
-   const int nMasterCols = m_masterSI->getNumCols();
-
-   for (int i = 0 ; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
-         m_masterSI->setContinuous(i);
-      }
-   }
 
    switch (phase) {
    case PHASE_PRICE1:
@@ -2870,7 +2860,6 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
 
             if (attempts != 0) {
                r = UtilURand(-aveC, aveC);
-	       r = -1; 
             }
 
             costeps[c] = objCoeff[c] + r;
@@ -3156,7 +3145,6 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    //   zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
-
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
 
    if (!m_param.DualStab && !UtilIsZero(unifDiff, 1e-04)) {
@@ -4598,8 +4586,6 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
                      uNew        + nBaseCoreRows);                  //to
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 
-
-
    for (int i = 0; i < nMasterRows; i++) {
    if (!UtilIsZero(uOld[i], DecompEpsilon)) {
          (*m_osLog) << "uOld[" << setw(5) << i << " ]: "
@@ -4609,7 +4595,6 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
       }
    }
              );
-
    /*
    for (int i = 0; i < (nMasterRows - m_numConvexCon); i++) {
    if (!UtilIsZero(uNew[i], DecompEpsilon)) {
@@ -4619,7 +4604,6 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
       }
    }
    */
-
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
 
    for (int i = 0; i < (nMasterRows - m_numConvexCon); i++) {
@@ -5154,7 +5138,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- NOTE: the variables coming back include alpha in
             //---       calculation of reduced cost
             //---
-
             solveRelaxed(redCostX,
                          origObjective,
                          alpha,
@@ -5300,7 +5283,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- calculate reduced costs
             //---
             generateVarsCalcRedCost(uBlockAdj, redCostXb);
-
             //---
             //--- solve relaxed problem
             //---
