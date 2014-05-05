@@ -20,8 +20,9 @@
 #include "Alps.h"
 #include "AlpsTreeNode.h"
 #include "AlpsDecompNodeDesc.h"
+#include "AlpsNodeDesc.h"
 
-class AlpsNodeDesc;
+//class AlpsNodeDesc;
 class AlpsDecompModel;
 
 //===========================================================================//
@@ -39,16 +40,15 @@ public:
    /** Default constructor. */
    AlpsDecompTreeNode() :
       AlpsTreeNode(),
-      m_classTag  ("ALPSTN")
-   {
+      m_classTag  ("ALPSTN") {
       //quality_ = -ALPS_OBJ_MAX;//MVG?
    }
 
 
-    AlpsDecompTreeNode(AlpsDecompModel *m ){
-	
-      desc_ = new AlpsDecompNodeDesc(m); 
-    }      
+   AlpsDecompTreeNode(AlpsDecompModel* m ) {
+      AlpsDecompTreeNode();
+      desc_ = new AlpsDecompNodeDesc(m);
+   }
 
 
    /** Destructor */
