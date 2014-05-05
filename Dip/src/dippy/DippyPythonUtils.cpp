@@ -3,6 +3,7 @@
 #include "UtilMacros.h"
 #include "UtilMacrosDecomp.h"
 #include "AlpsDecompNodeDesc.h"
+#include "AlpsDecompTreeNode.h"
 
 #include <assert.h>
 
