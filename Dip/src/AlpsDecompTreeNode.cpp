@@ -799,19 +799,20 @@ AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
    double* upBranchUBValues;
    encoded.readRep(upBranchUBIndices, upBranchUBSize);
    encoded.readRep(upBranchUBValues, upBranchUBSize);
-   std::vector< std::pair<int, double> > upBranchUB;
-   std::vector< std::pair<int, double> > upBranchLB ;
-   std::vector< std::pair<int, double> > downBranchLB ;
-   std::vector< std::pair<int, double> > downBranchUB ;
-   AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode();
-   treeNode->setBranchBound(upBranchUBSize, upBranchUBIndices,
-                            upBranchUBValues, upBranchUB);
-   treeNode->setBranchBound(upBranchLBSize, upBranchLBIndices,
-                            upBranchUBValues, upBranchLB);
-   treeNode->setBranchBound(downBranchLBSize, downBranchLBIndices,
-                            downBranchLBValues, downBranchLB);
-   treeNode->setBranchBound(downBranchUBSize, downBranchUBIndices,
-                            downBranchUBValues, downBranchUB);
+   AlpsDecompModel* model = dynamic_cast<AlpsDecompModel*>(desc_->getModel());
+   AlpsNodeDesc* nodeDesc = new AlpsDecompNodeDesc(model);
+   status = nodeDesc->decode(encoded);
+   nodeDesc = NULL;
+   AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode(model);
+   treeNode->decodeAlps(encoded);
+   treeNode->setBranchBound_upUB(upBranchUBSize, upBranchUBIndices,
+                                 upBranchUBValues);
+   treeNode->setBranchBound_upLB(upBranchLBSize, upBranchLBIndices,
+                                 upBranchUBValues);
+   treeNode->setBranchBound_downLB(downBranchLBSize, downBranchLBIndices,
+                                   downBranchLBValues);
+   treeNode->setBranchBound_downUB(downBranchUBSize, downBranchUBIndices,
+                                   downBranchUBValues);
    return treeNode;
 }
 
