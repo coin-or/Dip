@@ -234,6 +234,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //--- copy master-only columns from modelCore
    //---
    const vector<int>& masterOnlyCols = modelCore->getMasterOnlyCols();
+
    m_masterOnlyCols.clear();
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
    std::copy(masterOnlyCols.begin(), masterOnlyCols.end(),
@@ -2608,22 +2609,13 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
       if (m_param.SolveMasterUpdateAlgo == DecompDualSimplex) {
          m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
-      } else {
+      } else if (m_param.SolveMasterUpdateAlgo == DecompPrimSimplex) {
          m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
+      } else if (m_param.SolveMasterUpdateAlgo == DecompBarrier) {
+         m_masterSI->setHintParam(OsiDoBarrierInResolve, true, OsiHintDo);
+      } else {
+         throw UtilException("Master Method Unspecified", "solutionUpdate", "DecompAlgo");
       }
-
-      //TODO: interior
-      //if(m_algo == DECOMP)//THINK!
-      // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
-#if defined(DO_INTERIOR) && defined(__DECOMP_LP_CPX__)
-      //TODO: option, not compile time
-      //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
-      CPXbaropt(env, lp);
-      cpxMethod = CPXgetmethod(env, lp);
-      cpxStat = CPXgetstat(env, lp);
-      //if(cpxStat)
-      // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
-#else
 
       if (resolve) {
          //	m_masterSI->writeMps("temp");
@@ -2632,7 +2624,6 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
          m_masterSI->initialSolve();
       }
 
-#endif
       break;
    case PHASE_CUT:
       m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
@@ -2725,7 +2716,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
       //sanity check
       if (m_algo != CUT) {
-         checkMasterDualObj();
+	checkMasterDualObj();
       }
 
       //---
@@ -2768,13 +2759,10 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       m_masterSI->resolve();
       m_masterSI->setHintParam(OsiDoPresolveInResolve, true,  OsiHintDo);
    } else {
-#ifdef DO_INTERIOR
-
-      if (m_masterSI->isDualObjectiveLimitReached()) {
+      if (m_param.SolveMasterUpdateAlgo == DecompBarrier &&
+            m_masterSI->isDualObjectiveLimitReached()) {
          status = STAT_INFEASIBLE;
-      } else
-#endif
-      {
+      } else {
          assert(0);
       }
    }
@@ -3123,6 +3111,17 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    const double* colUpper = m_masterSI->getColUpper();
    //rStat might not be needed now, but will be needed
    // when we support ranged rows.
+   const double* sol = m_masterSI->getColSolution();
+
+   for (int c = 0; c < m_numCols; c++) {
+      if (sol[c] == colLower[c]) {
+         zDW_UBDual += rc[c] * colLower[c];
+      } else if (sol[c] == colUpper[c]) {
+         zDW_UBDual += rc[c] * colUpper[c];
+      }
+   }
+
+   /*
    int* rStat = new int[m_masterSI->getNumRows()];
    int* cStat = new int[m_masterSI->getNumCols()];
    m_masterSI->getBasisStatus(cStat, rStat);
@@ -3135,6 +3134,9 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
       }
    }
 
+   UTIL_DELARR(rStat);
+   UTIL_DELARR(cStat);
+   */
    int nRows = m_masterSI->getNumRows();
 
    for (r = 0; r < nRows; r++) {
@@ -3142,7 +3144,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    }
 
    zDW_LB = zDW_UBDual + mostNegRC;
-   //   zDW_LB = zDW_UBPrimal + mostNegRC;
+   //zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
@@ -3202,8 +3204,6 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
                  << " isTight = " << isGapTight << "\n";
    }
 
-   UTIL_DELARR(rStat);
-   UTIL_DELARR(cStat);
    m_relGap = relGap;
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "updateObjBound()", m_param.LogDebugLevel, 2);
@@ -4739,26 +4739,26 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       const CoinPackedMatrix* M     = m_masterSI->getMatrixByRow();
       double*                  uA    = new double[nCols];
       M->transposeTimes(pi, uA);
-#ifndef DO_INTERIOR
 
-      for (i = 0; i < nCols; i++) {
-         if (!UtilIsZero( x[i], 1.0e-5 ) &&
-               !UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ) {
-            printf("ERR in COMPL-SLACK i:%d objC:%15.10f uA:%15.10f x:%15.10f\n",
-                   i, objC[i], uA[i], x[i]);
-            fflush(stdout);
-            assert(0);
-         }
+      if (m_param.SolveMasterUpdateAlgo != DecompBarrier) {
+         for (i = 0; i < nCols; i++) {
+            if (!UtilIsZero( x[i], 1.0e-5 ) &&
+                  !UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ) {
+               printf("ERR in COMPL-SLACK i:%d objC:%15.10f uA:%15.10f x:%15.10f\n",
+                      i, objC[i], uA[i], x[i]);
+               fflush(stdout);
+               assert(0);
+            }
 
-         if (!UtilIsZero( (objC[i] - uA[i]) - rcLP[i], 1.0e-4 ) ) {
-            printf("ERR in RC i:%d objC:%15.10f uA:%15.10f RCLP:%15.10f\n",
-                   i, objC[i], uA[i], rcLP[i]);
-            fflush(stdout);
-            assert(0);
+            if (!UtilIsZero( (objC[i] - uA[i]) - rcLP[i], 1.0e-4 ) ) {
+               printf("ERR in RC i:%d objC:%15.10f uA:%15.10f RCLP:%15.10f\n",
+                      i, objC[i], uA[i], rcLP[i]);
+               fflush(stdout);
+               assert(0);
+            }
          }
       }
 
-#endif
       UTIL_DELARR(uA);
    }
 
