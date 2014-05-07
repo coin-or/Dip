@@ -28,7 +28,6 @@
 #endif
 
 #include "AlpsDecompTreeNode.h"
-//#define DEBUG_SOLVE_RELAXED
 
 //===========================================================================//
 //#define STAB_DUMERLE
