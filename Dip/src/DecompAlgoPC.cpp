@@ -23,8 +23,6 @@
 
 using namespace std;
 
-//#define   DO_INTERIOR //also in DecompAlgo
-
 //===========================================================================//
 void DecompAlgoPC::phaseInit(DecompPhase& phase)
 {
@@ -341,23 +339,24 @@ int DecompAlgoPC::compressColumns()
    //      if(c < nMasterCols)
    //	   isBasic[c] = true;
    //}
-#ifndef DO_INTERIOR
-   bool            mustDeleteWS = false;
-   CoinWarmStartBasis* warmStart
-   = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(
-                                          mustDeleteWS));
 
-   for (c = 0; c < nMasterCols; c++) {
-      if (warmStart->getStructStatus(c) == CoinWarmStartBasis::basic) {
-         isBasic[c] = true;
+   if (m_param.SolveMasterUpdateAlgo != DecompBarrier) {
+      bool            mustDeleteWS = false;
+      CoinWarmStartBasis* warmStart
+      = dynamic_cast<CoinWarmStartBasis*>(m_masterSI->getPointerToWarmStart(
+                                             mustDeleteWS));
+
+      for (c = 0; c < nMasterCols; c++) {
+         if (warmStart->getStructStatus(c) == CoinWarmStartBasis::basic) {
+            isBasic[c] = true;
+         }
+      }
+
+      if (mustDeleteWS) {
+         UTIL_DELPTR(warmStart);
       }
    }
 
-   if (mustDeleteWS) {
-      UTIL_DELPTR(warmStart);
-   }
-
-#endif
    //---
    //--- sanity check
    //---    m_vars should contain just the structural columns
@@ -1042,7 +1041,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
             for (int c = 0; c < modelCore->getNumCols(); c++) {
                if (!UtilIsZero(values[c] - rsolution[c])) {
-                  isDup = false;
+                  //                  isDup = false;
                   break;
                }
             }
