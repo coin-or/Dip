@@ -195,8 +195,20 @@ void DecompAlgo::checkMasterDualObj()
    const double* rc = m_masterSI->getReducedCost();
    const double* colLower = m_masterSI->getColLower();
    const double* colUpper = m_masterSI->getColUpper();
+   const double* sol = m_masterSI->getColSolution();
+
+   for (int c = 0; c < m_numCols; c++) {
+      if (sol[c] == colLower[c]) {
+         dualObj += rc[c] * colLower[c];
+      } else if (sol[c] == colUpper[c]) {
+         dualObj += rc[c] * colUpper[c];
+      }
+   }
+
    //rStat might not be needed now, but will be needed
    // when we support ranged rows.
+
+   /*
    int* rStat = new int[nRows];
    int* cStat = new int[nCols];
    m_masterSI->getBasisStatus(cStat, rStat);
@@ -208,7 +220,10 @@ void DecompAlgo::checkMasterDualObj()
          dualObj += rc[c] * colUpper[c];
       }
    }
+   UTIL_DELARR(rStat);
+   UTIL_DELARR(cStat);
 
+   */
    for (int r = 0; r < nRows; r++) {
       dualObj += dual[r] * rowRhs[r];
    }
@@ -237,9 +252,6 @@ void DecompAlgo::checkMasterDualObj()
       throw UtilException("primal and dual obj do not match",
                           "checkMasterDualObj", "DecompAlgo");
    }
-
-   UTIL_DELARR(rStat);
-   UTIL_DELARR(cStat);
 }
 
 //===========================================================================//
