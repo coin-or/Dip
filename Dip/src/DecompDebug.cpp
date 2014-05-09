@@ -197,7 +197,7 @@ void DecompAlgo::checkMasterDualObj()
    const double* colUpper = m_masterSI->getColUpper();
    const double* sol = m_masterSI->getColSolution();
 
-   for (int c = 0; c < m_numCols; c++) {
+   for (int c = 0; c < nCols; c++) {
       if (sol[c] == colLower[c]) {
          dualObj += rc[c] * colLower[c];
       } else if (sol[c] == colUpper[c]) {
