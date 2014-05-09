@@ -47,8 +47,8 @@ AlpsDecompTreeNode::createNewTreeNode(AlpsNodeDesc*& desc) const
    AlpsDecompParam&     param = model->getParam();
    UtilPrintFuncBegin(&cout, m_classTag,
                       "createNewTreeNode()", param.msgLevel, 3);
-   AlpsDecompTreeNode* node = new AlpsDecompTreeNode();
-   node->desc_ = desc;
+   AlpsDecompTreeNode* node = new AlpsDecompTreeNode(desc);
+   //   node->desc_ = desc;
    desc = NULL;
    UtilPrintFuncEnd(&cout, m_classTag,
                     "createNewTreeNode()", param.msgLevel, 3);

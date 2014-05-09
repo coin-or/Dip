@@ -44,6 +44,10 @@ public:
       //quality_ = -ALPS_OBJ_MAX;//MVG?
    }
 
+   AlpsDecompTreeNode(AlpsNodeDesc *&desc){
+     desc_ = desc; 
+   }
+
 
    AlpsDecompTreeNode(AlpsDecompModel* m ) {
       AlpsDecompTreeNode();
