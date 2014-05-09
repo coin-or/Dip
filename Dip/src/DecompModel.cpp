@@ -249,30 +249,47 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 #ifdef __DECOMP_IP_SYMPHONY__
 
    if (param.WarmStart) {
-      if (getCounter() == 0) {
-         OsiSolverInterface* m_subModelClone = m_osi->clone();
-         osi_Sym
-         = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
-         osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
-         assert(osi_Sym);
-         sym_environment* env = osi_Sym->getSymphonyEnvironment();
-         sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+      osi_Sym                                                                                                                                                 		   = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      sym_environment* env = osi_Sym->getSymphonyEnvironment();
+      sym_set_int_param(env, "do_reduced_cost_fixing", 0);
 
-         if (logIpLevel == 0 ) {
-            sym_set_int_param(env, "verbosity", -10);
-         } else {
-            sym_set_int_param(env, "verbosity", logIpLevel);
-         }
-
-         assert(env);
-         osi_Sym->initialSolve();
-         m_ws = osi_Sym->getWarmStart();
-         //         osi_Sym->branchAndBound();
+      if (logIpLevel == 0 ) {
+         sym_set_int_param(env, "verbosity", -10);
       } else {
-         //         osi_Sym->setWarmStart(m_ws);
-         std::cout << "cunter is " << getCounter() << std::endl;
-         osi_Sym->resolve();
+         sym_set_int_param(env, "verbosity", logIpLevel);
       }
+
+      //     osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+      m_ws = osi_Sym->getWarmStart();
+
+      if (m_ws) {
+         osi_Sym->resolve();
+      } else {
+         osi_Sym->branchAndBound();
+      }
+
+      /*
+            OsiSolverInterface* m_subModelClone = m_osi->clone();
+            osi_Sym
+            = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
+            //osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+            assert(osi_Sym);
+            sym_environment* env = osi_Sym->getSymphonyEnvironment();
+            sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+
+
+            assert(env);
+       //         osi_Sym->initialSolve();
+            m_ws = osi_Sym->getWarmStart();
+       osi_Sym->branchAndBound();
+         } else {
+      if(m_ws){
+        osi_Sym->setWarmStart(m_ws);
+      }
+            std::cout << "counter is " << getCounter() << std::endl;
+            osi_Sym->resolve();
+         }
+      */
    } else {
       OsiSolverInterface* m_subModelClone = m_osi->clone();
       osi_Sym
