@@ -61,6 +61,7 @@ public:
       m_quality   (1e75),
       m_app       (0) {}
 
+
    AlpsDecompSolution(const int             size,
                       const double*         values,
                       const double          quality,
@@ -127,9 +128,7 @@ public:
       encoded.readRep(q);
       //TODO: change of design of AlpsDecompSolution
       //       constructor
-      return new AlpsDecompSolution(s, v, q, NULL,
-                                    -1,
-                                    -1);
+      return new AlpsDecompSolution(s, v, q);
    }
 
 
