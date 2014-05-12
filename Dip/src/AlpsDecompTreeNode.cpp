@@ -251,7 +251,11 @@ int AlpsDecompTreeNode::process(bool isRoot,
 
    if (!isRoot) {
       bestNode = getKnowledgeBroker()->getBestNode();
-      globalLB = bestNode->getQuality();
+      
+      if(bestNode){
+	globalLB = bestNode->getQuality();
+      }
+      
       //---
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
@@ -744,8 +748,8 @@ AlpsDecompTreeNode::encode() const
       upBranchUBValues = 0;
    }
 
-   encoded->writeRep(downBranchLBIndices, downBranchUBSize);
-   encoded->writeRep(downBranchLBValues, downBranchUBSize);
+   encoded->writeRep(downBranchLBIndices, downBranchLBSize);
+   encoded->writeRep(downBranchLBValues, downBranchLBSize);
    encoded->writeRep(downBranchUBIndices, downBranchUBSize);
    encoded->writeRep(downBranchUBValues, downBranchUBSize );
    encoded->writeRep(upBranchLBIndices, upBranchLBSize);
