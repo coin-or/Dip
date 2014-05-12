@@ -54,12 +54,12 @@ public:
    }
 
 public:
-   AlpsDecompSolution() :
+   AlpsDecompSolution(const DecompApp* m) :
       AlpsSolution(),
       m_size      (0),
       m_values    (0),
       m_quality   (1e75),
-      m_app       (0) {}
+      m_app       (m) {}
 
 
    AlpsDecompSolution(const int             size,
