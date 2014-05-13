@@ -53,6 +53,8 @@ public:
       return m_quality;
    }
 
+   const DecompApp* getModel() const {return m_app;} 
+
 public:
    AlpsDecompSolution(const DecompApp* m) :
       AlpsSolution(),
@@ -128,7 +130,7 @@ public:
       encoded.readRep(q);
       //TODO: change of design of AlpsDecompSolution
       //       constructor
-      return new AlpsDecompSolution(s, v, q);
+      return new AlpsDecompSolution(s, v, q, getModel());
    }
 
 
