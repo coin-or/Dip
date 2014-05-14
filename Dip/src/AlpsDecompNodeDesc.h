@@ -94,9 +94,9 @@ public:
    /** Default constructor. */
    AlpsDecompNodeDesc() :
       AlpsNodeDesc(),
-      branchedDir_(0)
-      //      basis_(NULL)
-   {
+      lowerBounds_(NULL),
+      upperBounds_(NULL),
+      branchedDir_(0) {
    }
 
    /** Useful constructor. */
@@ -115,16 +115,13 @@ public:
          lowerBounds_[i] = -DecompInf;
          upperBounds_[i] = DecompInf;
       }
-
-      branchedDir_ = 0 ;
    }
 
    AlpsDecompNodeDesc(AlpsDecompModel* m,
                       const double*     lb,
                       const double*     ub)
       :
-      AlpsNodeDesc(m),
-      branchedDir_(0)
+      AlpsNodeDesc(m)
       //    basis_(NULL)
    {
       numberCols_ = m->getNumCoreCols();
@@ -133,6 +130,7 @@ public:
       upperBounds_ = new double [numberCols_];
       memcpy(lowerBounds_, lb, sizeof(double)*numberCols_);
       memcpy(upperBounds_, ub, sizeof(double)*numberCols_);
+      branchedDir_ = 0;
    }
 
    /** Destructor. */
