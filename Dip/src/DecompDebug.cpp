@@ -791,14 +791,16 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "solveDirect()", m_param.LogDebugLevel, 2);
    DecompVarList dummy;
-   int           i, nNodes;
+   int           i, nNodes(0);
    double        objLB      = -DecompInf;
    double        objUB      =  DecompInf;
    int           logIpLevel = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
+#ifdef __DECOMP_IP_CBC__
    int                   numCols   = m_masterSI->getNumCols();
    double                timeLimit = m_param.LimitTime;
+#endif
    //---
    //--- start timer
    //---
