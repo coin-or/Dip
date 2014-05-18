@@ -13,7 +13,6 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
-
 #ifndef DECOMP_MODEL_INCLUDED
 #define DECOMP_MODEL_INCLUDED
 
@@ -25,7 +24,6 @@
 #include "OsiSolverInterface.hpp"
 #include "OsiSymSolverInterface.hpp"
 //===========================================================================//
-
 //naming convention - usually would do DecompModelXx, DecompModelYy
 //===========================================================================//
 class DecompAppModel {
@@ -88,9 +86,19 @@ private:
    int                   m_numCols;
    int*                  m_colIndices;
    int                   m_counter;
+   int                   m_ws_tag;
    CoinWarmStart*        m_ws;
    OsiSymSolverInterface* osi_Sym;
 public:
+
+   inline void setCounter(const int num) {
+      m_counter = num;
+   }
+
+   inline int getCounter() {
+      return m_counter;
+   }
+
    void setOsi(OsiSolverInterface* osi) {
       m_osi = osi;
 
@@ -132,13 +140,6 @@ public:
                                m_colIndices + m_numCols, objCoeff);
    }
 
-   void setCounter(int num) {
-      m_counter = num;
-   }
-
-   int getCounter() {
-      return m_counter;
-   }
 
    void setActiveColBounds(const double* colLB,
                            const double* colUB) {
@@ -205,7 +206,8 @@ public:
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter     (  0 ),
+      m_counter    ( 0 ),
+      m_ws_tag     ( 0 ),
       m_ws          (NULL),
       osi_Sym     (NULL) {
    }
@@ -221,6 +223,7 @@ public:
       m_numCols     (0   ),
       m_colIndices  (NULL),
       m_counter     (0),
+      m_ws_tag      (0),
       m_ws          (NULL),
       osi_Sym       (NULL)
    {};
@@ -232,6 +235,7 @@ public:
       m_numCols     (0   ),
       m_colIndices  (NULL),
       m_counter     (0),
+      m_ws_tag      (0),
       m_ws          (NULL),
       osi_Sym       (NULL) {
    };

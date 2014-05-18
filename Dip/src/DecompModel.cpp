@@ -249,7 +249,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 #ifdef __DECOMP_IP_SYMPHONY__
 
    if (param.WarmStart) {
-      osi_Sym                                                                                                                                                 		   = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
       sym_environment* env = osi_Sym->getSymphonyEnvironment();
       sym_set_int_param(env, "do_reduced_cost_fixing", 0);
 
@@ -259,13 +259,21 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          sym_set_int_param(env, "verbosity", logIpLevel);
       }
 
-      //     osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
-      m_ws = osi_Sym->getWarmStart();
+      //      osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+      if (!m_ws_tag) {
+         m_ws = osi_Sym->getWarmStart();
 
-      if (m_ws) {
+         if (m_ws) {
+            m_ws_tag = 1;
+         }
+      }
+
+      if (m_ws_tag) {
          osi_Sym->resolve();
+         //	 std::cout << "warm start resolve " << std::endl;
       } else {
-         osi_Sym->branchAndBound();
+         osi_Sym->initialSolve();
+         //	 std::cout << "NON warm start resolve " << std::endl;
       }
 
       /*
@@ -291,10 +299,13 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          }
       */
    } else {
+      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      /*
       OsiSolverInterface* m_subModelClone = m_osi->clone();
       osi_Sym
       = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
       assert(osi_Sym);
+      */
       sym_environment* env = osi_Sym->getSymphonyEnvironment();
 
       if (logIpLevel == 0 ) {
