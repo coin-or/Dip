@@ -797,10 +797,9 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    int           logIpLevel = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
-#ifdef __DECOMP_IP_CBC__
    int                   numCols   = m_masterSI->getNumCols();
    double                timeLimit = m_param.LimitTime;
-#endif
+
    //---
    //--- start timer
    //---
