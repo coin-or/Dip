@@ -27,6 +27,10 @@
 #include "CoinMpsIO.hpp"
 #include "CoinLpIO.hpp"
 
+#include "Alps.h"
+#include "AlpsKnowledge.h"
+
+
 extern "C" {
 #if defined (COIN_HAS_METIS)
 #include "hmetis.h"
@@ -84,7 +88,7 @@ public:
    /**
     *  Model data: objective function
     */
-   const double* m_objective;
+   double* m_objective;
 
 
    /**
@@ -462,6 +466,11 @@ public:
    */
 
 
+   AlpsReturnStatus encodeDecompApp(AlpsEncoded*& encoded) const;
+
+   AlpsReturnStatus decodeDecompApp(AlpsEncoded& encoded) ;
+
+   virtual bool setupSelf();
 
 
 public:

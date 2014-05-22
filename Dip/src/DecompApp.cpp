@@ -1391,6 +1391,10 @@ void DecompApp::createModels()
       }
    }
 
+   std::cout << "the size of master only in decompapp is "
+             << modelCore->masterOnlyCols.size()
+             << std::endl;
+
    if (m_param.LogLevel >= 3) {
       (*m_osLog) << "Master only columns:" << endl;
       UtilPrintVector(modelCore->masterOnlyCols, m_osLog);
@@ -1864,8 +1868,167 @@ void DecompApp::singlyBorderStructureDetection()
    }
 }
 
+AlpsReturnStatus DecompApp::encodeDecompApp(AlpsEncoded*& encoded) const
+{
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   const int numCols = m_matrix->getNumCols();
+   const int numRows = m_matrix->getNumRows();
+   const CoinBigIndex numElements = m_matrix->getNumElements();
+   const double* elements = m_matrix->getElements();
+   const int* indices = m_matrix->getIndices();
+   const CoinBigIndex* start = m_matrix->getVectorStarts();
+   const int sizeVectorStarts = m_matrix->getSizeVectorStarts();
+   const int* vectorSize = m_matrix->getVectorLengths();
+   encoded->writeRep(numCols);
+   encoded->writeRep(numRows);
+   encoded->writeRep(numElements);
+   encoded->writeRep(elements, numElements);
+   encoded->writeRep(indices, numElements);
+   encoded->writeRep(sizeVectorStarts);
+   encoded->writeRep(start, sizeVectorStarts);
+   encoded->writeRep(vectorSize, sizeVectorStarts);
+   const int size = static_cast<int> (m_blocks.size());
+   int** block_num;
+   encoded->writeRep(size);
+   std::cout << "the encode informatin checking :begin " << std::endl;
+
+   if (size > 0) {
+      block_num = new int*[size];
+
+      for (int i = 0; i < size; ++i) {
+         block_num[i] = new int[m_blocks.at(i).size()];
+         const int size_block = static_cast<int>(m_blocks.at(i).size());
+         encoded->writeRep(size_block);
+         std::cout << "size of block " << i  << " is " << size_block << std::endl;
+         std::cout << "rows in the block" << std::endl;
+
+         for (int j = 0; j < size_block; j++) {
+            block_num[i][j] = m_blocks.at(i)[j];
+            std::cout  << m_blocks.at(i)[j] << std::endl;
+         }
+
+         encoded->writeRep(block_num[i], size_block);
+      }
+   } else {
+      block_num = NULL;
+   }
+
+   std::cout << "the number of columns is " << numCols << std::endl;
+   std::cout << "the number of rows is " << numRows << std::endl;
+   std::cout << "the number of numElements is " << numElements << std::endl;
+   std::cout << "the size of vector Starts is " << sizeVectorStarts << std::endl;
+   std::cout << "the number of blocks is " << size << std::endl;
+   std::cout << "the encode informatin checking :end " << std::endl;
+   encoded->writeRep(m_objective, numCols);
+   const double* colLower = m_mpsIO.getColLower();
+   const double* colUpper = m_mpsIO.getColUpper();
+   const double* rowLower = m_mpsIO.getRowLower();
+   const double* rowUpper = m_mpsIO.getRowUpper();
+   const char* integerColumns = m_mpsIO.integerColumns();
+   encoded->writeRep(colLower, numCols);
+   encoded->writeRep(colUpper, numCols);
+   encoded->writeRep(rowLower, numRows);
+   encoded->writeRep(rowUpper, numRows);
+   encoded->writeRep(integerColumns, numCols);
+   return status;
+}
+
+AlpsReturnStatus DecompApp::decodeDecompApp(AlpsEncoded& encoded)
+{
+   AlpsReturnStatus status = AlpsReturnStatusOk;
+   int numCols;
+   int numRows;
+   CoinBigIndex numElements;
+   double* elements ;
+   int* indices ;
+   int sizeVectorStarts;
+   CoinBigIndex* start;
+   int* vectorSize;
+   double* objective = NULL;
+   encoded.readRep(numCols);
+   encoded.readRep(numRows);
+   encoded.readRep(numElements);
+   encoded.readRep(elements, numElements);
+   encoded.readRep(indices, numElements);
+   encoded.readRep(sizeVectorStarts);
+   encoded.readRep(start, sizeVectorStarts);
+   encoded.readRep(vectorSize, sizeVectorStarts);
+   std::cout << "==========================================" << std::endl;
+   std::cout << "the decoding informatin checking :begin " << std::endl;
+   std::cout << "the number of columns is " << numCols << std::endl;
+   std::cout << "the number of rows is " << numRows << std::endl;
+   std::cout << "the number of numElements is " << numElements << std::endl;
+   std::cout << "the size of vector Starts is " << sizeVectorStarts << std::endl;
+   int size;
+   encoded.readRep(size);
+   std::cout << "the number of bloks is " << size << std::endl;
+   int* size_per_block = new int[size];
+
+   for (int i = 0; i < size; i ++) {
+      size_per_block[i] = 0;
+   }
+
+   int size_block;
+   int* block_num_per;
+
+   for (int i = 0 ; i < size; i ++) {
+      encoded.readRep(size_block);
+      size_per_block[i] = size_block;
+      std::cout << "size of block " << i  << " is " << size_per_block[i] << std::endl;
+      encoded.readRep(block_num_per, size_block);
+      std::vector<int> temp_row;
+
+      for (int j = 0; j < size_block; j ++) {
+         temp_row.push_back(block_num_per[j]);
+      }
+
+      m_blocks.insert(std::make_pair(i, temp_row));
+      temp_row.clear();
+   }
+
+   std::cout << "the size of m_blocks is " << m_blocks.size() << std::endl;
+   encoded.readRep(m_objective, numCols);
+   //   m_objective = objective;
+   // objective = NULL;
+   std::cout << "==========================================" << std::endl;
+   std::cout << "the decoding informatin checking :end " << std::endl;
+   CoinPackedMatrix matrix(false,
+                           numCols, numRows, numElements,
+                           elements, indices ,
+                           start, vectorSize);
+   m_matrix = & matrix;
+   double* colLower;
+   double* colUpper;
+   double* rowLower;
+   double* rowUpper;
+   char* integerColumns;
+   encoded.readRep(colLower, numCols);
+   encoded.readRep(colUpper, numCols);
+   encoded.readRep(rowLower, numRows);
+   encoded.readRep(rowUpper, numRows);
+   encoded.readRep(integerColumns, numCols);
+   m_mpsIO.setMpsData(matrix, COIN_DBL_MAX,
+                      colLower, colUpper,
+                      m_objective, integerColumns,
+                      rowLower, rowUpper,
+                      NULL, NULL);
+   m_mpsIO.writeMps("fuck.mps");
+   return status;
+}
 
 
+bool DecompApp:: setupSelf()
+{
+   int            i, nRowsRelax, nRowsCore;
+   int      nRows       = 0;
+   int      nCols       = 0;
+   std::cout << "==================================" << std::endl;
+   std::cout << "instance formate is "
+             << m_param.InstanceFormat
+             << std::endl;
+   std::cout << "==================================" << std::endl;
+   return true;
+}
 
 #if 0
 // --------------------------------------------------------------------- //

@@ -55,7 +55,7 @@ AlpsTreeNode* AlpsDecompModel::createRoot()
    //---
    UtilPrintFuncBegin(&cout, m_classTag,
                       "createRoot()", m_param.msgLevel, 3);
-   AlpsDecompTreeNode* root = new AlpsDecompTreeNode();
+   AlpsDecompTreeNode* root = new AlpsDecompTreeNode(this);
    assert(root);
    CoinAssert(m_decompAlgo);
    const DecompAlgoModel& modelCore = m_decompAlgo->getModelCore();
@@ -199,6 +199,7 @@ AlpsDecompModel::encode() const
    AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeModel);
    status = encodeAlps(encoded);
    status = encodeAlpsDecomp(encoded);
+   status = m_decompAlgo->getDecompApp()->encodeDecompApp(encoded);
    return encoded;
 }
 
@@ -208,6 +209,7 @@ AlpsDecompModel::decodeToSelf(AlpsEncoded& encoded)
    AlpsReturnStatus status = AlpsReturnStatusOk;
    status = decodeAlps(encoded);
    status = decodeAlpsDecomp(encoded);
+   status = m_decompAlgo->getDecompApp()->decodeDecompApp(encoded);
 }
 
 AlpsReturnStatus
@@ -278,4 +280,11 @@ AlpsDecompModel::registerKnowledge()
    if (broker_->getMsgLevel() > 100) {
       std::cout << "AlpsDecomp: Register Alps solution." << std::endl;
    }
+}
+
+bool AlpsDecompModel::setupSelf()
+{
+   bool status;
+   status = m_decompAlgo->getDecompApp()->setupSelf();
+   return status;
 }

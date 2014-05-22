@@ -251,11 +251,11 @@ int AlpsDecompTreeNode::process(bool isRoot,
 
    if (!isRoot) {
       bestNode = getKnowledgeBroker()->getBestNode();
-      
-      if(bestNode){
-	globalLB = bestNode->getQuality();
+
+      if (bestNode) {
+         globalLB = bestNode->getQuality();
       }
-      
+
       //---
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
@@ -673,13 +673,29 @@ AlpsDecompTreeNode::encode() const
 {
    //   AlpsReturnStatus status = AlpsReturnStatusOk;
    // NOTE: "AlpsKnowledgeTypeNode" is used as type name.
+   AlpsReturnStatus status = AlpsReturnStatusOk;
    AlpsEncoded* encoded = new AlpsEncoded(AlpsKnowledgeTypeNode);
-   AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   desc->encodeAlpsDecomp(encoded);
+   encoded->writeRep(index_);
+   encoded->writeRep(depth_);
+   encoded->writeRep(quality_);
+   encoded->writeRep(parentIndex_);
+   encoded->writeRep(numChildren_);
+   encoded->writeRep(status_);
+   encoded->writeRep(sentMark_);
+   std::cout << "encode begin" << std::endl;
+   std::cout << "index_ = " << index_ << "; " << std::endl;
+   std::cout << "depth_ = " << depth_ << "; " << std::endl;
+   std::cout << "quality_ = " << quality_ << "; " << std::endl;
+   std::cout << "parentIndex_ = " << parentIndex_ << "; " << std::endl;
+   std::cout << "numChildren_ = " << numChildren_ << "; " << std::endl;
+   std::cout << "status_ = " << status_ << "; " << std::endl;
+   std::cout << "sentMark_ = " << sentMark_ << std::endl;
+   std::cout << "encode finish" << std::endl;
    std::vector< std::pair<int, double> > downBranchLB = getDownBranchLB();
    const int downBranchLBSize = downBranchLB.size();
    int* downBranchLBIndices;
    double* downBranchLBValues;
+   encoded->writeRep(downBranchLBSize);
 
    if (downBranchLBSize) {
       downBranchLBIndices = new int[downBranchLBSize];
@@ -689,6 +705,9 @@ AlpsDecompTreeNode::encode() const
          downBranchLBIndices[i] = downBranchLB[i].first;
          downBranchLBValues[i] = downBranchLB[i].second;
       }
+
+      encoded->writeRep(downBranchLBIndices, downBranchLBSize);
+      encoded->writeRep(downBranchLBValues, downBranchLBSize);
    } else {
       downBranchLBIndices = 0 ;
       downBranchLBValues = 0;
@@ -698,6 +717,7 @@ AlpsDecompTreeNode::encode() const
    const int downBranchUBSize = downBranchUB.size();
    int* downBranchUBIndices;
    double* downBranchUBValues;
+   encoded->writeRep(downBranchUBSize);
 
    if (downBranchUBSize) {
       downBranchUBIndices = new int[downBranchUBSize];
@@ -707,6 +727,9 @@ AlpsDecompTreeNode::encode() const
          downBranchUBIndices[i] = downBranchUB[i].first;
          downBranchUBValues[i] = downBranchUB[i].second;
       }
+
+      encoded->writeRep(downBranchUBIndices, downBranchUBSize);
+      encoded->writeRep(downBranchUBValues, downBranchUBSize );
    } else {
       downBranchUBIndices = 0 ;
       downBranchUBValues = 0;
@@ -716,6 +739,7 @@ AlpsDecompTreeNode::encode() const
    const int upBranchLBSize = upBranchLB.size();
    int* upBranchLBIndices;
    double* upBranchLBValues;
+   encoded->writeRep(upBranchLBSize);
 
    if (upBranchLBSize) {
       upBranchLBIndices = new int[upBranchLBSize];
@@ -725,6 +749,9 @@ AlpsDecompTreeNode::encode() const
          upBranchLBIndices[i] = upBranchLB[i].first;
          upBranchLBValues[i] = upBranchLB[i].second;
       }
+
+      encoded->writeRep(upBranchLBIndices, upBranchLBSize);
+      encoded->writeRep(upBranchLBValues, upBranchLBSize );
    } else {
       upBranchLBIndices = 0 ;
       upBranchLBValues = 0;
@@ -734,6 +761,7 @@ AlpsDecompTreeNode::encode() const
    const int upBranchUBSize = upBranchUB.size();
    int* upBranchUBIndices;
    double* upBranchUBValues;
+   encoded->writeRep(upBranchUBSize);
 
    if (upBranchUBSize) {
       upBranchUBIndices = new int[upBranchUBSize];
@@ -743,26 +771,27 @@ AlpsDecompTreeNode::encode() const
          upBranchUBIndices[i] = upBranchUB[i].first;
          upBranchUBValues[i] = upBranchUB[i].second;
       }
+
+      encoded->writeRep(upBranchUBIndices, upBranchUBSize);
+      encoded->writeRep(upBranchUBValues, upBranchUBSize );
    } else {
       upBranchUBIndices = 0 ;
       upBranchUBValues = 0;
    }
 
-   encoded->writeRep(downBranchLBIndices, downBranchLBSize);
-   encoded->writeRep(downBranchLBValues, downBranchLBSize);
-   encoded->writeRep(downBranchUBIndices, downBranchUBSize);
-   encoded->writeRep(downBranchUBValues, downBranchUBSize );
-   encoded->writeRep(upBranchLBIndices, upBranchLBSize);
-   encoded->writeRep(upBranchLBValues, upBranchLBSize );
-   encoded->writeRep(upBranchUBIndices, upBranchUBSize);
-   encoded->writeRep(upBranchUBValues, upBranchUBSize );
+   AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   status = desc->encode(encoded);
+   AlpsDecompModel* model = dynamic_cast<AlpsDecompModel*>(desc_->getModel());
+   AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode(model);
+   desc = NULL;
+   treeNode->encodeAlps(encoded);
    // free memory
    delete [] downBranchLBValues;
    downBranchLBValues = NULL;
    delete [] downBranchLBIndices;
    downBranchLBIndices = NULL;
-   delete [] downBranchUBIndices;
-   downBranchUBIndices = NULL;
+   delete [] downBranchUBValues;
+   downBranchUBValues = NULL;
    delete [] downBranchUBIndices;
    downBranchUBIndices = NULL;
    delete [] upBranchLBIndices;
@@ -771,8 +800,8 @@ AlpsDecompTreeNode::encode() const
    upBranchLBValues = NULL;
    delete [] upBranchUBIndices;
    upBranchUBIndices = NULL;
-   delete [] upBranchLBValues;
-   upBranchLBValues = NULL;
+   delete [] upBranchUBValues;
+   upBranchUBValues = NULL;
    // Encode Alps portion.
    return encoded;
 }
@@ -782,33 +811,66 @@ AlpsDecompTreeNode::encode() const
 AlpsKnowledge*
 AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
 {
-   AlpsDecompNodeDesc* desc = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
-   AlpsReturnStatus status = desc->decodeAlpsDecomp(encoded);
+   int index;
+   int depth;
+   double quality;
+   int parentIndex;
+   int numChildren;
+   AlpsNodeStatus     nodeStatus;
+   int sentMark;
+   encoded.readRep(index);
+   encoded.readRep(depth);
+   encoded.readRep(quality);
+   encoded.readRep(parentIndex);
+   encoded.readRep(numChildren);
+   encoded.readRep(nodeStatus);
+   encoded.readRep(sentMark);
+   AlpsReturnStatus status ;
    int downBranchLBSize;
+   encoded.readRep(downBranchLBSize);
    int* downBranchLBIndices;
    double* downBranchLBValues;
-   encoded.readRep(downBranchLBIndices, downBranchLBSize);
-   encoded.readRep(downBranchLBValues, downBranchLBSize);
+
+   if (downBranchLBSize) {
+      encoded.readRep(downBranchLBIndices, downBranchLBSize);
+      encoded.readRep(downBranchLBValues, downBranchLBSize);
+   }
+
    int downBranchUBSize;
+   encoded.readRep(downBranchUBSize);
    int* downBranchUBIndices;
    double* downBranchUBValues;
-   encoded.readRep(downBranchUBIndices, downBranchUBSize);
-   encoded.readRep(downBranchUBValues, downBranchUBSize);
+
+   if (downBranchUBSize) {
+      encoded.readRep(downBranchUBIndices, downBranchUBSize);
+      encoded.readRep(downBranchUBValues, downBranchUBSize);
+   }
+
    int upBranchLBSize;
+   encoded.readRep(upBranchLBSize);
    int* upBranchLBIndices;
    double* upBranchLBValues;
-   encoded.readRep(upBranchLBIndices, upBranchLBSize);
-   encoded.readRep(upBranchLBValues, upBranchLBSize);
+
+   if (upBranchLBSize) {
+      encoded.readRep(upBranchLBIndices, upBranchLBSize);
+      encoded.readRep(upBranchLBValues, upBranchLBSize);
+   }
+
    int upBranchUBSize;
+   encoded.readRep(upBranchUBSize);
    int* upBranchUBIndices;
    double* upBranchUBValues;
-   encoded.readRep(upBranchUBIndices, upBranchUBSize);
-   encoded.readRep(upBranchUBValues, upBranchUBSize);
+
+   if (upBranchUBSize) {
+      encoded.readRep(upBranchUBIndices, upBranchUBSize);
+      encoded.readRep(upBranchUBValues, upBranchUBSize);
+   }
+
    AlpsDecompModel* model = dynamic_cast<AlpsDecompModel*>(desc_->getModel());
    AlpsNodeDesc* nodeDesc = new AlpsDecompNodeDesc(model);
    status = nodeDesc->decode(encoded);
+   AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode(nodeDesc);
    nodeDesc = NULL;
-   AlpsDecompTreeNode* treeNode = new AlpsDecompTreeNode(model);
    treeNode->decodeAlps(encoded);
    treeNode->setBranchBound_upUB(upBranchUBSize, upBranchUBIndices,
                                  upBranchUBValues);
@@ -818,6 +880,21 @@ AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
                                    downBranchLBValues);
    treeNode->setBranchBound_downUB(downBranchUBSize, downBranchUBIndices,
                                    downBranchUBValues);
+   treeNode->setIndex(index);
+   treeNode->setDepth(depth);
+   treeNode->setQuality(quality);
+   treeNode->setParentIndex(parentIndex);
+   treeNode->setNumChildren(numChildren);
+   treeNode->setStatus(nodeStatus);
+   treeNode->setSentMark(sentMark);
+   std::cout << "index = " << index << "; ";
+   std::cout << "depth = " << depth << "; ";
+   std::cout << "quality = " << quality << "; ";
+   std::cout << "parentIndex = " << parentIndex << "; ";
+   std::cout << "numChildren = " << numChildren << "; ";
+   std::cout << "nodeStatus = " << nodeStatus << "; ";
+   std::cout << "sentMark = " << sentMark << "treeNode->getSentMark() = "
+             <<  treeNode->getSentMark() << std::endl;
    return treeNode;
 }
 
