@@ -604,7 +604,7 @@ public:
       MasterGapLimit       = 1.0e-6;
       //MasterGapLimit       = 0.01;
       PCStrategy           = 0;
-      CompressColumns      = 1;
+      CompressColumns      = 0;
       CompressColumnsIterFreq       = 2;
       CompressColumnsSizeMultLimit  = 1.20;
       CompressColumnsMasterGapStart = 0.20;
@@ -634,6 +634,8 @@ public:
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
+      // SolveMasterUpdateAlgo    = DecompPrimSimplex;
+      //      SolveMasterUpdateAlgo    = DecompBarrier;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
@@ -652,6 +654,7 @@ public:
       LogLevel                 = 0;
       DataDir                  = "";
       Instance                 = "";
+      InstanceFormat           = "";
       BlockFile                = "";
       BlockFileFormat          = "";
       PermuteFile              = "";
