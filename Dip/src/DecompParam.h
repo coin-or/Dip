@@ -654,6 +654,7 @@ public:
       LogLevel                 = 0;
       DataDir                  = "";
       Instance                 = "";
+      InstanceFormat           = "";
       BlockFile                = "";
       BlockFileFormat          = "";
       PermuteFile              = "";
