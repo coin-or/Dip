@@ -446,7 +446,7 @@ public:
     * object (UtilParameters) and reads in the parameter settings into the
     * DecompApp paramter object.
     */
-   DecompApp() :
+   DecompApp(UtilParameters& utilParam) :
       m_classTag   ("D-APP"),
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
@@ -455,14 +455,20 @@ public:
       m_matrix     ( 0     ),
       m_modelC     ( 0     ),
       m_modelR     ( ) {
-      //---
-      //--- comment these functions, which were used in
-      //--- MILPBlock, otherwise, conflict occurs in building
-      //--- individual examples
-      //     m_param.getSettings(utilParam);
-      //     initializeApp(utilParam);
-      //     startupLog();
+      m_param.getSettings(utilParam);
+      initializeApp(utilParam);
+      startupLog();
    };
+
+   DecompApp() :
+      m_classTag   ("D-APP"),
+      m_osLog      (&std::cout  ),
+      m_bestKnownLB(-1e75  ),
+      m_bestKnownUB( 1e75  ),
+      m_objective  ( 0     ),
+      m_matrix     ( 0     ),
+      m_modelC     ( 0     ),
+      m_modelR     ( ) {};
 
    /**
     * Destructor.
