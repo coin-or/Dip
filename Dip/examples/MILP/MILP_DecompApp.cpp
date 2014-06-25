@@ -29,8 +29,12 @@ void MILP_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    //--- read MILP instance (mps format)
    //---
-   string fileName = m_appParam.DataDir 
-      + UtilDirSlash() + m_appParam.Instance;   
+   string fileName;
+   if (m_appParam.DataDir != "") {
+      fileName = m_appParam.DataDir + UtilDirSlash() + m_param.Instance;
+   } else {
+      fileName = m_appParam.Instance;
+   }
 
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
