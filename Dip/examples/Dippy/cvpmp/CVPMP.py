@@ -134,13 +134,13 @@ def Solver():
 
     prob += lpSum(y[i] for i in V) == p
 
-    prob.relaxed_solver = solve_subproblem
+#    prob.relaxed_solver = solve_subproblem
 
     dippy.Solve(prob, {
         'TolZero'           : '%s' % tol,
-        'doPriceCut'        : '1',
+        'doCut'        : '1',
         'generateInitVars'  : '1',
-        'CutCGL'            : '0',
+        'CutCGL'            : '1',
     })
 
 

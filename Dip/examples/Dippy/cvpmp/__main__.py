@@ -30,7 +30,7 @@ from    readInstance import *
 def main():
     #read instance
     #path=sys.argv[1]
-    id,n,p,d,s,w,cxy,V,mytype,id = read('Instances/pmedcap2.dat')
+    id,n,p,d,s,w,cxy,V,mytype,id = read('Instances/pmedcap1.dat')
     
     CVPMP.init(n,p,d,s,w,V)
     z, solution = CVPMP.Solver()
