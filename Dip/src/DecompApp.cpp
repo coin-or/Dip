@@ -2019,15 +2019,9 @@ AlpsReturnStatus DecompApp::decodeDecompApp(AlpsEncoded& encoded)
 
 bool DecompApp:: setupSelf()
 {
-   int            i, nRowsRelax, nRowsCore;
-   int      nRows       = 0;
-   int      nCols       = 0;
-   std::cout << "==================================" << std::endl;
-   std::cout << "instance formate is "
-             << m_param.InstanceFormat
-             << std::endl;
-   std::cout << "==================================" << std::endl;
-   return true;
+
+  createModels();
+  return true;
 }
 
 #if 0
