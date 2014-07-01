@@ -318,7 +318,7 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
       string extension = fileName.substr(idx + 1);
       std::size_t found = fileName.substr(0, idx).rfind('.');
 
-      if (found != std::string::npos) {
+      if (found != std::string::npos && extension == "gz") {
          extension = fileName.substr(found + 1);
       }
 
