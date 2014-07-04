@@ -4,11 +4,10 @@
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
 
-try:
-    import path
-except ImportError:
-    pass
-        
+import sys 
+
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
+
 try:
     import path
 except ImportError:
@@ -136,7 +135,7 @@ def knapsack01(obj, weights, capacity):
         return 0, []
 
     if (debug_subproblem):
-        relaxation = pulp.LpProblem('relaxation', pulp.LpMaximize)
+        relaxation = LpProblem('relaxation', LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
         relaxation += lpSum(var_dict[str(i)] * weights[i] for i in range(n)) <= capacity
@@ -182,7 +181,8 @@ prob.relaxed_solver = solve_subproblem
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
-    'doCut': '1',
+    'doPriceCut': '1',
+    'CutCGL' : '1',
 #    'logLevel': '3', 
 })
 

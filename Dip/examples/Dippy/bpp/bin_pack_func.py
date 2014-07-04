@@ -1,12 +1,7 @@
 import sys
 
-from pulp import *
+from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
-try:
-    import path
-except ImportError:
-    pass
-        
 try:
     import path
 except ImportError:
@@ -68,7 +63,6 @@ def formulate(bpp):
     return prob
 
 def my_branch(prob, sol):
-    bounds = None
    
     bounds = symmetry(prob, sol)
   
@@ -104,7 +98,7 @@ def solve(prob):
     prob.node_heuristic = True
   
     dippyOpts = {'doPriceCut' : '1',
-                 'CutCGL': '0',
+                 'CutCGL': '1',
 #                'SolveMasterAsIp': '0'
 #                'generateInitVars': '1',
 #                 'LogDebugLevel': 5,

@@ -14,10 +14,10 @@
 /**
  * Mixin class for Dip Algorithms
  *
- * This is a helper class for interfacing Dip Algo classes with Python. To add Python support
- * to a standard DecompAlgo, create a subclass which also inherits from DippyAlgoMixin and
- * override the virtual methods to call those provided by the Mixin class. See DippyAlgoC
- * for an example.
+ * This is a helper class for interfacing Dip Algo classes with Python.
+ * To add Python support to a standard DecompAlgo, create a subclass which
+ * also inherits from DippyAlgoMixin and override the virtual methods to call
+ * those provided by the Mixin class. See DippyAlgoC for an example.
  */
 class DippyAlgoMixin {
 private:

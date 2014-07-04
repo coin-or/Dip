@@ -588,7 +588,7 @@ void DecompApp::readBlockFile()
    } else {
       cerr << "Error: BlockFileFormat = "
            << m_param.BlockFileFormat
-           << " is an invalid type. Valid types = (List,ZIBlist,Pair,PairName)."
+           << " is an invalid type. Valid types = (List, ZIBList, Pair, PairName)."
            << endl;
       throw UtilException("Invalid Parameter.",
                           "readBlockFile", "DecompApp");

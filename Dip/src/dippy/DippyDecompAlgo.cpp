@@ -10,7 +10,8 @@
  * This function should populate the (down|up)Branch(LB|UB) vectors with (indices, bound-value) pairs
  * which define the branch.
  */
-bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo, std::vector< std::pair<int, double> >& downBranchLB,
+bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
+				     std::vector< std::pair<int, double> >& downBranchLB,
                                      std::vector< std::pair<int, double> >& downBranchUB,
                                      std::vector< std::pair<int, double> >& upBranchLB,
                                      std::vector< std::pair<int, double> >& upBranchUB)
@@ -18,7 +19,8 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo, std::vector< std::pair<in
    bool ret_val;
 
    if (!m_utilParam->GetSetting("pyBranchMethod", true)) {
-      return algo->DecompAlgo::chooseBranchSet(downBranchLB, downBranchUB, upBranchLB, upBranchUB);
+      return algo->DecompAlgo::chooseBranchSet(downBranchLB, downBranchUB, 
+					       upBranchLB, upBranchUB);
    }
 
    DippyDecompApp* app = (DippyDecompApp*)algo->getDecompApp();
@@ -26,11 +28,14 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo, std::vector< std::pair<in
    const double* xhat = algo->getXhat();
    PyObject* pSolutionList = pyTupleList_FromDoubleArray(xhat, app->m_colList);
    // try to call chooseBranchSet on the DipProblem python object
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "chooseBranchSet", "O", pSolutionList);
+   PyObject* pResult = PyObject_CallMethod(m_pProb, "chooseBranchSet", "O", 
+					   pSolutionList);
 
    if (pResult == NULL) {
-      //something's gone wrong with the function call, a Python exception has been set
-      throw UtilException("Error calling method prob.chooseBranchSet()", "chooseBranchSet", "DippyDecompAlgo");
+      //something's gone wrong with the function call, a Python exception has 
+      //been set 
+      throw UtilException("Error calling method prob.chooseBranchSet()", 
+			  "chooseBranchSet", "DippyDecompAlgo");
    }
 
    // need more error checking/assertion setting here
@@ -43,10 +48,12 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo, std::vector< std::pair<in
          pDownLB = PyDict_New(); // Down branch LBs is an empty dictionary
          pDownUB = PyDict_New();
          downBranchVar = PyList_GetItem(app->m_colList, downBranchUB[0].first);
-         PyDict_SetItem(pDownUB, downBranchVar, PyInt_FromLong(static_cast<int>(round(downBranchUB[0].second))));
+         PyDict_SetItem(pDownUB, downBranchVar, 
+			PyInt_FromLong(static_cast<int>(round(downBranchUB[0].second))));
          pUpLB = PyDict_New();
          upBranchVar = PyList_GetItem(app->m_colList, upBranchLB[0].first);
-         PyDict_SetItem(pUpLB, upBranchVar, PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
+         PyDict_SetItem(pUpLB, upBranchVar, 
+			PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
          pUpUB = PyDict_New(); // Up branch UBs is an empty dictionary
          assert(downBranchVar == upBranchVar);
       }
@@ -67,7 +74,8 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo, std::vector< std::pair<in
    }
 }
 
-void DippyAlgoMixin::postProcessBranch(DecompAlgo* algo, DecompStatus decompStatus)
+void DippyAlgoMixin::postProcessBranch(DecompAlgo* algo, 
+				       DecompStatus decompStatus)
 {
    PyObject* pOutput = PyList_New(0);
 

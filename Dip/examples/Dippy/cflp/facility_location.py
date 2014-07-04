@@ -2,18 +2,13 @@
 
 import sys
 
-from pulp import *
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
 try:
     import path
 except ImportError:
     pass
-        
-try:
-    import path
-except ImportError:
-    pass
-        
+                
 try:
     import dippy
 except ImportError:
@@ -43,7 +38,7 @@ try:
 except ImportError:
     ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
-display_mode = 'off'
+display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
                         layout = 'dot', display_interval = 0)
@@ -113,13 +108,14 @@ def solve_subproblem(prob, key, redCosts):
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
 
-    cost = FIXED_COST[loc] + sum([ASSIGNMENT_COSTS[(loc, PRODUCTS[j])] for j in solution])    
+    cost = FIXED_COST[loc] + sum([ASSIGNMENT_COSTS[(loc, PRODUCTS[j])] 
+                                  for j in solution]) 
     var_tuple = (cost, rc, var_values)
     rcCheck = 0.0
     for v in var_values.keys():
         rcCheck += redCosts[v] * var_values[v]
     if debug_print:
-        print "Checking rc calc", rc, rcCheck 
+        print "Checking rc calc", redCosts[use_vars[loc]] - z, rcCheck 
         print var_tuple
     return [var_tuple]
 
@@ -135,7 +131,7 @@ def knapsack01(obj, weights, capacity):
         return 0, []
 
     if (debug_subproblem):
-        relaxation = pulp.LpProblem('relaxation', pulp.LpMaximize)
+        relaxation = LpProblem('relaxation', LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
         relaxation += lpSum(var_dict[str(i)] * weights[i] for i in range(n)) <= capacity
@@ -376,8 +372,7 @@ if debug_print_lp:
 
 prob.writeFull('facility.lp', 'facility.dec')
 
-#prob.branch_method = choose_antisymmetry_branch
-prob.relaxed_solver = solve_subproblem
+#prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
@@ -399,10 +394,8 @@ dippy.Solve(prob, {
 
 if prob.display_mode != 'off':
     numNodes = len(prob.Tree.get_node_list())
-    if prob.Tree.attr['display'] == 'svg':
-        prob.Tree.write_as_svg(filename = "facility_node%d" % (numNodes + 1), 
-                               prevfile = "facility_node%d" % numNodes)
-    prob.Tree.display()
+    if prob.Tree.attr['display'] == 'pygame' or prob.Tree.attr['display'] == 'xdot':
+        prob.Tree.display()
 
 # print solution
 print "Optimal solution found!" 

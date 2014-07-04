@@ -11,12 +11,14 @@ from dipapi import DipAPI
 
 from _dippy import *
 
+gimpy_installed = True
 try:
-    from coinor.gimpy import BinaryTree
+    from src.gimpy import BinaryTree
 except ImportError:
-    gimpy_installed = False
-else:
-    gimpy_installed = True
+    try:
+        from coinor.gimpy import BinaryTree
+    except ImportError:
+        gimpy_installed = False
 
 if gimpy_installed:
     try:

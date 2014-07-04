@@ -21,7 +21,7 @@ if __name__ == '__main__':
   
     if prob.display_mode != 'off':
         numNodes = len(prob.Tree.get_node_list())
-        if (prob.Tree.display_mode == 'pygame') or (prob.Tree.display_mode == 'xdot'):
+        if (prob.Tree.attr['display'] == 'pygame') or (prob.Tree.attr['display'] == 'xdot'):
             prob.Tree.display()
 
   
