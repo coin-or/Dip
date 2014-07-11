@@ -21,9 +21,9 @@ using namespace std;
 //===========================================================================//
 /*!
  * \class GAP_Instance
- * A class to store an instance of the 
+ * A class to store an instance of the
  *     Generalized Assignment Problem (GAP).
- * 
+ *
  * Find the maximum profit assignment of n tasks to m machines
  * such that each task is assinged to precisely one machine subject
  * to capacity restrictions of the machine.
@@ -43,13 +43,13 @@ using namespace std;
 class GAP_Instance {
 
 private:
-   /** GAP_Instance problem instance data */   
+   /** GAP_Instance problem instance data */
    int    m_nTasks;       //n (use j index)
    int    m_nMachines;    //m (use i index)
-   int *  m_capacity;     //b[i = 1..m]
-   int *  m_profit;       //p[i,j]
-   int *  m_weight;       //w[i,j]
-   
+   int*   m_capacity;     //b[i = 1..m]
+   int*   m_profit;       //p[i,j]
+   int*   m_weight;       //w[i,j]
+
    /** GAP_Instance best known LB/UB */
    bool      m_isProvenOptimal;
    double    m_bestKnownLB;
@@ -58,19 +58,29 @@ private:
 
 public:
    /** @name Access methods. */
-   inline const int    getNTasks   ()  const {return m_nTasks;   }
-   inline const int    getNMachines()  const {return m_nMachines;}
-   inline const int *  getCapacity ()  const {return m_capacity; }
-   inline const int *  getProfit   ()  const {return m_profit;   }
-   inline const int *  getWeight   ()  const {return m_weight;   }
+   inline const int    getNTasks   ()  const {
+      return m_nTasks;
+   }
+   inline const int    getNMachines()  const {
+      return m_nMachines;
+   }
+   inline const int*   getCapacity ()  const {
+      return m_capacity;
+   }
+   inline const int*   getProfit   ()  const {
+      return m_profit;
+   }
+   inline const int*   getWeight   ()  const {
+      return m_weight;
+   }
 
 public:
    /** @name Helper Methods. */
-   void readInstance(string & filename);
-   void readBestKnown(string & fileName,
-                      string & instanceName);
+   void readInstance(string& filename);
+   void readBestKnown(string& fileName,
+                      string& instanceName);
 
-   inline void initMembers(){
+   inline void initMembers() {
       m_nTasks    = 0;
       m_nMachines = 0;
       m_capacity  = NULL;
@@ -82,27 +92,31 @@ public:
    }
 
    inline const int getIndexIJ(const int i,
-                               const int j) const{
+                               const int j) const {
       return (i * m_nTasks) + j;
    }
-   
-   inline pair<int,int> getIndexInv(const int index) const {      
+
+   inline pair<int, int> getIndexInv(const int index) const {
       return make_pair(index / m_nTasks, index % m_nTasks);
    }
 
-   inline const double getBestKnownLB() const {return m_bestKnownLB;}
-   inline const double getBestKnownUB() const {return m_bestKnownUB;}
-   
+   inline const double getBestKnownLB() const {
+      return m_bestKnownLB;
+   }
+   inline const double getBestKnownUB() const {
+      return m_bestKnownUB;
+   }
+
 public:
    /** @name Constructor and Destructor */
 
    /** Default constructor. */
-   GAP_Instance(){
+   GAP_Instance() {
       initMembers();
    };
-   
+
    /** Default constructor. Takes an instance of UtilParameters */
-   GAP_Instance(string & fileName) {
+   GAP_Instance(string& fileName) {
       initMembers();
       readInstance(fileName);
    }

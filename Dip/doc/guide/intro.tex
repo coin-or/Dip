@@ -1,0 +1,30 @@
+%Using a high-level modelling language such as AMPL, GAMS, Xpress-Mp or OPL Studio enables Operations Research practitioners to express complicated \ac{MILP} problems relatively quickly and naturally compared to expressing them with a traditional computer programming language.
+Using a high-level modelling language such as AMPL, GAMS, Xpress-MP or OPL Studio enables Operations Research practitioners to express complicated \ac{MILP} problems quickly and naturally.
+Once defined in one of these high-level languages, the \ac{MILP} can be solved using one of a number of solvers.
+However these solvers are not effective for all problem instances due to the computational difficulties associated with solving \ac{MILP}s (an NP-Hard class of problems).
+Despite steadily increasing computing power and algorithmic improvements for the solution of \ac{MILP}s in general, in many cases problem-specific techniques need to be included in the solution process to solve problems of a useful size in any reasonable time.
+
+Both commercial solvers -- such as CPLEX and Gurobi -- and open source solvers -- such as CBC, Symphony and \acs{DIP} (all from the COIN-OR repository \cite{coin_or}) -- provide callback functions that allow user-defined routines to be included in the solution framework.
+To make use of these callback functions the user must first create their \ac{MILP} problem in a low-level computer programming language (C, C++ or Java for CPLEX; C, C++, C\#, Java or Python for Gurobi; C or C++ for CBC, Symphony or \acs{DIP}).
+%While defining their problem they need to create structures to keep track of appropriate constraints and/or variables for later use in their user-defined routines.
+As part of the problem definition, it is necessary to create structures to keep track of the constraints and\slash{}or variables.
+Problem definition in C\slash{}C++\slash{}Java for a \ac{MILP} problem of any reasonable size and complexity is a major undertaking and thus a major barrier to the development of customised \ac{MILP} frameworks by both practitioners and researchers.
+
+Given the difficulty in defining a \ac{MILP} problem in a low-level language, another alternative for problem formulation is to use a high-level mathematical modelling language.
+By carefully constructing an indexing scheme, constraints and\slash{}or variables in the high-level language can be identified in the low-level callback functions.
+However implementing the indexing scheme can be as difficult as using the low-level language to define the problem in the first place and does little to remove the barrier to solution development.
+
+The purpose of the research presented here is to demonstrate a tool, Dippy, that supports easy experimentation with and customisation of advanced \ac{MILP} solution frameworks. 
+To achieve this aim we needed to:
+\begin{enumerate}
+\item provide a modern high-level modelling system that enables users to quickly and easily describe their \ac{MILP} problems;
+\item enable simple identification of constraints and variables in user-defined routines within the solution framework.
+\end{enumerate}
+The first requirement is satisfied by the modelling language PuLP~\cite{pulp}.
+Dippy extends PuLP to use the \ac{DIP} solver, and enables user-defined routines, implemented using Python and PuLP, to be accessed by the \ac{DIP} callback functions. This approach enables constraints or variables defined in the \ac{MILP} model to be easily accessed using PuLP in the user-defined routines.
+In addition to this, \ac{DIP} is implemented so that the \ac{MILP} problem is defined the same way whether branch-and-cut or branch-price-and-cut is being used -- it hides the implementation of the master problem and subproblems.
+This makes it very easy to switch between the two approaches when experimenting with solution methods.
+All this functionality combines to overcome the barrier described previously and provides researchers, practitioners and students with a simple and integrated way of describing problems and customising the solution framework.
+
+The rest of this article is structured as follows. In \scnref{scn:overview} we provide an overview of the interface between PuLP and \ac{DIP}, including a description of the callback functions available in Python from \ac{DIP}, followed by a guide of how to get started with Dippy in \scnref{scn:starting}. Then, \scnref{scn:define} contains descriptions and model definitions of the case studies we will use to demonstrate the effectiveness of Dippy. In \scnref{scn:techs} we describe how Dippy enables experimentation with advanced techniques within \ac{DIP}'s \ac{MILP} solution framework to improve solution times. We demonstrate these techniques using example code for the case studies from \scnref{scn:define}.
+We conclude in \scnref{scn:concl} where we discuss how this project enhances the ability of researchers to experiment with approaches for solving difficult \ac{MILP} problems. We also demonstrate that \ac{DIP} (via PuLP and Dippy) is competitive with leading commercial (Gurobi) and open source (CBC) solvers.

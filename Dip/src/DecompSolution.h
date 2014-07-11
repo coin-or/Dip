@@ -65,7 +65,8 @@ public:
       }
 
       os << "-------------------------" << std::endl;
-      os << std::resetiosflags(std::ios::fixed | std::ios::showpoint | std::ios::scientific);
+      os << std::resetiosflags(std::ios::fixed | std::ios::showpoint |
+                               std::ios::scientific);
    }
 
    /** Print solution in MIPLIB2010 solution checker format. */
@@ -85,7 +86,8 @@ public:
       }
 
       //os << "-------------------------" << std::endl;
-      os << std::resetiosflags(std::ios::fixed | std::ios::showpoint | std::ios::scientific);
+      os << std::resetiosflags(std::ios::fixed | std::ios::showpoint |
+                               std::ios::scientific);
    }
 
 public:

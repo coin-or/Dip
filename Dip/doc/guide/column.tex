@@ -1,0 +1,179 @@
+Using Dippy it is easy to transform a problem into a form that can be solved by either branch-and-cut or branch-price-and-cut.
+Branch-price-and-cut decomposes a problem into a master problem and a number of distinct subproblems.
+We can identify subproblems using the \lstinline{relaxation} member of the \lstinline{DipProblem} class.
+Once the subproblems have been identified, then they can either be ignored (when using branch-and-cut -- the default method for \ac{DIP}) or utilised (when using branch-price-and-cut -- specified by turning on the \lstinline{doPriceCut} option).
+
+In branch-price-and-cut, the original problem is decomposed into a master problem and multiple subproblems~\cite{DWDecomp00}:
+\begin{equation}
+\begin{array}{rr@{\ }r@{\ }r@{\ }r@{\ }l}
+             \min & c_1^\top x_1 & + \ c_2^\top x_2 & + \ \cdots & + \ c_K^\top x_K \\
+\text{subject to} & A_1 x_1      & + \ A_2 x_2      & + \ \cdots & + \ A_K x_K      & = b \\
+                  &              &   F_2 x_2      &          &                & = f_2 \\
+                  &              &                &  \ddots  &                & \ \ \vdots \\
+                  &              &                &          &   F_K x_K      & = f_K \\
+                  & x_1 \in \mathbb{Z}^{+}_{n_1} &, x_2 \in \mathbb{Z}^{+}_{n_2}&, \ldots, x_K & \in \mathbb{Z}^{+}_{n_K} \quad
+\end{array}
+\label{eqn:decomp}
+\end{equation}
+
+In \eqref{eqn:decomp}, there are $K-1$ subproblems defined by the constraints $F_k x_k = f_k, k \in 2, \ldots, K$. The constraints $A_1 x_1 + A_2 x_2 + \cdots + A_K x_K = b$ are known as \textit{linking} constraints. Instead of solving \eqref{eqn:decomp} directly, column generation uses a convex combination of solutions $y^k$ to each subproblem $j$ to define the subproblem variables:
+\begin{equation}
+x_k = \sum_{l_k=1}^{L_k} \lambda^k_{l_k} y^k_{l_k} \label{eqn:combin}
+\end{equation}
+where $0 \leq \lambda^k_{l_k} \leq 1$ and $\sum_{l_k=1}^{L_k} \lambda^k_{l_k} = 1$. By substituting \eqref{eqn:combin} into the linking constraints and recognising that each $y^k_{l_k}$ satisfies $F_k x_k = f_k, x_k \in \mathbb{Z}^{+}_{n_k}$ (as it is a solution of this subproblem), we can form the \textit{restricted} master problem (RMP) with corresponding duals ($\pi$, $\gamma_1, \ldots, \gamma_K$):
+\begin{equation}
+\begin{array}{rr@{\ }r@{\ }r@{\ }r@{\ }ll}
+             \min & c_1^\top x_1 & + \displaystyle\sum_{l_2=1}^{L_2} \left(c_2^\top y^2_{l_2} \right) \lambda^2_{l_2} & + \ \cdots & + \displaystyle\sum_{l_K=1}^{L_K} \left(c_K^\top y^K_{l_K} \right) \lambda^K_{l_K} \\
+\text{subject to} & A_1 x_1      & + \displaystyle\sum_{l_2=1}^{L_2} \left(A_2 y^2_{l_2} \right) \lambda^2_{l_2} & + \ \cdots & + \displaystyle\sum_{l_K=1}^{L_K} \left( A_K y^K_{l_K} \right) \lambda^K_{l_K}      & = b & : \pi \\
+                  &              &   \displaystyle\sum_{l_2=1}^{L_2} \lambda^2_{l_2}      &          &                & = 1 & : \gamma_1 \\
+                  &              &                &  \ddots  &                & \ \ \vdots \\
+                  &              &                &          &   \displaystyle\sum_{l_K=1}^{L_K} \lambda^K_{l_K}      & = 1 & : \gamma_K \\
+                  &              &   \displaystyle\sum_{l_2=1}^{L_2} y^2_{l_2} \lambda^2_{l_2}      &          &                & \in \mathbb{Z}^{+}_{n_2} \\
+                  &              &                &  \ddots  &                & \ \ \vdots \\
+                  &              &                &          &   \displaystyle\sum_{l_K=1}^{L_K} y^K_{l_K} \lambda^K_{l_K}      & \in \mathbb{Z}^{+}_{n_K} \\
+                  &          x_1 & \in \mathbb{Z}^{+}_{n_1}, \lambda^2 \in [0, 1]_{L_2}, & \ldots, \lambda^K & \in [0, 1]_{L_K} \hspace{1.25cm} &
+\end{array}
+\label{eqn:rmp}
+\end{equation}
+The RMP provides the optimal solution $x^*_1, x^*_2, \ldots, x^*_K$ to the original problem \eqref{eqn:decomp} if the necessary subproblem solutions are present in the RMP. That is, if $y^{k,*}_{l_k}, l_k =1, \ldots, L_k, k = 2, \ldots K$ such that $x^*_k = \sum_{l_k=1}^{L_k} \lambda^k_{l_k} y^{k,*}_{l_k}, k = 2, \ldots, K$ have been included.
+
+Given that $x^*_k, k = 1, \ldots, K$ are not known a priori, column generation starts with an initial solution consisting of $x_1$ and initial sets of subproblem solutions. ``Useful'' subproblem solutions, that form columns for the RMP, are found by looking for subproblem solutions that provide columns with negative reduced cost. The reduced cost of a solution $y^k_{l_k}$'s column, i.e., the reduced cost for $\lambda^k_{l_k}$,  is given by $c_k^\top y^k_{l_k} - \pi^\top A_k y^k_{l_k} - \gamma_k$. To find a solution with minimum reduced cost we can solve:
+\begin{equation}
+\begin{array}{rr@{\,}ll}
+{\cal S}_k: \min & (c_k - \pi^\top A_k)^\top &x_k - \gamma_k & \text{(reduced cost for corresponding $\lambda^k$)} \\
+\text{subject to} & F_k & x_k      = f_k & \text{(ensures that $y^k$ solves subproblem $k$)} \\
+                  & & x_k \in \mathbb{Z}^{+}_{n_k}
+\end{array}
+\label{eqn:subprob}
+\end{equation}
+If the objective value of ${\cal S}_k$ is less than $0$, then the solution $y^k$ will form a column in the RMP whose inclusion in the basis would improve the objective value of the RMP. The solution $y^k$ is added to the set of solution used in the RMP. There are other mechanisms for managing the sets of solutions present in \ac{DIP}, but they are beyond the scope of this paper.
+
+Within \ac{DIP}, hence Dippy, the RMP and \textit{relaxed} problems $S_k, k = 2, \ldots, K$ are not specified explicitly. Rather, the constraints for each subproblem $F_k x_k = f_k$ are specified by using the \lstinline{.relaxation[j]} syntax. \ac{DIP} then automatically constructs the RMP and the relaxed problems $S_k, k = 2, \ldots, K$. The relaxed subproblems $S_k, k = 2, \ldots, K$ can either be solved using the default \ac{MILP} solver (CBC) or a customised solver. A customised solver can be defined by the \lstinline{relaxed_solver} function.
+This function has 4 inputs:
+\begin{enumerate}
+\item \lstinline{prob} -- the \lstinline{DipProblem} being solved;
+\item \lstinline{index} -- the index $k$ of the subproblem being solved;
+\item \lstinline{redCosts} -- the reduced costs for the $x_k$ variables $c_k - \pi^\top A_k$;
+\item \lstinline{convexDual} -- the dual value for the convexity constraint for this subproblem $\gamma_k$.
+\end{enumerate}
+In addition to subproblem solutions generated using RMP dual values, initial columns for subproblems can also be generated either automatically using CBC or using a customised approach.
+A customised approach to initial variable generation can be defined by the \lstinline{init_vars} function.
+This function has only 1 input, \lstinline{prob}, the \lstinline{DipProblem} being solved.
+
+Starting from the original capacitated facility location problem from \scnref{scn:techs}:
+\[
+\begin{array}{rr@{\ }ll}
+       \min & \displaystyle \sum_{i=1}^m w_i \\
+\text{s.t.} & \displaystyle \sum_{i=1}^m x_{ij}           & = 1, j = 1, \ldots, n      & \text{ (each product produced)} \\
+            & \displaystyle \sum_{j=1}^n r_j x_{ij} + w_i & = C y_i, i = 1, \ldots, m  & \text{ (aggregate capacity at location $i$)} \\
+            & \multicolumn{2}{l}{x_{ij} \leq y_i, i = 1, \ldots, m, j = 1, \ldots, n}  & \text{ (disaggregate capacity at location $i$)} \\[6pt]
+            & \multicolumn{3}{l}{x_{ij} \in \{ 0, 1\}, w_i \geq 0, y_i \in \{0, 1\}, i = 1, \ldots, m, j = 1, \ldots, n}
+\end{array}
+\]
+we can decompose this formulation:
+\[
+\begin{array}{r@{\ }r@{\ }r@{\ }r@{\ }c@{\ }r@{\ }l@{\ }l}
+%      r           r                 r         r          c             r               l        
+\min        &                     &        &  1 w_2 & \cdots &                     &  +1 w_m 				\\
+\text{s.t.} & I \mathbf{x}_2      &        &        & \cdots & + I \mathbf{x}_m    &         &= 1 \text{ (each product produced)} \\
+            & r^\top \mathbf{x}_2 & -C y_2 & +1 w_2 &        &                     &         &= 0 \text{ (aggregate cap. at loc. 2)} \\
+            & I \mathbf{x}_2      & -e y_2 &        &        &                     &         &\leq 0 \text{ (disaggregate cap. at loc. 2)}\\
+            &                     &        &        & \ddots \\
+            &                     &        &        &        & r^\top \mathbf{x}_m & -C y_m +1 w_m  & = 0 \text{ (aggregate cap. at loc. K)}\\
+            &                     &        &        &        & + I \mathbf{x}_m    & -e y_m         & \leq 0 \text{ (disaggregate cap. at loc. K)}
+\end{array}
+\]
+where
+\[
+\mathbf{x}_i = \begin{pmatrix}
+x_{i1} \\ \vdots \\ x_{in}
+\end{pmatrix}, r = \begin{pmatrix}
+r_{1} \\ \vdots \\ r_{n}
+\end{pmatrix} \text{ and }
+e = \begin{pmatrix}
+1 \\ \vdots \\ 1
+\end{pmatrix}.
+\]
+Now the subproblems $F_k x_k = f_k, k = 2, \ldots, K$ are
+\[
+\begin{bmatrix}
+r^\top & -C & 1 \\
+I & e 
+\end{bmatrix} \begin{bmatrix}
+\mathbf{x}_i \\
+y_i \\
+w_i
+\end{bmatrix}
+\begin{matrix}
+= \\ \leq
+\end{matrix}
+\begin{bmatrix}
+0 \\ 0
+\end{bmatrix},
+\]
+\[ c_k^\top = \left[ \begin{array}{c|c|c} 0 & 0 & 1 \end{array} \right], A_k = \left[ \begin{array}{c|c|c} I & 0 & 0 \end{array} \right], \]
+so ${\cal S}_k$ becomes
+\[
+\begin{array}{rr@{\ }r@{\ }r@{\ }l}
+{\cal S}_i: \min  & \sum_{j=1}^n -\pi_j x_{ij} \, &           & +1 w_i & - \gamma_i \\
+\text{subject to} & \sum_{j=1}^n r_j    x_{ij} \, & -C y_i \, & +1 w_i & = 0 \\
+                  &                     x_{ij} \, & -  y_i \, &        & \leq 0, j = 1, \ldots, n \\
+                  &                     x_{ij},   &    y_i,   & \in \{0, 1 \}, & j = 1, \ldots, n, w_i \geq 0
+\end{array}
+\]
+where $\pi_j$ is the dual variable for the assignment constraint for product $j$ in the RMP.
+
+\begin{sloppypar}In Dippy, we define subproblems for each facility location using the \lstinline{.relaxation} syntax for the aggregate and disaggregate capacity constraints:\end{sloppypar}
+\lstinputlisting[firstnumber=32,linerange=32-41]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+All remaining constraints (the assignment constraints that ensure each product is assigned to a facility) form the master problem when using branch-price-and-cut.
+To use branch-price-and-cut we turn on the \lstinline{doPriceCut} option:
+\lstinputlisting[firstnumber=206,linerange=206-209]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+Note that symmetry is also present in the decomposed problem, so we add ordering constraints (described in \sbsref{sbs:branch}) to the RMP :
+\lstinputlisting[firstnumber=43,linerange=43-46]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+\begin{sloppypar}Using branch-price-and-cut, the RMP takes about ten times as long to solve as the original formulation, and has a search tree size of 37 nodes.
+The \lstinline{generateInitVars} option uses CBC by default to find initial columns for the RMP and then uses CBC to solve the relaxed problems.
+Dippy lets us provide our own approaches to solving the relaxed problems and generating initial variables, which may be able to speed up the overall solution process.\end{sloppypar}
+
+In the relaxed problem for location $i$, the objective simplified to $\min \sum_{j=1}^n -\pi_j x_{ij} +1 w_i - \gamma_i$. 
+However, the addition of the ordering constraints and the possibility of a Phase I/Phase II approach in the \ac{MILP} solution process to find initial variables mean that our method must work for any reduced costs, i.e., the objective becomes $\min \sum_{j=1}^n d_j x_{ij} + f y_i + g w_i - \gamma_i$. Although the objective changes, the constraints remain the same. If we choose not to use a location, then $x_{ij} = y_i = w_i = 0$ for $j=1, \ldots, n$ and the objective is $-\gamma_i$. Otherwise, we use the location and $y_i = 1$ and add $f$ to the objective. The relaxed problem reduces to:
+\[
+\begin{array}{rr@{\ }r@{\ }l}
+\min              & \sum_{j=1}^n d_j x_{ij} \, & +g w_i & - \gamma_i \\
+\text{subject to} & \sum_{j=1}^n r_j x_{ij} \, & +1 w_i & = C \\
+                  &                  x_{ij},   &    w_i    & \in \{0, 1 \}, j = 1, \ldots, n
+\end{array}
+\]
+However, the constraint ensures $w_i = C - \sum_{j=1}^n r_j x_{ij}$, so we can reformulate as:
+\[
+\begin{array}{rr@{\ }l}
+\min              & \sum_{j=1}^n (d_j - g r_j) x_{ij} \, & +f C - \gamma_i \\
+\text{subject to} & C - \sum_{j=1}^n r_j x_{ij} & \geq 0 \Rightarrow \sum_{j=1}^n r_j x_{ij} \leq C \\
+                  &                  x_{ij},   & \in \{0, 1 \}, j = 1, \ldots, n
+\end{array}
+\]
+This is a 0-1 knapsack problem with ``effective costs'' costs for each product $j$ of $d_j - g r_j$. We can use dynamic programming to find the optimal solution.
+
+In Dippy, we can access the problem data, variables and their reduced costs, so the 0-1 knapsack dynamic programming solution is straightforward to implement and use:
+\lstinputlisting[firstnumber=66,linerange=66-81]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+$\vdots$\newpage
+\lstinputlisting[firstnumber=83,linerange=83-105]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+Adding this customised solver reduces the solution time because it has the benefit of knowing it is solving a knapsack problem rather than a general \ac{MILP}.
+
+To generate initial facilities (complete with assigned products) we implemented two approaches.
+The first approach used a first-fit method and considered the products in order of decreasing requirement:
+\lstinputlisting[firstnumber=146,linerange=146-169]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+\newpage
+\lstinputlisting[firstnumber=172,linerange=172-184]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+The second approach simply assigned one product to each facility:
+\lstinputlisting[firstnumber=186,linerange=186-197]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+Using Dippy we can define both approaches at once and then define which one to use by setting the \lstinline{init_vars} method:
+\lstinputlisting[firstnumber=199,linerange=199-200]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+These approaches define the initial sets of subproblem solutions $y^k_{l_k}, l_k=1,$ $\ldots, L_k, k = 1, \ldots, K$ for the initial RMP before the relaxed problems are solved using the RMP duals.
+
+The effect of the different combinations of column generation, customised subproblem solvers and initial variable generation methods, both by themselves and combined with branching, heuristics, etc are summarised in \tabref{tab:fac_exp}. For this size of problem, column generation does not reduce the solution time significantly (if at all). However, we show in \scnref{scn:concl} that using column branching enables \ac{DIP} (via Dippy and PuLP) to be competitive with state-of-the-art solvers.

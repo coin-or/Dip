@@ -34,7 +34,7 @@ def draw(path, mytype, id):
         scale = 600
         delta = 20
 
-    if mytype == 3:
+    if mytype == 0:
         scale = 650
         delta = 20
     

@@ -42,7 +42,7 @@ AlpsDecompTreeNode::createNewTreeNode(AlpsNodeDesc*& desc) const
    //---    NOTE: we are not using differencing, constructs node from scratch
    //---
    AlpsDecompModel*     model
-      = dynamic_cast<AlpsDecompModel*>(desc->getModel());
+   = dynamic_cast<AlpsDecompModel*>(desc->getModel());
    AlpsDecompParam&     param = model->getParam();
    UtilPrintFuncBegin(&cout, m_classTag,
                       "createNewTreeNode()", param.msgLevel, 3);
@@ -109,9 +109,9 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //--- get pointer / reference to model, node description, decomp algo(s)
    //---
    AlpsDecompNodeDesc* desc
-      = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
    AlpsDecompModel*     model
-      = dynamic_cast<AlpsDecompModel*>(desc->getModel());
+   = dynamic_cast<AlpsDecompModel*>(desc->getModel());
    AlpsDecompParam&     param      = model->getParam();
    DecompAlgo*          decompAlgo = model->getDecompAlgo();
    CoinAssertDebug(desc && model);
@@ -142,8 +142,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
    const DecompApp*      app       = decompAlgo->getDecompApp();
    DecompConstraintSet* modelCore = decompAlgo->getModelCore().getModel();
    const int             n_cols    = modelCore->getNumCols();
-
    //TODO: cutoffIncrement (currentUB-cutoffIncrement)
+
    /** \todo get primalTolerance from parameter */
    if ((parentObjValue - primalTolerance) > currentUB) {
       doFathom = true;
@@ -190,8 +190,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
             cout << "bound-diffs c: " << c << " -> ";
             app->printOriginalColumn(c, &cout);
             cout << "\t(lb,ub): (" << colLBCore[c] << ","
-                 << colUBCore[c] << ")\t->\t(" << lbs[c]
-                 << "," << ubs[c] << ")" << endl;
+            << colUBCore[c] << ")\t->\t(" << lbs[c]
+            << "," << ubs[c] << ")" << endl;
          }
       }
               );
@@ -325,7 +325,6 @@ int AlpsDecompTreeNode::process(bool isRoot,
                << " doFathom " << doFathom << endl;
               );
       break;
-
    case STAT_INFEASIBLE:
       //---
       //--- the relaxation is infeasible, fathom
@@ -336,7 +335,6 @@ int AlpsDecompTreeNode::process(bool isRoot,
                cout << "Fathom since node infeasible\n";
               );
       break;
-
    default:
       assert(0);
    }
@@ -420,9 +418,9 @@ std::vector< CoinTriple<AlpsNodeDesc*, AlpsNodeStatus, double> >
 AlpsDecompTreeNode::branch()
 {
    AlpsDecompNodeDesc* desc
-      = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
+   = dynamic_cast<AlpsDecompNodeDesc*>(desc_);
    AlpsDecompModel*     m
-      = dynamic_cast<AlpsDecompModel*>(desc->getModel());
+   = dynamic_cast<AlpsDecompModel*>(desc->getModel());
    AlpsDecompParam&     param       = m->getParam();
    AlpsDecompNodeDesc* child       = 0;
    DecompAlgo*          decompAlgo  = m->getDecompAlgo();

@@ -21,10 +21,12 @@ void DippyDecompApp::createModels()
    // create the core model
    DecompConstraintSet* modelCore = new DecompConstraintSet();
    // gets the master problem model
-   PyObject* pMasterAsTuple = PyObject_CallMethod(m_pProb, "getMasterAsTuple", NULL);
+   PyObject* pMasterAsTuple = PyObject_CallMethod(m_pProb, "getMasterAsTuple", 
+						  NULL);
 
    if (pMasterAsTuple == NULL) {
-      throw UtilException("Error calling method prob.getMasterAsTuple()", "createModels", "DippyDecompApp");
+      throw UtilException("Error calling method prob.getMasterAsTuple()", 
+			  "createModels", "DippyDecompApp");
    }
 
    PyObject* pObjective = PyTuple_GetItem(pMasterAsTuple, 0);
@@ -44,19 +46,22 @@ void DippyDecompApp::createModels()
       pRowName = PyObject_CallMethod(pRow, "getName", NULL);
 
       if (pRowName == NULL) {
-         throw UtilException("Error calling method row.getName()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method row.getName()", 
+			     "createModels", "DippyDecompApp");
       }
 
       pRowLb   = PyObject_CallMethod(pRow, "getLb", NULL);
 
       if (pRowLb == NULL) {
-         throw UtilException("Error calling method row.getLb()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method row.getLb()", 
+			     "createModels", "DippyDecompApp");
       }
 
       pRowUb   = PyObject_CallMethod(pRow, "getUb", NULL);
 
       if (pRowUb == NULL) {
-         throw UtilException("Error calling method row.getUb()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method row.getUb()", 
+			     "createModels", "DippyDecompApp");
       }
 
       name = PyString_AsString(pRowName);
@@ -87,25 +92,29 @@ void DippyDecompApp::createModels()
       pColName = PyObject_CallMethod(pCol, "getName", NULL);
 
       if (pColName == NULL) {
-         throw UtilException("Error calling method col.getName()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method col.getName()", 
+			     "createModels", "DippyDecompApp");
       }
 
       pColLb   = PyObject_CallMethod(pCol, "getLb", NULL);
 
       if (pColLb == NULL) {
-         throw UtilException("Error calling method col.getLb()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method col.getLb()", 
+			     "createModels", "DippyDecompApp");
       }
 
       pColUb   = PyObject_CallMethod(pCol, "getUb", NULL);
 
       if (pColUb == NULL) {
-         throw UtilException("Error calling method col.getUb()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method col.getUb()", 
+			     "createModels", "DippyDecompApp");
       }
 
       pIsInt   = PyObject_CallMethod(pCol, "isInteger", NULL);
 
       if (pIsInt == NULL) {
-         throw UtilException("Error calling method col.isInteger()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method col.isInteger()", 
+			     "createModels", "DippyDecompApp");
       }
 
       name = PyString_AsString(pColName);
@@ -130,8 +139,8 @@ void DippyDecompApp::createModels()
          modelCore->integerVars.push_back(j);
       }
 
-      m_colIndices[pCol] = j; // Don't need to increase reference count here as m_rowList
-      // references pCol
+      m_colIndices[pCol] = j; // Don't need to increase reference count here 
+      // as m_rowList references pCol
    }
 
    // set objective coefficients
@@ -146,23 +155,28 @@ void DippyDecompApp::createModels()
       obj[m_colIndices[pCol]] = PyFloat_AsDouble(pCoeff);
    }
 
-   setModelObjective(obj);
+   setModelObjective(obj, m_numCols);
    // set constraint matrix
-   modelCore->M = pyConstraints_AsPackedMatrix(pRowList, m_rowIndices, m_colIndices);
-   modelCore->M->setDimensions(modelCore->rowLB.size(), modelCore->colLB.size());
+   modelCore->M = pyConstraints_AsPackedMatrix(pRowList, m_rowIndices, 
+					       m_colIndices);
+   modelCore->M->setDimensions(modelCore->rowLB.size(), 
+			       modelCore->colLB.size());
    // subproblems
-   PyObject* pRelaxedDict = PyObject_CallMethod(m_pProb, "getRelaxsAsDict", NULL);
+   PyObject* pRelaxedDict = PyObject_CallMethod(m_pProb, "getRelaxsAsDict", 
+						NULL);
 
    if (pRelaxedDict == NULL) {
-      throw UtilException("Error calling method prob.getRelaxsAsDict()", "createModels",
-                          "DippyDecompApp");
+      throw UtilException("Error calling method prob.getRelaxsAsDict()", 
+			  "createModels", "DippyDecompApp");
    }
 
+#if 0
    set<int> masterOnlyCols;
 
    for (int j = 0; j < m_numCols; j++) {
       masterOnlyCols.insert(j);
    }
+#endif
 
    int nRelaxed = 0;
 
@@ -180,12 +194,14 @@ void DippyDecompApp::createModels()
       // each relaxation is a LpProblem
       pKey = PyList_GetItem(m_relaxedKeys, p);
       pRelax = PyDict_GetItem(pRelaxedDict, pKey);
-      m_relaxIndices[pKey] = p; // Don't need to increase reference count here as m_relaxedKeys
-      // references pKey
-      PyObject* pRelaxAsTuple = PyObject_CallMethod(m_pProb, "getRelaxAsTuple", "O", pRelax);
+      m_relaxIndices[pKey] = p; // Don't need to increase reference count here 
+      //as m_relaxedKey references pKey
+      PyObject* pRelaxAsTuple = PyObject_CallMethod(m_pProb, "getRelaxAsTuple",
+						    "O", pRelax);
 
       if (pRelaxAsTuple == NULL) {
-         throw UtilException("Error calling method prob.getRelaxAsTuple()", "createModels", "DippyDecompApp");
+         throw UtilException("Error calling method prob.getRelaxAsTuple()", 
+			     "createModels", "DippyDecompApp");
       }
 
       // row names
@@ -199,19 +215,22 @@ void DippyDecompApp::createModels()
          pRowName = PyObject_CallMethod(pRow, "getName", NULL);
 
          if (pRowName == NULL) {
-            throw UtilException("Error calling method row.getName()", "createModels", "DippyDecompApp");
+            throw UtilException("Error calling method row.getName()", 
+				"createModels", "DippyDecompApp");
          }
 
          pRowLb   = PyObject_CallMethod(pRow, "getLb", NULL);
 
          if (pRowLb == NULL) {
-            throw UtilException("Error calling method row.getLb()", "createModels", "DippyDecompApp");
+            throw UtilException("Error calling method row.getLb()", 
+				"createModels", "DippyDecompApp");
          }
 
          pRowUb   = PyObject_CallMethod(pRow, "getUb", NULL);
 
          if (pRowUb == NULL) {
-            throw UtilException("Error calling method row.getUb()", "createModels", "DippyDecompApp");
+            throw UtilException("Error calling method row.getUb()", 
+				"createModels", "DippyDecompApp");
          }
 
          name = PyString_AsString(pRowName);
@@ -252,15 +271,19 @@ void DippyDecompApp::createModels()
          index = m_colIndices[pCol];
 
          if ( (index < 0) || (index >= m_colIndices.size()) ) {
-            throw UtilException("Bad index for " + name, "createModels", "DippyDecompApp");
+            throw UtilException("Bad index for " + name, "createModels", 
+				"DippyDecompApp");
          }
 
          modelRelax->colUB[index] = modelCore->colUB[index];
          modelRelax->activeColumns.push_back(index);
+#if 0
          masterOnlyCols.erase(masterOnlyCols.find(index));
+#endif
       }
 
-      modelRelax->M->setDimensions(modelRelax->rowLB.size(), modelRelax->colLB.size());
+      modelRelax->M->setDimensions(modelRelax->rowLB.size(), 
+				   modelRelax->colLB.size());
 
       // copy integer vars (from master prob)
       for (int j = 0; j < modelCore->integerVars.size(); j++) {
@@ -270,6 +293,7 @@ void DippyDecompApp::createModels()
       setModelRelax(modelRelax, "BLOCK", p);
    }
 
+#if 0
    // set the master only columns
    set<int>::iterator sit;
 
@@ -278,48 +302,7 @@ void DippyDecompApp::createModels()
    }
 
    printf("Num master-only cols: %d\n", modelCore->masterOnlyCols.size());
-
-   if (modelCore->masterOnlyCols.size() > 0) {
-      //MVG: taken from MILPBlock_DecompApp::createModelMasterOnlys2
-      int nBlocks       = nRelaxed;
-      int numMasterOnly = modelCore->masterOnlyCols.size();
-      vector<int>::iterator vit;
-
-      for (int j = 0; j < numMasterOnly; j++) {
-         i = modelCore->masterOnlyCols[j];
-         DecompConstraintSet* model = new DecompConstraintSet();
-         model->m_masterOnly      = true;
-         model->m_masterOnlyIndex = i;
-         model->m_masterOnlyLB    = modelCore->colLB[i];
-         model->m_masterOnlyUB    = modelCore->colUB[i];
-         vit = std::find(modelCore->integerVars.begin(), modelCore->integerVars.end(), i);
-
-         if (vit == modelCore->integerVars.end()) { // Index i not in modelCore->integerVars
-            model->m_masterOnlyIsInt = false;
-         } else {
-            model->m_masterOnlyIsInt = true;
-         }
-
-         // adjust +/- infinity to DecompInf
-         if (modelCore->colUB[i] > DecompInf) {
-            model->m_masterOnlyUB = DecompInf;
-         }
-
-         if (modelCore->colLB[i] < -DecompInf) {
-            model->m_masterOnlyLB = -DecompInf;
-         }
-
-         UTIL_MSG(m_param.LogDebugLevel, 3,
-                  (*m_osLog)
-                  << "master-only col j=" << j
-                  << " i=" << i
-                  << ", bounds = (" << model->m_masterOnlyLB
-                  << ", " << model->m_masterOnlyUB
-                  << "), is integer = " << model->m_masterOnlyIsInt << endl;);
-         setModelRelax(model, "master_only" + UtilIntToStr(i), nBlocks);
-         nBlocks++;
-      }
-   }
+#endif
 
    // set the core problem
    setModelCore(modelCore, "CORE");
@@ -345,11 +328,13 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
 
    PyObject* pRelaxKey = PyList_GetItem(m_relaxedKeys, whichBlock);
    PyObject* pRedCostList = pyTupleList_FromDoubleArray(redCostX, m_colList);
+   PyObject* pConvexDual = PyFloat_FromDouble(convexDual);
    // call solveRelaxed on DipProblem
+
    PyObject* pVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OOd", 
 					    pRelaxKey,
 					    pRedCostList,
-					    convexDual);
+					    pConvexDual);
 
    if (pVarList == NULL) {
       throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
@@ -405,12 +390,13 @@ bool DippyDecompApp::APPisUserFeasible(const double* x, const int n_cols, const 
 {
    assert(n_cols == m_modelCore.getModel()->getColNames().size());
    PyObject* pSolutionList = pyTupleList_FromDoubleArray(x, m_colList);
+   PyObject* pTolZero = PyFloat_FromDouble(tolZero);
 
    if (!m_pyIsUserFeasible) {
       return true;
    }
 
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "isUserFeasible", "Od", pSolutionList, tolZero);
+   PyObject* pResult = PyObject_CallMethod(m_pProb, "isUserFeasible", "Od", pSolutionList, pTolZero);
 
    if (pResult == NULL) {
       throw UtilException("Error calling method prob.isUserFeasible()", "APPisUserFeasible", "DippyDecompApp");
@@ -579,9 +565,11 @@ int DippyDecompApp::generateInitVars(DecompVarList& initVars)
       pColDict = PyTuple_GetItem(pVarTuple, 1);
       int*     varInds = NULL;
       double* varVals = NULL;
-      int numPairs = pyColDict_AsPackedArrays(pColDict, m_colIndices, &varInds, &varVals);
+      DecompVarType varType; 
+      
+      int numPairs = pyColDict_AsPackedArrays(pColDict, m_colIndices, &varInds, &varVals, varType);
       assert(numPairs == PyObject_Length(pColDict));
-      DecompVar* var =  new DecompVar(numPairs, varInds, varVals, cost);
+      DecompVar* var =  new DecompVar(numPairs, varInds, varVals, cost, varType);
       var->setBlockId(whichBlock);
       initVars.push_back(var);
    }

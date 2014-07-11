@@ -30,12 +30,16 @@ void ATM_DecompApp::initializeApp(UtilParameters & utilParam) {
    //---
    //--- read instance
    //
-   string fileNameA = m_appParam.DataDir
-      + UtilDirSlash() + m_appParam.DataAtm;
-   string fileNameD = m_appParam.DataDir
-      + UtilDirSlash() + m_appParam.DataDate;
-   string fileNameAD = m_appParam.DataDir
-      + UtilDirSlash() + m_appParam.DataAtmDate;
+   string fileNameA, fileNameD, fileNameAD;
+   if (m_appParam.DataDir != "") {
+      fileNameA = m_appParam.DataDir + UtilDirSlash() + m_appParam.DataAtm;
+      fileNameD = m_appParam.DataDir + UtilDirSlash() + m_appParam.DataDate;
+      fileNameAD = m_appParam.DataDir + UtilDirSlash() + m_appParam.DataAtmDate;
+   } else {
+      fileNameA = m_appParam.DataAtm;
+      fileNameD = m_appParam.DataDate;
+      fileNameAD = m_appParam.DataAtmDate;
+   }
    m_instance.readInstance(fileNameA,
                            fileNameD,
                            fileNameAD);
@@ -1238,7 +1242,7 @@ void ATM_DecompApp::createModels(){
    UtilFillN(m_objective, numCols, 0.0);
    for(i = getColOffset_fp(); i < getColOffset_x2(); i++)
       m_objective[i] = 1.0;
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, numCols);
    
    
    //---

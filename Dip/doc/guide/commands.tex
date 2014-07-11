@@ -1,0 +1,140 @@
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx,subfigure}
+\usepackage{hhline}
+\usepackage{arydshln}
+\usepackage{myacronym}
+\usepackage{multirow}
+
+% My adapted version of pythonlisting
+\usepackage{color}
+\usepackage[procnames]{listings}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{palatino}
+\renewcommand{\lstlistlistingname}{Code Listings}
+\renewcommand{\lstlistingname}{Code Listing}
+\definecolor{gray}{gray}{0.5}
+\definecolor{green}{rgb}{0,0.5,0}
+\definecolor{lightgreen}{rgb}{0,0.7,0}
+\definecolor{purple}{rgb}{0.5,0,0.5}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{orange}{rgb}{1,0.5,0}
+%\lstnewenvironment{python}[1][]{
+%\lstset{
+%numbers=left,
+%numberstyle=\sffamily\scriptsize,
+%numberblanklines=false,
+%showstringspaces=false,
+%language=python,
+%basicstyle=\ttfamily\small\setstretch{1},
+%stringstyle=\color{green},
+%showstringspaces=false,
+%alsoletter={1234567890},
+%otherkeywords={\ , \}, \{},
+%keywordstyle=\color{blue},
+%emph={access,and,as,break,class,continue,def,del,elif,else,%
+%except,exec,finally,for,from,global,if,import,in,is,%
+%lambda,not,or,pass,print,raise,return,try,while,assert},
+%emphstyle=\color{orange}\bfseries,
+%emph={[2]self},
+%emphstyle=[2]\color{gray},
+%emph={[4]ArithmeticError,AssertionError,AttributeError,BaseException,%
+%DeprecationWarning,EOFError,Ellipsis,EnvironmentError,Exception,%
+%False,FloatingPointError,FutureWarning,GeneratorExit,IOError,%
+%ImportError,ImportWarning,IndentationError,IndexError,KeyError,%
+%KeyboardInterrupt,LookupError,MemoryError,NameError,None,%
+%NotImplemented,NotImplementedError,OSError,OverflowError,%
+%PendingDeprecationWarning,ReferenceError,RuntimeError,RuntimeWarning,%
+%StandardError,StopIteration,SyntaxError,SyntaxWarning,SystemError,%
+%SystemExit,TabError,True,TypeError,UnboundLocalError,UnicodeDecodeError,%
+%UnicodeEncodeError,UnicodeError,UnicodeTranslateError,UnicodeWarning,%
+%UserWarning,ValueError,Warning,ZeroDivisionError,abs,all,any,apply,%
+%basestring,bool,buffer,callable,chr,classmethod,cmp,coerce,compile,%
+%complex,copyright,credits,delattr,dict,dir,divmod,enumerate,eval,%
+%execfile,exit,file,filter,float,frozenset,getattr,globals,hasattr,%
+%hash,help,hex,id,input,int,intern,isinstance,issubclass,iter,len,%
+%license,list,locals,long,map,max,min,object,oct,open,ord,pow,property,%
+%quit,range,raw_input,reduce,reload,repr,reversed,round,set,setattr,%
+%slice,sorted,staticmethod,str,sum,super,tuple,type,unichr,unicode,%
+%vars,xrange,zip},
+%emphstyle=[4]\color{purple}\bfseries,
+%upquote=true,
+%morecomment=[s][\color{lightgreen}]{"""}{"""},
+%commentstyle=\color{red}\slshape,
+%literate={>>>}{\textbf{\textcolor{darkred}{>{>}>}}}3%
+%         {...}{{\textcolor{gray}{...}}}3,
+%procnamekeys={def,class},
+%procnamestyle=\color{blue}\textbf,
+%framexleftmargin=1mm, framextopmargin=1mm, frame=shadowbox,
+%rulesepcolor=\color{blue},#1
+%}}{}
+
+% Initialise the listing settings
+\lstset{
+numbers=left,
+numberstyle=\sffamily\scriptsize,
+numberblanklines=false,
+showstringspaces=false,
+language=python,
+basicstyle=\ttfamily\footnotesize\setstretch{1},
+stringstyle=\color{green},
+showstringspaces=false,
+alsoletter={1234567890},
+otherkeywords={\ , \}, \{},
+keywordstyle=\color{blue},
+emph={access,and,as,break,class,continue,def,del,elif,else,%
+except,exec,finally,for,from,global,if,import,in,is,%
+lambda,not,or,pass,print,raise,return,try,while,assert},
+emphstyle=\color{orange}\bfseries,
+emph={[2]self},
+emphstyle=[2]\color{gray},
+emph={[4]ArithmeticError,AssertionError,AttributeError,BaseException,%
+DeprecationWarning,EOFError,Ellipsis,EnvironmentError,Exception,%
+False,FloatingPointError,FutureWarning,GeneratorExit,IOError,%
+ImportError,ImportWarning,IndentationError,IndexError,KeyError,%
+KeyboardInterrupt,LookupError,MemoryError,NameError,None,%
+NotImplemented,NotImplementedError,OSError,OverflowError,%
+PendingDeprecationWarning,ReferenceError,RuntimeError,RuntimeWarning,%
+StandardError,StopIteration,SyntaxError,SyntaxWarning,SystemError,%
+SystemExit,TabError,True,TypeError,UnboundLocalError,UnicodeDecodeError,%
+UnicodeEncodeError,UnicodeError,UnicodeTranslateError,UnicodeWarning,%
+UserWarning,ValueError,Warning,ZeroDivisionError,abs,all,any,apply,%
+basestring,bool,buffer,callable,chr,classmethod,cmp,coerce,compile,%
+complex,copyright,credits,delattr,dict,dir,divmod,enumerate,eval,%
+execfile,exit,file,filter,float,frozenset,getattr,globals,hasattr,%
+hash,help,hex,id,input,int,intern,isinstance,issubclass,iter,len,%
+license,list,locals,long,map,max,min,object,oct,open,ord,pow,property,%
+quit,range,raw_input,reduce,reload,repr,reversed,round,set,setattr,%
+slice,sorted,staticmethod,str,sum,super,tuple,type,unichr,unicode,%
+vars,xrange,zip},
+emphstyle=[4]\color{purple}\bfseries,
+upquote=true,
+morecomment=[s][\color{lightgreen}]{"""}{"""},
+commentstyle=\color{red}\slshape,
+literate={>>>}{\textbf{\textcolor{darkred}{>{>}>}}}3%
+         {...}{{\textcolor{gray}{...}}}3,
+procnamekeys={def,class},
+procnamestyle=\color{blue}\textbf,
+framexleftmargin=1mm, framextopmargin=1mm, frame=shadowbox,
+rulesepcolor=\color{blue}
+}
+\usepackage{comment}
+
+\newcommand{\eqnref}[1]{\eqref{#1}}
+
+\newcommand{\scnref}[1]{section \ref{#1}}
+\newcommand{\Scnref}[1]{Section \ref{#1}}
+
+\newcommand{\sbsref}[1]{\S \ref{#1}}
+\newcommand{\Sbsref}[1]{Section \ref{#1}}
+
+\newcommand{\figref}[1]{figure \ref{#1}}
+\newcommand{\Figref}[1]{Figure \ref{#1}}
+
+\newcommand{\tabref}[1]{Table \ref{#1}}
+\newcommand{\Tabref}[1]{Table \ref{#1}}
+
+\newcommand{\twosubs}[2]{\begin{matrix} \\[-14pt] \scriptstyle #1 \\[-3pt] \scriptstyle #2 \end{matrix}} 
+
+% Examples path (added by IRD 14/4/2011)
+\newcommand{\dippypath}[0]{C:/COIN}

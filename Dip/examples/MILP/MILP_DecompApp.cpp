@@ -29,8 +29,12 @@ void MILP_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    //--- read MILP instance (mps format)
    //---
-   string fileName = m_appParam.DataDir 
-      + UtilDirSlash() + m_appParam.Instance;   
+   string fileName;
+   if (m_appParam.DataDir != "") {
+      fileName = m_appParam.DataDir + UtilDirSlash() + m_param.Instance;
+   } else {
+      fileName = m_appParam.Instance;
+   }
 
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
@@ -138,7 +142,7 @@ void MILP_DecompApp::createModels(){
       throw UtilExceptionMemory("createModels", "MMKP_DecompApp");
    memcpy(m_objective, 
           m_mpsIO.getObjCoefficients(), nCols * sizeof(double));
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, nCols);
 
    //---
    //--- Construct the core matrix.

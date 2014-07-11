@@ -1,0 +1,104 @@
+\subsection{The Coke Supply Chain Problem (coke\_func.py and \\ coke\_instance.py)} \label{sbs:coke}
+
+This case study is sourced from the Operations Research Web in the Department of Engineering Science TWiki \cite{coke} (and was originally adapted from Leyland et al. \cite{geoff_coke}). There are 6 coal mines that produce coal. The coal is transported from the 6 mines to a coke-making plant where it is converted to coke using ``thermal decomposition''. Every tonne of coke produced by thermal decomposition requires 1.3 tonnes of coal. From the coke-making plants the coke is transported to one of 6 customers. There are 6 locations where coke-making plants can be constructed. There are 6 different size plants that can be constructed at each location.
+
+The size of a plant determines the coke processing level in kilotonnes/year the plant can produce. \Tabref{tab:plant_size} shows the different plant sizes with their corresponding processing levels and construction cost in million RMB.
+\begin{table}[htp]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\multirow{2}{*}{\bf Plant Size} & {\bf Processing Level} & {\bf Cost} \\
+ & {\bf (kT/year)} & {\bf (MRMB)} \\
+\hline
+1 & 75 & 4.4 \\
+2 & 150 & 7.4 \\
+3 & 225 & 10.5 \\
+4 & 300 & 13.5 \\
+5 & 375 & 16.5 \\
+6 & 450 & 19.6 \\
+\hline
+\end{tabular}
+\caption{Possible plant sizes} \label{tab:plant_size}
+\end{center}
+\end{table}
+
+To get this problem into Dippy we use the PuLP modelling language.  The formulation and solution functions from coke\_func.py are given below with a summary for each fragment.
+
+\begin{enumerate}[leftmargin=0cm,itemindent=0.75cm,labelwidth=.5cm,labelsep=.25cm,labelindent=0cm,align=left]
+\item PuLP and Dippy are loaded in an identical way to bin\_pack\_func.py (see \scnref{sbs:binpack});
+
+\item Define \lstinline{CokeProb}, a class that describes a coal-to-coke conversion and transportation problem;
+\lstinputlisting[firstnumber=26,linerange=26-41]{../../examples/Dippy/coke/coke_func.py}
+
+\item Define the \lstinline{formulate} function, with a coke problem object as input;
+\begin{enumerate}[leftmargin=0cm,itemindent=0.75cm,labelwidth=.5cm,labelsep=.25cm,labelindent=0cm,align=left]
+\item Create a \lstinline{DipProblem} (with some display options defined);
+\lstinputlisting[firstnumber=43,linerange=43-49]{../../examples/Dippy/coke/coke_func.py}
+
+\item Add binary variables that determine the plant sizes at each location and (non-negative) integer variables that determine the flow (in coal from the mines to the plants and coke from the plants to the customers) transported through the network;
+\lstinputlisting[firstnumber=51,linerange=51-58]{../../examples/Dippy/coke/coke_func.py}
+
+\item Add the objective of minimising total cost = building costs (converted from MRMB to RMB) + transportation costs;
+\lstinputlisting[firstnumber=60,linerange=60-64]{../../examples/Dippy/coke/coke_func.py}
+
+\item Add constraints that limit the flow of coke out of a coke-making plant depending on the capacity of the plant constructed;
+\lstinputlisting[firstnumber=66,linerange=66-70]{../../examples/Dippy/coke/coke_func.py}
+
+\item Add constraints that limit the number of coke-making plants built at any single location to be one (Note. there is a size with capacity 0 if no plant will be built);
+\lstinputlisting[firstnumber=72,linerange=72-74]{../../examples/Dippy/coke/coke_func.py}
+
+\item Add constraints to conserve flow at the mines ($\leq$ supply), coke-making plants (flow in $\geq$ coke-from-coal conversion rate $\times$ flow out) and customers ($\geq$ demand);
+\lstinputlisting[firstnumber=76,linerange=76-94]{../../examples/Dippy/coke/coke_func.py}
+\end{enumerate}
+
+\item Define the \lstinline{solve} function as in bin\_pack\_func.py (see \scnref{sbs:binpack}).
+\lstinputlisting[firstnumber=133,linerange={133-133,141-147}]{../../examples/Dippy/coke/coke_func.py}
+\end{enumerate}
+
+To solve an instance of the coke problem, the data needs to be specified and then the problem formulated and solved as demonstrated in the file coke\_instance.py.
+\begin{enumerate}[leftmargin=0cm,itemindent=0.75cm,labelwidth=.5cm,labelsep=.25cm,labelindent=0cm,align=left]
+\item Load the requisite class and functions and define the entry point for Python;
+\lstinputlisting[firstnumber=1,linerange=1-5]{../../examples/Dippy/coke/coke_instance.py}
+
+\item Define the coke-from-coal conversion rate;
+\lstinputlisting[firstnumber=6,linerange=6-6]{../../examples/Dippy/coke/coke_instance.py}
+
+\item Define the supply of coal at the mines, the possible locations and construction costs of the coke-making plants and the demand for coke from the customers.
+\lstinputlisting[firstnumber=8,linerange=8-36]{../../examples/Dippy/coke/coke_instance.py}
+
+\item Define the transportation costs from the mines to the coke-making plants and the coke-making plants to the customers in two tables and use the function \lstinline{read_table} (defined in coke\_func.py -- but omitted for brevity) to read these tables;
+\lstinputlisting[firstnumber=38,linerange=38-61]{../../examples/Dippy/coke/coke_instance.py}
+
+\item Define the transportation costs from the mine $\rightarrow$ plant and plant $\rightarrow$ customer costs;
+\lstinputlisting[firstnumber=63,linerange=63-64]{../../examples/Dippy/coke/coke_instance.py}
+
+\item Create, formulate and solve this instance of the coke problem, then observe the solution (using the function \lstinline{print_var_table} -- defined in coke\_func.py -- but omitted for brevity).
+\lstinputlisting[firstnumber=66,linerange=66-87]{../../examples/Dippy/coke/coke_instance.py}
+
+\end{enumerate}
+
+The solution defines plants to be built at locations 1, 5 and 6 and also defines shipments of coal and coke between the mines, plants and customers (note that the output shown following has been edited a little to line up nicely):
+\begin{verbatim}
+Build L1 150 (1.0)
+Build L2   0 (1.0)
+Build L3   0 (1.0)
+Build L4   0 (1.0)
+Build L5 450 (1.0)
+Build L6 300 (1.0)
+
+       L1      L2	 L3	 L4	   L5	   L6
+M1 	  0.0	    0.0	0.0	0.0	  0.0	 25.8
+M2 	  0.0	    0.0	0.0	0.0	  0.0	340.475
+M3 	124.1175  0.0	0.0	0.0	585.0	  0.0
+M4 	  0.0	    0.0	0.0	0.0	  0.0	  0.0
+M5 	  0.0	    0.0	0.0	0.0	  0.0	  0.0
+M6 	  0.0	    0.0	0.0	0.0	  0.0	  0.0
+
+      C1	 C2	 C3	   C4	   C5	   C6
+L1 	83.0	0.0	6.975	0.0	  0.0	  5.5
+L2 	 0.0	0.0	0.0	  0.0	  0.0	  0.0
+L3 	 0.0	0.0	0.0	  0.0	  0.0	  0.0
+L4 	 0.0	0.0	0.0	  0.0	  0.0	  0.0
+L5 	 0.0	0.0	0.0	  0.0	450.0	  0.0
+L6 	 0.0	5.5	0.0	  5.5	270.75  0.0
+\end{verbatim}

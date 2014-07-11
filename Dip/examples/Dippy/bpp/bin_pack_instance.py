@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# bin_pack_instance.py
 from bin_pack_func import BinPackProb, formulate, solve
 
 if __name__ == '__main__':
@@ -9,7 +10,8 @@ if __name__ == '__main__':
                       capacity = 8)
   
     prob = formulate(bpp)
-  
+
+    # Set a zero tolerance (Mike Saunders' "magic number")	
     prob.tol = pow(pow(2, -24), 2.0 / 3.0)
     xopt = solve(prob)
   

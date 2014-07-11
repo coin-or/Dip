@@ -22,7 +22,7 @@
 //===========================================================================//
 /*!
  * \class MCF_DecompParam
- * Storage for parameters for the 
+ * Storage for parameters for the
  *   Multi-Dimensional Multi-Choice Knapsack Problem (MCF).
  */
 
@@ -35,23 +35,25 @@ public:
    string Instance;           //name of instance
 
 public:
-   void getSettings(UtilParameters & utilParam){
-      static const char * common = "MCF";
+   void getSettings(UtilParameters& utilParam) {
+      static const char* common = "MCF";
       LogLevel       = utilParam.GetSetting("LogLevel",        0,      common);
       UseSparse      = utilParam.GetSetting("UseSparse",       0,      common);
       DataDir        = utilParam.GetSetting("DataDir",        "",      common);
       Instance       = utilParam.GetSetting("Instance",       "",      common);
-      if(!checkOptions())
+
+      if (!checkOptions()) {
          throw UtilException("Bad Parameter", "getSettings", "MCF_Param");
+      }
    }
 
-   bool checkOptions(){
+   bool checkOptions() {
       bool optionsOk = true;
       return optionsOk;
    }
 
-   void dumpSettings(ostream * os = &cout){
-      static const char * common = "MCF";
+   void dumpSettings(ostream* os = &cout) {
+      static const char* common = "MCF";
       (*os) << "\n=====================================================\n"
             << "MCF_DECOMP PARAMETER SETTINGS \n";
       (*os) << common << ": LogLevel          : " << LogLevel      << endl;
@@ -60,14 +62,14 @@ public:
       (*os) << common << ": Instance          : " << Instance      << endl;
       (*os) <<   "=====================================================\n";
    }
-   
+
 public:
    MCF_Param() :
       LogLevel          (0),
       UseSparse         (0),
       DataDir           (""),
-      Instance          ("")
-   {}
+      Instance          ("") {
+   }
    ~MCF_Param() {};
 };
 

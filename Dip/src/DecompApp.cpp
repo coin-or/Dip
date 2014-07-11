@@ -155,12 +155,11 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    //---
    //--- get application parameters
    //---
-
    if (m_param.LogLevel >= 1) {
       m_param.dumpSettings();
    }
 
-   if (!m_param.Concurrent) {
+   if (!m_param.Concurrent && !NumBlocks) {
       //---
       //--- read block file
       //---
@@ -168,7 +167,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    } else
       // automatic structure detection
    {
-      #pragma omp critical
+#pragma omp critical
       singlyBorderStructureDetection();
    }
 
@@ -222,13 +221,17 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
 
    if (m_param.InstanceFormat == "") {
       string::size_type idx = fileName.rfind('.');
+      string extension = fileName.substr(idx + 1);
+      std::size_t found = fileName.substr(0, idx).rfind('.');
+
+      if (found != std::string::npos && extension == "gz") {
+         extension = fileName.substr(found + 1);
+      }
 
       if (idx != string::npos) {
-         string extension = fileName.substr(idx + 1);
-
-         if (extension == "MPS" || extension == "mps") {
+         if (extension == "MPS" || extension == "mps" || extension == "mps.gz") {
             m_param.InstanceFormat = "MPS";
-         } else if (extension == "LP" || extension == "lp") {
+         } else if (extension == "LP" || extension == "lp" || extension == "lp.gz") {
             m_param.InstanceFormat = "LP";
          }
       } else {
@@ -262,7 +265,7 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
       throw UtilException("I/O Error.", "initalizeApp", "DecompApp");
    }
 
-   if (m_param.LogLevel >= 2)
+   if (m_param.LogLevel >= 2) {
       if (m_param.InstanceFormat == "MPS") {
          (*m_osLog) << "Objective Offset = "
                     << UtilDblToStr(m_mpsIO.objectiveOffset()) << endl;
@@ -270,6 +273,7 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
          (*m_osLog) << "Objective Offset = "
                     << UtilDblToStr(m_lpIO.objectiveOffset()) << endl;
       }
+   }
 
    //---
    //--- set best known lb/ub
@@ -290,6 +294,9 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
       return m_mpsIO.getMatrixByRow();
    } else if (m_param.InstanceFormat == "LP") {
       return m_lpIO.getMatrixByRow();
+   } else {
+      std::cerr << "Unknown InstanceFormat" << std::endl;
+      return NULL;
    }
 }
 
@@ -303,7 +310,7 @@ void DecompApp::readBlockFile()
    string fileName;
 
    if (m_param.DataDir != "") {
-      fileName = m_param.DataDir + UtilDirSlash() + m_param.Instance;
+      fileName = m_param.DataDir + UtilDirSlash() + m_param.BlockFile;
    } else {
       fileName = m_param.BlockFile;
    }
@@ -588,7 +595,7 @@ void DecompApp::readBlockFile()
    } else {
       cerr << "Error: BlockFileFormat = "
            << m_param.BlockFileFormat
-           << " is an invalid type. Valid types = (List,ZIBlist,Pair,PairName)."
+           << " is an invalid type. Valid types = (List,ZIBList,Pair,PairName)."
            << endl;
       throw UtilException("Invalid Parameter.",
                           "readBlockFile", "DecompApp");
@@ -659,17 +666,11 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
    for (mit = m_modelR.begin(); mit != m_modelR.end(); mit++) {
       int                   blockIndex = mit->first;
       DecompConstraintSet* model      = mit->second;
+      const vector<int>& activeColumns = model->getActiveColumns();
+      vector<int>::const_iterator vit;
 
-      if (model->m_masterOnly) {
-         colIndexToBlockIndex.insert(make_pair(model->m_masterOnlyIndex,
-                                               blockIndex));
-      } else {
-         const vector<int>& activeColumns = model->getActiveColumns();
-         vector<int>::const_iterator vit;
-
-         for (vit = activeColumns.begin(); vit != activeColumns.end(); vit++) {
-            colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
-         }
+      for (vit = activeColumns.begin(); vit != activeColumns.end(); vit++) {
+         colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
       }
    }
 
@@ -709,7 +710,7 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
       colIndex        = colNameToIndex[colName];
       blockIndex      = colIndexToBlockIndex[colIndex];
       DecompConstraintSet* model = m_modelR[blockIndex];
-
+      /*
       if (model->m_masterOnly) {
          printf("MasterOnly col=%s value=%g lb=%g ub=%g",
                 colName.c_str(), colValue, colLB[colIndex], colUB[colIndex]);
@@ -722,7 +723,7 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
 
          printf("\n");
       }
-
+      */
       pair<int, int> p = make_pair(solutionIndex, blockIndex);
       it = varTemp.find(p);
 
@@ -779,13 +780,18 @@ void DecompApp::findActiveColumns(const vector<int>& rowsPart,
    }
 
    const int*               ind  = M->getIndices();
+
    const int*               beg  = M->getVectorStarts();
+
    const int*               len  = M->getVectorLengths();
+
    const int*               indR = NULL;
+
    //---
    //--- which columns are present in this part's rows
    //---
    int k, r;
+
    vector<int>::const_iterator it;
 
    for (it = rowsPart.begin(); it != rowsPart.end(); it++) {
@@ -796,87 +802,6 @@ void DecompApp::findActiveColumns(const vector<int>& rowsPart,
          activeColsSet.insert(indR[k]);
       }
    }
-}
-
-void DecompApp::createModelMasterOnlys(vector<int>& masterOnlyCols)
-{
-   int            nBlocks     = static_cast<int>(m_blocks.size());
-   int      nCols       = 0;
-   double* colLB       = NULL;
-   double* colUB       = NULL;
-   char*    integerVars = NULL;
-
-   if (m_param.InstanceFormat == "MPS") {
-      nCols       = m_mpsIO.getNumCols();
-      colLB       = const_cast <double*>(m_mpsIO.getColLower());
-      colUB       = const_cast <double*>(m_mpsIO.getColUpper());
-      integerVars = const_cast <char*>  (m_mpsIO.integerColumns());
-   } else if (m_param.InstanceFormat == "LP") {
-      nCols       = m_lpIO.getNumCols();
-      colLB       = const_cast <double*>(m_lpIO.getColLower());
-      colUB       = const_cast <double*>(m_lpIO.getColUpper());
-      integerVars = const_cast <char*>  (m_lpIO.integerColumns());
-   }
-
-   int            nMasterOnlyCols =
-      static_cast<int>(masterOnlyCols.size());
-
-   if (m_param.LogLevel >= 1) {
-      (*m_osLog) << "nCols           = " << nCols << endl;
-      (*m_osLog) << "nMasterOnlyCols = " << nMasterOnlyCols << endl;
-   }
-
-   if (nMasterOnlyCols == 0) {
-      return;
-   }
-
-   int i;
-   vector<int>::iterator vit;
-
-   for (vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++) {
-      i = *vit;
-      //THINK:
-      //  what-if master-only var is integer and bound is not at integer
-      DecompConstraintSet* model = new DecompConstraintSet();
-      model->m_masterOnly      = true;
-      model->m_masterOnlyIndex = i;
-      model->m_masterOnlyLB    = colLB[i];
-      model->m_masterOnlyUB    = colUB[i];
-      //0=cont, 1=integer
-      model->m_masterOnlyIsInt =
-         (integerVars && integerVars[i]) ? true : false;
-
-      if (colUB[i]            >  1.0e15 &&
-            m_param.ColumnUB >= 1.0e15)
-         (*m_osLog) << "WARNING: Master-only column " << i
-                    << " has unbounded upper bound. DIP does not"
-                    << " yet support extreme rays. Please bound all"
-                    << " variables or use the ColumnUB parameter." << endl;
-
-      if (colLB[i]            <  -1.0e15 &&
-            m_param.ColumnLB <= -1.0e15)
-         (*m_osLog) << "WARNING: Master-only column " << i
-                    << " has unbounded lower bound. DIP does not"
-                    << " yet support extreme rays. Please bound all"
-                    << " variables or use the ColumnLB parameter." << endl;
-
-      if (m_param.ColumnUB <  1.0e15)
-         if (colUB[i] >  1.0e15) {
-            model->m_masterOnlyUB = m_param.ColumnUB;
-         }
-
-      if (m_param.ColumnLB > -1.0e15)
-         if (colLB[i] < -1.0e15) {
-            model->m_masterOnlyLB = m_param.ColumnLB;
-         }
-
-      m_modelR.insert(make_pair(nBlocks, model));
-      setModelRelax(model,
-                    "master_only" + UtilIntToStr(i), nBlocks);
-      nBlocks++;
-   }
-
-   return;
 }
 
 void DecompApp::createModelPart(DecompConstraintSet* model,
@@ -1114,16 +1039,27 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
    }
 
    const int*               matInd         = M->getIndices();
+
    const CoinBigIndex*      matBeg         = M->getVectorStarts();
+
    const int*               matLen         = M->getVectorLengths();
+
    const double*            matVal         = M->getElements();
+
    const int*               matIndI        = NULL;
+
    const double*            matValI        = NULL;
+
    vector<CoinBigIndex>&    rowBeg         = model->m_rowBeg;//used as temp
+
    vector<int         >&    rowInd         = model->m_rowInd;//used as temp
+
    vector<double      >&    rowVal         = model->m_rowVal;//used as temp
+
    map<int, int>::const_iterator mit;
+
    begInd = 0;
+
    rowBeg.push_back(0);
 
    for (i = 0; i < nRowsPart; i++) {
@@ -1263,7 +1199,7 @@ void DecompApp::createModels()
       }
    }
 
-   setModelObjective(objective);
+   setModelObjective(objective, nCols);
    //---
    //--- Construct the core matrix.
    //---
@@ -1338,6 +1274,7 @@ void DecompApp::createModels()
       }
    }
 
+   // find master Only Cols
    for (i = 0; i < nCols; i++) {
       if (!colMarker[i]) {
          if (m_param.LogLevel >= 3) {
@@ -1358,6 +1295,11 @@ void DecompApp::createModels()
       if (modelCore->getColNames().size() > 0)
          UtilPrintVector(modelCore->masterOnlyCols,
                          modelCore->getColNames(), m_osLog);
+   }
+
+   if (m_param.LogLevel >= 3) {
+      std::cout << "the number of masterOnlyCols is " << modelCore->masterOnlyCols.size()
+                << std::endl ;
    }
 
    //---
@@ -1385,31 +1327,9 @@ void DecompApp::createModels()
    }
 
    //---
-   //--- create an extra "empty" block for the master-only vars
-   //---   since I don't know what OSI will do with empty problem
-   //---   we will make column bounds explicity rows
-   //---
-   ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
-   int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
-
-   if (nMasterOnlyCols) {
-      if (m_param.LogLevel >= 1) {
-         (*m_osLog) << "Create model part Master-Only." << endl;
-      }
-
-      if (m_param.LogLevel >= 2) {
-         (*m_osLog) << "The number of master Only Cols is: "
-                    << nMasterOnlyCols << std::endl;
-         (*m_osLog) << "(kappa) The percentage of Master Only Cols over total columns is "
-                    << double(nMasterOnlyCols) / nCols << std::endl;
-      }
-
-      createModelMasterOnlys(modelCore->masterOnlyCols);
-   }
-
-   //---
    //--- free up local memory
    //---
+   UTIL_DELARR(objective);
    UTIL_DELARR(rowsMarker);
    UTIL_DELARR(rowsCore);
    UTIL_DELARR(colMarker);
@@ -1434,6 +1354,14 @@ int DecompApp::generateInitVars(DecompVarList & initVars){
 
 void DecompApp::singlyBorderStructureDetection()
 {
+   std::ofstream blockdata;
+   std::string BlockFile;
+   BlockFile = m_param.Instance + '.' + "block";
+
+   if (m_param.BlockFileOutput) {
+      blockdata.open (BlockFile.c_str());
+   }
+
    //======================================================================
    // Using Row-net hypergraph model for automatic matrix decomposition
    //======================================================================
@@ -1513,7 +1441,7 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    // declaring the number of partitions
-   int nparts = m_param.NumBlocks;
+   int nparts = NumBlocks;
    // weights of vertices and hyperedges
    int* vwgts = new int[numVertices] ;
    int* hewgts = new int[numHyperedges] ;
@@ -1550,9 +1478,9 @@ void DecompApp::singlyBorderStructureDetection()
 
       for ( int j = 0 ; j < lengthRows[i] ; j ++ ) {
          index = index_base + j ;
+
          // determine whether the corresponding column is
          // integer or not
-
          if (m_param.InstanceFormat == "MPS") {
             isInteger = m_mpsIO.isInteger(minorIndex[index]);
          } else if (m_param.InstanceFormat == "LP") {
@@ -1575,9 +1503,7 @@ void DecompApp::singlyBorderStructureDetection()
    /*
     *  define the weight parameter in the hypergraph
     */
-
    // assign the weights on vertices
-
    for (int i = 0 ; i < numVertices ; i ++) {
 #ifdef VARIABLE_WEIGHT
 
@@ -1593,7 +1519,6 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    // assign the weights on hyperedges
-
    for (int i = 0 ; i < numHyperedges; i ++) {
 #ifdef VARIABLE_WEIGHT
 
@@ -1685,7 +1610,6 @@ void DecompApp::singlyBorderStructureDetection()
     * Identify the coupling row in the matrix by storing
     * them in a net set
     */
-
    for ( int i = 0 ; i < numRows ; i ++) {
       for ( int j = 0 ; j < lengthRows[i] ; j ++ ) {
          index = index_base + j ;
@@ -1746,8 +1670,18 @@ void DecompApp::singlyBorderStructureDetection()
       }
 
       if (numRowIndex.size() != 0) {
+         //GCG defaults 1 as starting block number, DIP had default value 0 but
+         // 1 should be fine, which is why we add 1
+         blockdata << "BLOCK " << (truePartNum + 1) << "\n";
+
          for (rowIter = numRowIndex.begin(); rowIter != numRowIndex.end();
                rowIter++) {
+            if (m_param.InstanceFormat == "MPS") {
+               blockdata << m_mpsIO.rowName(*rowIter) << "\n";
+            } else if (m_param.InstanceFormat == "LP") {
+               blockdata << m_lpIO.rowName(*rowIter) << "\n";
+            }
+
             rowsBlock.push_back(*rowIter);
          }
 
@@ -1758,6 +1692,26 @@ void DecompApp::singlyBorderStructureDetection()
       numRowIndex.clear();
       rowsBlock.clear();
       temp.clear();
+   }
+
+   blockdata.close();
+
+   if (m_param.BlockFileOutput) {
+      fstream input_file;
+      input_file.open(BlockFile.c_str(), ios::in);
+      std::ofstream blockdata2;
+      std::string BlockFile2;
+      BlockFile2 = m_param.Instance + '.' + "dec";
+      blockdata2.open(BlockFile2.c_str());
+      blockdata2 << "NBLOCKS " << truePartNum << "\n";
+      string line;
+
+      while (!input_file.eof()) {
+         getline(input_file, line);
+         blockdata2 << line << "\n";
+      }
+
+      blockdata2.close();
    }
 
    UTIL_DELARR(eptr);
@@ -1777,7 +1731,10 @@ void DecompApp::singlyBorderStructureDetection()
 #ifdef PaToH
    PaToH_Free();
 #endif
-   std::cout << "The number of blocks is " << nparts << std::endl;
+
+   if (m_threadIndex != 0) {
+      std::cout << "The number of blocks is " << truePartNum << std::endl;
+   }
 }
 
 

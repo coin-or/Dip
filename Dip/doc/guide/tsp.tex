@@ -1,0 +1,54 @@
+
+\subsection{The Travelling Salesperson Problem (tsp.py)} \label{sbs:tsp}
+
+This case study is a small \acf{TSP} example. This problem differs from the previous case studies (\sbsref{sbs:facility} and \sbsref{sbs:coke}) in that it can't be expressed explicitly for any reasonable size problem. To completely define the \ac{TSP} problem requires a number of subtour elimination constraints that is $O(2^n)$ where $n = |N|$ is the number of locations the salesperson must visit in their tour. The standard way to solve \ac{TSP} problems is to use a formulation without any subtour elimination constraints and dynamically add only the subtour elimination constraints needed to define an optimal tour. Here we will use PuLP to define the \ac{MILP} formulation without subtour elimination constraints.
+
+\begin{enumerate}
+\item Load PuLP, Dippy and the square root function from the math module;
+\lstinputlisting[linerange=1-3]{../../examples/Dippy/tsp/tsp.py}
+
+\newpage
+
+\item Define the cities and their locations in the $xy$-plane. Also, define empty structures for arcs between each pair of cities and int/out of cities;
+\lstinputlisting[firstnumber=7,linerange=7-17]{../../examples/Dippy/tsp/tsp.py}
+
+\item Define the Euclidean distance using {\tt sqrt};
+\lstinputlisting[firstnumber=19,linerange=19-21]{../../examples/Dippy/tsp/tsp.py}
+
+\item Define the arcs between cities, the arcs in/out of a city and the cost of the arcs as the distance between cities;
+\lstinputlisting[firstnumber=21,linerange=23-31]{../../examples/Dippy/tsp/tsp.py}
+
+\item Use the standard \ac{TSP} \ac{MILP} formulation without any subtour constraints. The standard formulation is:
+\begin{align*}
+\min & \sum_{(i, j) \in A} c_{ij} x_{ij} \\
+     & \sum_{\twosubs{(i, j) \in A}{i = k \text{ or } j = k}} x_{ij} = 2, k \in N.
+\end{align*}
+\lstinputlisting[firstnumber=33,linerange=33-38]{../../examples/Dippy/tsp/tsp.py}
+\lstinputlisting[firstnumber=40,linerange=40-42]{../../examples/Dippy/tsp/tsp.py}
+
+\item  Solve the \ac{TSP} using \ac{DIP} and display the minimum cost tour;
+\lstinputlisting[firstnumber=118,linerange=118-124]{../../examples/Dippy/tsp/tsp.py}
+
+\end{enumerate}
+
+Solving the \ac{TSP} using \ac{DIP} takes 0.13s of CPU time and gives the following solution:
+\begin{verbatim}
+(5, 9) 1.0
+(4, 7) 1.0
+(1, 3) 1.0
+(4, 8) 1.0
+(5, 6) 1.0
+(6, 9) 1.0
+(2, 3) 1.0
+(0, 1) 1.0
+(7, 8) 1.0
+(0, 2) 1.0
+\end{verbatim}
+with 3 subtours:
+\begin{enumerate}
+\item $0 \rightarrow 1 \rightarrow 3 \rightarrow 2 \rightarrow 0$;
+\item $4 \rightarrow 7 \rightarrow 8 \rightarrow 4$;
+\item $5 \rightarrow 6 \rightarrow 9 \rightarrow 5$.
+\end{enumerate}
+
+The optimal \ac{TSP} solution can only be found by adding user-defined cuts that remove subtours. \Scnref{scn:cuts} describes how to implement these user-defined cuts in Dippy and shows how these cuts combine with the \ac{CGL} cuts to efficiently solve this \ac{TSP}.

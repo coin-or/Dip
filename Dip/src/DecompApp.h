@@ -67,11 +67,14 @@ protected:
    double m_bestKnownLB;
    double m_bestKnownUB;
 
-
-
-
-
 public:
+
+   /** Number of Blocks
+       defalut value 0
+       set by BlockNumInput parameter
+   **/
+   int NumBlocks;
+
    /**
     *  Parameters.
     */
@@ -132,6 +135,16 @@ public:
    std::map<int, std::vector<int> > m_blocks;
 
 
+   /**
+    * serves as an index to track different DecompApp
+    * object during Concurrent process, where
+    * when m_threadIndex is 0, problem is solved by
+    * cutting plance from standalone solver, when it
+    * is greater than 0, it is solved by branch-and-price,
+    *
+    **/
+
+   int m_threadIndex;
 
 public:
    /**
@@ -176,9 +189,12 @@ public:
     *
     * NOTE: The user application MUST call this method.
     */
-   inline void setModelObjective(const double* objective) {
+   inline void setModelObjective(const double* objective, const
+                                 int length) {
       assert(objective);
-      m_objective = objective;
+      double* obj = new double[length];
+      memcpy(obj, objective, length * sizeof(double));
+      m_objective = obj;
    }
 
    /**
@@ -405,7 +421,6 @@ public:
                               const int             nRowsPart,
                               const int*            rowsPart);
 
-   void createModelMasterOnlys(std::vector<int>& masterOnlyCols);
 
    void readInitSolutionFile(DecompVarList& initVars);
 
@@ -448,15 +463,33 @@ public:
     * object (UtilParameters) and reads in the parameter settings into the
     * DecompApp paramter object.
     */
+
+
+   DecompApp(UtilParameters& utilParam) :
+      m_classTag   ("D-APP"),
+      m_osLog      (&std::cout  ),
+      m_bestKnownLB(-1e75  ),
+      m_bestKnownUB( 1e75  ),
+      NumBlocks    (  0    ),
+      m_objective  ( NULL  ),
+      m_matrix     ( NULL  ),
+      m_modelC     ( NULL  ),
+      m_threadIndex(  0    ) {
+      m_param.getSettings(utilParam);
+      startupLog();
+   };
+
+
    DecompApp() :
       m_classTag   ("D-APP"),
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
-      m_objective  ( 0     ),
-      m_matrix     ( 0     ),
-      m_modelC     ( 0     ),
-      m_modelR     ( ) {
+      NumBlocks    ( 0     ),
+      m_objective  ( NULL  ),
+      m_matrix     ( NULL  ),
+      m_modelC     ( NULL  ),
+      m_threadIndex(  0    ) {
       //---
       //--- comment these functions, which were used in
       //--- MILPBlock, otherwise, conflict occurs in building
@@ -473,8 +506,6 @@ public:
       UTIL_DELARR(m_objective);
       UtilDeleteMapPtr(m_modelR);
       UTIL_DELPTR(m_modelC);
-      UTIL_DELPTR(m_matrix);
-      //     std::cout << "destructor is called " << std::endl;
    };
 };
 

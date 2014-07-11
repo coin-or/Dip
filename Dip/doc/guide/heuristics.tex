@@ -1,0 +1,31 @@
+\begin{sloppypar}To add user-defined heuristics in Dippy, we first define a new procedure for node heuristics, \lstinline{heuristics}.
+This function has three inputs:
+\begin{enumerate}
+\item \lstinline{prob} -- the \lstinline{DipProblem} being solved;
+\item \lstinline{xhat} -- an indexable object representing the fraction solution at the current node;
+\item \lstinline{cost} -- the objective coefficients of the variables.
+\end{enumerate}
+Multiple heuristics can be executed and all heuristic solutions can be returned to \ac{DIP}.
+\lstinputlisting[firstnumber=216,linerange=216-229]{../../examples/Dippy/bpp/bin_pack_func.py}
+A heuristic that solves the original problem may not be as useful when a fractional solution is available, so we demonstrate two different heuristics here: a ``first-fit'' heuristic and a ``fractional-fit'' heuristic.\end{sloppypar}
+
+In the facility location problem, an initial allocation of production to locations can be found using the same first-fit heuristic that provided initial solutions for the column generation approach (see \sbsref{sbs:column}).
+The first-fit heuristic iterates through the items requiring production and the facility locations allocating production at the first facility that has sufficient capacity to produce the item.
+This can then be used to provide an initial, feasible solution at the root node within the customised \lstinline{heuristics} function.\newpage
+\lstinputlisting[firstnumber=141,linerange=141-163]{../../examples/Dippy/bpp/bin_pack_func.py}
+
+At each node in the branch-and-bound tree, the fractional solution (provided by \lstinline{xhat}) gives an indication of the best allocation of production.
+One heuristic approach to ``fixing'' the fractional solution is to consider each allocation (of an item's production to a facility) in order of decreasing fractionality and use a first-fit approach.
+\newpage
+\lstinputlisting[firstnumber=165,linerange=165-214]{../../examples/Dippy/bpp/bin_pack_func.py}
+%\newpage
+%\lstinputlisting[firstnumber=194,linerange=194-209]{../../examples/Dippy/bpp/bin_pack_decomp_func.py}
+
+
+Running the first-fit heuristic before starting the branching process has little effect on the solution time and does not reduce the number of nodes.
+Adding the first-fit heuristic guided by fractional values increases the solution time slightly and the number of nodes remains at 419.
+The reason this heuristic was not that helpful for this problem instance is that:
+\begin{itemize}
+\item the optimal solution is found within the first 10 nodes without any heuristics, so the heuristic only provides an improved upper bound for $< 10$ nodes;
+\item the extra overhead of the heuristic at each node increases the solution time more than any decrease from exploring fewer nodes.
+\end{itemize}

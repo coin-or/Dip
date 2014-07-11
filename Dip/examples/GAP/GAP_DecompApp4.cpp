@@ -17,26 +17,25 @@
 #include "DecompVar.h"
 
 //===========================================================================//
-void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
-   
-
+void GAP_DecompApp::initializeApp(UtilParameters& utilParam)
+{
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "initializeApp()", m_appParam.LogLevel, 2);
-   
+                      "initializeApp()", m_appParam.LogLevel, 2);
    //---
    //--- get application parameters
    //---
    m_appParam.getSettings(utilParam);
-   if(m_appParam.LogLevel >= 1)
+
+   if (m_appParam.LogLevel >= 1) {
       m_appParam.dumpSettings(m_osLog);
-   
+   }
+
    //---
    //--- read instance
    //
    string instanceFile = m_appParam.DataDir
-      + UtilDirSlash() + m_appParam.Instance;
+                         + UtilDirSlash() + m_appParam.Instance;
    m_instance.readInstance(instanceFile);
-
    //---
    //--- read best known lb/ub (for debugging)
    //---
@@ -44,29 +43,25 @@ void GAP_DecompApp::initializeApp(UtilParameters & utilParam) {
    m_instance.readBestKnown(bestKnownFile, m_appParam.Instance);
    setBestKnownLB(m_instance.getBestKnownLB());
    setBestKnownUB(m_instance.getBestKnownUB());
-
    //---
    //--- create models
    //---
    createModels();
-   
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "initializeApp()", m_appParam.LogLevel, 2);
 }
 
 // --------------------------------------------------------------------- //
-int GAP_DecompApp::createModelPartAP(DecompConstraintSet * model){
-   
+int GAP_DecompApp::createModelPartAP(DecompConstraintSet* model)
+{
    int             i, j, colIndex;
    int             status     = GAPStatusOk;
    int             nTasks     = m_instance.getNTasks();    //n
    int             nMachines  = m_instance.getNMachines(); //m
    int             nCols      = nTasks * nMachines;
    int             nRows      = nTasks;
-   
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModelPartAP()", m_appParam.LogLevel, 2);
-
+                      "createModelPartAP()", m_appParam.LogLevel, 2);
    //---
    //--- Build the core model constraints (AP = assignment problem).
    //---
@@ -81,16 +76,14 @@ int GAP_DecompApp::createModelPartAP(DecompConstraintSet * model){
    //---    x   x   x   = 1 [j=3]
    //---     x   x   x  = 1 [j=4]
    //---
-
    //---
    //--- Allocate an empty row-ordered CoinPackedMatrix. Since we plan
    //---   to add rows, set the column dimension and let the row dimension
    //---   be set dynamically.
-   //---   
+   //---
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
    CoinAssertHint(model->M, "Error: Out of Memory");
    model->M->setDimensions(0, nCols);
-
    //---
    //--- we know the sizes needed, so reserve space for them (for efficiency)
    //---
@@ -100,50 +93,51 @@ int GAP_DecompApp::createModelPartAP(DecompConstraintSet * model){
    //--- create one row per task
    //---   rowNames are not needed, they are used for debugging
    //---
-   for(j = 0; j < nTasks; j++){
+   for (j = 0; j < nTasks; j++) {
       CoinPackedVector row;
       string           rowName = "a(j_" + UtilIntToStr(j) + ")";
-      for(i = 0; i < nMachines; i++){
-         colIndex = getIndexIJ(i,j);
+
+      for (i = 0; i < nMachines; i++) {
+         colIndex = getIndexIJ(i, j);
          row.insert(colIndex, 1.0);
       }
+
       model->appendRow(row, 1.0, 1.0, rowName);
    }
-   
-   //---   
+
+   //---
    //--- set the col upper and lower bounds (all in [0,1])
    //---
    UtilFillN(model->colLB, nCols,  0.0);
    UtilFillN(model->colUB, nCols,  1.0);
-
    //---
-   //--- set the indices of the integer variables of model 
+   //--- set the indices of the integer variables of model
    //---   (all vars are binary)
    //---
    UtilIotaN(model->integerVars, nCols, 0);
-   
    //---
    //--- set column names for debugging
    //---
    colIndex = 0;
-   for(i = 0; i < nMachines; i++){
-      for(j = 0; j < nTasks; j++){
+
+   for (i = 0; i < nMachines; i++) {
+      for (j = 0; j < nTasks; j++) {
          string colName = "x("
-            + UtilIntToStr(colIndex) + "_"
-            + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
+                          + UtilIntToStr(colIndex) + "_"
+                          + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
          model->colNames.push_back(colName);
          colIndex++;
-      }      
+      }
    }
-   
+
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModelPartAP()", m_appParam.LogLevel, 2);
-
    return status;
 }
 
 //===========================================================================//
-int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model){
+int GAP_DecompApp::createModelPartKP(DecompConstraintSet* model)
+{
    //---
    //--- helper method - create model with nMachines KPs
    //---
@@ -154,8 +148,9 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model){
 }
 
 //===========================================================================//
-int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model, 
-                                     int                   whichKnap){
+int GAP_DecompApp::createModelPartKP(DecompConstraintSet* model,
+                                     int                   whichKnap)
+{
    //---
    //--- helper method - create model with one (whichKnap) KP
    //---
@@ -165,22 +160,20 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model,
 }
 
 //===========================================================================//
-int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model, 
-                                     vector<int>         & whichKnaps){
-   
+int GAP_DecompApp::createModelPartKP(DecompConstraintSet* model,
+                                     vector<int>&          whichKnaps)
+{
    int          i, j, b, colIndex;
    int          status     = GAPStatusOk;
    int          nTasks     = m_instance.getNTasks();    //n
    int          nMachines  = m_instance.getNMachines(); //m
    int          nKnaps     = static_cast<int>(whichKnaps.size());
-   const int *  weight     = m_instance.getWeight();   
-   const int *  capacity   = m_instance.getCapacity();
+   const int*   weight     = m_instance.getWeight();
+   const int*   capacity   = m_instance.getCapacity();
    int          nCols      = nTasks * nKnaps;
    int          nRows      = nKnaps;
-
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModelPartKP()", m_appParam.LogLevel, 2);
-
+                      "createModelPartKP()", m_appParam.LogLevel, 2);
    //---
    //--- Build the relax model constraints (KP = assignment problem).
    //---
@@ -195,7 +188,6 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model,
    //---      xxxx     <= b[i=2]
    //---          xxxx <= b[i=3]
    //---
-
    //---
    //--- Allocate an empty row-ordered CoinPackedMatrix. Since we plan
    //---   to add rows, set the column dimension and let the row dimension
@@ -203,23 +195,20 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model,
    //--- NOTE: this matrix is sparse version. So, nCols is just the number
    //---   of active columns. That is, if we are generating one KP per block,
    //---   then there are only nTasks columns in this model.
-   //---  
+   //---
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
    CoinAssertHint(model->M, "Error: Out of Memory");
    model->M->setDimensions(0, nCols);
-
    //---
    //--- we know the sizes needed, so reserve space for them (for efficiency)
    //---
    model->reserve(nRows, nCols);
-
    //---
    //--- tell the solver that this block is represented sparsely
-   //---   as an argument, tell the method how many columns are 
+   //---   as an argument, tell the method how many columns are
    //---   in the original compact formulation
    //---
    model->setSparse(nTasks * nMachines);
-
    //---
    //--- create the columns using the pushCol interface
    //---    and setup the mapping between sparse and dense models
@@ -231,60 +220,62 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet * model,
    //---           index for the original compact formulation )
    //---
    vector<int>::iterator it;
-   for(it = whichKnaps.begin(); it != whichKnaps.end(); it++){
+
+   for (it = whichKnaps.begin(); it != whichKnaps.end(); it++) {
       b = *it;
-      for(i = 0; i < nMachines; i++)
-         for(j = 0; j < nTasks; j++)
-            if(i == b){
-	       //---
-	       //--- set column names for debugging
-	       //---
-	       string colName = "x("
-		  + UtilIntToStr(getIndexIJ(i,j)) + "_"
-		  + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
-	       model->colNames.push_back(colName);	       
-	       model->pushCol(0.0, 1.0, true, getIndexIJ(i,j));
-	    }
+
+      for (i = 0; i < nMachines; i++)
+         for (j = 0; j < nTasks; j++)
+            if (i == b) {
+               //---
+               //--- set column names for debugging
+               //---
+               string colName = "x("
+                                + UtilIntToStr(getIndexIJ(i, j)) + "_"
+                                + UtilIntToStr(i) + "," + UtilIntToStr(j) + ")";
+               model->colNames.push_back(colName);
+               model->pushCol(0.0, 1.0, true, getIndexIJ(i, j));
+            }
    }
-   
+
    //---
    //--- create one row per knapsack
    //----  this is a sparse matrix, so use mapping between original
    //---   rowNames are not needed, they are used for debugging
-   //---    
-   const map<int,int> &  origToSparse = model->getMapOrigToSparse();
-   map<int,int>::const_iterator mit;
-   for(it = whichKnaps.begin(); it != whichKnaps.end(); it++){
+   //---
+   const map<int, int>&   origToSparse = model->getMapOrigToSparse();
+   map<int, int>::const_iterator mit;
+
+   for (it = whichKnaps.begin(); it != whichKnaps.end(); it++) {
       i = *it;
       CoinPackedVector row;
       string           rowName = "k(i_" + UtilIntToStr(i) + ")";
-      for(j = 0; j < nTasks; j++){
-	 colIndex = getIndexIJ(i,j);//dense
-	 mit      = origToSparse.find(colIndex);
-	 assert(mit != origToSparse.end());         
+
+      for (j = 0; j < nTasks; j++) {
+         colIndex = getIndexIJ(i, j); //dense
+         mit      = origToSparse.find(colIndex);
+         assert(mit != origToSparse.end());
          row.insert(mit->second, weight[colIndex]);
-      }      
+      }
+
       model->appendRow(row, -DecompInf, capacity[i], rowName);
    }
-      
+
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModelPartKP()", m_appParam.LogLevel, 2);
-
    return status;
 }
 
 // --------------------------------------------------------------------- //
-int GAP_DecompApp::createModels(){
-
+int GAP_DecompApp::createModels()
+{
    //---
-   //--- This function does the work to create the different models 
+   //--- This function does the work to create the different models
    //---  that will be used. This memory is owned by the user. It will
    //---  be passed to the application interface and used by the algorithms.
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "createModels()", m_appParam.LogLevel, 2);
-   
-
+                      "createModels()", m_appParam.LogLevel, 2);
    //---
    //--- Generalized Assignment Problem (GAP)
    //---   m is number of machines (index i)
@@ -304,7 +295,6 @@ int GAP_DecompApp::createModels(){
    //---    x   x   x   = 1 [j=3]
    //---     x   x   x  = 1 [j=4]
    //---
-
    //---
    //--- Get information about this problem instance.
    //--
@@ -313,19 +303,22 @@ int GAP_DecompApp::createModels(){
    int          status     = GAPStatusOk;
    int          nTasks     = m_instance.getNTasks();    //n
    int          nMachines  = m_instance.getNMachines(); //m
-   const int *  profit     = m_instance.getProfit();
+   const int*   profit     = m_instance.getProfit();
    int          nCols      = nTasks * nMachines;
-
    //---
-   //--- Construct the objective function (the original problem is 
+   //--- Construct the objective function (the original problem is
    //---  a maximization, so we flip the sign to make it minimization).
    //---
    m_objective = new double[nCols];
    assert(m_objective);
-   if(!m_objective)
+
+   if (!m_objective) {
       return GAPStatusOutOfMemory;
-   for(i = 0; i < nCols; i++)
+   }
+
+   for (i = 0; i < nCols; i++) {
       m_objective[i] = profit[i];
+   }
 
    //---
    //--- A'[i] for i=1..m: m independent knapsacks
@@ -349,32 +342,34 @@ int GAP_DecompApp::createModels(){
    //---    x   x   x   = 1 [j=3]
    //---     x   x   x  = 1 [j=4]
    //---
-   setModelObjective(m_objective);
-   
-   DecompConstraintSet * modelCore = new DecompConstraintSet();
+   setModelObjective(m_objective, nCols);
+   DecompConstraintSet* modelCore = new DecompConstraintSet();
    status = createModelPartAP(modelCore);
-   if(status) return status;
-   
+
+   if (status) {
+      return status;
+   }
+
    setModelCore(modelCore, "AP");
    m_models.push_back(modelCore);
-   
-   for(i = 0; i < nMachines; i++){
-      DecompConstraintSet * modelRelax = new DecompConstraintSet();
+
+   for (i = 0; i < nMachines; i++) {
+      DecompConstraintSet* modelRelax = new DecompConstraintSet();
       status = createModelPartKP(modelRelax, i);
-      
       modelName = "KP" + UtilIntToStr(i);
       setModelRelax(modelRelax, modelName, i);
       m_models.push_back(modelRelax);
    }
-   
+
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModels()", m_appParam.LogLevel, 2);
    return status;
 }
 
 //--------------------------------------------------------------------- //
-void GAP_DecompApp::printOriginalColumn(const int   index, 
-					ostream   * os) const {
-   pair<int,int> p = m_instance.getIndexInv(index);
+void GAP_DecompApp::printOriginalColumn(const int   index,
+                                        ostream*    os) const
+{
+   pair<int, int> p = m_instance.getIndexInv(index);
    (*os) << "x[ " << index << " : " << p.first << " , " << p.second << " ]";
 }

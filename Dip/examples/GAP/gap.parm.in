@@ -15,6 +15,8 @@ Settings for all decomp algorithms.
   section=DECOMP
 #############################################################################
 [DECOMP]
+BranchEnforceInMaster = 1
+BranchEnforceInSubProb = 0 
 
 #############################################################################
 Settings for decomp algorithm cutting plane method. 

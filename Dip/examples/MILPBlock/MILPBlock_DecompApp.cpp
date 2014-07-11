@@ -30,8 +30,12 @@ void MILPBlock_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    //--- read MILPBlock instance (mps format)
    //---
-   string fileName = m_appParam.DataDir 
-      + UtilDirSlash() + m_appParam.Instance;   
+   string fileName;
+   if (m_appParam.DataDir != "") {
+      fileName = m_appParam.DataDir + UtilDirSlash() + m_param.Instance;
+   } else {
+      fileName = m_appParam.Instance;
+   }
 
    m_mpsIO.messageHandler()->setLogLevel(m_param.LogLpLevel);
 
@@ -287,16 +291,18 @@ void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
    for(mit = m_modelR.begin(); mit != m_modelR.end(); mit++){
       int                   blockIndex = mit->first;
       DecompConstraintSet * model      = mit->second;
+      /*
       if(model->m_masterOnly){         
          colIndexToBlockIndex.insert(make_pair(model->m_masterOnlyIndex,
                                                blockIndex));
       }
-      else{         
+      else
+      */{         
          const vector<int> & activeColumns = model->getActiveColumns();
          vector<int>::const_iterator vit;
          for(vit = activeColumns.begin(); vit != activeColumns.end(); vit++){
             colIndexToBlockIndex.insert(make_pair(*vit, blockIndex));
-         }
+	 }
       }
    }
 
@@ -331,7 +337,8 @@ void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
       colIndex        = colNameToIndex[colName];
       blockIndex      = colIndexToBlockIndex[colIndex];
       DecompConstraintSet * model = m_modelR[blockIndex];
-      if(model->m_masterOnly){
+
+      /*      if(model->m_masterOnly){
          printf("MasterOnly col=%s value=%g lb=%g ub=%g",
                 colName.c_str(), colValue, colLB[colIndex], colUB[colIndex]);
          if(colValue < (colUB[colIndex]-1.0e-5) &&
@@ -340,7 +347,8 @@ void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
             //TODO: if so, should add both lb and ub
          }
          printf("\n");
-      }
+	 }*/
+
       pair<int,int> p = make_pair(solutionIndex, blockIndex);
       it = varTemp.find(p);
       if(it == varTemp.end()){         
@@ -410,6 +418,7 @@ MILPBlock_DecompApp::findActiveColumns(const vector<int> & rowsPart,
 }
 
 //===========================================================================//
+/*
 void
 MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
 
@@ -473,7 +482,7 @@ MILPBlock_DecompApp::createModelMasterOnlys(vector<int> & masterOnlyCols){
 
    return;   
 }
-
+*/
 //===========================================================================//
 void
 MILPBlock_DecompApp::createModelPart(DecompConstraintSet * model,
@@ -742,7 +751,7 @@ void MILPBlock_DecompApp::createModels(){
       for(i = 0; i < nCols; i++)
 	 m_objective[i] *= -1;
    }
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, nCols);
 
    //---
    //--- Construct the core matrix.
@@ -863,7 +872,7 @@ void MILPBlock_DecompApp::createModels(){
    //---   we will make column bounds explicity rows
    //---
    ///////////STOP - don't need anymore if DECOMP_MASTERONLY_DIRECT
-#if 1
+#if 0
    int nMasterOnlyCols = static_cast<int>(modelCore->masterOnlyCols.size());
    if(nMasterOnlyCols){
       if(m_appParam.LogLevel >= 1)

@@ -134,7 +134,6 @@ void DecompConstraintSet::prepareModel(bool modelIsCore)
    // columnMarker[*vit] = DecompColActive;
    //for(vit = masterOnlyCols.begin(); vit != masterOnlyCols.end(); vit++)
    // columnMarker[*vit] = DecompColMasterOnly;
-
    //---
    //--- mark integers (original number of cols)
    //---    only do this for core
@@ -292,15 +291,15 @@ CoinPackedMatrix* DecompConstraintSet::sparseToOrigMatrix()
    }
 
    CoinPackedMatrix* MOrig
-      = new CoinPackedMatrix(false,
-                             nCols,
-                             nRows,
-                             nElems,
-                             matVal,
-                             matIndOrig,
-                             matBeg,
-                             matLen,
-                             0.0, 0.0);
+   = new CoinPackedMatrix(false,
+                          nCols,
+                          nRows,
+                          nElems,
+                          matVal,
+                          matIndOrig,
+                          matBeg,
+                          matLen,
+                          0.0, 0.0);
    CoinAssertHint(MOrig, "Error: Out of Memory");
    UTIL_DELPTR(MRow);
    UTIL_DELARR(matIndOrig);

@@ -55,13 +55,6 @@ public:
    std::vector<int         > m_rowInd;
    std::vector<double      > m_rowVal;
 
-   //for special case of master-only vars
-   bool                 m_masterOnly;
-   int                  m_masterOnlyIndex;
-   double               m_masterOnlyLB;
-   double               m_masterOnlyUB;
-   bool                 m_masterOnlyIsInt;
-
    //for special case of sparse representation
    bool          m_isSparse;
    int           m_numColsOrig;
@@ -126,9 +119,6 @@ public:
    };
    inline const bool     hasPrepRun() const {
       return prepHasRun;
-   };
-   inline const bool     isMasterOnly() const {
-      return m_masterOnly;
    };
    inline const std::map<int, int>& getMapOrigToSparse() const {
       return m_origToSparse;
@@ -206,11 +196,6 @@ public:
       nBaseRowsOrig    (0),
       nBaseRows        (0),
       prepHasRun       (false),
-      m_masterOnly     (false),
-      m_masterOnlyIndex(0),
-      m_masterOnlyLB   (0.0),
-      m_masterOnlyUB   (0.0),
-      m_masterOnlyIsInt(false),
       m_isSparse       (false),
       m_numColsOrig    (0) {
    };

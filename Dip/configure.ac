@@ -20,7 +20,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.91],[dip@lists.coin-or.org])
+AC_INIT([Dip],[trunk],[dip@lists.coin-or.org])
 
 # copyright for configure script
 AC_COPYRIGHT([
@@ -215,7 +215,7 @@ test $coin_has_cpx != skipping])
 #                      Check for the IP solver                              #
 #############################################################################
 
-AC_MSG_CHECKING([for DIP default ip solver])
+AC_MSG_CHECKING([for Dip default ip solver])
 AC_ARG_WITH([ip-solver],
 [AC_HELP_STRING([--with-ip-solver@<:@=ipsolver@:>@],
                 [specify the IP solver in small

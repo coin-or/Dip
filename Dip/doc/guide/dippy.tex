@@ -1,0 +1,119 @@
+%\documentclass[12pt,a4paper,onecolumn,twoside]{elsarticle}
+\documentclass[12pt,a4paper,onecolumn,twoside]{article}
+
+\usepackage{vmargin, xspace}
+\usepackage[numbers]{natbib}
+
+\usepackage{url}
+\usepackage[english]{babel}
+
+\usepackage[absolute]{textpos}
+\usepackage{setspace}
+
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.eps,.png,.pdf}
+
+\usepackage{enumitem}
+\usepackage{calc}
+
+\include{commands}
+
+\begin{document}
+
+\begin{titlepage}
+\ 
+\setlength{\TPHorizModule}{1cm}
+\setlength{\TPVertModule}{1cm}
+\begin{textblock}{8.79}(8.655,11.5)
+\begin{center}
+\textbf{
+\begin{Large}
+\begin{onehalfspace}
+Dippy -- a simplified interface\\[-6pt] for advanced mixed-integer \\[-6pt] programming\\[3pt]
+\end{onehalfspace}
+\end{Large}
+By Dr Michael O'Sullivan, Dr Cameron Walker, Qi-Shan Lim,%
+Iain Dunning, Dr Stuart Mitchell and Assoc Prof Ted Ralphs\\[3pt]
+February 2011\\
+Report, University of Auckland Faculty of Engineering, no. ???\\
+%ISSN 1179-528X % Print version
+ISSN 1178-3680 % Electronic version
+}
+\end{center}
+\end{textblock}
+\vfill
+\end{titlepage}
+
+\title{
+Dippy -- a simplified interface for advanced mixed-integer programming
+}
+
+\author{Michael O'Sullivan\footnotemark, \ 
+				Qi-Shan Lim, \
+        Cameron Walker, \
+        Iain Dunning\\
+        {\it \small Department of Engineering Science, The University of Auckland, Auckland, New Zealand}\\
+        Stuart Mitchell\\
+        {\it \small Stuart Mitchell Consulting, Auckland, New Zealand}\\
+        Ted Ralphs\\
+        {\it \small Department of Industrial Engineering, Lehigh University, Pennsylvania, USA}}
+
+\date{\today}
+
+\maketitle
+
+\def\thefootnote{\fnsymbol{footnote}}
+\footnotetext[1]{\begin{tabular}[t]{@{}l}
+                 \,Corresponding author.\\
+                 {\it E-mail address:} michael.osullivan@auckland.ac.nz (M. J. O'Sullivan)
+                 \end{tabular}}
+\def\thefootnote{\arabic{footnote}}
+          
+\pagestyle{plain} \thispagestyle{empty}
+\pagenumbering{arabic}
+
+\acrodef{MILP}{mixed-integer linear programming}
+\acrodef{DIP}{Decomposition for Integer Programming}
+\acrodef{CGL}{Cut Generator Library}
+\acrodef{OSI}{Open Solver Interface}
+\acrodef{DP}{dynamic programming}
+\acrodef{TSP}{travelling salesperson}
+
+\subsection*{Abstract}
+\input{abstract}
+
+\section{Introduction} \label{scn:intro}
+\input{intro}
+
+\section{Combining \ac{DIP} and PuLP} \label{scn:overview}
+\input{overview}
+
+\section{Getting Started with Dippy} \label{scn:starting}
+\input{starting}
+
+\section{Case Studies} \label{scn:define}
+\input{define}
+
+\section{Dippy in Practice} \label{scn:techs}
+\input{techs}
+
+\section{Performance and Conclusions} \label{scn:concl}
+\input{concl}
+
+\newpage
+\section{Acknowledgments}
+
+The authors would like to thank Matt Galati, one of the authors of \ac{DIP}, for his help throughout this project and the Department of Engineering Science at the University of Auckland for their support of Qi-Shan and Iain during this research project.
+\\
+\\
+\\
+\vspace*{-0.5\baselineskip}
+%\bibliographystyle{amsalpha}
+%\bibliographystyle{plainnat}
+\bibliographystyle{plain}
+\bibliography{master}
+
+\end{document}
+
+
+

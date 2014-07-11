@@ -76,6 +76,8 @@ struct DecompMainParam {
    double timeSetupReal;
    double timeSolveCpu ;
    double timeSolveReal ;
+   double bestLB;
+   double bestUB;
 };
 
 
@@ -225,6 +227,17 @@ const std::string DecompRowTypeStr[4] = {
 };
 
 //===========================================================================//
+//Corresponding to the class DecompVar
+enum DecompVarType {
+   // points generated from bounded subproblem
+   DecompVar_Point,
+   // rays generated from unbounded subproblem
+   DecompVar_Ray
+};
+
+
+
+//===========================================================================//
 enum DecompColType {
    //structural column
    DecompCol_Structural,
@@ -312,6 +325,13 @@ typedef OsiClpSolverInterface OsiIpSolverInterface;
 #include "OsiCpxSolverInterface.hpp"
 typedef OsiCpxSolverInterface OsiIpSolverInterface;
 #endif
+
+#ifdef __DECOMP_IP_SYMPHONY__
+#include "symphony.h"
+#include "OsiSymSolverInterface.hpp"
+typedef OsiSymSolverInterface OsiIpSolverInterface;
+#endif
+
 
 //---
 //--- COIN vectors can do some extra checking if this is true,

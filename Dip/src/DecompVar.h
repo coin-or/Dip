@@ -35,6 +35,7 @@ public:
 
 private:
    //TODO: lb, ub, "type"?
+   DecompVarType    m_varType;
    double           m_origCost;
    double           m_redCost; //(c - uA'')s - alpha
    int              m_effCnt;  //effectiveness counter
@@ -44,6 +45,9 @@ private:
    double           m_norm;
 
 public:
+   inline DecompVarType getVarType()   const {
+      return m_varType;
+   }
    inline double getOriginalCost()   const {
       return m_origCost;
    }
@@ -72,6 +76,9 @@ public:
       return m_norm;
    }
 
+   inline void   setVarType(const DecompVarType varType)  {
+      m_varType = varType;
+   }
    inline void   setColMasterIndex(const int colIndex)  {
       m_colMasterIndex = colIndex;
    }
@@ -145,6 +152,7 @@ public:
    /** @name Copy Constructors */
    DecompVar(const DecompVar& source) :
       m_s       (source.m_s),
+      m_varType (source.m_varType),
       m_origCost(source.m_origCost),
       m_effCnt  (source.m_effCnt),
       m_strHash (source.m_strHash),
@@ -156,6 +164,7 @@ public:
    DecompVar& operator=(const DecompVar& rhs) {
       if (this != &rhs) {
          m_s        = rhs.m_s;
+         m_varType  = rhs.m_varType;
          m_origCost = rhs.m_origCost;
          m_redCost  = rhs.m_redCost;
          m_effCnt   = rhs.m_effCnt;
@@ -169,6 +178,7 @@ public:
 
    DecompVar():
       m_s       (),
+      m_varType (DecompVar_Point),
       m_origCost(0.0),
       m_redCost (0.0),
       m_effCnt  (0),
@@ -181,8 +191,10 @@ public:
    DecompVar(const std::vector<int>&     ind,
              const double           els,
              const double           redCost,
-             const double           origCost) :
+             const double           origCost,
+             const DecompVarType    varType) :
       m_s       (),
+      m_varType (varType),
       m_origCost(origCost),
       m_redCost (redCost),
       m_effCnt  (0),
@@ -222,6 +234,30 @@ public:
       }
    }
 
+   DecompVar(const std::vector<int>&     ind,
+             const std::vector<double>& els,
+             const double           redCost,
+             const double           origCost,
+             const DecompVarType    varType) :
+      m_s       (),
+      m_varType (varType),
+      m_origCost(origCost),
+      m_redCost (redCost),
+      m_effCnt  (0),
+      m_strHash (),
+      m_blockId (0),
+      m_colMasterIndex(-1),
+      m_norm    (0.0) {
+      if (ind.size() > 0) {
+         m_s.setVector(static_cast<int>(ind.size()),
+                       &ind[0], &els[0], DECOMP_TEST_DUPINDEX);
+         m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
+                                          &ind[0], &els[0]);
+         m_norm    = calcNorm();
+         sortVar();
+      }
+   }
+
    DecompVar(const int              len,
              const int*             ind,
              const double*          els,
@@ -242,15 +278,15 @@ public:
       }
    }
 
-
    DecompVar(const int              len,
              const int*             ind,
              const double*          els,
-             const double           redCost,
-             const double           origCost) :
+             const double           origCost,
+             const DecompVarType    varType) :
       m_s       (),
+      m_varType (varType),
       m_origCost(origCost),
-      m_redCost (redCost),
+      m_redCost (0.0),
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
@@ -287,6 +323,28 @@ public:
    DecompVar(const int              len,
              const int*             ind,
              const double           els,
+             const double           origCost,
+             const DecompVarType    varType) :
+      m_s       (),
+      m_origCost(origCost),
+      m_varType (varType),
+      m_redCost (0.0),
+      m_effCnt  (0),
+      m_strHash (),
+      m_blockId (0),
+      m_colMasterIndex(-1),
+      m_norm    (0.0) {
+      if (len > 0) {
+         m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
+         m_strHash = UtilCreateStringHash(len, ind, els);
+         m_norm    = calcNorm();
+         sortVar();
+      }
+   }
+
+   DecompVar(const int              len,
+             const int*             ind,
+             const double*          els,
              const double           redCost,
              const double           origCost) :
       m_s       (),
@@ -298,7 +356,30 @@ public:
       m_colMasterIndex(-1),
       m_norm    (0.0) {
       if (len > 0) {
-         m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
+         m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
+         m_strHash = UtilCreateStringHash(len, ind, els);
+         m_norm    = calcNorm();
+         sortVar();
+      }
+   }
+
+   DecompVar(const int              len,
+             const int*             ind,
+             const double*          els,
+             const double           redCost,
+             const double           origCost,
+             const DecompVarType    varType) :
+      m_s       (),
+      m_origCost(origCost),
+      m_varType (varType),
+      m_redCost (redCost),
+      m_effCnt  (0),
+      m_strHash (),
+      m_blockId (0),
+      m_colMasterIndex(-1),
+      m_norm    (0.0) {
+      if (len > 0) {
+         m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
          m_strHash = UtilCreateStringHash(len, ind, els);
          m_norm    = calcNorm();
          sortVar();
@@ -308,8 +389,10 @@ public:
    DecompVar(const int              denseLen,
              const double*          denseArray,
              const double           redCost,
-             const double           origCost) :
+             const double           origCost,
+             const DecompVarType    varType) :
       m_s       (DECOMP_TEST_DUPINDEX),
+      m_varType (varType),
       m_origCost(origCost),
       m_redCost (redCost),
       m_effCnt  (0),

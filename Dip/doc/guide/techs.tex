@@ -1,0 +1,85 @@
+\subsection{Adding Customised Branching} \label{sbs:branch}
+\input{branch}
+
+\subsection{Adding Customised Cut Generation} \label{sbs:cuts}
+\input{cuts}
+
+\subsection{Adding Customised Column Generation} \label{sbs:column}
+\input{column}
+
+\newpage\subsection{Adding Customised Heuristics} \label{sbs:heuristics}
+\input{heuristics}
+
+\subsection{Combining Techniques} \label{sbs:combine}
+
+\begin{table}[ht]
+%\begin{minipage}[c]{\textwidth}
+%\begin{small}
+\begin{center}
+\begin{tabular}[c]{|lll|}
+\hline
+\textbf{Strategies}																 & \textbf{Time (s)}	& \textbf{Nodes} \\ 
+\hline & &\\[-10pt]
+Default (branch and cut)                           & 0.26							  & 419 \\
+\hline
++ ordering constraints (OC)                        & 0.05 							& 77 \\
++ OC \& advanced branching (AB)                    & 0.01 							& 3 \\
+\hline
++ weighted inequalities (WI)                       & 0.34 							& 77 \\
++ WI \& OC                                         & 0.17 							& 20 \\
++ WI \& OC \& AB                                   & 0.06 							& 4 \\
+\hline
++ first-fit heuristic (FF) at root node            & 0.28 							& 419 \\
++ FF \& OC                                         & 0.05 							& 77 \\
++ FF \& OC \& AB                                   & 0.01 							& 3 \\
+\hline
++ FF \& WI                                         & 0.36 							& 77 \\
++ FF \& WI \& OC                                   & 0.14 							& 17 \\
++ FF \& WI \& OC \& AB                             & 0.05 							& 3 \\
+\hline
++ fractional-fit heuristic (RF) at nodes           & 0.28 							& 419 \\
++ RF \& OC                                         & 0.05 							& 77 \\
++ RF \& OC \& AB                                   & 0.01 							& 3 \\
+\hline
++ WI \& RF                                         & 0.38 							& 77 \\
++ WI \& RF \& OC                                   & 0.14 							& 17 \\
++ WI \& RF \& OC \& AB                             & 0.05 							& 3 \\
+\hline
++ FF \& RF                                         & 0.28 							& 419 \\
++ FF \& RF \& OC                                   & 0.05 							& 77 \\
++ FF \& RF \& OC \& AB                             & 0.01 							& 3 \\
+\hline
++ WI \& FF \& RF                                   & 0.38 							& 77 \\
++ WI \& FF \& RF \& OC                             & 0.14 							& 17 \\
++ WI \& FF \& RF \& OC \& AB                       & 0.05 							& 3 \\
+\hline
++ column generation (CG)                           & 2.98 							& 37 \\
++ CG \& OC                                         & 2.07 							& 23 \\
++ CG \& OC \& AB                                   & 0.56								& 10 \\
+\hline
++ CG \& customised subproblem solver (CS)          & 2.87 							& 37 \\
++ CG \& CS \& OC                                   & 1.95 							& 23 \\
++ CG \& CS \& OC \& AB                             & 0.44 							& 10 \\
+\hline
++ CG \& first-fit initial variable generation (FV) & 3.96 							& 45 \\
++ CG \& CS \& FV                                   & 3.72 							& 45 \\
++ CG \& CS \& FV \& OC                             & 1.70 							& 18 \\
++ CG \& CS \& FV \& OC \& AB                       & 0.22 							& 3\\
+\hline
++ CG \& one-each initial variable generation (OV)  & 3.40 							& 41 \\
++ CG \& CS \& OV                                   & 3.33 							& 41 \\
++ CG \& CS \& OV \& OC                             & 2.23 							& 24 \\
++ CG \& CS \& OV \& OC \& AB                       & 0.27 							& 3 \\
+\hline
+\end{tabular} 
+\end{center}
+%\end{small}
+%\end{minipage}
+\caption{Experiments for the Capacitated Facility Location Problem} \label{tab:fac_exp}
+\end{table}
+
+The techniques and modifications of the solver framework can be combined to improve performance further.
+\Tabref{tab:fac_exp} shows that it is possible to quickly and easily test many approaches for a particular problem, including combinations of approaches\footnote{All tests were run using Python 2.7.1 on a Windows~7 machine with an Intel Core~2~Duo T9500@2.60GHz CPU.}.
+Looking at the results shows that the heuristics only help when the size of the branch-and-bound tree has been reduced with other approaches, such as ordering constraints and advanced branching.
+Approaches for solving this problem that warrant further investigation use column generation, the customised solver and either ordering constraints or the first-fit heuristic to generate initial variables.
+Tests with different data showed that the solution time for branch-price-and-cut doesn't increase with problem size as quickly as for branch-and-cut, so the column generation approaches are worth considering for larger problems.

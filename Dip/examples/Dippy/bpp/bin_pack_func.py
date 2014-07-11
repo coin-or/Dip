@@ -1,12 +1,26 @@
+CGL_cuts = False
+
+Bin_antisymmetry = False
+Item_antisymmetry = False
+
+Symmetry_branch = False
+Most_use_branch = False
+Most_assign_branch = False
+
 import sys
 
+# Import classes and functions from PuLP
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
+# Import any customised paths
 try:
     import path
 except ImportError:
     pass
-        
+
+# Import dippy (local copy first,
+# then a development copy - if python setup.py develop used,
+# then the coinor.dippy package
 try:
     import dippy
 except ImportError:
@@ -21,8 +35,8 @@ class BinPackProb:
     def __init__(self, ITEMS, volume, capacity):
         self.ITEMS = ITEMS
         self.volume = volume
-        self.BINS = range(len(ITEMS)) # Create 1 bin for each item, indices 
-                                      # start at 0
+        self.BINS = range(len(ITEMS)) # Create 1 bin for each
+                                      # item, indices start at 0
         self.capacity = capacity
     
 def formulate(bpp):
@@ -33,29 +47,40 @@ def formulate(bpp):
                             )
 
     assign_vars = LpVariable.dicts("x",
-                                   [(i, j) for i in bpp.ITEMS
-                                    for j in bpp.BINS],
+                                   [(i, j) for i in bpp.BINS
+                                    for j in bpp.ITEMS],
                                    cat=LpBinary)
     use_vars    = LpVariable.dicts("y", bpp.BINS, cat=LpBinary)
     waste_vars  = LpVariable.dicts("w", bpp.BINS, 0, None)
 
-    prob += lpSum(waste_vars[j] for j in bpp.BINS), "min_waste"
+    prob += lpSum(waste_vars[i] for i in bpp.BINS), "min_waste"
 
-    for j in bpp.BINS:
-        prob += lpSum(bpp.volume[i] * assign_vars[i, j] for i in bpp.ITEMS) \
-                + waste_vars[j] == bpp.capacity * use_vars[j]
+    for i in bpp.BINS:
+        prob += lpSum(bpp.volume[j] * assign_vars[i, j]
+                      for j in bpp.ITEMS) + waste_vars[i] \
+             == bpp.capacity * use_vars[i]
 
-    for i in bpp.ITEMS:
-        prob += lpSum(assign_vars[i, j] for j in bpp.BINS) == 1
+    for j in bpp.ITEMS:
+        prob += lpSum(assign_vars[i, j] for i in bpp.BINS) == 1
 
-    for i in bpp.ITEMS:
-        for j in bpp.BINS:
-            prob += assign_vars[i, j] <= use_vars[j]
+    for i in bpp.BINS:
+        for j in bpp.ITEMS:
+            prob += assign_vars[i, j] <= use_vars[i]
 
-    for n in range(0, len(bpp.BINS) - 1):
-        prob += use_vars[bpp.BINS[n]] >= use_vars[bpp.BINS[n + 1]]
+    if Bin_antisymmetry:
+        for m in range(0, len(bpp.BINS) - 1):
+            prob += use_vars[bpp.BINS[m]] >= use_vars[bpp.BINS[m + 1]]
 
-    # Attach the problem data and variable dictionaries to the DipProblem 
+    if Item_antisymmetry:
+        for m in range(0, len(bpp.BINS)):
+            for n in range(0, len(bpp.ITEMS)):
+                if m > n:
+                    i = bpp.BINS[m]
+                    j = bpp.ITEMS[n]
+                    prob += assign_vars[i, j] == 0
+
+    # Attach the problem data and variable dictionaries
+    # to the DipProblem 
     prob.bpp         = bpp
     prob.assign_vars = assign_vars
     prob.use_vars    = use_vars
@@ -65,13 +90,18 @@ def formulate(bpp):
 
 def my_branch(prob, sol):
    
-    bounds = symmetry(prob, sol)
-  
-    if bounds is None:
-        bounds = most_frac_use(prob, sol)
+    bounds = None
     
-    if bounds is None:
-        bounds = most_frac_assign(prob, sol)
+    if Symmetry_branch:
+        bounds = symmetry(prob, sol)
+  
+    if Most_use_branch:
+        if bounds is None:
+            bounds = most_frac_use(prob, sol)
+    
+    if Most_assign_branch:
+        if bounds is None:
+            bounds = most_frac_assign(prob, sol)
     
     return bounds
 
@@ -92,19 +122,23 @@ def my_heuristics(prob, xhat, cost):
 
 def solve(prob):
 
-#    prob.branch_method = my_branch
-    prob.heuristics = my_heuristics
-    prob.is_root_node = True
-    prob.root_heuristic = True
-    prob.node_heuristic = True
+    if Symmetry_branch or Most_use_branch or Most_assign_branch:
+        prob.branch_method = my_branch
+#    prob.heuristics = my_heuristics
+#    prob.is_root_node = True
+#    prob.root_heuristic = True
+#    prob.node_heuristic = True
   
-    dippyOpts = {'doPriceCut' : '1',
-                 'CutCGL': '1',
+    dippyOpts = {}
+
+    if not CGL_cuts:
+      dippyOpts['CutCGL'] = '0'
+#               'doPriceCut' : '1',
+#                 'CutCGL': '0',
 #                'SolveMasterAsIp': '0'
 #                'generateInitVars': '1',
 #                 'LogDebugLevel': 5,
 #                'LogDumpModel': 5,
-                 }
 
     status, message, primals, duals = dippy.Solve(prob, dippyOpts)
   
@@ -179,9 +213,9 @@ def symmetry(prob, sol):
   
     alpha = sum(sol[use_vars[j]] for j in bpp.BINS)
 #      print "# bins =", alpha
-    up   = int(ceil(alpha))  # Round up to next nearest integer 
-    down = int(floor(alpha)) # Round down
-    frac = min(up - alpha, alpha - down)
+    up    = int(ceil(alpha))  # Round up to next nearest integer 
+    down  = int(floor(alpha)) # Round down
+    frac  = min(up - alpha, alpha - down)
     if frac > tol: # Is fractional?
 #    print "Symmetry branch"
     
@@ -192,7 +226,7 @@ def symmetry(prob, sol):
         for n in range(up - 1, len(bpp.BINS)):
             down_ubs[use_vars[bpp.BINS[n]]] = 0.0
 #           print down_ubs
-        for n in range(up):
+        for n in range(up): # Same as range(0, up)
             up_lbs[use_vars[bpp.BINS[n]]] = 1.0
 #           print up_lbs
 

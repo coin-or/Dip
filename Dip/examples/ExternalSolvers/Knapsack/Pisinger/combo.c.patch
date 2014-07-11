@@ -1,5 +1,14 @@
---- combo.c	2002-12-27 17:28:35.000000000 -0500
-+++ /home/magh/COIN/coin-Decomp/Decomp/examples/ExternalSolvers/Knapsack/Pisinger/combo.c	2009-10-06 18:43:30.000000000 -0400
+--- combo.c.5	2002-12-27 17:28:35.000000000 -0500
++++ combo.c	2014-03-29 14:27:33.441309861 -0400
+@@ -52,7 +52,7 @@
+ #include <stdarg.h>
+ #include <string.h>
+ #include <math.h>
+-#include <malloc.h>
++#include <memory.h>
+ 
+ 
+ /* ======================================================================
 @@ -103,6 +103,7 @@
    itype   p;              /* profit                  */
    itype   w;              /* weight                  */
@@ -57,6 +66,15 @@
    switch (side) {
      case LEFT : pos = a->intv1; (a->intv1)++; break;
      case RIGHT: pos = a->intv2; (a->intv2)--; break;
+@@ -288,7 +290,7 @@
+ 
+ static void pop(allinfo *a, int side, item **f, item **l)
+ {
+-  interval *pos;
++  interval *pos = NULL;
+   switch (side) {
+     case LEFT : if (a->intv1 == a->intv1b) error("pop left");
+                 (a->intv1)--; pos = a->intv1;
 @@ -308,9 +310,6 @@
  
  static void improvesol(allinfo *a, state *v)

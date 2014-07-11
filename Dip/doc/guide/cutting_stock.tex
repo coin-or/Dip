@@ -1,0 +1,46 @@
+\subsection{The Cutting Stock Problem (cutting\_stock.py)} \label{sbs:sponge}
+
+This case study also come from the Operations Research Web in the Department of Engineering Science TWiki \cite{sponge}. The solution of this problem defines cutting patterns to produce the required demand for items from standard items. In this case study the demand is for variable length sponge rolls to be cut from standard length rolls. The entire input file is given below with a summary for each fragment.
+
+\begin{enumerate}
+\item Load PuLP and Dippy;
+\lstinputlisting[linerange=1-2]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item Define the length of sponge rolls required and the demand for each length of sponge roll (note, some variations of demand are shown but have been commented out);
+\lstinputlisting[firstnumber=4,linerange=4-8]{../../examples/Dippy/csp/cutting_stock.py}
+\lstinputlisting[firstnumber=10,linerange=10-22]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item Define the maximum number of possible patterns used for cutting the standard rolls (at most one standard roll for each sponge roll needed) and the length of the standard rolls;
+\lstinputlisting[firstnumber=24,linerange=24-29]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item Define a two dimensional set of items cut from patterns (cf. \ref{itm:2d} from \sbsref{sbs:coke});
+\lstinputlisting[firstnumber=31,linerange=31-32]{../../examples/Dippy/csp/cutting_stock.py}
+
+\newpage
+
+\item Create a \texttt{DipProblem}. Add binary variables that determine if each pattern is used and (non-negative, bounded) integer variables that define the number of sponge rolls of each length cut from a particular pattern.
+\lstinputlisting[firstnumber=34,linerange=34-40]{../../examples/Dippy/csp/cutting_stock.py}
+Note that normally we would define an integer variable that defines how many times a pattern is used and, thus, need less patterns. However, \ac{DIP} does not (yet) solve identical subproblems simultaneously, so we need one subproblem for each pattern cut;
+
+\item We want to minimise the total number of standard rolls used;
+\lstinputlisting[firstnumber=42,linerange=42-43]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item We want to meet demand for sponge rolls;
+\lstinputlisting[firstnumber=45,linerange=45-48]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item Add constraints that make sure patterns are used ``in order'' (these constraints are not strictly necessary but remove symmetry in the solution space);
+\lstinputlisting[firstnumber=50,linerange=50-53]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item Create one subproblem for each pattern that makes sure the sponge rolls cut from the standard roll in the pattern do not exceed the length of the standard roll. Note the \texttt{relaxation[p]} on line 57. This adds the constraint to the Dantzig-Wolfe subproblem if branch, price and cut is used (for more details see \scnref{scn:cuts});
+\lstinputlisting[firstnumber=55,linerange=55-59]{../../examples/Dippy/csp/cutting_stock.py}
+
+\item Solve the Sponge Roll Production Problem using branch, price and cut.  Display the patterns used and the sponge rolls cut from those patterns. Note that the \texttt{doPriceCut} options is turned on (set to 1). This means that \ac{DIP} will use branch, price and cut instead of branch and cut;
+\lstinputlisting[firstnumber=186,linerange=186-198]{../../examples/Dippy/csp/cutting_stock.py}
+
+\end{enumerate}
+
+This problem takes 33.31s of CPU time and requires 175 nodes in the branch-and-bound tree for the master problem. The solution uses 2 standard rolls cut as follows:
+\begin{itemize}
+\item Standard roll 0: 2 $\times$ 5cm rolls and 1 $\times$ 9cm roll = 19cm used (1cm wasted);
+\item Standard roll 1: 2 $\times$ 5cm rolls and 1 $\times$ 7cm roll = 17cm used (3cm wasted).
+\end{itemize}

@@ -11,12 +11,14 @@ from dipapi import DipAPI
 
 from _dippy import *
 
+gimpy_installed = True
 try:
-    from coinor.gimpy import BinaryTree
+    from src.gimpy import BinaryTree
 except ImportError:
-    gimpy_installed = False
-else:
-    gimpy_installed = True
+    try:
+        from coinor.gimpy import BinaryTree
+    except ImportError:
+        gimpy_installed = False
 
 if gimpy_installed:
     try:
@@ -819,8 +821,10 @@ class DipProblem(pulp.LpProblem, DipAPI):
                     dvs_with_costs = []
                     for var in dvs:
                         if isinstance(var, dict):
-                            cost = sum(self.objective[i]*var[i] for i in var)
-                            red_cost = sum(redCostDict[i]*var[i] for i in var)
+                            cost = sum(self.objective[i]*var[i] for i in var
+                                       if i in self.objective)
+                            red_cost = sum(redCostDict[i]*var[i] for i in var
+                                           if i in redCostDict)
                             dvs_with_costs.append((cost, red_cost, var))
                         else:
                             return dvs

@@ -1,0 +1,8 @@
+Mathematical modelling languages such as AMPL, GAMS, and Xpress-MP enable mathematical models such as mixed-integer linear programmes (MILPs) to be expressed clearly for solution in solvers such as CPLEX, MINOS and Gurobi.
+However, some models are sufficiently difficult that they cannot be solved using ``out-of-the-box'' solvers, and customisation of the solver framework to exploit model-specific structure is required.
+Many solvers, including CPLEX, Symphony and DIP, enable this customisation by providing ``callback functions'' that are called at key steps in the solution of a model.
+This approach traditionally involves either expressing the mathematical formulation in a low-level language, such as C++ or Java, or implementing a complicated indexing scheme to be able to track model components, such as variables and constraints, between the mathematical modelling language and the solver's callback framework.
+
+In this paper we present Dippy, a combination of the Python-based mathematical modelling language PuLP and the open source solver DIP. 
+Dippy provides the power of callback functions, but without sacrificing the usability and flexibility of modelling languages.
+We discuss the link between PuLP and DIP and give examples of how advanced solving techniques can be expressed concisely and intuitively in Dippy.

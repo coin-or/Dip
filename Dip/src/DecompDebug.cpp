@@ -102,10 +102,11 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet* model,
    //--- M * x = ax
    //---
    M->times(x, ax);
-
    //---
    //--- check row bounds
    //---
+   //--- Need to deal with masterOnly variable
+
    for (i = 0; i < nRows; i++) {
       actViol = std::max<double>(rowLB[i] - ax[i], ax[i] - rowUB[i]);
       //printf("ax=%12.10f, actViol=%12.10f\n", ax[i], actViol);
@@ -185,14 +186,30 @@ bool DecompAlgo::checkPointFeasible(const DecompConstraintSet* model,
 //===========================================================================//
 void DecompAlgo::checkMasterDualObj()
 {
-   int    r;
    const int      nRows     = m_masterSI->getNumRows();
    const double* rowRhs    = m_masterSI->getRightHandSide();
    const double* dual      = m_masterSI->getRowPrice();
    const double   primalObj = m_masterSI->getObjValue();
    double dualObj = 0.0;
+   const int nCols = m_masterSI->getNumCols();
+   const double* rc = m_masterSI->getReducedCost();
+   const double* colLower = m_masterSI->getColLower();
+   const double* colUpper = m_masterSI->getColUpper();
+   //rStat might not be needed now, but will be needed
+   // when we support ranged rows.
+   int* rStat = new int[nRows];
+   int* cStat = new int[nCols];
+   m_masterSI->getBasisStatus(cStat, rStat);
 
-   for (r = 0; r < nRows; r++) {
+   for (int c = 0; c < nCols; c++) {
+      if (cStat[c] == 3) {
+         dualObj += rc[c] * colLower[c];
+      } else if (cStat[c] == 2 ) {
+         dualObj += rc[c] * colUpper[c];
+      }
+   }
+
+   for (int r = 0; r < nRows; r++) {
       dualObj += dual[r] * rowRhs[r];
    }
 
@@ -220,6 +237,9 @@ void DecompAlgo::checkMasterDualObj()
       throw UtilException("primal and dual obj do not match",
                           "checkMasterDualObj", "DecompAlgo");
    }
+
+   UTIL_DELPTR(rStat);
+   UTIL_DELPTR(cStat);
 }
 
 //===========================================================================//
@@ -290,7 +310,7 @@ bool DecompAlgo::isDualRayInfProof(const double*            dualRay,
    //sanity check
    if (!isProof)
       isProof
-         = isDualRayInfProofCpx(dualRay, rowMatrix, colLB, colUB, rowRhs, os);
+      = isDualRayInfProofCpx(dualRay, rowMatrix, colLB, colUB, rowRhs, os);
 
 #endif
    return isProof;
@@ -524,7 +544,7 @@ void DecompAlgo::printCurrentProblemDual(OsiSolverInterface* si,
                       "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
 #ifdef __DECOMP_LP_CPX__
    OsiCpxSolverInterface* siCpx
-      = dynamic_cast<OsiCpxSolverInterface*>(si);
+   = dynamic_cast<OsiCpxSolverInterface*>(si);
    CPXENVptr env = siCpx->getEnvironmentPtr();
    CPXLPptr  lp  = siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
    string filename = DecompAlgoStr[m_algo] + "_" + baseName
@@ -745,6 +765,8 @@ void DecompAlgo::printCuts(ostream* os)
    (*os) << endl;
 }
 
+
+
 //===========================================================================//
 DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
 {
@@ -760,7 +782,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    int           i, nNodes;
    double        objLB      = -DecompInf;
    double        objUB      =  DecompInf;
-   int           logIpLevel = m_param.LogLpLevel;
+   int           logIpLevel = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
    int                   numCols   = m_masterSI->getNumCols();
@@ -791,6 +813,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    }
 
    //#define PERMUTE_STUFF
+
    /*#ifdef  PERMUTE_STUFF
 
    //---
@@ -872,7 +895,6 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    }
    }
    #endif   */
-
    //---
    //--- dump full milp
    //---
@@ -883,34 +905,9 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
 
 #ifdef __DECOMP_IP_CBC__
    CbcModel cbc(*m_masterSI);
-   CbcMain0(cbc);
-   //---
-   //--- build argument list
-   //---
-   const char* argv[20];
-   int    argc         = 0;
-   string cbcExe       = "cbc";
-   string cbcSolve     = "-solve";
-   string cbcQuit      = "-quit";
-   string cbcLog       = "-log";
-   string cbcLogSet    = UtilIntToStr(logIpLevel);
-   string cbcTime      = "-seconds";
-   string cbcTimeSet   = UtilIntToStr(timeLimit);
-   argv[argc++] = cbcExe.c_str();
-   argv[argc++] = cbcLog.c_str();
-   argv[argc++] = cbcLogSet.c_str();
-   argv[argc++] = cbcTime.c_str();
-   argv[argc++] = cbcTimeSet.c_str();
-   argv[argc++] = cbcSolve.c_str();
-   argv[argc++] = cbcQuit.c_str();
-   //---
-   //--- solve IP using argument list
-   //---
-   CbcMain1(argc, argv, cbc);
-   //---
-   //--- get solver status
-   //---   comments based on Cbc2.3
-   //---
+   cbc.setLogLevel(logIpLevel);
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
+   cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
    int       solStatus    = cbc.status();
    int       solStatus2   = cbc.secondaryStatus();
@@ -918,7 +915,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    if (!UtilIsInSet(solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = "
            << solStatus << endl;
-      throw UtilException("CBC solver status", "solveDirect", m_classTag);
+      throw UtilException("CBC solver status", "solveDirect", "solveDirect");
    }
 
    //---
@@ -982,6 +979,10 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //--- set the time limit
    //---
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
+   //---
+   //--- set the thread limit, otherwise CPLEX will use all the resources
+   //---
+   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, m_param.NumThreadsIPSolver);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
@@ -990,7 +991,13 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //---
    //--- solve the MILP
    //---
+   UtilTimer timer1;
+   timer1.start();
    m_masterSI->branchAndBound();
+   timer1.stop();
+   cout << "just after solving" << endl;
+   cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
+        << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
    //---
    //--- get solver status
    //---

@@ -17,66 +17,78 @@
 //===========================================================================//
 
 // =========================================================================
-// Graph Macros                                                             
+// Graph Macros
 // =========================================================================
 // ------------------------------------------------------------------------- //
-pair<int,int> UtilBothEndsU(const int index){
+pair<int, int> UtilBothEndsU(const int index)
+{
    int i = (int)(floor(sqrt(1 + 8.0 * index) / 2 + .500000001));
    return make_pair( i, index - (i * (i - 1) / 2) );
 }
 
 // =========================================================================
-// COIN Macros                                                             
+// COIN Macros
 // =========================================================================
 // ------------------------------------------------------------------------- //
-CoinPackedVector * UtilPackedVectorFromDense(const int      len,
-                                             const double * dense,
-                                             const double   etol){
+CoinPackedVector* UtilPackedVectorFromDense(const int      len,
+      const double* dense,
+      const double   etol)
+{
    //TODO: test for dup? - efficiency vs debug
    //TODO: insert is slow - better to use setVector?
    int i;
-   CoinPackedVector * v = new CoinPackedVector();
-   for(i = 0; i < len; i++){
-      if(fabs(dense[i]) > etol)
+   CoinPackedVector* v = new CoinPackedVector();
+
+   for (i = 0; i < len; i++) {
+      if (fabs(dense[i]) > etol) {
          v->insert(i, dense[i]);
+      }
    }
+
    return v;
 }
 
 // ------------------------------------------------------------------------- //
 void UtilPackedVectorFromDense(const int          len,
-                               const double     * dense,
+                               const double*      dense,
                                const double       etol,
-                               CoinPackedVector & v){
+                               CoinPackedVector& v)
+{
    //TODO: test for dup? - efficiency vs debug
    //TODO: insert is slow - better to use setVector?
    int i;
-   for(i = 0; i < len; i++){
-      if(fabs(dense[i]) > etol)
+
+   for (i = 0; i < len; i++) {
+      if (fabs(dense[i]) > etol) {
          v.insert(i, dense[i]);
+      }
    }
 }
 
 // ------------------------------------------------------------------------- //
-void UtilPrintPackedVector(const CoinPackedVector & v,
-                           ostream                * os,
-                           DecompApp              * app){
-                           
+void UtilPrintPackedVector(const CoinPackedVector& v,
+                           ostream*                 os,
+                           DecompApp*               app)
+{
    (*os).precision(2);
-   const int    * inds  = v.getIndices();
-   const double * elems = v.getElements();
+   const int*     inds  = v.getIndices();
+   const double* elems = v.getElements();
    const int      len   = v.getNumElements();
-   for(int i = 0; i < len; i++){
-      if(!app)   
+
+   for (int i = 0; i < len; i++) {
+      if (!app) {
          (*os) << elems[i] << " x[" << inds[i] << "]  ";
-      else{
+      } else {
          (*os) << elems[i] << " ";
          app->printOriginalColumn(inds[i], os);
          (*os) << "  ";
       }
-      if((i+1) % 5 == 0)
+
+      if ((i + 1) % 5 == 0) {
          (*os) << "\n";
+      }
    }
+
    (*os) << endl;
 }
 
@@ -89,12 +101,12 @@ void UtilPrintPackedVector(const CoinPackedVector & v,
 //combine these two!
 /*==========================================================================*/
 int UtilScaleDblToIntArr(const int      arrLen,
-                         const double * arrDbl,
-                         int          * arrInt,
+                         const double* arrDbl,
+                         int*           arrInt,
                          const double   oneDbl,
-                         int          * oneInt,
-                         const double   epstol) {
-   
+                         int*           oneInt,
+                         const double   epstol)
+{
    //---
    //--- A very simple function to scale an array of doubles to integers.
    //---    Note: epstol denotes the preferred accuracy,
@@ -104,52 +116,59 @@ int UtilScaleDblToIntArr(const int      arrLen,
    //--- It can also scale oneDbl to oneInt wrt to the array (e.g..,
    //--- the rhs of row). If oneInt == NULL, then this part is skipped.
    //---
-
    int      i, scaleFactor = 1, n_aFrac = 0, factorToBig = 0;
-   double * arrFrac = NULL;
+   double* arrFrac = NULL;
    double   fractionalPart;
    double   oneOverEps = 1.0 / epstol;
-
    //TODO: pass in arrFrac?
    arrFrac = new double[arrLen + 1];
    CoinAssertHint(arrFrac, "Error: Out of Memory");
-   
-   for(i = 0; i < arrLen; i++){
+
+   for (i = 0; i < arrLen; i++) {
       fractionalPart = UtilFracPart(arrDbl[i]);
-      if(!UtilIsZero(fractionalPart)){
-         fractionalPart     *= oneOverEps;
-         arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
-      }
-   }
-   if(oneInt){
-      fractionalPart = UtilFracPart(oneDbl);
-      if(!UtilIsZero(fractionalPart)){
+
+      if (!UtilIsZero(fractionalPart)) {
          fractionalPart     *= oneOverEps;
          arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
       }
    }
 
-   for(i = 0; i < n_aFrac; i++){
+   if (oneInt) {
+      fractionalPart = UtilFracPart(oneDbl);
+
+      if (!UtilIsZero(fractionalPart)) {
+         fractionalPart     *= oneOverEps;
+         arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
+      }
+   }
+
+   for (i = 0; i < n_aFrac; i++) {
       CoinAssertDebug(arrFrac[i] < (INT_MAX / scaleFactor));
       arrFrac[i] *= scaleFactor;
-      while(!UtilIsZero(UtilFracPart(arrFrac[i]))){
+
+      while (!UtilIsZero(UtilFracPart(arrFrac[i]))) {
          scaleFactor *= 10;
-         if(scaleFactor >= oneOverEps){
+
+         if (scaleFactor >= oneOverEps) {
             factorToBig = 1;
             break;
          }
+
          CoinAssertDebug(arrFrac[i] < (INT_MAX / 10));
          arrFrac[i]    *= 10;
          CoinAssertDebug(arrFrac[i] >= 0);
       }
-      if(factorToBig)
+
+      if (factorToBig) {
          break;
+      }
    }
-   
-   for(i = 0; i < arrLen; i++){
+
+   for (i = 0; i < arrLen; i++) {
       arrInt[i] = (int)(arrDbl[i] * scaleFactor);
    }
-   if(oneInt){
+
+   if (oneInt) {
       *oneInt = (int)(oneDbl * scaleFactor);
    }
 
@@ -160,10 +179,10 @@ int UtilScaleDblToIntArr(const int      arrLen,
 
 /*==========================================================================*/
 int UtilScaleDblToIntArr(const int      arrLen,
-                         const double * arrDbl,
-                         int          * arrInt,
-                         const double   epstol) {
-   
+                         const double* arrDbl,
+                         int*           arrInt,
+                         const double   epstol)
+{
    //---
    //--- A very simple function to scale an array of doubles to integers.
    //---    Note: epstol denotes the preferred accuracy,
@@ -173,42 +192,46 @@ int UtilScaleDblToIntArr(const int      arrLen,
    //--- It can also scale oneDbl to oneInt wrt to the array (e.g..,
    //--- the rhs of row). If oneInt == NULL, then this part is skipped.
    //---
-
    int      i, scaleFactor = 1, n_aFrac = 0, factorToBig = 0;
-   double * arrFrac = NULL;
+   double* arrFrac = NULL;
    double   fractionalPart;
    double   oneOverEps = 1.0 / epstol;
-
    //TODO: pass in arrFrac?
    arrFrac = new double[arrLen];
    CoinAssertHint(arrFrac, "Error: Out of Memory");
-   
-   for(i = 0; i < arrLen; i++){
+
+   for (i = 0; i < arrLen; i++) {
       fractionalPart = UtilFracPart(arrDbl[i]);
-      if(!UtilIsZero(fractionalPart)){
+
+      if (!UtilIsZero(fractionalPart)) {
          fractionalPart     *= oneOverEps;
          arrFrac[n_aFrac++]  = (int)fractionalPart * (double)epstol;
       }
    }
 
-   for(i = 0; i < n_aFrac; i++){
+   for (i = 0; i < n_aFrac; i++) {
       CoinAssertDebug(arrFrac[i] < (INT_MAX / scaleFactor));
       arrFrac[i] *= scaleFactor;
-      while(!UtilIsZero(UtilFracPart(arrFrac[i]))){
+
+      while (!UtilIsZero(UtilFracPart(arrFrac[i]))) {
          scaleFactor *= 10;
-         if(scaleFactor >= oneOverEps){
+
+         if (scaleFactor >= oneOverEps) {
             factorToBig = 1;
             break;
          }
+
          CoinAssertDebug(arrFrac[i] < (INT_MAX / 10));
          arrFrac[i]    *= 10;
          CoinAssertDebug(arrFrac[i] >= 0);
       }
-      if(factorToBig)
+
+      if (factorToBig) {
          break;
+      }
    }
-   
-   for(i = 0; i < arrLen; i++){
+
+   for (i = 0; i < arrLen; i++) {
       arrInt[i] = (int)(arrDbl[i] * scaleFactor);
    }
 

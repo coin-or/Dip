@@ -1,0 +1,70 @@
+\subsection{The Wedding Planner Problem (wedding.py)} \label{sbs:wedding}
+
+This case study is taken from the PuLP documentation \cite{pulp}. Given a list of wedding attendees, a wedding planner must come up with a seating plan to minimise the unhappiness of all of the guests. The unhappiness of guest is defined as their maximum unhappiness at being seated with each of the other guests at their table, i.e., it is a pairwise function. The unhappiness of a table is the maximum unhappiness of all the guests at the table. All guests must be seated and there is a limited number of seats at each table.
+
+The wedding planner problem is a set partitioning problem. The set of guests $G$ must be partitioned into multiple subsets, with each subset seated at the same table. The cardinality of the subsets is determined by the number of seats at a table and the unhappiness of a table can be determined by the subset. The \ac{MILP} formulation is:
+\[
+\begin{array}{rrl}
+& x_{gt} &= \begin{cases} 1 & \text{if guest $g$ sits at table $t$} \\
+ 0 & \text{otherwise} \end{cases} \\
+& u_t &= \text{unhappiness of table $t$} \\
+& S &= \text{number of seats at a table} \\
+& U(g, h) &= \text{unhappiness of guests $g$ and $h$ if they are seated at the same table}
+\end{array}
+\]\[
+\begin{array}{rrl}
+\min & \displaystyle \sum_{t \in T} u_t & \text{(total unhappiness of the tables)} \\
+& \displaystyle \sum_{g \in G} x_{gt} &\leq S, t \in T \\
+& \displaystyle \sum_{t \in T} x_{gt} &=1, g \in G \\
+& u_t &\geq U(g, h) (x_{gt} + x_{ht} - 1), t \in T, g < h \in G
+\end{array}
+\]
+
+To get this problem into Dippy we use the PuLP modelling language. The entire model follows with a summary for each fragment:
+\begin{enumerate}
+\item Load PuLP and Dippy;
+\lstinputlisting[firstnumber=8,linerange=8-9]{../../examples/Dippy/wedding/wedding.py}
+
+\item Define the unhappiness function for the guests (in this case we use letters in the alphabet as guests and the ``distance'' between two letters in the guest list as their unhappiness at being seated together);
+\lstinputlisting[firstnumber=15,linerange=15-20]{../../examples/Dippy/wedding/wedding.py}
+
+\item Get the problem data from an external program  (this is used to test various inputs to the \ac{MILP} formulation);
+\lstinputlisting[firstnumber=22,linerange=22-22]{../../examples/Dippy/wedding/wedding.py}
+
+\item Create a the \texttt{DipProblem} for Dippy;
+\lstinputlisting[firstnumber=26,linerange=26-27]{../../examples/Dippy/wedding/wedding.py}
+
+\item Create a set for the tables and also for all possible seatings, i.e., pairs $g \in G, t \in T$;
+\lstinputlisting[firstnumber=29,linerange=29-34]{../../examples/Dippy/wedding/wedding.py}
+
+\newpage
+
+\item Create the seating variables $x_{gt}, g \in G, t \in T$;
+\lstinputlisting[firstnumber=36,linerange=36-42]{../../examples/Dippy/wedding/wedding.py}
+
+\item Create the table unhappiness variables $u_t, t \in T$;
+\lstinputlisting[firstnumber=44,linerange=44-48]{../../examples/Dippy/wedding/wedding.py}
+
+\item Create the objective that minimises the total unhappiness of the tables;
+\lstinputlisting[firstnumber=50,linerange=50-51]{../../examples/Dippy/wedding/wedding.py}
+
+\item Create the constraints for: 1) the number of seats at a table; 2) ensuring each guest is seated; and 3) defining table unhappiness;
+\lstinputlisting[firstnumber=53,linerange=53-57]{../../examples/Dippy/wedding/wedding.py}
+\lstinputlisting[firstnumber=59,linerange=59-75]{../../examples/Dippy/wedding/wedding.py}
+
+\newpage
+
+\item Solve the problem using branch, price and cut;
+\lstinputlisting[firstnumber=157,linerange=157-159]{../../examples/Dippy/wedding/wedding.py}
+
+\end{enumerate}
+
+Note the \texttt{relaxation[table]} syntax on lines 55 and 72. This defines a separate subproblem for each table that contains the constraint for the number of seats at a table and the constraints defining table unhappiness. These table subproblems are used in branch, price and cut.
+
+For a simple example, where the wedding guests are \{ A, B, C, D, E, F, G, H, I, J, K \}, the solution time is 1.28s of CPU time and the tree consists of 1395 nodes. The solution is
+\begin{verbatim}
+Table 0 = ['D', 'E', 'F', 'G']
+Table 1 = ['A', 'B', 'C']
+Table 2 = ['H', 'I', 'J', 'K']
+\end{verbatim}
+
