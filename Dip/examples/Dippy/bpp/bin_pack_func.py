@@ -129,7 +129,6 @@ def solve(prob, algo = 'PriceCut'):
 #    prob.root_heuristic = True
 #    prob.node_heuristic = True
   
-<<<<<<< .mine
     dippyOpts = {}
 
     if CGL_cuts:
@@ -146,14 +145,6 @@ def solve(prob, algo = 'PriceCut'):
     else:
         dippyOpts['doCut'] = '1'
 
-=======
-    dippyOpts = {}
-
-    if not CGL_cuts:
-      dippyOpts['CutCGL'] = '0'
-#               'doPriceCut' : '1',
-#                 'CutCGL': '0',
->>>>>>> .r1164
 #                'SolveMasterAsIp': '0'
 #                'generateInitVars': '1',
 #                 'LogDebugLevel': 5,
