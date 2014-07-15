@@ -647,7 +647,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      DebugCheckBlocksColumns  = true;
+      DebugCheckBlocksColumns  = false;
       /*
        * parameters from MILPBlock and to be MILP
        */

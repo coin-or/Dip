@@ -3503,8 +3503,12 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
             nextPhase = PHASE_PRICE1;
             goto PHASE_UPDATE_FINISH;
          } else {
-            std::cout << "varsThis CAll is " << varsThisCall << std::endl;
-            std::cout << "priceCallsTotal " << priceCallsTotal << std::endl;
+            UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+		     (*m_osLog)
+		     << "Vars this call is " << varsThisCall << endl;);
+            UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+		     (*m_osLog)
+		     << "Price calls total is " << priceCallsTotal << endl;);
             UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                      (*m_osLog)
                      << "Node " << getNodeIndex()
