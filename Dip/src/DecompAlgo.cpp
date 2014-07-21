@@ -1,4 +1,3 @@
-
 //===========================================================================//
 // This file is part of the DIP Solver Framework.                            //
 //                                                                           //
@@ -233,7 +232,6 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //--- copy master-only columns from modelCore
    //---
    const vector<int>& masterOnlyCols = modelCore->getMasterOnlyCols();
-
    m_masterOnlyCols.clear();
    m_masterOnlyCols.reserve(UtilGetSize<int>(masterOnlyCols));
    std::copy(masterOnlyCols.begin(), masterOnlyCols.end(),
@@ -1942,7 +1940,9 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          mostNegRC                  = 0.0;
          m_nodeStats.varsThisCall   = generateVars(m_status,
                                       newVars, mostNegRC);
+         //	 std::cout << "variables generated this call  " << m_nodeStats.varsThisCall <<  std::endl;
          m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
+         //	 std::cout << "variables generated this round  " << m_nodeStats.varsThisRound <<  std::endl;
          m_nodeStats.cutsThisCall   = 0;
          map<int, DecompAlgoModel>::iterator mit;
 
@@ -2715,7 +2715,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
       //sanity check
       if (m_algo != CUT) {
-	checkMasterDualObj();
+         checkMasterDualObj();
       }
 
       //---
@@ -3108,8 +3108,6 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    const double* rc = getMasterColReducedCost();
    const double* colLower = m_masterSI->getColLower();
    const double* colUpper = m_masterSI->getColUpper();
-   //rStat might not be needed now, but will be needed
-   // when we support ranged rows.
    const double* sol = m_masterSI->getColSolution();
 
    for (int c = 0; c < m_numCols; c++) {
@@ -3121,6 +3119,8 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    }
 
    /*
+   //rStat might not be needed now, but will be needed
+   // when we support ranged rows.
    int* rStat = new int[m_masterSI->getNumRows()];
    int* cStat = new int[m_masterSI->getNumCols()];
    m_masterSI->getBasisStatus(cStat, rStat);
@@ -3518,8 +3518,13 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
             nextPhase = PHASE_PRICE1;
             goto PHASE_UPDATE_FINISH;
          } else {
-            std::cout << "varsThis CAll is " << varsThisCall << std::endl;
-            std::cout << "priceCallsTotal " << priceCallsTotal << std::endl;
+            UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+                     (*m_osLog)
+                     << "Vars this call is " << varsThisCall << std::endl;);
+            UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
+                     (*m_osLog)
+                     << "Price calls total is << priceCallsTotal"
+                     << std::endl;);
             UTIL_MSG(m_app->m_param.LogDebugLevel, 3,
                      (*m_osLog)
                      << "Node " << getNodeIndex()
