@@ -64,7 +64,7 @@ int main(int argc, char** argv)
       gethostname(hostname, sizeof(hostname));
       printf("PID %d on %s ready for attach\n", getpid(), hostname);
       /*      if (i == 0)
-	sleep(50); 
+      	sleep(50);
       */
 #endif
       DecompApp milp;
@@ -86,6 +86,8 @@ int main(int argc, char** argv)
       }
 
       const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
+
+      milp.m_matrix = m_matrix;
 
       if (milp.m_param.BlockNumInput > 0) {
          milp.NumBlocks = milp.m_param.BlockNumInput;
@@ -364,6 +366,13 @@ void DecompAuto(DecompApp milp,
    //---
    //--- create the algorithm (a DecompAlgo)
    //---
+
+   if (milp.DecompToFull == true) {
+      decompMainParam.doCut = true;
+      decompMainParam.doDirect = true;
+      decompMainParam.doPriceCut = false;
+   }
+
    DecompAlgo* algo = NULL;
 
    if ((decompMainParam.doCut + decompMainParam.doPriceCut) != 1)

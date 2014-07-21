@@ -169,8 +169,11 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
       getBlockSuccess = readBlockFile();
    }
 
-   if ( m_param.CheckSpecialStructure
-         && !getBlockSuccess) {
+   if (DecompToFull == true) {
+      createModels();
+      return ;
+   } else if ( m_param.CheckSpecialStructure
+               && !getBlockSuccess) {
       connectedComponentsDetection();
    } else if (!getBlockSuccess)
       // automatic structure detection
@@ -553,6 +556,11 @@ bool DecompApp::readBlockFile()
 
          if (tmp == "NBLOCKS") {
             is >> numBlocks;
+         }
+
+         if (numBlocks == 0) {
+            DecompToFull = true;
+            return false;
          }
       }
 
@@ -2019,9 +2027,8 @@ AlpsReturnStatus DecompApp::decodeDecompApp(AlpsEncoded& encoded)
 
 bool DecompApp:: setupSelf()
 {
-
-  createModels();
-  return true;
+   createModels();
+   return true;
 }
 
 #if 0
