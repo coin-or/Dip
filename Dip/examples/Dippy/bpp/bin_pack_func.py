@@ -7,8 +7,6 @@ Symmetry_branch = False
 Most_use_branch = False
 Most_assign_branch = False
 
-import sys
-
 # Import classes and functions from PuLP
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 

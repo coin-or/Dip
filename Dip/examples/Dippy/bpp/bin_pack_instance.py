@@ -13,8 +13,6 @@ if __name__ == '__main__':
   
     prob = formulate(bpp)
 
-    prob.writeFull('bpp1.lp', 'bpp1.dec')
-
     # Set a zero tolerance (Mike Saunders' "magic number")	
     prob.tol = pow(pow(2, -24), 2.0 / 3.0)
     if len(sys.argv) > 1:

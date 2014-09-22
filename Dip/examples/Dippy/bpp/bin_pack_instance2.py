@@ -12,8 +12,6 @@ if __name__ == '__main__':
   
     prob = formulate(bpp)
   
-    prob.writeFull('bpp2.lp', 'bpp2.dec')
-
     prob.tol = pow(pow(2, -24), 2.0 / 3.0)
     if len(sys.argv) > 1:
         xopt = solve(prob, sys.argv[1])

@@ -364,7 +364,7 @@ if debug_print_lp:
 #prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
-prob.generate_cuts = generate_weight_cuts
+#prob.generate_cuts = generate_weight_cuts
 #prob.heuristics = heuristics
 #prob.root_heuristic = True
 #prob.node_heuristic = True
@@ -384,13 +384,6 @@ else:
 
 dippyOpts['TolZero'] = '%s' % tol
         
-#    'SolveMasterAsIp': '0',
-#    'generateInitVars': '1',
-#    'LogDebugLevel': 3,
-#    'LogDumpModel': 5,
-#    'ALPS' :
-#    {'msgLevel' : 3}
-
 dippy.Solve(prob, dippyOpts)
 
 if prob.display_mode != 'off':
