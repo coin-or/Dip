@@ -55,17 +55,17 @@ def formulate(bpp):
 
     prob += lpSum(waste_vars[i] for i in bpp.BINS), "min_waste"
 
-    for i in bpp.BINS:
-        prob += lpSum(bpp.volume[j] * assign_vars[i, j]
-                      for j in bpp.ITEMS) + waste_vars[i] \
-             == bpp.capacity * use_vars[i]
-
     for j in bpp.ITEMS:
         prob += lpSum(assign_vars[i, j] for i in bpp.BINS) == 1
 
     for i in bpp.BINS:
+        prob.relaxation[i] += (lpSum(bpp.volume[j] * assign_vars[i, j]
+                                for j in bpp.ITEMS) + waste_vars[i] 
+                                == bpp.capacity * use_vars[i])
+
+    for i in bpp.BINS:
         for j in bpp.ITEMS:
-            prob += assign_vars[i, j] <= use_vars[i]
+            prob.relaxation[i] += assign_vars[i, j] <= use_vars[i]
 
     if Bin_antisymmetry:
         for m in range(0, len(bpp.BINS) - 1):
@@ -120,7 +120,7 @@ def my_heuristics(prob, xhat, cost):
     if sol is not None:
         return [sol]
 
-def solve(prob):
+def solve(prob, algo = 'PriceCut'):
 
     if Symmetry_branch or Most_use_branch or Most_assign_branch:
         prob.branch_method = my_branch
@@ -131,10 +131,20 @@ def solve(prob):
   
     dippyOpts = {}
 
-    if not CGL_cuts:
+    if CGL_cuts:
+      dippyOpts['CutCGL'] = '1'
+    else:
       dippyOpts['CutCGL'] = '0'
-#               'doPriceCut' : '1',
-#                 'CutCGL': '0',
+
+    if algo == 'PriceCut':
+        dippyOpts['doPriceCut'] = '1'
+        dippyOpts['CutCGL'] = '1'
+    elif algo == 'Price':
+        dippyOpts['doPriceCut'] = '1'
+        dippyOpts['CutCGL'] = '0'
+    else:
+        dippyOpts['doCut'] = '1'
+
 #                'SolveMasterAsIp': '0'
 #                'generateInitVars': '1',
 #                 'LogDebugLevel': 5,

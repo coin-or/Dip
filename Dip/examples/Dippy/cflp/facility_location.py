@@ -21,24 +21,24 @@ from math import floor, ceil
 
 tol = pow(pow(2, -24), 2.0 / 3.0)
 
-from facility_ex2 import REQUIREMENT, PRODUCTS
-from facility_ex2 import LOCATIONS, CAPACITY
+from facility_ex1 import REQUIREMENT, PRODUCTS
+from facility_ex1 import LOCATIONS, CAPACITY
 try:
-    from facility_ex2 import FIXED_COST
+    from facility_ex1 import FIXED_COST
 except ImportError:
     FIXED_COST = [1 for i in LOCATIONS]
 
 try:
-    from facility_ex2 import ASSIGNMENTS
+    from facility_ex1 import ASSIGNMENTS
 except ImportError:
     ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
 
 try:
-    from facility_ex2 import ASSIGNMENT_COSTS
+    from facility_ex1 import ASSIGNMENT_COSTS
 except ImportError:
     ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
-display_mode = 'off'
+display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
                         layout = 'dot', display_interval = 0)
@@ -359,27 +359,39 @@ if debug_print_lp:
     for n, i in enumerate(LOCATIONS):
         prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
-prob.writeFull('facility.lp', 'facility.dec')
+#prob.writeFull('facility.lp', 'facility.dec')
 
 #prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
-#prob.generate_cuts = generate_weight_cuts
+prob.generate_cuts = generate_weight_cuts
 #prob.heuristics = heuristics
 #prob.root_heuristic = True
 #prob.node_heuristic = True
 
-dippy.Solve(prob, {
-    'TolZero': '%s' % tol,
-    'doPriceCut': '1',
-    'CutCGL': '1',
+dippyOpts = {}
+algo = 'PriceCut'
+if len(sys.argv) > 1:
+    algo = sys.argv[1]
+if algo == 'PriceCut':
+    dippyOpts['doPriceCut'] = '1'
+    dippyOpts['CutCGL'] = '1'
+elif algo == 'Price':
+    dippyOpts['doPriceCut'] = '1'
+    dippyOpts['CutCGL'] = '0'
+else:
+    dippyOpts['doCut'] = '1'
+
+dippyOpts['TolZero'] = '%s' % tol
+        
 #    'SolveMasterAsIp': '0',
 #    'generateInitVars': '1',
 #    'LogDebugLevel': 3,
 #    'LogDumpModel': 5,
 #    'ALPS' :
 #    {'msgLevel' : 3}
-})
+
+dippy.Solve(prob, dippyOpts)
 
 if prob.display_mode != 'off':
     numNodes = len(prob.Tree.get_node_list())

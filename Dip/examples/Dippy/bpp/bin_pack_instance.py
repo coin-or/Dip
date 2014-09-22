@@ -3,6 +3,8 @@
 # bin_pack_instance.py
 from bin_pack_func import BinPackProb, formulate, solve
 
+import sys
+
 if __name__ == '__main__':
     # Python starts here
     bpp = BinPackProb(ITEMS  = [1, 2, 3, 4, 5],
@@ -11,9 +13,14 @@ if __name__ == '__main__':
   
     prob = formulate(bpp)
 
+    prob.writeFull('bpp1.lp', 'bpp1.dec')
+
     # Set a zero tolerance (Mike Saunders' "magic number")	
     prob.tol = pow(pow(2, -24), 2.0 / 3.0)
-    xopt = solve(prob)
+    if len(sys.argv) > 1:
+        xopt = solve(prob, sys.argv[1])
+    else:
+        xopt = solve(prob)
   
     if xopt is not None:
         for var in prob.variables():

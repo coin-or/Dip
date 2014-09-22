@@ -212,6 +212,7 @@ Dip/examples/ATM/Makefile.in -text
 Dip/examples/ATM/atm.parm.in -text
 Dip/examples/ATM/data_extract.sh.in -text
 Dip/examples/ATM/notes.txt -text
+Dip/examples/Dippy/SolverStudio/SolverStudioExamples.xlsx -text svneol=unset#application/vnd.ms-excel
 Dip/examples/Dippy/bpp/bin_pack.run -text
 Dip/examples/Dippy/bpp/bin_pack_func.py -text
 Dip/examples/Dippy/bpp/bin_pack_instance.py -text
