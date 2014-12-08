@@ -31,5 +31,3 @@ if __name__ == '__main__':
         if ((prob.Tree.attr['display'] == 'pygame') or 
             (prob.Tree.attr['display'] == 'xdot')):
             prob.Tree.display()
-
-  
