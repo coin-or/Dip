@@ -241,6 +241,7 @@ int GAP_DecompApp::createModels()
 DecompSolverStatus
 GAP_DecompApp::solveRelaxed(const int             whichBlock,
                             const double*         redCostX,
+			    const double          target,
                             list<DecompVar*>&     vars)
 {
    if (!m_appParam.UsePisinger) {
