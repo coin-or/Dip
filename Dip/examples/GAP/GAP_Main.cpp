@@ -35,6 +35,9 @@ int main(int argc, char ** argv){
       //---
       UtilParameters utilParam(argc, argv);  
 
+      utilParam.Add("DECOMP", "BranchEnforceInMaster", "1");
+      utilParam.Add("DECOMP", "BranchEnforceInSubProb", "0");
+
       bool doCut          = utilParam.GetSetting("doCut",          true);
       bool doPriceCut     = utilParam.GetSetting("doPriceCut",     false);
       bool doDirect       = utilParam.GetSetting("doDirect",       false);

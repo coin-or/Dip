@@ -60,7 +60,6 @@ public:
    /** Solve the relaxed problem. */
    DecompSolverStatus solveRelaxed(const int             whichBlock,
 				   const double        * redCostX,
-				   const double          convexDual,
 				   list<DecompVar*>    & vars);   
 
    /** Print an original column (format for this app). */
@@ -119,7 +118,7 @@ public:
 
    /** Default constructor. Takes an instance of UtilParameters */
    GAP_DecompApp(UtilParameters & utilParam) : 
-      DecompApp   (utilParam),
+      DecompApp   (),
       m_classTag  ("GAP-APP"),
       m_objective (NULL)
    {
@@ -128,7 +127,7 @@ public:
    
    virtual ~GAP_DecompApp() {
       UtilDeleteVectorPtr(m_knap);
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
       UtilDeleteMapPtr(m_models);
    };
 };
