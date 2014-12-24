@@ -1,0 +1,3 @@
+cd @srcdir@/../../data/VRP
+tar -zxvf vrplib.tgz
+
