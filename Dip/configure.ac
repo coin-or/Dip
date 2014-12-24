@@ -322,21 +322,11 @@ AC_CONFIG_FILES([Makefile
                  examples/MILP/milp.parm
                  examples/MILP/data_extract.sh
                  examples/MILP/README.txt
-                 examples/MILPBlock/Makefile
-                 examples/MILPBlock/milpblock.parm
-                 examples/MILPBlock/milpblock.parm2
-                 examples/MILPBlock/data_extract.sh
-                 examples/MILPBlock/README.txt
-                 examples/MILPBlock/test.sh
-                 examples/AP3/Makefile
-                 examples/AP3/ap3.parm
                  examples/GAP/Makefile
                  examples/GAP/gap.parm
                  examples/GAP/data_extract.sh
 		 examples/GAP/get_pisinger.sh
 		 examples/GAP/README.txt
-                 examples/MAD/Makefile
-                 examples/MAD/mad.parm
                  examples/MCF/Makefile
                  examples/MCF/mcf.parm
                  examples/MCF/data_extract.sh
@@ -348,6 +338,7 @@ AC_CONFIG_FILES([Makefile
 		 examples/MMKP/README.txt
                  examples/VRP/Makefile
                  examples/VRP/vrp.parm                 
+                 examples/VRP/data_extract.sh
                  examples/VRP/get_boost.sh
                  examples/VRP/get_concorde.sh
                  examples/VRP/get_cvrpsep.sh
