@@ -70,8 +70,6 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/dip-uninstalled.pc.in \
 	$(srcdir)/dip.pc.in $(top_srcdir)/configure \
-	$(top_srcdir)/examples/AP3/Makefile.in \
-	$(top_srcdir)/examples/AP3/ap3.parm.in \
 	$(top_srcdir)/examples/ATM/Makefile.in \
 	$(top_srcdir)/examples/ATM/atm.parm.in \
 	$(top_srcdir)/examples/ATM/data_extract.sh.in \
@@ -87,8 +85,6 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/GAP/data_extract.sh.in \
 	$(top_srcdir)/examples/GAP/gap.parm.in \
 	$(top_srcdir)/examples/GAP/get_pisinger.sh.in \
-	$(top_srcdir)/examples/MAD/Makefile.in \
-	$(top_srcdir)/examples/MAD/mad.parm.in \
 	$(top_srcdir)/examples/MCF/Makefile.in \
 	$(top_srcdir)/examples/MCF/README.txt.in \
 	$(top_srcdir)/examples/MCF/data_extract.sh.in \
@@ -101,12 +97,6 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/MILP/README.txt.in \
 	$(top_srcdir)/examples/MILP/data_extract.sh.in \
 	$(top_srcdir)/examples/MILP/milp.parm.in \
-	$(top_srcdir)/examples/MILPBlock/Makefile.in \
-	$(top_srcdir)/examples/MILPBlock/README.txt.in \
-	$(top_srcdir)/examples/MILPBlock/data_extract.sh.in \
-	$(top_srcdir)/examples/MILPBlock/milpblock.parm.in \
-	$(top_srcdir)/examples/MILPBlock/milpblock.parm2.in \
-	$(top_srcdir)/examples/MILPBlock/test.sh.in \
 	$(top_srcdir)/examples/MMKP/Makefile.in \
 	$(top_srcdir)/examples/MMKP/README.txt.in \
 	$(top_srcdir)/examples/MMKP/data_extract.sh.in \
@@ -127,6 +117,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/TSP/get_concorde.sh.in \
 	$(top_srcdir)/examples/TSP/tsp.parm.in \
 	$(top_srcdir)/examples/VRP/Makefile.in \
+	$(top_srcdir)/examples/VRP/data_extract.sh.in \
 	$(top_srcdir)/examples/VRP/get_boost.sh.in \
 	$(top_srcdir)/examples/VRP/get_concorde.sh.in \
 	$(top_srcdir)/examples/VRP/get_cvrpsep.sh.in \
@@ -152,25 +143,20 @@ CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/SmallIP/README.txt examples/SmallIP/test.sh \
 	examples/MILP/Makefile examples/MILP/milp.parm \
 	examples/MILP/data_extract.sh examples/MILP/README.txt \
-	examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm \
-	examples/MILPBlock/milpblock.parm2 \
-	examples/MILPBlock/data_extract.sh \
-	examples/MILPBlock/README.txt examples/MILPBlock/test.sh \
-	examples/AP3/Makefile examples/AP3/ap3.parm \
 	examples/GAP/Makefile examples/GAP/gap.parm \
 	examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh \
-	examples/GAP/README.txt examples/MAD/Makefile \
-	examples/MAD/mad.parm examples/MCF/Makefile \
+	examples/GAP/README.txt examples/MCF/Makefile \
 	examples/MCF/mcf.parm examples/MCF/data_extract.sh \
 	examples/MCF/README.txt examples/MMKP/Makefile \
 	examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh \
 	examples/MMKP/get_pisinger.sh examples/MMKP/README.txt \
 	examples/VRP/Makefile examples/VRP/vrp.parm \
-	examples/VRP/get_boost.sh examples/VRP/get_concorde.sh \
-	examples/VRP/get_cvrpsep.sh examples/ATM/Makefile \
-	examples/ATM/atm.parm examples/ATM/data_extract.sh \
-	examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm \
-	examples/SDPUC/data_extract.sh examples/SDPUC/README.txt \
+	examples/VRP/data_extract.sh examples/VRP/get_boost.sh \
+	examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh \
+	examples/ATM/Makefile examples/ATM/atm.parm \
+	examples/ATM/data_extract.sh examples/SDPUC/Makefile \
+	examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh \
+	examples/SDPUC/README.txt \
 	examples/ExternalSolvers/Knapsack/Pisinger/Makefile \
 	examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger \
 	examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger \
@@ -550,22 +536,6 @@ examples/MILP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examp
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MILP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MILP/README.txt.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MILPBlock/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MILPBlock/milpblock.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/milpblock.parm.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MILPBlock/milpblock.parm2: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/milpblock.parm2.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MILPBlock/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/data_extract.sh.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MILPBlock/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/README.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MILPBlock/test.sh: $(top_builddir)/config.status $(top_srcdir)/examples/MILPBlock/test.sh.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/AP3/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/AP3/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/AP3/ap3.parm: $(top_builddir)/config.status $(top_srcdir)/examples/AP3/ap3.parm.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/GAP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/GAP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/GAP/gap.parm: $(top_builddir)/config.status $(top_srcdir)/examples/GAP/gap.parm.in
@@ -575,10 +545,6 @@ examples/GAP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/exampl
 examples/GAP/get_pisinger.sh: $(top_builddir)/config.status $(top_srcdir)/examples/GAP/get_pisinger.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/GAP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/GAP/README.txt.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MAD/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/MAD/mad.parm: $(top_builddir)/config.status $(top_srcdir)/examples/MAD/mad.parm.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/MCF/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/MCF/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -601,6 +567,8 @@ examples/MMKP/README.txt: $(top_builddir)/config.status $(top_srcdir)/examples/M
 examples/VRP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/VRP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/VRP/vrp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/VRP/vrp.parm.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/VRP/data_extract.sh: $(top_builddir)/config.status $(top_srcdir)/examples/VRP/data_extract.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/VRP/get_boost.sh: $(top_builddir)/config.status $(top_srcdir)/examples/VRP/get_boost.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -803,7 +771,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/examples $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
