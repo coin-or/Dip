@@ -251,7 +251,6 @@ int TSP_DecompApp::generateCuts(const double              * x,
 DecompSolverStatus 
 TSP_DecompApp::solveRelaxed(const int          whichBlock,
                             const double     * redCostX,
-                            const double       convexDual,
                             DecompVarList    & varList){
    
    UtilPrintFuncBegin(m_osLog, m_classTag,
@@ -274,7 +273,7 @@ TSP_DecompApp::solveRelaxed(const int          whichBlock,
             edge_cost.push_back(make_pair(index, redCostX[index]));
          }
       }   
-      solveOneTree(redCostX, convexDual, edge_cost, varList, cgV);      
+      solveOneTree(redCostX, edge_cost, varList, cgV);      
       solverStatus = DecompSolStatOptimal;
    }
 
@@ -285,7 +284,6 @@ TSP_DecompApp::solveRelaxed(const int          whichBlock,
 
 //===========================================================================//
 void TSP_DecompApp::solveOneTree(const double               * cost, 
-                                 const double                 alpha,
                                  vector< pair<int,double> > & edge_cost,
                                  DecompVarList              & vars,
                                  Graph                      & g) {
@@ -411,11 +409,11 @@ void TSP_DecompApp::solveOneTree(const double               * cost,
 	 (*m_osLog) << "Adding edges:" << endl;
 	 UtilPrintEdge((*vpi).first);
 	 (*m_osLog) << " -> " << cost[(*vpi).first] << " rc : " << rc << endl;
-	 (*m_osLog) << "Creating var with reduced = " << rc - alpha 
+	 (*m_osLog) << "Creating var with reduced = " << rc 
                     << " obj = " << obj << endl;
       }
 
-      DecompVar * oneTree = new DecompVar(inds, els, rc - alpha, obj);
+      DecompVar * oneTree = new DecompVar(inds, els, rc, obj);
       //oneTree->setBlockId(0);//this will happen by default
       vars.push_back(oneTree);
 

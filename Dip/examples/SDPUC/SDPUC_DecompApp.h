@@ -78,7 +78,7 @@ public:
    
    /** Default constructor. Takes an instance of UtilParameters */
    SDPUC_DecompApp(UtilParameters & utilParam) :
-      DecompApp   (utilParam),
+      DecompApp   (),
       m_classTag  ("SDPUC-APP"),
       m_objective (NULL)
    {
@@ -86,7 +86,7 @@ public:
    }
    
    virtual ~SDPUC_DecompApp() {
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
       UtilDeleteVectorPtr(m_models);
    };
 };

@@ -52,7 +52,7 @@ public:
 
 public:
    SmallIP_DecompApp(UtilParameters & utilParam) : 
-      DecompApp  (utilParam),
+      DecompApp  (),
       m_classTag ("SMALL-APP"),
       m_objective(NULL)
    {
@@ -60,7 +60,7 @@ public:
    }
   
    virtual ~SmallIP_DecompApp() {
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
    };
 };
 

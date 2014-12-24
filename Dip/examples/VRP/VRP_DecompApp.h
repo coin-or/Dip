@@ -72,7 +72,6 @@ public:
    /** Solve the relaxed problem. */
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
                                            const double     * redCostX,
-                                           const double       convexDual,
                                            DecompVarList    & varList);
 
 
@@ -115,7 +114,7 @@ public:
 
    /** Default constructor. Takes an instance of UtilParameters */
    VRP_DecompApp(UtilParameters & utilParam) : 
-      DecompApp(utilParam),
+      DecompApp(),
       m_classTag("VRP-APP"),
 	m_objective(NULL),
 	m_modelESPPRC(NULL)
@@ -125,7 +124,7 @@ public:
    
    virtual ~VRP_DecompApp() {
       UtilDeleteVectorPtr(m_models);
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
    };
 };
 

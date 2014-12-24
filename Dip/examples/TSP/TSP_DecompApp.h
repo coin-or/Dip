@@ -53,7 +53,6 @@ public:
    /** Solve the relaxed problem. */
    virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
 					   const double     * redCostX,
-					   const double       convexDual,
 					   DecompVarList    & varList);
    
    virtual int generateCuts(const double  * x, 
@@ -84,7 +83,6 @@ private:
    int generateCutsSubtour(DecompCutList & newCuts);
 
    void solveOneTree(const double               * cost, 
-                     const double                 alpha,
                      vector< pair<int,double> > & edge_cost,
                      DecompVarList              & vars,
                      Graph                      & g);
@@ -94,7 +92,7 @@ public:
 
    /** Default constructor. Takes an instance of UtilParameters */
    TSP_DecompApp(UtilParameters & utilParam) : 
-      DecompApp(utilParam),
+      DecompApp(),
       m_classTag("TSP-APP"),
       m_objective(NULL)
    {
@@ -103,7 +101,7 @@ public:
    
    virtual ~TSP_DecompApp() {
       UtilDeleteVectorPtr(m_models);
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
    };
 };
 

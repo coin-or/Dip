@@ -69,7 +69,7 @@ public:
    
    /** Default constructor. Takes an instance of UtilParameters */
    MCF_DecompApp(UtilParameters & utilParam) :
-      DecompApp   (utilParam),
+      DecompApp   (),
       m_classTag  ("MCF-APP"),
       m_objective (NULL)
    {
@@ -77,7 +77,7 @@ public:
    }
    
    virtual ~MCF_DecompApp() {
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
       UtilDeleteVectorPtr(m_models);
    };
 };

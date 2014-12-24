@@ -16,6 +16,8 @@ Settings for all decomp algorithms.
 #############################################################################
 [DECOMP]
 
+SolveMasterAsIp = 0
+
 #############################################################################
 Settings for decomp algorithm cutting plane method. 
   section=CUT

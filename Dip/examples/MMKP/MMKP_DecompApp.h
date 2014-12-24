@@ -105,7 +105,7 @@ public:
    
    /** Default constructor. Takes an instance of UtilParameters */
    MMKP_DecompApp(UtilParameters & utilParam) :
-      DecompApp   (utilParam),
+      DecompApp   (),
       m_classTag  ("MMKP-APP"),
       m_mcknap    (),
       m_objective (NULL),
@@ -117,7 +117,7 @@ public:
    virtual ~MMKP_DecompApp() {
       UtilDeleteVectorPtr(m_mcknap);
       UtilDeleteVectorPtr(m_models);
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
    };
 };
 

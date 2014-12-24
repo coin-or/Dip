@@ -58,7 +58,7 @@ private:
 public:
    /** @name Constructor and Destructor */
    MILP_DecompApp(UtilParameters & utilParam) : 
-      DecompApp  (utilParam),
+      DecompApp  (),
       m_classTag ("MILP-APP"),
       m_objective(NULL)
    {
@@ -66,7 +66,7 @@ public:
    }
    
    virtual ~MILP_DecompApp() {
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
    }
 };
 

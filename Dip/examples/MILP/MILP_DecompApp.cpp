@@ -31,7 +31,7 @@ void MILP_DecompApp::initializeApp(UtilParameters & utilParam)  {
    //---
    string fileName;
    if (m_appParam.DataDir != "") {
-      fileName = m_appParam.DataDir + UtilDirSlash() + m_param.Instance;
+      fileName = m_appParam.DataDir + UtilDirSlash() + m_appParam.Instance;
    } else {
       fileName = m_appParam.Instance;
    }
