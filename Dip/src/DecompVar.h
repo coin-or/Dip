@@ -186,7 +186,7 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-   }
+      }
 
    DecompVar(const std::vector<int>&     ind,
              const double           els,
@@ -202,41 +202,44 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (ind.size() > 0) {
-         m_s.setConstant(static_cast<int>(ind.size()),
-                         &ind[0], els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
-                                          &ind[0], els);
-         m_norm    = calcNorm();
-         sortVar();
+	 //m_varType = varType;
+	 if (ind.size() > 0) {
+	    m_s.setConstant(static_cast<int>(ind.size()),
+			    &ind[0], els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
+					     &ind[0], els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
-
-   DecompVar(const std::vector<int>&     ind,
-             const std::vector<double>& els,
-             const double           redCost,
-             const double           origCost) :
-      m_s       (),
-      m_origCost(origCost),
-      m_redCost (redCost),
-      m_effCnt  (0),
-      m_strHash (),
-      m_blockId (0),
-      m_colMasterIndex(-1),
-      m_norm    (0.0) {
-      if (ind.size() > 0) {
-         m_s.setVector(static_cast<int>(ind.size()),
-                       &ind[0], &els[0], DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
-                                          &ind[0], &els[0]);
-         m_norm    = calcNorm();
-         sortVar();
-      }
-   }
 
    DecompVar(const std::vector<int>&     ind,
              const std::vector<double>& els,
              const double           redCost,
+             const double           origCost) :
+      m_s       (),
+      m_varType (DecompVar_Point),
+      m_origCost(origCost),
+      m_redCost (redCost),
+      m_effCnt  (0),
+      m_strHash (),
+      m_blockId (0),
+      m_colMasterIndex(-1),
+      m_norm    (0.0) {
+	 //m_varType = DecompVar_Point;
+	 if (ind.size() > 0) {
+	    m_s.setVector(static_cast<int>(ind.size()),
+			  &ind[0], &els[0], DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
+					     &ind[0], &els[0]);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
+      }
+
+   DecompVar(const std::vector<int>&     ind,
+             const std::vector<double>& els,
+             const double           redCost,
              const double           origCost,
              const DecompVarType    varType) :
       m_s       (),
@@ -248,21 +251,23 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (ind.size() > 0) {
-         m_s.setVector(static_cast<int>(ind.size()),
-                       &ind[0], &els[0], DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
-                                          &ind[0], &els[0]);
-         m_norm    = calcNorm();
-         sortVar();
+	 //m_varType = varType;
+	 if (ind.size() > 0) {
+	    m_s.setVector(static_cast<int>(ind.size()),
+			  &ind[0], &els[0], DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(static_cast<int>(ind.size()),
+					     &ind[0], &els[0]);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              len,
              const int*             ind,
              const double*          els,
              const double           origCost) :
       m_s       (),
+      m_varType (DecompVar_Point),
       m_origCost(origCost),
       m_redCost (0.0),
       m_effCnt  (0),
@@ -270,13 +275,13 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (len > 0) {
-         m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(len, ind, els);
-         m_norm    = calcNorm();
-         sortVar();
+	 if (len > 0) {
+	    m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(len, ind, els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              len,
              const int*             ind,
@@ -292,19 +297,20 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (len > 0) {
-         m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(len, ind, els);
-         m_norm    = calcNorm();
-         sortVar();
+	 if (len > 0) {
+	    m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(len, ind, els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              len,
              const int*             ind,
              const double           els,
              const double           origCost) :
       m_s       (),
+      m_varType (DecompVar_Point),
       m_origCost(origCost),
       m_redCost (0.0),
       m_effCnt  (0),
@@ -312,13 +318,13 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (len > 0) {
-         m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(len, ind, els);
-         m_norm    = calcNorm();
-         sortVar();
+	 if (len > 0) {
+	    m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(len, ind, els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              len,
              const int*             ind,
@@ -326,21 +332,21 @@ public:
              const double           origCost,
              const DecompVarType    varType) :
       m_s       (),
-      m_origCost(origCost),
       m_varType (varType),
+      m_origCost(origCost),
       m_redCost (0.0),
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (len > 0) {
-         m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(len, ind, els);
-         m_norm    = calcNorm();
-         sortVar();
+	 if (len > 0) {
+	    m_s.setConstant(len, ind, els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(len, ind, els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              len,
              const int*             ind,
@@ -348,6 +354,7 @@ public:
              const double           redCost,
              const double           origCost) :
       m_s       (),
+      m_varType (DecompVar_Point),
       m_origCost(origCost),
       m_redCost (redCost),
       m_effCnt  (0),
@@ -355,13 +362,13 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (len > 0) {
-         m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(len, ind, els);
-         m_norm    = calcNorm();
-         sortVar();
+	 if (len > 0) {
+	    m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(len, ind, els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              len,
              const int*             ind,
@@ -370,21 +377,21 @@ public:
              const double           origCost,
              const DecompVarType    varType) :
       m_s       (),
-      m_origCost(origCost),
       m_varType (varType),
+      m_origCost(origCost),
       m_redCost (redCost),
       m_effCnt  (0),
       m_strHash (),
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      if (len > 0) {
-         m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
-         m_strHash = UtilCreateStringHash(len, ind, els);
-         m_norm    = calcNorm();
-         sortVar();
+	 if (len > 0) {
+	    m_s.setVector(len, ind, els, DECOMP_TEST_DUPINDEX);
+	    m_strHash = UtilCreateStringHash(len, ind, els);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    DecompVar(const int              denseLen,
              const double*          denseArray,
@@ -400,14 +407,14 @@ public:
       m_blockId (0),
       m_colMasterIndex(-1),
       m_norm    (0.0) {
-      UtilPackedVectorFromDense(denseLen, denseArray, DecompEpsilon, m_s);
-
-      if (m_s.getNumElements() > 0) {
-         m_strHash = UtilCreateStringHash(denseLen, denseArray);
-         m_norm    = calcNorm();
-         sortVar();
+	 UtilPackedVectorFromDense(denseLen, denseArray, DecompEpsilon, m_s);
+	 
+	 if (m_s.getNumElements() > 0) {
+	    m_strHash = UtilCreateStringHash(denseLen, denseArray);
+	    m_norm    = calcNorm();
+	    sortVar();
+	 }
       }
-   }
 
    virtual ~DecompVar() {};
 };
