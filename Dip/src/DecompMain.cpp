@@ -88,14 +88,19 @@ int main(int argc, char** argv)
       const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
 
       milp.m_matrix = m_matrix;
-
+            
+      //      if (utilParam.GetSetting("BlockNumInput", true)){
       if (milp.m_param.BlockNumInput > 0) {
-         milp.NumBlocks = milp.m_param.BlockNumInput;
+	//if (utilParam.BlockNumInput > 0) {
+	//	milp.NumBlocks = utilParam.GetSetting("BlockNumInput", true);
+	 milp.NumBlocks = milp.m_param.BlockNumInput;
+	 std::cout << "the number of blocks is " << milp.NumBlocks << std::endl; 
          milp.m_param.Concurrent = false ;
          milp.m_param.NumBlocksCand = 0;
+        blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);  
       }
 
-      blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
+//      blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
       // obtain the number of CPU (core)s on machines with operating
       // system Linux, Solaris, & AIX and Mac OS X
       // (for all OS releases >= 10.4, i.e., Tiger onwards)
@@ -530,7 +535,8 @@ void DecompAuto(DecompApp milp,
       //---
 
       if (milp.m_param.SolutionOutputToFile
-            && alpsModel.getGlobalUB() < 1.e100) {
+            && alpsModel.getGlobalUB() < 1.e100
+	    && alpsModel.getBestSolution()!=NULL) {
          const DecompSolution* solution = alpsModel.getBestSolution();
          const vector<string>& colNames = alpsModel.getColNames();
          string solutionFile;
