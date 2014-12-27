@@ -42,6 +42,7 @@ BOOST_DIR = ../ExternalSolvers/Graph
 
 SRCDIR = @srcdir@
 VPATH = @srcdir@
+BUILDDIR = @abs_top_builddir@
 
 ###########################################################################
 # CHANGEME: Put any additional flags here
@@ -76,7 +77,8 @@ include ../Makefile.Examples
 
 $(CONCORDE_DIR)/$(CONCORDE_LIB).a:
 	(cd $(CONCORDE_DIR)   && \
-	./configure           && \
+	./configure \
+	--with-qsopt=$(BUILDDIR)/examples/ExternalSolvers/TSP && \
 	${MAKE})
 
 cleanall:

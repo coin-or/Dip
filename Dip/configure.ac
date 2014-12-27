@@ -348,6 +348,7 @@ AC_CONFIG_FILES([Makefile
 		 examples/MMKP/README.txt
                  examples/VRP/Makefile
                  examples/VRP/vrp.parm                 
+                 examples/VRP/data_extract.sh                
                  examples/VRP/get_boost.sh
                  examples/VRP/get_concorde.sh
                  examples/VRP/get_cvrpsep.sh

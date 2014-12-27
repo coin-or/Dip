@@ -46,6 +46,7 @@ CVRPSEP_DIR = ../ExternalSolvers/VRP/CVRPSEP
 
 SRCDIR = @srcdir@
 VPATH  = @srcdir@
+BUILDDIR = @abs_top_builddir@
 
 ###########################################################################
 # CHANGEME: Put any additional flags here
@@ -82,8 +83,9 @@ include ../Makefile.Examples
 ###########################################################################
 
 $(CONCORDE_DIR)/$(CONCORDE_LIB).a:
-	(cd ${CONCORDE_DIR} \
-        && ./configure --with-qsopt=@abs_lib_dir@/../Dip/examples/ExternalSolvers/TSP \
+	(cd ${CONCORDE_DIR} && \
+	./configure \
+	--with-qsopt=$(BUILDDIR)/examples/ExternalSolvers/TSP && \
 	&& make)
 
 $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a:

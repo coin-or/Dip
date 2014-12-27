@@ -105,7 +105,7 @@ void TSP_DecompApp::createModels(){
    if(!m_objective)
       throw UtilExceptionMemory("createModels", "TSP_DecompApp");
    copy(graphLib.edge_wt, graphLib.edge_wt + numCols, m_objective);
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, numCols);
 
    //---
    //--- Two matching relaxation.

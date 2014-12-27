@@ -1981,21 +1981,6 @@ echo "$as_me: error: --enable-msvc option makes sense only under Cygwin or MinGW
   fi
 
 
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
-
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -2099,6 +2084,7 @@ fi
 	       comps="xlc gcc pgcc icc cc"
 	     fi
 	     ;;
+  *-*-darwin*) comps="clang gcc cc" ;;
   *-linux-gnu*) comps="gcc cc pgcc icc xlc" ;;
   *-linux-*) comps="xlc gcc cc pgcc icc" ;;
   *)         comps="xlc_r xlc cc gcc pgcc icc" ;;
@@ -3216,20 +3202,7 @@ fi
 case "$CC" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
+    LD=link
     ;;
 esac
 
@@ -3268,7 +3241,7 @@ case $build in
       fi ;;
   *-*-solaris*)
   	     comps="CC xlC_r aCC g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
-  *-darwin*) comps="g++ c++ CC" ;;
+  *-darwin*) comps="clang++ g++ c++ CC" ;;
   *-linux-gnu*)
              comps="g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC xlC_r aCC CC" ;;
           *) comps="xlC_r aCC CC g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
@@ -3705,7 +3678,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 coin_cxx_is_cl=false
 # It seems that we need to cleanup something here for the Windows
 case "$CXX" in
-  clang* ) ;;
+  clang* | */clang*) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
     sed -e 's/^void exit (int);//' confdefs.h >> confdefs.hh
     mv confdefs.hh confdefs.h
@@ -4105,24 +4078,11 @@ echo "$as_me: Will use MPI C++ compiler $MPICXX" >&6;}
   CXX="$MPICXX"
 fi
 
-# correct the LD variable in a mingw build with MS or intel compiler
+# correct the LD variable in a build with MS or intel compiler
 case "$CXX" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
+    LD=link
     ;;
 esac
 
@@ -5910,7 +5870,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5913 "configure"' > conftest.$ac_ext
+  echo '#line 5873 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7044,7 +7004,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7047:" \
+echo "$as_me:7007:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8111,11 +8071,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8114: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8074: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8118: \$? = $ac_status" >&5
+   echo "$as_me:8078: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8379,11 +8339,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8382: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8342: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8386: \$? = $ac_status" >&5
+   echo "$as_me:8346: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8483,11 +8443,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8486: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8446: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8490: \$? = $ac_status" >&5
+   echo "$as_me:8450: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10828,7 +10788,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10831 "configure"
+#line 10791 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10928,7 +10888,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10931 "configure"
+#line 10891 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13272,11 +13232,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13275: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13235: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13279: \$? = $ac_status" >&5
+   echo "$as_me:13239: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13376,11 +13336,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13379: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13339: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13383: \$? = $ac_status" >&5
+   echo "$as_me:13343: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14946,11 +14906,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14949: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14909: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14953: \$? = $ac_status" >&5
+   echo "$as_me:14913: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15050,11 +15010,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15053: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15013: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15057: \$? = $ac_status" >&5
+   echo "$as_me:15017: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17257,11 +17217,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17260: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17220: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17264: \$? = $ac_status" >&5
+   echo "$as_me:17224: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17525,11 +17485,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17528: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17488: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17532: \$? = $ac_status" >&5
+   echo "$as_me:17492: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17629,11 +17589,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17632: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17592: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17636: \$? = $ac_status" >&5
+   echo "$as_me:17596: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20797,7 +20757,6 @@ COINDEPEND_DATA=
 COINDEPEND_DEPENDENCIES=
 COINDEPEND_PCLIBS=
 COINDEPEND_PCREQUIRES=
-COINDEPEND_DATA=
 
 
 
@@ -21314,7 +21273,6 @@ CLP_DATA=
 CLP_DEPENDENCIES=
 CLP_PCLIBS=
 CLP_PCREQUIRES=
-CLP_DATA=
 
 
 
@@ -21825,7 +21783,6 @@ SAMPLE_DATA=
 SAMPLE_DEPENDENCIES=
 SAMPLE_PCLIBS=
 SAMPLE_PCREQUIRES=
-SAMPLE_DATA=
 
 
 
@@ -22306,7 +22263,6 @@ CGL_DATA=
 CGL_DEPENDENCIES=
 CGL_PCLIBS=
 CGL_PCREQUIRES=
-CGL_DATA=
 
 
 
@@ -22817,7 +22773,6 @@ CBC_DATA=
 CBC_DEPENDENCIES=
 CBC_PCLIBS=
 CBC_PCREQUIRES=
-CBC_DATA=
 
 
 
@@ -23335,7 +23290,6 @@ CPX_DATA=
 CPX_DEPENDENCIES=
 CPX_PCLIBS=
 CPX_PCREQUIRES=
-CPX_DATA=
 
 
 
@@ -23853,7 +23807,6 @@ ASL_DATA=
 ASL_DEPENDENCIES=
 ASL_PCLIBS=
 ASL_PCREQUIRES=
-ASL_DATA=
 
 
 
@@ -25116,7 +25069,7 @@ esac
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile src/Makefile src/dippy/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ATM/data_extract.sh examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh examples/SDPUC/README.txt examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile src/Makefile src/dippy/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/data_extract.sh examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ATM/data_extract.sh examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh examples/SDPUC/README.txt examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc"
 
 
 
@@ -25970,6 +25923,7 @@ do
   "examples/MMKP/README.txt" ) CONFIG_FILES="$CONFIG_FILES examples/MMKP/README.txt" ;;
   "examples/VRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/Makefile" ;;
   "examples/VRP/vrp.parm" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/vrp.parm" ;;
+  "examples/VRP/data_extract.sh" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/data_extract.sh" ;;
   "examples/VRP/get_boost.sh" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/get_boost.sh" ;;
   "examples/VRP/get_concorde.sh" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/get_concorde.sh" ;;
   "examples/VRP/get_cvrpsep.sh" ) CONFIG_FILES="$CONFIG_FILES examples/VRP/get_cvrpsep.sh" ;;

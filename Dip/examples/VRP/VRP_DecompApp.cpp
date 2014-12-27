@@ -141,7 +141,7 @@ void VRP_DecompApp::createModels(){
    if(!m_objective)
       throw UtilExceptionMemory("createModels", "VRP_DecompApp");
    copy(graphLib.edge_wt, graphLib.edge_wt + n_cols, m_objective);
-   setModelObjective(m_objective);
+   setModelObjective(m_objective, n_cols);
 
    //--- 
    //--- Possible decompositions:

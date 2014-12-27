@@ -50,7 +50,7 @@ DataFormat     = hifi
 DataDir        = @srcdir@/../../data/MMKP/hifi
 
 # Name of file for instance (assumed to be in DataDir).
-Instance        = I2
+Instance        = I09
 ModelNameCore   = MDKP0
 ModelNameRelax  = MCKP0
 

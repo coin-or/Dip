@@ -4645,7 +4645,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
    int            whichBlock;
    double         varRedCost;
    DecompVarList::iterator it;
-   assert(!m_masterSI->isProvenPrimalInfeasible());
+   //  assert(!m_masterSI->isProvenPrimalInfeasible());
 
    if (m_algo == DECOMP) {
       nBaseCoreRows = nCoreCols;

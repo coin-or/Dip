@@ -1,4 +1,4 @@
-BuildTools  https://projects.coin-or.org/svn/BuildTools/trunk
+BuildTools  https://projects.coin-or.org/svn/BuildTools/stable/0.7
 Cbc         https://projects.coin-or.org/svn/Cbc/trunk/Cbc
 CoinUtils   https://projects.coin-or.org/svn/CoinUtils/trunk/CoinUtils
 Osi         https://projects.coin-or.org/svn/Osi/trunk/Osi
