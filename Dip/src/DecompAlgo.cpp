@@ -2857,9 +2857,11 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          //---
          map<int, DecompAlgoModel>::iterator mit;
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
-
+         tempTimeLimit = m_param.LimitTime; 
+         UtilTimer timer;
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
+            timer.start();
             solveRelaxed(costeps,               //reduced cost (fake here)
                          objCoeff,              //original cost vector
                          9e15,                  //alpha        (fake here)
@@ -2868,7 +2870,8 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                          algoModel,
                          &subprobResult,        //results
                          initVars);             //var list to populate
-
+            timer.stop(); 
+            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(),0.0);         
             if (attempts == 0) {
                //TODO: have to treat masterOnly differently
                //  we don't correctly populate LB/UB in
@@ -4998,7 +5001,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             arg[i].n_origCols    = nCoreCols;
             arg[i].vars          = &potentialVarsT[i];
          }
-
+	 tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0); 
          //---
          //--- For pricing,
          //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
@@ -5044,7 +5047,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          omp_set_num_threads(numThreads);
 #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
-
+	 
          for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
             DecompAlgo*           algo         = arg[subprobIndex].algo;
             int                   nBaseCoreRows = arg[subprobIndex].nBaseCoreRows;
@@ -5070,7 +5073,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                                *vars
                               );
          }
-
          m_isColGenExact = true;
 
          //clean-up memory
@@ -5124,7 +5126,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
 
          map<int, DecompAlgoModel>::iterator mit;
-
+         tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0);
+	 UtilTimer timer;
+	   
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
             subprobSI = algoModel.getOsi();
@@ -5142,7 +5146,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- NOTE: the variables coming back include alpha in
             //---       calculation of reduced cost
             //---
-            solveRelaxed(redCostX,
+            timer.start();
+ 	    solveRelaxed(redCostX,
                          origObjective,
                          alpha,
                          nCoreCols,
@@ -5150,7 +5155,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                          algoModel,
                          &solveResult,
                          potentialVars);
-
+	    timer.stop();
+            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);
             //if cutoff delcares infeasible, we know subprob >= 0
             //  we can use 0 as valid (but possibly weaker bound)
             if (solveResult.m_isCutoff) {
@@ -6767,7 +6773,8 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                              doExact,
                              doCutoff,
                              isRoot,
-                             alpha - DecompEpsilon);
+                             alpha - DecompEpsilon,
+			     tempTimeLimit);
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
       //double * milpSolution = NULL;
       //if(solveResult->m_nSolutions)

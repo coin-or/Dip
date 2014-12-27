@@ -192,7 +192,8 @@ public:
                      bool                 doExact,
                      bool                 doCutoff,
                      bool                 isRoot,
-                     double               cutoff);
+                     double               cutoff,
+                     double               timeLimit);
 
    bool isPointFeasible(const double* x,
                         const bool     isXSparse  = false,
