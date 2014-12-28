@@ -151,6 +151,16 @@ public:
 
    int m_threadIndex;
 
+   /*
+     Boolean variable that signals the conversion from Decomposition
+     -based method to full model solving techniques (such as cplex or cbc
+     cutting plane methods)
+     For example, if the block number in the block file is zero,
+     this signal will be turned on and DIP will solve this prolbem using
+     underlying subproblem MILP solver as a whole
+    */
+   bool DecompToFull;
+
 public:
    /**
     * @name Helper functions.
@@ -490,7 +500,8 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ) {
+      m_threadIndex(  0    ),
+      DecompToFull ( false ) {
       m_param.getSettings(utilParam);
       startupLog();
    };
@@ -505,7 +516,8 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ) {
+      m_threadIndex(  0    ),
+      DecompToFull ( false ) {
       //---
       //--- comment these functions, which were used in
       //--- MILPBlock, otherwise, conflict occurs in building
