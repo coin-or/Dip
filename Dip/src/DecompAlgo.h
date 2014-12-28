@@ -263,8 +263,8 @@ protected:
    // branching strategy
    DecompBranchStrategy* branchStrategy_;
    DecompBranchStrategy* rampUpBranchStrategy_;
-
-
+   // used for setting time limit to solving MIP subproblem
+   double tempTimeLimit; 
 public:
    /**
     * @}
@@ -739,7 +739,7 @@ public:
       return m_param;
    }
 
-   inline const DecompApp* getDecompApp() const {
+   inline DecompApp* getDecompApp() const {
       return m_app;
    }
    inline DecompApp* getDecompAppMutable() {
@@ -805,17 +805,17 @@ public:
 
 
    inline const double getGlobalLB() const {
-     return m_globalLB; 
+      return m_globalLB;
    }
 
    inline const double getGlobalUB() const {
-     return m_globalUB; 
+      return m_globalUB;
    }
 
    inline const DecompNodeStats getNodeStats() const {
-     return m_nodeStats; 
+      return m_nodeStats;
    }
-   
+
 
    /**
     * Get the current global (integrality) gap.
@@ -986,6 +986,14 @@ public:
       branchStrategy_ = method;
    }
 
+
+   inline void setPhase(DecompPhase phase) {
+      m_phase = phase ;
+   }
+
+   inline void setLastPhase(DecompPhase phase) {
+      m_phaseLast = phase;
+   }
    //-----------------------------------------------------------------------//
    /**
     * @name Constructors and destructor.
@@ -1041,7 +1049,8 @@ public:
       m_isStrongBranch(false),
       m_masterOnlyCols(),
       branchStrategy_(NULL),
-      rampUpBranchStrategy_(NULL) {
+      rampUpBranchStrategy_(NULL),
+      tempTimeLimit(0) {
       m_app->m_decompAlgo = this;
    }
 
