@@ -285,6 +285,8 @@ AlpsDecompModel::registerKnowledge()
 bool AlpsDecompModel::setupSelf()
 {
    bool status;
-   status = m_decompAlgo->getDecompApp()->setupSelf();
+   //   status = m_decompAlgo->getDecompApp()->setupSelf();
+   m_decompAlgo->setPhase(PHASE_PRICE1);
+   m_decompAlgo->setLastPhase(PHASE_PRICE1);
    return status;
 }
