@@ -270,7 +270,7 @@ public:
    virtual void unpackSharedKnowledge(AlpsEncoded&);
 
 
-
+   virtual bool setupSelf();
    /**
     * @}
     */
