@@ -17,7 +17,7 @@
 #include "DecompModel.h"
 #include "DecompSolverResult.h"
 //===========================================================================//
-
+#include "CbcParam.hpp"
 using namespace std;
 
 //===========================================================================//
@@ -247,20 +247,52 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    result->m_solution.clear();
 #ifdef __DECOMP_IP_SYMPHONY__
-   OsiSolverInterface* m_subModelClone = m_osi->clone();
-   OsiSymSolverInterface* osi_Sym
-   = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
-   assert(osi_Sym);
-   sym_environment* env = osi_Sym->getSymphonyEnvironment();
 
-   if (logIpLevel == 0 ) {
-      sym_set_int_param(env, "verbosity", -10);
+   if (param.WarmStart) {
+      if (getCounter() == 0) {
+         OsiSolverInterface* m_subModelClone = m_osi->clone();
+         osi_Sym
+         = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
+         osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+         assert(osi_Sym);
+         sym_environment* env = osi_Sym->getSymphonyEnvironment();
+         sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+   else{
+     sym_set_int_param(env, "verbosity", logIpLevel);
+   }
+         if (logIpLevel == 0 ) {
+            sym_set_int_param(env, "verbosity", -10);
+         } else {
+            sym_set_int_param(env, "verbosity", logIpLevel);
+         }
+
+         assert(env);
+         osi_Sym->initialSolve();
+         m_ws = osi_Sym->getWarmStart();
+         //         osi_Sym->branchAndBound();
+      } else {
+         //         osi_Sym->setWarmStart(m_ws);
+         std::cout << "cunter is " << getCounter() << std::endl;
+         osi_Sym->resolve();
+      }
    } else {
-      sym_set_int_param(env, "verbosity", logIpLevel);
+      OsiSolverInterface* m_subModelClone = m_osi->clone();
+      osi_Sym
+      = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
+      assert(osi_Sym);
+      sym_environment* env = osi_Sym->getSymphonyEnvironment();
+
+      if (logIpLevel == 0 ) {
+         sym_set_int_param(env, "verbosity", -10);
+      } else {
+         sym_set_int_param(env, "verbosity", logIpLevel);
+      }
+
+      assert(env);
+      osi_Sym->branchAndBound();
    }
 
-   assert(env);
-   osiSym->branchAndBound();
+   sym_environment* env = osi_Sym->getSymphonyEnvironment();
    int status = sym_get_status(env);
 
    if (status == TM_OPTIMAL_SOLUTION_FOUND) {
@@ -279,6 +311,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       std::cout << "TM stopped after achieving "
                 << "the predened target gap"
                 << std::endl;
+   } else if (status == TM_NO_SOLUTION) {
+      std::cout << "TM has NO SOLUTION"
+                << std::endl;
    } else {
       std::cerr << "Error: SYPHONMY IP solver status =  "
                 << status << std::endl;
@@ -293,11 +328,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       std::cout << "The optimal objective value is "
                 << objective_value << std::endl;
       status = sym_get_col_solution(env, solution);
+      /*
       for (int i = 0 ; i < numCols; ++i) {
          std::cout << "the solution is " << solution[i]
                    << std::endl;
       }
-
+      */
       result->m_nSolutions = 1;
       vector<double> solVec(solution, solution + numCols);
       result->m_solution.push_back(solVec);
@@ -316,13 +352,27 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       }
    }
 
-   UTIL_DELPTR(osi_Sym);
+   /*
+   if (!param.WarmStart) {
+      UTIL_DELPTR(osi_Sym);
+   }
+   */
 #endif
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
    cbc.setLogLevel(logIpLevel);
 #if 0
+   cbc.branchAndBound();
+   const int statusSet[2] = {0, 1};
+   result->m_solStatus    = cbc.status();
+
+   if (!UtilIsInSet(result->m_solStatus, statusSet, 2)) {
+      cerr << "Error: CBC IP solver status = " << result->m_solStatus << endl;
+      throw UtilException("CBC solver status",
+                          "solveOsiAsIp", "DecompAlgoModel");
+   }
+#else
    CbcMain0(cbc);
    //int i;
    //const double * colUB = cbc.getColUpper();
@@ -350,11 +400,15 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    string cbcSLogSet   = "2";
 
    if (doExact) {
-      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitExact, -1, COIN_DBL_MAX);
-      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact, -1, COIN_DBL_MAX);
+      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitExact, param.LimitTime),
+                                -1, COIN_DBL_MAX);
+      cbcGapSet  = UtilDblToStr(min(param.SubProbGapLimitExact, param.LimitTime)
+                                , -1, COIN_DBL_MAX);
    } else {
-      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitInexact, -1, COIN_DBL_MAX);
-      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact, -1, COIN_DBL_MAX);
+      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitInexact, param.LimitTime),
+                                -1, COIN_DBL_MAX);
+      cbcGapSet  = UtilDblToStr(min(param.SubProbGapLimitInexact, param.LimitTime),
+                                -1, COIN_DBL_MAX);
    }
 
    bool   doTime       = false;
@@ -407,16 +461,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
     *   (5  event user programmed event occurred)
    */
 #endif
-   cbc.branchAndBound();
-   const int statusSet[2] = {0, 1};
-   result->m_solStatus    = cbc.status();
-
-   if (!UtilIsInSet(result->m_solStatus, statusSet, 2)) {
-      cerr << "Error: CBC IP solver status = " << result->m_solStatus << endl;
-      throw UtilException("CBC solver status",
-                          "solveOsiAsIp", "DecompAlgoModel");
-   }
-
    /** Secondary status of problem
     *   -1 unset (status_ will also be -1)
     *    0 search completed with solution
@@ -464,6 +508,19 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
 
+   if (cbc.isContinuousUnbounded()) {
+      OsiClpSolverInterface* m_relax = dynamic_cast<OsiClpSolverInterface*>(m_osi);
+      m_relax->initialSolve();
+      std::vector<double*> solDbl;
+      //ToDo: To add parameter of number of rays in the getPrimalRays()
+      solDbl = m_relax->getPrimalRays(1);
+      const double* solDbl2 = solDbl.front();
+      vector<double> solVec(solDbl2, solDbl2 + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isUnbounded = true;
+   }
+
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
    if (cbc.isProvenOptimal()) {
       result->m_nSolutions = 1;
@@ -493,6 +550,11 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       const double* solDbl = cbc.getColSolution();
       vector<double> solVec(solDbl, solDbl + numCols);
       result->m_solution.push_back(solVec);
+      /*
+      for(unsigned i=0; i < solVec.size(); i++){
+      	std::cout << "index " << i <<"  "<< solVec[i] << std::endl;
+      }
+      */
       //memcpy(result->m_solution,
       //  cbc.getColSolution(), numCols * sizeof(double));
       assert(result->m_nSolutions ==

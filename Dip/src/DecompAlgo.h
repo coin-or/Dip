@@ -143,6 +143,7 @@ protected:
 
 #ifdef __DECOMP_IP_SYMPHONY__
    OsiSymSolverInterface* osi_Sym;
+   CoinWarmStart* ws;
 #endif
    /**
     * Solver interface(s) for entire problem (Q'').

@@ -312,11 +312,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //---
    //--- create the master OSI interface
    //---
-#ifdef __DECOMP_IP_SYMPHONY__
-   m_masterSI = new OsiSymSolverInterface();
-#else
    m_masterSI = new OsiLpSolverInterface();
-#endif
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
 #if defined ( __DECOMP_LP_CLP__) && !defined ( __DECOMP_IP_SYMPHONY__)
@@ -478,7 +474,7 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
 
    if (nInts > 0) {
       subprobSI->setInteger(model->getIntegerVars(), nInts);
-#if defined(__DECOMP_IP_CPX__) || defined(__DECOMP_LP_CPX__)
+#if defined(__DECOMP_IP_CPX__) && defined (__DECOMP_LP_CPX__)
       OsiCpxSolverInterface* osiCpx
       = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
       osiCpx->switchToMIP();
@@ -1903,7 +1899,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
 
       switch (m_phase) {
       case PHASE_PRICE1:
-      case PHASE_PRICE2:
+      case PHASE_PRICE2: {
          m_nodeStats.priceCallsRound++;
          m_nodeStats.priceCallsTotal++;
 
@@ -1939,6 +1935,12 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                                       newVars, mostNegRC);
          m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
          m_nodeStats.cutsThisCall   = 0;
+         map<int, DecompAlgoModel>::iterator mit;
+
+         for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
+            (*mit).second.setCounter((*mit).second.getCounter() + 1);
+         }
+
          // Store the m_numCols and use it in updateObjBound function
          m_numCols = m_masterSI->getNumCols();
 
@@ -2002,7 +2004,8 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          }
          }
          #endif*/
-         break;
+      }
+      break;
       case PHASE_CUT:
          m_nodeStats.cutCallsRound++;
          m_nodeStats.cutCallsTotal++;
@@ -2044,8 +2047,14 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          }
 
          break;
-      case PHASE_DONE:
-         break;
+      case PHASE_DONE: {
+         map<int, DecompAlgoModel>::iterator mit;
+
+         for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
+            (*mit).second.setCounter(0);
+         }
+      }
+      break;
       default:
          assert(0);
       }
@@ -2608,7 +2617,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 #else
 
       if (resolve) {
-         //	m_masterSI->writeMps("temp");
+	//	m_masterSI->writeMps("temp");
          m_masterSI->resolve();
       } else {
          m_masterSI->initialSolve();
@@ -2707,7 +2716,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 
       //sanity check
       if (m_algo != CUT) {
-         checkMasterDualObj();
+         //checkMasterDualObj();
       }
 
       //---
