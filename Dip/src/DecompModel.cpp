@@ -303,13 +303,13 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          }
       */
    } else {
-      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
-      /*
+    //  osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      
       OsiSolverInterface* m_subModelClone = m_osi->clone();
       osi_Sym
         = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
       assert(osi_Sym);
-      */
+      
       sym_environment* env = osi_Sym->getSymphonyEnvironment();
 
       if (logIpLevel == 0 ) {
