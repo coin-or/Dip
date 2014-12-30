@@ -1,9 +1,9 @@
 BuildTools  https://projects.coin-or.org/svn/BuildTools/trunk
-Cbc         https://projects.coin-or.org/svn/Cbc/trunk/Cbc
+Cbc         https://projects.coin-or.org/svn/Cbc/stable/2.8/Cbc
 CoinUtils   https://projects.coin-or.org/svn/CoinUtils/trunk/CoinUtils
 Osi         https://projects.coin-or.org/svn/Osi/trunk/Osi
 Cgl         https://projects.coin-or.org/svn/Cgl/trunk/Cgl
-Clp         https://projects.coin-or.org/svn/Clp/trunk/Clp
+Clp         https://projects.coin-or.org/svn/Clp/stable/1.15/Clp
 Alps        https://projects.coin-or.org/svn/CHiPPS/Alps/branches/jiadong/Alps
 Data/Sample https://projects.coin-or.org/svn/Data/Sample/trunk
 ThirdParty/Blas   https://projects.coin-or.org/svn/BuildTools/ThirdParty/Blas/trunk
