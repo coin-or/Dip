@@ -743,8 +743,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface* si,
    for (mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
       relax = (*mit).second.getModel();
 
-      //TODO: names not working in sparse relax case (for CPM)
-      if (!relax || !relax->M || relax->isSparse()) {
+      if (!relax || !relax->M) {
          continue;
       }
 
