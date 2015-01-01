@@ -298,6 +298,10 @@ enum DecompBranchingStrategy {
 };
 
 
+enum DecompBranchingImplementation {
+   DecompBranchInSubproblem,
+   DecompBranchInMaster
+};
 /*
 enum DecompNumericErrorType {
 

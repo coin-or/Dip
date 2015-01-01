@@ -264,7 +264,15 @@ protected:
    DecompBranchStrategy* branchStrategy_;
    DecompBranchStrategy* rampUpBranchStrategy_;
    // used for setting time limit to solving MIP subproblem
-   double tempTimeLimit; 
+   double tempTimeLimit;
+
+   // variable dictating whether the branching is implemented
+   // in the master problem or the subproblem
+
+   DecompBranchingImplementation m_branchingImplementation;
+
+
+
 public:
    /**
     * @}
@@ -1050,7 +1058,8 @@ public:
       m_masterOnlyCols(),
       branchStrategy_(NULL),
       rampUpBranchStrategy_(NULL),
-      tempTimeLimit(0) {
+      tempTimeLimit(0),
+      m_branchingImplementation(DecompBranchInSubproblem) {
       m_app->m_decompAlgo = this;
    }
 

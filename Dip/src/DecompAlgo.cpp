@@ -197,6 +197,18 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //--- read in algorithm parameters
    //---
    m_param.getSettings(*utilParam, sectionParam);
+
+   if (m_param.BranchEnforceInSubProb == true
+         && m_param.BranchEnforceInMaster == false) {
+      m_branchingImplementation = DecompBranchInSubproblem;
+   } else if (m_param.BranchEnforceInMaster == true
+              && m_param.BranchEnforceInSubProb == false) {
+      m_branchingImplementation = DecompBranchInMaster;
+   } else {
+      throw UtilException("Branching Implementation should be set correctly",
+                          "initSetup", "DecompAlgo");
+   }
+
    UTIL_MSG(m_param.LogLevel, 2,
             (*m_osLog)
             << "Initial Algo Setup"
@@ -1061,7 +1073,9 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
 
               if (isZeroFeas)
               (*m_osLog) << "Zero Sol is Feasible - relax convexity con.\n";
-             );
+             ) {
+      ;
+   }
 
    //---
    //--- row bounds from core including
@@ -1242,7 +1256,8 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
       colUB[k]    = colUBCore[j];
       objCoeff[k] = 0;
       colNames.push_back(colNamesCore[j]);
-      m_masterColType.push_back(DecompCol_MasterOnly);
+      //  m_masterColType.push_back(DecompCol_MasterOnly);
+      m_masterColType.push_back(DecompCol_Structural_NoDelete);
       m_masterOnlyColsMap.insert(make_pair(j, k));
    }
 
@@ -2407,8 +2422,9 @@ void DecompAlgo::setMasterBounds(const double* lbs,
 
    //TODO: how to handle case where relax is not defined explicitly
    //  like in GAP...
-   if (!m_param.BranchEnforceInMaster) {
-      assert(m_param.BranchEnforceInSubProb);
+   // if (!m_param.BranchEnforceInMaster) {
+   //   assert(m_param.BranchEnforceInSubProb);
+   if (m_branchingImplementation == DecompBranchInSubproblem  ) {
       //---
       //--- Must remove (or fix to 0) any column in master that
       //---    does not satisfy the branching bounds.
@@ -2469,65 +2485,85 @@ void DecompAlgo::setMasterBounds(const double* lbs,
       }
 
       UTIL_DELARR(denseS);
-   } else {
+   } else if (m_branchingImplementation == DecompBranchInMaster) {
       int                   c, coreColIndex;
       DecompConstraintSet* modelCore = m_modelCore.getModel();
       const int             nIntVars  = modelCore->getNumInts();
-      //const int             nCols     = modelCore->getNumCols();
-      const int             beg       = modelCore->nBaseRowsOrig;
-      //TODO: can reuse this memory
-      int      nRows   = 2 * nIntVars;
-      int*     index   = new int[nRows];
-      char*    sense   = new char[nRows];
-      double* rhs     = new double[nRows];
-      double* range   = new double[nRows];
       const int* integerVars = modelCore->getIntegerVars();
 
-      //lbs,ubs is indexed on core column index
-      // but c is being looped over integers here...
-      //---
-      //--- the row index for column c's UB (x <= u) is: beg            + c
-      //--- the row index for column c's LB (x >= l) is: beg + nIntVars + c
-      //---
-      for (c = 0; c < nIntVars; c++) {
-         //x <= u
-         coreColIndex = integerVars[c];
-         index[c]     = beg + c; //row index into master
-         sense[c]     = 'L';
-         rhs  [c]     = ubs[coreColIndex];
-         range[c]     = 0.0;
+      // speical treat master-only variables, add variable bounds
+      // directly on the master-only variables
+      if (m_param.BranchEnforceInSubProb == true &&
+            m_branchingImplementation == DecompBranchInMaster) {
+         for (c = 0 ; c < nIntVars; c++) {
+            coreColIndex = integerVars[c];
 
-         if (m_masterRowType[beg + c] != DecompRow_Branch) {
-            printf("ERROR: row %d type: %s\n",
-                   beg + c,
-                   DecompRowTypeStr[m_masterRowType[beg + c]].c_str());
+            if (std::find (m_masterOnlyCols.begin(), m_masterOnlyCols.end(), coreColIndex)
+                  != m_masterOnlyCols.end()) {
+               m_masterSI->setColBounds(m_masterOnlyColsMap[coreColIndex],
+                                        lbs[coreColIndex], ubs[coreColIndex]);
+            }
+         }
+      } else {
+         const int             beg       = modelCore->nBaseRowsOrig;
+         //TODO: can reuse this memory
+         int      nRows   = 2 * nIntVars;
+         int*     index   = new int[nRows];
+         char*    sense   = new char[nRows];
+         double* rhs     = new double[nRows];
+         double* range   = new double[nRows];
+
+         //lbs,ubs is indexed on core column index
+         // but c is being looped over integers here...
+         //---
+         //--- the row index for column c's UB (x <= u) is: beg            + c
+         //--- the row index for column c's LB (x >= l) is: beg + nIntVars + c
+         //---
+
+         for (c = 0; c < nIntVars; c++) {
+            //x <= u
+            coreColIndex = integerVars[c];
+            index[c]     = beg + c; //row index into master
+            sense[c]     = 'L';
+            rhs  [c]     = ubs[coreColIndex];
+            range[c]     = 0.0;
+
+            if (m_masterRowType[beg + c] != DecompRow_Branch) {
+               printf("ERROR: row %d type: %s\n",
+                      beg + c,
+                      DecompRowTypeStr[m_masterRowType[beg + c]].c_str());
+            }
+
+            assert(m_masterRowType[beg + c] == DecompRow_Branch);
          }
 
-         assert(m_masterRowType[beg + c] == DecompRow_Branch);
-      }
+         for (c = nIntVars; c < (2 * nIntVars); c++) {
+            //x >= l
+            coreColIndex = integerVars[c - nIntVars];
+            index[c]     = beg + c;
+            sense[c]     = 'G';
+            rhs  [c]     = lbs[coreColIndex];
+            range[c]     = 0.0;
 
-      for (c = nIntVars; c < (2 * nIntVars); c++) {
-         //x >= l
-         coreColIndex = integerVars[c - nIntVars];
-         index[c]     = beg + c;
-         sense[c]     = 'G';
-         rhs  [c]     = lbs[coreColIndex];
-         range[c]     = 0.0;
+            if (m_masterRowType[beg + c] != DecompRow_Branch) {
+               printf("ERROR: row %d type: %s\n",
+                      beg + c,
+                      DecompRowTypeStr[m_masterRowType[beg + c]].c_str());
+            }
 
-         if (m_masterRowType[beg + c] != DecompRow_Branch) {
-            printf("ERROR: row %d type: %s\n",
-                   beg + c,
-                   DecompRowTypeStr[m_masterRowType[beg + c]].c_str());
+            assert(m_masterRowType[beg + c] == DecompRow_Branch);
          }
 
-         assert(m_masterRowType[beg + c] == DecompRow_Branch);
+         m_masterSI->setRowSetTypes(index, index + (2 * nIntVars), sense, rhs, range);
+         UTIL_DELARR(index);
+         UTIL_DELARR(sense);
+         UTIL_DELARR(rhs);
+         UTIL_DELARR(range);
       }
+   }
 
-      m_masterSI->setRowSetTypes(index, index + (2 * nIntVars), sense, rhs, range);
-      UTIL_DELARR(index);
-      UTIL_DELARR(sense);
-      UTIL_DELARR(rhs);
-      UTIL_DELARR(range);
+   if (m_param.BranchEnforceInSubProb == true) {
+      m_branchingImplementation = DecompBranchInSubproblem;
    }
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -2856,8 +2892,9 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          //---
          map<int, DecompAlgoModel>::iterator mit;
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
-         tempTimeLimit = m_param.LimitTime; 
+         tempTimeLimit = m_param.LimitTime;
          UtilTimer timer;
+
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
             timer.start();
@@ -2869,8 +2906,9 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                          algoModel,
                          &subprobResult,        //results
                          initVars);             //var list to populate
-            timer.stop(); 
-            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(),0.0);         
+            timer.stop();
+            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);
+
             if (attempts == 0) {
                //TODO: have to treat masterOnly differently
                //  we don't correctly populate LB/UB in
@@ -3149,7 +3187,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
-
+   /*
    if (!m_param.DualStab && !UtilIsZero(unifDiff, 1e-04)) {
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal)
                  << endl;
@@ -3158,7 +3196,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
       throw UtilException("Primal and Dual Master Obj Not Matching.",
                           "updateObjBoundLB", "DecompAlgo");
    }
-
+   */
    //TODO: stats - we want to play zDW_LB vs UB...
    UTIL_MSG(m_param.LogDebugLevel, 3,
             (*m_osLog)
@@ -5000,7 +5038,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             arg[i].n_origCols    = nCoreCols;
             arg[i].vars          = &potentialVarsT[i];
          }
-	 tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0); 
+
+         tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0);
          //---
          //--- For pricing,
          //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
@@ -5044,9 +5083,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
 
          omp_set_num_threads(numThreads);
-#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
+         #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
-	 
+
          for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
             DecompAlgo*           algo         = arg[subprobIndex].algo;
             int                   nBaseCoreRows = arg[subprobIndex].nBaseCoreRows;
@@ -5072,6 +5111,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                                *vars
                               );
          }
+
          m_isColGenExact = true;
 
          //clean-up memory
@@ -5126,8 +5166,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 
          map<int, DecompAlgoModel>::iterator mit;
          tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0);
-	 UtilTimer timer;
-	   
+         UtilTimer timer;
+
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
             subprobSI = algoModel.getOsi();
@@ -5146,7 +5186,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //---       calculation of reduced cost
             //---
             timer.start();
- 	    solveRelaxed(redCostX,
+            solveRelaxed(redCostX,
                          origObjective,
                          alpha,
                          nCoreCols,
@@ -5154,8 +5194,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                          algoModel,
                          &solveResult,
                          potentialVars);
-	    timer.stop();
+            timer.stop();
             tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);
+
             //if cutoff delcares infeasible, we know subprob >= 0
             //  we can use 0 as valid (but possibly weaker bound)
             if (solveResult.m_isCutoff) {
@@ -6485,7 +6526,9 @@ bool DecompAlgo::isIPFeasible(const double* x,
                     if (hasColNames)
                     (*m_osLog) << " -> " << colNames[c];
                     (*m_osLog) << " : " << UtilDblToStr(x[c]) << endl;
-                   );
+                   ) {
+            ;
+         }
 
          if (!UtilIsIntegral(x[c], intTol10)) {
             ipFeas = false;
@@ -6773,7 +6816,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                              doCutoff,
                              isRoot,
                              alpha - DecompEpsilon,
-			     tempTimeLimit);
+                             tempTimeLimit);
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
       //double * milpSolution = NULL;
       //if(solveResult->m_nSolutions)
