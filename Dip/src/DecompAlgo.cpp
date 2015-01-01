@@ -3369,7 +3369,7 @@ void DecompAlgo::masterPhaseItoII()
       mit = m_masterOnlyColsMap.find(j);
       assert(mit != m_masterOnlyColsMap.end());
       colIndex = mit->second;
-      assert(isMasterColMasterOnly(colIndex));
+//      assert(isMasterColMasterOnly(colIndex));
       m_masterSI->setObjCoeff(colIndex, objCoeff[j]);
    }
 
@@ -7080,7 +7080,8 @@ void DecompAlgo::recomposeSolution(const double* solution,
       mit      = m_masterOnlyColsMap.find(j);
       assert(mit != m_masterOnlyColsMap.end());
       colIndex = mit->second;
-      assert(isMasterColMasterOnly(colIndex));
+      // For now , master-only variable is of type DecompCol_Structural_NoDelete
+      //   assert(isMasterColMasterOnly(colIndex));
       rsolution[j] = solution[colIndex];
    }
 
