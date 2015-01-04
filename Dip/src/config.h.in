@@ -30,7 +30,7 @@
 /* Define to 1 if the Sample package is available */
 #undef COIN_HAS_SAMPLE
 
-/* Define to 1 if the Symphony package is available */
+/* Define to 1 if the SYMPHONY package is available */
 #undef COIN_HAS_SYMPHONY
 
 /* SVN revision number of project */
