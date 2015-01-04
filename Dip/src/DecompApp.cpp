@@ -303,7 +303,7 @@ void DecompApp::readBlockFile()
    string fileName;
 
    if (m_param.DataDir != "") {
-      fileName = m_param.DataDir + UtilDirSlash() + m_param.Instance;
+      fileName = m_param.DataDir + UtilDirSlash() + m_param.BlockFile;
    } else {
       fileName = m_param.BlockFile;
    }
