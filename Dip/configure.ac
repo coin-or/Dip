@@ -98,7 +98,7 @@ AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
 # Check which third party solvers are available 
 
 AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
-AC_COIN_CHECK_PACKAGE(Symphony, [osi-sym], [DipLib])
+AC_COIN_CHECK_PACKAGE(SYMPHONY, [osi-sym], [DipLib])
 #############################################################################
 #                       Other third party software                          #
 #############################################################################
@@ -175,7 +175,7 @@ AC_SUBST([PYTHON_CFLAGS])
 #############################################################################
 
 AC_MSG_CHECKING([for Dip default lp solver])
-AC_ARG_WITH([lp-solver],
+AC_ARG_WITH([dip-lp-solver],
 [AC_HELP_STRING([--with-dip-lp-solver@<:@=lpsolver@:>@],
                 [specify the LP solver in small
                 letters(default lpsolver=clp)])],
@@ -195,12 +195,6 @@ case $dip_lp_solver in
          found_package=false
      fi
    ;; 
-   symphony)
-     AC_MSG_RESULT{symphony}
-     if test $coin_has_symphony != yes; then
-     	found_package=false
-     fi
-   ;;
   *)
     AC_MSG_ERROR(Unknown LP solver!)
   ;;
@@ -216,16 +210,13 @@ test $coin_has_clp != skipping])
 AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex &&
 test $coin_has_cpx != unavailable &&
 test $coin_has_cpx != skipping])
-AM_CONDITIONAL(SYMPHONY_IP_SOLVER,[test $dip_ip_solver = symphony &&
-test $coin_has_symphony != unavailable &&
-test $coin_has_symphony != skipping])
 
 #############################################################################
 #                      Check for the IP solver                              #
 #############################################################################
 
 AC_MSG_CHECKING([for Dip default ip solver])
-AC_ARG_WITH([ip-solver],
+AC_ARG_WITH([dip-ip-solver],
 [AC_HELP_STRING([--with-dip-ip-solver@<:@=ipsolver@:>@],
                 [specify the IP solver in small
                 letters(default ipsolver=cbc)])],
@@ -245,6 +236,12 @@ case $dip_ip_solver in
          found_package=false
      fi
    ;; 
+   symphony)
+     AC_MSG_RESULT(SYMPHONY)
+     if test $coin_has_symphony != yes; then
+     	found_package=false
+     fi
+   ;;
   *)
     AC_MSG_ERROR(Unknown IP solver!)
   ;;
@@ -260,6 +257,9 @@ test $coin_has_cbc != skipping])
 AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex &&
 test $coin_has_cpx != unavailable &&
 test $coin_has_cpx != skipping])
+AM_CONDITIONAL(SYMPHONY_IP_SOLVER,[test $dip_ip_solver = symphony &&
+test $coin_has_symphony != unavailable &&
+test $coin_has_symphony != skipping])
 
 ##############################################################################
 #                   VPATH links for unit test                                #

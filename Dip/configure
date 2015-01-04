@@ -483,7 +483,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE have_svnversion DIP_SVN_REV CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS DEPENDENCY_LINKING_TRUE DEPENDENCY_LINKING_FALSE LT_LDFLAGS PKG_CONFIG ac_ct_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED COINDEPEND_LIBS COINDEPEND_CFLAGS COINDEPEND_DATA COINDEPEND_DEPENDENCIES COINDEPEND_LIBS_INSTALLED COINDEPEND_CFLAGS_INSTALLED COINDEPEND_DATA_INSTALLED DIPLIB_CFLAGS DIPLIB_LIBS DIPLIB_PCLIBS DIPLIB_PCREQUIRES DIPLIB_DEPENDENCIES DIPLIB_CFLAGS_INSTALLED DIPLIB_LIBS_INSTALLED COIN_HAS_COINDEPEND_TRUE COIN_HAS_COINDEPEND_FALSE CLP_LIBS CLP_CFLAGS CLP_DATA CLP_DEPENDENCIES CLP_LIBS_INSTALLED CLP_CFLAGS_INSTALLED CLP_DATA_INSTALLED COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE SAMPLE_LIBS SAMPLE_CFLAGS SAMPLE_DATA SAMPLE_DEPENDENCIES SAMPLE_LIBS_INSTALLED SAMPLE_CFLAGS_INSTALLED SAMPLE_DATA_INSTALLED COIN_HAS_SAMPLE_TRUE COIN_HAS_SAMPLE_FALSE CGL_LIBS CGL_CFLAGS CGL_DATA CGL_DEPENDENCIES CGL_LIBS_INSTALLED CGL_CFLAGS_INSTALLED CGL_DATA_INSTALLED COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CBC_LIBS CBC_CFLAGS CBC_DATA CBC_DEPENDENCIES CBC_LIBS_INSTALLED CBC_CFLAGS_INSTALLED CBC_DATA_INSTALLED COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE CPX_LIBS CPX_CFLAGS CPX_DATA CPX_DEPENDENCIES CPX_LIBS_INSTALLED CPX_CFLAGS_INSTALLED CPX_DATA_INSTALLED COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE SYMPHONY_LIBS SYMPHONY_CFLAGS SYMPHONY_DATA SYMPHONY_DEPENDENCIES SYMPHONY_LIBS_INSTALLED SYMPHONY_CFLAGS_INSTALLED SYMPHONY_DATA_INSTALLED COIN_HAS_SYMPHONY_TRUE COIN_HAS_SYMPHONY_FALSE ASL_LIBS ASL_CFLAGS ASL_DATA ASL_DEPENDENCIES ASL_LIBS_INSTALLED ASL_CFLAGS_INSTALLED ASL_DATA_INSTALLED COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE HMETISINCDIR HMETISLIB COIN_HAS_HMETIS_TRUE COIN_HAS_HMETIS_FALSE OPENMP_TRUE OPENMP_FALSE PYTHON PYTHON_VERSION PYTHON_PREFIX PYTHON_EXEC_PREFIX PYTHON_PLATFORM pythondir pkgpythondir pyexecdir pkgpyexecdir HAVE_PYTHON_TRUE HAVE_PYTHON_FALSE PYTHON_LIBS PYTHON_CFLAGS CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE SYMPHONY_IP_SOLVER_TRUE SYMPHONY_IP_SOLVER_FALSE CBC_IP_SOLVER_TRUE CBC_IP_SOLVER_FALSE CPLEX_IP_SOLVER_TRUE CPLEX_IP_SOLVER_FALSE DIPINCDIR DIPSRCDIR DipDEFS ARCH COIN_HAS_CLP LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE have_svnversion DIP_SVN_REV CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS DEPENDENCY_LINKING_TRUE DEPENDENCY_LINKING_FALSE LT_LDFLAGS PKG_CONFIG ac_ct_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED COINDEPEND_LIBS COINDEPEND_CFLAGS COINDEPEND_DATA COINDEPEND_DEPENDENCIES COINDEPEND_LIBS_INSTALLED COINDEPEND_CFLAGS_INSTALLED COINDEPEND_DATA_INSTALLED DIPLIB_CFLAGS DIPLIB_LIBS DIPLIB_PCLIBS DIPLIB_PCREQUIRES DIPLIB_DEPENDENCIES DIPLIB_CFLAGS_INSTALLED DIPLIB_LIBS_INSTALLED COIN_HAS_COINDEPEND_TRUE COIN_HAS_COINDEPEND_FALSE CLP_LIBS CLP_CFLAGS CLP_DATA CLP_DEPENDENCIES CLP_LIBS_INSTALLED CLP_CFLAGS_INSTALLED CLP_DATA_INSTALLED COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE SAMPLE_LIBS SAMPLE_CFLAGS SAMPLE_DATA SAMPLE_DEPENDENCIES SAMPLE_LIBS_INSTALLED SAMPLE_CFLAGS_INSTALLED SAMPLE_DATA_INSTALLED COIN_HAS_SAMPLE_TRUE COIN_HAS_SAMPLE_FALSE CGL_LIBS CGL_CFLAGS CGL_DATA CGL_DEPENDENCIES CGL_LIBS_INSTALLED CGL_CFLAGS_INSTALLED CGL_DATA_INSTALLED COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CBC_LIBS CBC_CFLAGS CBC_DATA CBC_DEPENDENCIES CBC_LIBS_INSTALLED CBC_CFLAGS_INSTALLED CBC_DATA_INSTALLED COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE CPX_LIBS CPX_CFLAGS CPX_DATA CPX_DEPENDENCIES CPX_LIBS_INSTALLED CPX_CFLAGS_INSTALLED CPX_DATA_INSTALLED COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE SYMPHONY_LIBS SYMPHONY_CFLAGS SYMPHONY_DATA SYMPHONY_DEPENDENCIES SYMPHONY_LIBS_INSTALLED SYMPHONY_CFLAGS_INSTALLED SYMPHONY_DATA_INSTALLED COIN_HAS_SYMPHONY_TRUE COIN_HAS_SYMPHONY_FALSE ASL_LIBS ASL_CFLAGS ASL_DATA ASL_DEPENDENCIES ASL_LIBS_INSTALLED ASL_CFLAGS_INSTALLED ASL_DATA_INSTALLED COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE HMETISINCDIR HMETISLIB COIN_HAS_HMETIS_TRUE COIN_HAS_HMETIS_FALSE OPENMP_TRUE OPENMP_FALSE PYTHON PYTHON_VERSION PYTHON_PREFIX PYTHON_EXEC_PREFIX PYTHON_PLATFORM pythondir pkgpythondir pyexecdir pkgpyexecdir HAVE_PYTHON_TRUE HAVE_PYTHON_FALSE PYTHON_LIBS PYTHON_CFLAGS CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE CBC_IP_SOLVER_TRUE CBC_IP_SOLVER_FALSE CPLEX_IP_SOLVER_TRUE CPLEX_IP_SOLVER_FALSE SYMPHONY_IP_SOLVER_TRUE SYMPHONY_IP_SOLVER_FALSE DIPINCDIR DIPSRCDIR DipDEFS ARCH COIN_HAS_CLP LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1148,10 +1148,10 @@ Optional Packages:
   --with-cpx-lib linker flags for using package Cpx
   --with-cpx-incdir directory with header files for using package Cpx
   --with-cpx-datadir directory with data files for using package Cpx
-  --with-symphony-lib linker flags for using package Symphony
+  --with-symphony-lib linker flags for using package SYMPHONY
   --with-symphony-incdir directory with header files for using package
-                          Symphony
-  --with-symphony-datadir directory with data files for using package Symphony
+                          SYMPHONY
+  --with-symphony-datadir directory with data files for using package SYMPHONY
   --with-asl-lib linker flags for using package ASL
   --with-asl-incdir directory with header files for using package ASL
   --with-asl-datadir directory with data files for using package ASL
@@ -23772,15 +23772,15 @@ fi
 
 
 
-echo "$as_me:$LINENO: checking for COIN-OR package Symphony" >&5
-echo $ECHO_N "checking for COIN-OR package Symphony... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for COIN-OR package SYMPHONY" >&5
+echo $ECHO_N "checking for COIN-OR package SYMPHONY... $ECHO_C" >&6
 
 coin_has_symphony=notGiven
 
 # check if user wants to skip package in any case
 if test x"$COIN_SKIP_PROJECTS" != x; then
   for dir in $COIN_SKIP_PROJECTS; do
-    if test $dir = "Symphony"; then
+    if test $dir = "SYMPHONY"; then
       coin_has_symphony=skipping
     fi
   done
@@ -23788,7 +23788,7 @@ fi
 
 if test "$coin_has_symphony" != skipping; then
 
-# Check whether --with-m4_tolower(Symphony) or --without-m4_tolower(Symphony) was given.
+# Check whether --with-m4_tolower(SYMPHONY) or --without-m4_tolower(SYMPHONY) was given.
 if test "${with_symphony+set}" = set; then
   withval="$with_symphony"
   if test "$withval" = no ; then
@@ -23824,7 +23824,7 @@ SYMPHONY_PCREQUIRES=
 #check if user provided LIBS, CFLAGS, or DATA for package or disables use of package
 if test $coin_has_symphony != skipping; then
 
-# Check whether --with-m4_tolower(Symphony)-lib or --without-m4_tolower(Symphony)-lib was given.
+# Check whether --with-m4_tolower(SYMPHONY)-lib or --without-m4_tolower(SYMPHONY)-lib was given.
 if test "${with_symphony_lib+set}" = set; then
   withval="$with_symphony_lib"
   if test "$withval" = no ; then
@@ -23849,7 +23849,7 @@ fi
 
 if test $coin_has_symphony != skipping; then
 
-# Check whether --with-m4_tolower(Symphony)-incdir or --without-m4_tolower(Symphony)-incdir was given.
+# Check whether --with-m4_tolower(SYMPHONY)-incdir or --without-m4_tolower(SYMPHONY)-incdir was given.
 if test "${with_symphony_incdir+set}" = set; then
   withval="$with_symphony_incdir"
   if test "$withval" = no ; then
@@ -23870,7 +23870,7 @@ fi
 
 if test $coin_has_symphony != skipping; then
 
-# Check whether --with-m4_tolower(Symphony)-datadir or --without-m4_tolower(Symphony)-datadir was given.
+# Check whether --with-m4_tolower(SYMPHONY)-datadir or --without-m4_tolower(SYMPHONY)-datadir was given.
 if test "${with_symphony_datadir+set}" = set; then
   withval="$with_symphony_datadir"
   if test "$withval" = no ; then
@@ -23941,8 +23941,8 @@ echo "${ECHO_T}not given: $SYMPHONY_PKG_ERRORS" >&6
 
   fi
 else
-  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module Symphony without pkg-config\"" >&5
-echo "$as_me: error: \"Cannot check for existance of module Symphony without pkg-config\"" >&2;}
+  { { echo "$as_me:$LINENO: error: \"Cannot check for existance of module SYMPHONY without pkg-config\"" >&5
+echo "$as_me: error: \"Cannot check for existance of module SYMPHONY without pkg-config\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -23957,8 +23957,8 @@ fi
     echo "$as_me:$LINENO: result: skipped check via pkg-config, redirect to fallback" >&5
 echo "${ECHO_T}skipped check via pkg-config, redirect to fallback" >&6
 
-echo "$as_me:$LINENO: checking for COIN-OR package Symphony (fallback)" >&5
-echo $ECHO_N "checking for COIN-OR package Symphony (fallback)... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for COIN-OR package SYMPHONY (fallback)" >&5
+echo $ECHO_N "checking for COIN-OR package SYMPHONY (fallback)... $ECHO_C" >&6
 
 coin_has_symphony=notGiven
 SYMPHONY_LIBS=
@@ -24233,28 +24233,28 @@ fi;
 
   if test 1 = 0 ; then  #change this test to enable a bit of debugging output
     if test -n "$SYMPHONY_CFLAGS" ; then
-      { echo "$as_me:$LINENO: Symphony CFLAGS are $SYMPHONY_CFLAGS" >&5
-echo "$as_me: Symphony CFLAGS are $SYMPHONY_CFLAGS" >&6;}
+      { echo "$as_me:$LINENO: SYMPHONY CFLAGS are $SYMPHONY_CFLAGS" >&5
+echo "$as_me: SYMPHONY CFLAGS are $SYMPHONY_CFLAGS" >&6;}
     fi
     if test -n "$SYMPHONY_LIBS" ; then
-      { echo "$as_me:$LINENO: Symphony LIBS   are $SYMPHONY_LIBS" >&5
-echo "$as_me: Symphony LIBS   are $SYMPHONY_LIBS" >&6;}
+      { echo "$as_me:$LINENO: SYMPHONY LIBS   are $SYMPHONY_LIBS" >&5
+echo "$as_me: SYMPHONY LIBS   are $SYMPHONY_LIBS" >&6;}
     fi
     if test -n "$SYMPHONY_DEPENDENCIES" ; then
-      { echo "$as_me:$LINENO: Symphony DEPENDENCIES are $SYMPHONY_DEPENDENCIES" >&5
-echo "$as_me: Symphony DEPENDENCIES are $SYMPHONY_DEPENDENCIES" >&6;}
+      { echo "$as_me:$LINENO: SYMPHONY DEPENDENCIES are $SYMPHONY_DEPENDENCIES" >&5
+echo "$as_me: SYMPHONY DEPENDENCIES are $SYMPHONY_DEPENDENCIES" >&6;}
     fi
     if test -n "$SYMPHONY_DATA" ; then
-      { echo "$as_me:$LINENO: Symphony DATA   is  $SYMPHONY_DATA" >&5
-echo "$as_me: Symphony DATA   is  $SYMPHONY_DATA" >&6;}
+      { echo "$as_me:$LINENO: SYMPHONY DATA   is  $SYMPHONY_DATA" >&5
+echo "$as_me: SYMPHONY DATA   is  $SYMPHONY_DATA" >&6;}
     fi
     if test -n "$SYMPHONY_PCLIBS" ; then
-      { echo "$as_me:$LINENO: Symphony PCLIBS are $SYMPHONY_PCLIBS" >&5
-echo "$as_me: Symphony PCLIBS are $SYMPHONY_PCLIBS" >&6;}
+      { echo "$as_me:$LINENO: SYMPHONY PCLIBS are $SYMPHONY_PCLIBS" >&5
+echo "$as_me: SYMPHONY PCLIBS are $SYMPHONY_PCLIBS" >&6;}
     fi
     if test -n "$SYMPHONY_PCREQUIRES" ; then
-      { echo "$as_me:$LINENO: Symphony PCREQUIRES are $SYMPHONY_PCREQUIRES" >&5
-echo "$as_me: Symphony PCREQUIRES are $SYMPHONY_PCREQUIRES" >&6;}
+      { echo "$as_me:$LINENO: SYMPHONY PCREQUIRES are $SYMPHONY_PCREQUIRES" >&5
+echo "$as_me: SYMPHONY PCREQUIRES are $SYMPHONY_PCREQUIRES" >&6;}
     fi
 
       { echo "$as_me:$LINENO: DipLib CFLAGS are $DIPLIB_CFLAGS" >&5
@@ -25386,9 +25386,9 @@ fi
 echo "$as_me:$LINENO: checking for Dip default lp solver" >&5
 echo $ECHO_N "checking for Dip default lp solver... $ECHO_C" >&6
 
-# Check whether --with-lp-solver or --without-lp-solver was given.
-if test "${with_lp_solver+set}" = set; then
-  withval="$with_lp_solver"
+# Check whether --with-dip-lp-solver or --without-dip-lp-solver was given.
+if test "${with_dip_lp_solver+set}" = set; then
+  withval="$with_dip_lp_solver"
   dip_lp_solver=$withval
 else
   dip_lp_solver=clp
@@ -25408,13 +25408,6 @@ echo "${ECHO_T}Clp" >&6
 echo "${ECHO_T}Cplex" >&6
      if test $coin_has_cpx != yes; then
          found_package=false
-     fi
-   ;;
-   symphony)
-     echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6{symphony}
-     if test $coin_has_symphony != yes; then
-     	found_package=false
      fi
    ;;
   *)
@@ -25455,18 +25448,6 @@ else
 fi
 
 
-
-if test $dip_ip_solver = symphony &&
-test $coin_has_symphony != unavailable &&
-test $coin_has_symphony != skipping; then
-  SYMPHONY_IP_SOLVER_TRUE=
-  SYMPHONY_IP_SOLVER_FALSE='#'
-else
-  SYMPHONY_IP_SOLVER_TRUE='#'
-  SYMPHONY_IP_SOLVER_FALSE=
-fi
-
-
 #############################################################################
 #                      Check for the IP solver                              #
 #############################################################################
@@ -25474,9 +25455,9 @@ fi
 echo "$as_me:$LINENO: checking for Dip default ip solver" >&5
 echo $ECHO_N "checking for Dip default ip solver... $ECHO_C" >&6
 
-# Check whether --with-ip-solver or --without-ip-solver was given.
-if test "${with_ip_solver+set}" = set; then
-  withval="$with_ip_solver"
+# Check whether --with-dip-ip-solver or --without-dip-ip-solver was given.
+if test "${with_dip_ip_solver+set}" = set; then
+  withval="$with_dip_ip_solver"
   dip_ip_solver=$withval
 else
   dip_ip_solver=cbc
@@ -25496,6 +25477,13 @@ echo "${ECHO_T}Cbc" >&6
 echo "${ECHO_T}Cplex" >&6
      if test $coin_has_cpx != yes; then
          found_package=false
+     fi
+   ;;
+   symphony)
+     echo "$as_me:$LINENO: result: SYMPHONY" >&5
+echo "${ECHO_T}SYMPHONY" >&6
+     if test $coin_has_symphony != yes; then
+     	found_package=false
      fi
    ;;
   *)
@@ -25533,6 +25521,18 @@ test $coin_has_cpx != skipping; then
 else
   CPLEX_IP_SOLVER_TRUE='#'
   CPLEX_IP_SOLVER_FALSE=
+fi
+
+
+
+if test $dip_ip_solver = symphony &&
+test $coin_has_symphony != unavailable &&
+test $coin_has_symphony != skipping; then
+  SYMPHONY_IP_SOLVER_TRUE=
+  SYMPHONY_IP_SOLVER_FALSE='#'
+else
+  SYMPHONY_IP_SOLVER_TRUE='#'
+  SYMPHONY_IP_SOLVER_FALSE=
 fi
 
 
@@ -25965,13 +25965,6 @@ echo "$as_me: error: conditional \"CPLEX_LP_SOLVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${SYMPHONY_IP_SOLVER_TRUE}" && test -z "${SYMPHONY_IP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"SYMPHONY_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"SYMPHONY_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${CBC_IP_SOLVER_TRUE}" && test -z "${CBC_IP_SOLVER_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"CBC_IP_SOLVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -25983,6 +25976,13 @@ if test -z "${CPLEX_IP_SOLVER_TRUE}" && test -z "${CPLEX_IP_SOLVER_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"CPLEX_IP_SOLVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"CPLEX_IP_SOLVER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${SYMPHONY_IP_SOLVER_TRUE}" && test -z "${SYMPHONY_IP_SOLVER_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"SYMPHONY_IP_SOLVER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"SYMPHONY_IP_SOLVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -26803,12 +26803,12 @@ s,@CLP_LP_SOLVER_TRUE@,$CLP_LP_SOLVER_TRUE,;t t
 s,@CLP_LP_SOLVER_FALSE@,$CLP_LP_SOLVER_FALSE,;t t
 s,@CPLEX_LP_SOLVER_TRUE@,$CPLEX_LP_SOLVER_TRUE,;t t
 s,@CPLEX_LP_SOLVER_FALSE@,$CPLEX_LP_SOLVER_FALSE,;t t
-s,@SYMPHONY_IP_SOLVER_TRUE@,$SYMPHONY_IP_SOLVER_TRUE,;t t
-s,@SYMPHONY_IP_SOLVER_FALSE@,$SYMPHONY_IP_SOLVER_FALSE,;t t
 s,@CBC_IP_SOLVER_TRUE@,$CBC_IP_SOLVER_TRUE,;t t
 s,@CBC_IP_SOLVER_FALSE@,$CBC_IP_SOLVER_FALSE,;t t
 s,@CPLEX_IP_SOLVER_TRUE@,$CPLEX_IP_SOLVER_TRUE,;t t
 s,@CPLEX_IP_SOLVER_FALSE@,$CPLEX_IP_SOLVER_FALSE,;t t
+s,@SYMPHONY_IP_SOLVER_TRUE@,$SYMPHONY_IP_SOLVER_TRUE,;t t
+s,@SYMPHONY_IP_SOLVER_FALSE@,$SYMPHONY_IP_SOLVER_FALSE,;t t
 s,@DIPINCDIR@,$DIPINCDIR,;t t
 s,@DIPSRCDIR@,$DIPSRCDIR,;t t
 s,@DipDEFS@,$DipDEFS,;t t
