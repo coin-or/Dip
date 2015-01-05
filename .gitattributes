@@ -43,7 +43,6 @@ Dip/MSVisualStudio/v9/DecompExamples/VRP/vrp.parm -text
 Dip/Makefile.am -text
 Dip/Makefile.in -text
 Dip/README -text
-Dip/README.md -text
 Dip/README.rst -text
 Dip/bugs/OsiCbc/main.cpp -text
 Dip/bugs/OsiCbc/tmp.mps -text
@@ -637,6 +636,7 @@ Dip/test/Makefile.in -text
 /Makefile.am -text
 /Makefile.in -text
 /README -text
+/README.md -text
 conf/perms.txt -text
 /config.guess -text
 /config.sub -text
