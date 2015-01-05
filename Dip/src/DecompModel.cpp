@@ -236,7 +236,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
                                    bool                 doExact,
                                    bool                 doCutoff,
                                    bool                 isRoot,
-                                   double               cutoff)
+                                   double               cutoff,
+				   double               timeLimit)
 {
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
@@ -249,37 +250,65 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 #ifdef __DECOMP_IP_SYMPHONY__
 
    if (param.WarmStart) {
-      if (getCounter() == 0) {
-         OsiSolverInterface* m_subModelClone = m_osi->clone();
-         osi_Sym
-         = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
-         osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
-         assert(osi_Sym);
-         sym_environment* env = osi_Sym->getSymphonyEnvironment();
-         sym_set_int_param(env, "do_reduced_cost_fixing", 0);
-   else{
-     sym_set_int_param(env, "verbosity", logIpLevel);
-   }
-         if (logIpLevel == 0 ) {
-            sym_set_int_param(env, "verbosity", -10);
-         } else {
-            sym_set_int_param(env, "verbosity", logIpLevel);
-         }
+      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      sym_environment* env = osi_Sym->getSymphonyEnvironment();
+      sym_set_int_param(env, "do_reduced_cost_fixing", 0);
 
-         assert(env);
-         osi_Sym->initialSolve();
-         m_ws = osi_Sym->getWarmStart();
-         //         osi_Sym->branchAndBound();
+      if (logIpLevel == 0 ) {
+         sym_set_int_param(env, "verbosity", -10);
       } else {
-         //         osi_Sym->setWarmStart(m_ws);
-         std::cout << "cunter is " << getCounter() << std::endl;
-         osi_Sym->resolve();
+         sym_set_int_param(env, "verbosity", logIpLevel);
       }
+
+      osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+      //whether to trim the warm start tree before re-solving.
+      osi_Sym->setSymParam(OsiSymTrimWarmTree, true);
+
+      if (!m_ws_tag) {
+         m_ws = osi_Sym->getWarmStart();
+
+         if (m_ws) {
+            m_ws_tag = 1;
+         }
+      }
+
+      if (m_ws_tag) {
+         osi_Sym->resolve();
+         //	 std::cout << "warm start resolve " << std::endl;
+      } else {
+         osi_Sym->initialSolve();
+         //	 std::cout << "NON warm start resolve " << std::endl;
+      }
+
+      /*
+            OsiSolverInterface* m_subModelClone = m_osi->clone();
+            osi_Sym
+            = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
+            //osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+            assert(osi_Sym);
+            sym_environment* env = osi_Sym->getSymphonyEnvironment();
+            sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+
+
+            assert(env);
+       //         osi_Sym->initialSolve();
+            m_ws = osi_Sym->getWarmStart();
+       osi_Sym->branchAndBound();
+         } else {
+      if(m_ws){
+        osi_Sym->setWarmStart(m_ws);
+      }
+            std::cout << "counter is " << getCounter() << std::endl;
+            osi_Sym->resolve();
+         }
+      */
    } else {
+    //  osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+      
       OsiSolverInterface* m_subModelClone = m_osi->clone();
-      osi_Sym
-      = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
+      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
       assert(osi_Sym);
+      
       sym_environment* env = osi_Sym->getSymphonyEnvironment();
 
       if (logIpLevel == 0 ) {
@@ -295,28 +324,30 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
    int status = sym_get_status(env);
 
-   if (status == TM_OPTIMAL_SOLUTION_FOUND) {
-      std::cout << "Tree Manager(TM) found the "
-                << "optimal solution and stopped"
-                << std::endl;
-   } else if (status == TM_TIME_LIMIT_EXCEEDED) {
-      std::cout << "TM stopped after reaching the"
-                << " predefined time limit "
-                << std::endl;
-   } else if (status == TM_NODE_LIMIT_EXCEEDED) {
-      std::cout << "TM stopped after reading"
-                << " the predefined node limit "
-                << std::endl;
-   } else if (status == TM_TARGET_GAP_ACHIEVED) {
-      std::cout << "TM stopped after achieving "
-                << "the predened target gap"
-                << std::endl;
-   } else if (status == TM_NO_SOLUTION) {
-      std::cout << "TM has NO SOLUTION"
-                << std::endl;
-   } else {
-      std::cerr << "Error: SYPHONMY IP solver status =  "
-                << status << std::endl;
+   if (param.LogDebugLevel >= 4){
+      if (status == TM_OPTIMAL_SOLUTION_FOUND) {
+	 std::cout << "Tree Manager(TM) found the "
+		   << "optimal solution and stopped"
+		   << std::endl;
+      } else if (status == TM_TIME_LIMIT_EXCEEDED) {
+	 std::cout << "TM stopped after reaching the"
+		   << " predefined time limit "
+		   << std::endl;
+      } else if (status == TM_NODE_LIMIT_EXCEEDED) {
+	 std::cout << "TM stopped after reading"
+		   << " the predefined node limit "
+		   << std::endl;
+      } else if (status == TM_TARGET_GAP_ACHIEVED) {
+	 std::cout << "TM stopped after achieving "
+		   << "the predened target gap"
+		   << std::endl;
+      } else if (status == TM_NO_SOLUTION) {
+	 std::cout << "TM has NO SOLUTION"
+		   << std::endl;
+      } else {
+	 std::cerr << "Error: SYPHONMY IP solver status =  "
+		   << status << std::endl;
+      }
    }
 
    if ( (status == PREP_OPTIMAL_SOLUTION_FOUND ) ||
@@ -325,8 +356,10 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       result->m_isOptimal = true;
       double objective_value = 0.0;
       sym_get_obj_val(env, &objective_value);
-      std::cout << "The optimal objective value is "
-                << objective_value << std::endl;
+      if (param.LogDebugLevel >= 4){
+	 std::cout << "The optimal objective value is "
+		   << objective_value << std::endl;
+      }
       status = sym_get_col_solution(env, solution);
       /*
       for (int i = 0 ; i < numCols; ++i) {
@@ -337,10 +370,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       result->m_nSolutions = 1;
       vector<double> solVec(solution, solution + numCols);
       result->m_solution.push_back(solVec);
-      std::cout << "status is " << status << std::endl;
-      //  if(status == FUNCTION_TERMINATED_ABNORMALLY){
-      //       throw UtilException("sym_get_col_solution failure",
-      //			   "solveOsiAsIp", "DecompAlgoModel");
+      if (param.LogDebugLevel >= 4){
+	 std::cout << "status is " << status << std::endl;
+	 //  if(status == FUNCTION_TERMINATED_ABNORMALLY){
+	 //       throw UtilException("sym_get_col_solution failure",
+	 //			   "solveOsiAsIp", "DecompAlgoModel");
+      }
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result->m_nSolutions = 0;
@@ -363,6 +398,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    CbcModel cbc(*m_osi);
    cbc.setLogLevel(logIpLevel);
 #if 0
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit); 
    cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
    result->m_solStatus    = cbc.status();
@@ -393,7 +429,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    string cbcGap       = "-ratio";
    string cbcGapSet    = "0";
    string cbcTime      = "-seconds";
-   string cbcTimeSet   = "0";
+   string cbcTimeSet   = UtilDblToStr(timeLimit, -1, COIN_DBL_MAX);
    string cbcCutoff    = "-cutoff";
    string cbcCutoffSet = UtilDblToStr(cutoff, -1, COIN_DBL_MAX);
    string cbcSLog      = "-slog";

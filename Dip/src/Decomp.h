@@ -279,6 +279,10 @@ const std::string DecompColTypeStr[12] = {
    "DecompCol_ToBeDeleted"
 };
 
+enum DecompBranchingImplementation {
+   DecompBranchInSubproblem,
+   DecompBranchInMaster
+};
 /*
 enum DecompNumericErrorType {
 

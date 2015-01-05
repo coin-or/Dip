@@ -171,7 +171,10 @@ public:
       colUB.push_back(upBound);
 
       if (isInteger) {
-         integerVars.push_back(index);
+         if (std::find(integerVars.begin(), integerVars.end(), index)
+               == integerVars.end()) {
+            integerVars.push_back(index);
+         }
       }
 
       assert(!(origIndex == -1 && m_isSparse));

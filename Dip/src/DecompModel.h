@@ -13,7 +13,6 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
-
 #ifndef DECOMP_MODEL_INCLUDED
 #define DECOMP_MODEL_INCLUDED
 
@@ -27,7 +26,6 @@
 #include "OsiSymSolverInterface.hpp"
 #endif
 //===========================================================================//
-
 //naming convention - usually would do DecompModelXx, DecompModelYy
 //===========================================================================//
 class DecompAppModel {
@@ -87,14 +85,24 @@ public:
 class DecompAlgoModel : public DecompAppModel {
 private:
    OsiSolverInterface*   m_osi;
-   int                   m_numCols;
-   int*                  m_colIndices;
-   int                   m_counter;
-   CoinWarmStart*        m_ws;
 #ifdef __DECOMP_IP_SYMPHONY__
    OsiSymSolverInterface* osi_Sym;
 #endif
+   int                   m_numCols;
+   int*                  m_colIndices;
+   int                   m_counter;
+   int                   m_ws_tag;
+   CoinWarmStart*        m_ws;
 public:
+
+   inline void setCounter(const int num) {
+      m_counter = num;
+   }
+
+   inline int getCounter() {
+      return m_counter;
+   }
+
    void setOsi(OsiSolverInterface* osi) {
       m_osi = osi;
 
@@ -136,13 +144,6 @@ public:
                                m_colIndices + m_numCols, objCoeff);
    }
 
-   void setCounter(int num) {
-      m_counter = num;
-   }
-
-   int getCounter() {
-      return m_counter;
-   }
 
    void setActiveColBounds(const double* colLB,
                            const double* colUB) {
@@ -195,7 +196,8 @@ public:
                      bool                 doExact,
                      bool                 doCutoff,
                      bool                 isRoot,
-                     double               cutoff);
+                     double               cutoff,
+                     double               timeLimit);
 
    bool isPointFeasible(const double* x,
                         const bool     isXSparse  = false,
@@ -207,12 +209,13 @@ public:
    DecompAlgoModel(const DecompAppModel& appModel) :
       DecompAppModel(appModel),
       m_osi         (NULL),
-      m_numCols     (0   ),
-      m_colIndices  (NULL),
-      m_counter     (  0 ),
 #ifdef __DECOMP_IP_SYMPHONY__
       osi_Sym     (NULL),
 #endif
+      m_numCols     (0   ),
+      m_colIndices  (NULL),
+      m_counter    ( 0 ),
+      m_ws_tag     ( 0 ),
       m_ws          (NULL)
    {};
 
@@ -224,12 +227,13 @@ public:
    DecompAlgoModel() :
       DecompAppModel(),
       m_osi         (NULL),
-      m_numCols     (0   ),
-      m_colIndices  (NULL),
-      m_counter     (0),
 #ifdef __DECOMP_IP_SYMPHONY__
       osi_Sym       (NULL),
 #endif
+      m_numCols     (0   ),
+      m_colIndices  (NULL),
+      m_counter     (0),
+      m_ws_tag      (0),
       m_ws          (NULL)
    {};
    DecompAlgoModel(DecompConstraintSet* model,
@@ -237,12 +241,13 @@ public:
                    int                   blockId) :
       DecompAppModel(model, modelName, blockId),
       m_osi         (NULL),
-      m_numCols     (0   ),
-      m_colIndices  (NULL),
-      m_counter     (0),
 #ifdef __DECOMP_IP_SYMPHONY__
       osi_Sym       (NULL),
 #endif
+      m_numCols     (0   ),
+      m_colIndices  (NULL),
+      m_counter     (0),
+      m_ws_tag      (0),
       m_ws          (NULL)
    {};
    ~DecompAlgoModel() {
