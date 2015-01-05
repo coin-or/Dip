@@ -27,19 +27,19 @@ Dip package in two ways:
    scheme". On Windows, it is recommended to get the source with the SVN
    client TortoiseSVN (http://tortoisesvn.net).
 
-   Assuming that you want to download a release version 0.9.0, as an example,
+   Assuming that you want to download a release version 0.9.12, as an example,
    you would execute the command
 
-   svn co https://projects.coin-or.org/svn/Dip/releases/0.9.0 Dip-0.9.0
+   svn co https://projects.coin-or.org/svn/Dip/releases/0.9.12 Dip-0.9.12
 
    You can similarly get source for the latest stable version or the trunk
    (development) version.
 
 2. Download the tarball from http://www.coin-or.org/download/source/Dip 
-   and extract it. For example, for the release 0.9.0 you type
+   and extract it. For example, for the release 0.9.12 you type
 
-   gunzip Dip-0.9.0.tgz
-   tar xvf Dip-0.9.0.tar
+   gunzip Dip-0.9.12.tgz
+   tar xvf Dip-0.9.12.tar
 
    More detailed download instructions can be found at
 
@@ -47,7 +47,7 @@ Dip package in two ways:
 ***                        CONFIGURATION                           ***
 **********************************************************************
 
-Go into the directory that you just downloaded or extracted (e.g., Dip-0.9.0).
+Go into the directory that you just downloaded or extracted (e.g., Dip-0.9.12).
 Then create a build directory and configure the package by typing
 
    mkdir build
