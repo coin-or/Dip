@@ -3,8 +3,9 @@ DIP README
 
 Welcome to the README for the Decomposition in Integer Programming (DIP)
 Framework. DIP is distributed under the Eclipse Public License and is freely
-redistributable. All source code and documentation is Copyright IBM and
-others. This README may be redistributed freely.
+redistributable. All source code and documentation is Copyright Matthew
+Galati, Ted Ralphs, Lehigh University, and others. This README may be 
+redistributed freely.
 
 DOCUMENTATION
 =============
