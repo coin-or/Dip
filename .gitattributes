@@ -648,7 +648,7 @@ doxydoc/Bcps/doxygen.conf -text
 doxydoc/Cbc/doxygen.conf -text
 doxydoc/Clp/doxygen.conf -text
 doxydoc/CoinUtils/doxygen.conf -text
-doxydoc/Decomp/doxygen.conf -text
+doxydoc/Dip/doxygen.conf -text
 doxydoc/Osi/doxygen.conf -text
 doxydoc/all/doxygen.conf -text
 /install-sh -text
