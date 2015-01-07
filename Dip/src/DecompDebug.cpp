@@ -238,8 +238,8 @@ void DecompAlgo::checkMasterDualObj()
                           "checkMasterDualObj", "DecompAlgo");
    }
 
-   UTIL_DELPTR(rStat);
-   UTIL_DELPTR(cStat);
+   UTIL_DELARR(rStat);
+   UTIL_DELARR(cStat);
 }
 
 //===========================================================================//
