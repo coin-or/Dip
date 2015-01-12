@@ -152,6 +152,7 @@ void DecompAlgoPC::adjustMasterDualSolution()
    double         alpha  = m_param.DualStabAlpha;
    double         alpha1 = 1.0 - alpha;
    copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+
    //---
    //--- for both the first PhaseI and first PhaseII calls,
    //---   be sure to set the dual vector to dualRM as dual=0
@@ -371,7 +372,7 @@ int DecompAlgoPC::compressColumns()
       }
    }
 
-   assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
+   //assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
    //several strategies here - we can sort by effCnt and
    // purge those with the worse (only those negative)
    //or we can just purge anything negative
@@ -532,7 +533,7 @@ int DecompAlgoPC::compressColumns()
          }
       }
 
-      assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
+      //assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
       UTIL_DEBUG(m_param.LogLevel, 5,
                  (*m_osLog) << "VARS after compress:" << endl;
                  printVars(m_osLog););
@@ -696,7 +697,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status == FUNCTION_TERMINATED_ABNORMALLY)
          throw UtilException("sym_get_col_solution failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result.m_nSolutions = 0;
@@ -780,8 +781,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    if (!UtilIsInSet(result.m_solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = " << result.m_solStatus << endl;
-      throw UtilException("CBC solver status",
-                          "solveOsiAsIp", "DecompAlgoModel");
+      //This shouldn't really cause an exception
+      //throw UtilException("CBC solver status",
+      //                    "solutionUpdateAsIp", "DecompAlgoModel");
    }
 
    /** Secondary status of problem
@@ -804,10 +806,11 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //---   can be infeasible.
    //---
    if (!UtilIsInSet(result.m_solStatus2, statusSet2, 4)) {
-      cerr << "Error: CBC IP solver 2nd status = "
+      cerr << "Warning: CBC IP solver 2nd status = "
            << result.m_solStatus2 << endl;
-      throw UtilException("CBC solver 2nd status",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+      //This shouldn't really cause an exception
+      //throw UtilException("CBC solver 2nd status",
+      //                    "solutionUpdateAsIp", "DecompAlgoPC");
    }
 
    //---
@@ -868,19 +871,19 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
    }
 
    if (m_firstPhase2Call) {
@@ -1290,7 +1293,15 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
          = m_cutpool.createRowReform(modelCore->getNumCols(),
                                      row,
                                      m_vars);
+	 int tempIndex(0); 
+	 for (int i = 0; i < row->getNumElements(); i++){
+	   tempIndex = row->getIndices()[i];
+	   if (m_masterOnlyColsMap.find(tempIndex)!=m_masterOnlyColsMap.end()){
+	     rowReform->insert(m_masterOnlyColsMap.at(tempIndex),row->getElements()[i]);
+	   } 
+	 }
 
+	
          if (!rowReform) {
             //TODO: need status return code for failure in -O
             (*m_osLog) << "ERROR in createRowReform\n";
