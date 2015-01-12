@@ -150,6 +150,7 @@ void DecompAlgoPC::adjustMasterDualSolution()
    double         alpha  = m_param.DualStabAlpha;
    double         alpha1 = 1.0 - alpha;
    copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+
    //---
    //--- for both the first PhaseI and first PhaseII calls,
    //---   be sure to set the dual vector to dualRM as dual=0
@@ -1284,7 +1285,15 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
          = m_cutpool.createRowReform(modelCore->getNumCols(),
                                      row,
                                      m_vars);
+	 int tempIndex(0); 
+	 for (int i = 0; i < row->getNumElements(); i++){
+	   tempIndex = row->getIndices()[i];
+	   if (m_masterOnlyColsMap.find(tempIndex)!=m_masterOnlyColsMap.end()){
+	     rowReform->insert(m_masterOnlyColsMap.at(tempIndex),row->getElements()[i]);
+	   } 
+	 }
 
+	
          if (!rowReform) {
             //TODO: need status return code for failure in -O
             (*m_osLog) << "ERROR in createRowReform\n";
