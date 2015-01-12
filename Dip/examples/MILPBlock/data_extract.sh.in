@@ -1,5 +1,0 @@
-cd @srcdir@/../../data/MILP/block
-./get.data
-tar -zxvf atm.tgz
-tar -zxvf retail.tgz
-tar -zxvf drugport.tgz
