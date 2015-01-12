@@ -16,6 +16,8 @@ test: ../src/dip$(EXEEXT)
 
 	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --MILP:BestKnownLB 11   --MILP::BestKnownUB 11
 
+	../src/dip$(EXEEXT) --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --MILP:BestKnownLB 88   --MILP::BestKnownUB 88
+
 .PHONY: test
 
 ########################################################################

@@ -51,12 +51,13 @@ numLinkingCons = 10
 numVars = sum(numBlockVars)
 numCons = sum(numBlockCons) + numLinkingCons
 
-VARIABLES = dict(((i, j), 0) for i in range(numBlocks) for j in range(numBlockVars[i]))
+VARIABLES = dict(((i, j), 0) for i in range(numBlocks) 
+                 for j in range(numBlockVars[i]))  
 
 CONSTRAINTS = []
-for j in range(numBlocks):
-    CONSTRAINTS.append(["C"+str(j)+"_"+str(i) for i in range(numCons)])
-CONSTRAINTS.append(["C"+str(numBlocks)+"_"+str(i) for i in range(numCons)])
+for k in range(numBlocks):
+    CONSTRAINTS.append(["C"+str(k)+"_"+str(j) for j in range(numCons)])
+CONSTRAINTS.append(["C"+str(numBlocks)+"_"+str(j) for j in range(numCons)])
 
 #Generate random MILP
 var = LpVariable.dicts("x", VARIABLES, 0, 1, LpBinary)

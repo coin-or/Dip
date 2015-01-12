@@ -321,6 +321,8 @@ public:
 
    std::string SolutionOutputFileName;
 
+   bool WarmStart;
+
    /**
     * @}
     */
@@ -435,6 +437,7 @@ public:
       PARAM_getSetting("BlockFileOutputFormat", BlockFileOutputFormat);
       PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
       PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
+      PARAM_getSetting("WarmStart", WarmStart);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -579,6 +582,7 @@ public:
       UtilPrintParameter(os, sec, "BlockFileOutputFormat", BlockFileOutputFormat);
       UtilPrintParameter(os, sec, "SolutionOutputToFile", SolutionOutputToFile);
       UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
+      UtilPrintParameter(os, sec, "WarmStart", WarmStart);
       (*os) << "========================================================\n";
    }
 
@@ -647,7 +651,7 @@ public:
       MasterConvexityLessThan  = 0;
       ParallelColsLimit        = 1.0;
       BranchStrongIter         = 0;
-      DebugCheckBlocksColumns  = true;
+      DebugCheckBlocksColumns  = false;
       /*
        * parameters from MILPBlock and to be MILP
        */
@@ -683,6 +687,7 @@ public:
       BlockFileOutputFormat    = 0;
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
+      WarmStart                = false;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

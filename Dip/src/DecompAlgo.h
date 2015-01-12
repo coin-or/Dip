@@ -143,6 +143,7 @@ protected:
 
 #ifdef __DECOMP_IP_SYMPHONY__
    OsiSymSolverInterface* osi_Sym;
+   CoinWarmStart* ws;
 #endif
    /**
     * Solver interface(s) for entire problem (Q'').
@@ -254,6 +255,16 @@ protected:
     *  Map from original index to master index for master-only vars.
     */
    std::map<int, int> m_masterOnlyColsMap;
+
+   // used for setting time limit to solving MIP subproblem
+   double tempTimeLimit;
+
+   // variable dictating whether the branching is implemented
+   // in the master problem or the subproblem
+
+   DecompBranchingImplementation m_branchingImplementation;
+
+
 
 public:
    /**
@@ -1006,7 +1017,9 @@ public:
       m_masterObjLast(DecompInf),
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
-      m_masterOnlyCols() {
+      m_masterOnlyCols(),
+      tempTimeLimit(0),
+      m_branchingImplementation(DecompBranchInSubproblem) {
       m_app->m_decompAlgo = this;
    }
 

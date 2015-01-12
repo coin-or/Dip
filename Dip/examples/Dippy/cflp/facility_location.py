@@ -38,7 +38,7 @@ try:
 except ImportError:
     ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
-display_mode = 'off'
+display_mode = 'xdot'
 
 prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
                         layout = 'dot', display_interval = 0)
@@ -381,16 +381,8 @@ elif algo == 'Price':
     dippyOpts['CutCGL'] = '0'
 else:
     dippyOpts['doCut'] = '1'
-
 dippyOpts['TolZero'] = '%s' % tol
         
-#    'SolveMasterAsIp': '0',
-#    'generateInitVars': '1',
-#    'LogDebugLevel': 3,
-#    'LogDumpModel': 5,
-#    'ALPS' :
-#    {'msgLevel' : 3}
-
 dippy.Solve(prob, dippyOpts)
 
 if prob.display_mode != 'off':

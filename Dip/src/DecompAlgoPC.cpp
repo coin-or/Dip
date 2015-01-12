@@ -152,6 +152,7 @@ void DecompAlgoPC::adjustMasterDualSolution()
    double         alpha  = m_param.DualStabAlpha;
    double         alpha1 = 1.0 - alpha;
    copy(u, u + nRows, m_dualRM.begin()); //copy for sake of debugging
+
    //---
    //--- for both the first PhaseI and first PhaseII calls,
    //---   be sure to set the dual vector to dualRM as dual=0
@@ -371,7 +372,7 @@ int DecompAlgoPC::compressColumns()
       }
    }
 
-   assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
+   //assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
    //several strategies here - we can sort by effCnt and
    // purge those with the worse (only those negative)
    //or we can just purge anything negative
@@ -532,7 +533,7 @@ int DecompAlgoPC::compressColumns()
          }
       }
 
-      assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
+      //assert(nMasterColsStruct == static_cast<int>(m_vars.size()));
       UTIL_DEBUG(m_param.LogLevel, 5,
                  (*m_osLog) << "VARS after compress:" << endl;
                  printVars(m_osLog););
@@ -612,16 +613,6 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
    }
 
-   for (i = 0; i < numMOs; i++) {
-      j        = m_masterOnlyCols[i];
-
-      if (intMarkerCore[j] != 'C') {
-         colIndex = m_masterOnlyColsMap[j];
-         assert(isMasterColMasterOnly(colIndex));
-         m_masterSI->setInteger(colIndex);
-      }
-   }
-
    if (m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
                           "masterProbRootIP",
@@ -631,20 +622,21 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    DecompSolverResult    result;
 #ifdef __DECOMP_IP_SYMPHONY__
-   int numCols = m_masterSI->getNumCols();
+   OsiSolverInterface * m_masterClone = m_masterSI->clone();
+ 
+   int numCols = m_masterClone->getNumCols();
    OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
-   const CoinPackedMatrix* matrix_sym = (m_masterSI->getMatrixByRow());
-   const double* col_lb = (m_masterSI->getColLower());
-   const double* col_up = (m_masterSI->getColUpper());
-   const double* row_lb = (m_masterSI->getRowLower());
-   const double* row_up = (m_masterSI->getRowUpper());
-   const double* obj_coef = (m_masterSI->getObjCoefficients());
+   const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
+   const double* col_lb = (m_masterClone->getColLower());
+   const double* col_up = (m_masterClone->getColUpper());
+   const double* row_lb = (m_masterClone->getRowLower());
+   const double* row_up = (m_masterClone->getRowUpper());
+   const double* obj_coef = (m_masterClone->getObjCoefficients());
    osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
                           const_cast<double*&>(col_lb),
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
-
-   for (i = 0; i < nMasterCols; i++) {
+   for (int i = 0; i < nMasterCols; i++) {
       if (isMasterColStructural(i)) {
          osi_Sym->setInteger(i);
       }
@@ -653,6 +645,10 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //TODO: is this expensive? if so,
    //  better to use column type info
    //  like above
+   /*
+   DecompVarList::iterator li; 
+   map<int, DecompAlgoModel>::iterator mit; 
+
    for (li = m_vars.begin(); li != m_vars.end(); li++) {
       b   = (*li)->getBlockId();
       mit = m_modelRelax.find(b);
@@ -664,17 +660,25 @@ void DecompAlgoPC::solutionUpdateAsIP()
          continue;
       }
 
-      if (( model->m_masterOnly && !model->m_masterOnlyIsInt) ||
-            (!model->m_masterOnly && model->getNumInts() == 0)) {
+      if ( model->masterOnlyCols.size() ||
+	  (!model->masterOnlyCols.size() && model->getNumInts() == 0)) {
          osi_Sym->setContinuous((*li)->getColMasterIndex());
          //printf("set back to continuous index=%d block=%d\n",
          //       b, (*li)->getColMasterIndex());
          //       std::cout << "set continuous variables back " << std::endl;
       }
    }
+   */
 
    assert(osi_Sym);
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
+   if (logIpLevel == 0){
+     sym_set_int_param(env, "verbosity", -10);
+   }
+   else{
+     sym_set_int_param(env, "verbosity", logIpLevel);
+   }
+
    assert(env);
    osi_Sym->branchAndBound();
    int status = sym_get_status(env);
@@ -693,7 +697,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status == FUNCTION_TERMINATED_ABNORMALLY)
          throw UtilException("sym_get_col_solution failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result.m_nSolutions = 0;
@@ -723,8 +727,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
                    m_param.SolveMasterAsIpLimitGap);
    cbc.setDblParam(CbcModel::CbcMaximumSeconds, m_param.SolveMasterAsIpLimitTime);
    cbc.setDblParam(CbcModel::CbcCurrentCutoff, m_globalUB);
-   cbc.branchAndBound();
 #if 0
+   cbc.branchAndBound();
+#else
    CbcMain0(cbc);
    //---
    //--- build argument list
@@ -776,8 +781,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    if (!UtilIsInSet(result.m_solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = " << result.m_solStatus << endl;
-      throw UtilException("CBC solver status",
-                          "solveOsiAsIp", "DecompAlgoModel");
+      //This shouldn't really cause an exception
+      //throw UtilException("CBC solver status",
+      //                    "solutionUpdateAsIp", "DecompAlgoModel");
    }
 
    /** Secondary status of problem
@@ -800,10 +806,11 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //---   can be infeasible.
    //---
    if (!UtilIsInSet(result.m_solStatus2, statusSet2, 4)) {
-      cerr << "Error: CBC IP solver 2nd status = "
+      cerr << "Warning: CBC IP solver 2nd status = "
            << result.m_solStatus2 << endl;
-      throw UtilException("CBC solver 2nd status",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+      //This shouldn't really cause an exception
+      //throw UtilException("CBC solver 2nd status",
+      //                    "solutionUpdateAsIp", "DecompAlgoPC");
    }
 
    //---
@@ -864,19 +871,19 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompAlgoModel");
    }
 
    if (m_firstPhase2Call) {
@@ -1108,6 +1115,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
       }
    }
 
+
 #ifdef __DECOMP_IP_CPX__
    //---
    //--- set time back
@@ -1285,7 +1293,15 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
          = m_cutpool.createRowReform(modelCore->getNumCols(),
                                      row,
                                      m_vars);
+	 int tempIndex(0); 
+	 for (int i = 0; i < row->getNumElements(); i++){
+	   tempIndex = row->getIndices()[i];
+	   if (m_masterOnlyColsMap.find(tempIndex)!=m_masterOnlyColsMap.end()){
+	     rowReform->insert(m_masterOnlyColsMap.at(tempIndex),row->getElements()[i]);
+	   } 
+	 }
 
+	
          if (!rowReform) {
             //TODO: need status return code for failure in -O
             (*m_osLog) << "ERROR in createRowReform\n";

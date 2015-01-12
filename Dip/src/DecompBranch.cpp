@@ -40,6 +40,7 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
    branchedOnIndex = -1;
    branchedOnValue =  0;
    CoinAssert(modelCore->integerVars.size() > 0);
+   // const std::vector<std::string> & colNames = modelCore->getColNames();
 
    for (intIt =  modelCore->integerVars.begin();
          intIt != modelCore->integerVars.end(); intIt++) {
@@ -55,12 +56,24 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
       }
    }
 
+   std::map<int, int >:: iterator mit;
+
    if (branchedOnIndex != -1) {
       //---
       //--- Example x[0]=2.5:
       //---    x[0] <= 2 (down)
       //---    x[0] >= 3 (up  )
       //---
+      mit = m_masterOnlyColsMap.find(branchedOnIndex);
+
+      if (mit != m_masterOnlyColsMap.end()) {
+         // it indicates the branched variable is a master-only variable
+         // we need to set the branching method to branch in the master
+         m_branchingImplementation = DecompBranchInMaster;
+      }
+      
+      //std::cout << "The branching variable is " << branchedOnIndex
+      //          << "  " << colNames[branchedOnIndex] << std::endl;
       downBranchUB.push_back(std::pair<int, double>(branchedOnIndex,
                              floor(branchedOnValue)));
       upBranchLB.push_back(std::pair<int, double>(branchedOnIndex,

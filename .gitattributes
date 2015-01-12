@@ -212,6 +212,7 @@ Dip/examples/ATM/Makefile.in -text
 Dip/examples/ATM/atm.parm.in -text
 Dip/examples/ATM/data_extract.sh.in -text
 Dip/examples/ATM/notes.txt -text
+Dip/examples/Dippy/SolverStudio/SolverStudioExamples.xlsx -text svneol=unset#application/vnd.ms-excel
 Dip/examples/Dippy/bpp/bin_pack.run -text
 Dip/examples/Dippy/bpp/bin_pack_func.py -text
 Dip/examples/Dippy/bpp/bin_pack_instance.py -text
@@ -382,6 +383,7 @@ Dip/examples/VRP/VRP_Instance.h -text
 Dip/examples/VRP/VRP_Main.cpp -text
 Dip/examples/VRP/VRP_Param.h -text
 Dip/examples/VRP/VRP_SPPRC.cpp -text
+Dip/examples/VRP/data_extract.sh.in -text
 Dip/examples/VRP/get_boost.sh.in -text
 Dip/examples/VRP/get_concorde.sh.in -text
 Dip/examples/VRP/get_cvrpsep.sh.in -text
@@ -634,6 +636,7 @@ Dip/test/Makefile.in -text
 /Makefile.am -text
 /Makefile.in -text
 /README -text
+/README.md -text
 conf/perms.txt -text
 /config.guess -text
 /config.sub -text
@@ -645,7 +648,7 @@ doxydoc/Bcps/doxygen.conf -text
 doxydoc/Cbc/doxygen.conf -text
 doxydoc/Clp/doxygen.conf -text
 doxydoc/CoinUtils/doxygen.conf -text
-doxydoc/Decomp/doxygen.conf -text
+doxydoc/Dip/doxygen.conf -text
 doxydoc/Osi/doxygen.conf -text
 doxydoc/all/doxygen.conf -text
 /install-sh -text

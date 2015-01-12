@@ -187,7 +187,7 @@ public:
 
    /** Default constructor. Takes an instance of UtilParameters */
    ATM_DecompApp(UtilParameters & utilParam) : 
-      DecompApp   (utilParam),
+      DecompApp   (),
       m_classTag  ("ATM-APP"),
       m_objective (NULL)
    {
@@ -195,7 +195,7 @@ public:
    };
    
    virtual ~ATM_DecompApp() {
-      UTIL_DELARR(m_objective);
+      //UTIL_DELARR(m_objective);
       UtilDeleteVectorPtr(m_models);
    };
 };
