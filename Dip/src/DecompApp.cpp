@@ -834,7 +834,7 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
 
    if (!model->M) {
-      throw UtilExceptionMemory("createModels", "DecompApp");
+      throw UtilExceptionMemory("createModelPart", "DecompApp");
    }
 
    model->reserve(nRowsPart, nCols);
@@ -1020,7 +1020,7 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
    model->M = new CoinPackedMatrix(false, 0.0, 0.0);
 
    if (!model->M) {
-      throw UtilExceptionMemory("createModels", "DecompApp");
+      throw UtilExceptionMemory("createModelPartSparse", "DecompApp");
    }
 
    model->M->setDimensions(0, nCols);
