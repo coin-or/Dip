@@ -122,25 +122,53 @@ AC_ARG_ENABLE([openmp],
    *) AC_MSG_ERROR(Bad value ${enableval} for --enable-openmp)
    ;;
 esac],
-[dip_openmp=false])
+[dip_openmp=auto])
 
-if test $dip_openmp = true; then 
-   AC_MSG_CHECKING([G++ version])
-   fopenmp_version=4.2
-   gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
-   get_gcc_version=`$CXX -dumpversion`
-   gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
-   major_gcc_version=`echo ${gcc_version:0:3}`
-   AC_MSG_RESULT([$get_gcc_version])
-   if test ${major_gcc_version} -lt ${gcc_required_version}; then
-       AC_MSG_ERROR(OpenMP feautures are supported by G++ 4.2.0 or higher.)
-   DipDEFS="$DipDEFS -D_OPENMP"
-   fi
-fi      
+if test $dip_openmp = auto; then 
+   AC_MSG_CHECKING([whether compiler supports OpenMP])
+   case "$CXX" in
+     clang*) 
+       AC_MSG_RESULT([no])
+       dip_openmp=false
+       ;;
+     cl* | *\cl* | */cl*)
+       AC_MSG_RESULT([yes])
+       dip_openmp=true
+       ;;
+     g++*)
+        dip_openmp=true
+   	fopenmp_version=4.2
+   	gcc_required_version=`echo ${fopenmp_version} | sed -e 's/\./0/g'`
+   	get_gcc_version=`$CXX -dumpversion`
+   	gcc_version=`echo ${get_gcc_version} | sed -e 's/\./0/g'`
+   	major_gcc_version=`echo ${gcc_version:0:3}`
+   	#AC_MSG_RESULT([$get_gcc_version])
+   	if test ${major_gcc_version} -lt ${gcc_required_version}; then
+       	   AC_MSG_RESULT([no])
+           dip_openmp=false
+        else
+       	   AC_MSG_RESULT([yes])
+           dip_openmp=true
+	fi
+        ;;
+   esac
+fi
 
 AM_CONDITIONAL(OPENMP, [test $dip_openmp = true])
-
-
+AC_SUBST(DIP_OPENMP_FLAGS)
+AC_SUBST(DIP_OPENMP_LIBS)
+if test $dip_openmp = true; then
+  if test x$coin_cxx_is_cl = xtrue; then
+    DIP_OPENMP_FLAGS=-openmp 
+    DIP_OPENMP_LIBS=
+  else
+    DIP_OPENMP_FLAGS=-fopenmp
+    DIP_OPENMP_LIBS=-lgomp
+  fi
+else
+  DIP_OPENMP_FLAGS= 
+  DIP_OPENMP_LIBS=
+fi
 
 #############################################################################
 #                       Python Stuff (for Dippy)                            #
