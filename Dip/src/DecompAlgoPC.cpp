@@ -1294,10 +1294,12 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
                                      row,
                                      m_vars);
 	 int tempIndex(0); 
+	 map<int, int >:: iterator mit;
 	 for (int i = 0; i < row->getNumElements(); i++){
 	   tempIndex = row->getIndices()[i];
-	   if (m_masterOnlyColsMap.find(tempIndex)!=m_masterOnlyColsMap.end()){
-	     rowReform->insert(m_masterOnlyColsMap.at(tempIndex),row->getElements()[i]);
+	   mit =  m_masterOnlyColsMap.find(tempIndex);
+	   if (mit != m_masterOnlyColsMap.end()){
+	     rowReform->insert(mit->second, row->getElements()[i]);
 	   } 
 	 }
 
