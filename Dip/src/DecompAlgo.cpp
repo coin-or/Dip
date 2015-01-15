@@ -5000,7 +5000,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 #ifdef _OPENMP
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 		    (*m_osLog)
-		    << "===== START Threaded solve of subproblems. =====\n");
+		    << "===== START Threaded solve of subproblems. =====\n";);
 #endif
          DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
          CoinAssertHint(potentialVarsT, "Error: Out of Memory");
@@ -5055,14 +5055,14 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 	 
          for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon;
 	      subprobIndex++) {
-            DecompAlgoModel& algoModel         = getModelRelax(subprobIndex);
+            DecompAlgoModel&   algoModel       = getModelRelax(subprobIndex);
             double             alpha           = u[nBaseCoreRows + subprobIndex];
             DecompSolverResult solveResult;
 #ifdef _OPENMP
 	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 		       (*m_osLog)
 		       << "THREAD " <<  omp_get_thread_num() <<
-		       " solving subproblem " <<  subprobIndex << "\n");
+		       " solving subproblem " <<  subprobIndex << "\n";);
 #endif
             solveRelaxed(redCostX,
 			 origObjective,
@@ -5077,12 +5077,12 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          m_isColGenExact = true;
 
          //clean-up memory
-         for (int t = 0; t < m_numConvexCon; t++) {
+         for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
             /*	 printf("arg[%d].vars size=%d\n",
             t, static_cast<int>(arg[t].vars->size()));
             */
-            for (it  = arg[t].vars->begin();
-                  it != arg[t].vars->end(); it++) {
+            for (it  = potentialVarsT[subprobIndex].begin();
+                  it != potentialVarsT[subprobIndex].end(); it++) {
                varRedCost = (*it)->getReducedCost();
                whichBlock = (*it)->getBlockId();
 
@@ -5103,13 +5103,13 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 #ifdef _OPENMP
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 		    (*m_osLog)
-		    << "===== END   Threaded solve of subproblems. =====\n");
+		    << "===== END   Threaded solve of subproblems. =====\n";);
 #endif
 
-         for (int t = 0; t < m_numConvexCon; t++) {
+         for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
             //one function to do this?
-            for (it  = arg[t].vars->begin();
-                  it != arg[t].vars->end(); it++) {
+            for (it  = potentialVarsT[subprobIndex].begin();
+                  it != potentialVarsT[subprobIndex].end(); it++) {
                potentialVars.push_back(*it);
             }
          }
