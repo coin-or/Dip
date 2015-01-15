@@ -20857,10 +20857,6 @@ fi
 #                  Check which subprojects are there                        #
 #############################################################################
 
-#Hack: add flag to make CBC thread safe
-
-ADD_CXXFLAGS="$ADD_CXXFLAGS -DCBC_THREAD_SAFE"
-
 
 echo "$as_me:$LINENO: checking whether source of project Blas is available and should be compiled" >&5
 echo $ECHO_N "checking whether source of project Blas is available and should be compiled... $ECHO_C" >&6
