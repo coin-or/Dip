@@ -4998,7 +4998,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       //---
       if (m_param.SubProbParallel == true) {
 #ifdef _OPENMP
-         printf("===== START Threaded solve of subproblems. =====\n");
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog)
+		    << "===== START Threaded solve of subproblems. =====\n");
 #endif
          DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
          CoinAssertHint(potentialVarsT, "Error: Out of Memory");
@@ -5011,15 +5013,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          m_isColGenExact = false; //so it goes to IP solver - ugh
          SolveRelaxedThreadArgs* arg = new SolveRelaxedThreadArgs[m_numConvexCon];
 
-         for (int i = 0 ; i < m_numConvexCon; i ++) {
-            arg[i].algo          = this;
-            arg[i].nBaseCoreRows = nBaseCoreRows;
-            arg[i].u             = const_cast<double*>(u); //duals (for alpha)
-            arg[i].redCostX      = redCostX;
-            arg[i].origCost      = origObjective;
-            arg[i].n_origCols    = nCoreCols;
-            arg[i].vars          = &potentialVarsT[i];
-         }
 	 tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0); 
          tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0);
          //---
@@ -5054,44 +5047,32 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
          */
 #ifdef _OPENMP
-         // Avoid the case when the allocated threads is greater than the
-         // number of blocks
-         int numThreads;
-
-         if (m_numConvexCon < m_param.NumConcurrentThreadsSubProb) {
-            numThreads = min(m_param.NumConcurrentThreadsSubProb, m_numConvexCon);
-         } else {
-            numThreads = m_param.NumConcurrentThreadsSubProb;
-         }
-
-         omp_set_num_threads(numThreads);
-         #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
+         omp_set_num_threads(min(m_param.NumConcurrentThreadsSubProb,
+				 m_numConvexCon));
+         #pragma omp parallel for schedule(dynamic, \
+			                   m_param.SubProbParallelChunksize) 
 #endif
 	 
-         for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
-            DecompAlgo*           algo         = arg[subprobIndex].algo;
-            int                   nBaseCoreRows = arg[subprobIndex].nBaseCoreRows;
-            double*               u            = arg[subprobIndex].u;
-            double*               redCostX     = arg[subprobIndex].redCostX; //read-only
-            const double*         origObjective = arg[subprobIndex].origCost; //read-only
-            int                   nCoreCols    = arg[subprobIndex].n_origCols;
-            list<DecompVar*>*     vars         = arg[subprobIndex].vars;
-            DecompAlgoModel& algoModel = algo->getModelRelax(subprobIndex);
+         for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon;
+	      subprobIndex++) {
+            DecompAlgoModel& algoModel         = getModelRelax(subprobIndex);
             double             alpha           = u[nBaseCoreRows + subprobIndex];
             DecompSolverResult solveResult;
 #ifdef _OPENMP
-            printf("THREAD %d solving subproblem %d\n",
-                   omp_get_thread_num(), subprobIndex);
+	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		       (*m_osLog)
+		       << "THREAD " <<  omp_get_thread_num() <<
+		       " solving subproblem " <<  subprobIndex << "\n");
 #endif
-            algo->solveRelaxed(redCostX,
-                               origObjective,
-                               alpha,
-                               nCoreCols,
-                               false,//isNested
-                               algoModel,
-                               &solveResult,
-                               *vars
-                              );
+            solveRelaxed(redCostX,
+			 origObjective,
+			 alpha,
+			 nCoreCols,
+			 false,//isNested
+			 algoModel,
+			 &solveResult,
+			 potentialVarsT[subprobIndex]
+			 );
          }
          m_isColGenExact = true;
 
@@ -5120,7 +5101,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
 
 #ifdef _OPENMP
-         printf("===== END   Threaded solve of subproblems. =====\n");
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog)
+		    << "===== END   Threaded solve of subproblems. =====\n");
 #endif
 
          for (int t = 0; t < m_numConvexCon; t++) {
