@@ -4978,225 +4978,176 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
              );
    int doAllBlocks = false;
 
-   if (m_phase          == PHASE_PRICE1 ||
-         m_rrIterSinceAll >= m_param.RoundRobinInterval) {
+   if (m_phase          == PHASE_PRICE1 || m_rrIterSinceAll >= m_param.RoundRobinInterval) {
       doAllBlocks      = true;
       m_rrIterSinceAll = 0;
    }
 
-   //   vector<double>       mostNegRCvec(m_numConvexCon, DecompInf);
+   //vector<double>       mostNegRCvec(m_numConvexCon, DecompInf);
    vector<double>       mostNegRCvec(m_numConvexCon, 0);
    DecompSolverResult   solveResult;
-   OsiSolverInterface* subprobSI   = NULL;
 
    //---
    //--- solve min{ (c - u.A'')x - alpha |  x in F'}
    //---
    if (doAllBlocks) {
-      //---
-      //--- here is where you would thread it
-      //---
-      if (m_param.SubProbParallel == true) {
 #ifdef _OPENMP
-	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		    (*m_osLog)
-		    << "===== START Threaded solve of subproblems. =====\n";);
-#endif
-         DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
-         CoinAssertHint(potentialVarsT, "Error: Out of Memory");
-         bool useCutoff = false;
-
-         if (m_phase == PHASE_PRICE2) {
-            useCutoff = m_param.SubProbUseCutoff;
-         }
-
-         m_isColGenExact = false; //so it goes to IP solver - ugh
-         SolveRelaxedThreadArgs* arg = new SolveRelaxedThreadArgs[m_numConvexCon];
-
-	 tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0); 
-         tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0);
-         //---
-         //--- For pricing,
-         //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
-         //--- origCost: is the original cost for each original column c_e
-         //--- alpha:    is the dual for the convexity constraint
-         //---
-         //--- The reduced cost of a new variable (column) is the sum of the
-         //--- reduced cost on each of the original columns in the new variable
-         //--- minus alpha (this function is responsible for returning the reduced
-         //--- cost, which includes alpha).
-         //---
-         //--- NOTE, redCost does not include alpha as sent in
-         //---
-         //DecompApp * app = algo->getDecompAppMutable();
-         /*
-         DecompSubProbParallelType ParallelType
-         = static_cast<DecompSubProbParallelType>(m_param.SubProbParallelType);
-
-         if (ParallelType == SubProbScheduleDynamic){
-         omp_set_schedule(omp_sched_dynamic, m_param.SubProbParallelChunksize);
-         }
-         else if (ParallelType == SubProbScheduleRuntime){
-         omp_set_schedule(omp_sched_auto,0);
-         }
-         else if(ParallelType == SubProbScheduleGuided){
-         omp_set_schedule(omp_sched_guided, m_param.SubProbParallelChunksize);
-         }
-         else if(ParallelType == SubProbScheduleStatic){
-         omp_set_schedule(omp_sched_static, m_param.SubProbParallelChunksize);
-         }
-         */
-#ifdef _OPENMP
-         omp_set_num_threads(min(m_param.NumConcurrentThreadsSubProb,
+      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		 (*m_osLog)
+		 << "===== START Threaded solve of subproblems. =====\n";);
+      if (m_param.SubProbParallel){
+	 omp_set_num_threads(min(m_param.NumConcurrentThreadsSubProb,
 				 m_numConvexCon));
-         #pragma omp parallel for schedule(dynamic, \
-			                   m_param.SubProbParallelChunksize) 
+      }else{
+	 omp_set_num_threads(1);
+      }
+#endif
+
+      DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
+      CoinAssertHint(potentialVarsT, "Error: Out of Memory");
+
+      UtilTimer timer;
+      //---
+      //--- For pricing,
+      //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
+      //--- origCost: is the original cost for each original column c_e
+      //--- alpha:    is the dual for the convexity constraint
+      //---
+      //--- The reduced cost of a new variable (column) is the sum of the
+      //--- reduced cost on each of the original columns in the new variable
+      //--- minus alpha (this function is responsible for returning the reduced
+      //--- cost, which includes alpha).
+      //---
+      //--- NOTE, redCost does not include alpha as sent in
+      //---
+      //DecompApp * app = algo->getDecompAppMutable();
+      /*
+	DecompSubProbParallelType ParallelType
+	= static_cast<DecompSubProbParallelType>(m_param.SubProbParallelType);
+
+	if (ParallelType == SubProbScheduleDynamic){
+	omp_set_schedule(omp_sched_dynamic, m_param.SubProbParallelChunksize);
+	}
+	else if (ParallelType == SubProbScheduleRuntime){
+	omp_set_schedule(omp_sched_auto,0);
+	}
+	else if(ParallelType == SubProbScheduleGuided){
+	omp_set_schedule(omp_sched_guided, m_param.SubProbParallelChunksize);
+	}
+	else if(ParallelType == SubProbScheduleStatic){
+	omp_set_schedule(omp_sched_static, m_param.SubProbParallelChunksize);
+	}
+      */
+	 
+#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize) 
+      for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
+
+	 DecompAlgoModel&   algoModel       = getModelRelax(subprobIndex);
+	 double             alpha           = u[nBaseCoreRows + subprobIndex];
+	 DecompSolverResult solveResult;
+
+#ifdef _OPENMP
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+		    (*m_osLog)
+		    << "THREAD " <<  omp_get_thread_num() <<
+		    " solving subproblem " <<  subprobIndex << "\n";);
+#else
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+		    (*m_osLog) << "solve relaxed model = "
+		    << algoModel.getModelName() << endl;);
 #endif
 	 
-         for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon;
-	      subprobIndex++) {
-            DecompAlgoModel&   algoModel       = getModelRelax(subprobIndex);
-            double             alpha           = u[nBaseCoreRows + subprobIndex];
-            DecompSolverResult solveResult;
-#ifdef _OPENMP
+	 tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0); 
+	 timer.start();
+	 solveRelaxed(redCostX,
+		      origObjective,
+		      alpha,
+		      nCoreCols,
+		      false,//isNested
+		      algoModel,
+		      &solveResult,
+		      potentialVarsT[subprobIndex]
+		      );
+	 timer.stop();
+	 if (solveResult.m_isCutoff) {
+	    mostNegRCvec[subprobIndex] = min(mostNegRCvec[subprobIndex], 0.0);
+	 }
+      }
+
+      for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
+	 /* printf("arg[%d].vars size=%d\n",
+	    t, static_cast<int>(arg[t].vars->size()));
+	 */
+	 for (it  = potentialVarsT[subprobIndex].begin();
+	      it != potentialVarsT[subprobIndex].end(); it++) {
+	    varRedCost = (*it)->getReducedCost();
+	    whichBlock = (*it)->getBlockId();
+	    
+	    if ((*it)->getVarType() == DecompVar_Point) {
+	       alpha = u[nBaseCoreRows + whichBlock];
+	    } else if ( (*it)->getVarType() == DecompVar_Ray) {
+	       alpha = 0;
+	    }
+	    
 	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 		       (*m_osLog)
-		       << "THREAD " <<  omp_get_thread_num() <<
-		       " solving subproblem " <<  subprobIndex << "\n";);
-#endif
-            solveRelaxed(redCostX,
-			 origObjective,
-			 alpha,
-			 nCoreCols,
-			 false,//isNested
-			 algoModel,
-			 &solveResult,
-			 potentialVarsT[subprobIndex]
-			 );
-         }
-         m_isColGenExact = true;
-
-         //clean-up memory
-         for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
-            /*	 printf("arg[%d].vars size=%d\n",
-            t, static_cast<int>(arg[t].vars->size()));
-            */
-            for (it  = potentialVarsT[subprobIndex].begin();
-                  it != potentialVarsT[subprobIndex].end(); it++) {
-               varRedCost = (*it)->getReducedCost();
-               whichBlock = (*it)->getBlockId();
-
-               if ((*it)->getVarType() == DecompVar_Point) {
-                  alpha = u[nBaseCoreRows + whichBlock];
-               } else if ( (*it)->getVarType() == DecompVar_Ray) {
-                  alpha = 0;
-               }
-
-               UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-                          (*m_osLog)
-                          << "alpha[block=" << whichBlock << "]:" << alpha
-                          << " varRedCost: " << varRedCost << "\n";
-                         );
-            }
-         }
+		       << "alpha[block=" << whichBlock << "]:" << alpha
+		       << " varRedCost: " << varRedCost << "\n";
+		       );
+	 }
+      }
 
 #ifdef _OPENMP
-	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
-		    (*m_osLog)
-		    << "===== END   Threaded solve of subproblems. =====\n";);
+      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		 (*m_osLog)
+		 << "===== END   Threaded solve of subproblems. =====\n";);
 #endif
 
-         for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
-            //one function to do this?
-            for (it  = potentialVarsT[subprobIndex].begin();
-                  it != potentialVarsT[subprobIndex].end(); it++) {
-               potentialVars.push_back(*it);
-            }
-         }
-
-         //put the vars from all threads into one vector
-         //---
-         //--- clean-up local memory
-         //---
-         UTIL_DELARR(potentialVarsT);
-         UTIL_DELARR(arg);
-      } else {
-         bool useCutoff = false;
-         bool useExact  = true;
-
-         if (m_phase == PHASE_PRICE2) {
-            useCutoff = m_param.SubProbUseCutoff ? true : false;
-         }
-
-         map<int, DecompAlgoModel>::iterator mit;
-         tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0);
-	 UtilTimer timer;
-	   
-         for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-            DecompAlgoModel& algoModel = (*mit).second;
-            subprobSI = algoModel.getOsi();
-            b         = algoModel.getBlockId();
-            UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
-                       (*m_osLog) << "solve relaxed model = "
-                       << algoModel.getModelName() << endl;);
-            //---
-            //--- PC: get dual vector
-            //---   alpha --> sum{s} lam[s]   = 1 - convexity constraint
-            //---
-            alpha = u[nBaseCoreRows + b];
-            //TODO: stat return, restrict how many? pass that in to user?
-            //---
-            //--- NOTE: the variables coming back include alpha in
-            //---       calculation of reduced cost
-            //---
-            timer.start();
- 	    solveRelaxed(redCostX,
-                         origObjective,
-                         alpha,
-                         nCoreCols,
-                         false, //isNested
-                         algoModel,
-                         &solveResult,
-                         potentialVars);
-	    timer.stop();
-            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);
-            //if cutoff delcares infeasible, we know subprob >= 0
-            //  we can use 0 as valid (but possibly weaker bound)
-            if (solveResult.m_isCutoff) {
-               mostNegRCvec[b] = min(mostNegRCvec[b], 0.0);
-            }
-         }
-
-         map<int, vector<DecompAlgoModel> >::iterator mivt;
-         vector<DecompAlgoModel>           ::iterator vit;
-         useExact  = false;
-         useCutoff = true;
-
-         for (mivt  = m_modelRelaxNest.begin();
-               mivt != m_modelRelaxNest.end(); mivt++) {
-            for (vit  = (*mivt).second.begin();
-                  vit != (*mivt).second.end(); vit++) {
-               subprobSI = (*vit).getOsi();
-               b         = (*vit).getBlockId();
-               alpha     = u[nBaseCoreRows + b];
-               UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
-                          (*m_osLog) << "solve relaxed nested model = "
-                          << (*vit).getModelName() << endl;);
-               solveRelaxed(redCostX,
-                            origObjective,         //original cost vector
-                            alpha,
-                            nCoreCols,             //num core columns
-                            true,                  //isNested
-                            (*vit),
-                            &solveResult,          //results
-                            potentialVars);        //var list to populate
-
-               if (solveResult.m_isCutoff) {
-                  mostNegRCvec[b] = min(mostNegRCvec[b], 0.0);
-               }
-            }
-         }
+      //put the vars from all threads into one vector
+      for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
+	 for (it  = potentialVarsT[subprobIndex].begin();
+	      it != potentialVarsT[subprobIndex].end(); it++) {
+	    potentialVars.push_back(*it);
+	 }
       }
+
+      UTIL_DELARR(potentialVarsT);
+
+      potentialVarsT = new DecompVarList[m_numConvexCon];
+      map<int, vector<DecompAlgoModel> >::iterator mivt;
+      vector<DecompAlgoModel>           ::iterator vit;
+
+      for (mivt  = m_modelRelaxNest.begin(); mivt != m_modelRelaxNest.end(); mivt++) {
+	 for (vit  = (*mivt).second.begin(); vit != (*mivt).second.end(); vit++) {
+	    b         = (*vit).getBlockId();
+	    alpha     = u[nBaseCoreRows + b];
+	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
+		       (*m_osLog) << "solve relaxed nested model = "
+		       << (*vit).getModelName() << endl;);
+	    solveRelaxed(redCostX,
+			 origObjective,         //original cost vector
+			 alpha,
+			 nCoreCols,             //num core columns
+			 true,                  //isNested
+			 (*vit),
+			 &solveResult,          //results
+			 potentialVarsT[b]);        //var list to populate
+	    
+	    if (solveResult.m_isCutoff) {
+	       mostNegRCvec[b] = min(mostNegRCvec[b], 0.0);
+	    }
+	 }
+      }
+      //put the vars from all threads into one vector
+      for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
+	 for (it  = potentialVarsT[subprobIndex].begin();
+	      it != potentialVarsT[subprobIndex].end(); it++) {
+	    potentialVars.push_back(*it);
+	 }
+      }
+
+      UTIL_DELARR(potentialVarsT);
+
    } //END: if(doAllBlocks)
    else {
       //---
@@ -5231,7 +5182,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          //--- get the OSI objet
          //---
          DecompAlgoModel& algoModel = (*mit).second;
-         subprobSI = algoModel.getOsi();
          //---
          //--- did the user provide a specific dual for this block
          //---
@@ -5269,8 +5219,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             double*          uBlockAdj = 0;
 
             if (static_cast<int>(uBlockV.size()) != m) {
-               throw UtilException("The size of the user dual vector is not the same as the number of master rows",
-                                   "generateVarsFea", "DecompAlgo");
+               throw UtilException("The size of the user dual vector is not the same as the", 
+                                   "number of master rows generateVarsFea", "DecompAlgo");
             }
 
             if (m_param.LogDebugLevel >= 3) {
@@ -5354,7 +5304,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
-            subprobSI = algoModel.getOsi();
             b         = algoModel.getBlockId();
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
                        (*m_osLog) << "solve relaxed model = "
@@ -5394,7 +5343,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                mivt != m_modelRelaxNest.end(); mivt++) {
             for (vit  = (*mivt).second.begin();
                   vit != (*mivt).second.end(); vit++) {
-               subprobSI = (*vit).getOsi();
                b         = (*vit).getBlockId();
                alpha     = u[nBaseCoreRows + b];
                UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
