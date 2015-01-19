@@ -7,6 +7,6 @@ Name: DIP
 Description: Decomposition for Integer Programs
 URL: https://projects.coin-or.org/Dip
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lDecomp @DIPLIB_PCLIBS@
-Cflags: -I${includedir}
+Libs: -L${libdir} -lDecomp @DIPLIB_PCLIBS@ @DIP_OPENMP_LIBS@
+Cflags: -I${includedir} @DIP_OPENMP_FLAGS@
 Requires: @DIPLIB_PCREQUIRES@
