@@ -37,20 +37,20 @@ CHANGELOG
 =========
 
 ## Release 0.91.1
-    * Updating dependencies.
-    * Fix for dependency linking
-    * Fix to installation with {{{DESTDIR}}}
+ * Updating dependencies.
+ * Fix for dependency linking
+ * Fix to installation with {{{DESTDIR}}}
 
 ## Release 0.91.0
-    * Multiple parallel modes added
-      * Solution of individual subproblems can be parallelized
-      * Multiple subproblems can be solved simultaneously
-      * Multiple algorithms can be executed in parallel (branch and cut plus
+ * Multiple parallel modes added
+   * Solution of individual subproblems can be parallelized
+   * Multiple subproblems can be solved simultaneously
+   * Multiple algorithms can be executed in parallel (branch and cut plus
         one or more decomposition-based algorithms)
-    * Warm starting for solutions of subproblems is supported when using
-      SYMPHONY as the subproblem solver. 
-    * Unbounded feasible regions now supported.
-    * Explicit treatment of master-only variables.
+ * Warm starting for solutions of subproblems is supported when using
+   SYMPHONY as the subproblem solver. 
+ * Unbounded feasible regions now supported.
+ * Explicit treatment of master-only variables.
 
 ## Release 0.9.12:
 
