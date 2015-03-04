@@ -605,7 +605,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //   const char* intMarkerCore  = modelCore->getIntegerMark();
 
    for (int colIndex = 0; colIndex < nMasterCols; colIndex++) {
-      if (isMasterColStructural(colIndex)) {
+      if (isMasterColStructural(colIndex)|| 
+         (isMasterColMasterOnly(colIndex)&& m_masterSI->isInteger(colIndex)))
+      {
          m_masterSI->setInteger(colIndex);
       }
    }
@@ -634,7 +636,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
 
    for (int i = 0; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
+      if (isMasterColStructural(i)||
+	  (isMasterColMasterOnly(colIndex)&& m_masterSI->isInteger(colIndex))) {
          osi_Sym->setInteger(i);
       }
    }
