@@ -344,7 +344,10 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    } else if (status == TM_NO_SOLUTION) {
       std::cout << "TM has NO SOLUTION"
                 << std::endl;
-   } else {
+   } else if (status == TM_UNBOUNDED){
+      std::cout << "TM is UNBOUNDED " << std::endl;
+   }	
+     else {
       std::cerr << "Error: SYPHONMY IP solver status =  "
                 << status << std::endl;
    }
@@ -376,10 +379,20 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_nSolutions = 0;
          result->m_isOptimal = true;
          result->m_isCutoff = doCutoff;
-      } else {
+      } else if (status = TM_UNBOUNDED){
+	 result->m_isOptimal = false; 
+         result->m_nSolutions ++; 
+	 result->m_isUnbounded = true; 
+         std::vector<double*> tempVect =osi_Sym->getDualRays(1);
+         std::vector<double> solVect;
+         for (int i = 0; i < tempVect.size(); i++){
+         solVect.push_back(*(tempVect[i]));
+         }
+      }
+         else {
          result->m_isCutoff = doCutoff;
          result->m_isOptimal = false ;
-      }
+         }
    }
 
    /*
