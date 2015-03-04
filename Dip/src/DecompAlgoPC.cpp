@@ -407,7 +407,8 @@ int DecompAlgoPC::compressColumns()
       //---   these were degenerate points and deleting them can
       //---   cause cycling
       //---
-      if (m_masterColType[colMasterIndex] == DecompCol_Structural_NoDelete) {
+      if (m_masterColType[colMasterIndex] == DecompCol_Structural_NoDelete
+          || m_masterColType[colMasterIndex] == DecompCol_MasterOnly) {
          li++;
          nColsNoDel++;
          continue;
@@ -608,7 +609,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
    const char* intMarkerCore  = modelCore->getIntegerMark();
 
    for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
-      if (isMasterColStructural(colIndex)) {
+      if (isMasterColStructural(colIndex)|| 
+         (isMasterColMasterOnly(colIndex)&& m_masterSI->isInteger(colIndex)))
+      {
          m_masterSI->setInteger(colIndex);
       }
    }
@@ -637,7 +640,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
    for (int i = 0; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)) {
+      if (isMasterColStructural(i)||
+	  (isMasterColMasterOnly(colIndex)&& m_masterSI->isInteger(colIndex))) {
          osi_Sym->setInteger(i);
       }
    }

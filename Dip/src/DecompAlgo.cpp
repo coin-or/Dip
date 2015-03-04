@@ -1249,8 +1249,8 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
       colUB[k]    = colUBCore[j];
       objCoeff[k] = 0;
       colNames.push_back(colNamesCore[j]);
-      //  m_masterColType.push_back(DecompCol_MasterOnly);
-      m_masterColType.push_back(DecompCol_Structural_NoDelete);
+      m_masterColType.push_back(DecompCol_MasterOnly);
+      //m_masterColType.push_back(DecompCol_Structural_NoDelete);
       m_masterOnlyColsMap.insert(make_pair(j, k));
    }
 
@@ -6999,7 +6999,7 @@ void DecompAlgo::recomposeSolution(const double* solution,
       assert(mit != m_masterOnlyColsMap.end());
       colIndex = mit->second;
       // For now , master-only variable is of type DecompCol_Structural_NoDelete
-      //   assert(isMasterColMasterOnly(colIndex));
+      assert(isMasterColMasterOnly(colIndex));
       rsolution[j] = solution[colIndex];
    }
 
