@@ -406,7 +406,8 @@ int DecompAlgoPC::compressColumns()
       //---   these were degenerate points and deleting them can
       //---   cause cycling
       //---
-      if (m_masterColType[colMasterIndex] == DecompCol_Structural_NoDelete) {
+      if (m_masterColType[colMasterIndex] == DecompCol_Structural_NoDelete
+          || m_masterColType[colMasterIndex] == DecompCol_MasterOnly) {
          li++;
          nColsNoDel++;
          continue;
