@@ -9,7 +9,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2015, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
@@ -54,7 +54,7 @@ void DecompApp::startupLog()
             << "\n========================================================"
             << "\n========================================================"
             <<   "\nWelcome to the DIP Decomposition Framework"
-            <<   "\nCopyright 2002-2013 Lehigh University and others"
+            <<   "\nCopyright 2002-2015 Lehigh University and others"
             <<   "\nAll Rights Reserved"
             <<   "\nDistributed under the Eclipse Public License 1.0"
             <<   "\nVersion: " << DIP_VERSION

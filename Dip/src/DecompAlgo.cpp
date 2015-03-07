@@ -10,7 +10,7 @@
 // Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
 //                    Ted Ralphs, Lehigh University                          //
 //                                                                           //
-// Copyright (C) 2002-2013, Lehigh University, Matthew Galati, and Ted Ralphs//
+// Copyright (C) 2002-2015, Lehigh University, Matthew Galati, and Ted Ralphs//
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
