@@ -156,6 +156,7 @@ Dip/examples/ATM/Makefile.in -text
 Dip/examples/ATM/atm.parm.in -text
 Dip/examples/ATM/data_extract.sh.in -text
 Dip/examples/ATM/notes.txt -text
+Dip/examples/Dippy/bpp/bin_pack_decomp_func.py -text
 Dip/examples/Dippy/bpp/bin_pack_func.py -text
 Dip/examples/Dippy/bpp/bin_pack_instance.py -text
 Dip/examples/Dippy/bpp/bin_pack_instance2.py -text
