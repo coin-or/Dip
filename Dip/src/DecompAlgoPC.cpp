@@ -609,13 +609,15 @@ void DecompAlgoPC::solutionUpdateAsIP()
    const char* intMarkerCore  = modelCore->getIntegerMark();
 
    for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
-      if (isMasterColStructural(colIndex)|| 
-         (isMasterColMasterOnly(colIndex)&& m_masterSI->isInteger(colIndex)))
-      {
+      if (isMasterColStructural(colIndex)){
          m_masterSI->setInteger(colIndex);
       }
    }
-
+   for (int i = 0; i < m_masterOnlyCols.size(); i++){
+      if (intMarkerCore[m_masterOnlyCols[i]] == 'I'){
+	 m_masterSI->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
+      } 
+   }
    if (m_param.LogDumpModel >= 2)
       printCurrentProblem(m_masterSI,
                           "masterProbRootIP",
@@ -639,11 +641,15 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           const_cast<double*&>(col_lb),
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
-   for (int i = 0; i < nMasterCols; i++) {
-      if (isMasterColStructural(i)||
-	  (isMasterColMasterOnly(colIndex)&& m_masterSI->isInteger(colIndex))) {
-         osi_Sym->setInteger(i);
+   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
+      if (isMasterColStructural(colIndex)){
+         osi_Sym->setInteger(colIndex);
       }
+   }
+   for (int i = 0; i < m_masterOnlyCols.size(); i++){
+      if (intMarkerCore[m_masterOnlyCols[i]] == 'I'){
+	 osi_Sym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
+      } 
    }
 
    //TODO: is this expensive? if so,
