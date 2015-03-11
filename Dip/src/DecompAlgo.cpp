@@ -1249,8 +1249,8 @@ void DecompAlgo::masterMatrixAddMOCols(CoinPackedMatrix* masterM,
       colUB[k]    = colUBCore[j];
       objCoeff[k] = 0;
       colNames.push_back(colNamesCore[j]);
-      //  m_masterColType.push_back(DecompCol_MasterOnly);
-      m_masterColType.push_back(DecompCol_Structural_NoDelete);
+      m_masterColType.push_back(DecompCol_MasterOnly);
+      //m_masterColType.push_back(DecompCol_Structural_NoDelete);
       m_masterOnlyColsMap.insert(make_pair(j, k));
    }
 
@@ -3147,11 +3147,9 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    double         zDW_UBDual   = 0.0;
    double         zDW_UB       = 0.0;
    double         zDW_LB       = 0.0;
-   const int nCols = m_masterSI->getNumCols();
    const double* rc = getMasterColReducedCost();
    const double* colLower = m_masterSI->getColLower();
    const double* colUpper = m_masterSI->getColUpper();
-   const double* dual      = m_masterSI->getRowPrice();
    //rStat might not be needed now, but will be needed
    // when we support ranged rows.
    int* rStat = new int[m_masterSI->getNumRows()];
@@ -6999,7 +6997,7 @@ void DecompAlgo::recomposeSolution(const double* solution,
       assert(mit != m_masterOnlyColsMap.end());
       colIndex = mit->second;
       // For now , master-only variable is of type DecompCol_Structural_NoDelete
-      //   assert(isMasterColMasterOnly(colIndex));
+      assert(isMasterColMasterOnly(colIndex));
       rsolution[j] = solution[colIndex];
    }
 

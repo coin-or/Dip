@@ -17,7 +17,6 @@
 #include "DecompModel.h"
 #include "DecompSolverResult.h"
 //===========================================================================//
-#include "CbcParam.hpp"
 using namespace std;
 
 //===========================================================================//
@@ -364,21 +363,28 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 	 std::cout << "The optimal objective value is "
 		   << objective_value << std::endl;
       }
-      status = sym_get_col_solution(env, solution);
-      /*
-      for (int i = 0 ; i < numCols; ++i) {
-         std::cout << "the solution is " << solution[i]
-                   << std::endl;
-      }
-      */
-      result->m_nSolutions = 1;
-      vector<double> solVec(solution, solution + numCols);
-      result->m_solution.push_back(solVec);
-      if (param.LogDebugLevel >= 4){
-	 std::cout << "status is " << status << std::endl;
-	 //  if(status == FUNCTION_TERMINATED_ABNORMALLY){
-	 //       throw UtilException("sym_get_col_solution failure",
-	 //			   "solveOsiAsIp", "DecompAlgoModel");
+
+      double objval;
+      status = sym_get_sp_size(env, &result->m_nSolutions);
+
+      if (result->m_nSolutions == 0){
+	 //Solution pool is empty, but we canfetch the optimal solution
+	 result->m_nSolutions = 1;
+	 status = sym_get_col_solution(env, solution);
+	 vector<double> solVec(solution, solution + numCols);
+	 result->m_solution.push_back(solVec);
+      }else{
+	 for (int i = 0; i < result->m_nSolutions; i++){
+	    status = sym_get_sp_solution(env, i, solution, &objval);
+	    /*
+	      for (int i = 0 ; i < numCols; ++i) {
+	      std::cout << "the solution is " << solution[i]
+	      << std::endl;
+	      }
+	    */
+	    vector<double> solVec(solution, solution + numCols);
+	    result->m_solution.push_back(solVec);
+	 }
       }
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
@@ -562,7 +568,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
    if (cbc.isProvenOptimal()) {
-      result->m_nSolutions = 1;
+      result->m_nSolutions = cbc.numberSavedSolutions();
       result->m_isOptimal  = true;
    } else {
       if (cbc.isProvenInfeasible()) {
@@ -580,13 +586,13 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    }
 
    //---
-   //--- get copy of solution
+   //--- get copy of solution(s)
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
 
-   if (result->m_nSolutions >= 1) {
-      result->m_objUB = cbc.getObjValue();
-      const double* solDbl = cbc.getColSolution();
+   for (int i = 0; i < result->m_nSolutions; i++){
+      //result->m_objUB = cbc.getObjValue();
+      const double* solDbl = cbc.savedSolution(i);
       vector<double> solVec(solDbl, solDbl + numCols);
       result->m_solution.push_back(solVec);
       /*
