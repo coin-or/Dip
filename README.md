@@ -32,6 +32,12 @@ https://projects.coin-or.org/Dip/newticket
 
 # CHANGELOG
 
+## Release 0.91.2
+ * Fixed issue with master only variable when solving master as an integer 
+   program.
+ * Added ability to generate multiple columns per iteration with SYMPHONY and 
+   Cbc. 
+
 ## Release 0.91.1
  * Updating dependencies.
  * Fix for dependency linking
