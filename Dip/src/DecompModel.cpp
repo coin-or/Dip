@@ -260,6 +260,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          sym_set_int_param(env, "verbosity", logIpLevel);
       }
 
+      sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
+
       osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
       //whether to trim the warm start tree before re-solving.
       osi_Sym->setSymParam(OsiSymTrimWarmTree, true);
@@ -317,6 +319,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       } else {
          sym_set_int_param(env, "verbosity", logIpLevel);
       }
+
+      sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
 
       assert(env);
       osi_Sym->branchAndBound();
@@ -405,6 +409,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
    cbc.setLogLevel(logIpLevel);
+#ifdef _OPENMP
    cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit); 
    cbc.branchAndBound();
    const int statusSet[2] = {0, 1};
@@ -416,8 +421,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
                           "solveOsiAsIp", "DecompAlgoModel");
    }
 
-#if 0
-   CbcMain0(cbc);
+#else
    //int i;
    //const double * colUB = cbc.getColUpper();
    //for(i = 0; i < cbc.getNumCols(); i++){
@@ -491,7 +495,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    //--- solve IP using argument list
    //---
-   CbcMain1(argc, argv, cbc);
+   CbcMain(argc, argv, cbc);
    //---
    //--- get solver status
    //---   comments based on Cbc2.3

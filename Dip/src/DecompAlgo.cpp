@@ -5016,7 +5016,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       //---
       if (m_param.SubProbParallel == true) {
 #ifdef _OPENMP
-         printf("===== START Threaded solve of subproblems. =====\n");
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog)
+		    << "===== START Threaded solve of subproblems. =====\n";);
 #endif
          DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
          CoinAssertHint(potentialVarsT, "Error: Out of Memory");
@@ -5085,42 +5087,37 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          omp_set_num_threads(numThreads);
          #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
-
-         for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
-            DecompAlgo*           algo         = arg[subprobIndex].algo;
-            int                   nBaseCoreRows = arg[subprobIndex].nBaseCoreRows;
-            double*               u            = arg[subprobIndex].u;
-            double*               redCostX     = arg[subprobIndex].redCostX; //read-only
-            const double*         origObjective = arg[subprobIndex].origCost; //read-only
-            int                   nCoreCols    = arg[subprobIndex].n_origCols;
-            list<DecompVar*>*     vars         = arg[subprobIndex].vars;
-            DecompAlgoModel& algoModel = algo->getModelRelax(subprobIndex);
+         for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon;
+	      subprobIndex++) {
+            DecompAlgoModel&   algoModel       = getModelRelax(subprobIndex);
             double             alpha           = u[nBaseCoreRows + subprobIndex];
             DecompSolverResult solveResult;
-#ifdef _OPENMP
-            printf("THREAD %d solving subproblem %d\n",
-                   omp_get_thread_num(), subprobIndex);
+#ifdef _OPENMP   
+	     UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		       (*m_osLog)
+		       << "THREAD " <<  omp_get_thread_num() <<
+		       " solving subproblem " <<  subprobIndex << "\n";);
 #endif
-            algo->solveRelaxed(redCostX,
-                               origObjective,
-                               alpha,
-                               nCoreCols,
-                               false,//isNested
-                               algoModel,
-                               &solveResult,
-                               *vars
-                              );
+            solveRelaxed(redCostX,
+                         origObjective,
+                         alpha,
+                         nCoreCols,
+                         false,//isNested
+                         algoModel,
+                         &solveResult,
+                         potentialVarsT[subprobIndex] 
+                         );
          }
 
          m_isColGenExact = true;
 
          //clean-up memory
-         for (int t = 0; t < m_numConvexCon; t++) {
+         for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
             /*	 printf("arg[%d].vars size=%d\n",
             t, static_cast<int>(arg[t].vars->size()));
             */
-            for (it  = arg[t].vars->begin();
-                  it != arg[t].vars->end(); it++) {
+            for (it  = potentialVarsT[subprobIndex].begin();
+                  it != potentialVarsT[subprobIndex].end(); it++) {
                varRedCost = (*it)->getReducedCost();
                whichBlock = (*it)->getBlockId();
 
@@ -5139,13 +5136,15 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
 
 #ifdef _OPENMP
-         printf("===== END   Threaded solve of subproblems. =====\n");
+	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+		    (*m_osLog)
+		    << "===== END   Threaded solve of subproblems. =====\n";);
 #endif
 
-         for (int t = 0; t < m_numConvexCon; t++) {
+         for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
             //one function to do this?
-            for (it  = arg[t].vars->begin();
-                  it != arg[t].vars->end(); it++) {
+            for (it  = potentialVarsT[subprobIndex].begin();
+                  it != potentialVarsT[subprobIndex].end(); it++) {
                potentialVars.push_back(*it);
             }
          }

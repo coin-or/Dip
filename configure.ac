@@ -63,6 +63,11 @@ AC_COIN_CREATE_LIBTOOL
 #############################################################################
 #                  Check which subprojects are there                        #
 #############################################################################
+
+#Hack: add flag to make CBC thread safe
+AC_SUBST(ADD_CXXFLAGS)
+ADD_CXXFLAGS="$ADD_CXXFLAGS -DCBC_THREAD_SAFE"
+
 AC_COIN_MAIN_PACKAGEDIR(Blas,  ThirdParty,[daxpy.f])
 AC_COIN_MAIN_PACKAGEDIR(Lapack,ThirdParty,[LAPACK/SRC/dlarf.f])
 AC_COIN_MAIN_PACKAGEDIR(Sample,Data)
