@@ -328,18 +328,22 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
    PyObject* pConvexDual = PyFloat_FromDouble(convexDual);
    // call solveRelaxed on DipProblem
 
-   PyObject* pVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OOd", 
-					    pRelaxKey,
-					    pRedCostList,
-					    pConvexDual);
+   PyObject* pStatandVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OOd", 
+					             pRelaxKey,
+					             pRedCostList,
+					             pConvexDual);
 
-   if (pVarList == NULL) {
+   if ( (pStatandVarList == NULL) || (pStatandVarList == Py_None) ){
       throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
    }
 
-   if (pVarList == Py_None) {
-      return DecompSolStatNoSolution;
-   }
+
+   // [status, varList] = relaxed_solver(...)
+   PyObject * pStatus = PyList_GetItem(pStatandVarList, 0);
+   int cStatus = PyInt_AsLong(pStatus);
+   DecompSolverStatus status = (DecompSolverStatus)cStatus;
+
+   PyObject * pVarList = PyList_GetItem(pStatandVarList, 1);
 
    int nVars = PyObject_Length(pVarList);
 
@@ -375,7 +379,7 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
       varList.push_back(var);
    }
 
-   return DecompSolStatOptimal;
+   return status;
 }
 
 /**

@@ -77,7 +77,7 @@ public:
 
 public:
    DippyDecompApp(UtilParameters& utilParam, PyObject* p) :
-      DecompApp  (),
+      DecompApp  (utilParam),
       m_classTag ("SMALL-APP"),
       m_pProb(NULL) {
       addPuLPProb(p);

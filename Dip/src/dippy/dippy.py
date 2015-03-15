@@ -34,6 +34,26 @@ class DipError(Exception):
     """
     Dip Exception
     """
+	
+# DIP solver status
+#enum DecompSolverStatus {
+#   DecompSolStatError,
+#   DecompSolStatOptimal,
+#   DecompSolStatFeasible,
+#   DecompSolStatInfeasible,
+#   DecompSolStatNoSolution
+#};
+DipSolStatError      = 0
+DipSolStatOptimal    = 1
+DipSolStatFeasible   = 2
+DipSolStatInfeasible = 3
+DipSolStatNoSolution = 4
+DipStatus = { DipSolStatError:      "Error",
+              DipSolStatOptimal:    "Optimal",
+              DipSolStatFeasible:   "Feasible",
+              DipSolStatInfeasible: "Infeasible",
+              DipSolStatNoSolution: "No solution"
+    }
 
 _Solve = Solve
 def Solve(prob, params=None):
@@ -814,9 +834,10 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 raise DipError("Reduced cost and variable list don't match in",
                                "solveRelaxed")
     
-            dvs = self.relaxed_solver(self, key, redCostDict, target)
+            sndvs = self.relaxed_solver(self, key, redCostDict, target)
             
-            if dvs is not None:
+            if sndvs is not None:
+				[status, dvs] = sndvs;
                 if len(dvs) > 0:
                     dvs_with_costs = []
                     for var in dvs:
@@ -827,10 +848,13 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                            if i in redCostDict)
                             dvs_with_costs.append((cost, red_cost, var))
                         else:
-                            return dvs
-                    return dvs_with_costs
+                            return [status, dvs]
+                    return [status, dvs_with_costs]
                 else:
-                    print "Empty variable list in solveRelaxed, returning None"
+					return [status, dvs]
+			else:
+				errorStr = "Error (none returned from solveRelaxed)\n%s" % ex
+				raise DipError(errorStr)
   
         except Exception as ex:
             errorStr = "Error in solveRelaxed\n%s" % ex

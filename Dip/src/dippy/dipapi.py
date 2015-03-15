@@ -108,6 +108,10 @@ class DipAPI(object):
     convexDual (float) = dual for convexity constraint for this relaxed subproblem
 
     Output:
+	status (integer) = status of the relaxation solve, will be one of
+	   DipSolStatOptimal    = no better columns can be found
+	   DipSolStatFeasible   = better columns can be found, but just use these for now
+	   DipSolStatNoSolution = use any columns returned, but also use DIP's default column finder
     varList (list of (cost, reduced cost, list of (variable, value) dictionaries)) =
     solution for this relaxed subproblem expressed as a cost, reduced cost and
     dictionary of non-zero values for variables
