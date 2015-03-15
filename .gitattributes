@@ -652,6 +652,7 @@ doxydoc/CoinUtils/doxygen.conf -text
 doxydoc/Dip/doxygen.conf -text
 doxydoc/Osi/doxygen.conf -text
 doxydoc/all/doxygen.conf -text
+doxydoc/doxygen.conf.in -text
 /install-sh -text
 /ltmain.sh -text
 /missing -text
