@@ -405,7 +405,8 @@ AC_CONFIG_FILES([Makefile
                  examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
                  dip.pc
-		 dip-uninstalled.pc])
+		 dip-uninstalled.pc
+		 doxydoc/doxygen.conf])
 
 
 # Here put the location and name of the configuration header file
