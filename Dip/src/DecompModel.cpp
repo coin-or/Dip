@@ -374,9 +374,11 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
  	vector<double> solVec(solution, solution + numCols);
         result->m_solution.push_back(solVec);
       }else{
- 	for (int i = 0; i < result->m_nSolutions; i++){
+	int nSols = std::min<int>(result->m_nSolutions, 
+				  param.SubProbNumSolLimit);
+ 	for (int i = 0; i < nSols; i++){
  	status = sym_get_sp_solution(env, i, solution, &objval);
- 	/*
+	/*
  	for (int i = 0 ; i < numCols; ++i) {
  	std::cout << "the solution is " << solution[i]
  	<< std::endl;
@@ -384,7 +386,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
  	*/
  	vector<double> solVec(solution, solution + numCols);
  	result->m_solution.push_back(solVec);
-        }	
+       }	
      }	
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
@@ -406,7 +408,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal = false ;
          }
    }
-
+   std::cout << "bye" << std::endl; 
    /*
    if (!param.WarmStart) {
       UTIL_DELPTR(osi_Sym);
@@ -600,8 +602,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- get copy of solution(s)
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
-
-   for(int i = 0; i < result->m_nSolutions; i++){
+   int nSols = std::min<int>(result->m_nSolutions,
+			     param.SubProbNumSolLimit);
+   for(int i = 0; i < nSols; i++){
       //result->m_objUB = cbc.getObjValue();
       const double* solDbl = cbc.savedSolution(i);
       vector<double> solVec(solDbl, solDbl + numCols);
