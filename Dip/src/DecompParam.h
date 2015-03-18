@@ -242,27 +242,27 @@ public:
     *
     * (1) "List" or "LIST"
     * The block file defines those rows in each block.
-    *   <block id>  <num rows in block>
-    *   <row ids...>
-    *   <block id>  <num rows in block>
-    *   <row ids...>
+    *   [block id]  [num rows in block]
+    *   [row ids...]
+    *   [block id]  [num rows in block]
+    *   [row ids...]
     *
     * (2) "ZIBList" or "ZIBLIST"
     * The block file defines those rows in each block.
     *   NBLOCKS
-    *   <numBlocks>
-    *   BLOCK <block id>
-    *   <row names...>
-    *   BLOCK  <block id>
-    *   <row names...>
+    *   [numBlocks]
+    *   BLOCK [id of block]
+    *   [row names...]
+    *   BLOCK  [id of block]
+    *   [row names...]
     *
     * (3) "Pair" or "PAIR"
     * Each line is a block id to row id pair.
-    *   <block id> <row id>
+    *   [id of block] [row id]
     *
     * (4) "PairName" or "PAIRNAME"
     * Each line is a block id to row name (matching mps) pair.
-    *   <block id> <row name>
+    *   [id of block] [row name]
     */
    std::string BlockFileFormat;
 
