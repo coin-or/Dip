@@ -25802,32 +25802,28 @@ for proj in $tmp ; do
 echo $ECHO_N "checking for doxygen doc'n for $proj ... $ECHO_C" >&6
   doxytag=${lc_proj}_doxy.tag
   doxyfound=no
-  for chkProj in $coin_subdirs ; do
-    if test "$chkProj" = "$proj" ; then
-      # proj will be configured, hence doxydoc present in build tree
-      doxysrcdir="${srcdir}/${proj}"
-      # AC_MSG_NOTICE([Considering $doxysrcdir (base)])
-      if test -d "$doxysrcdir" ; then
-	# with a doxydoc directory?
-	doxydir="$doxysrcdir/doxydoc"
-	# AC_MSG_NOTICE([Considering $doxydir (base)])
-	# AC_MSG_NOTICE([Subdirs: $coin_subdirs)])
-	if test -d "$doxydir" ; then
-	  # use tag file; don't process source
-	  eval doxydir="`pwd`/${proj}/doxydoc"
-	  coin_doxy_tagfiles="$coin_doxy_tagfiles $doxydir/$doxytag=$doxydir/html"
-	  echo "$as_me:$LINENO: result: $doxydir (tag)" >&5
+  # proj will be configured, hence doxydoc present in build tree
+  doxysrcdir="${srcdir}/../${proj}"
+  # AC_MSG_NOTICE([Considering $doxysrcdir (base)])
+  if test -d "$doxysrcdir" ; then
+    # with a doxydoc directory?
+    doxydir="$doxysrcdir/doxydoc"
+    # AC_MSG_NOTICE([Considering $doxydir (base)])
+    # AC_MSG_NOTICE([Subdirs: $coin_subdirs)])
+    if test -d "$doxydir" ; then
+      # use tag file; don't process source
+      doxydir="../${proj}/doxydoc"
+      coin_doxy_tagfiles="$coin_doxy_tagfiles $doxydir/$doxytag=../../$doxydir/html"
+      echo "$as_me:$LINENO: result: $doxydir (tag)" >&5
 echo "${ECHO_T}$doxydir (tag)" >&6
-	  coin_doxy_excludes="$coin_doxy_excludes */${proj}"
-	else
-	  # will process the source -- nothing further to be done here
-	  echo "$as_me:$LINENO: result: $doxysrcdir (src)" >&5
+      coin_doxy_excludes="$coin_doxy_excludes */${proj}"
+    else
+      # will process the source -- nothing further to be done here
+      echo "$as_me:$LINENO: result: $doxysrcdir (src)" >&5
 echo "${ECHO_T}$doxysrcdir (src)" >&6
-	fi
-	doxyfound=yes
-      fi
     fi
-  done
+    doxyfound=yes
+  fi
   # Not built, fall back to installed tag file
   if test $doxyfound = no ; then
     eval doxydir="${datadir}/coin/doc/${proj}/doxydoc"
@@ -25885,7 +25881,7 @@ esac
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile src/Makefile src/dippy/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/data_extract.sh examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ATM/data_extract.sh examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh examples/SDPUC/README.txt examples/HRP/Makefile examples/HRP/hrp.parm examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc doxydoc/doxygen.conf"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile src/dippy/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/data_extract.sh examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ATM/data_extract.sh examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh examples/SDPUC/README.txt examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc doxydoc/doxygen.conf"
 
 
 
@@ -26785,8 +26781,6 @@ do
   "examples/SDPUC/sdpuc.parm" ) CONFIG_FILES="$CONFIG_FILES examples/SDPUC/sdpuc.parm" ;;
   "examples/SDPUC/data_extract.sh" ) CONFIG_FILES="$CONFIG_FILES examples/SDPUC/data_extract.sh" ;;
   "examples/SDPUC/README.txt" ) CONFIG_FILES="$CONFIG_FILES examples/SDPUC/README.txt" ;;
-  "examples/HRP/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/HRP/Makefile" ;;
-  "examples/HRP/hrp.parm" ) CONFIG_FILES="$CONFIG_FILES examples/HRP/hrp.parm" ;;
   "examples/ExternalSolvers/Knapsack/Pisinger/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Knapsack/Pisinger/Makefile" ;;
   "examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger" ;;
   "examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger" ) CONFIG_FILES="$CONFIG_FILES examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger" ;;
