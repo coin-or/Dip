@@ -218,6 +218,7 @@ public:
              const double           origCost
             ):
       m_s       (),
+      m_varType (DecompVar_Point),
       m_origCost(origCost),
       m_redCost (redCost),
       m_effCnt  (0),
