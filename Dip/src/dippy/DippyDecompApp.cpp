@@ -158,11 +158,13 @@ void DippyDecompApp::createModels()
                           "DippyDecompApp");
    }
 
-   set<int> masterOnlyCols;
+   int* masterOnly = new int[m_numCols];
 
-   for (int j = 0; j < m_numCols; j++) {
-      masterOnlyCols.insert(j);
+   if (!masterOnly) {
+      throw UtilExceptionMemory("createModels", "DecompApp");
    }
+
+   UtilFillN(masterOnly, m_numCols, 1);
 
    int nRelaxed = 0;
 
@@ -235,7 +237,8 @@ void DippyDecompApp::createModels()
       }
 
       // get the constraint matrix for this relaxation
-      modelRelax->M = pyConstraints_AsPackedMatrix(pRowList, relaxRowIndices, m_colIndices);
+      modelRelax->M = pyConstraints_AsPackedMatrix(pRowList, relaxRowIndices,
+						   m_colIndices);  
 
       // set all cols at their lower bounds
       for (int j = 0; j < modelCore->colLB.size(); j++) {
@@ -257,7 +260,7 @@ void DippyDecompApp::createModels()
 
          modelRelax->colUB[index] = modelCore->colUB[index];
          modelRelax->activeColumns.push_back(index);
-         masterOnlyCols.erase(masterOnlyCols.find(index));
+         masterOnly[index] = 0;
       }
 
       modelRelax->M->setDimensions(modelRelax->rowLB.size(), modelRelax->colLB.size());
@@ -270,17 +273,17 @@ void DippyDecompApp::createModels()
       setModelRelax(modelRelax, "BLOCK", p);
    }
 
-   // set the master only columns
-   set<int>::iterator sit;
-
-   for (sit = masterOnlyCols.begin(); sit != masterOnlyCols.end(); sit++) {
-      modelCore->masterOnlyCols.push_back(*sit);
+   for (i = 0; i < m_numCols; i++) {
+      if (masterOnly[i]){
+	 modelCore->masterOnlyCols.push_back(i);
+      }
    }
 
    printf("Num master-only cols: %d\n", modelCore->masterOnlyCols.size());
 
    // set the core problem
    setModelCore(modelCore, "CORE");
+   UTIL_DELARR(masterOnly);
 }
 
 /**
