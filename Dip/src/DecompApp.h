@@ -333,6 +333,8 @@ public:
     * provide this method.
     *
     * @param[in] x The solution point to check.
+    * @param[in] numCols The number of variables.
+    * @param[in] tolZero The integrality tolerance (currently ignored).
     * @return True, if x is feasible; otherwise, false.
     */
    //TODO: what is doxy tag for function return
