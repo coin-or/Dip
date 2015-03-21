@@ -300,6 +300,12 @@ AC_CONFIG_LINKS(test/MILP_DecompApp.cpp:examples/MILP/MILP_DecompApp.cpp
                 
 AC_COIN_LINK_INPUT_CMD
 
+#############################################################################
+#                  Check for doxygen                                        #
+#############################################################################
+
+AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Alps)
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
@@ -386,6 +392,8 @@ AC_CONFIG_FILES([Makefile
 		 examples/SDPUC/sdpuc.parm
 		 examples/SDPUC/data_extract.sh
 		 examples/SDPUC/README.txt
+		 examples/HRP/Makefile
+		 examples/HRP/hrp.parm
 		 examples/ExternalSolvers/Knapsack/Pisinger/Makefile
 		 examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger
 		 examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger
@@ -395,7 +403,8 @@ AC_CONFIG_FILES([Makefile
                  examples/ExternalSolvers/TSP/get.concorde
                  test/Makefile
                  dip.pc
-		 dip-uninstalled.pc])
+		 dip-uninstalled.pc
+		 doxydoc/doxygen.conf])
 
 
 # Here put the location and name of the configuration header file

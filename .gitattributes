@@ -195,6 +195,7 @@ Dip/doc/guide/tsp_figs.m -text
 Dip/doc/guide/tsp_prob.png -text
 Dip/doc/guide/tsp_soln.png -text
 Dip/doc/guide/wedding.tex -text
+Dip/doxydoc/doxygen.conf.in -text
 Dip/examples/ATM/ATM_DecompApp.cpp -text
 Dip/examples/ATM/ATM_DecompApp.h -text
 Dip/examples/ATM/ATM_Instance.cpp -text
