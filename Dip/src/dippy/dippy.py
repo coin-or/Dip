@@ -837,7 +837,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
             sndvs = self.relaxed_solver(self, key, redCostDict, target)
             
             if sndvs is not None:
-				[status, dvs] = sndvs;
+                status, dvs = sndvs
                 if len(dvs) > 0:
                     dvs_with_costs = []
                     for var in dvs:
@@ -848,13 +848,13 @@ class DipProblem(pulp.LpProblem, DipAPI):
                                            if i in redCostDict)
                             dvs_with_costs.append((cost, red_cost, var))
                         else:
-                            return [status, dvs]
+                            return sndvs
                     return [status, dvs_with_costs]
                 else:
-					return [status, dvs]
-			else:
-				errorStr = "Error (none returned from solveRelaxed)\n%s" % ex
-				raise DipError(errorStr)
+                    return sndvs
+            else:
+                errorStr = "Error (none returned from solveRelaxed)\n%s" % ex
+                raise DipError(errorStr)
   
         except Exception as ex:
             errorStr = "Error in solveRelaxed\n%s" % ex
