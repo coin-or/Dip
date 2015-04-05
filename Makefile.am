@@ -79,7 +79,7 @@ clean-local: clean-doxydoc
 # install-data-local: install-doxydoc
 uninstall-local: uninstall-doxydoc
 
-.PHONY: test tests unitTests doxydoc doxydocd
+.PHONY: test tests unitTests doxydoc
 
 ########################################################################
 #                         Maintainer Stuff                             #
