@@ -36,6 +36,9 @@ https://projects.coin-or.org/Dip/newticket
 CHANGELOG
 =========
 
+## Release 0.91.3
+ * Fixes for correctly producing Doxygen documentation
+
 ## Release 0.91.2
  * Fixed issue with master only variable when solving master as an integer
    program.

@@ -56,7 +56,7 @@ doxydoc:
 
 unitTests: tests
 
-.PHONY: test tests unitTests doxydoc doxydocd
+.PHONY: test tests unitTests doxydoc
 
 ########################################################################
 #                         Maintainer Stuff                             #

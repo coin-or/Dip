@@ -6756,8 +6756,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       // and produce more than one, etc... THINK
       if (solveResult->m_nSolutions) {
          int k;
-
-         for (k = 0; k < solveResult->m_nSolutions; k++) {
+         int nSol = std::min<int>(solveResult->m_nSolutions,
+				  m_param.SubProbNumSolLimit);
+         for (k = 0; k < nSol; k++) {
             const double* milpSolution = solveResult->getSolution(k);
             //---
             //--- create a DecompVar (shat) from the optimal solution
