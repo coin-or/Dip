@@ -48,12 +48,13 @@ DipSolStatOptimal    = 1
 DipSolStatFeasible   = 2
 DipSolStatInfeasible = 3
 DipSolStatNoSolution = 4
-DipStatus = { DipSolStatError:      "Error",
-              DipSolStatOptimal:    "Optimal",
-              DipSolStatFeasible:   "Feasible",
-              DipSolStatInfeasible: "Infeasible",
-              DipSolStatNoSolution: "No solution"
-    }
+DipStatus = {
+             DipSolStatError:      "Error",
+             DipSolStatOptimal:    "Optimal",
+             DipSolStatFeasible:   "Feasible",
+             DipSolStatInfeasible: "Infeasible",
+             DipSolStatNoSolution: "No solution"
+            }
 
 _Solve = Solve
 def Solve(prob, params=None):
@@ -812,15 +813,20 @@ class DipProblem(pulp.LpProblem, DipAPI):
     def solveRelaxed(self, key, redCostX, target):
         """
         Returns solutions to the whichBlock relaxed subproblem
-
-        Inputs: 
+    
+        Inputs:  
         key (Python Object) = key of relaxed subproblem to be solved
-        redCostX (list of (LpVariable, value) tuples) = list of reduced costs
-
-        Output: 
-        varList (list of (cost, reduced cost, (LpVariable, value)
-        dictionaries)) = solution for this relaxed subproblem expressed as a
-        cost, reduced cost and dictionary of non-zero values for variables
+        redCostX (list of (variable, value) tuples) = list of reduced costs for all variables
+        target (float) = any total reduced cost less than the target is "good" (results in a negative cost column)
+    
+        Output:
+        status (integer) = status of the relaxation solve, will be one of
+          DipSolStatOptimal    = no better columns can be found
+          DipSolStatFeasible   = better columns can be found, but just use these for now
+          DipSolStatNoSolution = use any columns returned, but also use DIP's default column finder
+        varList (list of (cost, reduced cost, list of (variable, value) dictionaries)) =
+        solution for this relaxed subproblem expressed as a cost, reduced cost and
+        dictionary of non-zero values for variables
         """
         try:
           
@@ -849,11 +855,12 @@ class DipProblem(pulp.LpProblem, DipAPI):
                             dvs_with_costs.append((cost, red_cost, var))
                         else:
                             return sndvs
+                  
                     return [status, dvs_with_costs]
                 else:
                     return sndvs
             else:
-                errorStr = "Error (none returned from solveRelaxed)\n%s" % ex
+                errorStr = "Error (none returned from solveRelaxed)"
                 raise DipError(errorStr)
   
         except Exception as ex:
