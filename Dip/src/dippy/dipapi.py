@@ -98,20 +98,20 @@ class DipAPI(object):
     """
     raise DipAPIError("Bad function definition, DipAPI.postProcess must be overwritten")
 
-  def solveRelaxed(self, key, redCostX, convexDual):
+  def solveRelaxed(self, key, redCostX, target):
     """
     Returns solutions to the whichBlock relaxed subproblem
 
     Inputs:  
     key (Python Object) = key of relaxed subproblem to be solved
     redCostX (list of (variable, value) tuples) = list of reduced costs for all variables
-    convexDual (float) = dual for convexity constraint for this relaxed subproblem
+    target (float) = any total reduced cost less than the target is "good" (results in a negative cost column)
 
     Output:
-	status (integer) = status of the relaxation solve, will be one of
-	   DipSolStatOptimal    = no better columns can be found
-	   DipSolStatFeasible   = better columns can be found, but just use these for now
-	   DipSolStatNoSolution = use any columns returned, but also use DIP's default column finder
+	  status (integer) = status of the relaxation solve, will be one of
+	    DipSolStatOptimal    = no better columns can be found
+	    DipSolStatFeasible   = better columns can be found, but just use these for now
+	    DipSolStatNoSolution = use any columns returned, but also use DIP's default column finder
     varList (list of (cost, reduced cost, list of (variable, value) dictionaries)) =
     solution for this relaxed subproblem expressed as a cost, reduced cost and
     dictionary of non-zero values for variables
