@@ -465,12 +465,14 @@ class DipProblem(pulp.LpProblem, DipAPI):
         b.write("%i\n" % len(self.relaxation.dict))
         for k in self.constraints:
             f.write(self.constraints[k].asCplexLpConstraint(k))
+        blockId = 0
         for r in self.relaxation.dict:
             rname = asCplexName(str(r))
-            b.write("BLOCK %s\n" % rname)
+            b.write("BLOCK %d\n" % blockId) 
             for k in self.relaxation.dict[r].constraints:
                 f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+rname))
                 b.write(str(k)+'_'+rname+'\n')
+            blockId += 1
         vs = list(self.variables())
         # check if any names are longer than 100 characters
         long_names = [v.name for v in vs if len(v.name) > 100]
@@ -840,28 +842,23 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 raise DipError("Reduced cost and variable list don't match in",
                                "solveRelaxed")
     
-            sndvs = self.relaxed_solver(self, key, redCostDict, target)
-            
-            if sndvs is not None:
-                status, dvs = sndvs
-                if len(dvs) > 0:
-                    dvs_with_costs = []
-                    for var in dvs:
-                        if isinstance(var, dict):
-                            cost = sum(self.objective[i]*var[i] for i in var
-                                       if i in self.objective)
-                            red_cost = sum(redCostDict[i]*var[i] for i in var
-                                           if i in redCostDict)
-                            dvs_with_costs.append((cost, red_cost, var))
-                        else:
-                            return sndvs
-                  
-                    return [status, dvs_with_costs]
-                else:
-                    return sndvs
+            status, dvs = self.relaxed_solver(self, key, redCostDict, target)
+    
+            if len(dvs) > 0:
+                dvs_with_costs = []
+                for var in dvs:
+                    print var
+                    if isinstance(var, dict):
+                        cost = sum(self.objective[i]*var[i] for i in var
+                                   if i in self.objective)
+                        red_cost = sum(redCostDict[i]*var[i] for i in var
+                                       if i in redCostDict)
+                        dvs_with_costs.append((cost, red_cost, var))
+                    else:
+                        return status, dvs
+                return status, dvs_with_costs
             else:
-                errorStr = "Error (none returned from solveRelaxed)"
-                raise DipError(errorStr)
+                return status, dvs
   
         except Exception as ex:
             errorStr = "Error in solveRelaxed\n%s" % ex

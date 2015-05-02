@@ -337,13 +337,14 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
       throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
    }
 
-
    // [status, varList] = relaxed_solver(...)
-   PyObject * pStatus = PyList_GetItem(pStatandVarList, 0);
+   PyObject * pStatus = PyTuple_GetItem(pStatandVarList, 0);
+
    int cStatus = PyInt_AsLong(pStatus);
+
    DecompSolverStatus status = (DecompSolverStatus)cStatus;
 
-   PyObject * pVarList = PyList_GetItem(pStatandVarList, 1);
+   PyObject * pVarList = PyTuple_GetItem(pStatandVarList, 1);
 
    int nVars = PyObject_Length(pVarList);
 
@@ -362,6 +363,7 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
       pTuple = PySequence_GetItem(pVarList, j);
       cost   = PyFloat_AsDouble(PyTuple_GetItem(pTuple, 0));
       rc     = PyFloat_AsDouble(PyTuple_GetItem(pTuple, 1));
+
       pDict = PyTuple_GetItem(pTuple, 2);
       pKeys = PyDict_Keys(pDict);
       vector<int>    varInds;
