@@ -1,0 +1,46 @@
+*** EDIT THIS TO MATCH BIN PACKING ***
+model;
+
+set PRODUCTS;
+
+param Requirement {PRODUCTS};
+
+set LOCATIONS;
+
+param Capacity;
+
+data;
+
+set PRODUCTS := 1 2 3 4 5 ;
+
+param Requirement :=
+    1 7
+    2 5
+    3 3
+    4 2
+    5 2
+;
+
+param Capacity := 8;
+
+model;
+
+let LOCATIONS := 1..card(PRODUCTS);
+
+var assign_vars {LOCATIONS, PRODUCTS} binary;
+
+var use_vars {LOCATIONS} binary;
+
+var waste_vars {LOCATIONS} >= 0;
+
+minimize TotalWaste : sum {i in LOCATIONS} waste_vars[i];
+
+subject to assignment {j in PRODUCTS}:
+    sum {i in LOCATIONS} assign_vars[i, j] = 1;
+    
+subject to aggregate_capacity {i in LOCATIONS}:
+    sum {j in PRODUCTS} assign_vars[i, j] * Requirement[j] +
+        waste_vars[i] == Capacity * use_vars[i];
+
+subject to disaggregate_capacity {i in LOCATIONS, j in PRODUCTS}:
+    assign_vars[i, j] <= use_vars[i];
