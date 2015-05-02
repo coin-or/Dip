@@ -1,5 +1,11 @@
+#!/usr/bin/env python
+
 from pulp import *
-import dippy
+
+try:
+    import src.dippy as dippy
+except ImportError:
+    import coinor.dippy as dippy
 
 length = {
 "9cm": 9,
@@ -52,14 +58,14 @@ for i in ITEMS:
 # Ordering patterns
 for i, p in enumerate(PATTERNS):
     if p != PATTERNS[-1]:
-         prob += useVars[p] >= useVars[PATTERNS[i+1]]
+        prob += useVars[p] >= useVars[PATTERNS[i+1]]
 
 for p in PATTERNS:
     prob.relaxation[p] += \
     lpSum(length[i] * cutVars[(p, i)] for i in ITEMS) \
     <= total_length[p] * useVars[p]
 
-def relaxed_solver(prob, keySub, redCosts, convexDual):
+def solve_subproblem(prob, keySub, redCosts, target):
     # get items with negative reduced cost
     item_idx = [i for i in ITEMS \
                 if redCosts[cutVars[(keySub, i)]] < 0]
@@ -74,18 +80,14 @@ def relaxed_solver(prob, keySub, redCosts, convexDual):
     assert total_weight <= total_length[p]
 
     # add in reduced cost of useVars
-    rc = -z + redCosts[useVars[keySub]]
-    if rc < 0:
-        var_values = [(v, solution[i]) \
-                      for i, v in enumerate(vars) \
-                      if solution[i] > 0]
-        var_values.append((useVars[keySub], 1))
+    var_values = [(v, solution[i]) \
+                  for i, v in enumerate(vars) \
+                  if solution[i] > 0]
+    var_values.append((useVars[keySub], 1))
 
-        dv = dippy.DecompVar(var_values, rc - convexDual, 1)
-        return [dv]
-    return []
+    return [var_values]
 
-prob.relaxed_solver = relaxed_solver
+#prob.relaxed_solver = solve_subproblem
 
 def kp(obj, weights, capacity):
     assert len(obj) == len(weights)

@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
-
 __title__     = 'B&P-cut for the Capacitated Vertex p-Median Problem (CVPMP)'
 __version__   = '1.0 Nov 2013'
 __author__    = 'Dago Quevedo'
 __email__     = 'dago@yalma.fime.uanl.mx'
-
 
 import  sys
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
@@ -16,12 +14,9 @@ except ImportError:
     pass
         
 try:
-    import dippy
+    import src.dippy as dippy
 except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    import coinor.dippy as dippy
 
 #Globar vars
 
@@ -34,10 +29,8 @@ V  = None
 x  = None
 y  = None
 
-
 tol          = pow(pow(2, -24), 2.0 / 3.0)
 display_mode = 'off'
-
 
 def init(_n,_p,_d,_s,_w,_V):
     
@@ -49,7 +42,6 @@ def init(_n,_p,_d,_s,_w,_V):
     w   = _w
     V   = _V
 
-
 def solve_subproblem(prob, i, redCosts, target):
     
     vars   = [x[(i, j)] for j in V]
@@ -60,9 +52,6 @@ def solve_subproblem(prob, i, redCosts, target):
     z, solution = KP01(obj, weights, s[i])
     rc = redCosts[y[i]] - z
     
-    if rc > tol:
-        return [{}]
-
     #Cost
     cost           = sum([d[i,V[j]] for j in solution])
 
@@ -71,7 +60,6 @@ def solve_subproblem(prob, i, redCosts, target):
     var_val[y[i]]  = 1
 
     return [var_val]
-
 
 def KP01(obj, weights, capacity):
     

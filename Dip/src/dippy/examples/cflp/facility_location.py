@@ -10,12 +10,9 @@ except ImportError:
     pass
                 
 try:
-    import dippy
+    import src.dippy as dippy
 except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    import coinor.dippy as dippy
 
 from math import floor, ceil
 
@@ -46,7 +43,7 @@ prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
-debug_print = False
+debug_print = True
 
 debug_print_lp = False
 
@@ -90,11 +87,6 @@ def solve_subproblem(prob, key, redCosts, target):
         print "z, solution =", z, solution
         print "redCosts[use_vars[loc]] =", redCosts[use_vars[loc]]
         print "Fixed cost, rc", FIXED_COST[loc], redCosts[use_vars[loc]] - z
-
-    if redCosts[use_vars[loc]] > z + tol: # ... or an empty location is "useful"
-        if debug_print:
-            print "Zero solution is optimal"
-        return [{}]
 
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
@@ -381,8 +373,9 @@ elif algo == 'Price':
     dippyOpts['CutCGL'] = '0'
 else:
     dippyOpts['doCut'] = '1'
+
 dippyOpts['TolZero'] = '%s' % tol
-        
+  
 dippy.Solve(prob, dippyOpts)
 
 if prob.display_mode != 'off':

@@ -1,5 +1,11 @@
-from pulp import *
-import dippy
+#!/usr/bin/env python
+
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMinimize, LpAffineExpression
+
+try:
+    import src.dippy as dippy
+except ImportError:
+    import coinor.dippy as dippy
 
 CC = 1.3
 BIG_M = 1e10
@@ -154,12 +160,12 @@ def do_branch(prob, sol):
         else:
             smaller = SIZES[i-1]
         if bigger - sol_size > tol and sol_size - smaller > tol:
-            down_branch_ub = [(buildVars[loc, SIZES[j]], 0) \
-                              for j in range(i, len(SIZES))]
-            up_branch_ub = [(buildVars[loc, SIZES[j]], 0) \
-                            for j in range(0, i)]
+            down_branch_ub = dict([(buildVars[loc, SIZES[j]], 0) \
+                              for j in range(i, len(SIZES))])
+            up_branch_ub = dict([(buildVars[loc, SIZES[j]], 0) \
+                            for j in range(0, i)])
 
-            return ([], down_branch_ub, [], up_branch_ub)
+            return ({}, down_branch_ub, {}, up_branch_ub)
         
 prob.branch_method = do_branch
 

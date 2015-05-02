@@ -1,8 +1,11 @@
 from pulp import *
 import sys
-sys.path.append('C:\\cygwin\\home\\ted\\COIN\\trunk\\Dip\\src\\dippy')
-sys.path.append('C:\\cygwin\\home\\ted\\COIN\\trunk\\Dip\\MSVisualStudio\\v10\\Dippy\\Win32-v100-Debug')
-import dippy
+
+try:
+    import src.dippy as dippy
+except ImportError:
+    import coinor.dippy as dippy
+
 from math import sqrt
 
 # 2d Euclidean TSP with extremely simple cut generation

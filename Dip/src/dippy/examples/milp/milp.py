@@ -8,7 +8,7 @@ Created on Dec 29, 2013
 
 import sys
 import random
-from pulp import *
+from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 
 try:
     import path
@@ -16,12 +16,9 @@ except ImportError:
     pass
         
 try:
-    import dippy
+    import src.dippy as dippy
 except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    import coinor.dippy as dippy
 
 def GenerateRandomBlock(VARIABLES, CONSTRAINTS, density = 0.2,
                         maxObjCoeff = 10, maxConsCoeff = 10, 

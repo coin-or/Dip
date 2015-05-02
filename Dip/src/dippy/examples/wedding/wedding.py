@@ -11,12 +11,9 @@ except ImportError:
     pass
         
 try:
-    import dippy
+    import src.dippy as dippy
 except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    import coinor.dippy as dippy
 
 max_tables = 5
 max_table_size = 4
@@ -72,7 +69,7 @@ for table in tables:
             happy[table] >= (happiness(a, b) * (x[(a, table)] + 
                                                 x[(b, table)] - 1))
 
-def relaxed_solver(prob, table, redCosts):
+def relaxed_solver(prob, table, redCosts, target):
     """
     Generate columns (tables) with negative reduced costs
     """
@@ -98,27 +95,22 @@ def relaxed_solver(prob, table, redCosts):
         # calculate the sum of the reduced costs for each of the guests
         neg_cost = sum(redCosts[x[(g, table)]] for g in possible_table)
         table_happiness = happiness(possible_table[0], possible_table[-1])
-        rc = neg_cost + table_happiness * redCosts[happy[table]]# - convexDual
-        #if rc <= -0.000001:
+        rc = neg_cost + table_happiness * redCosts[happy[table]]
         var_values = [(x[(g, table)], 1) 
                       for g in possible_table]
         var_values.append((happy[table], table_happiness))
-        #dv = dippy.DecompVar(var_values, rc, table_happiness)
         dvs.append(var_values)
         print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
-    if len(dvs) > 0:
         return dvs
-    else:
-        return None
 
 #seating_model.relaxed_solver = relaxed_solver
 
-seating_model.writeLP('wedding_main.lp')
-for table in tables:
-    seating_model.writeRelaxed(table, 'wedding_relax%s.lp' % table);
+#seating_model.writeLP('wedding_main.lp')
+#for table in tables:
+#    seating_model.writeRelaxed(table, 'wedding_relax%s.lp' % table);
     
 dippy.Solve(seating_model, {
-        'doCut' : '1',
+        'doPriceCut' : '1',
         'CutCGL' : '1',
         'generateInitVars' : '1',
     })
