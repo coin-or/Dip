@@ -1,5 +1,13 @@
+#!/usr/bin/env python
+
 from pulp import *
-import dippy
+
+try:
+    import src.dippy as dippy
+    from src.dippy import DipSolStatOptimal
+except ImportError:
+    import coinor.dippy as dippy
+    from coinor.dippy import DipSolStatOptimal
 
 length = {
 "9cm": 9,
@@ -52,14 +60,14 @@ for i in ITEMS:
 # Ordering patterns
 for i, p in enumerate(PATTERNS):
     if p != PATTERNS[-1]:
-         prob += useVars[p] >= useVars[PATTERNS[i+1]]
+        prob += useVars[p] >= useVars[PATTERNS[i+1]]
 
 for p in PATTERNS:
     prob.relaxation[p] += \
     lpSum(length[i] * cutVars[(p, i)] for i in ITEMS) \
     <= total_length[p] * useVars[p]
 
-def relaxed_solver(prob, keySub, redCosts, convexDual):
+def solve_subproblem(prob, keySub, redCosts, convexDual):
     # get items with negative reduced cost
     item_idx = [i for i in ITEMS \
                 if redCosts[cutVars[(keySub, i)]] < 0]
@@ -82,10 +90,10 @@ def relaxed_solver(prob, keySub, redCosts, convexDual):
         var_values.append((useVars[keySub], 1))
 
         dv = dippy.DecompVar(var_values, rc - convexDual, 1)
-        return [dv]
-    return []
+        return DipSolStatOptimal, [dv]
+    return DipSolStatOptimal, []
 
-prob.relaxed_solver = relaxed_solver
+#prob.relaxed_solver = solve_subproblem
 
 def kp(obj, weights, capacity):
     assert len(obj) == len(weights)

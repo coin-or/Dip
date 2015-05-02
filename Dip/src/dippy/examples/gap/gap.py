@@ -14,12 +14,11 @@ except ImportError:
     pass
         
 try:
-    import dippy
+    import src.dippy as dippy
+    from src.dippy import DipSolStatOptimal
 except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    import coinor.dippy as dippy
+    from coinor.dippy import DipSolStatOptimal
 
 debug_print = False
 
@@ -50,7 +49,6 @@ for m in MACHINES:
 line = input.readline().split()
 assert len(line) == NUM_MACHINES
 CAPACITIES = [int(f) for f in line]
-
 
 assignVars = []
 for m in MACHINES:
@@ -95,12 +93,6 @@ def solve_subproblem(prob, machine, redCosts, target):
         print obj
         print "z, solution =", z, solution
         print "rc", -z
-    # Return the solution if the reduced cost is low enough
-    # ...
-    if z < -tol: # ... or an empty location is "useful"
-        if debug_print:
-            print "Empty solution is optimal"
-        return [{}]
 
     var_values = dict([(var[i], 1) for i in solution])
 
@@ -110,7 +102,8 @@ def solve_subproblem(prob, machine, redCosts, target):
             rcCheck += redCosts[v] * var_values[v]
         print "Checking rc calc", -z, rcCheck 
         print var_values
-    return [var_values]
+        
+    return DipSolStatOptimal, [var_values]
 
 def knapsack01(obj, weights, capacity):
     """ 0/1 knapsack solver, maximizes profit. weights and capacity integer """

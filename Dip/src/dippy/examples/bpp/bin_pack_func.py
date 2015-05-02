@@ -20,12 +20,9 @@ except ImportError:
 # then a development copy - if python setup.py develop used,
 # then the coinor.dippy package
 try:
-    import dippy
+    import src.dippy as dippy
 except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    import coinor.dippy as dippy
 
 from math import floor, ceil
 
@@ -130,9 +127,9 @@ def solve(prob, algo = 'PriceCut'):
     dippyOpts = {}
 
     if CGL_cuts:
-      dippyOpts['CutCGL'] = '1'
+        dippyOpts['CutCGL'] = '1'
     else:
-      dippyOpts['CutCGL'] = '0'
+        dippyOpts['CutCGL'] = '0'
 
     if algo == 'PriceCut':
         dippyOpts['doPriceCut'] = '1'

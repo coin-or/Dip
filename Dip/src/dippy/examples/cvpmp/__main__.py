@@ -16,14 +16,6 @@ try:
 except ImportError:
     pass
         
-try:
-    import dippy
-except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
-        
 import  CVPMP
 from    readInstance import *
 
