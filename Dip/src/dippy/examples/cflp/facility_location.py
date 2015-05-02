@@ -355,7 +355,7 @@ if debug_print_lp:
 
 #prob.writeFull('facility.lp', 'facility.dec')
 
-#prob.relaxed_solver = solve_subproblem
+prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts

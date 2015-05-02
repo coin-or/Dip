@@ -67,7 +67,7 @@ for p in PATTERNS:
     lpSum(length[i] * cutVars[(p, i)] for i in ITEMS) \
     <= total_length[p] * useVars[p]
 
-def solve_subproblem(prob, keySub, redCosts, convexDual):
+def solve_subproblem(prob, keySub, redCosts, target):
     # get items with negative reduced cost
     item_idx = [i for i in ITEMS \
                 if redCosts[cutVars[(keySub, i)]] < 0]
@@ -82,18 +82,14 @@ def solve_subproblem(prob, keySub, redCosts, convexDual):
     assert total_weight <= total_length[p]
 
     # add in reduced cost of useVars
-    rc = -z + redCosts[useVars[keySub]]
-    if rc < 0:
-        var_values = [(v, solution[i]) \
-                      for i, v in enumerate(vars) \
-                      if solution[i] > 0]
-        var_values.append((useVars[keySub], 1))
+    var_values = [(v, solution[i]) \
+                  for i, v in enumerate(vars) \
+                  if solution[i] > 0]
+    var_values.append((useVars[keySub], 1))
 
-        dv = dippy.DecompVar(var_values, rc - convexDual, 1)
-        return DipSolStatOptimal, [dv]
-    return DipSolStatOptimal, []
+    return DipSolStatOptimal, [var_values]
 
-#prob.relaxed_solver = solve_subproblem
+prob.relaxed_solver = solve_subproblem
 
 def kp(obj, weights, capacity):
     assert len(obj) == len(weights)

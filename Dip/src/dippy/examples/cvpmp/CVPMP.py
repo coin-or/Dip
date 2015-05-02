@@ -124,7 +124,7 @@ def Solver():
 
     prob += lpSum(y[i] for i in V) == p
 
-#    prob.relaxed_solver = solve_subproblem
+    prob.relaxed_solver = solve_subproblem
 
     dippy.Solve(prob, {
         'TolZero'           : '%s' % tol,
