@@ -444,12 +444,14 @@ class DipProblem(pulp.LpProblem, DipAPI):
         b.write("%i\n" % len(self.relaxation.dict))
         for k in self.constraints:
             f.write(self.constraints[k].asCplexLpConstraint(k))
+        blockId = 0
         for r in self.relaxation.dict:
             rname = asCplexName(str(r))
-            b.write("BLOCK %s\n" % rname)
+            b.write("BLOCK %d\n" % blockId) 
             for k in self.relaxation.dict[r].constraints:
                 f.write(self.relaxation.dict[r].constraints[k].asCplexLpConstraint(str(k)+'_'+rname))
                 b.write(str(k)+'_'+rname+'\n')
+            blockId += 1
         vs = list(self.variables())
         # check if any names are longer than 100 characters
         long_names = [v.name for v in vs if len(v.name) > 100]
