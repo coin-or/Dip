@@ -559,6 +559,9 @@ Dip/src/dippy/__init__.py -text
 Dip/src/dippy/dipapi.py -text
 Dip/src/dippy/dippy.py -text
 Dip/src/dippy/examples/SolverStudio/SolverStudioExamples.xlsx -text svneol=unset#application/vnd.ms-excel
+Dip/src/dippy/examples/SolverStudio/__init__.py -text
+Dip/src/dippy/examples/__init__.py -text
+Dip/src/dippy/examples/bpp/__init__.py -text
 Dip/src/dippy/examples/bpp/bin_pack.run -text
 Dip/src/dippy/examples/bpp/bin_pack_decomp_func.py -text
 Dip/src/dippy/examples/bpp/bin_pack_func.py -text
@@ -566,12 +569,15 @@ Dip/src/dippy/examples/bpp/bin_pack_instance.py -text
 Dip/src/dippy/examples/bpp/bin_pack_instance2.py -text
 Dip/src/dippy/examples/bpp/mdbin_pack_func.py -text
 Dip/src/dippy/examples/bpp/mdbin_pack_instance.py -text
+Dip/src/dippy/examples/cflp/__init__.py -text
 Dip/src/dippy/examples/cflp/facility_ex1.py -text
 Dip/src/dippy/examples/cflp/facility_ex2.py -text
 Dip/src/dippy/examples/cflp/facility_location.py -text
+Dip/src/dippy/examples/coke/__init__.py -text
 Dip/src/dippy/examples/coke/coke.py -text
 Dip/src/dippy/examples/coke/coke_func.py -text
 Dip/src/dippy/examples/coke/coke_instance.py -text
+Dip/src/dippy/examples/csp/__init__.py -text
 Dip/src/dippy/examples/csp/cutting_stock.py -text
 Dip/src/dippy/examples/cvpmp/CVPMP.py -text
 Dip/src/dippy/examples/cvpmp/Global.py -text
@@ -582,13 +588,18 @@ Dip/src/dippy/examples/cvpmp/Instances/pmedcap4.dat -text
 Dip/src/dippy/examples/cvpmp/Instances/pmedcap5.dat -text
 Dip/src/dippy/examples/cvpmp/Instances/pmedcap6.dat -text
 Dip/src/dippy/examples/cvpmp/Instances/pmedcap7.dat -text
+Dip/src/dippy/examples/cvpmp/__init__.py -text
 Dip/src/dippy/examples/cvpmp/__main__.py -text
 Dip/src/dippy/examples/cvpmp/draw.py -text
 Dip/src/dippy/examples/cvpmp/readInstance.py -text
+Dip/src/dippy/examples/gap/__init__.py -text
 Dip/src/dippy/examples/gap/gap.py -text
 Dip/src/dippy/examples/gap/gap0515-2.dat -text
+Dip/src/dippy/examples/milp/__init__.py -text
 Dip/src/dippy/examples/milp/milp.py -text
+Dip/src/dippy/examples/tsp/__init__.py -text
 Dip/src/dippy/examples/tsp/tsp.py -text
+Dip/src/dippy/examples/wedding/__init__.py -text
 Dip/src/dippy/examples/wedding/wedding.py -text
 Dip/src/dippy/tests/__init__.py -text
 Dip/src/dippy/tests/dippy_tests.py -text
