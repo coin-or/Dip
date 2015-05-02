@@ -107,9 +107,9 @@ def relaxed_solver(prob, table, redCosts, target):
 
 seating_model.relaxed_solver = relaxed_solver
 
-seating_model.writeLP('wedding_main.lp')
-for table in tables:
-    seating_model.writeRelaxed(table, 'wedding_relax%s.lp' % table);
+#seating_model.writeLP('wedding_main.lp')
+#for table in tables:
+#    seating_model.writeRelaxed(table, 'wedding_relax%s.lp' % table);
     
 dippy.Solve(seating_model, {
         'doPriceCut' : '1',

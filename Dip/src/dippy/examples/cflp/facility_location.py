@@ -377,8 +377,6 @@ else:
     dippyOpts['doCut'] = '1'
 
 dippyOpts['TolZero'] = '%s' % tol
-dippyOpts['LogLevel'] = '10'
-dippyOpts['LogDebugLevel'] = '10'
   
 dippy.Solve(prob, dippyOpts)
 
