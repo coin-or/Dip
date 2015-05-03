@@ -366,7 +366,9 @@ TERM_PROCESS:
       setStatus(AlpsNodeStatusFathomed);
    } else {
       status = chooseBranchingObject(model);
-      decompAlgo->postProcessBranch(decompStatus);
+      if (getStatus() == AlpsNodeStatusPregnant){
+	 decompAlgo->postProcessBranch(decompStatus);
+      }
    }
 
    UtilPrintFuncEnd(&cout, m_classTag,
