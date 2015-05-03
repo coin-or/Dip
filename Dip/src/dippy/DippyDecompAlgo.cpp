@@ -42,7 +42,14 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
    if (pResult == Py_None) {
       // if chooseBranchSet returns None, do default branching for this algo
       ret_val = algo->DecompAlgo::chooseBranchSet(downBranchLB, downBranchUB, upBranchLB, upBranchUB);
+      
+      // No branching set was returned. This shouldn't happen
+      assert(ret_val == true);
 
+      if (!ret_val){
+	 throw UtilException("No branch set found in prob.chooseBranchSet()", 
+			     "chooseBranchSet", "DippyDecompAlgo");
+      }
       if (downBranchUB.size() > 0) {
          PyObject* downBranchVar, * upBranchVar;
          pDownLB = PyDict_New(); // Down branch LBs is an empty dictionary
@@ -56,8 +63,15 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
 			PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
          pUpUB = PyDict_New(); // Up branch UBs is an empty dictionary
          assert(downBranchVar == upBranchVar);
+      }else{
+	 //No branching set was returned. Zero out pointers to old branching 
+	 //sets
+	 assert(ret_val == false);
+	 pDownLB = NULL;
+	 pDownUB = NULL;
+	 pUpLB = NULL;
+	 pUpUB = NULL;
       }
-
       return ret_val;
    } else {
       // or else, the function should have returned 4 lists of (name, value) tuples
