@@ -36,6 +36,12 @@ https://projects.coin-or.org/Dip/newticket
 CHANGELOG
 =========
 
+## Release 0.91.4
+ * Updates to dependencies
+ * All examples fixed
+ * DipPy examples moved into package source subdirectory
+ * Samll bug fixes
+
 ## Release 0.91.3
  * Fixes for correctly producing Doxygen documentation
 
