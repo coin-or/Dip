@@ -19,14 +19,14 @@
 /***************************************************************************/
 
 /* Version number of project */
-#define DIP_VERSION "0.91.4"
+#define DIP_VERSION "trunk"
 
 /* Major Version number of project */
-#define DIP_VERSION_MAJOR 0
+#define DIP_VERSION_MAJOR   9999
 
 /* Minor Version number of project */
-#define DIP_VERSION_MINOR 91
+#define DIP_VERSION_MINOR   9999
 
 /* Release Version number of project */
-#define DIP_VERSION_RELEASE 4
+#define DIP_VERSION_RELEASE 9999
 
