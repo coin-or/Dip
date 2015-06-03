@@ -120,7 +120,7 @@ setup(name=PROJECT,
       url=URL,
       license=read_file('LICENSE'),
       namespace_packages=['coinor'],
-      packages=['coinor.dippy', 'coinor'],
+      packages=['coinor.dippy', 'coinor', 'coinor.dippy.examples'],
       package_dir = {'coinor': 'src'},
       install_requires=['pulp>=1.5.4','coinor.gimpy'],
       ext_modules=modules
