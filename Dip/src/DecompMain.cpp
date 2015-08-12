@@ -64,11 +64,9 @@ int main(int argc, char** argv)
       milp.startupLog();
       // get the current working Directory.
       char the_path[256];
-      std::string path(getcwd(the_path, 255));
-      milp.m_param.CurrentWorkingDir = path;
+      milp.m_param.CurrentWorkingDir = std::string(getcwd(the_path, 255));
 
       if (milp.m_param.LogDebugLevel >= 1) {
-         std::cout << path << std::endl;
          std::cout << milp.m_param.CurrentWorkingDir << std::endl;
       }
 
