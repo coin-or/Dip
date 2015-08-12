@@ -141,10 +141,6 @@ protected:
     */
    OsiSolverInterface* m_masterSI;
 
-#ifdef __DECOMP_IP_SYMPHONY__
-   OsiSymSolverInterface* osi_Sym;
-   CoinWarmStart* ws;
-#endif
    /**
     * Solver interface(s) for entire problem (Q'').
     *   CPM: not used (use m_masterSI)

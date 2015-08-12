@@ -85,14 +85,9 @@ public:
 class DecompAlgoModel : public DecompAppModel {
 private:
    OsiSolverInterface*   m_osi;
-#ifdef __DECOMP_IP_SYMPHONY__
-   OsiSymSolverInterface* osi_Sym;
-#endif
    int                   m_numCols;
    int*                  m_colIndices;
    int                   m_counter;
-   int                   m_ws_tag;
-   CoinWarmStart*        m_ws;
 public:
 
    inline void setCounter(const int num) {
@@ -191,13 +186,13 @@ public:
    }
 
 public:
-   void solveOsiAsIp(DecompSolverResult* result,
-                     DecompParam&         param,
-                     bool                 doExact,
-                     bool                 doCutoff,
-                     bool                 isRoot,
-                     double               cutoff,
-                     double               timeLimit);
+   void solveSubproblemAsMIP(DecompSolverResult* result,
+			     DecompParam&         param,
+			     bool                 doExact,
+			     bool                 doCutoff,
+			     bool                 isRoot,
+			     double               cutoff,
+			     double               timeLimit);
 
    bool isPointFeasible(const double* x,
                         const bool     isXSparse  = false,
@@ -209,14 +204,9 @@ public:
    DecompAlgoModel(const DecompAppModel& appModel) :
       DecompAppModel(appModel),
       m_osi         (NULL),
-#ifdef __DECOMP_IP_SYMPHONY__
-      osi_Sym     (NULL),
-#endif
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter    ( 0 ),
-      m_ws_tag     ( 0 ),
-      m_ws          (NULL)
+      m_counter    ( 0 )
    {};
 
    DecompAlgoModel& operator=(const DecompAppModel& rhs) {
@@ -227,28 +217,18 @@ public:
    DecompAlgoModel() :
       DecompAppModel(),
       m_osi         (NULL),
-#ifdef __DECOMP_IP_SYMPHONY__
-      osi_Sym       (NULL),
-#endif
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter     (0),
-      m_ws_tag      (0),
-      m_ws          (NULL)
+      m_counter     (0)
    {};
    DecompAlgoModel(DecompConstraintSet* model,
                    std::string                modelName,
                    int                   blockId) :
       DecompAppModel(model, modelName, blockId),
       m_osi         (NULL),
-#ifdef __DECOMP_IP_SYMPHONY__
-      osi_Sym       (NULL),
-#endif
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter     (0),
-      m_ws_tag      (0),
-      m_ws          (NULL)
+      m_counter     (0)
    {};
    ~DecompAlgoModel() {
       if (m_osi) {

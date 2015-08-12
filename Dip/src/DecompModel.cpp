@@ -230,13 +230,13 @@ FUNC_EXIT:
 }
 
 //===========================================================================//
-void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
-                                   DecompParam&         param,
-                                   bool                 doExact,
-                                   bool                 doCutoff,
-                                   bool                 isRoot,
-                                   double               cutoff,
-				   double               timeLimit)
+void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
+					   DecompParam&         param,
+					   bool                 doExact,
+					   bool                 doCutoff,
+					   bool                 isRoot,
+					   double               cutoff,
+					   double               timeLimit)
 {
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
@@ -248,83 +248,36 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    result->m_solution.clear();
 #ifdef __DECOMP_IP_SYMPHONY__
 
-   if (param.WarmStart) {
-      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
-      sym_environment* env = osi_Sym->getSymphonyEnvironment();
-      sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+   //OsiSymSolverInterface* osiSym
+   //   = dynamic_cast<OsiSymSolverInterface*>(m_osi->clone());
+   OsiSymSolverInterface* osiSym
+      = dynamic_cast<OsiSymSolverInterface*>(m_osi);
+   sym_environment* env = osiSym->getSymphonyEnvironment();
 
-      if (logIpLevel == 0 ) {
-         sym_set_int_param(env, "verbosity", -10);
-      } else {
-         sym_set_int_param(env, "verbosity", logIpLevel);
-      }
-
-      sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
-
-      osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
-      //whether to trim the warm start tree before re-solving.
-      osi_Sym->setSymParam(OsiSymTrimWarmTree, true);
-
-      if (!m_ws_tag) {
-         m_ws = osi_Sym->getWarmStart();
-
-         if (m_ws) {
-            m_ws_tag = 1;
-         }
-      }
-
-      if (m_ws_tag) {
-         osi_Sym->resolve();
-         //	 std::cout << "warm start resolve " << std::endl;
-      } else {
-         osi_Sym->initialSolve();
-         //	 std::cout << "NON warm start resolve " << std::endl;
-      }
-
-      /*
-            OsiSolverInterface* m_subModelClone = m_osi->clone();
-            osi_Sym
-            = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
-            //osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
-            assert(osi_Sym);
-            sym_environment* env = osi_Sym->getSymphonyEnvironment();
-            sym_set_int_param(env, "do_reduced_cost_fixing", 0);
-
-
-            assert(env);
-       //         osi_Sym->initialSolve();
-            m_ws = osi_Sym->getWarmStart();
-       osi_Sym->branchAndBound();
-         } else {
-      if(m_ws){
-        osi_Sym->setWarmStart(m_ws);
-      }
-            std::cout << "counter is " << getCounter() << std::endl;
-            osi_Sym->resolve();
-         }
-      */
+   if (logIpLevel == 0 ) {
+      sym_set_int_param(env, "verbosity", -10);
    } else {
-    //  osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
-      
-      OsiSolverInterface* m_subModelClone = m_osi->clone();
-      osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
-      assert(osi_Sym);
-      
-      sym_environment* env = osi_Sym->getSymphonyEnvironment();
-
-      if (logIpLevel == 0 ) {
-         sym_set_int_param(env, "verbosity", -10);
-      } else {
-         sym_set_int_param(env, "verbosity", logIpLevel);
-      }
-
-      sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
-
-      assert(env);
-      osi_Sym->branchAndBound();
+      sym_set_int_param(env, "verbosity", logIpLevel);
    }
 
-   sym_environment* env = osi_Sym->getSymphonyEnvironment();
+   sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
+
+   if (param.WarmStart) {
+      sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+
+      osiSym->setSymParam(OsiSymKeepWarmStart, true);
+      //whether to trim the warm start tree before re-solving.
+      osiSym->setSymParam(OsiSymTrimWarmTree, true);
+
+      //This call automatically detects whether to warm start or not
+      osiSym->resolve();
+
+   } else {
+      
+      osiSym->initialSolve();
+
+   }
+
    int status = sym_get_status(env);
 
    if (param.LogDebugLevel >= 4){
@@ -365,29 +318,33 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       }
 
       double objval;
+      double* opt_solution = new double[numCols];
+      
       status = sym_get_sp_size(env, &result->m_nSolutions);
 
-      if (result->m_nSolutions == 0){
-	 //Solution pool is empty, but we canfetch the optimal solution
-	 result->m_nSolutions = 1;
-	 status = sym_get_col_solution(env, solution);
-	 vector<double> solVec(solution, solution + numCols);
-	 result->m_solution.push_back(solVec);
-      }else{
-	 int nSols = std::min<int>(result->m_nSolutions, 
-				  param.SubProbNumSolLimit);
-	 for (int i = 0; i < nSols; i++){
-	    status = sym_get_sp_solution(env, i, solution, &objval);
-	    /*
-	      for (int i = 0 ; i < numCols; ++i) {
-	      std::cout << "the solution is " << solution[i]
-	      << std::endl;
-	      }
-	    */
+      result->m_nSolutions = 1;
+      status = sym_get_col_solution(env, opt_solution);
+      vector<double> solVec(opt_solution, opt_solution + numCols);
+      result->m_solution.push_back(solVec);
+
+      int nSols = std::min<int>(result->m_nSolutions, 
+				param.SubProbNumSolLimit);
+      
+      for (int i = 0; i < nSols; i++){
+	 status = sym_get_sp_solution(env, i, solution, &objval);
+	 /*
+	   for (int i = 0 ; i < numCols; ++i) {
+	   std::cout << "the solution is " << solution[i]
+	   << std::endl;
+	   }
+	 */
+	 //We have to make sure that the solution is not one we already have
+	 if (memcmp(opt_solution, solution, numCols*DSIZE) == 0){
 	    vector<double> solVec(solution, solution + numCols);
 	    result->m_solution.push_back(solVec);
-	 }	
+	 }
       }	
+      UTIL_DELARR(opt_solution);      
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result->m_nSolutions = 0;
@@ -398,12 +355,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal = false ;
       }
    }
-   std::cout << "bye" << std::endl; 
-   /*
-   if (!param.WarmStart) {
-      UTIL_DELPTR(osi_Sym);
-   }
-   */
 #endif
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
@@ -418,7 +369,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    if (!UtilIsInSet(result->m_solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CBC solver status",
-                          "solveOsiAsIp", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompAlgoModel");
    }
 #else
    //int i;
@@ -537,14 +488,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          cerr << "Error: CBC IP solver 2nd status = "
               << result->m_solStatus2 << endl;
          throw UtilException("CBC solver 2nd status",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
    } else {
       if (!UtilIsInSet(result->m_solStatus2, statusSet2b, nSetb)) {
          cerr << "Error: CBC IP solver 2nd status = "
               << result->m_solStatus2 << endl;
          throw UtilException("CBC solver 2nd status",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
    }
 
@@ -631,19 +582,19 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
    }
 
    if (doExact)
@@ -655,7 +606,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveOsiAsIp", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompAlgoModel");
 
    if (doExact) {
       if (param.SubProbTimeLimitExact < COIN_DBL_MAX) {
@@ -671,7 +622,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveOsiAsIp", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompAlgoModel");
 
    if (doCutoff) {
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, cutoff);
@@ -681,7 +632,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveOsiAsIp", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompAlgoModel");
 
    //---
    //--- starting with CPX12, parallel MIP is on by default
@@ -693,7 +644,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveOsiAsIp", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompAlgoModel");
 
    int startAlgo = 0;
 
@@ -713,7 +664,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveOsiAsIp", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompAlgoModel");
 
    //---
    //--- check the mip starts solution pool, never let it get too
@@ -730,7 +681,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
       if (status)
          throw UtilException("CPXdelmipstarts failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
    }
 
 #endif
@@ -784,7 +735,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
       if (status) {
          throw UtilException("XPXsetintparam failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
 
       osiCpx->initialSolve();
@@ -804,7 +755,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
       if (status) {
          throw UtilException("CPXgetray failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
 
       vector<double> solVec(solution, solution + numCols);
@@ -820,7 +771,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
    }
 
@@ -835,14 +786,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
    } else {
       if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
       }
    }
 
@@ -865,7 +816,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
          if (status)
             throw UtilException("CPXgetsolnpoolobjval",
-                                "solveOsiAsIp", "DecompAlgoModel");
+                                "solveSubproblemAsMIP", "DecompAlgoModel");
 
          //printf("Sol %4d: Obj: %10g\n", i, objVal);
          status = CPXgetsolnpoolx(cpxEnv, cpxLp, i,
@@ -913,14 +864,14 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
       if (status)
          throw UtilException("CPXgetbestobjval failure",
-                             "solveOsiAsIp", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompAlgoModel");
 
       if (result->m_nSolutions >= 1 && !result->m_isUnbounded) {
          status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
 
          if (status)
             throw UtilException("CPXgetmipobjval failure",
-                                "solveOsiAsIp", "DecompAlgoModel");
+                                "solveSubproblemAsMIP", "DecompAlgoModel");
       }
    }
 

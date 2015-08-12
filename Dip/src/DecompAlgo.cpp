@@ -59,7 +59,7 @@ struct SolveRelaxedThreadArgs {
    bool                  checkDup;
    bool                  doExact;
    bool                  doCutoff;
-   list<DecompVar*>*     vars;
+   DecompVarList*        vars;
 };
 
 
@@ -465,14 +465,14 @@ void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
       subprobSI = new OsiLpSolverInterface();
    }
    */
+#ifdef __DECOMP_IP_CBC__
+   subprobSI = new OsiClpSolverInterface();
+#endif
 #if defined(__DECOMP_IP_CPX__)
    subprobSI = new OsiCpxSolverInterface();
 #endif
 #ifdef __DECOMP_IP_SYMPHONY__
    subprobSI = new OsiSymSolverInterface();
-#endif
-#ifdef __DECOMP_IP_CBC__
-   subprobSI = new OsiClpSolverInterface();
 #endif
    assert(subprobSI);
    subprobSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
@@ -6534,7 +6534,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                                       const bool            isNested,
                                       DecompAlgoModel&      algoModel,
                                       DecompSolverResult*   solveResult,
-                                      list<DecompVar*>&     vars
+                                      DecompVarList&        vars
                                      )
 {
    //---
@@ -6564,9 +6564,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 
    if (m_param.SubProbParallel) {
       m_stats.timerOther1.reset();
-   }
-
-   if (!m_param.SubProbParallel) {
+   }else{
       m_stats.timerOther2.reset();
    }
 
@@ -6583,51 +6581,26 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    bool doCutoff = m_param.SubProbUseCutoff ? true : false;
    bool doExact  = isNested ? false : true;
    doExact       = m_function == DecompFuncGenerateInitVars ? false : doExact;
-   //---
-   //--- run user method, but disregard so we can compare
-   //--- against built-in oracle
-   //---
    DecompSolverStatus solverStatus = DecompSolStatNoSolution;
+   DecompVarList userVars;
 
    //#ifndef RELAXED_THREADED
-   if (m_param.SolveRelaxAsIp == 2) {
-      list<DecompVar*> varsDebug;
-
-      if (isNested)
-         solverStatus
-            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, varsDebug);
-      else
-         solverStatus
-            = m_app->solveRelaxed(whichBlock, redCostX, alpha, varsDebug);
-
-      DecompVarList::iterator it;
-
-      for (it = varsDebug.begin(); it != varsDebug.end(); it++) {
-         if ((*it)->getBlockId() == whichBlock) {
-            (*it)->setReducedCost((*it)->getReducedCost() - alpha);
-         }
-      }
-
-      solverStatus = DecompSolStatNoSolution;
-   }
-
    if (m_param.SolveRelaxAsIp != 1) {
+
       if (isNested) {
          solverStatus
-            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, vars);
+            = m_app->solveRelaxedNest(whichBlock, redCostX, alpha, userVars);
       } else {
          solverStatus
-            = m_app->solveRelaxed(whichBlock, redCostX, alpha, vars);
+            = m_app->solveRelaxed(whichBlock, redCostX, alpha, userVars);
       }
 
       DecompVarList::iterator it;
 
-      for (it = vars.begin(); it != vars.end(); it++) {
+      for (it = userVars.begin(); it != userVars.end(); it++) {
          if ((*it)->getBlockId() == whichBlock) {
             if ((*it)->getVarType() == DecompVar_Point) {
                (*it)->setReducedCost((*it)->getReducedCost() - alpha);
-            } else if ( (*it)->getVarType() == DecompVar_Ray) {
-               (*it)->setReducedCost( (*it)->getReducedCost());
             }
          }
       }
@@ -6636,15 +6609,16 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
          m_stats.thisSolveRelaxApp.push_back(m_stats.timerOther2.getRealTime());
       }
 
-      nNewVars        = static_cast<int>(vars.size()) - nVars;
+      nNewVars        = static_cast<int>(userVars.size()) - nVars;
+
    }
 
    m_isColGenExact = (solverStatus == DecompSolStatOptimal);
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
-              (*m_osLog) << "m_isColGenExact = " << m_isColGenExact << endl;
-             );
-
+	      (*m_osLog) << "m_isColGenExact = " << m_isColGenExact << endl;
+	      );
    //#endif
+
    if ((!m_isColGenExact && nNewVars <= 0) || (m_param.SolveRelaxAsIp == 2)) {
       //---
       //--- Here, we are going to use the built-in IP solver
@@ -6724,15 +6698,13 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---
       //--- solve: min cx, s.t. A'x >= b', x in Z ([A,b] is in modelRelax.M)
       //---
-      //TODO: get best N feasible solutions? is this possible with CBC
-      //  this can help if this is the primary form of col-gen
-      algoModel.solveOsiAsIp(solveResult,
-                             m_param,
-                             doExact,
-                             doCutoff,
-                             isRoot,
-                             alpha - DecompEpsilon,
-			     tempTimeLimit);
+      algoModel.solveSubproblemAsMIP(solveResult,
+				     m_param,
+				     doExact,
+				     doCutoff,
+				     isRoot,
+				     alpha - DecompEpsilon,
+				     tempTimeLimit);
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
       //double * milpSolution = NULL;
       //if(solveResult->m_nSolutions)
@@ -6772,7 +6744,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
             DecompVarType varType = !solveResult->m_isUnbounded ?
                                     DecompVar_Point : DecompVar_Ray;
 
-            //	    std::cout << "The variable Type is " << varType << std::endl;
+            //std::cout << "The variable Type is " << varType << std::endl;
             if (model->isSparse()) {
                //TODO: this can just be a vector? ever need arb access?
                map<int, int>::const_iterator mcit;
@@ -6826,14 +6798,19 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                        (*m_osLog) << "varRedCost = " << varRedCost << "\n";
                        (*m_osLog) << "varOrigCost = " << varOrigCost << "\n";
                       );
-            DecompVar* var = new DecompVar(ind, els, varRedCost, varOrigCost, varType);
+            DecompVar* var = new DecompVar(ind, els, varRedCost, 
+					   varOrigCost, varType);
             var->setBlockId(whichBlock);
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
                        var->print(););
             vars.push_back(var);
          }
       }
-   } //END:   if((rc == STAT_UNKNOWN)  || (!isExact && nNewVars <= 0)){
+   }else{
+      // We didn't solve the subproblem as a generic MIP, so just take user
+      // variables.
+      vars = userVars;
+   }//END:   if((rc == STAT_UNKNOWN)  || (!isExact && nNewVars <= 0)){
 
    //---
    //--- sanity check - if user provides a full description of
@@ -6849,7 +6826,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---
       double* xTemp = new double[n_origCols];
       assert(xTemp);
-      list<DecompVar*>::iterator it;
+      DecompVarList::iterator it;
 
       for (it = vars.begin(); it != vars.end(); it++) {
          int               whichBlock     = (*it)->getBlockId();

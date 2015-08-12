@@ -630,25 +630,25 @@ void DecompAlgoPC::solutionUpdateAsIP()
    OsiSolverInterface * m_masterClone = m_masterSI->clone();
  
    int numCols = m_masterClone->getNumCols();
-   OsiSymSolverInterface* osi_Sym = new OsiSymSolverInterface();
+   OsiSymSolverInterface* osiSym = new OsiSymSolverInterface();
    const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
    const double* col_lb = (m_masterClone->getColLower());
    const double* col_up = (m_masterClone->getColUpper());
    const double* row_lb = (m_masterClone->getRowLower());
    const double* row_up = (m_masterClone->getRowUpper());
    const double* obj_coef = (m_masterClone->getObjCoefficients());
-   osi_Sym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
+   osiSym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
                           const_cast<double*&>(col_lb),
                           const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
                           const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
    for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
       if (isMasterColStructural(colIndex)){
-         osi_Sym->setInteger(colIndex);
+         osiSym->setInteger(colIndex);
       }
    }
    for (int i = 0; i < m_masterOnlyCols.size(); i++){
       if (intMarkerCore[m_masterOnlyCols[i]] == 'I'){
-	 osi_Sym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
+	 osiSym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
       } 
    }
 
@@ -672,7 +672,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if ( model->masterOnlyCols.size() ||
 	  (!model->masterOnlyCols.size() && model->getNumInts() == 0)) {
-         osi_Sym->setContinuous((*li)->getColMasterIndex());
+         osiSym->setContinuous((*li)->getColMasterIndex());
          //printf("set back to continuous index=%d block=%d\n",
          //       b, (*li)->getColMasterIndex());
          //       std::cout << "set continuous variables back " << std::endl;
@@ -680,8 +680,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    }
    */
 
-   assert(osi_Sym);
-   sym_environment* env = osi_Sym->getSymphonyEnvironment();
+   assert(osiSym);
+   sym_environment* env = osiSym->getSymphonyEnvironment();
    if (logIpLevel == 0){
      sym_set_int_param(env, "verbosity", -10);
    }
@@ -690,7 +690,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    }
 
    assert(env);
-   osi_Sym->branchAndBound();
+   osiSym->branchAndBound();
    int status = sym_get_status(env);
 
    if ((status == PREP_OPTIMAL_SOLUTION_FOUND) ||
@@ -727,7 +727,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                 << status << std::endl;
    }
 
-   UTIL_DELPTR(osi_Sym);
+   UTIL_DELPTR(osiSym);
 #endif
 #ifdef __DECOMP_IP_CBC__
    //TODO: what exactly does this do? make copy of entire model!?
