@@ -205,9 +205,9 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
    if (m_param.Instance.empty()) {
       cerr << "================================================" << std::endl
            << "Usage:"
-           << "./dip  --MILP:BlockFileFormat List" << std::endl
-           << "       --MILP:Instance /FilePath/ABC.mps" << std::endl
-           << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "./dip  --BlockFileFormat List" << std::endl
+           << "       --Instance /FilePath/ABC.mps" << std::endl
+           << "       --BlockFile /FilePath/ABC.block" << std::endl
            << "================================================" << std::endl
            << std::endl;
       exit(0);

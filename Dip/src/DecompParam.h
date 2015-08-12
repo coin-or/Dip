@@ -403,15 +403,13 @@ public:
       PARAM_getSetting("ParallelColsLimit",       ParallelColsLimit);
       PARAM_getSetting("BranchStrongIter",        BranchStrongIter);
       PARAM_getSetting("DebugCheckBlocksColumns", DebugCheckBlocksColumns);
-      DataDir       = param.GetSetting("DataDir",       "",    "MILP");
-      Instance      = param.GetSetting("Instance",      "",    "MILP");
-      InstanceFormat = param.GetSetting("InstanceFormat", "",    "MILP");
-      BlockFile     = param.GetSetting("BlockFile",     "",    "MILP");
-      PermuteFile   = param.GetSetting("PermuteFile",   "",    "MILP");
-      BlockFileFormat
-      = param.GetSetting("BlockFileFormat",    "",    "MILP");
-      InitSolutionFile
-      = param.GetSetting("InitSolutionFile",   "",    "MILP");
+      PARAM_getSetting("DataDir",          DataDir);
+      PARAM_getSetting("Instance",         Instance);
+      PARAM_getSetting("InstanceFormat",   InstanceFormat);
+      PARAM_getSetting("BlockFile",        BlockFile);
+      PARAM_getSetting("PermuteFile",      PermuteFile);
+      PARAM_getSetting("BlockFileFormat",  BlockFileFormat);
+      PARAM_getSetting("InitSolutionFile", InitSolutionFile);
       PARAM_getSetting("LogLevel", LogLevel);
       PARAM_getSetting("UseNames", UseNames);
       PARAM_getSetting("UseSparse", UseSparse);
@@ -658,9 +656,9 @@ public:
       LogLevel                 = 0;
       DataDir                  = "";
       Instance                 = "";
-      InstanceFormat           = "";
+      InstanceFormat           = "MPS";
       BlockFile                = "";
-      BlockFileFormat          = "";
+      BlockFileFormat          = "Pair";
       PermuteFile              = "";
       InitSolutionFile         = "";
       UseNames                 = 1 ;
