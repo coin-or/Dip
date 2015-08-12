@@ -157,6 +157,10 @@ if CPLEX_LP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_LP_CPX__
 endif
 
+if GRB_LP_SOLVER
+  AM_CPPFLAGS += -D__DECOMP_LP_GRB__
+endif
+
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
@@ -169,6 +173,10 @@ endif
 
 if CPLEX_IP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_IP_CPX__
+endif
+
+if GRB_IP_SOLVER
+  AM_CPPFLAGS += -D__DECOMP_IP_GRB__
 endif
 
 if SYMPHONY_IP_SOLVER

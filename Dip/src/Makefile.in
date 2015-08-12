@@ -61,13 +61,15 @@ bin_PROGRAMS = dip$(EXEEXT)
 #because CGL depends on CLP, we need this in any case
 @CLP_LP_SOLVER_TRUE@am__append_4 = -D__DECOMP_LP_CLP__
 @CPLEX_LP_SOLVER_TRUE@am__append_5 = -D__DECOMP_LP_CPX__
+@GRB_LP_SOLVER_TRUE@am__append_6 = -D__DECOMP_LP_GRB__
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_6 = -D__DECOMP_IP_CBC__
-@CPLEX_IP_SOLVER_TRUE@am__append_7 = -D__DECOMP_IP_CPX__
-@SYMPHONY_IP_SOLVER_TRUE@am__append_8 = -D__DECOMP_IP_SYMPHONY__
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_7 = -D__DECOMP_IP_CBC__
+@CPLEX_IP_SOLVER_TRUE@am__append_8 = -D__DECOMP_IP_CPX__
+@GRB_IP_SOLVER_TRUE@am__append_9 = -D__DECOMP_IP_GRB__
+@SYMPHONY_IP_SOLVER_TRUE@am__append_10 = -D__DECOMP_IP_SYMPHONY__
 subdir = src
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -218,6 +220,8 @@ COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
 COIN_HAS_DOXYGEN_FALSE = @COIN_HAS_DOXYGEN_FALSE@
 COIN_HAS_DOXYGEN_TRUE = @COIN_HAS_DOXYGEN_TRUE@
+COIN_HAS_GRB_FALSE = @COIN_HAS_GRB_FALSE@
+COIN_HAS_GRB_TRUE = @COIN_HAS_GRB_TRUE@
 COIN_HAS_HMETIS_FALSE = @COIN_HAS_HMETIS_FALSE@
 COIN_HAS_HMETIS_TRUE = @COIN_HAS_HMETIS_TRUE@
 COIN_HAS_LATEX_FALSE = @COIN_HAS_LATEX_FALSE@
@@ -276,6 +280,17 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GRB_CFLAGS = @GRB_CFLAGS@
+GRB_CFLAGS_INSTALLED = @GRB_CFLAGS_INSTALLED@
+GRB_DATA = @GRB_DATA@
+GRB_DATA_INSTALLED = @GRB_DATA_INSTALLED@
+GRB_DEPENDENCIES = @GRB_DEPENDENCIES@
+GRB_IP_SOLVER_FALSE = @GRB_IP_SOLVER_FALSE@
+GRB_IP_SOLVER_TRUE = @GRB_IP_SOLVER_TRUE@
+GRB_LIBS = @GRB_LIBS@
+GRB_LIBS_INSTALLED = @GRB_LIBS_INSTALLED@
+GRB_LP_SOLVER_FALSE = @GRB_LP_SOLVER_FALSE@
+GRB_LP_SOLVER_TRUE = @GRB_LP_SOLVER_TRUE@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 HAVE_PYTHON_FALSE = @HAVE_PYTHON_FALSE@
@@ -470,7 +485,7 @@ dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
 # "cygpath" stuff is necessary to compile with native compilers on Windows.
 AM_CPPFLAGS = $(DIPLIB_CFLAGS) $(am__append_3) $(am__append_4) \
 	$(am__append_5) $(am__append_6) $(am__append_7) \
-	$(am__append_8)
+	$(am__append_8) $(am__append_9) $(am__append_10)
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
