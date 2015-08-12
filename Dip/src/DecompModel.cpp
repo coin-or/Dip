@@ -246,8 +246,8 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
    //--- clear out any old solutions
    //---
    result->m_solution.clear();
-#ifdef __DECOMP_IP_SYMPHONY__
 
+#ifdef __DECOMP_IP_SYMPHONY__
    //OsiSymSolverInterface* osiSym
    //   = dynamic_cast<OsiSymSolverInterface*>(m_osi->clone());
    OsiSymSolverInterface* osiSym
@@ -398,15 +398,17 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
    string cbcSLogSet   = "2";
 
    if (doExact) {
-      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitExact, param.LimitTime),
-                                -1, COIN_DBL_MAX);
-      cbcGapSet  = UtilDblToStr(min(param.SubProbGapLimitExact, param.LimitTime)
-                                , -1, COIN_DBL_MAX);
+      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitExact, 
+				    param.LimitTime), -1, 
+				COIN_DBL_MAX);
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact, -1, 
+				COIN_DBL_MAX);
    } else {
-      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitInexact, param.LimitTime),
-                                -1, COIN_DBL_MAX);
-      cbcGapSet  = UtilDblToStr(min(param.SubProbGapLimitInexact, param.LimitTime),
-                                -1, COIN_DBL_MAX);
+      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitInexact, 
+				    param.LimitTime), -1, 
+				COIN_DBL_MAX);
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact, -1, 
+				COIN_DBL_MAX);
    }
 
    bool   doTime       = false;
