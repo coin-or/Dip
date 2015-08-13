@@ -318,6 +318,33 @@ public:
 
    bool WarmStart;
 
+   bool BranchPriorityMasterOnly;   
+ 
+   // The following parameters are for the SYMPHONY warmstarting capability
+   
+   // Setting this parameter will start the warm start routine using only the 
+   // first warm_start_node_limit nodes generated during the previous solve
+   //  procedure. The rest of the tree will be trimmed.  
+   int WarmStartNodeLimit; 
+   
+   // Setting this parameter will start the warm start routine using only the 
+   // first warm_start_node_ratio% of the nodes generated during the previous
+   //  solve procedure. 
+  
+   int WarmStartNodeRatio; 
+ 
+   // Setting this parameter will start the warm start routine using all the nodes
+   // above the level warm_start_node_level of the tree generated during the 
+   // previous solve procedure. The rest of the tree will be trimmed.
+   int WarmStartNodeLevel; 
+ 
+   // Setting this parameter will start the warm start routine using all the
+   // nodes above the level warm_start_node_level% of the warm start tree depth.
+   // The rest of the tree will be trimmed
+
+   int WarmStartNodeLevelRatio; 
+  
+      
    /**
     * @}
     */
@@ -432,7 +459,13 @@ public:
       PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
       PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
       PARAM_getSetting("BranchingStrategy", BranchingStrategy);
-      PARAM_getSetting("WarmStart", WarmStart);
+      PARAM_getSetting("WarmStart", WarmStart);  
+      PARAM_getSetting("BranchPriorityMasterOnly", BranchPriorityMasterOnly); 
+      PARAM_getSetting("WarmStartNodeLimit", WarmStartNodeLimit); 
+      PARAM_getSetting("WarmStartNodeRatio", WarmStartNodeRatio); 
+      PARAM_getSetting("WarmStartNodeLevel", WarmStartNodeLevel); 
+      PARAM_getSetting("WarmStartNodeLevelRatio", WarmStartNodeLevelRatio); 
+
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -577,6 +610,11 @@ public:
       UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
       UtilPrintParameter(os, sec, "BranchingStrategy", BranchingStrategy);
       UtilPrintParameter(os, sec, "WarmStart", WarmStart);
+      UtilPrintParameter(os, sec, "BranchPriorityMasterOnly", BranchPriorityMasterOnly);
+      UtilPrintParameter(os, sec, "WarmStartNodeLimit", WarmStartNodeLimit);
+      UtilPrintParameter(os, sec, "WarmStartNodeRatio", WarmStartNodeRatio);
+      UtilPrintParameter(os, sec, "WarmStartNodeLevel", WarmStartNodeLevel);
+      UtilPrintParameter(os, sec, "WarmStartNodeLevelRatio", WarmStartNodeLevelRatio);
       (*os) << "========================================================\n";
    }
 
@@ -684,8 +722,13 @@ public:
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
       BranchingStrategy        = 0;
-      WarmStart                = false;
-   }
+      WarmStart                = true;
+      BranchPriorityMasterOnly = false; 
+      WarmStartNodeLimit       = 100;        
+      WarmStartNodeRatio       = 0.5; 
+      WarmStartNodeLevel       = 3; 
+      WarmStartNodeLevelRatio  = 0.5;  
+     }
 
    void dumpSettings(std::ostream* os = &std::cout) {
       const std::string sec = "DECOMP";
