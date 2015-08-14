@@ -510,7 +510,7 @@ test: ../src/dip$(EXEEXT)
 
 	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --BestKnownLB 11   --BestKnownUB 11
 
-	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --BestKnownLB 88   --BestKnownUB 88
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --BestKnownLB -88   --BestKnownUB -88
 
 .PHONY: test
 
