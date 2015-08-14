@@ -2830,16 +2830,21 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    //const int      limit2     = 1;
    const int      nCoreCols  = modelCore->getNumCols();
    const double* objCoeff   = getOrigObjective();
+   double timeLimit;
+
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "generateInitVars()", m_param.LogDebugLevel, 2);
    m_function = DecompFuncGenerateInitVars;
+
    //---
    //--- APP: create an initial set of points F'[0] subseteq F'
    //---  The base implementation of this function does nothing.
    //---  This is the user's chance to implement something application
    //---  specific.
    //---
+
    m_app->generateInitVars(initVars);
+
    //TODO: think - if user gives a partial feasible solution
    //   and this part is not run then PI master can be infeasible
    //   which will cause an issue
@@ -2851,6 +2856,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    //  with some master-only vars set to their LB=0. This will not be
    //  added as 0-columns. So, will have convexity constraints that are
    //  0=1.
+
    int nInitVars = static_cast<int>(initVars.size());
    UTIL_DEBUG(m_param.LogDebugLevel, 4,
               (*m_osLog)
@@ -2896,11 +2902,10 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          //---
          map<int, DecompAlgoModel>::iterator mit;
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
-         tempTimeLimit = m_param.LimitTime; 
-         UtilTimer timer;
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
-            timer.start();
+	    timeLimit = max(m_param.SubProbTimeLimitExact - 
+			    m_stats.timerOverall.getRealTime(), 0.0);
             solveRelaxed(costeps,               //reduced cost (fake here)
                          objCoeff,              //original cost vector
                          9e15,                  //alpha        (fake here)
@@ -2908,9 +2913,9 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                          false,                 //isNested
                          algoModel,
                          &subprobResult,        //results
-                         initVars);             //var list to populate
-            timer.stop(); 
-            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(),0.0);         
+                         initVars,             //var list to populate
+			 timeLimit);
+
             if (attempts == 0) {
                //TODO: have to treat masterOnly differently
                //  we don't correctly populate LB/UB in
@@ -2928,15 +2933,17 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                mivt != m_modelRelaxNest.end(); mivt++) {
             for (vit  = (*mivt).second.begin();
                   vit != (*mivt).second.end(); vit++) {
-               solveRelaxed(
-                  costeps,               //reduced cost (fake here)
-                  objCoeff,              //original cost vector
-                  9e15,                  //alpha        (fake here)
-                  nCoreCols,             //num core columns
-                  true,                  //isNested
-                  (*vit),
-                  &subprobResult,        //results
-                  initVars);             //var list to populate
+	       timeLimit = max(m_param.SubProbTimeLimitExact - 
+			       m_stats.timerOverall.getRealTime(), 0.0);
+               solveRelaxed(costeps,               //reduced cost (fake here)
+			    objCoeff,              //original cost vector
+			    9e15,                  //alpha        (fake here)
+			    nCoreCols,             //num core columns
+			    true,                  //isNested
+			    (*vit),
+			    &subprobResult,        //results
+			    initVars,             //var list to populate
+			    timeLimit);
             }
          }
 
@@ -3212,7 +3219,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
                  << UtilDblToStr(m_app->getBestKnownUB())
                  << " thisBoundLB = "
                  << UtilDblToStr(zDW_LB) << endl;
-      assert(0);
+      //assert(0);
    }
 
    //---
@@ -4679,16 +4686,17 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
    int                   i, b;
    DecompVarList         potentialVars;
    DecompConstraintSet* modelCore   = m_modelCore.getModel();
-   const int      m             = m_masterSI->getNumRows();
-   int            nBaseCoreRows = modelCore->nBaseRows;
-   const int      nCoreCols     = modelCore->getNumCols();
+   const int     m             = m_masterSI->getNumRows();
+   int           nBaseCoreRows = modelCore->nBaseRows;
+   const int     nCoreCols     = modelCore->getNumCols();
    const double* u             = NULL;
    const double* userU         = NULL;
    const double* origObjective = getOrigObjective();
-   double*        redCostX      = NULL;
-   double         alpha         = 0.0;
-   int            whichBlock;
-   double         varRedCost;
+   double*       redCostX      = NULL;
+   double        alpha         = 0.0;
+   int           whichBlock;
+   double        varRedCost;
+   double        timeLimit;
    DecompVarList::iterator it;
    //  assert(!m_masterSI->isProvenPrimalInfeasible());
 
@@ -5004,7 +5012,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       DecompVarList* potentialVarsT = new DecompVarList[m_numConvexCon];
       CoinAssertHint(potentialVarsT, "Error: Out of Memory");
 
-      UtilTimer timer;
       //---
       //--- For pricing,
       //--- redCostX: is the red-cost for each original column  (c - uhat A")_e
@@ -5038,7 +5045,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       */
 	 
 #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize) 
-      for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; subprobIndex++) {
+      for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; 
+	   subprobIndex++) {
 
 	 DecompAlgoModel&   algoModel       = getModelRelax(subprobIndex);
 	 double             alpha           = u[nBaseCoreRows + subprobIndex];
@@ -5055,8 +5063,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 		    << algoModel.getModelName() << endl;);
 #endif
 	 
-	 tempTimeLimit = max(m_param.LimitTime - m_stats.timerOverall.getRealTime(), 0.0); 
-	 timer.start();
+	 timeLimit = max(m_param.SubProbTimeLimitExact - 
+			 m_stats.timerOverall.getRealTime(), 0.0);
 	 solveRelaxed(redCostX,
 		      origObjective,
 		      alpha,
@@ -5064,15 +5072,15 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 		      false,//isNested
 		      algoModel,
 		      &solveResult,
-		      potentialVarsT[subprobIndex]
-		      );
-	 timer.stop();
+		      potentialVarsT[subprobIndex],
+		      timeLimit);
 	 if (solveResult.m_isCutoff) {
 	    mostNegRCvec[subprobIndex] = min(mostNegRCvec[subprobIndex], 0.0);
 	 }
       }
 
-      for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
+      for (int subprobIndex = 0; subprobIndex < m_numConvexCon; 
+	   subprobIndex++) {
 	 /* printf("arg[%d].vars size=%d\n",
 	    t, static_cast<int>(arg[t].vars->size()));
 	 */
@@ -5122,6 +5130,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 	    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
 		       (*m_osLog) << "solve relaxed nested model = "
 		       << (*vit).getModelName() << endl;);
+	    timeLimit = max(m_param.SubProbTimeLimitExact - 
+			    m_stats.timerOverall.getRealTime(), 0.0);
 	    solveRelaxed(redCostX,
 			 origObjective,         //original cost vector
 			 alpha,
@@ -5129,7 +5139,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 			 true,                  //isNested
 			 (*vit),
 			 &solveResult,          //results
-			 potentialVarsT[b]);        //var list to populate
+			 potentialVarsT[b],     //var list to populate
+			 timeLimit);
 	    
 	    if (solveResult.m_isCutoff) {
 	       mostNegRCvec[b] = min(mostNegRCvec[b], 0.0);
@@ -5202,6 +5213,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //---       calculation of reduced cost
             //---
             alpha = u[nBaseCoreRows + b];
+	    timeLimit = max(m_param.SubProbTimeLimitExact - 
+			    m_stats.timerOverall.getRealTime(), 0.0);
             solveRelaxed(redCostX,
                          origObjective,
                          alpha,
@@ -5209,7 +5222,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                          false,//isNested
                          algoModel,
                          &solveResult,
-                         potentialVars);
+                         potentialVars,
+			 timeLimit);
          } else {
             vector<double>& uBlockV   = mitv->second;
             double*          uBlock    = &uBlockV[0];
@@ -5248,6 +5262,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- solve relaxed problem
             //---
             alpha = uBlockAdj[nBaseCoreRows + b];
+	    timeLimit = max(m_param.SubProbTimeLimitExact - 
+			    m_stats.timerOverall.getRealTime(), 0.0);
             solveRelaxed(redCostXb,
                          origObjective,
                          alpha,
@@ -5255,7 +5271,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                          false,//isNested
                          algoModel,
                          &solveResult,
-                         potentialVars);
+                         potentialVars,
+			 timeLimit);
             UTIL_DELARR(redCostXb);
             UTIL_DELARR(uBlockAdj);
          }
@@ -5316,6 +5333,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             //--- NOTE: the variables coming back include alpha in
             //---       calculation of reduced cost
             //---
+	    timeLimit = max(m_param.SubProbTimeLimitExact - 
+			    m_stats.timerOverall.getRealTime(), 0.0);
             solveRelaxed(redCostX,
                          origObjective,
                          alpha,
@@ -5323,7 +5342,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                          false, //isNested
                          algoModel,
                          &solveResult,
-                         potentialVars);
+                         potentialVars,
+			 timeLimit);
 
             //if cutoff delcares infeasible, we know subprob >= 0
             //  we can use 0 as valid (but possibly weaker bound)
@@ -5346,6 +5366,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
                           (*m_osLog) << "solve relaxed nested model = "
                           << (*vit).getModelName() << endl;);
+	       timeLimit = max(m_param.SubProbTimeLimitExact - 
+			       m_stats.timerOverall.getRealTime(), 0.0);
                solveRelaxed(redCostX,
                             origObjective,         //original cost vector
                             alpha,
@@ -5353,7 +5375,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                             true,                  //isNested
                             (*vit),
                             &solveResult,          //results
-                            potentialVars);        //var list to populate
+                            potentialVars,         //var list to populate
+			    timeLimit);
 
                if (solveResult.m_isCutoff) {
                   mostNegRCvec[b] = min(mostNegRCvec[b], 0.0);
@@ -6534,8 +6557,9 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                                       const bool            isNested,
                                       DecompAlgoModel&      algoModel,
                                       DecompSolverResult*   solveResult,
-                                      DecompVarList&        vars
-                                     )
+                                      DecompVarList&        vars,
+				      double                timeLimit
+				      )
 {
    //---
    //--- For pricing,
@@ -6704,7 +6728,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 				     doCutoff,
 				     isRoot,
 				     alpha - DecompEpsilon,
-				     tempTimeLimit);
+				     timeLimit);
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
       //double * milpSolution = NULL;
       //if(solveResult->m_nSolutions)

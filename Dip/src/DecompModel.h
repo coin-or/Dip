@@ -30,7 +30,7 @@
 //===========================================================================//
 class DecompAppModel {
 protected:
-   DecompConstraintSet* m_model;
+   DecompConstraintSet*  m_model;
    std::string           m_modelName;
    int                   m_blockId;
 

@@ -252,9 +252,6 @@ protected:
     */
    std::map<int, int> m_masterOnlyColsMap;
 
-   // used for setting time limit to solving MIP subproblem
-   double tempTimeLimit;
-
    // variable dictating whether the branching is implemented
    // in the master problem or the subproblem
 
@@ -450,14 +447,15 @@ public:
                      const double   feasConTol = 1.0e-5); //0.01%
 
    //fugly
-   DecompStatus solveRelaxed(const double*         redCostX,
-                             const double*         origCost,
-                             const double          alpha,
-                             const int             n_origCols,
-                             const bool            isNested,
-                             DecompAlgoModel&      algoModel,
-                             DecompSolverResult*   solveResult,
-                             std::list<DecompVar*>&     vars);
+   DecompStatus solveRelaxed(const double*          redCostX,
+                             const double*          origCost,
+                             const double           alpha,
+                             const int              n_origCols,
+                             const bool             isNested,
+                             DecompAlgoModel&       algoModel,
+                             DecompSolverResult*    solveResult,
+                             std::list<DecompVar*>& vars,
+			     double                 timeLimit);
 
 
    inline void appendVars(DecompVar* var) {
@@ -1014,7 +1012,6 @@ public:
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
       m_masterOnlyCols(),
-      tempTimeLimit(0),
       m_branchingImplementation(DecompBranchInSubproblem) {
       m_app->m_decompAlgo = this;
    }
