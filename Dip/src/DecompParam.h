@@ -588,9 +588,6 @@ public:
       LogLevel             = 0;
       LogDebugLevel        = 0;
       LogLpLevel           = 0;
-      //verbosity in Symphony allows negative value and 0 is really verbose
-      // so -1 was set as the default value for Symphony, adjustment is made
-      // in the corresponding code
       LogIpLevel           = 0;
       LogDumpModel         = 0;
       LogObjHistory        = 0;
@@ -656,9 +653,9 @@ public:
       LogLevel                 = 0;
       DataDir                  = "";
       Instance                 = "";
-      InstanceFormat           = "MPS";
+      InstanceFormat           = "";
       BlockFile                = "";
-      BlockFileFormat          = "Pair";
+      BlockFileFormat          = "";
       PermuteFile              = "";
       InitSolutionFile         = "";
       UseNames                 = 1 ;
