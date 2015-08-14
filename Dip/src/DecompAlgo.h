@@ -153,9 +153,9 @@ protected:
 
 
    const double*                       m_objective;
-   DecompAlgoModel                     m_modelCore;
-   std::map<int, DecompAlgoModel>           m_modelRelax;
-   std::map<int, std::vector<DecompAlgoModel> >  m_modelRelaxNest;
+   DecompSubModel                     m_modelCore;
+   std::map<int, DecompSubModel>           m_modelRelax;
+   std::map<int, std::vector<DecompSubModel> >  m_modelRelaxNest;
 
 
    /**
@@ -276,8 +276,8 @@ public:
    virtual void createMasterProblem(DecompVarList& initVars);
    void loadSIFromModel(OsiSolverInterface*            si,
                         //need next 2 args? ever different?
-                        //DecompAlgoModel              & modelCore,
-                        //map<int, DecompAlgoModel>    & modelRelax,
+                        //DecompSubModel              & modelCore,
+                        //map<int, DecompSubModel>    & modelRelax,
                         bool                           doInt = false);
 
 
@@ -452,7 +452,7 @@ public:
                              const double           alpha,
                              const int              n_origCols,
                              const bool             isNested,
-                             DecompAlgoModel&       algoModel,
+                             DecompSubModel&       algoModel,
                              DecompSolverResult*    solveResult,
                              std::list<DecompVar*>& vars,
 			     double                 timeLimit);
@@ -492,7 +492,7 @@ public:
    void initSetup(UtilParameters* utilParam,
                   std::string&          sectionParam);
    void getModelsFromApp();
-   void createOsiSubProblem(DecompAlgoModel& algoModel);
+   void createOsiSubProblem(DecompSubModel& algoModel);
 
    /**
     * Calculate gap: |(ub-lb)|/|lb|
@@ -673,7 +673,7 @@ public:
    inline const double* getOrigObjective() const {
       return m_app->m_objective;
    }
-   inline const DecompAlgoModel& getModelCore() const {
+   inline const DecompSubModel& getModelCore() const {
       return m_modelCore;
    }
 
@@ -693,8 +693,8 @@ public:
       return m_masterSI;
    }
 
-   inline DecompAlgoModel& getModelRelax(const int blockId) {
-      std::map<int, DecompAlgoModel>::iterator mit;
+   inline DecompSubModel& getModelRelax(const int blockId) {
+      std::map<int, DecompSubModel>::iterator mit;
       mit = m_modelRelax.find(blockId);
       assert(mit != m_modelRelax.end());
       return (*mit).second;

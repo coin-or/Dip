@@ -20,7 +20,7 @@
 using namespace std;
 
 //===========================================================================//
-bool DecompAlgoModel::isPointFeasible(const double* x,
+bool DecompSubModel::isPointFeasible(const double* x,
                                       const bool     isXSparse,
                                       const int      logLevel,
                                       const double   feasVarTol,
@@ -230,7 +230,7 @@ FUNC_EXIT:
 }
 
 //===========================================================================//
-void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
+void DecompSubModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 					   DecompParam&         param,
 					   bool                 doExact,
 					   bool                 doCutoff,
@@ -369,7 +369,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
    if (!UtilIsInSet(result->m_solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CBC solver status",
-                          "solveSubproblemAsMIP", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompSubModel");
    }
 #else
    //int i;
@@ -490,14 +490,14 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
          cerr << "Error: CBC IP solver 2nd status = "
               << result->m_solStatus2 << endl;
          throw UtilException("CBC solver 2nd status",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
    } else {
       if (!UtilIsInSet(result->m_solStatus2, statusSet2b, nSetb)) {
          cerr << "Error: CBC IP solver 2nd status = "
               << result->m_solStatus2 << endl;
          throw UtilException("CBC solver 2nd status",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
    }
 
@@ -584,19 +584,19 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
    }
 
    if (doExact)
@@ -608,7 +608,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompSubModel");
 
    if (doExact) {
       if (param.SubProbTimeLimitExact < COIN_DBL_MAX) {
@@ -624,7 +624,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompSubModel");
 
    if (doCutoff) {
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, cutoff);
@@ -634,7 +634,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompSubModel");
 
    //---
    //--- starting with CPX12, parallel MIP is on by default
@@ -646,7 +646,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompSubModel");
 
    int startAlgo = 0;
 
@@ -666,7 +666,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompAlgoModel");
+                          "solveSubproblemAsMIP", "DecompSubModel");
 
    //---
    //--- check the mip starts solution pool, never let it get too
@@ -683,7 +683,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
       if (status)
          throw UtilException("CPXdelmipstarts failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
    }
 
 #endif
@@ -737,7 +737,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
       if (status) {
          throw UtilException("XPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
 
       osiCpx->initialSolve();
@@ -757,7 +757,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
       if (status) {
          throw UtilException("CPXgetray failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
 
       vector<double> solVec(solution, solution + numCols);
@@ -773,7 +773,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
       if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
    }
 
@@ -788,14 +788,14 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
    } else {
       if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
       }
    }
 
@@ -818,7 +818,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
          if (status)
             throw UtilException("CPXgetsolnpoolobjval",
-                                "solveSubproblemAsMIP", "DecompAlgoModel");
+                                "solveSubproblemAsMIP", "DecompSubModel");
 
          //printf("Sol %4d: Obj: %10g\n", i, objVal);
          status = CPXgetsolnpoolx(cpxEnv, cpxLp, i,
@@ -866,14 +866,14 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
       if (status)
          throw UtilException("CPXgetbestobjval failure",
-                             "solveSubproblemAsMIP", "DecompAlgoModel");
+                             "solveSubproblemAsMIP", "DecompSubModel");
 
       if (result->m_nSolutions >= 1 && !result->m_isUnbounded) {
          status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
 
          if (status)
             throw UtilException("CPXgetmipobjval failure",
-                                "solveSubproblemAsMIP", "DecompAlgoModel");
+                                "solveSubproblemAsMIP", "DecompSubModel");
       }
    }
 

@@ -26,7 +26,7 @@ using namespace std;
 // to branching.
 bool DecompVar::doesSatisfyBounds(int                     denseLen,
                                   double*                 denseArr,
-                                  const DecompAlgoModel& model,
+                                  const DecompSubModel&   model,
                                   const double*           lbs,
                                   const double*           ubs)
 {

@@ -28,7 +28,7 @@
 //===========================================================================//
 //naming convention - usually would do DecompModelXx, DecompModelYy
 //===========================================================================//
-class DecompAppModel {
+class DecompModel {
 protected:
    DecompConstraintSet*  m_model;
    std::string           m_modelName;
@@ -57,32 +57,32 @@ public:
    }
 
 public:
-   DecompAppModel(const DecompAppModel& appModel) {
+   DecompModel(const DecompModel& appModel) {
       m_model     = appModel.m_model;
       m_modelName = appModel.m_modelName;
       m_blockId   = appModel.m_blockId;
    }
-   DecompAppModel& operator=(const DecompAppModel& rhs) {
+   DecompModel& operator=(const DecompModel& rhs) {
       m_model     = rhs.m_model;
       m_modelName = rhs.m_modelName;
       m_blockId   = rhs.m_blockId;
       return *this;
    }
-   DecompAppModel() :
+   DecompModel() :
       m_model    (NULL),
       m_modelName(""),
       m_blockId  (0) {};
-   DecompAppModel(DecompConstraintSet* model,
+   DecompModel(DecompConstraintSet* model,
                   std::string                modelName,
                   int                   blockId) :
       m_model    (model),
       m_modelName(modelName),
       m_blockId  (blockId) {};
-   virtual ~DecompAppModel() {}
+   virtual ~DecompModel() {}
 };
 
 //===========================================================================//
-class DecompAlgoModel : public DecompAppModel {
+class DecompSubModel : public DecompModel {
 private:
    OsiSolverInterface*   m_osi;
    int                   m_numCols;
@@ -112,7 +112,7 @@ public:
          m_colIndices      = new int[numCols];
 
          if (!m_colIndices) {
-            UtilExceptionMemory("setOsi", "DecompAlgoModel");
+            UtilExceptionMemory("setOsi", "DecompSubModel");
          }
 
          UtilIotaN(m_colIndices, numCols, 0);
@@ -201,36 +201,36 @@ public:
                         const double   feasConTol = 1.0e-4);
 
 public:
-   DecompAlgoModel(const DecompAppModel& appModel) :
-      DecompAppModel(appModel),
+   DecompSubModel(const DecompModel& appModel) :
+      DecompModel(appModel),
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
       m_counter    ( 0 )
    {};
 
-   DecompAlgoModel& operator=(const DecompAppModel& rhs) {
-      DecompAppModel::operator=(rhs);
+   DecompSubModel& operator=(const DecompModel& rhs) {
+      DecompModel::operator=(rhs);
       return *this;
    }
 
-   DecompAlgoModel() :
-      DecompAppModel(),
+   DecompSubModel() :
+      DecompModel(),
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
       m_counter     (0)
    {};
-   DecompAlgoModel(DecompConstraintSet* model,
+   DecompSubModel(DecompConstraintSet* model,
                    std::string                modelName,
                    int                   blockId) :
-      DecompAppModel(model, modelName, blockId),
+      DecompModel(model, modelName, blockId),
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
       m_counter     (0)
    {};
-   ~DecompAlgoModel() {
+   ~DecompSubModel() {
       if (m_osi) {
          delete    m_osi;
       }

@@ -99,10 +99,10 @@ public:
       m_objective = NULL;
       delete m_modelCore.getModel();
       m_modelCore.setModel(NULL);
-      map<int, DecompAppModel>::iterator mit;
+      map<int, DecompModel	>::iterator mit;
 
       for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-         DecompAppModel& modelRelax = (*mit).second;
+         DecompModel	& modelRelax = (*mit).second;
          delete modelRelax.getModel();
          modelRelax.setModel(NULL);
       }

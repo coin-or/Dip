@@ -657,13 +657,13 @@ void DecompAlgoPC::solutionUpdateAsIP()
    //  like above
    /*
    DecompVarList::iterator li; 
-   map<int, DecompAlgoModel>::iterator mit; 
+   map<int, DecompSubModel>::iterator mit; 
 
    for (li = m_vars.begin(); li != m_vars.end(); li++) {
       b   = (*li)->getBlockId();
       mit = m_modelRelax.find(b);
       assert(mit != m_modelRelax.end());
-      DecompAlgoModel&      algoModel = (*mit).second;
+      DecompSubModel&      algoModel = (*mit).second;
       DecompConstraintSet* model     = algoModel.getModel();
 
       if (!model) {
@@ -707,7 +707,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status == FUNCTION_TERMINATED_ABNORMALLY)
          throw UtilException("sym_get_col_solution failure",
-                             "solutionUpdateAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompSubModel");
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result.m_nSolutions = 0;
@@ -793,7 +793,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
       cerr << "Error: CBC IP solver status = " << result.m_solStatus << endl;
       //This shouldn't really cause an exception
       //throw UtilException("CBC solver status",
-      //                    "solutionUpdateAsIp", "DecompAlgoModel");
+      //                    "solutionUpdateAsIp", "DecompSubModel");
    }
 
    /** Secondary status of problem
@@ -881,19 +881,19 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solutionUpdateAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompSubModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solutionUpdateAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompSubModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solutionUpdateAsIp", "DecompAlgoModel");
+                             "solutionUpdateAsIp", "DecompSubModel");
    }
 
    if (m_firstPhase2Call) {

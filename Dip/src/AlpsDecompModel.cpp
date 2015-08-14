@@ -52,7 +52,7 @@ AlpsTreeNode* AlpsDecompModel::createRoot()
    AlpsDecompTreeNode* root = new AlpsDecompTreeNode();
    assert(root);
    CoinAssert(m_decompAlgo);
-   const DecompAlgoModel& modelCore = m_decompAlgo->getModelCore();
+   const DecompSubModel& modelCore = m_decompAlgo->getModelCore();
    CoinAssert(modelCore.getModel()->getColLB());
    CoinAssert(modelCore.getModel()->getColUB());
    AlpsDecompNodeDesc* desc

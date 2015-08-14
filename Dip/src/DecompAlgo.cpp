@@ -50,7 +50,7 @@ using namespace std;
 
 struct SolveRelaxedThreadArgs {
    DecompAlgo*           algo;
-   vector<DecompAlgoModel*>*   algoModel;
+   vector<DecompSubModel*>*   algoModel;
    int                   nBaseCoreRows;
    double*               u;
    double*               redCostX;
@@ -78,11 +78,11 @@ void DecompAlgo::checkBlocksColumns()
    //---
    //--- sanity check that the blocks are column disjoint
    //---
-   map<int, DecompAlgoModel>::iterator mid1;
-   map<int, DecompAlgoModel>::iterator mid2;
+   map<int, DecompSubModel>::iterator mid1;
+   map<int, DecompSubModel>::iterator mid2;
 
    for (mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++) {
-      DecompAlgoModel&      modelRelax1 = (*mid1).second;
+      DecompSubModel&      modelRelax1 = (*mid1).second;
       DecompConstraintSet* model       = modelRelax1.getModel();
 
       if (!model || !model->getMatrix()) {
@@ -99,7 +99,7 @@ void DecompAlgo::checkBlocksColumns()
             continue;
          }
 
-         DecompAlgoModel& modelRelax2 = (*mid2).second;
+         DecompSubModel& modelRelax2 = (*mid2).second;
          set<int>&         activeCols2
          = modelRelax2.getModel()->activeColumnsS;
          set<int>          activeCols1inter2;
@@ -145,7 +145,7 @@ void DecompAlgo::checkBlocksColumns()
    set<int>::iterator sit;
 
    for (mid1 = m_modelRelax.begin(); mid1 != m_modelRelax.end(); mid1++) {
-      DecompAlgoModel&      modelRelax = (*mid1).second;
+      DecompSubModel&      modelRelax = (*mid1).second;
       DecompConstraintSet* model      = modelRelax.getModel();
       assert(model);
       set<int>&             activeCols = model->activeColumnsS;
@@ -154,7 +154,7 @@ void DecompAlgo::checkBlocksColumns()
                 inserter(activeColsUnion, activeColsUnion.begin()));
    }
 
-   const DecompAlgoModel& modelCore      = getModelCore();
+   const DecompSubModel& modelCore      = getModelCore();
 
    // add the master-only variables ot the set union
    const vector<int>& masterOnlyCols = modelCore.getModel()->getMasterOnlyCols();
@@ -219,7 +219,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    }
 
    //---
-   //--- create DecompAlgoModel objects from DecompAppModel objects
+   //--- create DecompSubModel objects from DecompModel objects
    //---   these just store pointers to the models provided by user
    //---   and will store pointers to the approriate OSI objects
    //---
@@ -267,9 +267,9 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    //--- Here, for each relaxation, we initialize an OSI interface and load
    //--- the problem data.
    //---
-   map<int, DecompAlgoModel>         ::iterator mit;
-   map<int, vector<DecompAlgoModel> >::iterator mivt;
-   vector<DecompAlgoModel>           ::iterator vit;
+   map<int, DecompSubModel>         ::iterator mit;
+   map<int, vector<DecompSubModel> >::iterator mivt;
+   vector<DecompSubModel>           ::iterator vit;
 
    for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
       createOsiSubProblem((*mit).second);
@@ -434,7 +434,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
 }
 
 //===========================================================================//
-void DecompAlgo::createOsiSubProblem(DecompAlgoModel& algoModel)
+void DecompAlgo::createOsiSubProblem(DecompSubModel& algoModel)
 {
    //TODO: design question, we are assuming that master solver is
    //  an LP solver and relaxed solver is an IP - it really should
@@ -549,22 +549,22 @@ void DecompAlgo::getModelsFromApp()
 
    m_objective = m_app->m_objective;
    m_modelCore = m_app->m_modelCore;
-   map<int, DecompAppModel>         ::iterator mit;
-   map<int, vector<DecompAppModel> >::iterator mivt;
-   vector<DecompAppModel>           ::iterator vit;
+   map<int, DecompModel>         ::iterator mit;
+   map<int, vector<DecompModel> >::iterator mivt;
+   vector<DecompModel>           ::iterator vit;
 
    for (mit  = m_app->m_modelRelax.begin();
          mit != m_app->m_modelRelax.end(); mit++) {
       //---
-      //--- this constructs a DecompAlgoModel from a DecompAppModel
+      //--- this constructs a DecompSubModel from a DecompModel
       //---
-      DecompAlgoModel algoModel = (*mit).second;
+      DecompSubModel algoModel = (*mit).second;
       m_modelRelax.insert(make_pair((*mit).first, algoModel));
    }
 
    for (mivt  = m_app->m_modelRelaxNest.begin();
          mivt != m_app->m_modelRelaxNest.end(); mivt++) {
-      vector<DecompAlgoModel> v;
+      vector<DecompSubModel> v;
 
       for (vit  = (*mivt).second.begin();
             vit != (*mivt).second.end(); vit++) {
@@ -615,7 +615,7 @@ void DecompAlgo::loadSIFromModel(OsiSolverInterface* si,
       os.open("blockFile.txt");   //<block id> <row name> or <row id>
    }
 
-   map<int, DecompAlgoModel>::iterator mit;
+   map<int, DecompSubModel>::iterator mit;
 
    for (mit  = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
       relax = (*mit).second.getModel();
@@ -1561,11 +1561,11 @@ void DecompAlgo::breakOutPartial(const double*   xHat,
    //---  are integral - if so, use these as candidate columns
    //---
    const double* objCoeff = getOrigObjective();
-   map<int, DecompAlgoModel>::iterator mit;
+   map<int, DecompSubModel>::iterator mit;
    vector<int>::const_iterator         vit;
 
    for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-      DecompAlgoModel&      algoModel  = (*mit).second;
+      DecompSubModel&      algoModel  = (*mit).second;
       DecompConstraintSet* model      = algoModel.getModel();
       int                   b          = algoModel.getBlockId();
       const vector<int>&    activeCols = model->getActiveColumns();
@@ -1949,7 +1949,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
                                       newVars, mostNegRC);
          m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
          m_nodeStats.cutsThisCall   = 0;
-         map<int, DecompAlgoModel>::iterator mit;
+         map<int, DecompSubModel>::iterator mit;
 
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             (*mit).second.setCounter((*mit).second.getCounter() + 1);
@@ -2062,7 +2062,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
 
          break;
       case PHASE_DONE: {
-         map<int, DecompAlgoModel>::iterator mit;
+         map<int, DecompSubModel>::iterator mit;
 
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             (*mit).second.setCounter(0);
@@ -2436,7 +2436,7 @@ void DecompAlgo::setMasterBounds(const double* lbs,
       const int             nCols     = modelCore->getNumCols();
       const double*         colUB     = m_masterSI->getColUpper();
       double*               denseS    = new double[nCols];
-      map<int, DecompAlgoModel>::iterator mit;
+      map<int, DecompSubModel>::iterator mit;
 
       for (li = m_vars.begin(); li != m_vars.end(); li++) {
          masterColIndex = (*li)->getColMasterIndex();
@@ -2900,10 +2900,10 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          //---
          //--- APP: solve zSP(c + eps)
          //---
-         map<int, DecompAlgoModel>::iterator mit;
+         map<int, DecompSubModel>::iterator mit;
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-            DecompAlgoModel& algoModel = (*mit).second;
+            DecompSubModel& algoModel = (*mit).second;
 	    timeLimit = max(m_param.SubProbTimeLimitExact - 
 			    m_stats.timerOverall.getRealTime(), 0.0);
             solveRelaxed(costeps,               //reduced cost (fake here)
@@ -2926,8 +2926,8 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
             }
          }
 
-         map<int, vector<DecompAlgoModel> >::iterator mivt;
-         vector<DecompAlgoModel>           ::iterator vit;
+         map<int, vector<DecompSubModel> >::iterator mivt;
+         vector<DecompSubModel>           ::iterator vit;
 
          for (mivt  = m_modelRelaxNest.begin();
                mivt != m_modelRelaxNest.end(); mivt++) {
@@ -3039,11 +3039,11 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                                                  0.0, result->m_objUB, varType);
             initVars.push_back(directVar);
          } else {
-            map<int, DecompAlgoModel>::iterator mid;
+            map<int, DecompSubModel>::iterator mid;
 
             for (mid = m_modelRelax.begin(); mid != m_modelRelax.end(); mid++) {
                int               blockId       = (*mid).first;
-               DecompAlgoModel& modelRelax    = (*mid).second;
+               DecompSubModel& modelRelax    = (*mid).second;
                vector<int>&      activeColumns
                = modelRelax.getModel()->activeColumns;
                vector<int>       ind;
@@ -5048,7 +5048,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; 
 	   subprobIndex++) {
 
-	 DecompAlgoModel&   algoModel       = getModelRelax(subprobIndex);
+	 DecompSubModel&   algoModel       = getModelRelax(subprobIndex);
 	 double             alpha           = u[nBaseCoreRows + subprobIndex];
 	 DecompSolverResult solveResult;
 
@@ -5120,8 +5120,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
       UTIL_DELARR(potentialVarsT);
 
       potentialVarsT = new DecompVarList[m_numConvexCon];
-      map<int, vector<DecompAlgoModel> >::iterator mivt;
-      vector<DecompAlgoModel>           ::iterator vit;
+      map<int, vector<DecompSubModel> >::iterator mivt;
+      vector<DecompSubModel>           ::iterator vit;
 
       for (mivt  = m_modelRelaxNest.begin(); mivt != m_modelRelaxNest.end(); mivt++) {
 	 for (vit  = (*mivt).second.begin(); vit != (*mivt).second.end(); vit++) {
@@ -5184,13 +5184,13 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          //---
          //--- make sure the model for this block can be found
          //---
-         map<int, DecompAlgoModel>::iterator mit;
+         map<int, DecompSubModel>::iterator mit;
          mit = m_modelRelax.find(b);
          assert(mit != m_modelRelax.end());
          //---
          //--- get the OSI objet
          //---
-         DecompAlgoModel& algoModel = (*mit).second;
+         DecompSubModel& algoModel = (*mit).second;
          //---
          //--- did the user provide a specific dual for this block
          //---
@@ -5315,10 +5315,10 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
          }
 
          //TODO: make this a function (to solve all blocks)
-         map<int, DecompAlgoModel>::iterator mit;
+         map<int, DecompSubModel>::iterator mit;
 
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-            DecompAlgoModel& algoModel = (*mit).second;
+            DecompSubModel& algoModel = (*mit).second;
             b         = algoModel.getBlockId();
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
                        (*m_osLog) << "solve relaxed model = "
@@ -5352,8 +5352,8 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             }
          }
 
-         map<int, vector<DecompAlgoModel> >::iterator mivt;
-         vector<DecompAlgoModel>           ::iterator vit;
+         map<int, vector<DecompSubModel> >::iterator mivt;
+         vector<DecompSubModel>           ::iterator vit;
          useExact  = false;
          useCutoff = true;
 
@@ -6520,7 +6520,7 @@ bool DecompAlgo::isLPFeasible(const double* x,
    }
 
    if (m_modelRelax.size()) {
-      map<int, DecompAlgoModel>::iterator mit;
+      map<int, DecompSubModel>::iterator mit;
 
       for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
          lpFeas = (*mit).second.isPointFeasible(x,
@@ -6555,7 +6555,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                                       const double          alpha,
                                       const int             n_origCols,
                                       const bool            isNested,
-                                      DecompAlgoModel&      algoModel,
+                                      DecompSubModel&      algoModel,
                                       DecompSolverResult*   solveResult,
                                       DecompVarList&        vars,
 				      double                timeLimit
@@ -6864,7 +6864,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
             (*it)->fillDenseArr(n_origCols, xTemp);
             //TODO: get rid of this function, use isPointFeasible
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                       DecompAlgoModel& algoModelCheck =
+                       DecompSubModel& algoModelCheck =
                           getModelRelax(whichBlock);
                        bool isRelaxFeas =
                           checkPointFeasible(algoModelCheck.getModel(),

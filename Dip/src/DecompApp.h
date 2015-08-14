@@ -89,17 +89,17 @@ public:
    /**
     *  Model data: the core model (A'')
     */
-   DecompAppModel m_modelCore;
+   DecompModel m_modelCore;
 
    /**
     *  Model data: the relaxed model(s) (A')
     */
-   std::map<int, DecompAppModel> m_modelRelax;
+   std::map<int, DecompModel> m_modelRelax;
 
    /**
     *  Model data: the relaxed (nested) model(s) (A')
     */
-   std::map<int, std::vector<DecompAppModel> > m_modelRelaxNest;
+   std::map<int, std::vector<DecompModel> > m_modelRelaxNest;
 
    /**
     * Pointer to the base algorithmic object.
@@ -251,7 +251,7 @@ public:
       //---
       //--- make sure this block has not been set yet
       //---
-      std::map<int, DecompAppModel>::iterator mit = m_modelRelax.find(blockId);
+      std::map<int, DecompModel>::iterator mit = m_modelRelax.find(blockId);
 
       if (mit != m_modelRelax.end()) {
          std::cerr << "Block " << blockId << " relaxation has already been set. "
@@ -261,7 +261,7 @@ public:
                              "setModelRelax", "DecompApp");
       }
 
-      DecompAppModel appModel(model, modelName, blockId);
+      DecompModel appModel(model, modelName, blockId);
       m_modelRelax.insert(std::make_pair(blockId, appModel));
    }
 
@@ -278,7 +278,7 @@ public:
          model->prepareModel();
       }
 
-      DecompAppModel appModel(model, modelName, blockId);
+      DecompModel appModel(model, modelName, blockId);
       m_modelRelaxNest[blockId].push_back(appModel);
    }
 
