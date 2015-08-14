@@ -561,6 +561,8 @@ public:
     */
    void printVars(std::ostream* os);
    void printCuts(std::ostream* os);
+   void checkDuals();
+   void checkReducedCost(const double *u, const double *u_adjusted);
 
    /**
     *

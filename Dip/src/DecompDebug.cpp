@@ -765,7 +765,238 @@ void DecompAlgo::printCuts(ostream* os)
    (*os) << endl;
 }
 
+//===========================================================================//
+void DecompAlgo::checkDuals()
+{
+   //---
+   //--- sanity check on duals returned
+   //---   complementary slackness (c-uA)x = 0
+   //---   also check that the given reduced cost matches the
+   //---   hand calculation
+   //---
+   const double*            x     = m_masterSI->getColSolution();
+   const double*            pi    = m_masterSI->getRowPrice();
+   const int                nCols = m_masterSI->getNumCols();
+   const CoinPackedMatrix* M     = m_masterSI->getMatrixByRow();
+   double*                  uA    = new double[nCols];
+   const double* objC = m_masterSI->getObjCoefficients();
+   const double* rcLP = m_masterSI->getReducedCost();
+   M->transposeTimes(pi, uA);
+#ifndef DO_INTERIOR
 
+   for (int i = 0; i < nCols; i++) {
+      if (!UtilIsZero( x[i], 1.0e-5 ) &&
+	  !UtilIsZero( (objC[i] - uA[i]) * x[i], 1.0e-4 ) ) {
+	 printf("ERR in COMPL-SLACK i:%d objC:%15.10f uA:%15.10f x:%15.10f\n",
+		i, objC[i], uA[i], x[i]);
+	 fflush(stdout);
+	 assert(0);
+      }
+
+      if (!UtilIsZero( (objC[i] - uA[i]) - rcLP[i], 1.0e-4 ) ) {
+	 printf("ERR in RC i:%d objC:%15.10f uA:%15.10f RCLP:%15.10f\n",
+		i, objC[i], uA[i], rcLP[i]);
+	 fflush(stdout);
+	 assert(0);
+      }
+   }
+
+#endif
+   UTIL_DELARR(uA);
+
+}
+
+//===========================================================================//
+void DecompAlgo::checkReducedCost(const double *u, const double *u_adjusted)
+{
+   //---
+   //--- sanity check - none of the columns currently in master
+   //--- should have negative reduced cost
+   //---   m_vars contains the variables (in x-space) that have
+   //---   been pushed into the master LP (assumes no compression)
+   //---
+
+   DecompVarList::iterator it;
+   int b, var_index = 0;
+   double*       redCostX      = NULL;
+   const double* objC = m_masterSI->getObjCoefficients();
+   const double* rcLP = m_masterSI->getReducedCost();
+   DecompConstraintSet* modelCore   = m_modelCore.getModel();
+   const int     nCoreCols     = modelCore->getNumCols();
+   double        alpha         = 0.0;
+   int           nBaseCoreRows = modelCore->nBaseRows;
+   const double* origObjective = getOrigObjective();
+
+   for (it = m_vars.begin(); it != m_vars.end(); it++) {
+      double redCost = 0.0;
+      //m_s      is a sparse vector in x-space (the column)
+      //redCostX is a dense  vector in x-space (the cost in subproblem)
+      b       = (*it)->getBlockId();
+      redCost = (*it)->m_s.dotProduct(redCostX);//??
+
+      if ( (*it)->getVarType() == DecompVar_Point) {
+	 alpha   = u[nBaseCoreRows + b];
+      } else if ((*it)->getVarType() == DecompVar_Ray) {
+	 alpha = 0;
+      }
+
+      assert(m_masterRowType[nBaseCoreRows + b] == DecompRow_Convex);
+      assert(isMasterColStructural((*it)->getColMasterIndex()));
+      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		 (*m_osLog)
+		 << "MasterColIndex = "
+		 << setw(6) << (*it)->getColMasterIndex()
+		 << "Block = "
+		 << setw(3) << b
+		 << "LPRedCost = " << setw(10)
+		 << UtilDblToStr(rcLP[(*it)->getColMasterIndex()], 5)
+		 << "CalcRedCost = " << setw(10)
+		 << UtilDblToStr(redCost - alpha, 5)
+		 << "ObjCost = " << setw(10)
+		 << UtilDblToStr(objC[(*it)->getColMasterIndex()], 5)
+		 << "Alpha = " << setw(10)
+		 << UtilDblToStr(alpha, 5)
+		 << endl; );
+      //---
+      //--- sanity check - none of the columns currently in master
+      //---    should have negative reduced cost
+      //--- unless they have been fixed to 0 by branching
+      //---
+      //const double * colLB = m_masterSI->getColLower();
+      const double* colUB = m_masterSI->getColUpper();
+      int            index = (*it)->getColMasterIndex();
+      double         rcLPi = rcLP[index];
+
+      if (rcLPi        < - m_param.RedCostEpsilon &&
+	  colUB[index] > DecompEpsilon) {
+	 (*m_osLog) << "VAR v-index:" << var_index++
+		    << " m-index: " << (*it)->getColMasterIndex()
+		    << " b-index: " << b
+		    << " rcLP: "   << rcLPi
+		    << endl;
+	 (*it)->print(m_osLog, modelCore->colNames,
+		      const_cast<double*>(redCostX));
+	 (*m_osLog) << "******** ERROR ********" << endl;
+	 assert(0);
+      }
+
+      //---
+      //--- check that objective in LP and calculated objective match
+      //---
+      if (m_phase == PHASE_PRICE2) {
+	 double objCalc = (*it)->m_s.dotProduct(origObjective);
+
+	 if (!UtilIsZero(objCalc - objC[(*it)->getColMasterIndex()],
+			 1.0e-3)) {
+	    (*m_osLog) << "VAR v-index:" << var_index++
+		       << " m-index: " << (*it)->getColMasterIndex()
+		       << " b-index: " << b
+		       << " objLP: "   << objC[(*it)->getColMasterIndex()]
+		       << " objCalc: " << objCalc
+		       << endl;
+	    (*it)->print(m_osLog, modelCore->colNames,
+			 const_cast<double*>(origObjective));
+	    (*m_osLog) << "******** ERROR ********" << endl;
+	    assert(0);
+	 }
+      }
+
+      //---
+      //--- check that LP reduced cost and calculated reduced cost
+      //---  match up
+      //--- in the case of using dual smoothing, we cannot do this check
+      //---  since the calculated reduced cost is based on the smoothed
+      //---  duals
+      //---
+      if (!m_param.DualStab &&
+	  !UtilIsZero(rcLP[(*it)->getColMasterIndex()]
+		      - (redCost - alpha), 1.0e-3)) {
+	 //---
+	 //--- this whole next section is an expansion of log
+	 //---   when there is an issue found that the solver
+	 //---   returns RC that doesn't match the one calculated
+	 //---   based on core matrix and duals
+	 //---
+	 (*m_osLog) << "VAR v-index:" << var_index++
+		    << " m-index: " << (*it)->getColMasterIndex()
+		    << " b-index: " << b
+		    << " rc: "      << redCost
+		    << " alpha: "   << alpha
+		    << " rc-a: "    << redCost - alpha
+		    << " RCLP: "    << rcLP[(*it)->getColMasterIndex()]
+		    << endl;
+	 //---
+	 //--- this, plus alpha shows the calculation of the red-cost in
+	 //---   x-space, next, look at the same calculation in lambda-space
+	 //---
+	 (*it)->print(m_osLog, modelCore->colNames,
+		      const_cast<double*>(redCostX));
+	 (*m_osLog) << "******** ERROR ********" << endl;
+	 //---
+	 //--- the rows in lambda that show up should be ones where
+	 //---   these components show up in original A''
+	 //---
+	 double* uA2    = new double[nCoreCols];
+	 modelCore->M->transposeTimes(u_adjusted, uA2);
+	 (*it)->print(m_osLog, modelCore->colNames,
+		      const_cast<double*>(uA2));
+	 UTIL_DELARR(uA2);
+	 //---
+	 //--- RC of a col of lambda-space is u.A[i]
+	 //---
+	 (*m_osLog) << " objLP: "
+		    << UtilDblToStr(objC[(*it)->getColMasterIndex()], 4)
+		    << endl;
+
+	 //---
+	 //--- recalc column of master A.s for this s
+	 //---
+	 if (m_algo != DECOMP) {
+	    double* denseS = new double[modelCore->getNumCols()];
+	    (*it)->fillDenseArr(modelCore->getNumCols(), denseS);
+	    int r;
+	    const CoinPackedMatrix* Mr = modelCore->getMatrix();
+
+	    for (r = 0; r < modelCore->getNumRows(); r++) {
+	       printf("\nROW %d\n", r);
+	       CoinShallowPackedVector vec = Mr->getVector(r);
+	       UtilPrintPackedVector(vec, m_osLog,
+				     modelCore->getColNames(),
+				     denseS);
+	    }
+
+	    UTIL_DELARR(denseS);
+	 }
+
+	 const CoinPackedMatrix* Mc = m_masterSI->getMatrixByCol();
+
+            CoinShallowPackedVector vec
+	       = Mc->getVector((*it)->getColMasterIndex());
+
+            UtilPrintPackedVector(vec, m_osLog, m_masterSI->getColNames(), u);
+
+            double uA = vec.dotProduct(u);
+
+            (*m_osLog) << " objLP: "
+                       << UtilDblToStr(objC[(*it)->getColMasterIndex()], 4)
+                       << endl;
+
+            (*m_osLog) << " uA   : "   << UtilDblToStr(uA, 4) << endl;
+
+            (*m_osLog) << " RC   : "
+                       << UtilDblToStr(objC[(*it)->getColMasterIndex()] - uA,
+                                       4) << endl;
+
+            (*m_osLog) << " RCLP : "
+                       << UtilDblToStr(rcLP[(*it)->getColMasterIndex()], 4)
+                       << endl;
+
+            assert(0);
+
+            (*m_osLog) << endl;
+      } //END: if(!UtilIsZero(rcLP[(*it)->getColMasterIndex()] ...
+   } //END: for(it = m_vars.begin(); it != m_vars.end(); it++)
+}
 
 //===========================================================================//
 DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
