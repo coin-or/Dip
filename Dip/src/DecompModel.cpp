@@ -230,7 +230,7 @@ FUNC_EXIT:
 }
 
 //===========================================================================//
-void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
+void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 					   DecompParam&         param,
 					   bool                 doExact,
 					   bool                 doCutoff,
@@ -249,7 +249,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
 
 #ifdef __DECOMP_IP_SYMPHONY__
    //OsiSymSolverInterface* osiSym
-   //   = dynamic_cast<OsiSymSolverInterface*>(m_osi->clone());
+   //  = dynamic_cast<OsiSymSolverInterface*>(m_osi->clone());
    OsiSymSolverInterface* osiSym
       = dynamic_cast<OsiSymSolverInterface*>(m_osi);
    sym_environment* env = osiSym->getSymphonyEnvironment();
@@ -261,7 +261,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
    }
 
    sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
-   sym_set_int_param(env, "prep_level", 2);
+   sym_set_int_param(env, "prep_level", 0);
 
    if (param.WarmStart) {
       sym_set_int_param(env, "do_reduced_cost_fixing", 0);
@@ -318,16 +318,16 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
 
       double objval;
       double* opt_solution = new double[numCols];
-      
-      status = sym_get_sp_size(env, &result->m_nSolutions);
+      int nSols = 0;
+
+      status = sym_get_sp_size(env, &nSols);
 
       result->m_nSolutions = 1;
       status = sym_get_col_solution(env, opt_solution);
       vector<double> solVec(opt_solution, opt_solution + numCols);
       result->m_solution.push_back(solVec);
 
-      int nSols = std::min<int>(result->m_nSolutions, 
-				param.SubProbNumSolLimit);
+      nSols = std::min<int>(nSols, param.SubProbNumSolLimit);
       
       for (int i = 0; i < nSols; i++){
 	 status = sym_get_sp_solution(env, i, solution, &objval);
@@ -341,6 +341,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
 	 if (memcmp(opt_solution, solution, numCols*DSIZE) == 0){
 	    vector<double> solVec(solution, solution + numCols);
 	    result->m_solution.push_back(solVec);
+	    result->m_nSolutions += 1;
 	 }
       }	
       UTIL_DELARR(opt_solution);      
