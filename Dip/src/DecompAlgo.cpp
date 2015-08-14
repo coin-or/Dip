@@ -1871,7 +1871,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
       //--- check if we have exceeded time
       //---   THINK: should this check be in phaseUpdate?
       //---
-      if (m_stats.timerOverall.isPast(m_param.LimitTime)) {
+      if (m_stats.timerOverall.isPast(m_param.TimeLimit)) {
          UTIL_MSG(m_param.LogLevel, 2,
                   (*m_osLog)
                   << "Node " << nodeIndex << " process stopping on time."
@@ -2824,7 +2824,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    int          c, attempts;
    double       aveC;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
-   const int      limit      = m_param.LimitInitVars;
+   const int      limit      = m_param.InitVarsLimit;
    // Need to get the different strategies for generating initial Vars
    const int      limit2     = 2 * limit;
    //const int      limit2     = 1;
@@ -3020,10 +3020,10 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
       printf("======= BEGIN Gen Init Vars - call Direct IP solver\n");
       DecompAlgoC          direct(m_app, m_utilParam);
       DecompSolverResult* result = NULL;
-      double oldSetting = m_param.LimitTime;
-      m_param.LimitTime = m_param.InitVarsWithIPLimitTime;
+      double oldSetting = m_param.TimeLimit;
+      m_param.TimeLimit = m_param.InitVarsWithIPTimeLimit;
       result = direct.solveDirect();
-      m_param.LimitTime = oldSetting;
+      m_param.TimeLimit = oldSetting;
 
       if (result->m_nSolutions) {
          //---
@@ -3501,11 +3501,11 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
    //--- check to see if we have exceeded the total iter limits
    //---
    isCutPossible   =
-      (m_param.LimitRoundCutIters   > 0) &&
-      (cutCallsTotal                < m_param.LimitTotalCutIters);
+      (m_param.RoundCutItersLimit   > 0) &&
+      (cutCallsTotal                < m_param.TotalCutItersLimit);
    isPricePossible =
-      (m_param.LimitRoundPriceIters > 0) &&
-      (priceCallsTotal              < m_param.LimitTotalPriceIters);
+      (m_param.RoundPriceItersLimit > 0) &&
+      (priceCallsTotal              < m_param.TotalPriceItersLimit);
 
    switch (phase) {
    case PHASE_PRICE1: {
@@ -3612,7 +3612,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
       //---
       //--- if we hit the round limit, we must consider switching
       //---
-      if (priceCallsRound >= m_param.LimitRoundPriceIters) {
+      if (priceCallsRound >= m_param.RoundPriceItersLimit) {
          considerSwitch = true;
       }
 
@@ -3732,9 +3732,9 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
                                        upBranchLB,
                                        upBranchUB);
 
-      if (m_param.LimitNodes == 0) {
+      if (m_param.NodeLimit == 0) {
          UTIL_DEBUG(m_param.LogDebugLevel, 3,
-                    (*m_osLog) << "Gap is tight and LimitNodes=0."
+                    (*m_osLog) << "Gap is tight and NodeLimit=0."
                     << endl;);
          nextPhase = PHASE_DONE;
          break;
@@ -3800,9 +3800,9 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
                                           upBranchLB,
                                           upBranchUB);
 
-         if (m_param.LimitNodes == 0) {
+         if (m_param.NodeLimit == 0) {
             UTIL_DEBUG(m_param.LogDebugLevel, 3,
-                       (*m_osLog) << "Gap is tight and LimitNodes=0."
+                       (*m_osLog) << "Gap is tight and NodeLimit=0."
                        << endl;);
             nextPhase = PHASE_DONE;
             goto PHASE_UPDATE_FINISH;
@@ -3839,7 +3839,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
       //---
       //--- if we hit the round limit, we must consider switching
       //---
-      if (cutCallsRound >= m_param.LimitRoundCutIters) {
+      if (cutCallsRound >= m_param.RoundCutItersLimit) {
          considerSwitch = true;
       }
 

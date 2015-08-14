@@ -508,22 +508,22 @@ AlpsDecompTreeNode::branch()
    if (decompParam.BranchStrongIter) {
       double globalUB             = getKnowledgeBroker()->getIncumbentValue();
       int    solveMasterAsIp      = decompParam.SolveMasterAsIp;
-      int    limitTotalCutIters   = decompParam.LimitTotalCutIters;
-      int    limitTotalPriceIters = decompParam.LimitTotalPriceIters;
+      int    limitTotalCutIters   = decompParam.TotalCutItersLimit;
+      int    limitTotalPriceIters = decompParam.TotalPriceItersLimit;
       //---
       //--- calculate an estimate on the lower bound after branching
       //---
-      //decompParam.LimitTotalCutIters   = decompParam.BranchStrongIter;
-      decompParam.LimitTotalCutIters   = 0;
-      decompParam.LimitTotalPriceIters = decompParam.BranchStrongIter;
+      //decompParam.TotalCutItersLimit   = decompParam.BranchStrongIter;
+      decompParam.TotalCutItersLimit   = 0;
+      decompParam.TotalPriceItersLimit = decompParam.BranchStrongIter;
       decompParam.SolveMasterAsIp      = 0;
       decompAlgo->setStrongBranchIter(true);
       decompAlgo->setMasterBounds(newLbs, newUbs);
       decompAlgo->setSubProbBounds(newLbs, newUbs);
       decompAlgo->processNode(this, objVal, globalUB);
       decompAlgo->setStrongBranchIter(false);
-      decompParam.LimitTotalCutIters   = limitTotalCutIters;
-      decompParam.LimitTotalPriceIters = limitTotalPriceIters;
+      decompParam.TotalCutItersLimit   = limitTotalCutIters;
+      decompParam.TotalPriceItersLimit = limitTotalPriceIters;
       decompParam.SolveMasterAsIp      = solveMasterAsIp;
       //TOOD: what if it stops in Phase1
       //how will this work in CPM?
@@ -572,22 +572,22 @@ AlpsDecompTreeNode::branch()
    if (decompParam.BranchStrongIter) {
       double globalUB             = getKnowledgeBroker()->getIncumbentValue();
       int    solveMasterAsIp      = decompParam.SolveMasterAsIp;
-      int    limitTotalCutIters   = decompParam.LimitTotalCutIters;
-      int    limitTotalPriceIters = decompParam.LimitTotalPriceIters;
+      int    limitTotalCutIters   = decompParam.TotalCutItersLimit;
+      int    limitTotalPriceIters = decompParam.TotalPriceItersLimit;
       //---
       //--- calculate an estimate on the lower bound after branching
       //---
-      //decompParam.LimitTotalCutIters   = decompParam.BranchStrongIter;
-      decompParam.LimitTotalCutIters   = 0;
-      decompParam.LimitTotalPriceIters = decompParam.BranchStrongIter;
+      //decompParam.TotalCutItersLimit   = decompParam.BranchStrongIter;
+      decompParam.TotalCutItersLimit   = 0;
+      decompParam.TotalPriceItersLimit = decompParam.BranchStrongIter;
       decompParam.SolveMasterAsIp      = 0;
       decompAlgo->setStrongBranchIter(true);
       decompAlgo->setMasterBounds(newLbs, newUbs);
       decompAlgo->setSubProbBounds(newLbs, newUbs);
       decompAlgo->processNode(this, objVal, globalUB);
       decompAlgo->setStrongBranchIter(false);
-      decompParam.LimitTotalCutIters   = limitTotalCutIters;
-      decompParam.LimitTotalPriceIters = limitTotalPriceIters;
+      decompParam.TotalCutItersLimit   = limitTotalCutIters;
+      decompParam.TotalPriceItersLimit = limitTotalPriceIters;
       decompParam.SolveMasterAsIp      = solveMasterAsIp;
    }
 

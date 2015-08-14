@@ -786,7 +786,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
    int                   numCols   = m_masterSI->getNumCols();
-   double                timeLimit = m_param.LimitTime;
+   double                timeLimit = m_param.TimeLimit;
    //---
    //--- start timer
    //---

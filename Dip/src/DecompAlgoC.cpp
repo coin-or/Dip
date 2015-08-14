@@ -196,8 +196,8 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
             (*m_osLog) << "cutsThisCall       : " << cutsThisCall    << "\n";
             (*m_osLog) << "cutCallsTotal      : " << cutCallsTotal   << "\n";
             (*m_osLog) << "cutCallsRound      : " << cutCallsRound   << "\n";
-            (*m_osLog) << "LimitTotalCutIters : " << m_param.LimitTotalCutIters << "\n";
-            (*m_osLog) << "LimitRoundCutIters : " << m_param.LimitRoundCutIters << "\n";
+            (*m_osLog) << "TotalCutItersLimit : " << m_param.TotalCutItersLimit << "\n";
+            (*m_osLog) << "RoundCutItersLimit : " << m_param.RoundCutItersLimit << "\n";
             (*m_osLog) << "PHASEIN        : "
             << DecompPhaseStr[phase] << "\n";
             (*m_osLog) << "STATIN         : "
@@ -219,8 +219,8 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
    //---
    //--- if no cuts, then jump to finish
    //---
-   if ((m_param.LimitTotalCutIters == 0) ||
-         (m_param.LimitRoundCutIters == 0)) {
+   if ((m_param.TotalCutItersLimit == 0) ||
+         (m_param.RoundCutItersLimit == 0)) {
       nextPhase = PHASE_DONE;
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
                  (*m_osLog) << "Done - no cuts allowed." << endl;);
@@ -230,7 +230,7 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
    //---
    //--- we have exceeded the cut iter limit we are done
    //---
-   if (cutCallsTotal >= m_param.LimitTotalCutIters) {
+   if (cutCallsTotal >= m_param.TotalCutItersLimit) {
       nextPhase = PHASE_DONE;
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
                  (*m_osLog) << "Done total cut calls exceeds limit." << endl;);
@@ -244,7 +244,7 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
       goto PHASE_UPDATE_FINISH;
    }
 
-   isCutPossible = (cutCallsTotal < m_param.LimitTotalCutIters);
+   isCutPossible = (cutCallsTotal < m_param.TotalCutItersLimit);
 
    switch (phase) {
       /*case PHASE_INIT:
@@ -264,7 +264,7 @@ void DecompAlgoC::phaseUpdate(DecompPhase&   phase,
          mustSwitch = true;
       }
 
-      if (cutCallsRound >= m_param.LimitRoundCutIters) {
+      if (cutCallsRound >= m_param.RoundCutItersLimit) {
          considerSwitch = true;
       }
 

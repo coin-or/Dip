@@ -111,10 +111,10 @@ public:
    void solveD(DecompCutList* newCuts) {
       m_newCuts = newCuts;
       //need to change parameters to price, no cut
-      m_param.LimitTotalCutIters   = 0;
-      m_param.LimitRoundCutIters   = 0;
-      m_param.LimitTotalPriceIters = 1000;
-      m_param.LimitRoundPriceIters = 1000;
+      m_param.TotalCutItersLimit   = 0;
+      m_param.RoundCutItersLimit   = 0;
+      m_param.TotalPriceItersLimit = 1000;
+      m_param.RoundPriceItersLimit = 1000;
       m_param.SolveMasterAsIp      = 0;
       processNode(NULL);
    }

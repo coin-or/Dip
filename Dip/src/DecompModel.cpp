@@ -399,13 +399,13 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult*  result,
 
    if (doExact) {
       cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitExact, 
-				    param.LimitTime), -1, 
+				    param.TimeLimit), -1, 
 				COIN_DBL_MAX);
       cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact, -1, 
 				COIN_DBL_MAX);
    } else {
       cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitInexact, 
-				    param.LimitTime), -1, 
+				    param.TimeLimit), -1, 
 				COIN_DBL_MAX);
       cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact, -1, 
 				COIN_DBL_MAX);

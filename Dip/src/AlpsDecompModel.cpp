@@ -33,7 +33,7 @@ void AlpsDecompModel::setAlpsSettings()
    AlpsPar()->setEntry(AlpsParams::msgLevel,        m_param.msgLevel);
    AlpsPar()->setEntry(AlpsParams::nodeLimit,       m_param.nodeLimit);
    AlpsPar()->setEntry(AlpsParams::nodeLogInterval, m_param.nodeLogInterval);
-   double timeLimit = m_decompAlgo->getParam().LimitTime;
+   double timeLimit = m_decompAlgo->getParam().TimeLimit;
    AlpsPar()->setEntry(AlpsParams::timeLimit,       timeLimit);
    UtilPrintFuncEnd(&cout, m_classTag,
                     "setAlpsSettings()", m_param.msgLevel, 3);
@@ -134,13 +134,13 @@ AlpsExitStatus AlpsDecompModel::solve()
    DecompAlgo*   decompAlgo  = getDecompAlgo();
    DecompStats& decompStats = decompAlgo->getStats();
    DecompParam& decompParam = decompAlgo->getMutableParam();
-   double timeLimit = decompParam.LimitTime;
+   double timeLimit = decompParam.TimeLimit;
    double timeLeft  = timeLimit - decompStats.timerOverall.getRealTime();
    AlpsPar()->setEntry(AlpsParams::timeLimit, timeLeft);
    //---
    //--- copy relevant parameters to DecompParam from AlpsParam
    //---
-   decompParam.LimitNodes = m_param.nodeLimit;
+   decompParam.NodeLimit = m_param.nodeLimit;
    //---
    //--- declare an AlpsKnowledgeBroker for serial application
    //---

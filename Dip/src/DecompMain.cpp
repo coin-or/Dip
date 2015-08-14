@@ -599,7 +599,7 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    int nNodes;
    double objLB   = -DecompInf;
    double objUB   = DecompInf;
-   double timeLimit = decompApp.m_param.LimitTime;
+   double timeLimit = decompApp.m_param.TimeLimit;
    UtilTimer timer;
    timer.start();
    DecompSolverResult* result = new DecompSolverResult();

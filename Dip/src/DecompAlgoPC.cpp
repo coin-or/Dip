@@ -735,7 +735,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    cbc.setLogLevel(logIpLevel);
    cbc.setDblParam(CbcModel::CbcAllowableFractionGap,
                    m_param.SolveMasterAsIpLimitGap);
-   cbc.setDblParam(CbcModel::CbcMaximumSeconds, m_param.SolveMasterAsIpLimitTime);
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, m_param.SolveMasterAsIpTimeLimit);
    cbc.setDblParam(CbcModel::CbcCurrentCutoff, m_globalUB);
 #if 0
    cbc.branchAndBound();
@@ -755,7 +755,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    string cbcGap       = "-ratio";
    string cbcGapSet    = UtilDblToStr(m_param.SolveMasterAsIpLimitGap);
    string cbcTime      = "-seconds";
-   string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsIpLimitTime);
+   string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsIpTimeLimit);
    string cbcCutoff    = "-cutoff";
    string cbcCutoffSet = UtilDblToStr(m_globalUB, -1, 1.0e100);
    argv[argc++] = cbcExe.c_str();
@@ -919,7 +919,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
                           "solutionUpdateAsIp", "DecompAlgoPC");
 
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM,
-                           m_param.SolveMasterAsIpLimitTime);
+                           m_param.SolveMasterAsIpTimeLimit);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",

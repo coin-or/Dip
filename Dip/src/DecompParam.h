@@ -56,22 +56,22 @@ public:
    int    LogObjHistory;
 
 
-   int    LimitInitVars;
+   int    InitVarsLimit;
 
    int    DebugLevel;//=0 (default), =1 (extra checks on duals, etc)
 
    double TolZero;
-   int    LimitTotalCutIters;
-   int    LimitTotalPriceIters;
-   int    LimitRoundCutIters;
-   int    LimitRoundPriceIters;
-   double LimitTime;
+   int    TotalCutItersLimit;
+   int    TotalPriceItersLimit;
+   int    RoundCutItersLimit;
+   int    RoundPriceItersLimit;
+   double TimeLimit;
 
    /**
     * Max number of nodes (copied from Alps parameters)
     */
 
-   int    LimitNodes;
+   int    NodeLimit;
 
    //---
    //--- tailing off when average bound over TailoffLength iterations
@@ -149,7 +149,7 @@ public:
    int    SolveMasterAsIp;         //{0,1}
    int    SolveMasterAsIpFreqNode; //solve every n nodes
    int    SolveMasterAsIpFreqPass; //solve every n passes (within one node)
-   double SolveMasterAsIpLimitTime;
+   double SolveMasterAsIpTimeLimit;
    double SolveMasterAsIpLimitGap;
 
    // DecompDualSimplex = 0,
@@ -171,7 +171,7 @@ public:
 
    int    InitVarsWithCutDC;
    int    InitVarsWithIP;
-   int    InitVarsWithIPLimitTime;
+   int    InitVarsWithIPTimeLimit;
 
    //solve compact formulation first before starting PhaseI
    //  hopefully identify infeasibiity in tree quicker
@@ -200,7 +200,7 @@ public:
     *  during strong branching.
     * CPM: this is simplex iterations of master
     * PC : this is outer price and cut iterations
-    *         sets LimitTotalCutIters=LimitTotalPriceIters=BranchStrongIter
+    *         sets TotalCutItersLimit=TotalPriceItersLimit=BranchStrongIter
     *  THINK: or CPM could be cut passes... and solve master fully?
     *          which is expensive and clearly not standard strong branching
     */
@@ -346,15 +346,15 @@ public:
       PARAM_getSetting("LogIpLevel",           LogIpLevel);
       PARAM_getSetting("LogDumpModel",         LogDumpModel);
       PARAM_getSetting("LogObjHistory",        LogObjHistory);
-      PARAM_getSetting("LimitInitVars",        LimitInitVars);
+      PARAM_getSetting("InitVarsLimit",        InitVarsLimit);
       PARAM_getSetting("DebugLevel",           DebugLevel);
       PARAM_getSetting("TolZero",              TolZero);
-      PARAM_getSetting("LimitTotalCutIters",   LimitTotalCutIters);
-      PARAM_getSetting("LimitTotalPriceIters", LimitTotalPriceIters);
-      PARAM_getSetting("LimitRoundCutIters",   LimitRoundCutIters);
-      PARAM_getSetting("LimitRoundPriceIters", LimitRoundPriceIters);
-      PARAM_getSetting("LimitTime",            LimitTime);
-      PARAM_getSetting("LimitNodes",           LimitNodes);
+      PARAM_getSetting("TotalCutItersLimit",   TotalCutItersLimit);
+      PARAM_getSetting("TotalPriceItersLimit", TotalPriceItersLimit);
+      PARAM_getSetting("RoundCutItersLimit",   RoundCutItersLimit);
+      PARAM_getSetting("RoundPriceItersLimit", RoundPriceItersLimit);
+      PARAM_getSetting("TimeLimit",            TimeLimit);
+      PARAM_getSetting("NodeLimit",            NodeLimit);
       PARAM_getSetting("TailoffLength",        TailoffLength);
       PARAM_getSetting("TailoffPercent",       TailoffPercent);
       PARAM_getSetting("MasterGapLimit",       MasterGapLimit);
@@ -386,13 +386,13 @@ public:
       PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
       PARAM_getSetting("SolveMasterAsIpFreqNode", SolveMasterAsIpFreqNode);
       PARAM_getSetting("SolveMasterAsIpFreqPass", SolveMasterAsIpFreqPass);
-      PARAM_getSetting("SolveMasterAsIpLimitTime", SolveMasterAsIpLimitTime);
+      PARAM_getSetting("SolveMasterAsIpTimeLimit", SolveMasterAsIpTimeLimit);
       PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
       PARAM_getSetting("SolveMasterUpdateAlgo",    SolveMasterUpdateAlgo);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
       PARAM_getSetting("InitVarsWithCutDC",    InitVarsWithCutDC);
       PARAM_getSetting("InitVarsWithIP",       InitVarsWithIP);
-      PARAM_getSetting("InitVarsWithIPLimitTime", InitVarsWithIPLimitTime);
+      PARAM_getSetting("InitVarsWithIPTimeLimit", InitVarsWithIPTimeLimit);
       PARAM_getSetting("InitCompactSolve",     InitCompactSolve);
       PARAM_getSetting("DualStab",             DualStab);
       PARAM_getSetting("DualStabAlpha",        DualStabAlpha);
@@ -472,15 +472,15 @@ public:
       UtilPrintParameter(os, sec, "LogIpLevel",          LogIpLevel);
       UtilPrintParameter(os, sec, "LogDumpModel",        LogDumpModel);
       UtilPrintParameter(os, sec, "LogObjHistory",       LogObjHistory);
-      UtilPrintParameter(os, sec, "LimitInitVars",       LimitInitVars);
+      UtilPrintParameter(os, sec, "InitVarsLimit",       InitVarsLimit);
       UtilPrintParameter(os, sec, "DebugLevel",          DebugLevel);
       UtilPrintParameter(os, sec, "TolZero",             TolZero);
-      UtilPrintParameter(os, sec, "LimitTotalCutIters",  LimitTotalCutIters);
-      UtilPrintParameter(os, sec, "LimitTotalPriceIters", LimitTotalPriceIters);
-      UtilPrintParameter(os, sec, "LimitRoundCutIters",  LimitRoundCutIters);
-      UtilPrintParameter(os, sec, "LimitRoundPriceIters", LimitRoundPriceIters);
-      UtilPrintParameter(os, sec, "LimitTime",           LimitTime);
-      UtilPrintParameter(os, sec, "LimitNodes",          LimitNodes);
+      UtilPrintParameter(os, sec, "TotalCutItersLimit",  TotalCutItersLimit);
+      UtilPrintParameter(os, sec, "TotalPriceItersLimit", TotalPriceItersLimit);
+      UtilPrintParameter(os, sec, "RoundCutItersLimit",  RoundCutItersLimit);
+      UtilPrintParameter(os, sec, "RoundPriceItersLimit", RoundPriceItersLimit);
+      UtilPrintParameter(os, sec, "TimeLimit",           TimeLimit);
+      UtilPrintParameter(os, sec, "NodeLimit",           NodeLimit);
       UtilPrintParameter(os, sec, "TailoffLength",       TailoffLength);
       UtilPrintParameter(os, sec, "TailoffPercent",      TailoffPercent);
       UtilPrintParameter(os, sec, "MasterGapLimit",      MasterGapLimit);
@@ -522,8 +522,8 @@ public:
                          SolveMasterAsIpFreqNode);
       UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",
                          SolveMasterAsIpFreqPass);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitTime",
-                         SolveMasterAsIpLimitTime);
+      UtilPrintParameter(os, sec, "SolveMasterAsIpTimeLimit",
+                         SolveMasterAsIpTimeLimit);
       UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",
                          SolveMasterAsIpLimitGap);
       UtilPrintParameter(os, sec, "SolveMasterUpdateAlgo",
@@ -531,8 +531,8 @@ public:
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
       UtilPrintParameter(os, sec, "InitVarsWithCutDC",   InitVarsWithCutDC);
       UtilPrintParameter(os, sec, "InitVarsWithIP",   InitVarsWithIP);
-      UtilPrintParameter(os, sec, "InitVarsWithIPLimitTime",
-                         InitVarsWithIPLimitTime);
+      UtilPrintParameter(os, sec, "InitVarsWithIPTimeLimit",
+                         InitVarsWithIPTimeLimit);
       UtilPrintParameter(os, sec, "InitCompactSolve",  InitCompactSolve);
       UtilPrintParameter(os, sec, "DualStab",          DualStab);
       UtilPrintParameter(os, sec, "DualStabAlpha",     DualStabAlpha);
@@ -591,15 +591,15 @@ public:
       LogIpLevel           = 0;
       LogDumpModel         = 0;
       LogObjHistory        = 0;
-      LimitInitVars        = 5;
+      InitVarsLimit        = 5;
       DebugLevel           = 0;
       TolZero              = DecompEpsilon;
-      LimitTotalCutIters   = COIN_INT_MAX;
-      LimitTotalPriceIters = COIN_INT_MAX;
-      LimitRoundCutIters   = COIN_INT_MAX;
-      LimitRoundPriceIters = COIN_INT_MAX;
-      LimitTime            = DecompBigNum;
-      LimitNodes           = COIN_INT_MAX;
+      TotalCutItersLimit   = COIN_INT_MAX;
+      TotalPriceItersLimit = COIN_INT_MAX;
+      RoundCutItersLimit   = COIN_INT_MAX;
+      RoundPriceItersLimit = COIN_INT_MAX;
+      TimeLimit            = DecompBigNum;
+      NodeLimit            = COIN_INT_MAX;
       TailoffLength        = 10;
       TailoffPercent       = 0.10;
       MasterGapLimit       = 1.0e-6;
@@ -630,13 +630,13 @@ public:
       SolveMasterAsIp          = 1;//TODO: turn off if one block
       SolveMasterAsIpFreqNode  = 1;
       SolveMasterAsIpFreqPass  = 1000;
-      SolveMasterAsIpLimitTime = 30;
+      SolveMasterAsIpTimeLimit = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
-      InitVarsWithIPLimitTime  = 10;
+      InitVarsWithIPTimeLimit  = 10;
       InitCompactSolve         = 0;
       DualStab                 = 0;
       DualStabAlpha            = 0.10;
