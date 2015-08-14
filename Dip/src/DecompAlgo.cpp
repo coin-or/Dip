@@ -49,17 +49,17 @@ using namespace std;
 //===========================================================================//
 
 struct SolveRelaxedThreadArgs {
-   DecompAlgo*           algo;
-   vector<DecompSubModel*>*   algoModel;
-   int                   nBaseCoreRows;
-   double*               u;
-   double*               redCostX;
-   const double*         origCost;
-   int                   n_origCols;
-   bool                  checkDup;
-   bool                  doExact;
-   bool                  doCutoff;
-   DecompVarList*        vars;
+   DecompAlgo*                algo;
+   vector<DecompSubModel*>*   subModel;
+   int                        nBaseCoreRows;
+   double*                    u;
+   double*                    redCostX;
+   const double*              origCost;
+   int                        n_origCols;
+   bool                       checkDup;
+   bool                       doExact;
+   bool                       doCutoff;
+   DecompVarList*             vars;
 };
 
 
@@ -434,14 +434,14 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
 }
 
 //===========================================================================//
-void DecompAlgo::createOsiSubProblem(DecompSubModel& algoModel)
+void DecompAlgo::createOsiSubProblem(DecompSubModel& subModel)
 {
    //TODO: design question, we are assuming that master solver is
    //  an LP solver and relaxed solver is an IP - it really should
    //  be a generic object and an LP or IP solver is just one option
    //  for a solver
    OsiSolverInterface*   subprobSI = NULL;
-   DecompConstraintSet* model     = algoModel.getModel();
+   DecompConstraintSet* model      = subModel.getModel();
 
    if (!model || !model->M) {
       //---
@@ -525,7 +525,7 @@ void DecompAlgo::createOsiSubProblem(DecompSubModel& algoModel)
    //---
    //--- set subproblem pointer
    //---
-   algoModel.setOsi(subprobSI);
+   subModel.setOsi(subprobSI);
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createOsiSubProblem()", m_param.LogDebugLevel, 2);
 }
@@ -558,8 +558,8 @@ void DecompAlgo::getModelsFromApp()
       //---
       //--- this constructs a DecompSubModel from a DecompModel
       //---
-      DecompSubModel algoModel = (*mit).second;
-      m_modelRelax.insert(make_pair((*mit).first, algoModel));
+      DecompSubModel subModel = (*mit).second;
+      m_modelRelax.insert(make_pair((*mit).first, subModel));
    }
 
    for (mivt  = m_app->m_modelRelaxNest.begin();
@@ -1565,10 +1565,10 @@ void DecompAlgo::breakOutPartial(const double*   xHat,
    vector<int>::const_iterator         vit;
 
    for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-      DecompSubModel&      algoModel  = (*mit).second;
-      DecompConstraintSet* model      = algoModel.getModel();
-      int                   b          = algoModel.getBlockId();
-      const vector<int>&    activeCols = model->getActiveColumns();
+      DecompSubModel&      subModel      = (*mit).second;
+      DecompConstraintSet* model         = subModel.getModel();
+      int                   b            = subModel.getBlockId();
+      const vector<int>&    activeCols   = model->getActiveColumns();
       bool blockFeasible = true;
 
       for (vit = activeCols.begin(); vit != activeCols.end(); vit++) {
@@ -2902,7 +2902,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          map<int, DecompSubModel>::iterator mit;
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-            DecompSubModel& algoModel = (*mit).second;
+            DecompSubModel& subModel = (*mit).second;
 	    timeLimit = max(m_param.SubProbTimeLimitExact - 
 			    m_stats.timerOverall.getRealTime(), 0.0);
             solveRelaxed(costeps,               //reduced cost (fake here)
@@ -2910,7 +2910,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                          9e15,                  //alpha        (fake here)
                          nCoreCols,             //num core columns
                          false,                 //isNested
-                         algoModel,
+                         subModel,
                          &subprobResult,        //results
                          initVars,             //var list to populate
 			 timeLimit);
@@ -4847,7 +4847,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
       for (int subprobIndex = 0 ; subprobIndex < m_numConvexCon; 
 	   subprobIndex++) {
 
-	 DecompSubModel&   algoModel       = getModelRelax(subprobIndex);
+	 DecompSubModel&    subModel        = getModelRelax(subprobIndex);
 	 double             alpha           = u[nBaseCoreRows + subprobIndex];
 	 DecompSolverResult solveResult;
 
@@ -4859,7 +4859,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
 #else
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
 		    (*m_osLog) << "solve relaxed model = "
-		    << algoModel.getModelName() << endl;);
+		    << subModel.getModelName() << endl;);
 #endif
 	 
 	 timeLimit = max(m_param.SubProbTimeLimitExact - 
@@ -4869,7 +4869,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
 		      alpha,
 		      nCoreCols,
 		      false,//isNested
-		      algoModel,
+		      subModel,
 		      &solveResult,
 		      potentialVarsT[subprobIndex],
 		      timeLimit);
@@ -4989,7 +4989,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
          //---
          //--- get the OSI objet
          //---
-         DecompSubModel& algoModel = (*mit).second;
+         DecompSubModel& subModel = (*mit).second;
          //---
          //--- did the user provide a specific dual for this block
          //---
@@ -5019,7 +5019,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
                          alpha,
                          nCoreCols,
                          false,//isNested
-                         algoModel,
+                         subModel,
                          &solveResult,
                          potentialVars,
 			 timeLimit);
@@ -5068,7 +5068,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
                          alpha,
                          nCoreCols,
                          false,//isNested
-                         algoModel,
+                         subModel,
                          &solveResult,
                          potentialVars,
 			 timeLimit);
@@ -5117,11 +5117,11 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
          map<int, DecompSubModel>::iterator mit;
 
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
-            DecompSubModel& algoModel = (*mit).second;
-            b         = algoModel.getBlockId();
+            DecompSubModel& subModel = (*mit).second;
+            b         = subModel.getBlockId();
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
                        (*m_osLog) << "solve relaxed model = "
-                       << algoModel.getModelName() << endl;);
+                       << subModel.getModelName() << endl;);
             //---
             //--- PC: get dual vector
             //---   alpha --> sum{s} lam[s]   = 1 - convexity constraint
@@ -5139,7 +5139,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
                          alpha,
                          nCoreCols,
                          false, //isNested
-                         algoModel,
+                         subModel,
                          &solveResult,
                          potentialVars,
 			 timeLimit);
@@ -6319,7 +6319,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                                       const double          alpha,
                                       const int             n_origCols,
                                       const bool            isNested,
-                                      DecompSubModel&      algoModel,
+                                      DecompSubModel&       subModel,
                                       DecompSolverResult*   solveResult,
                                       DecompVarList&        vars,
 				      double                timeLimit
@@ -6340,10 +6340,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "solveRelaxed()", m_param.LogDebugLevel, 2);
-   OsiSolverInterface*   subprobSI  = algoModel.getOsi();
-   int                   whichBlock = algoModel.getBlockId();
+   OsiSolverInterface*   subprobSI  = subModel.getOsi();
+   int                   whichBlock = subModel.getBlockId();
    bool                  isRoot     = getNodeIndex() ? false : true;
-   DecompConstraintSet* model      = algoModel.getModel();
+   DecompConstraintSet* model       = subModel.getModel();
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
               (*m_osLog) << "solve block b = " << whichBlock << endl;
               (*m_osLog) << "alpha         = " << alpha      << endl;
@@ -6427,7 +6427,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---
       //--- reset the objective to reduced cost
       //---
-      algoModel.setOsiObjCoeff(redCostX);
+      subModel.setOsiObjCoeff(redCostX);
 
       //---
       //--- reset the col lbs/ubs to node bounds
@@ -6440,7 +6440,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---  to match up with core, this might cause an issue
       //---
       if (m_param.BranchEnforceInSubProb) {
-         algoModel.setActiveColBounds(m_colLBNode, m_colUBNode);
+         subModel.setActiveColBounds(m_colLBNode, m_colUBNode);
       }
 
       //---
@@ -6448,7 +6448,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---
       if (m_param.LogDumpModel > 1) {
          if (isNested) {
-            string baseName = "subProbN_" + algoModel.getModelName();
+            string baseName = "subProbN_" + subModel.getModelName();
 
             if (m_isStrongBranch) {
                baseName += "_SB";
@@ -6461,7 +6461,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
                                 m_nodeStats.priceCallsTotal,
                                 whichBlock);
          } else {
-            string baseName = "subProb_" + algoModel.getModelName();
+            string baseName = "subProb_" + subModel.getModelName();
 
             if (m_isStrongBranch) {
                baseName += "_SB";
@@ -6486,13 +6486,13 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---
       //--- solve: min cx, s.t. A'x >= b', x in Z ([A,b] is in modelRelax.M)
       //---
-      algoModel.solveSubproblemAsMIP(solveResult,
-				     m_param,
-				     doExact,
-				     doCutoff,
-				     isRoot,
-				     alpha - DecompEpsilon,
-				     timeLimit);
+      subModel.solveAsMIP(solveResult,
+			  m_param,
+			  doExact,
+			  doCutoff,
+			  isRoot,
+			  alpha - DecompEpsilon,
+			  timeLimit);
       rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
       //double * milpSolution = NULL;
       //if(solveResult->m_nSolutions)
@@ -6628,10 +6628,10 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
             (*it)->fillDenseArr(n_origCols, xTemp);
             //TODO: get rid of this function, use isPointFeasible
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                       DecompSubModel& algoModelCheck =
+                       DecompSubModel& subModelCheck =
                           getModelRelax(whichBlock);
                        bool isRelaxFeas =
-                          checkPointFeasible(algoModelCheck.getModel(),
+                          checkPointFeasible(subModelCheck.getModel(),
                                              xTemp);
                        assert(isRelaxFeas);
                       );

@@ -449,7 +449,7 @@ public:
                              const double           alpha,
                              const int              n_origCols,
                              const bool             isNested,
-                             DecompSubModel&       algoModel,
+                             DecompSubModel&        subModel,
                              DecompSolverResult*    solveResult,
                              std::list<DecompVar*>& vars,
 			     double                 timeLimit);
@@ -489,7 +489,7 @@ public:
    void initSetup(UtilParameters* utilParam,
                   std::string&          sectionParam);
    void getModelsFromApp();
-   void createOsiSubProblem(DecompSubModel& algoModel);
+   void createOsiSubProblem(DecompSubModel& subModel);
 
    /**
     * Calculate gap: |(ub-lb)|/|lb|

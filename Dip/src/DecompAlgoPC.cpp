@@ -663,8 +663,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
       b   = (*li)->getBlockId();
       mit = m_modelRelax.find(b);
       assert(mit != m_modelRelax.end());
-      DecompSubModel&      algoModel = (*mit).second;
-      DecompConstraintSet* model     = algoModel.getModel();
+      DecompSubModel&      subModel  = (*mit).second;
+      DecompConstraintSet* model     = subModel.getModel();
 
       if (!model) {
          continue;

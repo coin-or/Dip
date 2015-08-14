@@ -39,31 +39,18 @@ bool DecompSubModel::isPointFeasible(const double* x,
    }
 
    const  vector<string>&   colNames = model->getColNames();
-
    const  vector<string>&   rowNames = model->getRowNames();
-
    int    c, r, i;
-
    bool   isFeas      = true;
-
    bool   hasColNames = false;
-
    bool   hasRowNames = false;
-
    double xj          = 0.0;
-
    double ax          = 0.0;
-
    double clb         = 0.0;
-
    double cub         = 0.0;
-
    double rlb         = 0.0;
-
    double rub         = 0.0;
-
    double actViol     = 0.0;
-
    double relViol     = 0.0;
 
    if (colNames.size()) {
@@ -230,24 +217,47 @@ FUNC_EXIT:
 }
 
 //===========================================================================//
-void DecompSubModel::solveSubproblemAsMIP(DecompSolverResult*  result,
-					   DecompParam&         param,
-					   bool                 doExact,
-					   bool                 doCutoff,
-					   bool                 isRoot,
-					   double               cutoff,
-					   double               timeLimit)
+void DecompSubModel::solveAsMIP(DecompSolverResult*  result,
+				DecompParam&         param,
+				bool                 doExact,
+				bool                 doCutoff,
+				bool                 isRoot,
+				double               cutoff,
+				double               timeLimit)
 {
-   const int numCols    = m_osi->getNumCols();
-   const int logIpLevel = param.LogIpLevel;
-   double* solution = new double[numCols];
-   assert(solution);
    //---
    //--- clear out any old solutions
    //---
    result->m_solution.clear();
 
 #ifdef __DECOMP_IP_SYMPHONY__
+   solveAsMIPSym(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
+#endif
+#ifdef __DECOMP_IP_CBC__
+   solveAsMIPCbc(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
+#endif
+#ifdef __DECOMP_IP_CPX__
+   solveAsMIPCpx(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
+#endif
+#ifdef __DECOMP_IP_GRB__
+   solveAsMIPGrb(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
+#endif
+}
+
+//===========================================================================//
+void DecompSubModel::solveAsMIPSym(DecompSolverResult*  result,
+				   DecompParam&         param,
+				   bool                 doExact,
+				   bool                 doCutoff,
+				   bool                 isRoot,
+				   double               cutoff,
+				   double               timeLimit)
+{
+#ifdef __DECOMP_IP_SYMPHONY__
+   const int numCols    = m_osi->getNumCols();
+   const int logIpLevel = param.LogIpLevel;
+   double* solution = new double[numCols];
+   assert(solution);
    //OsiSymSolverInterface* osiSym
    //  = dynamic_cast<OsiSymSolverInterface*>(m_osi->clone());
    OsiSymSolverInterface* osiSym
@@ -355,8 +365,22 @@ void DecompSubModel::solveSubproblemAsMIP(DecompSolverResult*  result,
          result->m_isOptimal = false ;
       }
    }
+   UTIL_DELARR(solution);
 #endif
+}
+
+//===========================================================================//
+void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
+				   DecompParam&         param,
+				   bool                 doExact,
+				   bool                 doCutoff,
+				   bool                 isRoot,
+				   double               cutoff,
+				   double               timeLimit)
+{
 #ifdef __DECOMP_IP_CBC__
+   const int numCols    = m_osi->getNumCols();
+   const int logIpLevel = param.LogIpLevel;
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_osi);
    cbc.setLogLevel(logIpLevel);
@@ -561,9 +585,23 @@ void DecompSubModel::solveSubproblemAsMIP(DecompSolverResult*  result,
       assert(result->m_nSolutions ==
              static_cast<int>(result->m_solution.size()));
    }
-
 #endif
-#ifdef __DECOMP_IP_CPX__
+}
+
+//===========================================================================//
+void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
+				   DecompParam&         param,
+				   bool                 doExact,
+				   bool                 doCutoff,
+				   bool                 isRoot,
+				   double               cutoff,
+				   double               timeLimit)
+{
+#ifdef __DECOMP_IP_CPLEX__
+   const int numCols    = m_osi->getNumCols();
+   const int logIpLevel = param.LogIpLevel;
+   double* solution = new double[numCols];
+   assert(solution);
    //---
    //--- get OsiCpx object from Osi object
    //--- get CPEXENVptr for use with internal methods
@@ -876,7 +914,21 @@ void DecompSubModel::solveSubproblemAsMIP(DecompSolverResult*  result,
                                 "solveSubproblemAsMIP", "DecompSubModel");
       }
    }
+   UTIL_DELARR(solution);
+#endif
+}
+
+//===========================================================================//
+void DecompSubModel::solveAsMIPGrb(DecompSolverResult*  result,
+				   DecompParam&         param,
+				   bool                 doExact,
+				   bool                 doCutoff,
+				   bool                 isRoot,
+				   double               cutoff,
+				   double               timeLimit)
+{
+#ifdef __DECOMP_IP_GRB__
 
 #endif
-   UTIL_DELARR(solution);
 }
+

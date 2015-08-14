@@ -186,15 +186,47 @@ public:
    }
 
 public:
-   void solveSubproblemAsMIP(DecompSolverResult* result,
-			     DecompParam&         param,
-			     bool                 doExact,
-			     bool                 doCutoff,
-			     bool                 isRoot,
-			     double               cutoff,
-			     double               timeLimit);
-
-   bool isPointFeasible(const double* x,
+   void solveAsMIP(DecompSolverResult*  result,
+		   DecompParam&         param,
+		   bool                 doExact,
+		   bool                 doCutoff,
+		   bool                 isRoot,
+		   double               cutoff,
+		   double               timeLimit);
+   
+   void solveAsMIPSym(DecompSolverResult*  result,
+		      DecompParam&         param,
+		      bool                 doExact,
+		      bool                 doCutoff,
+		      bool                 isRoot,
+		      double               cutoff,
+		      double               timeLimit);
+   
+   void solveAsMIPCbc(DecompSolverResult*  result,
+		      DecompParam&         param,
+		      bool                 doExact,
+		      bool                 doCutoff,
+		      bool                 isRoot,
+		      double               cutoff,
+		      double               timeLimit);
+   
+   void solveAsMIPCpx(DecompSolverResult*  result,
+		      DecompParam&         param,
+		      bool                 doExact,
+		      bool                 doCutoff,
+		      bool                 isRoot,
+		      double               cutoff,
+		      double               timeLimit);
+   
+   void solveAsMIPGrb(DecompSolverResult*  result,
+		      DecompParam&         param,
+		      bool                 doExact,
+		      bool                 doCutoff,
+		      bool                 isRoot,
+		      double               cutoff,
+		      double               timeLimit);
+   
+   bool isPointFeasible(const double*  x,
                         const bool     isXSparse  = false,
                         const int      logLevel   = 0,
                         const double   feasVarTol = 1.0e-5,
