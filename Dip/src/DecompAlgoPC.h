@@ -83,13 +83,11 @@ private:
    virtual void createMasterProblem(DecompVarList& initVars) {
       DecompAlgo::createMasterProblem(initVars);
    }
-   virtual int generateVarsFea(DecompVarList&     newVars,
-                               double&            mostNegReducedCost) {
-      return DecompAlgo::generateVarsFea(newVars, mostNegReducedCost);
+   virtual int generateVars(DecompVarList&     newVars,
+			    double&            mostNegReducedCost) {
+      return DecompAlgo::generateVars(newVars, mostNegReducedCost);
    }
    virtual void phaseInit(DecompPhase& phase);
-
-
 
    /**
     * Get current dual solution for master problem.

@@ -419,12 +419,9 @@ public:
    //TODO: should move out to PC
    //THINK - helper func?, or specific to PC - right? as is genInit
    std::vector<double*> getDualRays(int maxNumRays);
-   virtual int generateVarsFea(DecompVarList&     newVars,
-                               double&            mostNegReducedCost);
+   virtual int generateVars(DecompVarList&     newVars,
+			    double&            mostNegReducedCost);
 
-   virtual int generateVars(const DecompStatus   stat,
-                            DecompVarList&     newVars,
-                            double&            mostNegReducedCost);
    virtual int generateCuts(double*         xhat,
                             DecompCutList& newCuts);
 

@@ -1945,8 +1945,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          //--- attempt to generate some new variables with rc < 0
          //---
          mostNegRC                  = 0.0;
-         m_nodeStats.varsThisCall   = generateVars(m_status,
-                                      newVars, mostNegRC);
+         m_nodeStats.varsThisCall   = generateVars(newVars, mostNegRC);
          m_nodeStats.varsThisRound += m_nodeStats.varsThisCall;
          m_nodeStats.cutsThisCall   = 0;
          map<int, DecompSubModel>::iterator mit;
@@ -4648,8 +4647,8 @@ void DecompAlgo::generateVarsAdjustDuals(const double* uOld,
 }
 
 //------------------------------------------------------------------------ //
-int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
-                                double&            mostNegReducedCost)
+int DecompAlgo::generateVars(DecompVarList&     newVars,
+			     double&            mostNegReducedCost)
 {
    //---
    //--- solve min{s in F' | RC[s]} to generate new variables
@@ -4668,7 +4667,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
    //--- we have to be aware of where alpha actually is.
    //---
    UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "generateVarsFea()", m_param.LogDebugLevel, 2);
+                      "generateVars()", m_param.LogDebugLevel, 2);
    m_stats.timerOther1.reset();
    //---
    //--- TODO:
@@ -5232,7 +5231,7 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
 
             if (static_cast<int>(uBlockV.size()) != m) {
                throw UtilException("The size of the user dual vector is not the same as the", 
-                                   "number of master rows generateVarsFea", "DecompAlgo");
+                                   "number of master rows generateVars", "DecompAlgo");
             }
 
             if (m_param.LogDebugLevel >= 3) {
@@ -5495,44 +5494,9 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
    UTIL_DELARR(redCostX);
    m_stats.thisGenVars.push_back(m_stats.timerOther1.getRealTime());
    UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "generateVarsFea()", m_param.LogDebugLevel, 2);
+                    "generateVars()", m_param.LogDebugLevel, 2);
    return static_cast<int>(newVars.size());
 }
-
-//------------------------------------------------------------------------ //
-int DecompAlgo::generateVars(const DecompStatus   stat,
-                             DecompVarList&       newVars,
-                             double&              mostNegReducedCost)
-{
-   //---
-   //--- solve min{s in F' | RC[s]} to generate new variables
-   //---
-   //--- if LP was feasible,   then RC[s] = c.s - (uhat A''s + alpha)
-   //--- if LP was infeasible, then RC[s] = (uhat A''s + alpha), dual ray
-   //---
-   //--- The master LP was formed in the following order
-   //---   (A''s) lam[s]  >= b'' - from the original core [A'', b'']
-   //---   sum{s} lam[s]   = 1   - convexity constraint
-   //--- But, we may have added cuts - which conceptually are added
-   //--- into [A'', b'']. But, in reality they are simply appended to
-   //--- the end of the LP matrix. So, when we get back the dual vector,
-   //--- we have to be aware of where alpha actually is.
-   //---
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "generateVars()", m_param.LogDebugLevel, 2);
-   return generateVarsFea(newVars, mostNegReducedCost);
-   /*#else
-     switch(stat){
-     case STAT_FEASIBLE:
-     return generateVarsFea(newVars, mostNegReducedCost);
-     case STAT_INFEASIBLE:
-     return generateVarsInf(newVars, mostNegReducedCost);
-     default:
-     assert(0);
-     }*/
-   return 0;
-}
-
 
 //TODO - ugh! only PC again?
 //------------------------------------------------------------------------ //

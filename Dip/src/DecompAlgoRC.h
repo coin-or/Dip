@@ -90,8 +90,7 @@ private:
                                const int         maxInnerIter,
                                const int         maxOuterIter);
    int addCutsFromPool();
-   int generateVars(const DecompStatus   stat,
-                    DecompVarList&     newVars,
+   int generateVars(DecompVarList&     newVars,
                     double&            mostNegReducedCost);
    bool updateObjBound(const double mostNegRC = -DecompBigNum);
 

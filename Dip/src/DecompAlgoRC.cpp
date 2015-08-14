@@ -307,8 +307,7 @@ int DecompAlgoRC::addCutsFromPool()
 }
 
 // ------------------------------------------------------------------------- //
-int DecompAlgoRC::generateVars(const DecompStatus   stat,
-                               DecompVarList&     newVars,
+int DecompAlgoRC::generateVars(DecompVarList&     newVars,
                                double&            mostNegReducedCost)
 {
    UtilPrintFuncBegin(m_osLog, m_classTag,
@@ -394,8 +393,8 @@ int DecompAlgoRC::generateVars(const DecompStatus   stat,
 
 // ------------------------------------------------------------------------- //
 DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
-      const int         maxInnerIter,
-      const int         maxOuterIter)
+					  const int         maxInnerIter,
+					  const int         maxOuterIter)
 {
    //---
    //--- C, PC: This step solves (or takes a few steps to solve) master LP
