@@ -261,6 +261,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
    }
 
    sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
+   sym_set_int_param(env, "prep_level", 2);
 
    if (param.WarmStart) {
       sym_set_int_param(env, "do_reduced_cost_fixing", 0);
@@ -273,9 +274,7 @@ void DecompAlgoModel::solveSubproblemAsMIP(DecompSolverResult* result,
       osiSym->resolve();
 
    } else {
-      
       osiSym->initialSolve();
-
    }
 
    int status = sym_get_status(env);
