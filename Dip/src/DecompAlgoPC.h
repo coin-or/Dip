@@ -163,7 +163,7 @@ private:
    //TODO
    void phaseDone();
    int  addCutsFromPool();
-   void solutionUpdateAsIP();
+   void solveMasterAsMIP();
    int  adjustColumnsEffCnt();
    int  compressColumns    ();
 

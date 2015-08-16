@@ -146,11 +146,11 @@ public:
    //  if there are more than one blocks)
    //TODO: how often? after every pass?
 
-   int    SolveMasterAsIp;         //{0,1}
-   int    SolveMasterAsIpFreqNode; //solve every n nodes
-   int    SolveMasterAsIpFreqPass; //solve every n passes (within one node)
-   double SolveMasterAsIpTimeLimit;
-   double SolveMasterAsIpLimitGap;
+   int    SolveMasterAsMip;         //{0,1}
+   int    SolveMasterAsMipFreqNode; //solve every n nodes
+   int    SolveMasterAsMipFreqPass; //solve every n passes (within one node)
+   double SolveMasterAsMipTimeLimit;
+   double SolveMasterAsMipLimitGap;
 
    // DecompDualSimplex = 0,
    // DecompPrimSimplex = 1,
@@ -383,11 +383,11 @@ public:
       PARAM_getSetting("SubProbSolverStartAlgo", SubProbSolverStartAlgo);
       PARAM_getSetting("RoundRobinInterval",   RoundRobinInterval);
       PARAM_getSetting("RoundRobinStrategy",   RoundRobinStrategy);
-      PARAM_getSetting("SolveMasterAsIp",      SolveMasterAsIp);
-      PARAM_getSetting("SolveMasterAsIpFreqNode", SolveMasterAsIpFreqNode);
-      PARAM_getSetting("SolveMasterAsIpFreqPass", SolveMasterAsIpFreqPass);
-      PARAM_getSetting("SolveMasterAsIpTimeLimit", SolveMasterAsIpTimeLimit);
-      PARAM_getSetting("SolveMasterAsIpLimitGap",  SolveMasterAsIpLimitGap);
+      PARAM_getSetting("SolveMasterAsMip",      SolveMasterAsMip);
+      PARAM_getSetting("SolveMasterAsMipFreqNode", SolveMasterAsMipFreqNode);
+      PARAM_getSetting("SolveMasterAsMipFreqPass", SolveMasterAsMipFreqPass);
+      PARAM_getSetting("SolveMasterAsMipTimeLimit", SolveMasterAsMipTimeLimit);
+      PARAM_getSetting("SolveMasterAsMipLimitGap",  SolveMasterAsMipLimitGap);
       PARAM_getSetting("SolveMasterUpdateAlgo",    SolveMasterUpdateAlgo);
       PARAM_getSetting("SolveRelaxAsIp",       SolveRelaxAsIp);
       PARAM_getSetting("InitVarsWithCutDC",    InitVarsWithCutDC);
@@ -517,15 +517,15 @@ public:
                          SubProbSolverStartAlgo);
       UtilPrintParameter(os, sec, "RoundRobinInterval",  RoundRobinInterval);
       UtilPrintParameter(os, sec, "RoundRobinStrategy",  RoundRobinStrategy);
-      UtilPrintParameter(os, sec, "SolveMasterAsIp",     SolveMasterAsIp);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqNode",
-                         SolveMasterAsIpFreqNode);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpFreqPass",
-                         SolveMasterAsIpFreqPass);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpTimeLimit",
-                         SolveMasterAsIpTimeLimit);
-      UtilPrintParameter(os, sec, "SolveMasterAsIpLimitGap",
-                         SolveMasterAsIpLimitGap);
+      UtilPrintParameter(os, sec, "SolveMasterAsMip",     SolveMasterAsMip);
+      UtilPrintParameter(os, sec, "SolveMasterAsMipFreqNode",
+                         SolveMasterAsMipFreqNode);
+      UtilPrintParameter(os, sec, "SolveMasterAsMipFreqPass",
+                         SolveMasterAsMipFreqPass);
+      UtilPrintParameter(os, sec, "SolveMasterAsMipTimeLimit",
+                         SolveMasterAsMipTimeLimit);
+      UtilPrintParameter(os, sec, "SolveMasterAsMipLimitGap",
+                         SolveMasterAsMipLimitGap);
       UtilPrintParameter(os, sec, "SolveMasterUpdateAlgo",
                          SolveMasterUpdateAlgo);
       UtilPrintParameter(os, sec, "SolveRelaxAsIp",     SolveRelaxAsIp);
@@ -627,11 +627,11 @@ public:
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
-      SolveMasterAsIp          = 1;//TODO: turn off if one block
-      SolveMasterAsIpFreqNode  = 1;
-      SolveMasterAsIpFreqPass  = 1000;
-      SolveMasterAsIpTimeLimit = 30;
-      SolveMasterAsIpLimitGap  = 0.05; //5% gap
+      SolveMasterAsMip          = 1;//TODO: turn off if one block
+      SolveMasterAsMipFreqNode  = 1;
+      SolveMasterAsMipFreqPass  = 1000;
+      SolveMasterAsMipTimeLimit = 30;
+      SolveMasterAsMipLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
       SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;

@@ -370,7 +370,7 @@ public:
    virtual bool updateObjBound(const double mostNegRC = -DecompBigNum);
 
 
-   virtual void solutionUpdateAsIP() {}
+   virtual void solveMasterAsMIP() {}
 
    virtual int adjustColumnsEffCnt() {
       return DecompStatOk;

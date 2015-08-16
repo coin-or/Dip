@@ -507,7 +507,7 @@ AlpsDecompTreeNode::branch()
 
    if (decompParam.BranchStrongIter) {
       double globalUB             = getKnowledgeBroker()->getIncumbentValue();
-      int    solveMasterAsIp      = decompParam.SolveMasterAsIp;
+      int    solveMasterAsMip      = decompParam.SolveMasterAsMip;
       int    limitTotalCutIters   = decompParam.TotalCutItersLimit;
       int    limitTotalPriceIters = decompParam.TotalPriceItersLimit;
       //---
@@ -516,7 +516,7 @@ AlpsDecompTreeNode::branch()
       //decompParam.TotalCutItersLimit   = decompParam.BranchStrongIter;
       decompParam.TotalCutItersLimit   = 0;
       decompParam.TotalPriceItersLimit = decompParam.BranchStrongIter;
-      decompParam.SolveMasterAsIp      = 0;
+      decompParam.SolveMasterAsMip      = 0;
       decompAlgo->setStrongBranchIter(true);
       decompAlgo->setMasterBounds(newLbs, newUbs);
       decompAlgo->setSubProbBounds(newLbs, newUbs);
@@ -524,7 +524,7 @@ AlpsDecompTreeNode::branch()
       decompAlgo->setStrongBranchIter(false);
       decompParam.TotalCutItersLimit   = limitTotalCutIters;
       decompParam.TotalPriceItersLimit = limitTotalPriceIters;
-      decompParam.SolveMasterAsIp      = solveMasterAsIp;
+      decompParam.SolveMasterAsMip      = solveMasterAsMip;
       //TOOD: what if it stops in Phase1
       //how will this work in CPM?
    }
@@ -571,7 +571,7 @@ AlpsDecompTreeNode::branch()
 
    if (decompParam.BranchStrongIter) {
       double globalUB             = getKnowledgeBroker()->getIncumbentValue();
-      int    solveMasterAsIp      = decompParam.SolveMasterAsIp;
+      int    solveMasterAsMip      = decompParam.SolveMasterAsMip;
       int    limitTotalCutIters   = decompParam.TotalCutItersLimit;
       int    limitTotalPriceIters = decompParam.TotalPriceItersLimit;
       //---
@@ -580,7 +580,7 @@ AlpsDecompTreeNode::branch()
       //decompParam.TotalCutItersLimit   = decompParam.BranchStrongIter;
       decompParam.TotalCutItersLimit   = 0;
       decompParam.TotalPriceItersLimit = decompParam.BranchStrongIter;
-      decompParam.SolveMasterAsIp      = 0;
+      decompParam.SolveMasterAsMip      = 0;
       decompAlgo->setStrongBranchIter(true);
       decompAlgo->setMasterBounds(newLbs, newUbs);
       decompAlgo->setSubProbBounds(newLbs, newUbs);
@@ -588,7 +588,7 @@ AlpsDecompTreeNode::branch()
       decompAlgo->setStrongBranchIter(false);
       decompParam.TotalCutItersLimit   = limitTotalCutIters;
       decompParam.TotalPriceItersLimit = limitTotalPriceIters;
-      decompParam.SolveMasterAsIp      = solveMasterAsIp;
+      decompParam.SolveMasterAsMip      = solveMasterAsMip;
    }
 
    newNodes.push_back(CoinMakeTriple(static_cast<AlpsNodeDesc*>(child),

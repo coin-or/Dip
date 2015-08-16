@@ -474,6 +474,9 @@ void DecompAlgo::createOsiSubProblem(DecompSubModel& subModel)
 #ifdef __DECOMP_IP_SYMPHONY__
    subprobSI = new OsiSymSolverInterface();
 #endif
+#ifdef __DECOMP_IP_GRB__
+   subprobSI = new OsiGrbSolverInterface();
+#endif
    assert(subprobSI);
    subprobSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
    //TODO: use assign vs load? just pass pointers?
@@ -1655,11 +1658,11 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
    m_globalUB       = globalUB;
 
    //---
-   //--- check SolveMasterAsIp setting
+   //--- check solveMasterAsMip setting
    //---   on by default, but if only one block, turn off
    //---
    if (m_numConvexCon == 1) {
-      m_param.SolveMasterAsIp = 0;
+      m_param.SolveMasterAsMip = 0;
    }
 
    //---
@@ -2579,19 +2582,19 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //---    init solution, let's always solve master as IP as soon
    //---    as we get into PHASE 2
    //---
-   if (m_param.SolveMasterAsIp       &&
+   if (m_param.SolveMasterAsMip       &&
          ((m_phase != PHASE_PRICE1      &&
            m_nodeStats.priceCallsTotal  &&
-           m_nodeStats.priceCallsTotal % m_param.SolveMasterAsIpFreqPass == 0)
+           m_nodeStats.priceCallsTotal % m_param.SolveMasterAsMipFreqPass == 0)
           ||
           m_firstPhase2Call)) {
       UTIL_MSG(m_param.LogLevel, 2,
-               (*m_osLog) << "SolveMasterAsIp: PriceCallsTotal=" <<
+               (*m_osLog) << "solveMasterAsMip: PriceCallsTotal=" <<
                m_nodeStats.priceCallsTotal
                << " m_firstPhase2Call = "
                << m_firstPhase2Call
                << endl;);
-      solutionUpdateAsIP();
+      solveMasterAsMIP();
 
       if (m_firstPhase2Call) {
          m_firstPhase2Call = false;
@@ -6696,7 +6699,7 @@ void DecompAlgo::recomposeSolution(const double* solution,
 
       if (m_masterSI->getNumIntegers() == 0) {
          //---
-         //--- in the case of recompose after solutionUpdateAsIp
+         //--- in the case of recompose after solveMasterAsMIP
          //---  we cannot access valid duals
          //---
          const double*          dualSol  = m_masterSI->getRowPrice();

@@ -569,10 +569,10 @@ void DecompAlgoPC::phaseDone()
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "phaseDone()", m_param.LogDebugLevel, 2);
 
-   if (m_param.SolveMasterAsIp                                &&
-         getNodeIndex() % m_param.SolveMasterAsIpFreqNode == 0  &&
+   if (m_param.SolveMasterAsMip                                &&
+         getNodeIndex() % m_param.SolveMasterAsMipFreqNode == 0  &&
          m_stopCriteria != DecompStopTime) {
-      solutionUpdateAsIP();
+      solveMasterAsMIP();
    }
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
@@ -580,7 +580,7 @@ void DecompAlgoPC::phaseDone()
 }
 
 //===========================================================================//
-void DecompAlgoPC::solutionUpdateAsIP()
+void DecompAlgoPC::solveMasterAsMIP()
 {
    //---
    //--- if node was already found infeasible, just return
@@ -590,7 +590,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    }
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "solutionUpdateAsIp()", m_param.LogDebugLevel, 2);
+                      "solveMasterAsMIP()", m_param.LogDebugLevel, 2);
    //---
    //--- no point in doing this if only one block, we check each
    //---  new column to see if it is feasible to original already
@@ -707,7 +707,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status == FUNCTION_TERMINATED_ABNORMALLY)
          throw UtilException("sym_get_col_solution failure",
-                             "solutionUpdateAsIp", "DecompSubModel");
+                             "solveMasterAsMIP", "DecompSubModel");
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result.m_nSolutions = 0;
@@ -734,8 +734,8 @@ void DecompAlgoPC::solutionUpdateAsIP()
    CbcModel cbc(*m_masterSI);
    cbc.setLogLevel(logIpLevel);
    cbc.setDblParam(CbcModel::CbcAllowableFractionGap,
-                   m_param.SolveMasterAsIpLimitGap);
-   cbc.setDblParam(CbcModel::CbcMaximumSeconds, m_param.SolveMasterAsIpTimeLimit);
+                   m_param.SolveMasterAsMipLimitGap);
+   cbc.setDblParam(CbcModel::CbcMaximumSeconds, m_param.SolveMasterAsMipTimeLimit);
    cbc.setDblParam(CbcModel::CbcCurrentCutoff, m_globalUB);
 #if 0
    cbc.branchAndBound();
@@ -753,9 +753,9 @@ void DecompAlgoPC::solutionUpdateAsIP()
    string cbcLog       = "-log";
    string cbcLogSet    = UtilIntToStr(logIpLevel);
    string cbcGap       = "-ratio";
-   string cbcGapSet    = UtilDblToStr(m_param.SolveMasterAsIpLimitGap);
+   string cbcGapSet    = UtilDblToStr(m_param.SolveMasterAsMipLimitGap);
    string cbcTime      = "-seconds";
-   string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsIpTimeLimit);
+   string cbcTimeSet   = UtilDblToStr(m_param.SolveMasterAsMipTimeLimit);
    string cbcCutoff    = "-cutoff";
    string cbcCutoffSet = UtilDblToStr(m_globalUB, -1, 1.0e100);
    argv[argc++] = cbcExe.c_str();
@@ -793,7 +793,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
       cerr << "Error: CBC IP solver status = " << result.m_solStatus << endl;
       //This shouldn't really cause an exception
       //throw UtilException("CBC solver status",
-      //                    "solutionUpdateAsIp", "DecompSubModel");
+      //                    "solveMasterAsMIP", "DecompSubModel");
    }
 
    /** Secondary status of problem
@@ -820,7 +820,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
            << result.m_solStatus2 << endl;
       //This shouldn't really cause an exception
       //throw UtilException("CBC solver 2nd status",
-      //                    "solutionUpdateAsIp", "DecompAlgoPC");
+      //                    "solveMasterAsMIP", "DecompAlgoPC");
    }
 
    //---
@@ -881,19 +881,19 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solutionUpdateAsIp", "DecompSubModel");
+                             "solveMasterAsMIP", "DecompSubModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solutionUpdateAsIp", "DecompSubModel");
+                             "solveMasterAsMIP", "DecompSubModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solutionUpdateAsIp", "DecompSubModel");
+                             "solveMasterAsMIP", "DecompSubModel");
    }
 
    if (m_firstPhase2Call) {
@@ -911,32 +911,32 @@ void DecompAlgoPC::solutionUpdateAsIP()
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP, 0.005); //0.5%
    } else {
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_EPGAP,
-                              m_param.SolveMasterAsIpLimitGap);
+                              m_param.SolveMasterAsMipLimitGap);
    }
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
 
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM,
-                           m_param.SolveMasterAsIpTimeLimit);
+                           m_param.SolveMasterAsMipTimeLimit);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
 
    status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, m_globalUB);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
 
 #if CPX_VERSION >= 1100
    status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, 1);
 
    if (status)
       throw UtilException("CPXsetintparam failure",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
 
 #endif
    //---
@@ -968,7 +968,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
    if (!UtilIsInSet(result.m_solStatus, statusSet, 5)) {
       cerr << "Error: CPX IP solver status = " << result.m_solStatus << endl;
       throw UtilException("CPX solver status",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
    }
 
    //---
@@ -1005,14 +1005,14 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    if (status)
       throw UtilException("CPXgetbestobjval failure",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
 
    if (result.m_nSolutions >= 1) {
       status = CPXgetmipobjval(cpxEnv, cpxLp, &result.m_objUB);
 
       if (status)
          throw UtilException("CPXgetmipobjval failure",
-                             "solutionUpdateAsIp", "DecompAlgoPC");
+                             "solveMasterAsMIP", "DecompAlgoPC");
 
       const double* solDbl = osiCpx->getColSolution();
       vector<double> solVec(solDbl, solDbl + nMasterCols);
@@ -1030,7 +1030,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
       double* rsolution = new double[modelCore->getNumCols()];
 
       if (!rsolution) {
-         throw UtilExceptionMemory("solutionUpdateAsIp", "DecompAlgoPC");
+         throw UtilExceptionMemory("solveMasterAsMIP", "DecompAlgoPC");
       }
 
       UTIL_MSG(m_param.LogLevel, 3,
@@ -1039,7 +1039,7 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
       if (!isIPFeasible(rsolution))
          throw UtilException("Recomposed solution is not feasible",
-                             "solutionUpdateAsIp", "DecompAlgoPC");
+                             "solveMasterAsMIP", "DecompAlgoPC");
 
       if (m_app->APPisUserFeasible(rsolution,
                                    modelCore->getNumCols(),
@@ -1134,11 +1134,11 @@ void DecompAlgoPC::solutionUpdateAsIP()
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solutionUpdateAsIp", "DecompAlgoPC");
+                          "solveMasterAsMIP", "DecompAlgoPC");
 
 #endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "solutionUpdateAsIp()", m_param.LogDebugLevel, 2);
+                    "solveMasterAsMIP()", m_param.LogDebugLevel, 2);
 }
 
 
