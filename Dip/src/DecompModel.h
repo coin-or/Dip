@@ -21,10 +21,7 @@
 #include "DecompParam.h"
 #include "DecompConstraintSet.h"
 #include "DecompSolverResult.h"
-#ifdef __DECOMP_IP_SYMPHONY__
-#include "OsiSolverInterface.hpp"
-#include "OsiSymSolverInterface.hpp"
-#endif
+
 //===========================================================================//
 //naming convention - usually would do DecompModelXx, DecompModelYy
 //===========================================================================//
