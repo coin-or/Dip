@@ -598,7 +598,6 @@ void DecompAlgoPC::solveMasterAsMIP()
    assert(m_numConvexCon > 1);
    int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda
-   int  logIpLevel  = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    //---
    //--- set the master (generated) columns (lambda) to integer
@@ -626,9 +625,132 @@ void DecompAlgoPC::solveMasterAsMIP()
                           m_nodeStats.priceCallsTotal);
 
    DecompSolverResult    result;
+
+#ifdef __DECOMP_IP_SYMPHONY__
+   solveMasterAsMIPSym(&result);
+#endif
+#ifdef __DECOMP_IP_CBC__
+   solveMasterAsMIPCbc(&result);
+#endif
+#ifdef __DECOMP_IP_CPX__
+   solveMasterAsMIPCpx(&result);
+#endif
+#ifdef __DECOMP_IP_GRB__
+   solveMasterAsMIPGrb(&result);
+#endif
+
+   if (result.m_nSolutions) {
+      double* rsolution = new double[modelCore->getNumCols()];
+
+      if (!rsolution) {
+         throw UtilExceptionMemory("solveMasterAsMIP", "DecompAlgoPC");
+      }
+
+      UTIL_MSG(m_param.LogLevel, 3,
+               (*m_osLog) << "Solve as IP found a solution." << endl;);
+      recomposeSolution(result.getSolution(0), rsolution);
+
+      if (!isIPFeasible(rsolution))
+         throw UtilException("Recomposed solution is not feasible",
+                             "solveMasterAsMIP", "DecompAlgoPC");
+
+      if (m_app->APPisUserFeasible(rsolution,
+                                   modelCore->getNumCols(),
+                                   m_param.TolZero)) {
+         UTIL_MSG(m_param.LogLevel, 3,
+                  (*m_osLog) << "Solution is app-feasible, nSolutions="
+                  << (int)m_xhatIPFeas.size() << endl;);
+         //check for dup sol - TODO: make func
+         bool isDup = m_xhatIPFeas.size() > 0 ? true : false;
+         vector<DecompSolution*>::iterator vit;
+
+         for (vit  = m_xhatIPFeas.begin();
+               vit != m_xhatIPFeas.end(); vit++) {
+            const DecompSolution* xhatIPFeas = *vit;
+            const double*          values
+            = xhatIPFeas->getValues();
+
+            for (int c = 0; c < modelCore->getNumCols(); c++) {
+               if (!UtilIsZero(values[c] - rsolution[c])) {
+                  isDup = false;
+                  break;
+               }
+            }
+         }
+
+         if (isDup) {
+            UTIL_MSG(m_param.LogLevel, 3,
+                     (*m_osLog) << "Solution is a duplicate, not pushing."
+                     << endl;);
+         } else {
+            DecompSolution* decompSol
+            = new DecompSolution(modelCore->getNumCols(),
+                                 rsolution,
+                                 getOrigObjective());
+            m_xhatIPFeas.push_back(decompSol);
+            vector<DecompSolution*>::iterator vi;
+            DecompSolution* viBest = NULL;
+            double bestBoundUB = m_nodeStats.objBest.second;
+
+            for (vi = m_xhatIPFeas.begin(); vi != m_xhatIPFeas.end(); vi++) {
+               const DecompSolution* xhatIPFeas = *vi;
+
+               if (xhatIPFeas->getQuality() <= bestBoundUB) {
+                  bestBoundUB = xhatIPFeas->getQuality();
+                  viBest = *vi;
+               }
+            }
+
+            if (viBest) {
+               //save the best
+               setObjBoundIP(bestBoundUB);
+               m_xhatIPBest = viBest;
+            }
+         }
+      }
+
+      if (m_param.LogDebugLevel >= 3) {
+         int j;
+         const vector<string>& colNames = modelCore->getColNames();
+
+         for (j = 0; j < modelCore->getNumCols(); j++) {
+            if (fabs(rsolution[j]) > DecompEpsilon) {
+               if (j < static_cast<int>(colNames.size()))
+                  printf("MASTER PRIM[%6d->%20s] = %12.10f\n",
+                         j, colNames[j].c_str(), rsolution[j]);
+               else
+                  printf("MASTER PRIM[%6d] = %12.10f\n",
+                         j, rsolution[j]);
+            }
+         }
+      }
+
+      UTIL_DELARR(rsolution);
+   }
+
+   //---
+   //--- set the master columns back to continuous
+   //---
+   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
+      if (isMasterColStructural(colIndex) ||
+            isMasterColMasterOnly(colIndex)) {
+         m_masterSI->setContinuous(colIndex);
+      }
+   }
+
+   UtilPrintFuncEnd(m_osLog, m_classTag,
+                    "solveMasterAsMIP()", m_param.LogDebugLevel, 2);
+}
+
+//===========================================================================//
+void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
+{
 #ifdef __DECOMP_IP_SYMPHONY__
    OsiSolverInterface * m_masterClone = m_masterSI->clone();
  
+   int colIndex;
+   int  nMasterCols = m_masterSI->getNumCols();//lambda
+   int  logIpLevel  = m_param.LogIpLevel;
    int numCols = m_masterClone->getNumCols();
    OsiSymSolverInterface* osiSym = new OsiSymSolverInterface();
    const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
@@ -637,48 +759,13 @@ void DecompAlgoPC::solveMasterAsMIP()
    const double* row_lb = (m_masterClone->getRowLower());
    const double* row_up = (m_masterClone->getRowUpper());
    const double* obj_coef = (m_masterClone->getObjCoefficients());
+
    osiSym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
-                          const_cast<double*&>(col_lb),
-                          const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
-                          const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
-   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
-      if (isMasterColStructural(colIndex)){
-         osiSym->setInteger(colIndex);
-      }
-   }
-   for (int i = 0; i < m_masterOnlyCols.size(); i++){
-      if (intMarkerCore[m_masterOnlyCols[i]] == 'I'){
-	 osiSym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
-      } 
-   }
-
-   //TODO: is this expensive? if so,
-   //  better to use column type info
-   //  like above
-   /*
-   DecompVarList::iterator li; 
-   map<int, DecompSubModel>::iterator mit; 
-
-   for (li = m_vars.begin(); li != m_vars.end(); li++) {
-      b   = (*li)->getBlockId();
-      mit = m_modelRelax.find(b);
-      assert(mit != m_modelRelax.end());
-      DecompSubModel&      subModel  = (*mit).second;
-      DecompConstraintSet* model     = subModel.getModel();
-
-      if (!model) {
-         continue;
-      }
-
-      if ( model->masterOnlyCols.size() ||
-	  (!model->masterOnlyCols.size() && model->getNumInts() == 0)) {
-         osiSym->setContinuous((*li)->getColMasterIndex());
-         //printf("set back to continuous index=%d block=%d\n",
-         //       b, (*li)->getColMasterIndex());
-         //       std::cout << "set continuous variables back " << std::endl;
-      }
-   }
-   */
+			 const_cast<double*&>(col_lb),
+			 const_cast<double*&>(col_up), 
+			 const_cast<double*&>(obj_coef),
+			 const_cast<double*&>(row_lb), 
+			 const_cast<double*&>(row_up));
 
    assert(osiSym);
    sym_environment* env = osiSym->getSymphonyEnvironment();
@@ -729,7 +816,14 @@ void DecompAlgoPC::solveMasterAsMIP()
 
    UTIL_DELPTR(osiSym);
 #endif
+}
+
+//===========================================================================//
+void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
+{
 #ifdef __DECOMP_IP_CBC__
+   int  nMasterCols = m_masterSI->getNumCols();//lambda
+   int  logIpLevel  = m_param.LogIpLevel;
    //TODO: what exactly does this do? make copy of entire model!?
    CbcModel cbc(*m_masterSI);
    cbc.setLogLevel(logIpLevel);
@@ -860,12 +954,19 @@ void DecompAlgoPC::solveMasterAsMIP()
    }
 
 #endif
+}
+
+//===========================================================================//
+void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
+{
 #ifdef __DECOMP_IP_CPX__
    //---
    //--- get OsiCpx object from Osi object
    //--- get CPEXENVptr for use with internal methods
    //--- get CPXLPptr   for use with internal methods
    //---
+   int  nMasterCols = m_masterSI->getNumCols();//lambda
+   int  logIpLevel  = m_param.LogIpLevel;
    OsiCpxSolverInterface* osiCpx
    = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
    CPXENVptr cpxEnv = osiCpx->getEnvironmentPtr();
@@ -1023,110 +1124,6 @@ void DecompAlgoPC::solveMasterAsMIP()
       //     cbc.getColSolution(),
       //     nMasterCols * sizeof(double));
    }
-
-#endif
-
-   if (result.m_nSolutions) {
-      double* rsolution = new double[modelCore->getNumCols()];
-
-      if (!rsolution) {
-         throw UtilExceptionMemory("solveMasterAsMIP", "DecompAlgoPC");
-      }
-
-      UTIL_MSG(m_param.LogLevel, 3,
-               (*m_osLog) << "Solve as IP found a solution." << endl;);
-      recomposeSolution(result.getSolution(0), rsolution);
-
-      if (!isIPFeasible(rsolution))
-         throw UtilException("Recomposed solution is not feasible",
-                             "solveMasterAsMIP", "DecompAlgoPC");
-
-      if (m_app->APPisUserFeasible(rsolution,
-                                   modelCore->getNumCols(),
-                                   m_param.TolZero)) {
-         UTIL_MSG(m_param.LogLevel, 3,
-                  (*m_osLog) << "Solution is app-feasible, nSolutions="
-                  << (int)m_xhatIPFeas.size() << endl;);
-         //check for dup sol - TODO: make func
-         bool isDup = m_xhatIPFeas.size() > 0 ? true : false;
-         vector<DecompSolution*>::iterator vit;
-
-         for (vit  = m_xhatIPFeas.begin();
-               vit != m_xhatIPFeas.end(); vit++) {
-            const DecompSolution* xhatIPFeas = *vit;
-            const double*          values
-            = xhatIPFeas->getValues();
-
-            for (int c = 0; c < modelCore->getNumCols(); c++) {
-               if (!UtilIsZero(values[c] - rsolution[c])) {
-                  isDup = false;
-                  break;
-               }
-            }
-         }
-
-         if (isDup) {
-            UTIL_MSG(m_param.LogLevel, 3,
-                     (*m_osLog) << "Solution is a duplicate, not pushing."
-                     << endl;);
-         } else {
-            DecompSolution* decompSol
-            = new DecompSolution(modelCore->getNumCols(),
-                                 rsolution,
-                                 getOrigObjective());
-            m_xhatIPFeas.push_back(decompSol);
-            vector<DecompSolution*>::iterator vi;
-            DecompSolution* viBest = NULL;
-            double bestBoundUB = m_nodeStats.objBest.second;
-
-            for (vi = m_xhatIPFeas.begin(); vi != m_xhatIPFeas.end(); vi++) {
-               const DecompSolution* xhatIPFeas = *vi;
-
-               if (xhatIPFeas->getQuality() <= bestBoundUB) {
-                  bestBoundUB = xhatIPFeas->getQuality();
-                  viBest = *vi;
-               }
-            }
-
-            if (viBest) {
-               //save the best
-               setObjBoundIP(bestBoundUB);
-               m_xhatIPBest = viBest;
-            }
-         }
-      }
-
-      if (m_param.LogDebugLevel >= 3) {
-         int j;
-         const vector<string>& colNames = modelCore->getColNames();
-
-         for (j = 0; j < modelCore->getNumCols(); j++) {
-            if (fabs(rsolution[j]) > DecompEpsilon) {
-               if (j < static_cast<int>(colNames.size()))
-                  printf("MASTER PRIM[%6d->%20s] = %12.10f\n",
-                         j, colNames[j].c_str(), rsolution[j]);
-               else
-                  printf("MASTER PRIM[%6d] = %12.10f\n",
-                         j, rsolution[j]);
-            }
-         }
-      }
-
-      UTIL_DELARR(rsolution);
-   }
-
-   //---
-   //--- set the master columns back to continuous
-   //---
-   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
-      if (isMasterColStructural(colIndex) ||
-            isMasterColMasterOnly(colIndex)) {
-         m_masterSI->setContinuous(colIndex);
-      }
-   }
-
-
-#ifdef __DECOMP_IP_CPX__
    //---
    //--- set time back
    //---
@@ -1135,13 +1132,18 @@ void DecompAlgoPC::solveMasterAsMIP()
    if (status)
       throw UtilException("CPXsetdblparam failure",
                           "solveMasterAsMIP", "DecompAlgoPC");
-
 #endif
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "solveMasterAsMIP()", m_param.LogDebugLevel, 2);
 }
 
-
+//===========================================================================//
+void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
+{
+   //Not implemented yet
+   result->m_isUnbounded = false;
+   result->m_isOptimal   = true;
+   result->m_isCutoff    = false;
+   result->m_nSolutions  = 0;
+}
 
 /*-------------------------------------------------------------------------*/
 //because rowReform, this is very specific to PC

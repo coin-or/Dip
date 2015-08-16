@@ -164,10 +164,12 @@ private:
    void phaseDone();
    int  addCutsFromPool();
    void solveMasterAsMIP();
+   void solveMasterAsMIPSym(DecompSolverResult* result);
+   void solveMasterAsMIPCbc(DecompSolverResult* result);
+   void solveMasterAsMIPCpx(DecompSolverResult* result);
+   void solveMasterAsMIPGrb(DecompSolverResult* result);
    int  adjustColumnsEffCnt();
    int  compressColumns    ();
-
-
 
    /**
     * @}
