@@ -60,12 +60,15 @@ host_triplet = @host@
 #because CGL depends on CLP, we need this in any case
 @CLP_LP_SOLVER_TRUE@am__append_2 = -D__DECOMP_LP_CLP__
 @CPLEX_LP_SOLVER_TRUE@am__append_3 = -D__DECOMP_LP_CPX__
+@GRB_LP_SOLVER_TRUE@am__append_4 = -D__DECOMP_LP_GRB__
 
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
-@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_4 = -D__DECOMP_IP_CBC__
-@CPLEX_IP_SOLVER_TRUE@am__append_5 = -D__DECOMP_IP_CPX__
+@CBC_IP_SOLVER_TRUE@@COIN_HAS_CBC_TRUE@am__append_5 = -D__DECOMP_IP_CBC__
+@CPLEX_IP_SOLVER_TRUE@am__append_6 = -D__DECOMP_IP_CPX__
+@GRB_IP_SOLVER_TRUE@am__append_7 = -D__DECOMP_IP_GRB__
+@SYMPHONY_IP_SOLVER_TRUE@am__append_8 = -D__DECOMP_IP_SYMPHONY__
 subdir = src/dippy
 DIST_COMMON = $(DIPPY_PYTHON) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in AUTHORS
@@ -428,7 +431,8 @@ _dippy_la_SOURCES = \
 
 # This is for libtool
 _dippy_la_CPPFLAGS = $(PYTHON_CFLAGS) $(DIPLIB_CFLAGS) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
+	$(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7) $(am__append_8)
 _dippy_la_LIBADD = ../libDecomp.la $(CBCLIB_LIBS) $(am__append_1)
 _dippy_la_LDFLAGS = $(LT_LDFLAGS) -module -avoid-version -export-symbols-regex initmyext -noundefined 
 
