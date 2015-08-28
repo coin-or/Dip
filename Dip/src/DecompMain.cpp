@@ -38,47 +38,55 @@ void DecompAuto(DecompApp milp,
                 DecompMainParam& decompMainParam);
 
 DecompSolverResult* solveDirect(const DecompApp& decompApp);
+
 //===========================================================================//
+
 int main(int argc, char** argv)
 {
    try {
-      //---
-      //--- create the utility class for parsing parameters
-      //---
-      UtilParameters utilParam(argc, argv);
-      DecompMainParam decompMainParam;
+
       UtilTimer timer;
+      std::vector<int> blockNumCandidates;
+      DecompMainParam decompMainParam;
       decompMainParam.timeSetupReal = 0.0;
       decompMainParam.timeSetupCpu  = 0.0;
       decompMainParam.timeSolveReal = 0.0;
       decompMainParam.timeSolveCpu  = 0.0;
+
+      //---
+      //--- Parse cpmmand line and store parameters
+      //---
+      UtilParameters utilParam(argc, argv);
+
       //---
       //--- start overall timer
       //---
       timer.start();
+
+      //---
+      //--- construct the instance
+      //---
       DecompApp milp(utilParam);
-      //---
-      //--- put the one of the functions in the constructor into the main
-      //---
-      std::vector<int> blockNumCandidates;
-      milp.startupLog();
+
       // get the current working Directory.
       char the_path[256];
       milp.m_param.CurrentWorkingDir = std::string(getcwd(the_path, 255));
-
       if (milp.m_param.LogDebugLevel >= 1) {
          std::cout << milp.m_param.CurrentWorkingDir << std::endl;
       }
 
-      const CoinPackedMatrix* m_matrix = milp.readProblem();
-
+      //---
+      //--- Analyze the matrix
+      //---
+      const CoinPackedMatrix* m_matrix = milp.getMatrix();
       if (milp.m_param.BlockNumInput > 0) {
          milp.NumBlocks = milp.m_param.BlockNumInput;
          milp.m_param.Concurrent = false ;
          milp.m_param.NumBlocksCand = 0;
       }
-
-      blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
+      if (milp.m_param.NumBlocksCand == 0) {
+	 blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
+      }
       // obtain the number of CPU (core)s on machines with operating
       // system Linux, Solaris, & AIX and Mac OS X
       // (for all OS releases >= 10.4, i.e., Tiger onwards)
@@ -185,14 +193,14 @@ int main(int argc, char** argv)
 }
 
 /*
- *   Determining the candidate block numbers based on the instance fequency
+ *   Determining the candidate block numbers based on the instance frequency
  *     table
  */
-void blockNumberFinder(DecompParam utilParam,
+void blockNumberFinder(DecompParam decompParam,
                        std::vector<int>& blockNums,
                        const CoinPackedMatrix* matrix)
 {
-   if (utilParam.NumBlocksCand == 0) {
+   if (decompParam.NumBlocksCand == 0) {
       return ;
    }
 
@@ -214,9 +222,9 @@ void blockNumberFinder(DecompParam utilParam,
 
    std::map<int, int>::iterator histIter;
 
-   if (utilParam.LogDebugLevel >= 1) {
+   if (decompParam.LogDebugLevel >= 1) {
       std::ofstream histogramTable;
-      std::string path1 = utilParam.CurrentWorkingDir + UtilDirSlash() +
+      std::string path1 = decompParam.CurrentWorkingDir + UtilDirSlash() +
                           "histogramTable.dat";
       histogramTable.open(path1.c_str());
 
@@ -273,9 +281,9 @@ void blockNumberFinder(DecompParam utilParam,
       }
    }
 
-   if (utilParam.LogDebugLevel >= 1) {
+   if (decompParam.LogDebugLevel >= 1) {
       std::ofstream histogramTable1;
-      std::string path2 = utilParam.CurrentWorkingDir + UtilDirSlash() +
+      std::string path2 = decompParam.CurrentWorkingDir + UtilDirSlash() +
                           "histogramTable1.dat";
       histogramTable1.open(path2.c_str());
       std::map<int, int >::iterator histIter3;
@@ -288,7 +296,7 @@ void blockNumberFinder(DecompParam utilParam,
       histogramTable1.close();
    }
 
-   int blockCands = std::min(utilParam.NumBlocksCand - static_cast<int>
+   int blockCands = std::min(decompParam.NumBlocksCand - static_cast<int>
                              (blocksNumTemp.size()),
                              static_cast<int>(histogram2.size()));
 
@@ -304,7 +312,7 @@ void blockNumberFinder(DecompParam utilParam,
          }
       }
    } else {
-      int counter = utilParam.NumBlocksCand;
+      int counter = decompParam.NumBlocksCand;
       std::set<int>:: iterator setIter = blocksNumTemp.begin();
 
       while (counter) {
@@ -342,31 +350,25 @@ void DecompAuto(DecompApp milp,
    }
 
    //---
-   //--- put the one of the functions in the constructor into the main
+   //--- Initialize
    //---
-   milp.initializeApp(utilParam);
-   //      milp.startupLog();
+   milp.initializeApp();
+
    //---
    //--- create the algorithm (a DecompAlgo)
    //---
-   DecompAlgo* algo = NULL;
 
    if ((decompMainParam.doCut + decompMainParam.doPriceCut) != 1)
       throw UtilException("doCut or doPriceCut must be set",
                           "main", "main");
 
-   //assert(doCut + doPriceCut == 1);
    //---
-   //--- create the CPM algorithm object
+   //--- create the algorithm object
    //---
+   DecompAlgo* algo = NULL;
    if (decompMainParam.doCut) {
       algo = new DecompAlgoC(&milp, &utilParam);
-   }
-
-   //---
-   //--- create the PC algorithm object
-   //---
-   if (decompMainParam.doPriceCut) {
+   }else{
       algo = new DecompAlgoPC(&milp, &utilParam);
    }
 

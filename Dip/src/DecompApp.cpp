@@ -144,17 +144,12 @@ void DecompApp::printOriginalSolution(const int              n_cols,
  *  The following methods are from MILPBlock_DecompApp
  */
 
-void DecompApp::initializeApp(UtilParameters& utilParam)
+void DecompApp::initializeApp()
 {
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "initializeApp()", m_param.LogLevel, 2);
 
-   //---
-   //--- get application parameters
-   //---
-   if (m_param.LogLevel >= 1) {
-      m_param.dumpSettings();
-   }
+   readProblem();
 
    if (!m_param.Concurrent && !NumBlocks) {
       //---
@@ -180,12 +175,8 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
 }
 
 
-const CoinPackedMatrix* DecompApp::readProblem()
+void DecompApp::readProblem()
 {
-   if (m_param.LogLevel >= 1) {
-      m_param.dumpSettings();
-   }
-
    //---
    //--- read MILP instance (mps format)
    //---
@@ -283,12 +274,9 @@ const CoinPackedMatrix* DecompApp::readProblem()
    preprocess();
 
    if (m_param.InstanceFormat == "MPS") {
-      return m_mpsIO.getMatrixByRow();
+      m_matrix = m_mpsIO.getMatrixByRow();
    } else if (m_param.InstanceFormat == "LP") {
-      return m_lpIO.getMatrixByRow();
-   } else {
-      std::cerr << "Unknown InstanceFormat" << std::endl;
-      return NULL;
+      m_matrix = m_lpIO.getMatrixByRow();
    }
 }
 
@@ -1365,12 +1353,10 @@ void DecompApp::singlyBorderStructureDetection()
       numRows = m_mpsIO.getNumRows();
       numCols = m_mpsIO.getNumCols();
       numElements = m_mpsIO.getNumElements();
-      m_matrix = m_mpsIO.getMatrixByRow();
    } else if (m_param.InstanceFormat == "LP") {
       numRows = m_mpsIO.getNumRows();
       numCols = m_mpsIO.getNumCols();
       numElements = m_mpsIO.getNumElements();
-      m_matrix = m_mpsIO.getMatrixByRow();
    }
 
    // get the column/row index for by-row matrix

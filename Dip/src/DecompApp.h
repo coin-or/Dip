@@ -406,7 +406,7 @@ public:
 public:
 
    /** Initialize applications */
-   virtual void initializeApp(UtilParameters& utilParam);
+   virtual void initializeApp();
 
    /** Create model parts */
 
@@ -430,7 +430,7 @@ public:
    void readBlockFile();
 
    /** Read Problem */
-   const CoinPackedMatrix*  readProblem();
+   void readProblem();
 
 
    /** Automatically detect singly bordered structure */
@@ -456,8 +456,9 @@ public:
    		   int * options, int * part, int *edgecut);
    */
 
+   /** Get constraint matrix for analysis **/
 
-
+   const CoinPackedMatrix* getMatrix() { return m_matrix; }
 
 public:
    /**
@@ -465,7 +466,6 @@ public:
     * object (UtilParameters) and reads in the parameter settings into the
     * DecompApp paramter object.
     */
-
 
    DecompApp(UtilParameters& utilParam) :
       m_classTag   ("D-APP"),
@@ -476,11 +476,19 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ) {
+      m_threadIndex(  0    )
+   {
+      //---
+      //--- get application parameters
+      //---
       m_param.getSettings(utilParam);
+      
+      if (m_param.LogLevel >= 1) {
+	 m_param.dumpSettings();
+      }
+
       startupLog();
    };
-
 
    DecompApp() :
       m_classTag   ("D-APP"),
@@ -491,16 +499,17 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ) {
+      m_threadIndex(  0    )
+   {
       //---
       //--- comment these functions, which were used in
       //--- MILPBlock, otherwise, conflict occurs in building
       //--- individual examples
       //     m_param.getSettings(utilParam);
       //     initializeApp(utilParam);
-      //     startupLog();
+      startupLog();
    };
-
+      
    /**
     * Destructor.
     */
