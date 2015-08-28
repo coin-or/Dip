@@ -180,13 +180,8 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
 }
 
 
-const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
+const CoinPackedMatrix* DecompApp::readProblem()
 {
-   //---
-   //--- get application parameters
-   //---
-   m_param.getSettings(utilParam);
-
    if (m_param.LogLevel >= 1) {
       m_param.dumpSettings();
    }

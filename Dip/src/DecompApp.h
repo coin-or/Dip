@@ -430,7 +430,7 @@ public:
    void readBlockFile();
 
    /** Read Problem */
-   const CoinPackedMatrix*  readProblem(UtilParameters& utilParam);
+   const CoinPackedMatrix*  readProblem();
 
 
    /** Automatically detect singly bordered structure */

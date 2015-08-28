@@ -56,7 +56,7 @@ int main(int argc, char** argv)
       //--- start overall timer
       //---
       timer.start();
-      DecompApp milp;
+      DecompApp milp(utilParam);
       //---
       //--- put the one of the functions in the constructor into the main
       //---
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
          std::cout << milp.m_param.CurrentWorkingDir << std::endl;
       }
 
-      const CoinPackedMatrix* m_matrix = milp.readProblem(utilParam);
+      const CoinPackedMatrix* m_matrix = milp.readProblem();
 
       if (milp.m_param.BlockNumInput > 0) {
          milp.NumBlocks = milp.m_param.BlockNumInput;
