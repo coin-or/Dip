@@ -225,17 +225,13 @@ void UtilParameters::Add(string& sSection,
                          string& sName,
                          string& sValue)
 {
-   UtilParam utilParam;
    string    keyname ("");
    keyname  = UtilStrToLower(UtilStrTrim(sSection));
    keyname += "@";
    keyname += UtilStrToLower(UtilStrTrim(sName));
-   utilParam.paramName = UtilStrTrim(sValue);
-   utilParam.isUsed    = false;
    //TODO: why doesn't insert override??
-   // m_paramMap.insert(make_pair(keyname, utilParam));
-   m_paramMap[keyname].paramName = utilParam.paramName;
-   m_paramMap[keyname].isUsed    = utilParam.isUsed;
+   // m_paramMap.insert(make_pair(keyname, UtilStrTrim(sValue)));
+   m_paramMap[keyname] = UtilStrTrim(sValue);
 }
 
 // ------------------------------------------------------------------------- //
@@ -243,7 +239,6 @@ void UtilParameters::Add(const char* section,
                          const char* name,
                          const char* value)
 {
-   UtilParam utilParam;
    string    keyname ("");
    string    sSection("DECOMP");
    string    sName   (name);
@@ -257,20 +252,17 @@ void UtilParameters::Add(const char* section,
 
    keyname += "@";
    keyname += UtilStrToLower(UtilStrTrim(sName));
-   utilParam.paramName = UtilStrTrim(sValue);
-   utilParam.isUsed    = false;
    //TODO: why doesn't insert override??
    // m_paramMap.insert(make_pair(keyname, utilParam));
-   m_paramMap[keyname].paramName = utilParam.paramName;
-   m_paramMap[keyname].isUsed    = utilParam.isUsed;
+   m_paramMap[keyname] = UtilStrTrim(sValue);
 }
 
 // ------------------------------------------------------------------------- //
-UtilParam* UtilParameters::FindEntry(const char* section,
-                                     const char* name)
+std::string* UtilParameters::Find(const char* section,
+				  const char* name)
 {
    string    keyname ("");
-   string    sSection("");
+   string    sSection("DECOMP");
    string    sName   (name);
 
    if (section) {
@@ -280,29 +272,16 @@ UtilParam* UtilParameters::FindEntry(const char* section,
 
    keyname += "@";
    keyname += UtilStrToLower(UtilStrTrim(sName));
-   map<string, UtilParam>::iterator it;
+   map<std::string, std::string>::iterator it;
    it = m_paramMap.find(keyname);
 
    if (it == m_paramMap.end()) {
-      return NULL;
-   } else {
-      return &(it->second);
-   }
-}
-
-// ------------------------------------------------------------------------- //
-string* UtilParameters::Find(const char* section,
-                             const char* name)
-{
-   UtilParam* utilParam = FindEntry(section, name);
-
-   if (utilParam == NULL) {
       Add(section, name, "(undefined)");
       return NULL;
-   } else if (utilParam->paramName == "(undefined)") {
+   } else if (it->second == "(undefined)"){
       return NULL;
-   } else {
-      return &utilParam->paramName;
+   }else{
+      return &(it->second);
    }
 }
 

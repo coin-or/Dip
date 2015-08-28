@@ -22,17 +22,9 @@
 #include <fstream>
 
 //===========================================================================//
-struct UtilParamT {
-   //bad name for this string, really valueStr?
-   std::string paramName;
-   bool   isUsed;        //is used in code (a call to getSetting)?
-};
-typedef struct UtilParamT UtilParam;
-
-//===========================================================================//
 class UtilParameters {
 private:
-   std::map<std::string, UtilParam> m_paramMap;
+   std::map<std::string, std::string> m_paramMap;
 
 public:
    UtilParameters()
@@ -75,8 +67,6 @@ public:
                           const std::string defaultValue,
                           const char* section = NULL) ;
 private:
-   UtilParam* FindEntry(const char* section,
-                        const char* name);
    std::string*     Find(const char* section,
                          const char* name);
 };
