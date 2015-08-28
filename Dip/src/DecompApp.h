@@ -76,15 +76,15 @@ public:
    int NumBlocks;
 
    /**
-    *  Parameters.
+    * Parameters
     */
    DecompParam m_param;
+   UtilParameters* m_utilParam;
 
    /**
     *  Model data: objective function
     */
    const double* m_objective;
-
 
    /**
     *  Model data: the core model (A'')
@@ -106,8 +106,6 @@ public:
     *   NOTE: only for the advanced user
     */
    DecompAlgo* m_decompAlgo;
-
-
    /*
     *  The following definitiions was from MILPBlock
     *
@@ -122,13 +120,10 @@ public:
    /** Original constraint matrix for the instance */
 
    const CoinPackedMatrix* m_matrix;
-
-
    /** The model constraint systems used for different algos */
 
    DecompConstraintSet*   m_modelC;
    std::map<int, DecompConstraintSet*>  m_modelR;
-
 
    /** Definition of blocks (by rows) */
 
@@ -242,8 +237,8 @@ public:
     * not deriving the function DecompApp::solveRelaxed.
     */
    inline void setModelRelax(DecompConstraintSet* model,
-                             const std::string          modelName = "",
-                             const int             blockId   = 0) {
+                             const std::string    modelName = "",
+                             const int            blockId   = 0) {
       if (model && !model->hasPrepRun()) {
          model->prepareModel();
       }
@@ -261,7 +256,7 @@ public:
                              "setModelRelax", "DecompApp");
       }
 
-      DecompModel appModel(model, modelName, blockId);
+      DecompModel appModel(model, modelName, blockId, *m_utilParam);
       m_modelRelax.insert(std::make_pair(blockId, appModel));
    }
 
@@ -270,15 +265,15 @@ public:
     *  (for a particular block).
     */
    inline void setModelRelaxNest(DecompConstraintSet* model,
-                                 const std::string          modelName,
-                                 const int             blockId = 0) {
+                                 const std::string    modelName,
+                                 const int            blockId = 0) {
       assert(model);
 
       if (!model->hasPrepRun()) {
          model->prepareModel();
       }
 
-      DecompModel appModel(model, modelName, blockId);
+      DecompModel appModel(model, modelName, blockId, *m_utilParam);
       m_modelRelaxNest[blockId].push_back(appModel);
    }
 
@@ -476,7 +471,9 @@ public:
       m_objective  ( NULL  ),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    )
+      m_threadIndex(  0    ),
+      m_utilParam  (&utilParam),
+      m_modelCore  (utilParam)
    {
       //---
       //--- get application parameters
@@ -490,26 +487,6 @@ public:
       startupLog();
    };
 
-   DecompApp() :
-      m_classTag   ("D-APP"),
-      m_osLog      (&std::cout  ),
-      m_bestKnownLB(-1e75  ),
-      m_bestKnownUB( 1e75  ),
-      NumBlocks    ( 0     ),
-      m_objective  ( NULL  ),
-      m_matrix     ( NULL  ),
-      m_modelC     ( NULL  ),
-      m_threadIndex(  0    )
-   {
-      //---
-      //--- comment these functions, which were used in
-      //--- MILPBlock, otherwise, conflict occurs in building
-      //--- individual examples
-      //     m_param.getSettings(utilParam);
-      //     initializeApp(utilParam);
-      startupLog();
-   };
-      
    /**
     * Destructor.
     */

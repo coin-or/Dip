@@ -30,6 +30,7 @@ protected:
    DecompConstraintSet*  m_model;
    std::string           m_modelName;
    int                   m_blockId;
+   UtilParameters*       m_utilParam;
 
 public:
    DecompConstraintSet* getModel()     const {
@@ -58,23 +59,32 @@ public:
       m_model     = appModel.m_model;
       m_modelName = appModel.m_modelName;
       m_blockId   = appModel.m_blockId;
+      m_utilParam = appModel.m_utilParam;
    }
+   
    DecompModel& operator=(const DecompModel& rhs) {
       m_model     = rhs.m_model;
       m_modelName = rhs.m_modelName;
       m_blockId   = rhs.m_blockId;
+      m_utilParam = rhs.m_utilParam;
       return *this;
    }
-   DecompModel() :
+   
+   DecompModel(UtilParameters& utilParam) :
       m_model    (NULL),
       m_modelName(""),
-      m_blockId  (0) {};
+      m_blockId  (0),
+      m_utilParam(&utilParam){};
+
    DecompModel(DecompConstraintSet* model,
-                  std::string                modelName,
-                  int                   blockId) :
+	       std::string          modelName,
+	       int                  blockId,
+	       UtilParameters&      utilParam) :
       m_model    (model),
       m_modelName(modelName),
-      m_blockId  (blockId) {};
+      m_blockId  (blockId),
+      m_utilParam(&utilParam){};
+
    virtual ~DecompModel() {}
 };
 
@@ -177,20 +187,6 @@ public:
       }
    }
 
-public:
-   OsiSolverInterface*   getOsi() const {
-      return m_osi;
-   }
-
-public:
-   void solveAsMIP(DecompSolverResult*  result,
-		   DecompParam&         param,
-		   bool                 doExact,
-		   bool                 doCutoff,
-		   bool                 isRoot,
-		   double               cutoff,
-		   double               timeLimit);
-   
    void solveAsMIPSym(DecompSolverResult*  result,
 		      DecompParam&         param,
 		      bool                 doExact,
@@ -223,6 +219,20 @@ public:
 		      double               cutoff,
 		      double               timeLimit);
    
+public:
+   OsiSolverInterface*   getOsi() const {
+      return m_osi;
+   }
+
+public:
+   void solveAsMIP(DecompSolverResult*  result,
+		   DecompParam&         param,
+		   bool                 doExact,
+		   bool                 doCutoff,
+		   bool                 isRoot,
+		   double               cutoff,
+		   double               timeLimit);
+   
    bool isPointFeasible(const double*  x,
                         const bool     isXSparse  = false,
                         const int      logLevel   = 0,
@@ -235,7 +245,7 @@ public:
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
-      m_counter    ( 0 )
+      m_counter     ( 0 )
    {};
 
    DecompSubModel& operator=(const DecompModel& rhs) {
@@ -243,17 +253,18 @@ public:
       return *this;
    }
 
-   DecompSubModel() :
-      DecompModel(),
+   DecompSubModel(UtilParameters &utilParam) :
+      DecompModel(utilParam),
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),
       m_counter     (0)
    {};
    DecompSubModel(DecompConstraintSet* model,
-                   std::string                modelName,
-                   int                   blockId) :
-      DecompModel(model, modelName, blockId),
+                  std::string          modelName,
+		  int                  blockId,
+		  UtilParameters&      utilParam) :
+      DecompModel(model, modelName, blockId, utilParam),
       m_osi         (NULL),
       m_numCols     (0   ),
       m_colIndices  (NULL),

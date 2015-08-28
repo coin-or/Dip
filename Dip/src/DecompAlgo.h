@@ -79,7 +79,8 @@ protected:
     * Parameters
     */
    DecompParam m_param;
-   
+   UtilParameters* m_utilParam;
+
    /**
     * Type of algorithm for this instance.
     */
@@ -152,9 +153,9 @@ protected:
    OsiSolverInterface*     m_auxSI;
 
 
-   const double*                       m_objective;
-   DecompSubModel                     m_modelCore;
-   std::map<int, DecompSubModel>           m_modelRelax;
+   const double*                                m_objective;
+   DecompSubModel                               m_modelCore;
+   std::map<int, DecompSubModel>                m_modelRelax;
    std::map<int, std::vector<DecompSubModel> >  m_modelRelaxNest;
 
 
@@ -192,8 +193,6 @@ protected:
    int m_numCols;
 
    bool m_isColGenExact;
-
-   UtilParameters* m_utilParam;
 
    int m_numConvexCon;
 
@@ -1011,7 +1010,8 @@ public:
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
       m_masterOnlyCols(),
-      m_branchingImplementation(DecompBranchInSubproblem)
+      m_branchingImplementation(DecompBranchInSubproblem),
+      m_modelCore(utilParam)	 
    {
       std::string paramSection = DecompAlgoStr[algo];
       //---
