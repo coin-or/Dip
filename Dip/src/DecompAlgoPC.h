@@ -196,46 +196,17 @@ public:
     * Default constructors.
     */
    DecompAlgoPC(DecompApp*       app,
-                UtilParameters* utilParam,
-                bool             doSetup    = true) :
-      DecompAlgo(PRICE_AND_CUT, app, utilParam),
+                UtilParameters& utilParam,
+                bool             doSetup    = true,
+		const DecompAlgoType   algo = PRICE_AND_CUT) :
+      DecompAlgo(algo, app, utilParam),
       m_classTag("D-ALGOPC") {
       //---
       //--- do any parameter overrides of the defaults here
       //---    by default turn off gomory cuts for PC
       //---
       m_param.CutCglGomory = 0;
-
-      //---
-      //--- run init setup
-      //---
-      if (doSetup) {
-         std::string paramSection = DecompAlgoStr[PRICE_AND_CUT];
-         initSetup(utilParam, paramSection);
-      }
    }
-
-   DecompAlgoPC(DecompApp*       app,
-                UtilParameters* utilParam,
-                std::string&          paramSection,
-                bool             doSetup    = true) :
-      //is utilParam used in base class?
-      DecompAlgo(PRICE_AND_CUT, app, utilParam),
-      m_classTag("D-ALGOPC") {
-      //---
-      //--- do any parameter overrides of the defaults here
-      //---    by default turn off gomory cuts for PC
-      //---
-      m_param.CutCglGomory = 0;
-
-      //---
-      //--- run init setup
-      //---
-      if (doSetup) {
-         initSetup(utilParam, paramSection);
-      }
-   }
-
 
    /**
     * Destructor.

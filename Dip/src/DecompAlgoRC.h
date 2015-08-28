@@ -126,7 +126,7 @@ public:
     * Default constructors.
     */
    DecompAlgoRC(DecompApp*             app,
-                UtilParameters*        utilParam):
+                UtilParameters&        utilParam):
       DecompAlgo(RELAX_AND_CUT, app, utilParam),
       m_classTag("D-ALGORC"),
       m_u        (),
@@ -137,26 +137,8 @@ public:
       m_iter     (0),
       m_step     (2.0), //(0, 2] param?
       m_zeroSub  (false),
-      m_shatVar  () {
-      std::string paramSection = DecompAlgoStr[RELAX_AND_CUT];
-      initSetup(utilParam, paramSection);
-   }
-
-   DecompAlgoRC(DecompApp*       app,
-                UtilParameters* utilParam,
-                std::string&          paramSection) :
-      DecompAlgo(RELAX_AND_CUT, app, utilParam),
-      m_classTag ("D-ALGORC"),
-      m_u        (),
-      m_rc       (NULL),
-      m_UB       (DecompInf),
-      m_LB       (-DecompInf),
-      m_cntSameLB(0),
-      m_iter     (0),
-      m_step     (2.0), //(0, 2] param?
-      m_zeroSub  (false),
-      m_shatVar  () {
-      initSetup(utilParam, paramSection);
+      m_shatVar  ()
+   {
    }
 
    /**

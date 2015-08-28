@@ -1138,11 +1138,38 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
 //===========================================================================//
 void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
 {
-   //Not implemented yet
+#ifdef __DECOMP_IP_GRB__
+   int stat;
+   const int numCols    = m_masterSI->getNumCols();
+
+   OsiGrbSolverInterface* osiGrb
+      = dynamic_cast<OsiGrbSolverInterface*>(m_masterSI);
+
+   GRBenv* env = osiGrb->getEnvironmentPtr();
+
+   GRBmodel* model = osiGrb->getLpPtr();
+
+   osiGrb->branchAndBound();
+
+   GRBgetintattr(model, GRB_INT_ATTR_STATUS, &stat);
+
    result->m_isUnbounded = false;
-   result->m_isOptimal   = true;
+   result->m_isOptimal   = false;
    result->m_isCutoff    = false;
    result->m_nSolutions  = 0;
+   if (stat == GRB_OPTIMAL){
+      const double *solution = osiGrb->getColSolution();
+      vector<double> solVec(solution, solution + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isOptimal   = true;
+   }else if (stat == GRB_INFEASIBLE){
+      result->m_isOptimal = true;
+   }else{
+      throw UtilException("Solution failure",
+                          "solveMasterAsMIPGrb", "DecompSubModel");
+   }
+#endif
 }
 
 /*-------------------------------------------------------------------------*/

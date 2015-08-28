@@ -187,25 +187,8 @@ void DecompAlgo::checkBlocksColumns()
 }
 
 //===========================================================================//
-void DecompAlgo::initSetup(UtilParameters* utilParam,
-                           string&          sectionParam)
+void DecompAlgo::initSetup()
 {
-   //---
-   //--- read in algorithm parameters
-   //---
-   m_param.getSettings(*utilParam, sectionParam);
-
-   if (m_param.BranchEnforceInSubProb == true
-         && m_param.BranchEnforceInMaster == false) {
-      m_branchingImplementation = DecompBranchInSubproblem;
-   } else if (m_param.BranchEnforceInMaster == true
-              && m_param.BranchEnforceInSubProb == false) {
-      m_branchingImplementation = DecompBranchInMaster;
-   } else {
-      throw UtilException("Branching Implementation should be set correctly",
-                          "initSetup", "DecompAlgo");
-   }
-
    UTIL_MSG(m_param.LogLevel, 2,
             (*m_osLog)
             << "Initial Algo Setup"
@@ -213,10 +196,6 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
            );
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "initSetup()", m_param.LogDebugLevel, 2);
-
-   if (m_param.LogLevel > 1) {
-      m_param.dumpSettings(sectionParam, m_osLog);
-   }
 
    //---
    //--- create DecompSubModel objects from DecompModel objects
@@ -327,12 +306,7 @@ void DecompAlgo::initSetup(UtilParameters* utilParam,
    m_masterSI = new OsiLpSolverInterface();
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
-#if defined ( __DECOMP_LP_CLP__) && !defined ( __DECOMP_IP_SYMPHONY__)
-   OsiClpSolverInterface* masterSIClp = dynamic_cast<OsiClpSolverInterface*>
-                                        (m_masterSI);
-   masterSIClp->getModelPtr()->setLogLevel(m_param.LogLpLevel);
-   masterSIClp->setupForRepeatedUse();
-#endif
+
    //---
    //--- init CGL object
    //---  NOTE: do not allow PC gomory cuts for now
@@ -1960,6 +1934,12 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          // Store the m_numCols and use it in updateObjBound function
          m_numCols = m_masterSI->getNumCols();
 
+         if (m_isColGenExact           &&
+               m_rrIterSinceAll == 0     &&
+               m_status == STAT_FEASIBLE) {
+            isGapTight = updateObjBound(mostNegRC);
+         }
+
          if (m_nodeStats.varsThisCall > 0) {
             //---
             //--- add the newly generated variables to the var pool
@@ -1982,11 +1962,6 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
             m_status == STAT_FEASIBLE &&
             m_phase  == PHASE_PRICE2)
             isGapTight = updateObjBoundLB(mostNegRC);*/
-         if (m_isColGenExact           &&
-               m_rrIterSinceAll == 0     &&
-               m_status == STAT_FEASIBLE) {
-            isGapTight = updateObjBound(mostNegRC);
-         }
 
          //---
          //--- update stab parameters delta=duals, epsilon reduced
@@ -2652,14 +2627,12 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //if(cpxStat)
       // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
 #else
-
       if (resolve) {
 	//	m_masterSI->writeMps("temp");
          m_masterSI->resolve();
       } else {
          m_masterSI->initialSolve();
       }
-
 #endif
       break;
    case PHASE_CUT:
@@ -2976,7 +2949,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    //---
    if (m_param.InitVarsWithCutDC) {
       printf("======= BEGIN Gen Init Vars - call CPM process root node\n");
-      DecompAlgoC cpm(m_app, m_utilParam);
+      DecompAlgoC cpm(m_app, *m_utilParam);
       cpm.m_param.CutDC = 2;
       cpm.processNode(0, -DecompInf, DecompInf);
       //---
@@ -3020,7 +2993,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
 
    if (m_param.InitVarsWithIP) {
       printf("======= BEGIN Gen Init Vars - call Direct IP solver\n");
-      DecompAlgoC          direct(m_app, m_utilParam);
+      DecompAlgoC          direct(m_app, *m_utilParam);
       DecompSolverResult* result = NULL;
       double oldSetting = m_param.TimeLimit;
       m_param.TimeLimit = m_param.InitVarsWithIPTimeLimit;
@@ -4242,8 +4215,7 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
 
 
 
-#ifdef __DECOMP_LP_CLP__
-
+#if defined(__DECOMP_LP_CLP__) || defined(__DECOMP_LP_GRB__)
 
 #ifdef USE_MULTI_RAY
 //------------------------------------------------------------------------- //
@@ -5366,7 +5338,7 @@ int DecompAlgo::generateCuts(double*         xhat,
    if ((m_param.CutDC == 1 && newCuts.size() == 0) ||
          (m_param.CutDC == 2)) {
       //printf("\n\n==================================== IN DECOMP\n\n");
-      DecompAlgoD D(m_app, m_utilParam,
+      DecompAlgoD D(m_app, *m_utilParam,
                     xhat, modelCore->getNumCols());
       //also might want to use the columns you get here for something...
       //heur for ubs, etc..

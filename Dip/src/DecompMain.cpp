@@ -367,9 +367,9 @@ void DecompAuto(DecompApp milp,
    //---
    DecompAlgo* algo = NULL;
    if (decompMainParam.doCut) {
-      algo = new DecompAlgoC(&milp, &utilParam);
+      algo = new DecompAlgoC(&milp, utilParam);
    }else{
-      algo = new DecompAlgoPC(&milp, &utilParam);
+      algo = new DecompAlgoPC(&milp, utilParam);
    }
 
    if (decompMainParam.doCut && decompMainParam.doDirect) {

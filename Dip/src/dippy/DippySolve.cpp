@@ -72,16 +72,16 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
       DecompAlgo* algo = NULL;
 
       if (doPriceCut) {
-         algo = new DippyAlgoPC(&sip, &utilParam, pProb);
+         algo = new DippyAlgoPC(&sip, utilParam, pProb);
       } else if (doCut) {
-         algo = new DippyAlgoC(&sip, &utilParam, pProb);
+         algo = new DippyAlgoC(&sip, utilParam, pProb);
       } else if (doRelaxCut) {
-         algo = new DippyAlgoRC(&sip, &utilParam, pProb);
+         algo = new DippyAlgoRC(&sip, utilParam, pProb);
       }
 
       // default
       if (algo == NULL) {
-         algo = new DippyAlgoC(&sip, &utilParam, pProb);
+         algo = new DippyAlgoC(&sip, utilParam, pProb);
       }
 
       AlpsDecompModel alpsModel(utilParam, algo);

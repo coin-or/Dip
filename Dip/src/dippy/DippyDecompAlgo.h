@@ -36,8 +36,8 @@ public:
     * @param utilParam parameter class
     * @param pProb a DipProblem python object
     */
-   DippyAlgoMixin(UtilParameters* utilParam, PyObject* pProb)
-      : m_pProb(pProb), m_utilParam(utilParam), pDownLB(NULL),
+   DippyAlgoMixin(UtilParameters& utilParam, PyObject* pProb)
+      : m_pProb(pProb), m_utilParam(&utilParam), pDownLB(NULL),
         pDownUB(NULL), pUpLB(NULL), pUpUB(NULL) {
    }
 
@@ -72,7 +72,7 @@ public:
  */
 class DippyAlgoC : DippyAlgoMixin, public DecompAlgoC {
 public:
-   DippyAlgoC(DecompApp* app, UtilParameters* utilParam, PyObject* pProb)
+   DippyAlgoC(DecompApp* app, UtilParameters& utilParam, PyObject* pProb)
       : DippyAlgoMixin(utilParam, pProb), DecompAlgoC(app, utilParam) {
    }
 
@@ -102,7 +102,7 @@ public:
  */
 class DippyAlgoPC : DippyAlgoMixin, public DecompAlgoPC {
 public:
-   DippyAlgoPC(DecompApp* app, UtilParameters* utilParam, PyObject* pProb)
+   DippyAlgoPC(DecompApp* app, UtilParameters& utilParam, PyObject* pProb)
       : DippyAlgoMixin(utilParam, pProb), DecompAlgoPC(app, utilParam) {
    }
 
@@ -130,7 +130,7 @@ public:
  */
 class DippyAlgoRC : DippyAlgoMixin, public DecompAlgoRC {
 public:
-   DippyAlgoRC(DecompApp* app, UtilParameters* utilParam, PyObject* pProb)
+   DippyAlgoRC(DecompApp* app, UtilParameters& utilParam, PyObject* pProb)
       : DippyAlgoMixin(utilParam, pProb), DecompAlgoRC(app, utilParam) {
    }
 

@@ -137,21 +137,11 @@ public:
     * Default constructors.
     */
    DecompAlgoC(DecompApp*             app,
-               UtilParameters*        utilParam):
+               UtilParameters&        utilParam):
       DecompAlgo(CUT, app, utilParam),
-      m_classTag("D-ALGOC") {
-      std::string paramSection = DecompAlgoStr[CUT];
-      initSetup(utilParam, paramSection);
+      m_classTag("D-ALGOC")
+   {
    }
-
-   DecompAlgoC(DecompApp*       app,
-               UtilParameters* utilParam,
-               std::string&          paramSection):
-      DecompAlgo(CUT, app, utilParam),
-      m_classTag("D-ALGOC") {
-      initSetup(utilParam, paramSection);
-   }
-
 
    /**
     * Destructor.

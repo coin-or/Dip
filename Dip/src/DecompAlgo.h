@@ -76,10 +76,10 @@ protected:
    std::string m_classTag;
 
    /**
-   // DIP is distributed under the Eclipse Public License as part of the        //
+    * Parameters
     */
    DecompParam m_param;
-
+   
    /**
     * Type of algorithm for this instance.
     */
@@ -486,8 +486,7 @@ public:
    /**
     * Initial setup of algorithm structures and solver interfaces.
     */
-   void initSetup(UtilParameters* utilParam,
-                  std::string&          sectionParam);
+   void initSetup();
    void getModelsFromApp();
    void createOsiSubProblem(DecompSubModel& subModel);
 
@@ -969,7 +968,8 @@ public:
     */
    DecompAlgo(const DecompAlgoType   algo,
               DecompApp*             app,
-              UtilParameters*        utilParam):
+              UtilParameters&        utilParam,
+	      bool                   doSetup = true) :
       m_classTag   ("D-ALGO"),
       m_param      (),
       m_algo       (algo),
@@ -998,7 +998,7 @@ public:
       m_xhatIPFeas (),
       m_xhatIPBest (NULL),
       m_isColGenExact(false),
-      m_utilParam    (utilParam),
+      m_utilParam    (&utilParam),
       m_numConvexCon (1),
       m_rrLastBlock (-1),
       m_rrIterSinceAll(0),
@@ -1011,8 +1011,37 @@ public:
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
       m_masterOnlyCols(),
-      m_branchingImplementation(DecompBranchInSubproblem) {
+      m_branchingImplementation(DecompBranchInSubproblem)
+   {
+      std::string paramSection = DecompAlgoStr[algo];
+      //---
+      //--- read in algorithm parameters
+      //---
+      m_param.getSettings(utilParam, paramSection);
+
+      if (m_param.BranchEnforceInSubProb == true
+	  && m_param.BranchEnforceInMaster == false) {
+	 m_branchingImplementation = DecompBranchInSubproblem;
+      } else if (m_param.BranchEnforceInMaster == true
+		 && m_param.BranchEnforceInSubProb == false) {
+	 m_branchingImplementation = DecompBranchInMaster;
+      } else {
+	 throw UtilException("Branching Implementation should be set correctly",
+			     "initSetup", "DecompAlgo");
+      }
+
+      if (m_param.LogLevel > 1) {
+	 m_param.dumpSettings(paramSection, m_osLog);
+      }
+
       m_app->m_decompAlgo = this;
+
+      //---
+      //--- run init setup
+      //---
+      if (doSetup) {
+         initSetup();
+      }
    }
 
 

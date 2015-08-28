@@ -141,34 +141,17 @@ public:
     * Default constructors.
     */
    DecompAlgoD(DecompApp*             app,
-               UtilParameters*        utilParam,
+               UtilParameters&        utilParam,
                double*                xhat,
                int                    numOrigCols) //need to pass this? :
       :
-      DecompAlgoPC(app, utilParam,
-                   const_cast<std::string&>(DecompAlgoStr[DECOMP]), false),
+   DecompAlgoPC(app, utilParam, false, DECOMP),
       m_classTag   ("D-ALGOD"),
       m_xhatD      (xhat),
       m_newCuts    (0),
-      m_numOrigCols(numOrigCols) { //need?
-      std::string paramSection = DecompAlgoStr[DECOMP];
-      m_algo              = DECOMP;
-      initSetup(utilParam, paramSection);
-   }
-
-   //need this?
-   DecompAlgoD(DecompApp*       app,
-               UtilParameters* utilParam,
-               std::string&          paramSection,
-               double*          xhat,
-               int              numOrigCols):
-      DecompAlgoPC(app, utilParam, paramSection, false),
-      m_classTag   ("D-ALGOD"),
-      m_xhatD      (xhat),
-      m_newCuts    (0),
-      m_numOrigCols(numOrigCols) { //need?
-      m_algo = DECOMP;
-      initSetup(utilParam, paramSection);
+      m_numOrigCols(numOrigCols)
+   {
+      m_param.CutCglGomory = 0;
    }
 
    /**
