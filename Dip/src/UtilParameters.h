@@ -20,6 +20,8 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <sstream>
+#include <vector>
 
 //===========================================================================//
 class UtilParameters {
@@ -38,6 +40,8 @@ public:
 
    ~UtilParameters() {};
 
+   const std::map<std::string, std::string> getParamMap() { return m_paramMap; }
+      
    void ScanCmdLineArgs(int&   argc,
                         char* argv[]);
    void   LoadParamFile(std::string& paramFileName);
@@ -66,7 +70,20 @@ public:
    std::string GetSetting(const char* name,
                           const std::string defaultValue,
                           const char* section = NULL) ;
-private:
+   
+   std::vector<std::string> &split(const std::string &s,
+				   std::vector<std::string> &elems,
+				   char delim = '@') {
+      std::stringstream ss(s);
+      std::string item;
+      while (std::getline(ss, item, delim)) {
+	 elems.push_back(item);
+      }
+      return elems;
+   }
+
+ private:
+   
    std::string*     Find(const char* section,
                          const char* name);
 };
