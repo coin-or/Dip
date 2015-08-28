@@ -267,8 +267,8 @@ std::string* UtilParameters::Find(const char* section,
 
    if (section) {
       sSection = section;
-      keyname  = UtilStrToLower(UtilStrTrim(sSection));
    }
+   keyname  = UtilStrToLower(UtilStrTrim(sSection));
 
    keyname += "@";
    keyname += UtilStrToLower(UtilStrTrim(sName));
