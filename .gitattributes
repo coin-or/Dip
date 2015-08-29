@@ -139,6 +139,7 @@ Dip/data/VRP/vrplib.tgz -text
 Dip/depcomp -text
 Dip/dip-uninstalled.pc.in -text
 Dip/dip.pc.in -text
+Dip/doxydoc/doxygen.conf.in -text
 Dip/examples/AP3/AP3_DecompApp.cpp -text
 Dip/examples/AP3/AP3_DecompApp.h -text
 Dip/examples/AP3/AP3_DecompParam.h -text
