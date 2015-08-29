@@ -22,16 +22,13 @@
 #include <string>
 #include "iterator"
 //#if defined(autoDecomp) && defined(PaToH)
-
+#include <stdlib.h>
 #include <vector>
 #include <set>
 #include <fstream>
 #include <string>
 #include <queue>
 #include "iterator"
-#if defined(_OPENMP)
-#include "omp.h"
-#endif
 //#if defined(autoDecomp) && defined(PaToH)
 #if  defined(PaToH)
 
@@ -50,6 +47,7 @@ extern "C" {
 
 using namespace std;
 
+#define VARIABLE_WEIGHT
 // --------------------------------------------------------------------- //
 void DecompApp::startupLog()
 {
@@ -178,7 +176,7 @@ void DecompApp::initializeApp(UtilParameters& utilParam)
    } else if (!getBlockSuccess)
       // automatic structure detection
    {
-#pragma omp critical
+      #pragma omp critical
       singlyBorderStructureDetection();
    }
 
@@ -305,9 +303,9 @@ const CoinPackedMatrix* DecompApp::readProblem(UtilParameters& utilParam)
    if (m_param.Instance.empty()) {
       cerr << "================================================" << std::endl
            << "Usage:"
-           << "./dip  --MILP:BlockFileFormat List" << std::endl
-           << "       --MILP:Instance /FilePath/ABC.mps" << std::endl
-           << "       --MILP:BlockFile /FilePath/ABC.block" << std::endl
+           << "./dip  --BlockFileFormat List" << std::endl
+           << "       --Instance /FilePath/ABC.mps" << std::endl
+           << "       --BlockFile /FilePath/ABC.block" << std::endl
            << "================================================" << std::endl
            << std::endl;
       exit(0);
@@ -1034,7 +1032,10 @@ void DecompApp::createModelPart(DecompConstraintSet* model,
       }
 
       if (integerVars && integerVars[i]) {
-         model->integerVars.push_back(i);
+         if (std::find(model->integerVars.begin(), model->integerVars.end(), i)
+               == model->integerVars.end()) {
+            model->integerVars.push_back(i);
+         }
       }
    }
 }
@@ -1045,12 +1046,12 @@ void DecompApp::createModelPartSparse(DecompConstraintSet* model,
                                       const int             nRowsPart,
                                       const int*            rowsPart)
 {
-   int      nColsOrig   = 0;
+   int     nColsOrig   = 0;
    double* rowLB       = NULL;
    double* rowUB       = NULL;
    double* colLB       = NULL;
    double* colUB       = NULL;
-   char*    integerVars = NULL;
+   char*   integerVars = NULL;
 
    if (m_param.InstanceFormat == "MPS") {
       nColsOrig   = m_mpsIO.getNumCols();
@@ -1227,13 +1228,16 @@ void DecompApp::createModels()
    int            i, nRowsRelax, nRowsCore;
    int      nRows       = 0;
    int      nCols       = 0;
+   char*    integerVars = NULL;
 
    if (m_param.InstanceFormat == "MPS") {
       nRows       = m_mpsIO.getNumRows();
       nCols       = m_mpsIO.getNumCols();
+      integerVars = const_cast<char*>  (m_mpsIO.integerColumns());
    } else if (m_param.InstanceFormat == "LP") {
       nRows       = m_lpIO.getNumRows();
       nCols       = m_lpIO.getNumCols();
+      integerVars = const_cast<char*>  (m_lpIO.integerColumns());
    }
 
    int            nBlocks     = static_cast<int>(m_blocks.size());
@@ -1277,7 +1281,8 @@ void DecompApp::createModels()
          rowsCore[nRowsCoreTmp++]   = i;
       }
    }
-
+   std::cout << "nRowsCoreTmp is " << nRowsCoreTmp << std::endl; 
+   std::cout << "nRowsCore is " << nRowsCore << std::endl; 
    assert(nRowsCoreTmp == nRowsCore);
    UTIL_MSG(m_param.LogLevel, 3,
             (*m_osLog) << "Core  Rows:";
@@ -1285,7 +1290,9 @@ void DecompApp::createModels()
             for (i = 0; i < nRowsCore; i++)
             (*m_osLog) << rowsCore[i] << " ";
             (*m_osLog) << "\n";
-           );
+           ) {
+      ;
+   }
 
    //---
    //--- Construct the objective function.
@@ -1386,6 +1393,7 @@ void DecompApp::createModels()
    }
 
    // find master Only Cols
+
    for (i = 0; i < nCols; i++) {
       if (!colMarker[i]) {
          if (m_param.LogLevel >= 3) {
@@ -1396,13 +1404,23 @@ void DecompApp::createModels()
          }
 
          modelCore->masterOnlyCols.push_back(i);
+         std::cout << "the master only index is " << i << std::endl;
+      }
+
+      if (integerVars && integerVars[i]) {
+         if (std::find(modelCore->integerVars.begin(),
+                       modelCore->integerVars.end(), i)
+               == modelCore->integerVars.end()) {
+            modelCore->integerVars.push_back(i);
+         }
       }
    }
 
+   /*
    std::cout << "the size of master only in decompapp is "
              << modelCore->masterOnlyCols.size()
              << std::endl;
-
+   */
    if (m_param.LogLevel >= 3) {
       (*m_osLog) << "Master only columns:" << endl;
       UtilPrintVector(modelCore->masterOnlyCols, m_osLog);
@@ -1587,6 +1605,7 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    bool isInteger = false;
+   int intNum = 0;
 
    for (int i = 0; i < numRows ; i ++) {
       intCounter = 0;
@@ -1606,6 +1625,7 @@ void DecompApp::singlyBorderStructureDetection()
             intVertices[index] = true;
             intHyperedges[majorIndex[index]] = true;
             intCounter ++;
+            intNum++;
          } else {
             intVertices[index] = false;
          }
@@ -1623,7 +1643,7 @@ void DecompApp::singlyBorderStructureDetection()
 #ifdef VARIABLE_WEIGHT
 
       if (intVertices[i]) {
-         vwgts[i] = 2 ;
+         vwgts[i] = 10;
       } else {
          vwgts[i] = 1;
       }
@@ -1759,6 +1779,14 @@ void DecompApp::singlyBorderStructureDetection()
     * blocks where there is no element in the block
     */
    int truePartNum = 0 ;
+   // vector that stores the number of nonzero elements in each partition
+   std::vector<int> nonzeroCntPerPartition;
+   // vector that stores the number of integer elements in each partition
+   std::vector<int> integerCntPerPartition;
+   // vector that stores the percentage of integer elements in each partition
+   std::vector<double> intPercentPerPartition;
+   int tempNonzeroCnt(0);
+   int tempIntCnt(0);
 
    for (int part_index = 0 ; part_index < nparts; part_index ++) {
       // first, store the rows in different nets
@@ -1784,6 +1812,9 @@ void DecompApp::singlyBorderStructureDetection()
          numRowIndex.erase(temp.at(s));
       }
 
+      tempNonzeroCnt = 0;
+      tempIntCnt = 0;
+
       if (m_param.BlockFileOutputFormat == GCG_BLOCKFILE) {
          if (numRowIndex.size() != 0) {
             //GCG defaults 1 as starting block number, DIP had default value 0 but
@@ -1799,8 +1830,14 @@ void DecompApp::singlyBorderStructureDetection()
                }
 
                rowsBlock.push_back(*rowIter);
+               tempNonzeroCnt += lengthRows[*rowIter];
+               tempIntCnt += intLengthRows[*rowIter];
             }
 
+            nonzeroCntPerPartition.push_back(tempNonzeroCnt);
+            integerCntPerPartition.push_back(tempIntCnt);
+            intPercentPerPartition.push_back((double)tempIntCnt / tempNonzeroCnt);
+            //	    std::cout << "the int percentage is " << (double)tempIntCnt/tempNonzeroCnt << std::endl;
             m_blocks.insert(make_pair(truePartNum, rowsBlock));
             truePartNum ++;
          }
@@ -1833,13 +1870,81 @@ void DecompApp::singlyBorderStructureDetection()
    }
 
    blockdata.close();
+   // the number of nonzero elements in the coupling rows
+   int numElementsCouplingRows = 0;
+   // the number of integer elements in the coupling rows
+   int numIntegerCouplingRows = 0;
+   /** the percentage of nonzero elements in the coupling rows over all
+       the nonzero elements in the matrix
+    **/
+   double numElementsCouplingRowsPercentage = 0.0;
+   /**
+      the percentage of integer elements in the coupling rows over all
+      the integer elements in the matrix
+    **/
+   double numIntegerCouplingOverIntegerMatrix = 0.0;
+   /**
+      the percentage of integer elements in the coupling rows over all
+      the elements in the matrix
+    **/
+   double numIntegerCouplingOverElementsMatrix = 0.0;
+   double sum = std::accumulate(intPercentPerPartition.begin(), intPercentPerPartition.end(), 0.0);
+   double mean = sum / intPercentPerPartition.size();
+   std::vector<double> diff(intPercentPerPartition.size());
+   std::transform(intPercentPerPartition.begin(), intPercentPerPartition.end(), diff.begin(),
+                  std::bind2nd(std::minus<double>(), mean));
+   double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+   double stdev = std::sqrt(sq_sum / intPercentPerPartition.size());
 
+   /*
+   for ( netIter = netSet.begin(); netIter != netSet.end(); netIter ++ )
+     {
+       //       std::cout << *netIter << std::endl;
+
+       numElementsCouplingRows += (lengthRows[*netIter]);
+
+       numIntegerCouplingRows +=(intLengthRows[*netIter]);
+     }
+
+   std::cout << "number of elements in the coupling rows " << numElementsCouplingRows << std::endl;
+   std::cout << "number of integer in the coupling rows " << numIntegerCouplingRows << std::endl;
+
+   numElementsCouplingRowsPercentage = (double)numElementsCouplingRows/numElements;
+
+   numIntegerCouplingOverIntegerMatrix = (double)numIntegerCouplingRows/intNum;
+
+   numIntegerCouplingOverElementsMatrix = (double)numIntegerCouplingRows/numElements;
+
+
+     std::cout << " (alpha) The percent of nonzero elements of the coupling rows in the matrix over total Num is "
+        << numElementsCouplingRowsPercentage
+        << std::endl;
+
+   std::cout << " (Beta) The percent of integer elements of the coupling rows over total number of nonzero elements "
+        << numIntegerCouplingOverElementsMatrix
+        << std::endl;
+
+   std::cout << " (Gamma) The percent of integer elements of the coupling rows over total number of integer elements "
+        << numIntegerCouplingOverIntegerMatrix
+        << std::endl;
+
+   std::cout << " (Eta) The average of integer elements of each partition over the total number of nonzero elements "
+        << mean
+        << std::endl;
+
+   std::cout << " (Delta) The standard deviation of eta"
+        << stdev
+        << std::endl;
+   */
    if (m_param.BlockFileOutput && (m_param.BlockFileOutputFormat == GCG_BLOCKFILE)) {
       fstream input_file;
       input_file.open(BlockFile.c_str(), ios::in);
       std::ofstream blockdata2;
       std::string BlockFile2;
-      BlockFile2 = m_param.Instance + '.' + "dec";
+      std::stringstream ss;
+      ss << truePartNum;
+      std::string temp = ss.str();
+      BlockFile2 = m_param.Instance + '_' + temp + '.' + "dec";
       blockdata2.open(BlockFile2.c_str());
       blockdata2 << "NBLOCKS " << truePartNum << "\n";
       string line;

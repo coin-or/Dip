@@ -245,14 +245,15 @@ void UtilParameters::Add(const char* section,
 {
    UtilParam utilParam;
    string    keyname ("");
-   string    sSection("");
+   string    sSection("DECOMP");
    string    sName   (name);
    string    sValue  (value);
 
    if (section) {
       sSection = section;
-      keyname  = UtilStrToLower(UtilStrTrim(sSection));
-   }
+   }      
+
+   keyname  = UtilStrToLower(UtilStrTrim(sSection));
 
    keyname += "@";
    keyname += UtilStrToLower(UtilStrTrim(sName));
