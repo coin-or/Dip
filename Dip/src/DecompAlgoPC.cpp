@@ -746,26 +746,30 @@ void DecompAlgoPC::solveMasterAsMIP()
 void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
 {
 #ifdef __DECOMP_IP_SYMPHONY__
-   OsiSolverInterface * m_masterClone = m_masterSI->clone();
- 
    int colIndex;
-   int  nMasterCols = m_masterSI->getNumCols();//lambda
-   int  logIpLevel  = m_param.LogIpLevel;
-   int numCols = m_masterClone->getNumCols();
+   int nMasterCols = m_masterSI->getNumCols();//lambda
+   int logIpLevel  = m_param.LogIpLevel;
+   int numCols = m_masterSI->getNumCols();
    OsiSymSolverInterface* osiSym = new OsiSymSolverInterface();
-   const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
-   const double* col_lb = (m_masterClone->getColLower());
-   const double* col_up = (m_masterClone->getColUpper());
-   const double* row_lb = (m_masterClone->getRowLower());
-   const double* row_up = (m_masterClone->getRowUpper());
-   const double* obj_coef = (m_masterClone->getObjCoefficients());
+   const char* intMarkerCore  = m_modelCore.getModel()->getIntegerMark();
 
-   osiSym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
-			 const_cast<double*&>(col_lb),
-			 const_cast<double*&>(col_up), 
-			 const_cast<double*&>(obj_coef),
-			 const_cast<double*&>(row_lb), 
-			 const_cast<double*&>(row_up));
+   osiSym->loadProblem(const_cast<CoinPackedMatrix&>(*m_masterSI->getMatrixByRow()),
+		       const_cast<double*>(m_masterSI->getColLower()),
+		       const_cast<double*>(m_masterSI->getColUpper()), 
+		       const_cast<double*>(m_masterSI->getObjCoefficients()),
+		       const_cast<double*>(m_masterSI->getRowLower()), 
+		       const_cast<double*>(m_masterSI->getRowUpper()));
+
+   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
+      if (isMasterColStructural(colIndex)){
+         osiSym->setInteger(colIndex);
+      }
+   }
+   for (int i = 0; i < m_masterOnlyCols.size(); i++){
+      if (intMarkerCore[m_masterOnlyCols[i]] == 'I'){
+         osiSym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
+      }
+   }
 
    assert(osiSym);
    sym_environment* env = osiSym->getSymphonyEnvironment();
@@ -783,13 +787,13 @@ void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
    if ((status == PREP_OPTIMAL_SOLUTION_FOUND) ||
          (status == TM_OPTIMAL_SOLUTION_FOUND)
          || (status == TM_TARGET_GAP_ACHIEVED)) {
-      result.m_isOptimal = true;
+      result->m_isOptimal = true;
       double* solution = new double[numCols];
       assert(solution);
       status = sym_get_col_solution(env, solution);
-      result.m_nSolutions = 1;
+      result->m_nSolutions = 1;
       vector<double> solVec(solution, solution + numCols);
-      result.m_solution.push_back(solVec);
+      result->m_solution.push_back(solVec);
       UTIL_DELARR(solution);
 
       if (status == FUNCTION_TERMINATED_ABNORMALLY)
@@ -797,12 +801,12 @@ void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
                              "solveMasterAsMIP", "DecompSubModel");
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
-         result.m_nSolutions = 0;
-         result.m_isOptimal = true;
-         //	 result.m_isCutoff = doCutoff;
+         result->m_nSolutions = 0;
+         result->m_isOptimal = true;
+         //	 result->m_isCutoff = doCutoff;
       } else {
-         //	 result.m_isCutoff = doCutoff;
-         result.m_isOptimal = false ;
+         //	 result->m_isCutoff = doCutoff;
+         result->m_isOptimal = false ;
       }
    }
 
@@ -881,10 +885,10 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
     *   (5  event user programmed event occurred)
    */
    const int statusSet[2] = {0, 1};
-   result.m_solStatus    = cbc.status();
+   result->m_solStatus    = cbc.status();
 
-   if (!UtilIsInSet(result.m_solStatus, statusSet, 2)) {
-      cerr << "Error: CBC IP solver status = " << result.m_solStatus << endl;
+   if (!UtilIsInSet(result->m_solStatus, statusSet, 2)) {
+      cerr << "Error: CBC IP solver status = " << result->m_solStatus << endl;
       //This shouldn't really cause an exception
       //throw UtilException("CBC solver status",
       //                    "solveMasterAsMIP", "DecompSubModel");
@@ -902,16 +906,16 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
     *    7 linear relaxation unbounded
     */
    const int statusSet2[4] = {0, 1, 2, 4};
-   result.m_solStatus2 = cbc.secondaryStatus();
+   result->m_solStatus2 = cbc.secondaryStatus();
 
    //---
    //--- In root the subproblem should not be infeasible
    //---   unless due to cutoff. But, after branching it
    //---   can be infeasible.
    //---
-   if (!UtilIsInSet(result.m_solStatus2, statusSet2, 4)) {
+   if (!UtilIsInSet(result->m_solStatus2, statusSet2, 4)) {
       cerr << "Warning: CBC IP solver 2nd status = "
-           << result.m_solStatus2 << endl;
+           << result->m_solStatus2 << endl;
       //This shouldn't really cause an exception
       //throw UtilException("CBC solver 2nd status",
       //                    "solveMasterAsMIP", "DecompAlgoPC");
@@ -920,8 +924,8 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
    //---
    //--- update results object
    //---
-   result.m_nSolutions = 0;
-   result.m_isOptimal  = false;
+   result->m_nSolutions = 0;
+   result->m_isOptimal  = false;
    //TODO: can get multple solutions!
    //   how to retrieve?
    //TODO: look into setHotstartSolution... done automatically
@@ -929,26 +933,26 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
    //TODO: look into setNumberThreads
    //TODO: redo cpx in this same way - it could be stopping on time, not gap
    int nSolutions = cbc.getSolutionCount();
-   result.m_nSolutions = nSolutions ? 1 : 0;
+   result->m_nSolutions = nSolutions ? 1 : 0;
 
    if (cbc.isProvenOptimal() ||
          cbc.isProvenInfeasible()) {
-      result.m_isOptimal  = true;
+      result->m_isOptimal  = true;
    }
 
    //---
    //--- get copy of solution
    //---
-   result.m_objLB = cbc.getBestPossibleObjValue();
+   result->m_objLB = cbc.getBestPossibleObjValue();
 
    if (nSolutions >= 1) {
-      result.m_objUB = cbc.getObjValue();
+      result->m_objUB = cbc.getObjValue();
       const double* solDbl = cbc.getColSolution();
       vector<double> solVec(solDbl, solDbl + nMasterCols);
-      result.m_solution.push_back(solVec);
-      assert(result.m_nSolutions ==
-             static_cast<int>(result.m_solution.size()));
-      //memcpy(result.m_solution,
+      result->m_solution.push_back(solVec);
+      assert(result->m_nSolutions ==
+             static_cast<int>(result->m_solution.size()));
+      //memcpy(result->m_solution,
       //     cbc.getColSolution(),
       //     nMasterCols * sizeof(double));
    }
@@ -1047,16 +1051,16 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
    //---
    //--- get solver status
    //---
-   result.m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
-   result.m_solStatus2 = 0;
+   result->m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
+   result->m_solStatus2 = 0;
 
-   //cout << "CPX IP solver status = " << result.m_solStatus << endl;
+   //cout << "CPX IP solver status = " << result->m_solStatus << endl;
    //TEMP FIX?
    //THINK: if CPXMIP_INForUNBD, change to CPXMIP_INFEASIBLE,
    // I don't think there is anyway the price+branch heur could
    // be unbounded. But, what if the original full problem is unbounded?
-   if (result.m_solStatus == CPXMIP_INForUNBD ) {
-      result.m_solStatus = CPXMIP_INFEASIBLE;
+   if (result->m_solStatus == CPXMIP_INForUNBD ) {
+      result->m_solStatus = CPXMIP_INFEASIBLE;
    }
 
    const int statusSet[5] = {CPXMIP_OPTIMAL,
@@ -1066,8 +1070,8 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
                              CPXMIP_TIME_LIM_INFEAS
                             };
 
-   if (!UtilIsInSet(result.m_solStatus, statusSet, 5)) {
-      cerr << "Error: CPX IP solver status = " << result.m_solStatus << endl;
+   if (!UtilIsInSet(result->m_solStatus, statusSet, 5)) {
+      cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CPX solver status",
                           "solveMasterAsMIP", "DecompAlgoPC");
    }
@@ -1075,18 +1079,18 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
    //---
    //--- update results object
    //---
-   result.m_nSolutions = 0;
-   result.m_isOptimal  = false;
+   result->m_nSolutions = 0;
+   result->m_isOptimal  = false;
 
-   if (result.m_solStatus == CPXMIP_OPTIMAL ||
-         result.m_solStatus == CPXMIP_OPTIMAL_TOL) {
-      result.m_nSolutions = 1;
-      result.m_isOptimal  = true;
+   if (result->m_solStatus == CPXMIP_OPTIMAL ||
+         result->m_solStatus == CPXMIP_OPTIMAL_TOL) {
+      result->m_nSolutions = 1;
+      result->m_isOptimal  = true;
    } else {
-      if (result.m_solStatus == CPXMIP_INFEASIBLE ||
-            result.m_solStatus == CPXMIP_TIME_LIM_INFEAS) {
-         result.m_nSolutions = 0;
-         result.m_isOptimal  = true;
+      if (result->m_solStatus == CPXMIP_INFEASIBLE ||
+            result->m_solStatus == CPXMIP_TIME_LIM_INFEAS) {
+         result->m_nSolutions = 0;
+         result->m_isOptimal  = true;
       }
       //STOP - could have stopped on time... not just gap... do
       //something like did in CBC
@@ -1094,22 +1098,22 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
          //---
          //--- else it must have stopped on gap
          //---
-         result.m_nSolutions = 1;
-         result.m_isOptimal  = false;
+         result->m_nSolutions = 1;
+         result->m_isOptimal  = false;
       }
    }
 
    //---
    //--- get copy of solution
    //---
-   status = CPXgetbestobjval(cpxEnv, cpxLp, &result.m_objLB);
+   status = CPXgetbestobjval(cpxEnv, cpxLp, &result->m_objLB);
 
    if (status)
       throw UtilException("CPXgetbestobjval failure",
                           "solveMasterAsMIP", "DecompAlgoPC");
 
-   if (result.m_nSolutions >= 1) {
-      status = CPXgetmipobjval(cpxEnv, cpxLp, &result.m_objUB);
+   if (result->m_nSolutions >= 1) {
+      status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
 
       if (status)
          throw UtilException("CPXgetmipobjval failure",
@@ -1117,10 +1121,10 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
 
       const double* solDbl = osiCpx->getColSolution();
       vector<double> solVec(solDbl, solDbl + nMasterCols);
-      result.m_solution.push_back(solVec);
-      assert(result.m_nSolutions ==
-             static_cast<int>(result.m_solution.size()));
-      //memcpy(result.m_solution,
+      result->m_solution.push_back(solVec);
+      assert(result->m_nSolutions ==
+             static_cast<int>(result->m_solution.size()));
+      //memcpy(result->m_solution,
       //     cbc.getColSolution(),
       //     nMasterCols * sizeof(double));
    }
