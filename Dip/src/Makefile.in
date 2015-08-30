@@ -98,7 +98,8 @@ am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	DecompConstraintSet.lo UtilGraphLib.lo UtilHash.lo \
 	UtilMacros.lo UtilMacrosDecomp.lo UtilParameters.lo \
 	UtilKnapsack.lo AlpsDecompModel.lo AlpsDecompTreeNode.lo \
-	UtilMacrosAlps.lo
+	UtilMacrosAlps.lo DecompBranchStrategyMaxInf.lo \
+	DecompBranchStrategy.lo
 libDecomp_la_OBJECTS = $(am_libDecomp_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -431,7 +432,9 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	AlpsDecompModel.cpp AlpsDecompModel.h AlpsDecompSolution.h \
 	AlpsDecompTreeNode.cpp AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
-	UtilMacrosAlps.h
+	UtilMacrosAlps.h DecompBranchStrategyMaxInf.h \
+	DecompBranchStrategyMaxInf.cpp \
+	DecompBranchStrategy.h DecompBranchStrategy.cpp
 
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
