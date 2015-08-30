@@ -597,7 +597,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef __DECOMP_IP_CPLEX__
+#ifdef __DECOMP_IP_CPX__
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    double* solution = new double[numCols];
