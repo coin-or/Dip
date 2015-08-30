@@ -69,8 +69,7 @@ int main(int argc, char** argv)
 #endif
       DecompApp milp;
       char the_path[256];
-      std::string path(getcwd(the_path, 255));
-      milp.m_param.CurrentWorkingDir = path;
+      milp.m_param.CurrentWorkingDir = std::string(getcwd(the_path, 255));
 #ifndef COIN_HAS_MPI
       milp.startupLog();
 #endif
@@ -81,7 +80,6 @@ int main(int argc, char** argv)
 
       // get the current working Directory.
       if (milp.m_param.LogDebugLevel >= 1) {
-         std::cout << path << std::endl;
          std::cout << milp.m_param.CurrentWorkingDir << std::endl;
       }
 
@@ -91,16 +89,14 @@ int main(int argc, char** argv)
             
       //      if (utilParam.GetSetting("BlockNumInput", true)){
       if (milp.m_param.BlockNumInput > 0) {
-	//if (utilParam.BlockNumInput > 0) {
 	//	milp.NumBlocks = utilParam.GetSetting("BlockNumInput", true);
 	 milp.NumBlocks = milp.m_param.BlockNumInput;
 	 std::cout << "the number of blocks is " << milp.NumBlocks << std::endl; 
          milp.m_param.Concurrent = false ;
          milp.m_param.NumBlocksCand = 0;
-        blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);  
       }
 
-//      blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
+      blockNumberFinder(milp.m_param, blockNumCandidates, m_matrix);
       // obtain the number of CPU (core)s on machines with operating
       // system Linux, Solaris, & AIX and Mac OS X
       // (for all OS releases >= 10.4, i.e., Tiger onwards)
