@@ -747,11 +747,37 @@ void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
 {
 #ifdef __DECOMP_IP_SYMPHONY__
    int colIndex;
+   int numCols = m_masterSI->getNumCols();
    int nMasterCols = m_masterSI->getNumCols();//lambda
    int logIpLevel  = m_param.LogIpLevel;
-   int numCols = m_masterSI->getNumCols();
-   OsiSymSolverInterface* osiSym = new OsiSymSolverInterface();
    const char* intMarkerCore  = m_modelCore.getModel()->getIntegerMark();
+
+   OsiSymSolverInterface* osiSym = new OsiSymSolverInterface();
+
+#if 0
+   OsiSolverInterface * m_masterClone = m_masterSI->clone();
+ 
+   const CoinPackedMatrix* matrix_sym = (m_masterClone->getMatrixByRow());
+   const double* col_lb = (m_masterClone->getColLower());
+   const double* col_up = (m_masterClone->getColUpper());
+   const double* row_lb = (m_masterClone->getRowLower());
+   const double* row_up = (m_masterClone->getRowUpper());
+   const double* obj_coef = (m_masterClone->getObjCoefficients());
+   osiSym->assignProblem(const_cast<CoinPackedMatrix*&>(matrix_sym),
+                          const_cast<double*&>(col_lb),
+                          const_cast<double*&>(col_up), const_cast<double*&>(obj_coef),
+                          const_cast<double*&>(row_lb), const_cast<double*&>(row_up));
+   for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
+      if (isMasterColStructural(colIndex)){
+         osiSym->setInteger(colIndex);
+      }
+   }
+   for (int i = 0; i < m_masterOnlyCols.size(); i++){
+      if (intMarkerCore[m_masterOnlyCols[i]] == 'I'){
+	 osiSym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
+      } 
+   }
+#else
 
    osiSym->loadProblem(const_cast<CoinPackedMatrix&>(*m_masterSI->getMatrixByRow()),
 		       const_cast<double*>(m_masterSI->getColLower()),
@@ -770,7 +796,7 @@ void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
          osiSym->setInteger(m_masterOnlyColsMap[m_masterOnlyCols[i]]);
       }
    }
-
+#endif
    assert(osiSym);
    sym_environment* env = osiSym->getSymphonyEnvironment();
    if (logIpLevel == 0){
@@ -1167,11 +1193,8 @@ void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
       result->m_solution.push_back(solVec);
       result->m_nSolutions++;
       result->m_isOptimal   = true;
-   }else if (stat == GRB_INFEASIBLE){
-      result->m_isOptimal = true;
    }else{
-      throw UtilException("Solution failure",
-                          "solveMasterAsMIPGrb", "DecompSubModel");
+      result->m_isOptimal = true;
    }
 #endif
 }
