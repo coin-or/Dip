@@ -331,7 +331,7 @@ public:
    // first warm_start_node_ratio% of the nodes generated during the previous
    //  solve procedure. 
   
-   int WarmStartNodeRatio; 
+   double WarmStartNodeRatio; 
  
    // Setting this parameter will start the warm start routine using all the nodes
    // above the level warm_start_node_level of the tree generated during the 
@@ -342,7 +342,7 @@ public:
    // nodes above the level warm_start_node_level% of the warm start tree depth.
    // The rest of the tree will be trimmed
 
-   int WarmStartNodeLevelRatio; 
+   double WarmStartNodeLevelRatio; 
   
       
    /**
