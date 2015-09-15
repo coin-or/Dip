@@ -690,9 +690,9 @@ public:
       LogLevel                 = 0;
       DataDir                  = "";
       Instance                 = "";
-      InstanceFormat           = "MPS";
+      InstanceFormat           = "";
       BlockFile                = "";
-      BlockFileFormat          = "Pair";
+      BlockFileFormat          = "";
       PermuteFile              = "";
       InitSolutionFile         = "";
       UseNames                 = 1 ;
