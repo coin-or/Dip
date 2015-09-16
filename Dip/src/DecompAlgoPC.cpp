@@ -11,6 +11,8 @@
 //                                                                           //
 // Copyright (C) 2002-2015, Lehigh University, Matthew Galati, and Ted Ralphs//
 // All Rights Reserved.                                                      //
+//                                                                           //
+// Interface to Gurobi is Copyright 2015 Jazz Aviation LP                    //
 //===========================================================================//
 
 //===========================================================================//

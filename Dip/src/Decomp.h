@@ -11,6 +11,8 @@
 //                                                                           //
 // Copyright (C) 2002-2015, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
+//                                                                           //
+// Interface to Gurobi is Copyright 2015 Jazz Aviation LP                    //
 //===========================================================================//
 
 //===========================================================================//
@@ -317,6 +319,15 @@ typedef OsiCpxSolverInterface OsiLpSolverInterface;
 const double DecompInf = CPX_INFBOUND;
 #endif
 
+#ifdef __DECOMP_LP_GRB__
+extern "C" {
+#include "gurobi_c.h"
+}
+#include "OsiGrbSolverInterface.hpp"
+typedef OsiGrbSolverInterface OsiLpSolverInterface;
+const double DecompInf = GRB_INFINITY;
+#endif
+
 #ifdef __DECOMP_IP_CBC__
 #include "OsiCbcSolverInterface.hpp"
 //confusing, since we use CbcModel/Main, we need OsiClp here
@@ -334,6 +345,14 @@ typedef OsiCpxSolverInterface OsiIpSolverInterface;
 #include "symphony.h"
 #include "OsiSymSolverInterface.hpp"
 typedef OsiSymSolverInterface OsiIpSolverInterface;
+#endif
+
+#ifdef __DECOMP_IP_GRB__
+extern "C" {
+#include "gurobi_c.h"
+}
+#include "OsiGrbSolverInterface.hpp"
+typedef OsiGrbSolverInterface OsiIpSolverInterface;
 #endif
 
 

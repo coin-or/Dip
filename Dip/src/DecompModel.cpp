@@ -11,6 +11,8 @@
 //                                                                           //
 // Copyright (C) 2002-2015, Lehigh University, Matthew Galati, and Ted Ralphs//
 // All Rights Reserved.                                                      //
+//                                                                           //
+// Interface to Gurobi is Copyright 2015 Jazz Aviation LP                    //
 //===========================================================================//
 
 //===========================================================================//
@@ -61,8 +63,8 @@ bool DecompSubModel::isPointFeasible(const double* x,
       hasRowNames = true;
    }
 
-   double feasVarTol10 = 10 * feasVarTol;
-   double feasConTol10 = 10 * feasConTol;
+   double feasVarTol100 = 100 * feasVarTol;
+   double feasConTol100 = 100 * feasConTol;
    //---
    //--- do we satisfy all (active) column bounds
    //---
@@ -128,7 +130,7 @@ bool DecompSubModel::isPointFeasible(const double* x,
                     << endl;
                    );
 
-         if (relViol > feasVarTol10) {
+         if (relViol > feasVarTol100) {
             isFeas = false;
             goto FUNC_EXIT;
          }
@@ -202,7 +204,7 @@ bool DecompSubModel::isPointFeasible(const double* x,
                     << endl;
                    );
 
-         if (relViol > feasConTol10) {
+         if (relViol > feasConTol100) {
             isFeas = false;
             goto FUNC_EXIT;
          }
@@ -393,7 +395,7 @@ void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
    if (!UtilIsInSet(result->m_solStatus, statusSet, 2)) {
       cerr << "Error: CBC IP solver status = " << result->m_solStatus << endl;
       throw UtilException("CBC solver status",
-                          "solveSubproblemAsMIP", "DecompSubModel");
+                          "solveAsMIPCbc", "DecompSubModel");
    }
 #else
    //int i;
@@ -514,14 +516,14 @@ void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
          cerr << "Error: CBC IP solver 2nd status = "
               << result->m_solStatus2 << endl;
          throw UtilException("CBC solver 2nd status",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCbc", "DecompSubModel");
       }
    } else {
       if (!UtilIsInSet(result->m_solStatus2, statusSet2b, nSetb)) {
          cerr << "Error: CBC IP solver 2nd status = "
               << result->m_solStatus2 << endl;
          throw UtilException("CBC solver 2nd status",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCbc", "DecompSubModel");
       }
    }
 
@@ -622,19 +624,19 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
 
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SIMDISPLAY, logIpLevel);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
    } else {
       status = CPXsetintparam(cpxEnv, CPX_PARAM_SCRIND, CPX_OFF);
 
       if (status)
          throw UtilException("CPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
    }
 
    if (doExact)
@@ -646,7 +648,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompSubModel");
+                          "solveAsMIPCpx", "DecompSubModel");
 
    if (doExact) {
       if (param.SubProbTimeLimitExact < COIN_DBL_MAX) {
@@ -662,7 +664,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompSubModel");
+                          "solveAsMIPCpx", "DecompSubModel");
 
    if (doCutoff) {
       status = CPXsetdblparam(cpxEnv, CPX_PARAM_CUTUP, cutoff);
@@ -672,7 +674,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompSubModel");
+                          "solveAsMIPCpx", "DecompSubModel");
 
    //---
    //--- starting with CPX12, parallel MIP is on by default
@@ -684,7 +686,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompSubModel");
+                          "solveAsMIPCpx", "DecompSubModel");
 
    int startAlgo = 0;
 
@@ -704,7 +706,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
-                          "solveSubproblemAsMIP", "DecompSubModel");
+                          "solveAsMIPCpx", "DecompSubModel");
 
    //---
    //--- check the mip starts solution pool, never let it get too
@@ -721,7 +723,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
       if (status)
          throw UtilException("CPXdelmipstarts failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
    }
 
 #endif
@@ -775,7 +777,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
       if (status) {
          throw UtilException("XPXsetintparam failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
       }
 
       osiCpx->initialSolve();
@@ -795,7 +797,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
       if (status) {
          throw UtilException("CPXgetray failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
       }
 
       vector<double> solVec(solution, solution + numCols);
@@ -811,7 +813,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
       if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver status = " << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
       }
    }
 
@@ -826,14 +828,14 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
       }
    } else {
       if (!UtilIsInSet(result->m_solStatus, statusSet2, 9)) {
          cerr << "Error: CPX IP solver 2nd status = "
               << result->m_solStatus << endl;
          throw UtilException("CPX solver status",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
       }
    }
 
@@ -856,7 +858,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
          if (status)
             throw UtilException("CPXgetsolnpoolobjval",
-                                "solveSubproblemAsMIP", "DecompSubModel");
+                                "solveAsMIPCpx", "DecompSubModel");
 
          //printf("Sol %4d: Obj: %10g\n", i, objVal);
          status = CPXgetsolnpoolx(cpxEnv, cpxLp, i,
@@ -904,14 +906,14 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 
       if (status)
          throw UtilException("CPXgetbestobjval failure",
-                             "solveSubproblemAsMIP", "DecompSubModel");
+                             "solveAsMIPCpx", "DecompSubModel");
 
       if (result->m_nSolutions >= 1 && !result->m_isUnbounded) {
          status = CPXgetmipobjval(cpxEnv, cpxLp, &result->m_objUB);
 
          if (status)
             throw UtilException("CPXgetmipobjval failure",
-                                "solveSubproblemAsMIP", "DecompSubModel");
+                                "solveAsMIPCpx", "DecompSubModel");
       }
    }
    UTIL_DELARR(solution);
@@ -928,7 +930,68 @@ void DecompSubModel::solveAsMIPGrb(DecompSolverResult*  result,
 				   double               timeLimit)
 {
 #ifdef __DECOMP_IP_GRB__
+   int stat;
+   const int numCols    = m_osi->getNumCols();
 
+   OsiGrbSolverInterface* osiGrb
+      = dynamic_cast<OsiGrbSolverInterface*>(m_osi);
+
+   GRBenv* env = osiGrb->getEnvironmentPtr();
+
+   GRBmodel* model = osiGrb->getLpPtr();
+
+   const std::map<std::string, std::string> paramMap = m_utilParam->getParamMap();
+   map<std::string, std::string>::const_iterator it;
+   std::istringstream iss;
+
+   for (it = paramMap.begin(); it != paramMap.end(); it++){
+      std::vector<std::string> elems;
+      m_utilParam->split(it->first, elems);
+      if (elems[0] == "gurobi"){
+	 int intParam;
+	 double doubleParam;
+	 iss.str(it->second);
+	 if (iss >> intParam){
+	    GRBsetintparam(env, elems[1].c_str(), intParam);
+	 }
+	 iss.clear();
+	 iss.str(it->second);
+	 if (iss >> doubleParam){ 
+	    GRBsetdblparam(env, elems[1].c_str(), doubleParam);
+	 }else{
+	    GRBsetstrparam(env, elems[1].c_str(), it->second.c_str());
+	 }
+	 iss.clear();
+      }
+   }
+
+   osiGrb->branchAndBound();
+
+   GRBgetintattr(model, GRB_INT_ATTR_STATUS, &stat);
+
+   result->m_isUnbounded = false;
+   result->m_isOptimal   = false;
+   result->m_isCutoff    = false;
+   result->m_nSolutions  = 0;
+   if (stat == GRB_OPTIMAL){
+      const double *solution = osiGrb->getColSolution();
+      vector<double> solVec(solution, solution + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isOptimal   = true;
+   }else if (stat == GRB_UNBOUNDED){
+      osiGrb->initialSolve();
+      const double *ray = osiGrb->getDualRays(1, true)[0];
+      vector<double> solVec(ray, ray + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isUnbounded = true;
+   }else if (stat == GRB_INFEASIBLE){
+      result->m_isOptimal = true;
+   }else{
+      throw UtilException("Solution failure",
+			  "solveAsMIPGrb", "DecompSubModel");
+   }
 #endif
 }
 
