@@ -365,29 +365,34 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       }
 
       double objval;
-      status = sym_get_sp_size(env, &result->m_nSolutions);
+      double* opt_solution = new double[numCols];
+      int nSols = 0;
 
-      if (result->m_nSolutions == 0){
-	 //Solution pool is empty, but we canfetch the optimal solution
-	 result->m_nSolutions = 1;
-	 status = sym_get_col_solution(env, solution);
-	 vector<double> solVec(solution, solution + numCols);
-	 result->m_solution.push_back(solVec);
-      }else{
-	 int nSols = std::min<int>(result->m_nSolutions, 
-				  param.SubProbNumSolLimit);
-	 for (int i = 0; i < nSols; i++){
-	    status = sym_get_sp_solution(env, i, solution, &objval);
-	    /*
-	      for (int i = 0 ; i < numCols; ++i) {
-	      std::cout << "the solution is " << solution[i]
-	      << std::endl;
-	      }
-	    */
+      status = sym_get_sp_size(env, &nSols);
+
+      result->m_nSolutions = 1;
+      status = sym_get_col_solution(env, opt_solution);
+      vector<double> solVec(opt_solution, opt_solution + numCols);
+      result->m_solution.push_back(solVec);
+
+      nSols = std::min<int>(nSols, param.SubProbNumSolLimit);
+      
+      for (int i = 0; i < nSols; i++){
+	 status = sym_get_sp_solution(env, i, solution, &objval);
+	 /*
+	   for (int i = 0 ; i < numCols; ++i) {
+	   std::cout << "the solution is " << solution[i]
+	   << std::endl;
+	   }
+	 */
+	 //We have to make sure that the solution is not one we already have
+	 if (memcmp(opt_solution, solution, numCols*DSIZE) == 0){
 	    vector<double> solVec(solution, solution + numCols);
 	    result->m_solution.push_back(solVec);
-	 }	
+	    result->m_nSolutions += 1;
+	 }
       }	
+      UTIL_DELARR(opt_solution);      
    } else {
       if (sym_is_proven_primal_infeasible(env)) {
          result->m_nSolutions = 0;
@@ -398,7 +403,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal = false ;
       }
    }
-   std::cout << "bye" << std::endl; 
    /*
    if (!param.WarmStart) {
       UTIL_DELPTR(osi_Sym);
