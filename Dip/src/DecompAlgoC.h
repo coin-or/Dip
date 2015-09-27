@@ -138,9 +138,10 @@ public:
     */
    DecompAlgoC(DecompApp*             app,
                UtilParameters&        utilParam):
-      DecompAlgo(CUT, app, utilParam),
+   DecompAlgo(CUT, app, utilParam, false),
       m_classTag("D-ALGOC")
    {
+      initSetup();
    }
 
    /**
