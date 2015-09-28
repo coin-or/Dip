@@ -30,3 +30,9 @@
 /* Release Version number of project */
 #define DIP_VERSION_RELEASE 9999
 
+/* Define to 1 if the Clp package is available */
+#define DIP_HAS_CLP 1
+
+/* Define to 1 if the Cbc package is available */
+#define DIP_HAS_CBC 1
+

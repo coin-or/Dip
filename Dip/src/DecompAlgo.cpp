@@ -1,4 +1,3 @@
-
 //===========================================================================//
 // This file is part of the DIP Solver Framework.                            //
 //                                                                           //
@@ -39,10 +38,6 @@
 #include "CglClique.hpp"
 #include "CglFlowCover.hpp"
 #include "CglMixedIntegerRounding2.hpp"
-
-#ifdef __DECOMP_LP_CPX__
-#define USE_MULTI_RAY
-#endif
 
 using namespace std;
 
@@ -300,10 +295,13 @@ void DecompAlgo::initSetup()
    //---
    DecompVarList initVars;
    m_nodeStats.varsThisCall += generateInitVars(initVars);
+
    //---
    //--- create the master OSI interface
    //---
-   m_masterSI = new OsiLpSolverInterface();
+
+   m_masterSI = getOsiLpSolverInterface();
+
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
 
@@ -370,7 +368,7 @@ void DecompAlgo::initSetup()
    //---
    if (m_param.InitCompactSolve) {
       //TODO: would be nice if we could utilize IP presolve here?
-      m_auxSI = new OsiLpSolverInterface();
+      m_auxSI = getOsiLpSolverInterface();
       assert(m_auxSI);
       loadSIFromModel(m_auxSI);
    }
@@ -432,25 +430,9 @@ void DecompAlgo::createOsiSubProblem(DecompSubModel& subModel)
    int nInts = model->getNumInts();
    int nCols = model->getNumCols();
    int nRows = model->getNumRows();
-   /*
-   if (nInts) {
-      subprobSI = new OsiIpSolverInterface();
-   } else {
-      subprobSI = new OsiLpSolverInterface();
-   }
-   */
-#ifdef __DECOMP_IP_CBC__
-   subprobSI = new OsiClpSolverInterface();
-#endif
-#if defined(__DECOMP_IP_CPX__)
-   subprobSI = new OsiCpxSolverInterface();
-#endif
-#ifdef __DECOMP_IP_SYMPHONY__
-   subprobSI = new OsiSymSolverInterface();
-#endif
-#ifdef __DECOMP_IP_GRB__
-   subprobSI = new OsiGrbSolverInterface();
-#endif
+
+   subprobSI = getOsiIpSolverInterface();
+
    assert(subprobSI);
    subprobSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
    //TODO: use assign vs load? just pass pointers?
@@ -463,11 +445,13 @@ void DecompAlgo::createOsiSubProblem(DecompSubModel& subModel)
 
    if (nInts > 0) {
       subprobSI->setInteger(model->getIntegerVars(), nInts);
-#if defined(__DECOMP_IP_CPX__) && defined (__DECOMP_LP_CPX__)
-      OsiCpxSolverInterface* osiCpx
-      = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
-      osiCpx->switchToMIP();
+      if (m_param.DecompIPSolver == "CPLEX" && m_param.DecompLPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+	 OsiCpxSolverInterface* osiCpx
+	    = dynamic_cast<OsiCpxSolverInterface*>(subprobSI);
+	 osiCpx->switchToMIP();
 #endif
+      }
    }
 
    //---
@@ -2590,19 +2574,20 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    //m_masterSI->setIntParam(OsiMaxNumIteration, maxInnerIter);
    //THINK:
    //if we allow for interior, need crossover too?
-#ifdef __DECOMP_LP_CPX__
-   //int cpxStat=0, cpxMethod=0;
-   OsiCpxSolverInterface* masterCpxSI
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
-   CPXENVptr env = masterCpxSI->getEnvironmentPtr();
-   //CPXLPptr  lp  = masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
-   CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
-   CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
-   CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
-   //int preInd = 0;
-   //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
-   //printf("preind=%d\n",preInd);
+
+   if (m_param.DecompLPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      OsiCpxSolverInterface* masterCpxSI
+	 = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      CPXENVptr env = masterCpxSI->getEnvironmentPtr();
+      CPXsetintparam( env, CPX_PARAM_PREIND, CPX_ON );
+      CPXsetintparam( env, CPX_PARAM_SCRIND, CPX_ON );
+      CPXsetintparam( env, CPX_PARAM_SIMDISPLAY, 2 );
+      //int preInd = 0;
+      //CPXgetintparam(env, CPX_PARAM_PREIND, &preInd);
+      //printf("preind=%d\n",preInd);
 #endif
+   }
 
    switch (phase) {
    case PHASE_PRICE1:
@@ -2618,22 +2603,30 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //TODO: interior
       //if(m_algo == DECOMP)//THINK!
       // m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
-#if defined(DO_INTERIOR) && defined(__DECOMP_LP_CPX__)
-      //TODO: option, not compile time
-      //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
-      CPXbaropt(env, lp);
-      cpxMethod = CPXgetmethod(env, lp);
-      cpxStat = CPXgetstat(env, lp);
-      //if(cpxStat)
-      // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
-#else
-      if (resolve) {
-	//	m_masterSI->writeMps("temp");
-         m_masterSI->resolve();
-      } else {
-         m_masterSI->initialSolve();
-      }
+
+      if (m_param.DecompLPSolver == "CPLEX" && m_param.DoInteriorPoint){
+#ifdef DIP_HAS_CPX
+	 //int cpxStat=0, cpxMethod=0;
+	 OsiCpxSolverInterface* masterCpxSI
+	    = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+	 CPXENVptr env = masterCpxSI->getEnvironmentPtr();
+	 CPXLPptr lp = 
+	    masterCpxSI->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+	 //CPXhybbaropt(env, lp, 0);//if crossover, defeat purpose
+	 CPXbaropt(env, lp);
+	 //cpxMethod = CPXgetmethod(env, lp);
+	 //cpxStat = CPXgetstat(env, lp);
+	 //if(cpxStat)
+	 // printf("cpxMethod=%d, cpxStat = %d\n", cpxMethod, cpxStat);
 #endif
+      }else{
+	 if (resolve) {
+	    //	m_masterSI->writeMps("temp");
+	    m_masterSI->resolve();
+	 } else {
+	    m_masterSI->initialSolve();
+	 }
+      }
       break;
    case PHASE_CUT:
       m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
@@ -2657,24 +2650,21 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
             << setw(10) << m_stats.timerOther1.getRealTime()
             << endl;
            );
-#ifdef __DECOMP_LP_CLP__
-   UTIL_DEBUG(m_param.LogDebugLevel, 4, {
-      OsiClpSolverInterface* osiClp
-      = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
-      printf("clp status        = %d\n",
-      osiClp->getModelPtr()->status());
-      printf("clp prob status   = %d\n",
-      osiClp->getModelPtr()->problemStatus());
-      printf("clp second status = %d\n",
-      osiClp->getModelPtr()->secondaryStatus());
+   if (m_param.DecompLPSolver == "Clp"){
+#ifdef DIP_HAS_CLP
+      UTIL_DEBUG(m_param.LogDebugLevel, 4, {
+	    OsiClpSolverInterface* osiClp
+	       = dynamic_cast<OsiClpSolverInterface*>(m_masterSI);
+	    printf("clp status        = %d\n",
+		   osiClp->getModelPtr()->status());
+	    printf("clp prob status   = %d\n",
+		   osiClp->getModelPtr()->problemStatus());
+	    printf("clp second status = %d\n",
+		   osiClp->getModelPtr()->secondaryStatus());
+	 }
+	 );
+#endif
    }
-             );
-#endif
-#ifdef __DECOMP_LP_CPX__
-   //int cpxStat = CPXgetstat(env, lp);
-   //if(cpxStat)
-   // printf("cpxStat = %d\n", cpxStat);
-#endif
    UTIL_DEBUG(m_param.LogDebugLevel, 3,
               (*m_osLog)
               << "Iteration Count               : "
@@ -2791,6 +2781,612 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "solutionUpdate()", m_param.LogDebugLevel, 2);
    return status;
+}
+
+//===========================================================================//
+//NOTE: not ok for CPX... do self?
+vector<double*> DecompAlgo::getDualRays(int maxNumRays)
+{
+   if (m_param.DecompLPSolver == "CPLEX"){ 
+      return(getDualRaysCpx(maxNumRays));
+   }else if (m_param.DecompLPSolver == "Clp" ||
+	     m_param.DecompLPSolver == "Gurobi"){ 
+      return(getDualRaysOsi(maxNumRays));
+   }else{
+      throw UtilException("Unknown solver selected.",
+			  "getDualRays", "DecompAlgo");
+   }
+}
+
+//===========================================================================//
+vector<double*> DecompAlgo::getDualRaysCpx(int maxNumRays)
+{
+#ifdef DIP_HAS_CPX
+   bool useMultiRay = true;
+   if (useMultiRay){ 
+      OsiCpxSolverInterface* siCpx
+	 = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      const int m = m_masterSI->getNumRows();
+      const int n = m_masterSI->getNumCols();
+      const double* rowRhs    = m_masterSI->getRightHandSide();
+      const char*    rowSense  = m_masterSI->getRowSense();
+      int r, b, c;
+      vector<double*> rays;
+      //Ax + Is = b
+      // ax     <= b
+      // ax + s  = b, s >= 0
+      // ax     >= b
+      // ax + s  = b, s <= 0
+      UTIL_DEBUG(m_param.LogDebugLevel, 5,
+		 
+		 for (r = 0; r < m; r++) {
+		    (*m_osLog) << "Row r: " << r << " sense: " << rowSense[r]
+			       << " rhs: " << rowRhs[r] << endl;
+		 }
+		 );
+      m_masterSI->enableSimplexInterface(false);
+      double* tabRhs   = new double[m];
+      int*     basics   = new int[m];
+      double* yb       = new double[m];
+      double* bInvRow  = new double[m];
+      double* bInvARow = new double[n];
+      //STOP ============================================
+      //tabRhs and yb do NOT match up.... is this an issue?
+      //have to hand adjust or use tabRhs since proof is based on B-1
+      //which matches up with bhead - what to do in the case of CLP?
+      //but, we are multiplying this by A'' later on which is based on
+      //original variable space, not the one adjusted by simplex - so if
+      //we return the dual ray directly from B-1 then do B-1A by hand -
+      //do we have a problem?
+      //need to add a check that B-1A matches my dualray.A calculation
+      //in generate vars... it might be ok and yb not ok, because the
+      //adjustments in simplex might only be related to rhs...
+      //i don't think Osi returns tabRhs... that should be changed
+      CPXgetbhead(siCpx->getEnvironmentPtr(),
+		  siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
+		  basics, tabRhs);
+      //as a sanity check print out the basis status next to the yb vs tabRhs
+      //calculation.... let's see why and where things don't match up...
+      //yb, where y is a row of B-1 (note, can get from bhead?)
+      UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		 (*m_osLog) << "\nB-1:";
+		 
+		 for (r = 0; r < m; r++) {
+		    yb[r] = 0.0;
+		    m_masterSI->getBInvRow(r, bInvRow);
+		    (*m_osLog) << "\nB-1Row r: " << r << ": " << endl;
+		    
+		    for (b = 0; b < m; b++) {
+		       yb[r] += bInvRow[b] * rowRhs[b];
+		       (*m_osLog) << setw(6) << "bind: "
+				  << setw(4) << basics[b]
+				  << setw(12) << bInvRow[b]
+				  << " ["
+				  << setw(12) << rowRhs[b]
+				  << "] "
+				  << setw(8) << " +=: "
+				  << setw(12) << bInvRow[b] * rowRhs[b]
+				  << setw(8) << " yb: "
+				  << setw(12) << yb[r]
+				  << setw(8) << " tabRhs: "
+				  << setw(12) << tabRhs[r] << endl;
+		    }
+		    
+		    if (!UtilIsZero(yb[r] - tabRhs[r])) {
+		       (*m_osLog) << " DIFF is " << yb[r] - tabRhs[r] << endl;
+		    }
+		    
+		    assert(UtilIsZero(yb[r] - tabRhs[r], 1.0e-4));
+		 }
+		 );
+      
+      for (r = 0; r < m; r++) {
+	 yb[r] = 0.0;
+	 m_masterSI->getBInvRow(r, bInvRow);
+	 
+	 for (b = 0; b < m; b++) {
+	    yb[r] += bInvRow[b] * rowRhs[b];//(B-1)_r.b
+	 }
+	 
+	 if (!UtilIsZero(yb[r] - tabRhs[r])) {
+	    (*m_osLog) << " DIFF is " << yb[r] - tabRhs[r] << endl;
+	    (*m_osLog) << "\nB-1Row r: " << r << ": basics[r]=" << basics[r]
+		       << endl;
+	    yb[r] = 0.0;
+	    
+	    for (b = 0; b < m; b++) {
+	       if (UtilIsZero(bInvRow[b])) {
+		  continue;
+	       }
+	       
+	       yb[r] += bInvRow[b] * rowRhs[b];
+	       (*m_osLog) << setw(6) << "bind: "
+			  << setw(4) << basics[b]
+			  << setw(12) << bInvRow[b]
+			  << " ["
+			  << setw(12) << rowRhs[b];
+	       
+	       if (basics[b] < 0) { //== -rowIndex-1
+		  (*m_osLog) << " sense = " << rowSense[-(basics[b] + 1)];
+	       }
+	       
+	       (*m_osLog) << "] "
+			  << setw(8) << " +=: "
+			  << setw(12) << bInvRow[b] * rowRhs[b]
+			  << setw(8) << " yb: "
+			  << setw(12) << yb[r]
+			  << setw(8) << " tabRhs: "
+			  << setw(12) << tabRhs[r] << endl;
+	    }
+	 }
+	 
+	 //assert(UtilIsZero(yb[r] - tabRhs[r], 1.0e-4));
+      }
+      
+      for (r = 0; r < m; r++) {
+	 if (UtilIsZero(tabRhs[r])) {
+	    continue;
+	 }
+	 
+	 //all pos case? if yb < 0 (then we want to minimize B-1Ax, x in P')
+	 //all neg case? if yb > 0 (then we want to maximize B-1Ax, x in P')
+	 UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		    (*m_osLog) << "\nB-1A:";
+		    );
+	 
+	 if (tabRhs[r] > 0) {  //instead of yb
+	    //Ted also checks that it is a slack var here - why?
+	    bool allneg = true;
+	    m_masterSI->getBInvARow(r, bInvARow);
+	    UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		       (*m_osLog) << "\nB-1ARow r: " << r << ": ";
+		       );
+	    allneg = true;
+	    
+	    for (c = 0; c < n; c++) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << bInvARow[c] << " ";
+			  );
+	       
+	       if (bInvARow[c] >= DecompEpsilon) {
+		  allneg = false;
+		  break;
+	       }
+	    }
+	    
+	    if (allneg) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << " ---> allneg";
+			  );
+	       double* dualRay  = new double[m];
+	       m_masterSI->getBInvRow(r, dualRay);
+	       transform(dualRay, dualRay + m, dualRay, negate<double>());
+	       rays.push_back(dualRay);
+	    }
+	 } else {
+	    bool allpos = true;
+	    m_masterSI->getBInvARow(r, bInvARow);
+	    UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		       (*m_osLog) << "\nB-1ARow r: " << r << ": ";
+		       );
+	    allpos = true;
+	    
+	    for (c = 0; c < n; c++) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << bInvARow[c] << " ";
+			  );
+	       
+	       if (bInvARow[c] <= -DecompEpsilon) {
+		  allpos = false;
+		  break;
+	       }
+	    }
+	    
+	    if (allpos) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << " ---> allpos";
+			  );
+	       double* dualRay  = new double[m];
+	       m_masterSI->getBInvRow(r, dualRay);
+	       rays.push_back(dualRay);
+	    }
+	 }
+      }
+      
+      UTIL_DELARR(tabRhs);
+      UTIL_DELARR(basics);
+      UTIL_DELARR(yb);
+      UTIL_DELARR(bInvRow);
+      UTIL_DELARR(bInvARow);
+      m_masterSI->disableSimplexInterface();
+      printf("rays.size = %d\n", static_cast<int>(rays.size()));
+      
+      if (rays.size() <= 0) {
+	 printf("NO RAYS using standard lookup - try dualfarkas\n");
+	 double   proof_p;
+	 double* dualRay = new double[m];
+	 CPXdualfarkas(siCpx->getEnvironmentPtr(),
+		       siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
+		       dualRay, &proof_p);
+	 (*m_osLog) << "After dual farkas proof_p = " << proof_p << "\n";
+	 transform(dualRay, dualRay + m, dualRay, negate<double>());
+	 
+	 for (int i = 0; i < m; i++) {
+	    printf("dualRay[%d]: %g\n", i, dualRay[i]);
+	 }
+	 
+	 rays.push_back(dualRay);
+      }
+      
+      //NOTE: you will have dup rays here - need to filter out...
+      printf("rays.size = %d", static_cast<int>(rays.size()));
+      
+      for (size_t i = 0; i < rays.size(); i++) {
+	 bool isProof = isDualRayInfProof(rays[i],
+					  m_masterSI->getMatrixByRow(),
+					  m_masterSI->getColLower(),
+					  m_masterSI->getColUpper(),
+					  m_masterSI->getRightHandSide(),
+					  NULL);
+	 
+	 if (!isProof) {
+	    isDualRayInfProof(rays[i],
+			      m_masterSI->getMatrixByRow(),
+			      m_masterSI->getColLower(),
+			      m_masterSI->getColUpper(),
+			      m_masterSI->getRightHandSide(),
+			      m_osLog);
+	 }
+	 
+	 assert(isProof);
+      }
+      
+      assert(rays.size() > 0);
+      return rays;
+   }else{//useMultiRay == false
+//TEST THIS
+      OsiCpxSolverInterface* siCpx
+	 = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      const int m = m_masterSI->getNumRows();
+      const int n = m_masterSI->getNumCols();
+      double proof_p;
+      bool   isProof;
+      vector<double*> rays;
+      double* ray = new double[m];
+      int err
+	 = CPXdualfarkas(siCpx->getEnvironmentPtr(),
+			 siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
+			 ray, &proof_p);//proof_p
+      
+      if (err) {
+	 cerr << "CPXdualfarkas returns err " << err << endl;
+	 abort();
+      }
+      
+      cout << "After dual farkas proof_p = " << proof_p << "\n";
+      //We have to flip because in this context we want to max B-1Ax, x in P'
+      double* pneg = new double[m];
+      transform(ray, ray + m, pneg, negate<double>());
+      rays.push_back(pneg);
+#if 1
+      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		 bool isProof = isDualRayInfProof(rays[0],
+						  m_masterSI->getMatrixByRow(),
+						  m_masterSI->getColLower(),
+						  m_masterSI->getColUpper(),
+						  m_masterSI->getRightHandSide(),
+						  NULL);
+		 printf("isProof = %d\n", isProof);
+		 printBasisInfo(m_masterSI, m_osLog);
+		 fflush(stdout);
+		 
+		 if (!isProof) {
+		    isDualRayInfProof(ray,
+				      m_masterSI->getMatrixByRow(),
+				      m_masterSI->getColLower(),
+				      m_masterSI->getColUpper(),
+				      m_masterSI->getRightHandSide(),
+				      m_osLog);
+		    printBasisInfo(m_masterSI, m_osLog);
+		    fflush(stdout);
+		 }
+		 );
+      assert(isDualRayInfProof(ray,
+			       m_masterSI->getMatrixByRow(),
+			       m_masterSI->getColLower(),
+			       m_masterSI->getColUpper(),
+			       m_masterSI->getRightHandSide(),
+			       NULL));
+#endif
+      return rays;
+   }
+#else
+   throw UtilException("CPLEX function called when CPLEX is not available",
+		       "getDualRaysCpx", "DecompAlgo");
+#endif
+}
+
+//===========================================================================//
+//STOP - try this...
+vector<double*> DecompAlgo::getDualRaysOsi(int maxNumRays)
+{
+   if (m_param.UseMultiRay){
+      const int m = m_masterSI->getNumRows();
+      const int n = m_masterSI->getNumCols();
+      const double* rowRhs    = m_masterSI->getRightHandSide();
+      const char*    rowSense  = m_masterSI->getRowSense();
+      int i, r, b, c;
+      vector<double*> rays;
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "getDualRays()", m_param.LogDebugLevel, 2);
+      UTIL_DEBUG(m_param.LogDebugLevel, 5,
+		 
+		 for (r = 0; r < m; r++) {
+		    (*m_osLog) << "Row r: " << r << " sense: " << rowSense[r]
+			       << " rhs: " << rowRhs[r] << endl;
+		 }
+		 );
+      m_masterSI->enableSimplexInterface(false);
+      //with simplex interface, this is slightly different...
+      const double* primSolution = m_masterSI->getColSolution();
+      const double* rowAct       = m_masterSI->getRowActivity(); //==slacks?
+      double* tabRhs   = new double[m]; //osi_clp does not give this?
+      //B-1b just equals x, but what if art column then is slack var
+      int*     basics   = new int[m];
+      double* yb       = new double[m];
+      double* bInvRow  = new double[m];
+      double* bInvARow = new double[n];
+      m_masterSI->getBasics(basics);
+      
+      for (r = 0; r < m; r++) {
+	 i = basics[r];
+	 
+	 if (i < n) {
+	    tabRhs[r] = primSolution[i]; //should == B-1b
+	    //printf("tabRhs[c:%d]: %g\n", i, tabRhs[r]);
+	 } else {
+	    //this really should be slack vars...
+	    //assuming clp does Ax-Is = b, s = ax-b ??? nope...
+	    //tabRhs[r] = rowAct[i - n] - rowRhs[i - n];
+	    tabRhs[r] = rowRhs[i - n] - rowAct[i - n];
+	    //printf("tabRhs[r:%d]: %g [act: %g rhs: %g sense: %c]\n",
+	    //	i-n, tabRhs[r], rowAct[i-n], rowRhs[i-n], rowSense[i-n]);
+	 }
+      }
+      
+      //as a sanity check print out the basis status next to the yb vs tabRhs
+      //calculation.... let's see why and where things don't match up...
+      //yb, where y is a row of B-1 (note, can get from bhead?)
+      //B-1b is tab rhs, is this equivalent to x for struct columns?
+      UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		 (*m_osLog) << "\nB-1:";
+		 
+		 for (r = 0; r < m; r++) {
+		    if (UtilIsZero(tabRhs[r])) {
+		       continue;
+		    }
+		    
+		    yb[r] = 0.0;
+		    m_masterSI->getBInvRow(r, bInvRow);
+		    (*m_osLog) << "\nB-1Row r: " << r << ": " << endl;
+		    
+		    for (b = 0; b < m; b++) {
+		       yb[r] += bInvRow[b] * rowRhs[b];
+		       (*m_osLog) << setw(6) << "bind: "
+				  << setw(4) << basics[b]
+				  << setw(12) << bInvRow[b]
+				  << " ["
+				  << setw(12) << rowRhs[b]
+				  << "] "
+				  << setw(8) << " +=: "
+				  << setw(12) << bInvRow[b] * rowRhs[b]
+				  << setw(8) << " yb: "
+				  << setw(12) << yb[r]
+				  << setw(8) << " tabRhs: "
+				  << setw(12) << tabRhs[r]
+				  << endl;
+		    }
+		    
+		    if (!UtilIsZero(yb[r] - tabRhs[r])) {
+		       (*m_osLog) << " DIFF is " << yb[r] - tabRhs[r] << endl;
+		    }
+		    
+		    assert(UtilIsZero(yb[r] - tabRhs[r], 1.0e-4));
+		 }
+		 );
+      
+      for (r = 0; r < m; r++) {
+	 if (UtilIsZero(tabRhs[r])) {
+	    continue;
+	 }
+	 
+	 //all pos case? if yb < 0 (then we want to minimize B-1Ax, x in P')
+	 //all neg case? if yb > 0 (then we want to maximize B-1Ax, x in P')
+	 if (tabRhs[r] > 0) { //instead of yb
+	    //Ted also checks that it is a slack var here - why?
+	    bool allneg = true;
+	    //not getting back slacks part here... need?
+	    m_masterSI->getBInvARow(r, bInvARow);
+	    UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		       (*m_osLog) << "B-1ARow r: " << r << ": ";
+		       );
+	    allneg = true;
+	    
+	    for (c = 0; c < n; c++) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << bInvARow[c] << " ";
+			  );
+	       
+	       if (bInvARow[c] >= DecompEpsilon) {
+		  allneg = false;
+		  break;
+	       }
+	    }
+	    
+	    if (allneg) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << " ---> allneg";
+			  );
+	       double* dualRay  = new double[m];
+	       m_masterSI->getBInvRow(r, dualRay);
+	       transform(dualRay, dualRay + m, dualRay, negate<double>());
+	       rays.push_back(dualRay);
+	    }
+	 } else {
+	    bool allpos = true;
+	    m_masterSI->getBInvARow(r, bInvARow);
+	    UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		       (*m_osLog) << "B-1ARow r: " << r << ": ";
+		       );
+	    allpos = true;
+	    
+	    for (c = 0; c < n; c++) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << bInvARow[c] << " ";
+			  );
+	       
+	       if (bInvARow[c] <= -DecompEpsilon) {
+		  allpos = false;
+		  break;
+	       }
+	    }
+	    
+	    if (allpos) {
+	       UTIL_DEBUG(m_param.LogDebugLevel, 6,
+			  (*m_osLog) << " ---> allpos";
+			  );
+	       double* dualRay  = new double[m];
+	       m_masterSI->getBInvRow(r, dualRay);
+	       rays.push_back(dualRay);
+	    }
+	 }
+	 
+	 UTIL_DEBUG(m_param.LogDebugLevel, 6,
+		    (*m_osLog) << endl;
+		    );
+      }
+      
+      UTIL_DELARR(basics);
+      UTIL_DELARR(yb);
+      UTIL_DELARR(bInvRow);
+      UTIL_DELARR(bInvARow);
+      m_masterSI->disableSimplexInterface();
+      /*
+	if(rays.size() <= 0){
+	double   proof_p;
+	double * dualRay = new double[m];
+	CPXdualfarkas(siCpx->getEnvironmentPtr(),
+	siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
+	dualRay, &proof_p);
+	(*m_osLog) << "After dual farkas proof_p = " << proof_p << "\n";
+	transform(dualRay, dualRay + m, dualRay, negate<double>());
+	for(int i = 0; i < m; i++){
+	printf("dualRay[%d]: %g\n", i, dualRay[i]);
+	}
+	rays.push_back(dualRay);
+	}
+      */
+      //NOTE: you will have dup rays here - need to filter out...
+      UTIL_DEBUG(m_param.LogDebugLevel, 5,
+		 (*m_osLog) << "Number of Rays = " << rays.size() << endl;
+		 );
+      
+      for (int i = 0; i < (int)rays.size(); i++) {
+	 bool isProof = isDualRayInfProof(rays[i],
+					  m_masterSI->getMatrixByRow(),
+					  m_masterSI->getColLower(),
+					  m_masterSI->getColUpper(),
+					  m_masterSI->getRightHandSide(),
+					  NULL);
+	 
+	 if (!isProof) {
+	    isDualRayInfProof(rays[i],
+			      m_masterSI->getMatrixByRow(),
+			      m_masterSI->getColLower(),
+			      m_masterSI->getColUpper(),
+			      m_masterSI->getRightHandSide(),
+			      m_osLog);
+	 }
+	 
+	 assert(isProof);
+      }
+      
+      assert(rays.size() > 0);
+      UTIL_DELARR(tabRhs);
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "getDualRays()", m_param.LogDebugLevel, 2);
+      return rays;
+   }else{//m_param.UseMultiRay == false
+
+      UtilPrintFuncBegin(m_osLog, m_classTag,
+			 "getDualRays()", m_param.LogDebugLevel, 2);
+      vector<double*> raysT = m_masterSI->getDualRays(maxNumRays);
+      const double* rayT = raysT[0];
+      assert(rayT);
+      //stop
+      //what is yb, that will tell me if i want to opt over uA or -uA
+      //y^T b
+      int   i;
+      const CoinPackedMatrix* rowMatrix = m_masterSI->getMatrixByRow();
+      const double*            rowRhs    = m_masterSI->getRightHandSide();
+      const int                m         = rowMatrix->getNumRows();
+      double yb = 0.0;
+      
+      for (i = 0; i < m; i++) {
+	 yb += rayT[i] * rowRhs[i]; //safe to use rowRhs? or flips in tab going on
+      }
+      
+      (*m_osLog) << " yb = " << yb << endl;
+      //need tabRhs if doing this way?
+      //see Clp/examples/decompose.cpp
+      //   he flips the infeasibility ray (always...)
+      //---    yA >= 0, yb < 0, or  --> find a yAs <= 0 (min)
+      //---    yA <= 0, yb > 0 ??   --> find a yAs >= 0 (max <--> -min)
+      vector<double*> rays;
+      
+      if (yb > 0) {
+	 double* pneg = new double[m];
+	 transform(rayT, rayT + m, pneg, negate<double>());
+	 rays.push_back(pneg);
+      } else {
+	 rays.push_back(raysT[0]);
+      }
+      
+#if 1
+      UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
+		 const double* ray = rays[0];
+		 assert(ray);
+		 bool isProof = isDualRayInfProof(ray,
+						  m_masterSI->getMatrixByRow(),
+						  m_masterSI->getColLower(),
+						  m_masterSI->getColUpper(),
+						  m_masterSI->getRightHandSide(),
+						  NULL);
+		 printf("isProof = %d\n", isProof);
+		 fflush(stdout);
+		 
+		 if (!isProof) {
+		    isDualRayInfProof(ray,
+				      m_masterSI->getMatrixByRow(),
+				      m_masterSI->getColLower(),
+				      m_masterSI->getColUpper(),
+				      m_masterSI->getRightHandSide(),
+				      m_osLog);
+		    printBasisInfo(m_masterSI, m_osLog);
+		    fflush(stdout);
+		 }
+		 assert(isDualRayInfProof(ray,
+					  m_masterSI->getMatrixByRow(),
+					  m_masterSI->getColLower(),
+					  m_masterSI->getColUpper(),
+					  m_masterSI->getRightHandSide(),
+					  NULL));
+		 );;
+#endif
+      UtilPrintFuncEnd(m_osLog, m_classTag,
+		       "getDualRays()", m_param.LogDebugLevel, 2);
+      return rays;
+   }
 }
 
 //===========================================================================//
@@ -3127,7 +3723,6 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    const double* rowRhs       = m_masterSI->getRightHandSide();
    double         zDW_UBPrimal = getMasterObjValue();
    double         zDW_UBDual   = 0.0;
-   double         zDW_UB       = 0.0;
    double         zDW_LB       = 0.0;
    const double* rc = getMasterColReducedCost();
    const double* colLower = m_masterSI->getColLower();
@@ -3155,9 +3750,9 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    //zDW_LB = zDW_UBDual + mostNegRC;
    zDW_LB = zDW_UBPrimal + mostNegRC;
    setObjBound(zDW_LB, zDW_UBPrimal);
+   /*
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
-   /*
    if (!m_param.DualStab && !UtilIsZero(unifDiff, 1e-04)) {
       (*m_osLog) << "MasterObj [primal] = " << UtilDblToStr(zDW_UBPrimal)
                  << endl;
@@ -3186,7 +3781,6 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
               << setw(13) << UtilDblToStr(zDW_LB, 4)
               << endl;
              );
-   zDW_UB = zDW_UBPrimal;
 
    if ((getNodeIndex() == 0) &&
          (zDW_LB > (m_app->getBestKnownUB() + DecompEpsilon))) {
@@ -3902,609 +4496,6 @@ PHASE_UPDATE_FINISH:
                     "phaseUpdate()", m_param.LogDebugLevel, 2);
 }
 
-//NOTE: not ok for CPX... do self?
-
-#ifdef __DECOMP_LP_CPX__
-
-#ifdef USE_MULTI_RAY
-//------------------------------------------------------------------------- //
-vector<double*> DecompAlgo::getDualRays(int maxNumRays)
-{
-   OsiCpxSolverInterface* siCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
-   const int m = m_masterSI->getNumRows();
-   const int n = m_masterSI->getNumCols();
-   const double* rowRhs    = m_masterSI->getRightHandSide();
-   const char*    rowSense  = m_masterSI->getRowSense();
-   int r, b, c;
-   vector<double*> rays;
-   //Ax + Is = b
-   // ax     <= b
-   // ax + s  = b, s >= 0
-   // ax     >= b
-   // ax + s  = b, s <= 0
-   UTIL_DEBUG(m_param.LogDebugLevel, 5,
-
-   for (r = 0; r < m; r++) {
-   (*m_osLog) << "Row r: " << r << " sense: " << rowSense[r]
-      << " rhs: " << rowRhs[r] << endl;
-   }
-             );
-   m_masterSI->enableSimplexInterface(false);
-   double* tabRhs   = new double[m];
-   int*     basics   = new int[m];
-   double* yb       = new double[m];
-   double* bInvRow  = new double[m];
-   double* bInvARow = new double[n];
-   //STOP ============================================
-   //tabRhs and yb do NOT match up.... is this an issue?
-   //have to hand adjust or use tabRhs since proof is based on B-1
-   //which matches up with bhead - what to do in the case of CLP?
-   //but, we are multiplying this by A'' later on which is based on
-   //original variable space, not the one adjusted by simplex - so if
-   //we return the dual ray directly from B-1 then do B-1A by hand -
-   //do we have a problem?
-   //need to add a check that B-1A matches my dualray.A calculation
-   //in generate vars... it might be ok and yb not ok, because the
-   //adjustments in simplex might only be related to rhs...
-   //i don't think Osi returns tabRhs... that should be changed
-   CPXgetbhead(siCpx->getEnvironmentPtr(),
-               siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
-               basics, tabRhs);
-   //as a sanity check print out the basis status next to the yb vs tabRhs
-   //calculation.... let's see why and where things don't match up...
-   //yb, where y is a row of B-1 (note, can get from bhead?)
-   UTIL_DEBUG(m_param.LogDebugLevel, 6,
-              (*m_osLog) << "\nB-1:";
-
-   for (r = 0; r < m; r++) {
-   yb[r] = 0.0;
-      m_masterSI->getBInvRow(r, bInvRow);
-      (*m_osLog) << "\nB-1Row r: " << r << ": " << endl;
-
-      for (b = 0; b < m; b++) {
-         yb[r] += bInvRow[b] * rowRhs[b];
-         (*m_osLog) << setw(6) << "bind: "
-         << setw(4) << basics[b]
-         << setw(12) << bInvRow[b]
-         << " ["
-         << setw(12) << rowRhs[b]
-         << "] "
-         << setw(8) << " +=: "
-         << setw(12) << bInvRow[b] * rowRhs[b]
-         << setw(8) << " yb: "
-         << setw(12) << yb[r]
-         << setw(8) << " tabRhs: "
-         << setw(12) << tabRhs[r] << endl;
-      }
-
-      if (!UtilIsZero(yb[r] - tabRhs[r])) {
-         (*m_osLog) << " DIFF is " << yb[r] - tabRhs[r] << endl;
-      }
-
-      assert(UtilIsZero(yb[r] - tabRhs[r], 1.0e-4));
-   }
-             );
-
-   for (r = 0; r < m; r++) {
-      yb[r] = 0.0;
-      m_masterSI->getBInvRow(r, bInvRow);
-
-      for (b = 0; b < m; b++) {
-         yb[r] += bInvRow[b] * rowRhs[b];//(B-1)_r.b
-      }
-
-      if (!UtilIsZero(yb[r] - tabRhs[r])) {
-         (*m_osLog) << " DIFF is " << yb[r] - tabRhs[r] << endl;
-         (*m_osLog) << "\nB-1Row r: " << r << ": basics[r]=" << basics[r]
-                    << endl;
-         yb[r] = 0.0;
-
-         for (b = 0; b < m; b++) {
-            if (UtilIsZero(bInvRow[b])) {
-               continue;
-            }
-
-            yb[r] += bInvRow[b] * rowRhs[b];
-            (*m_osLog) << setw(6) << "bind: "
-                       << setw(4) << basics[b]
-                       << setw(12) << bInvRow[b]
-                       << " ["
-                       << setw(12) << rowRhs[b];
-
-            if (basics[b] < 0) { //== -rowIndex-1
-               (*m_osLog) << " sense = " << rowSense[-(basics[b] + 1)];
-            }
-
-            (*m_osLog) << "] "
-                       << setw(8) << " +=: "
-                       << setw(12) << bInvRow[b] * rowRhs[b]
-                       << setw(8) << " yb: "
-                       << setw(12) << yb[r]
-                       << setw(8) << " tabRhs: "
-                       << setw(12) << tabRhs[r] << endl;
-         }
-      }
-
-      //assert(UtilIsZero(yb[r] - tabRhs[r], 1.0e-4));
-   }
-
-   for (r = 0; r < m; r++) {
-      if (UtilIsZero(tabRhs[r])) {
-         continue;
-      }
-
-      //all pos case? if yb < 0 (then we want to minimize B-1Ax, x in P')
-      //all neg case? if yb > 0 (then we want to maximize B-1Ax, x in P')
-      UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                 (*m_osLog) << "\nB-1A:";
-                );
-
-      if (tabRhs[r] > 0) {  //instead of yb
-         //Ted also checks that it is a slack var here - why?
-         bool allneg = true;
-         m_masterSI->getBInvARow(r, bInvARow);
-         UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                    (*m_osLog) << "\nB-1ARow r: " << r << ": ";
-                   );
-         allneg = true;
-
-         for (c = 0; c < n; c++) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << bInvARow[c] << " ";
-                      );
-
-            if (bInvARow[c] >= DecompEpsilon) {
-               allneg = false;
-               break;
-            }
-         }
-
-         if (allneg) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << " ---> allneg";
-                      );
-            double* dualRay  = new double[m];
-            m_masterSI->getBInvRow(r, dualRay);
-            transform(dualRay, dualRay + m, dualRay, negate<double>());
-            rays.push_back(dualRay);
-         }
-      } else {
-         bool allpos = true;
-         m_masterSI->getBInvARow(r, bInvARow);
-         UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                    (*m_osLog) << "\nB-1ARow r: " << r << ": ";
-                   );
-         allpos = true;
-
-         for (c = 0; c < n; c++) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << bInvARow[c] << " ";
-                      );
-
-            if (bInvARow[c] <= -DecompEpsilon) {
-               allpos = false;
-               break;
-            }
-         }
-
-         if (allpos) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << " ---> allpos";
-                      );
-            double* dualRay  = new double[m];
-            m_masterSI->getBInvRow(r, dualRay);
-            rays.push_back(dualRay);
-         }
-      }
-   }
-
-   UTIL_DELARR(tabRhs);
-   UTIL_DELARR(basics);
-   UTIL_DELARR(yb);
-   UTIL_DELARR(bInvRow);
-   UTIL_DELARR(bInvARow);
-   m_masterSI->disableSimplexInterface();
-   printf("rays.size = %d\n", static_cast<int>(rays.size()));
-
-   if (rays.size() <= 0) {
-      printf("NO RAYS using standard lookup - try dualfarkas\n");
-      double   proof_p;
-      double* dualRay = new double[m];
-      CPXdualfarkas(siCpx->getEnvironmentPtr(),
-                    siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
-                    dualRay, &proof_p);
-      (*m_osLog) << "After dual farkas proof_p = " << proof_p << "\n";
-      transform(dualRay, dualRay + m, dualRay, negate<double>());
-
-      for (int i = 0; i < m; i++) {
-         printf("dualRay[%d]: %g\n", i, dualRay[i]);
-      }
-
-      rays.push_back(dualRay);
-   }
-
-   //NOTE: you will have dup rays here - need to filter out...
-   printf("rays.size = %d", static_cast<int>(rays.size()));
-
-   for (size_t i = 0; i < rays.size(); i++) {
-      bool isProof = isDualRayInfProof(rays[i],
-                                       m_masterSI->getMatrixByRow(),
-                                       m_masterSI->getColLower(),
-                                       m_masterSI->getColUpper(),
-                                       m_masterSI->getRightHandSide(),
-                                       NULL);
-
-      if (!isProof) {
-         isDualRayInfProof(rays[i],
-                           m_masterSI->getMatrixByRow(),
-                           m_masterSI->getColLower(),
-                           m_masterSI->getColUpper(),
-                           m_masterSI->getRightHandSide(),
-                           m_osLog);
-      }
-
-      assert(isProof);
-   }
-
-   assert(rays.size() > 0);
-   return rays;
-}
-#else
-//------------------------------------------------------------------------- //
-//TEST THIS
-vector<double*> DecompAlgo::getDualRays(int maxNumRays)
-{
-   OsiCpxSolverInterface* siCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
-   const int m = m_masterSI->getNumRows();
-   const int n = m_masterSI->getNumCols();
-   double proof_p;
-   bool   isProof;
-   vector<double*> rays;
-   double* ray = new double[m];
-   int err
-   = CPXdualfarkas(siCpx->getEnvironmentPtr(),
-                   siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
-                   ray, &proof_p);//proof_p
-
-   if (err) {
-      cerr << "CPXdualfarkas returns err " << err << endl;
-      abort();
-   }
-
-   cout << "After dual farkas proof_p = " << proof_p << "\n";
-   //We have to flip because in this context we want to max B-1Ax, x in P'
-   double* pneg = new double[m];
-   transform(ray, ray + m, pneg, negate<double>());
-   rays.push_back(pneg);
-#if 1
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-              bool isProof = isDualRayInfProof(rays[0],
-                             m_masterSI->getMatrixByRow(),
-                             m_masterSI->getColLower(),
-                             m_masterSI->getColUpper(),
-                             m_masterSI->getRightHandSide(),
-                             NULL);
-              printf("isProof = %d\n", isProof);
-              printBasisInfo(m_masterSI, m_osLog);
-              fflush(stdout);
-
-   if (!isProof) {
-   isDualRayInfProof(ray,
-                     m_masterSI->getMatrixByRow(),
-                     m_masterSI->getColLower(),
-                     m_masterSI->getColUpper(),
-                     m_masterSI->getRightHandSide(),
-                     m_osLog);
-      printBasisInfo(m_masterSI, m_osLog);
-      fflush(stdout);
-   }
-             );
-   assert(isDualRayInfProof(ray,
-                            m_masterSI->getMatrixByRow(),
-                            m_masterSI->getColLower(),
-                            m_masterSI->getColUpper(),
-                            m_masterSI->getRightHandSide(),
-                            NULL));
-#endif
-   return rays;
-}
-#endif
-#endif
-
-
-
-#if defined(__DECOMP_LP_CLP__) || defined(__DECOMP_LP_GRB__)
-
-#ifdef USE_MULTI_RAY
-//------------------------------------------------------------------------- //
-//STOP - try this...
-vector<double*> DecompAlgo::getDualRays(int maxNumRays)
-{
-   const int m = m_masterSI->getNumRows();
-   const int n = m_masterSI->getNumCols();
-   const double* rowRhs    = m_masterSI->getRightHandSide();
-   const char*    rowSense  = m_masterSI->getRowSense();
-   int i, r, b, c;
-   vector<double*> rays;
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "getDualRays()", m_param.LogDebugLevel, 2);
-   UTIL_DEBUG(m_param.LogDebugLevel, 5,
-
-   for (r = 0; r < m; r++) {
-   (*m_osLog) << "Row r: " << r << " sense: " << rowSense[r]
-      << " rhs: " << rowRhs[r] << endl;
-   }
-             );
-   m_masterSI->enableSimplexInterface(false);
-   //with simplex interface, this is slightly different...
-   const double* primSolution = m_masterSI->getColSolution();
-   const double* rowAct       = m_masterSI->getRowActivity(); //==slacks?
-   double* tabRhs   = new double[m]; //osi_clp does not give this?
-   //B-1b just equals x, but what if art column then is slack var
-   int*     basics   = new int[m];
-   double* yb       = new double[m];
-   double* bInvRow  = new double[m];
-   double* bInvARow = new double[n];
-   m_masterSI->getBasics(basics);
-
-   for (r = 0; r < m; r++) {
-      i = basics[r];
-
-      if (i < n) {
-         tabRhs[r] = primSolution[i]; //should == B-1b
-         //printf("tabRhs[c:%d]: %g\n", i, tabRhs[r]);
-      } else {
-         //this really should be slack vars...
-         //assuming clp does Ax-Is = b, s = ax-b ??? nope...
-         //tabRhs[r] = rowAct[i - n] - rowRhs[i - n];
-         tabRhs[r] = rowRhs[i - n] - rowAct[i - n];
-         //printf("tabRhs[r:%d]: %g [act: %g rhs: %g sense: %c]\n",
-         //	i-n, tabRhs[r], rowAct[i-n], rowRhs[i-n], rowSense[i-n]);
-      }
-   }
-
-   //as a sanity check print out the basis status next to the yb vs tabRhs
-   //calculation.... let's see why and where things don't match up...
-   //yb, where y is a row of B-1 (note, can get from bhead?)
-   //B-1b is tab rhs, is this equivalent to x for struct columns?
-   UTIL_DEBUG(m_param.LogDebugLevel, 6,
-              (*m_osLog) << "\nB-1:";
-
-   for (r = 0; r < m; r++) {
-   if (UtilIsZero(tabRhs[r])) {
-         continue;
-      }
-
-      yb[r] = 0.0;
-      m_masterSI->getBInvRow(r, bInvRow);
-      (*m_osLog) << "\nB-1Row r: " << r << ": " << endl;
-
-      for (b = 0; b < m; b++) {
-         yb[r] += bInvRow[b] * rowRhs[b];
-         (*m_osLog) << setw(6) << "bind: "
-         << setw(4) << basics[b]
-         << setw(12) << bInvRow[b]
-         << " ["
-         << setw(12) << rowRhs[b]
-         << "] "
-         << setw(8) << " +=: "
-         << setw(12) << bInvRow[b] * rowRhs[b]
-         << setw(8) << " yb: "
-         << setw(12) << yb[r]
-         << setw(8) << " tabRhs: "
-         << setw(12) << tabRhs[r]
-         << endl;
-      }
-
-      if (!UtilIsZero(yb[r] - tabRhs[r])) {
-         (*m_osLog) << " DIFF is " << yb[r] - tabRhs[r] << endl;
-      }
-
-      assert(UtilIsZero(yb[r] - tabRhs[r], 1.0e-4));
-   }
-             );
-
-   for (r = 0; r < m; r++) {
-      if (UtilIsZero(tabRhs[r])) {
-         continue;
-      }
-
-      //all pos case? if yb < 0 (then we want to minimize B-1Ax, x in P')
-      //all neg case? if yb > 0 (then we want to maximize B-1Ax, x in P')
-      if (tabRhs[r] > 0) { //instead of yb
-         //Ted also checks that it is a slack var here - why?
-         bool allneg = true;
-         //not getting back slacks part here... need?
-         m_masterSI->getBInvARow(r, bInvARow);
-         UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                    (*m_osLog) << "B-1ARow r: " << r << ": ";
-                   );
-         allneg = true;
-
-         for (c = 0; c < n; c++) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << bInvARow[c] << " ";
-                      );
-
-            if (bInvARow[c] >= DecompEpsilon) {
-               allneg = false;
-               break;
-            }
-         }
-
-         if (allneg) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << " ---> allneg";
-                      );
-            double* dualRay  = new double[m];
-            m_masterSI->getBInvRow(r, dualRay);
-            transform(dualRay, dualRay + m, dualRay, negate<double>());
-            rays.push_back(dualRay);
-         }
-      } else {
-         bool allpos = true;
-         m_masterSI->getBInvARow(r, bInvARow);
-         UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                    (*m_osLog) << "B-1ARow r: " << r << ": ";
-                   );
-         allpos = true;
-
-         for (c = 0; c < n; c++) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << bInvARow[c] << " ";
-                      );
-
-            if (bInvARow[c] <= -DecompEpsilon) {
-               allpos = false;
-               break;
-            }
-         }
-
-         if (allpos) {
-            UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                       (*m_osLog) << " ---> allpos";
-                      );
-            double* dualRay  = new double[m];
-            m_masterSI->getBInvRow(r, dualRay);
-            rays.push_back(dualRay);
-         }
-      }
-
-      UTIL_DEBUG(m_param.LogDebugLevel, 6,
-                 (*m_osLog) << endl;
-                );
-   }
-
-   UTIL_DELARR(basics);
-   UTIL_DELARR(yb);
-   UTIL_DELARR(bInvRow);
-   UTIL_DELARR(bInvARow);
-   m_masterSI->disableSimplexInterface();
-   /*
-     if(rays.size() <= 0){
-     double   proof_p;
-     double * dualRay = new double[m];
-     CPXdualfarkas(siCpx->getEnvironmentPtr(),
-     siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL),
-     dualRay, &proof_p);
-     (*m_osLog) << "After dual farkas proof_p = " << proof_p << "\n";
-     transform(dualRay, dualRay + m, dualRay, negate<double>());
-     for(int i = 0; i < m; i++){
-     printf("dualRay[%d]: %g\n", i, dualRay[i]);
-     }
-     rays.push_back(dualRay);
-     }
-   */
-   //NOTE: you will have dup rays here - need to filter out...
-   UTIL_DEBUG(m_param.LogDebugLevel, 5,
-              (*m_osLog) << "Number of Rays = " << rays.size() << endl;
-             );
-
-   for (int i = 0; i < (int)rays.size(); i++) {
-      bool isProof = isDualRayInfProof(rays[i],
-                                       m_masterSI->getMatrixByRow(),
-                                       m_masterSI->getColLower(),
-                                       m_masterSI->getColUpper(),
-                                       m_masterSI->getRightHandSide(),
-                                       NULL);
-
-      if (!isProof) {
-         isDualRayInfProof(rays[i],
-                           m_masterSI->getMatrixByRow(),
-                           m_masterSI->getColLower(),
-                           m_masterSI->getColUpper(),
-                           m_masterSI->getRightHandSide(),
-                           m_osLog);
-      }
-
-      assert(isProof);
-   }
-
-   assert(rays.size() > 0);
-   UTIL_DELARR(tabRhs);
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "getDualRays()", m_param.LogDebugLevel, 2);
-   return rays;
-}
-#else
-
-//===========================================================================//
-vector<double*> DecompAlgo::getDualRays(int maxNumRays)
-{
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "getDualRays()", m_param.LogDebugLevel, 2);
-   vector<double*> raysT = m_masterSI->getDualRays(maxNumRays);
-   const double* rayT = raysT[0];
-   assert(rayT);
-   //stop
-   //what is yb, that will tell me if i want to opt over uA or -uA
-   //y^T b
-   int   i;
-   const CoinPackedMatrix* rowMatrix = m_masterSI->getMatrixByRow();
-   const double*            rowRhs    = m_masterSI->getRightHandSide();
-   const int                m         = rowMatrix->getNumRows();
-   double yb = 0.0;
-
-   for (i = 0; i < m; i++) {
-      yb += rayT[i] * rowRhs[i]; //safe to use rowRhs? or flips in tab going on
-   }
-
-   (*m_osLog) << " yb = " << yb << endl;
-   //need tabRhs if doing this way?
-   //see Clp/examples/decompose.cpp
-   //   he flips the infeasibility ray (always...)
-   //---    yA >= 0, yb < 0, or  --> find a yAs <= 0 (min)
-   //---    yA <= 0, yb > 0 ??   --> find a yAs >= 0 (max <--> -min)
-   vector<double*> rays;
-
-   if (yb > 0) {
-      double* pneg = new double[m];
-      transform(rayT, rayT + m, pneg, negate<double>());
-      rays.push_back(pneg);
-   } else {
-      rays.push_back(raysT[0]);
-   }
-
-#if 1
-   UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-              const double* ray = rays[0];
-              assert(ray);
-              bool isProof = isDualRayInfProof(ray,
-                             m_masterSI->getMatrixByRow(),
-                             m_masterSI->getColLower(),
-                             m_masterSI->getColUpper(),
-                             m_masterSI->getRightHandSide(),
-                             NULL);
-              printf("isProof = %d\n", isProof);
-              fflush(stdout);
-
-   if (!isProof) {
-   isDualRayInfProof(ray,
-                     m_masterSI->getMatrixByRow(),
-                     m_masterSI->getColLower(),
-                     m_masterSI->getColUpper(),
-                     m_masterSI->getRightHandSide(),
-                     m_osLog);
-      printBasisInfo(m_masterSI, m_osLog);
-      fflush(stdout);
-   }
-   assert(isDualRayInfProof(ray,
-                            m_masterSI->getMatrixByRow(),
-                            m_masterSI->getColLower(),
-                            m_masterSI->getColUpper(),
-                            m_masterSI->getRightHandSide(),
-                            NULL));
-             );;
-#endif
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "getDualRays()", m_param.LogDebugLevel, 2);
-   return rays;
-}
-#endif
-#endif
-
 //------------------------------------------------------------------------ //
 void DecompAlgo::generateVarsCalcRedCost(const double* u,
       double*        redCostX)
@@ -4727,9 +4718,6 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
    //--- calculate reduced costs
    //---
    generateVarsCalcRedCost(u_adjusted, redCostX);
-   int var_index = 0;
-   const double* objC = m_masterSI->getObjCoefficients();
-   const double* rcLP = m_masterSI->getReducedCost();
 
    //TODO: move this all to debug utility file
    if (m_param.DebugLevel >= 1) {
@@ -5081,12 +5069,6 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
       //---
       if (!foundNegRC) {
          printf("no neg rc from user blocks, solve all blocks\n");
-         bool useCutoff = false;
-         bool useExact  = true;
-
-         if (m_phase == PHASE_PRICE2) {
-            useCutoff = m_param.SubProbUseCutoff ? true : false;
-         }
 
          //TODO: make this a function (to solve all blocks)
          map<int, DecompSubModel>::iterator mit;
@@ -5128,8 +5110,6 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
 
          map<int, vector<DecompSubModel> >::iterator mivt;
          vector<DecompSubModel>           ::iterator vit;
-         useExact  = false;
-         useCutoff = true;
 
          for (mivt  = m_modelRelaxNest.begin();
                mivt != m_modelRelaxNest.end(); mivt++) {
@@ -6341,7 +6321,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    //1 = Use the built-in IP solve, even if there is a user defines a function.
    //2 = Calls the user defined function (if exists) and then calls built-in
    //    IP solver (use this for debugging).
-   bool doCutoff = m_param.SubProbUseCutoff ? true : false;
+   bool doCutoff = m_param.SubProbUseCutoff;
    bool doExact  = isNested ? false : true;
    doExact       = m_function == DecompFuncGenerateInitVars ? false : doExact;
    DecompSolverStatus solverStatus = DecompSolStatNoSolution;
@@ -6398,7 +6378,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
       //---  solve the pricing problem to optimaity at some point.
       //---
       assert(subprobSI);
-      double   rcBestCol    = DecompInf;
       //---
       //--- reset the objective to reduced cost
       //---
@@ -6468,7 +6447,6 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 			  isRoot,
 			  alpha - DecompEpsilon,
 			  timeLimit);
-      rcBestCol = solveResult->m_objLB - alpha; //for sake of bound
       //double * milpSolution = NULL;
       //if(solveResult->m_nSolutions)
       // milpSolution = solveResult->m_solution;
@@ -6884,5 +6862,74 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       } else {
          return false;
       }
+   }
+}
+
+//===========================================================================//
+OsiSolverInterface *DecompAlgo::getOsiLpSolverInterface()
+{
+   if (m_param.DecompLPSolver == "Clp"){
+#ifdef DIP_HAS_CLP
+      return(new OsiClpSolverInterface());
+#else
+      throw UtilException("Clp selected as solver, but it's not available",
+			  "getOsiLpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompLPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      return(new OsiCpxSolverInterface());
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "getOsiLpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompLPSolver == "Gurobi"){
+#ifdef DIP_HAS_GRB
+      return(new OsiGrbSolverInterface());
+#else
+      throw UtilException("Gurobi selected as solver, but it's not available",
+			  "getOsiLpSolverInterface", "DecompAlgo");
+#endif
+   }else{
+      throw UtilException("Unknown solver selected",
+			  "getOsiLpSolverInterface", "DecompAlgo");
+   }
+}
+
+//===========================================================================//
+OsiSolverInterface *DecompAlgo::getOsiIpSolverInterface()
+{
+   if (m_param.DecompIPSolver == "SYMPHONY"){
+#ifdef DIP_HAS_SYMPHONY
+      return (new OsiSymSolverInterface());
+#else
+      throw UtilException("SYMPHONY selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompIPSolver == "Cbc"){
+#if defined(DIP_HAS_CLP) && defined(DIP_HAS_CBC)
+      //We return a ClpSolverInterface object here, since we'll make a CbcModel 
+      //object from it and Cbc expects a Clp object. Yes, a bit tangled.
+      return(new OsiClpSolverInterface());
+#else
+      throw UtilException("Cbc selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompIPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      return(new OsiCpxSolverInterface());
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompIPSolver == "Gurobi"){
+#ifdef DIP_HAS_GRB
+      return(new OsiGrbSolverInterface());
+#else
+      throw UtilException("Gurobi selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else{
+      throw UtilException("Unknown solver selected",
+			  "getOsiIpSolverInterface", "DecompAlgo");
    }
 }

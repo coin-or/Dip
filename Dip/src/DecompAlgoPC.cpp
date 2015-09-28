@@ -598,15 +598,13 @@ void DecompAlgoPC::solveMasterAsMIP()
    //---  new column to see if it is feasible to original already
    //---
    assert(m_numConvexCon > 1);
-   int  i, b;
    int  nMasterCols = m_masterSI->getNumCols();//lambda
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    //---
    //--- set the master (generated) columns (lambda) to integer
    //--- set the master-onlys (that are integral) to integer
    //---
-   int          j, colIndex;
-   int          numMOs         = UtilGetSize(m_masterOnlyCols);
+   int          colIndex;
    const char* intMarkerCore  = modelCore->getIntegerMark();
 
    for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
@@ -628,18 +626,18 @@ void DecompAlgoPC::solveMasterAsMIP()
 
    DecompSolverResult    result;
 
-#ifdef __DECOMP_IP_SYMPHONY__
-   solveMasterAsMIPSym(&result);
-#endif
-#ifdef __DECOMP_IP_CBC__
-   solveMasterAsMIPCbc(&result);
-#endif
-#ifdef __DECOMP_IP_CPX__
-   solveMasterAsMIPCpx(&result);
-#endif
-#ifdef __DECOMP_IP_GRB__
-   solveMasterAsMIPGrb(&result);
-#endif
+   if (m_param.DecompIPSolver == "SYMPHONY"){
+      solveMasterAsMIPSym(&result);
+   }else if (m_param.DecompIPSolver == "Cbc"){
+      solveMasterAsMIPCbc(&result);
+   }else if (m_param.DecompIPSolver == "CPLEX"){
+      solveMasterAsMIPCpx(&result);
+   }else if (m_param.DecompIPSolver == "Gurobi"){
+      solveMasterAsMIPGrb(&result);
+   }else{
+      throw UtilException("Unknown solver selected",
+			  "solveMasterAsMIP", "DecompAlgoPC");
+   }
 
    if (result.m_nSolutions) {
       double* rsolution = new double[modelCore->getNumCols()];
@@ -747,7 +745,7 @@ void DecompAlgoPC::solveMasterAsMIP()
 //===========================================================================//
 void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
 {
-#ifdef __DECOMP_IP_SYMPHONY__
+#ifdef DIP_HAS_SYMPHONY
    int colIndex;
    int numCols = m_masterSI->getNumCols();
    int nMasterCols = m_masterSI->getNumCols();//lambda
@@ -847,13 +845,16 @@ void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
    }
 
    UTIL_DELPTR(osiSym);
+#else
+   throw UtilException("SYMPHONY selected as solver, but it's not available",
+		       "solveMasterAsMIPSym", "DecompAlgoPC");
 #endif
 }
 
 //===========================================================================//
 void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
 {
-#ifdef __DECOMP_IP_CBC__
+#ifdef DIP_HAS_CBC
    int  nMasterCols = m_masterSI->getNumCols();//lambda
    int  logIpLevel  = m_param.LogIpLevel;
    //TODO: what exactly does this do? make copy of entire model!?
@@ -985,13 +986,16 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
       //     nMasterCols * sizeof(double));
    }
 
+#else
+   throw UtilException("Cbc selected as solver, but it's not available",
+		       "solveMasterAsMIPCbc", "DecompAlgoPC");
 #endif
 }
 
 //===========================================================================//
 void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
 {
-#ifdef __DECOMP_IP_CPX__
+#ifdef DIP_HAS_CPX
    //---
    //--- get OsiCpx object from Osi object
    //--- get CPEXENVptr for use with internal methods
@@ -1164,13 +1168,16 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
    if (status)
       throw UtilException("CPXsetdblparam failure",
                           "solveMasterAsMIP", "DecompAlgoPC");
+#else
+   throw UtilException("CPLEX selected as solver, but it's not available",
+		       "solveMasterAsMIPCpx", "DecompAlgoPC");
 #endif
 }
 
 //===========================================================================//
 void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
 {
-#ifdef __DECOMP_IP_GRB__
+#ifdef DIP_HAS_GRB
    int stat;
    const int numCols    = m_masterSI->getNumCols();
 
@@ -1198,10 +1205,13 @@ void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
    }else{
       result->m_isOptimal = true;
    }
+#else
+   throw UtilException("Gurobi selected as solver, but it's not available",
+		       "solveMasterAsMIPGrb", "DecompAlgoPC");
 #endif
 }
 
-/*-------------------------------------------------------------------------*/
+//===========================================================================//
 //because rowReform, this is very specific to PC
 void DecompAlgoPC::addCutsToPool(const double*    x,
                                  DecompCutList& newCuts,
@@ -1403,9 +1413,7 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
                     "addCutsToPool()", m_param.LogDebugLevel, 2);
 }
 
-
-
-/*---------------------------------------------------------------------------*/
+//===========================================================================//
 int DecompAlgoPC::addCutsFromPool()
 {
    UtilPrintFuncBegin(m_osLog, m_classTag,

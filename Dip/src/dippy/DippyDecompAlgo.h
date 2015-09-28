@@ -37,8 +37,8 @@ public:
     * @param pProb a DipProblem python object
     */
    DippyAlgoMixin(UtilParameters& utilParam, PyObject* pProb)
-      : m_pProb(pProb), m_utilParam(&utilParam), pDownLB(NULL),
-        pDownUB(NULL), pUpLB(NULL), pUpUB(NULL) {
+      : pDownLB(NULL), pDownUB(NULL), pUpLB(NULL), pUpUB(NULL),
+      m_pProb(pProb), m_utilParam(&utilParam) {
    }
 
    bool chooseBranchSet(DecompAlgo* algo,

@@ -45,17 +45,11 @@
 /* Define to 1 if the Cgl package is used */
 #define COIN_HAS_CGL 1
 
-/* Define to 1 if the Clp package is used */
-#define COIN_HAS_CLP 1
-
 /* Define to 1 if the CoinUtils package is used */
 #define COIN_HAS_COINUTILS 1
 
-/* Define to 1 if the Osi package is used */
+/* Define to 1 if the Osi package is available */
 #define COIN_HAS_OSI 1
-
-/* Define to 1 if the Osi package is used */
-#define COIN_HAS_CBC 1
 
 /* Define to the debug sanity check level (0 is no test) */
 //#define COIN_DECOMP_CHECKLEVEL 0
@@ -63,6 +57,4 @@
 /* Define to the debug verbosity level (0 is no output) */
 //#define COIN_DECOMP_VERBOSITY 0
 
-#define __DECOMP_LP_CLP__
-#define __DECOMP_IP_CBC__
 

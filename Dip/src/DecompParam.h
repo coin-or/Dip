@@ -55,7 +55,6 @@ public:
 
    int    LogObjHistory;
 
-
    int    InitVarsLimit;
 
    int    DebugLevel;//=0 (default), =1 (extra checks on duals, etc)
@@ -323,6 +322,12 @@ public:
 
    bool WarmStart;
 
+   std::string DecompLPSolver;
+   std::string DecompIPSolver;
+
+   bool UseMultiRay;
+   bool DoInteriorPoint;
+
    /**
     * @}
     */
@@ -436,6 +441,10 @@ public:
       PARAM_getSetting("SolutionOutputToFile", SolutionOutputToFile);
       PARAM_getSetting("SolutionOutputFileName", SolutionOutputFileName);
       PARAM_getSetting("WarmStart", WarmStart);
+      PARAM_getSetting("DecompIPSolver", DecompIPSolver);
+      PARAM_getSetting("DecompLPSolver", DecompLPSolver);
+      PARAM_getSetting("UseMultiRay", UseMultiRay);
+      PARAM_getSetting("DoInteriorPoint", DoInteriorPoint);
       //---
       //--- store the original setting for DualStabAlpha
       //---
@@ -581,6 +590,10 @@ public:
       UtilPrintParameter(os, sec, "SolutionOutputToFile", SolutionOutputToFile);
       UtilPrintParameter(os, sec, "SolutionOutputFileName", SolutionOutputFileName);
       UtilPrintParameter(os, sec, "WarmStart", WarmStart);
+      UtilPrintParameter(os, sec, "DecompIPSolver", DecompIPSolver);
+      UtilPrintParameter(os, sec, "DecompLPSplver", DecompLPSolver);
+      UtilPrintParameter(os, sec, "UseMultiRay", UseMultiRay);
+      UtilPrintParameter(os, sec, "DoInteriorPoint", DoInteriorPoint);
       (*os) << "========================================================\n";
    }
 
@@ -683,6 +696,10 @@ public:
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
       WarmStart                = false;
+      DecompIPSolver           = "Cbc";
+      DecompLPSolver           = "Clp";
+      UseMultiRay              = false;
+      DoInteriorPoint          = false;
    }
 
    void dumpSettings(std::ostream* os = &std::cout) {

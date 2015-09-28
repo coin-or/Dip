@@ -192,6 +192,8 @@ public:
       m_objective = obj;
    }
 
+   void setDecompInf();
+
    /**
     * Set the model core constraint matrix.
     *
@@ -468,12 +470,12 @@ public:
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
       NumBlocks    (  0    ),
+      m_utilParam  (&utilParam),
       m_objective  ( NULL  ),
+      m_modelCore  (utilParam),
       m_matrix     ( NULL  ),
       m_modelC     ( NULL  ),
-      m_threadIndex(  0    ),
-      m_utilParam  (&utilParam),
-      m_modelCore  (utilParam)
+      m_threadIndex(  0    )
    {
       //---
       //--- get application parameters

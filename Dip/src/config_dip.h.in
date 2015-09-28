@@ -28,4 +28,19 @@
 /* Release Version number of project */
 #undef DIP_VERSION_RELEASE
 
+/* Whether we have CLP */
+#undef DIP_HAS_CLP
+
+/* Whether we have SYMPHONY */
+#undef DIP_HAS_SYMPHONY
+
+/* Whether we have CBC */
+#undef DIP_HAS_CBC
+
+/* Whether we have CPLEX */
+#undef DIP_HAS_CPX
+
+/* Whether we have Gurobi */
+#undef DIP_HAS_GRB
+
 #endif

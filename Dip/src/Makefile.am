@@ -145,45 +145,6 @@ endif
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
-#                     Includes for LP Solver                           #
-########################################################################
-#because CGL depends on CLP, we need this in any case
-
-if CLP_LP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_LP_CLP__
-endif
-
-if CPLEX_LP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_LP_CPX__
-endif
-
-if GRB_LP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_LP_GRB__
-endif
-
-########################################################################
-#                     Includes for IP Solver                           #
-########################################################################
-
-if CBC_IP_SOLVER 
-if COIN_HAS_CBC
-  AM_CPPFLAGS += -D__DECOMP_IP_CBC__
-endif
-endif
-
-if CPLEX_IP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_IP_CPX__
-endif
-
-if GRB_IP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_IP_GRB__
-endif
-
-if SYMPHONY_IP_SOLVER
-  AM_CPPFLAGS += -D__DECOMP_IP_SYMPHONY__
-endif
-
-########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 # Here list all the header files that are required by a user of the library,

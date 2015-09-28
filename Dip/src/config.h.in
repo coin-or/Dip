@@ -36,6 +36,21 @@
 /* Define to 1 if the SYMPHONY package is available */
 #undef COIN_HAS_SYMPHONY
 
+/* Define to 1 if we have CBC */
+#undef DIP_HAS_CBC
+
+/* Define to 1 if we have CLP */
+#undef DIP_HAS_CLP
+
+/* Define to 1 if we have CPLEX */
+#undef DIP_HAS_CPX
+
+/* Define to 1 if we have Gurobi */
+#undef DIP_HAS_GRB
+
+/* Define to 1 if we have SYMPHONY */
+#undef DIP_HAS_SYMPHONY
+
 /* SVN revision number of project */
 #undef DIP_SVN_REV
 

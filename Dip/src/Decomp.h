@@ -44,6 +44,46 @@
 #include "DecompConfig.h"
 
 //===========================================================================//
+// COIN Headers                                                              //
+//===========================================================================//
+//---
+//--- include some standard COIN headers (depending on LP solver)
+//---   depending on LP solver, set:
+//---      OsiLp, OsiIp, and DecompInf
+//---
+#include "CoinError.hpp"
+#include "CoinFinite.hpp"
+#include "CoinPackedVector.hpp"
+#include "CoinPackedMatrix.hpp"
+
+extern double DecompInf;
+
+#ifdef DIP_HAS_CLP
+#include "OsiClpSolverInterface.hpp"
+#endif
+
+#ifdef DIP_HAS_CPX
+#include "cplex.h"
+#include "OsiCpxSolverInterface.hpp"
+#endif
+
+#ifdef DIP_HAS_GRB
+extern "C" {
+#include "gurobi_c.h"
+}
+#include "OsiGrbSolverInterface.hpp"
+#endif
+
+#ifdef DIP_HAS_CBC
+#include "OsiCbcSolverInterface.hpp"
+#endif
+
+#ifdef DIP_HAS_SYMPHONY
+#include "symphony.h"
+#include "OsiSymSolverInterface.hpp"
+#endif
+
+//===========================================================================//
 // DECOMP Enums, Constants and Typedefs                                      //
 //===========================================================================//
 
@@ -292,69 +332,6 @@ enum DecompNumericErrorType {
 
 };
 */
-
-//===========================================================================//
-// COIN Headers                                                              //
-//===========================================================================//
-//---
-//--- include some standard COIN headers (depending on LP solver)
-//---   depending on LP solver, set:
-//---      OsiLp, OsiIp, and DecompInf
-//---
-#include "CoinError.hpp"
-#include "CoinFinite.hpp"
-#include "CoinPackedVector.hpp"
-#include "CoinPackedMatrix.hpp"
-
-#ifdef __DECOMP_LP_CLP__
-#include "OsiClpSolverInterface.hpp"
-typedef OsiClpSolverInterface OsiLpSolverInterface;
-const double DecompInf = OsiClpInfinity;
-#endif
-
-#ifdef __DECOMP_LP_CPX__
-#include "cplex.h"
-#include "OsiCpxSolverInterface.hpp"
-typedef OsiCpxSolverInterface OsiLpSolverInterface;
-const double DecompInf = CPX_INFBOUND;
-#endif
-
-#ifdef __DECOMP_LP_GRB__
-extern "C" {
-#include "gurobi_c.h"
-}
-#include "OsiGrbSolverInterface.hpp"
-typedef OsiGrbSolverInterface OsiLpSolverInterface;
-const double DecompInf = GRB_INFINITY;
-#endif
-
-#ifdef __DECOMP_IP_CBC__
-#include "OsiCbcSolverInterface.hpp"
-//confusing, since we use CbcModel/Main, we need OsiClp here
-typedef OsiClpSolverInterface OsiIpSolverInterface;
-//typedef OsiCbcSolverInterface OsiIpSolverInterface;
-#endif
-
-#ifdef __DECOMP_IP_CPX__
-#include "cplex.h"
-#include "OsiCpxSolverInterface.hpp"
-typedef OsiCpxSolverInterface OsiIpSolverInterface;
-#endif
-
-#ifdef __DECOMP_IP_SYMPHONY__
-#include "symphony.h"
-#include "OsiSymSolverInterface.hpp"
-typedef OsiSymSolverInterface OsiIpSolverInterface;
-#endif
-
-#ifdef __DECOMP_IP_GRB__
-extern "C" {
-#include "gurobi_c.h"
-}
-#include "OsiGrbSolverInterface.hpp"
-typedef OsiGrbSolverInterface OsiIpSolverInterface;
-#endif
-
 
 //---
 //--- COIN vectors can do some extra checking if this is true,
