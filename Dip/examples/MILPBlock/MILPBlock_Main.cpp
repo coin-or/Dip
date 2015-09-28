@@ -65,13 +65,13 @@ int main(int argc, char ** argv){
       //--- create the CPM algorithm object
       //---      
       if(doCut)	 
-         algo = new DecompAlgoC(&milp, &utilParam);
+         algo = new DecompAlgoC(&milp, utilParam);
       
       //---
       //--- create the PC algorithm object
       //---
       if(doPriceCut)
-         algo = new DecompAlgoPC(&milp, &utilParam);
+         algo = new DecompAlgoPC(&milp, utilParam);
       
       if(doCut && doDirect){
 	 timer.stop();

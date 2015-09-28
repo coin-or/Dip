@@ -65,14 +65,14 @@ int main(int argc, char** argv)
       //--- create the CPM algorithm object
       //---
       if (doCut) {
-         algo = new DecompAlgoC(&gap, &utilParam);
+         algo = new DecompAlgoC(&gap, utilParam);
       }
 
       //---
       //--- create the PC algorithm object
       //---
       if (doPriceCut) {
-         algo = new DecompAlgoPC(&gap, &utilParam);
+         algo = new DecompAlgoPC(&gap, utilParam);
       }
 
       if (doCut && doDirect) {

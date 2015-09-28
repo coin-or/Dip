@@ -59,7 +59,7 @@ private:
    /** @name Helper functions (private). */
 
    /** Initialize application. */
-   void initializeApp(UtilParameters & utilParam);
+   void initializeApp();
 
    /** Create model parts. */
    void                  createModels();
@@ -97,7 +97,13 @@ public:
       m_classTag ("MILPB-APP"),
       m_objective(NULL)
    {
-      initializeApp(utilParam); //can there be a default?
+      m_appParam.getSettings(utilParam);
+      
+      if (m_appParam.LogLevel >= 1) {
+	 m_appParam.dumpSettings();
+      }
+
+      initializeApp(); //can there be a default?
    }
    
    virtual ~MILPBlock_DecompApp() {

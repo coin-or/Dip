@@ -10,6 +10,7 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
+#include "DecompAlgo.h"
 #include "DecompCutOsi.h"
 #include "AP3_DecompApp.h"
 
@@ -50,7 +51,7 @@ void AP3_DecompApp::initializeApp(UtilParameters & utilParam)
 
    //TODO: don't bother building if not using LP solver for this
    {
-      m_siAP = new OsiLpSolverInterface();
+      m_siAP = m_decompAlgo->getOsiLpSolverInterface();
       CoinAssertHint(m_siAP, "Error: Out of Memory");
 
       //---
@@ -261,10 +262,13 @@ void AP3_DecompApp::createModelPart(const int             modelType,
    CoinAssertHint(modelCore->M, "Error: Out of Memory");
    modelCore->M->setDimensions(0, n_cols);
 
+#if 0
    if(m_param.PriceMultiPoly)
       modelCore->M->reserve(n_rows, n_rows * dimensionSq);
    else
       modelCore->M->reserve(n_rowsThird, n_rowsThird * dimensionSq);
+#endif
+   modelCore->M->reserve(n_rowsThird, n_rowsThird * dimensionSq);
 
    modelRelax->M = new CoinPackedMatrix(false, 0.0, 0.0);
    CoinAssertHint(modelRelax->M, "Error: Out of Memory");
@@ -321,8 +325,10 @@ void AP3_DecompApp::createModelPart(const int             modelType,
          }
       }
       CoinAssertHint(len == dimensionSq, "Error in construction len != n^2");
+#if 0
       if(m_param.PriceMultiPoly)
          modelCore->M->appendRow(len, rowInd, rowEls);
+#endif
       modelRelax->M->appendRow(len, rowInd, rowEls);
       
       len = 0;
@@ -332,16 +338,21 @@ void AP3_DecompApp::createModelPart(const int             modelType,
          }
       }
       CoinAssertHint(len == dimensionSq, "Error in construction len != n^2");
+#if 0
       if(m_param.PriceMultiPoly)
          modelCore->M->appendRow(len, rowInd, rowEls);
+#endif
       modelRelax->M->appendRow(len, rowInd, rowEls);   
    }
+#if 0
    if(m_param.PriceMultiPoly){
       CoinAssert(modelCore->M->getNumRows()  ==   3*dimension);
    }
    else{
       CoinAssert(modelCore->M->getNumRows()  ==   dimension);
    }
+#endif
+   CoinAssert(modelCore->M->getNumRows()  ==   dimension);
    CoinAssert(modelRelax->M->getNumRows() == 2*dimension);
          
    //---

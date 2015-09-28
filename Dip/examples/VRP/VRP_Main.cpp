@@ -61,13 +61,13 @@ int main(int argc, char ** argv){
       //--- create the CPM algorithm object
       //---      
       if(doCut)	 
-         algo = new DecompAlgoC(&vrp, &utilParam);
+         algo = new DecompAlgoC(&vrp, utilParam);
       
       //---
       //--- create the PC algorithm object
       //---
       if(doPriceCut)
-         algo = new DecompAlgoPC(&vrp, &utilParam);
+         algo = new DecompAlgoPC(&vrp, utilParam);
 
       //---
       //--- create the driver AlpsDecomp model

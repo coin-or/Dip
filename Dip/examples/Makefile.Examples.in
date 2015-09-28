@@ -49,36 +49,6 @@ endif
 CFLAGS += -DCOIN_ASSERT
 
 ###########################################################################
-# define vars for which IP solver was chosen in configure
-###########################################################################
-
-CBC_IP_SOLVER    = @CBC_IP_SOLVER_TRUE@TRUE
-CPLEX_IP_SOLVER  = @CPLEX_IP_SOLVER_TRUE@TRUE
-
-ifeq ($(CBC_IP_SOLVER),TRUE)
-CFLAGS += -D__DECOMP_IP_CBC__
-endif
-
-ifeq ($(CPLEX_IP_SOLVER),TRUE)
-CFLAGS += -D__DECOMP_IP_CPX__
-endif
-
-###########################################################################
-# define vars for which LP solver was chosen in configure
-###########################################################################
-
-CLP_LP_SOLVER    = @CLP_LP_SOLVER_TRUE@TRUE
-CPLEX_LP_SOLVER  = @CPLEX_LP_SOLVER_TRUE@TRUE
-
-ifeq ($(CLP_LP_SOLVER),TRUE)
-CFLAGS += -D__DECOMP_LP_CLP__
-endif
-
-ifeq ($(CPLEX_LP_SOLVER),TRUE)
-CFLAGS += -D__DECOMP_LP_CPX__
-endif
-
-###########################################################################
 # define CFLAGS
 ###########################################################################
 
