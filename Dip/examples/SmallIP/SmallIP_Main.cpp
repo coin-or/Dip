@@ -25,6 +25,8 @@
 #include "DecompAlgoPC.h"
 #include "DecompAlgoRC.h"
 
+double DecompInf = COIN_DBL_MAX;
+
 //===========================================================================//
 int main(int argc, char ** argv){
    try{
