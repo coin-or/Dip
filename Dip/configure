@@ -483,7 +483,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE have_svnversion DIP_SVN_REV CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS DEPENDENCY_LINKING_TRUE DEPENDENCY_LINKING_FALSE LT_LDFLAGS PKG_CONFIG ac_ct_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED COINDEPEND_LIBS COINDEPEND_CFLAGS COINDEPEND_DATA COINDEPEND_DEPENDENCIES COINDEPEND_LIBS_INSTALLED COINDEPEND_CFLAGS_INSTALLED COINDEPEND_DATA_INSTALLED DIPLIB_CFLAGS DIPLIB_LIBS DIPLIB_PCLIBS DIPLIB_PCREQUIRES DIPLIB_DEPENDENCIES DIPLIB_CFLAGS_INSTALLED DIPLIB_LIBS_INSTALLED COIN_HAS_COINDEPEND_TRUE COIN_HAS_COINDEPEND_FALSE CLP_LIBS CLP_CFLAGS CLP_DATA CLP_DEPENDENCIES CLP_LIBS_INSTALLED CLP_CFLAGS_INSTALLED CLP_DATA_INSTALLED COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE SAMPLE_LIBS SAMPLE_CFLAGS SAMPLE_DATA SAMPLE_DEPENDENCIES SAMPLE_LIBS_INSTALLED SAMPLE_CFLAGS_INSTALLED SAMPLE_DATA_INSTALLED COIN_HAS_SAMPLE_TRUE COIN_HAS_SAMPLE_FALSE CGL_LIBS CGL_CFLAGS CGL_DATA CGL_DEPENDENCIES CGL_LIBS_INSTALLED CGL_CFLAGS_INSTALLED CGL_DATA_INSTALLED COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CBC_LIBS CBC_CFLAGS CBC_DATA CBC_DEPENDENCIES CBC_LIBS_INSTALLED CBC_CFLAGS_INSTALLED CBC_DATA_INSTALLED COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE CPX_LIBS CPX_CFLAGS CPX_DATA CPX_DEPENDENCIES CPX_LIBS_INSTALLED CPX_CFLAGS_INSTALLED CPX_DATA_INSTALLED COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE SYMPHONY_LIBS SYMPHONY_CFLAGS SYMPHONY_DATA SYMPHONY_DEPENDENCIES SYMPHONY_LIBS_INSTALLED SYMPHONY_CFLAGS_INSTALLED SYMPHONY_DATA_INSTALLED COIN_HAS_SYMPHONY_TRUE COIN_HAS_SYMPHONY_FALSE GRB_LIBS GRB_CFLAGS GRB_DATA GRB_DEPENDENCIES GRB_LIBS_INSTALLED GRB_CFLAGS_INSTALLED GRB_DATA_INSTALLED COIN_HAS_GRB_TRUE COIN_HAS_GRB_FALSE ASL_LIBS ASL_CFLAGS ASL_DATA ASL_DEPENDENCIES ASL_LIBS_INSTALLED ASL_CFLAGS_INSTALLED ASL_DATA_INSTALLED COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE HMETISINCDIR HMETISLIB COIN_HAS_HMETIS_TRUE COIN_HAS_HMETIS_FALSE OPENMP_TRUE OPENMP_FALSE DIP_OPENMP_FLAGS DIP_OPENMP_LIBS PYTHON PYTHON_VERSION PYTHON_PREFIX PYTHON_EXEC_PREFIX PYTHON_PLATFORM pythondir pkgpythondir pyexecdir pkgpyexecdir HAVE_PYTHON_TRUE HAVE_PYTHON_FALSE PYTHON_LIBS PYTHON_CFLAGS CLP_LP_SOLVER_TRUE CLP_LP_SOLVER_FALSE CPLEX_LP_SOLVER_TRUE CPLEX_LP_SOLVER_FALSE GRB_LP_SOLVER_TRUE GRB_LP_SOLVER_FALSE CBC_IP_SOLVER_TRUE CBC_IP_SOLVER_FALSE CPLEX_IP_SOLVER_TRUE CPLEX_IP_SOLVER_FALSE GRB_IP_SOLVER_TRUE GRB_IP_SOLVER_FALSE SYMPHONY_IP_SOLVER_TRUE SYMPHONY_IP_SOLVER_FALSE coin_have_doxygen coin_have_latex coin_doxy_usedot coin_doxy_tagname coin_doxy_logname COIN_HAS_DOXYGEN_TRUE COIN_HAS_DOXYGEN_FALSE COIN_HAS_LATEX_TRUE COIN_HAS_LATEX_FALSE coin_doxy_tagfiles coin_doxy_excludes DIPINCDIR DIPSRCDIR DipDEFS ARCH COIN_HAS_CLP LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os ALWAYS_FALSE_TRUE ALWAYS_FALSE_FALSE have_svnversion DIP_SVN_REV CDEFS ADD_CFLAGS DBG_CFLAGS OPT_CFLAGS sol_cc_compiler CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT COIN_CC_IS_CL_TRUE COIN_CC_IS_CL_FALSE MPICC CXXDEFS ADD_CXXFLAGS DBG_CXXFLAGS OPT_CXXFLAGS CXX CXXFLAGS ac_ct_CXX COIN_CXX_IS_CL_TRUE COIN_CXX_IS_CL_FALSE MPICXX EGREP LN_S INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBTOOLM4 have_autoconf have_automake have_svn BUILDTOOLSDIR AUX_DIR abs_source_dir abs_lib_dir abs_include_dir abs_bin_dir HAVE_EXTERNALS_TRUE HAVE_EXTERNALS_FALSE host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL ac_c_preproc_warn_flag ac_cxx_preproc_warn_flag RPATH_FLAGS DEPENDENCY_LINKING_TRUE DEPENDENCY_LINKING_FALSE LT_LDFLAGS PKG_CONFIG ac_ct_PKG_CONFIG COIN_HAS_PKGCONFIG_TRUE COIN_HAS_PKGCONFIG_FALSE COIN_PKG_CONFIG_PATH COIN_PKG_CONFIG_PATH_UNINSTALLED COINDEPEND_LIBS COINDEPEND_CFLAGS COINDEPEND_DATA COINDEPEND_DEPENDENCIES COINDEPEND_LIBS_INSTALLED COINDEPEND_CFLAGS_INSTALLED COINDEPEND_DATA_INSTALLED DIPLIB_CFLAGS DIPLIB_LIBS DIPLIB_PCLIBS DIPLIB_PCREQUIRES DIPLIB_DEPENDENCIES DIPLIB_CFLAGS_INSTALLED DIPLIB_LIBS_INSTALLED COIN_HAS_COINDEPEND_TRUE COIN_HAS_COINDEPEND_FALSE CLP_LIBS CLP_CFLAGS CLP_DATA CLP_DEPENDENCIES CLP_LIBS_INSTALLED CLP_CFLAGS_INSTALLED CLP_DATA_INSTALLED COIN_HAS_CLP_TRUE COIN_HAS_CLP_FALSE SAMPLE_LIBS SAMPLE_CFLAGS SAMPLE_DATA SAMPLE_DEPENDENCIES SAMPLE_LIBS_INSTALLED SAMPLE_CFLAGS_INSTALLED SAMPLE_DATA_INSTALLED COIN_HAS_SAMPLE_TRUE COIN_HAS_SAMPLE_FALSE CGL_LIBS CGL_CFLAGS CGL_DATA CGL_DEPENDENCIES CGL_LIBS_INSTALLED CGL_CFLAGS_INSTALLED CGL_DATA_INSTALLED COIN_HAS_CGL_TRUE COIN_HAS_CGL_FALSE CBC_LIBS CBC_CFLAGS CBC_DATA CBC_DEPENDENCIES CBC_LIBS_INSTALLED CBC_CFLAGS_INSTALLED CBC_DATA_INSTALLED COIN_HAS_CBC_TRUE COIN_HAS_CBC_FALSE CPX_LIBS CPX_CFLAGS CPX_DATA CPX_DEPENDENCIES CPX_LIBS_INSTALLED CPX_CFLAGS_INSTALLED CPX_DATA_INSTALLED COIN_HAS_CPX_TRUE COIN_HAS_CPX_FALSE SYMPHONY_LIBS SYMPHONY_CFLAGS SYMPHONY_DATA SYMPHONY_DEPENDENCIES SYMPHONY_LIBS_INSTALLED SYMPHONY_CFLAGS_INSTALLED SYMPHONY_DATA_INSTALLED COIN_HAS_SYMPHONY_TRUE COIN_HAS_SYMPHONY_FALSE GRB_LIBS GRB_CFLAGS GRB_DATA GRB_DEPENDENCIES GRB_LIBS_INSTALLED GRB_CFLAGS_INSTALLED GRB_DATA_INSTALLED COIN_HAS_GRB_TRUE COIN_HAS_GRB_FALSE ASL_LIBS ASL_CFLAGS ASL_DATA ASL_DEPENDENCIES ASL_LIBS_INSTALLED ASL_CFLAGS_INSTALLED ASL_DATA_INSTALLED COIN_HAS_ASL_TRUE COIN_HAS_ASL_FALSE HMETISINCDIR HMETISLIB COIN_HAS_HMETIS_TRUE COIN_HAS_HMETIS_FALSE OPENMP_TRUE OPENMP_FALSE DIP_OPENMP_FLAGS DIP_OPENMP_LIBS PYTHON PYTHON_VERSION PYTHON_PREFIX PYTHON_EXEC_PREFIX PYTHON_PLATFORM pythondir pkgpythondir pyexecdir pkgpyexecdir HAVE_PYTHON_TRUE HAVE_PYTHON_FALSE PYTHON_LIBS PYTHON_CFLAGS coin_have_doxygen coin_have_latex coin_doxy_usedot coin_doxy_tagname coin_doxy_logname COIN_HAS_DOXYGEN_TRUE COIN_HAS_DOXYGEN_FALSE COIN_HAS_LATEX_TRUE COIN_HAS_LATEX_FALSE coin_doxy_tagfiles coin_doxy_excludes DIPINCDIR DIPSRCDIR DipDEFS ARCH COIN_HAS_CLP LIBEXT VPATH_DISTCLEANFILES ABSBUILDDIR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1163,12 +1163,6 @@ Optional Packages:
   --with-asl-datadir directory with data files for using package ASL
   --with-hmetis-incdir specify the header file directory for library HMetis
   --with-hmetis-lib specify the flags used to link with the library HMetis
-  --with-dip-lp-solver[=lpsolver]
-                          specify the LP solver in small letters(default
-                          lpsolver=clp)
-  --with-dip-ip-solver[=ipsolver]
-                          specify the IP solver in small letters(default
-                          ipsolver=cbc)
   --with-dot              use dot (from graphviz) when creating documentation
                           with doxygen if available; --without-dot to disable
 
@@ -5881,7 +5875,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 5884 "configure"' > conftest.$ac_ext
+  echo '#line 5878 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7015,7 +7009,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:7018:" \
+echo "$as_me:7012:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -8082,11 +8076,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8085: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8079: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8089: \$? = $ac_status" >&5
+   echo "$as_me:8083: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8350,11 +8344,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8353: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8347: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8357: \$? = $ac_status" >&5
+   echo "$as_me:8351: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8454,11 +8448,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8457: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8451: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8461: \$? = $ac_status" >&5
+   echo "$as_me:8455: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10799,7 +10793,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10802 "configure"
+#line 10796 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10899,7 +10893,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10902 "configure"
+#line 10896 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13243,11 +13237,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13246: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13240: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13250: \$? = $ac_status" >&5
+   echo "$as_me:13244: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13347,11 +13341,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13350: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13344: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13354: \$? = $ac_status" >&5
+   echo "$as_me:13348: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14917,11 +14911,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14920: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14914: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14924: \$? = $ac_status" >&5
+   echo "$as_me:14918: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15021,11 +15015,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15024: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15018: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15028: \$? = $ac_status" >&5
+   echo "$as_me:15022: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17228,11 +17222,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17231: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17225: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17235: \$? = $ac_status" >&5
+   echo "$as_me:17229: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17496,11 +17490,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17499: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17493: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17503: \$? = $ac_status" >&5
+   echo "$as_me:17497: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -17600,11 +17594,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17603: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17597: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:17607: \$? = $ac_status" >&5
+   echo "$as_me:17601: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -25954,196 +25948,91 @@ fi
 #                      Check for the LP solver                              #
 #############################################################################
 
-echo "$as_me:$LINENO: checking for Dip default lp solver" >&5
-echo $ECHO_N "checking for Dip default lp solver... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking that we have an LP solver" >&5
+echo $ECHO_N "checking that we have an LP solver... $ECHO_C" >&6
 
-# Check whether --with-dip-lp-solver or --without-dip-lp-solver was given.
-if test "${with_dip_lp_solver+set}" = set; then
-  withval="$with_dip_lp_solver"
-  dip_lp_solver=$withval
-else
-  dip_lp_solver=clp
-fi;
+found_lp_solver=false
+if test $coin_has_clp = yes; then
+   found_lp_solver=true
+elif test $coin_has_cpx = yes; then
+   found_lp_solver=true
+elif test $coin_has_grb = yes; then
+   found_lp_solver=true
+fi
 
-found_package=true
-case $dip_lp_solver in
-   clp)
-     echo "$as_me:$LINENO: result: Clp" >&5
-echo "${ECHO_T}Clp" >&6
-     if test $coin_has_clp != yes; then
-         found_package=false
-     fi
-   ;;
-   cplex)
-     echo "$as_me:$LINENO: result: Cplex" >&5
-echo "${ECHO_T}Cplex" >&6
-     if test $coin_has_cpx != yes; then
-         found_package=false
-     fi
-   ;;
-   gurobi)
-     echo "$as_me:$LINENO: result: Gurobi" >&5
-echo "${ECHO_T}Gurobi" >&6
-     if test $coin_has_grb != yes; then
-         found_package=false
-     fi
-   ;;
-  *)
-    { { echo "$as_me:$LINENO: error: Unknown LP solver!" >&5
-echo "$as_me: error: Unknown LP solver!" >&2;}
+if test $found_lp_solver = false; then
+  { { echo "$as_me:$LINENO: error: Couldn't find an LP solver!" >&5
+echo "$as_me: error: Couldn't find an LP solver!" >&2;}
    { (exit 1); exit 1; }; }
-  ;;
-esac
-
-if test $found_package = false; then
-  { { echo "$as_me:$LINENO: error: Couldn't find the $dip_lp_solver package!" >&5
-echo "$as_me: error: Couldn't find the $dip_lp_solver package!" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-
-
-if test $dip_lp_solver = clp &&
-test $coin_has_clp != unavailable &&
-test $coin_has_clp != skipping; then
-  CLP_LP_SOLVER_TRUE=
-  CLP_LP_SOLVER_FALSE='#'
 else
-  CLP_LP_SOLVER_TRUE='#'
-  CLP_LP_SOLVER_FALSE=
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 fi
-
-
-
-if test $dip_lp_solver = cplex &&
-test $coin_has_cpx != unavailable &&
-test $coin_has_cpx != skipping; then
-  CPLEX_LP_SOLVER_TRUE=
-  CPLEX_LP_SOLVER_FALSE='#'
-else
-  CPLEX_LP_SOLVER_TRUE='#'
-  CPLEX_LP_SOLVER_FALSE=
-fi
-
-
-
-if test $dip_lp_solver = gurobi &&
-test $coin_has_grb != unavailable &&
-test $coin_has_grb != skipping; then
-  GRB_LP_SOLVER_TRUE=
-  GRB_LP_SOLVER_FALSE='#'
-else
-  GRB_LP_SOLVER_TRUE='#'
-  GRB_LP_SOLVER_FALSE=
-fi
-
 
 #############################################################################
 #                      Check for the IP solver                              #
 #############################################################################
 
-echo "$as_me:$LINENO: checking for Dip default ip solver" >&5
-echo $ECHO_N "checking for Dip default ip solver... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking that we have an IP solver" >&5
+echo $ECHO_N "checking that we have an IP solver... $ECHO_C" >&6
 
-# Check whether --with-dip-ip-solver or --without-dip-ip-solver was given.
-if test "${with_dip_ip_solver+set}" = set; then
-  withval="$with_dip_ip_solver"
-  dip_ip_solver=$withval
-else
-  dip_ip_solver=cbc
-fi;
+found_ip_solver=false
+if test $coin_has_clp = yes; then
+   found_ip_solver=true
+elif test $coin_has_cpx = yes; then
+   found_ip_solver=true
+elif test $coin_has_grb = yes; then
+   found_ip_solver=true
+fi
 
-found_package=true
-case $dip_ip_solver in
-   cbc)
-     echo "$as_me:$LINENO: result: Cbc" >&5
-echo "${ECHO_T}Cbc" >&6
-     if test $coin_has_cbc != yes; then
-         found_package=false
-     fi
-   ;;
-   cplex)
-     echo "$as_me:$LINENO: result: Cplex" >&5
-echo "${ECHO_T}Cplex" >&6
-     if test $coin_has_cpx != yes; then
-         found_package=false
-     fi
-   ;;
-   gurobi)
-     echo "$as_me:$LINENO: result: Gurobi" >&5
-echo "${ECHO_T}Gurobi" >&6
-     if test $coin_has_grb != yes; then
-         found_package=false
-     fi
-   ;;
-   symphony)
-     echo "$as_me:$LINENO: result: SYMPHONY" >&5
-echo "${ECHO_T}SYMPHONY" >&6
-     if test $coin_has_symphony != yes; then
-     	found_package=false
-     fi
-   ;;
-  *)
-    { { echo "$as_me:$LINENO: error: Unknown IP solver!" >&5
-echo "$as_me: error: Unknown IP solver!" >&2;}
+if test $found_ip_solver = false; then
+  { { echo "$as_me:$LINENO: error: Couldn't find an IP solver!" >&5
+echo "$as_me: error: Couldn't find an IP solver!" >&2;}
    { (exit 1); exit 1; }; }
-  ;;
-esac
-
-if test $found_package = false; then
-  { { echo "$as_me:$LINENO: error: Couldn't find the $dip_ip_solver package!" >&5
-echo "$as_me: error: Couldn't find the $dip_ip_solver package!" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-
-
-if test $dip_ip_solver = cbc &&
-test $coin_has_cbc != unavailable &&
-test $coin_has_cbc != skipping; then
-  CBC_IP_SOLVER_TRUE=
-  CBC_IP_SOLVER_FALSE='#'
 else
-  CBC_IP_SOLVER_TRUE='#'
-  CBC_IP_SOLVER_FALSE=
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 fi
 
+#############################################################################
+#                  Export symbols for available solvers                     #
+#############################################################################
 
+if test $coin_has_clp = yes ; then
 
-if test $dip_ip_solver = cplex &&
-test $coin_has_cpx != unavailable &&
-test $coin_has_cpx != skipping; then
-  CPLEX_IP_SOLVER_TRUE=
-  CPLEX_IP_SOLVER_FALSE='#'
-else
-  CPLEX_IP_SOLVER_TRUE='#'
-  CPLEX_IP_SOLVER_FALSE=
+cat >>confdefs.h <<\_ACEOF
+#define DIP_HAS_CLP 1
+_ACEOF
+
 fi
+if test $coin_has_symphony = yes ; then
 
+cat >>confdefs.h <<\_ACEOF
+#define DIP_HAS_SYMPHONY 1
+_ACEOF
 
-
-if test $dip_ip_solver = gurobi &&
-test $coin_has_grb != unavailable &&
-test $coin_has_grb != skipping; then
-  GRB_IP_SOLVER_TRUE=
-  GRB_IP_SOLVER_FALSE='#'
-else
-  GRB_IP_SOLVER_TRUE='#'
-  GRB_IP_SOLVER_FALSE=
 fi
+if test $coin_has_cbc = yes ; then
 
+cat >>confdefs.h <<\_ACEOF
+#define DIP_HAS_CBC 1
+_ACEOF
 
-
-if test $dip_ip_solver = symphony &&
-test $coin_has_symphony != unavailable &&
-test $coin_has_symphony != skipping; then
-  SYMPHONY_IP_SOLVER_TRUE=
-  SYMPHONY_IP_SOLVER_FALSE='#'
-else
-  SYMPHONY_IP_SOLVER_TRUE='#'
-  SYMPHONY_IP_SOLVER_FALSE=
 fi
+if test $coin_has_cpx = yes ; then
 
+cat >>confdefs.h <<\_ACEOF
+#define DIP_HAS_CPX 1
+_ACEOF
+
+fi
+if test $coin_has_grb = yes ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define DIP_HAS_GRB 1
+_ACEOF
+
+fi
 
 ##############################################################################
 #                   VPATH links for unit test                                #
@@ -26794,55 +26683,6 @@ if test -z "${HAVE_PYTHON_TRUE}" && test -z "${HAVE_PYTHON_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_PYTHON\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"HAVE_PYTHON\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${CLP_LP_SOLVER_TRUE}" && test -z "${CLP_LP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"CLP_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"CLP_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${CPLEX_LP_SOLVER_TRUE}" && test -z "${CPLEX_LP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"CPLEX_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"CPLEX_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${GRB_LP_SOLVER_TRUE}" && test -z "${GRB_LP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"GRB_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"GRB_LP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${CBC_IP_SOLVER_TRUE}" && test -z "${CBC_IP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"CBC_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"CBC_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${CPLEX_IP_SOLVER_TRUE}" && test -z "${CPLEX_IP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"CPLEX_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"CPLEX_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${GRB_IP_SOLVER_TRUE}" && test -z "${GRB_IP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"GRB_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"GRB_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${SYMPHONY_IP_SOLVER_TRUE}" && test -z "${SYMPHONY_IP_SOLVER_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"SYMPHONY_IP_SOLVER\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"SYMPHONY_IP_SOLVER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -27685,20 +27525,6 @@ s,@HAVE_PYTHON_TRUE@,$HAVE_PYTHON_TRUE,;t t
 s,@HAVE_PYTHON_FALSE@,$HAVE_PYTHON_FALSE,;t t
 s,@PYTHON_LIBS@,$PYTHON_LIBS,;t t
 s,@PYTHON_CFLAGS@,$PYTHON_CFLAGS,;t t
-s,@CLP_LP_SOLVER_TRUE@,$CLP_LP_SOLVER_TRUE,;t t
-s,@CLP_LP_SOLVER_FALSE@,$CLP_LP_SOLVER_FALSE,;t t
-s,@CPLEX_LP_SOLVER_TRUE@,$CPLEX_LP_SOLVER_TRUE,;t t
-s,@CPLEX_LP_SOLVER_FALSE@,$CPLEX_LP_SOLVER_FALSE,;t t
-s,@GRB_LP_SOLVER_TRUE@,$GRB_LP_SOLVER_TRUE,;t t
-s,@GRB_LP_SOLVER_FALSE@,$GRB_LP_SOLVER_FALSE,;t t
-s,@CBC_IP_SOLVER_TRUE@,$CBC_IP_SOLVER_TRUE,;t t
-s,@CBC_IP_SOLVER_FALSE@,$CBC_IP_SOLVER_FALSE,;t t
-s,@CPLEX_IP_SOLVER_TRUE@,$CPLEX_IP_SOLVER_TRUE,;t t
-s,@CPLEX_IP_SOLVER_FALSE@,$CPLEX_IP_SOLVER_FALSE,;t t
-s,@GRB_IP_SOLVER_TRUE@,$GRB_IP_SOLVER_TRUE,;t t
-s,@GRB_IP_SOLVER_FALSE@,$GRB_IP_SOLVER_FALSE,;t t
-s,@SYMPHONY_IP_SOLVER_TRUE@,$SYMPHONY_IP_SOLVER_TRUE,;t t
-s,@SYMPHONY_IP_SOLVER_FALSE@,$SYMPHONY_IP_SOLVER_FALSE,;t t
 s,@coin_have_doxygen@,$coin_have_doxygen,;t t
 s,@coin_have_latex@,$coin_have_latex,;t t
 s,@coin_doxy_usedot@,$coin_doxy_usedot,;t t

@@ -10,6 +10,21 @@ AUTOMAKE_OPTIONS = foreign
 
 test: ../src/dip$(EXEEXT)
 
+if COIN_HAS_CBC
+test: test_cbc
+endif
+if COIN_HAS_SYMPHONY
+test: test_symphony
+endif
+if COIN_HAS_CPX
+test: test_cpx
+endif
+if COIN_HAS_GRB
+test: test_grb
+endif
+
+test_cbc:
+
 	../src/dip$(EXEEXT) --BlockFileFormat Pair  --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --BestKnownLB 508.29976   --BestKnownUB 508.29976
 
 	../src/dip$(EXEEXT) --BlockFileFormat List --Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --BestKnownLB 59704.02009   --BestKnownUB 59704.02009
@@ -17,6 +32,44 @@ test: ../src/dip$(EXEEXT)
 	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --BestKnownLB 11   --BestKnownUB 11
 
 	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --BestKnownLB -88   --BestKnownUB -88
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --BestKnownLB -88   --BestKnownUB -88
+
+test_symphony:
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair  --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --DecompIPSolver SYMPHONY --BestKnownLB 508.29976   --BestKnownUB 508.29976
+
+	../src/dip$(EXEEXT) --BlockFileFormat List --Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --DecompIPSolver SYMPHONY --BestKnownLB 59704.02009   --BestKnownUB 59704.02009
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --DecompIPSolver SYMPHONY --BestKnownLB 11   --BestKnownUB 11
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --DecompIPSolver SYMPHONY --BestKnownLB -88   --BestKnownUB -88
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --DecompIPSolver SYMPHONY --BestKnownLB -88   --BestKnownUB -88
+
+test_cpx:
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair  --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --DecompIPSolver CPLEX --DecompLPSolver CPLEX --BestKnownLB 508.29976   --BestKnownUB 508.29976
+
+	../src/dip$(EXEEXT) --BlockFileFormat List --Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --DecompIPSolver CPLEX --DecompLPSolver CPLEX --BestKnownLB 59704.02009   --BestKnownUB 59704.02009
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --DecompIPSolver CPLEX --DecompLPSolver CPLEX --BestKnownLB 11   --BestKnownUB 11
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --DecompIPSolver CPLEX --DecompLPSolver CPLEX --BestKnownLB -88   --BestKnownUB -88
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --DecompIPSolver CPLEX --DecompLPSolver CPLEX --BestKnownLB -88   --BestKnownUB -88
+
+test_grb:
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair  --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB 508.29976   --BestKnownUB 508.29976
+
+	../src/dip$(EXEEXT) --BlockFileFormat List --Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB 59704.02009   --BestKnownUB 59704.02009
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB 11   --BestKnownUB 11
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB -88   --BestKnownUB -88
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB -88   --BestKnownUB -88
 
 .PHONY: test
 

@@ -37,6 +37,18 @@ SUBDIRS_DOXY = $(SUBDIRS) all
 test: all
 	cd Dip; $(MAKE) test
 
+test_cbc: all
+	cd Dip; $(MAKE) test_cbc
+
+test_symphony: all
+	cd Dip; $(MAKE) test_symphony
+
+test_cpx: all
+	cd Dip; $(MAKE) test_cpx
+
+test_grb: all
+	cd Dip; $(MAKE) test_grb
+
 tests: all
 	for dir in $(SUBDIRS); do \
 	  if test -r $$dir/test/Makefile; then \
