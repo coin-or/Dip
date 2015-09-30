@@ -28,6 +28,8 @@
 #define DLLEXPORT extern "C"
 #endif
 
+double DecompInf = COIN_DBL_MAX;
+
 DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
 {
    PyObject* pProb;
