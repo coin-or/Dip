@@ -36,6 +36,24 @@ https://projects.coin-or.org/Dip/newticket
 CHANGELOG
 =========
 
+## Release 0.92.0
+ * Substantially re-designed internals
+ * Renamed classes, functions, and parameters more intuitively
+ * Leiminated unnecessary "MILP" parameter section and joined it to "DECOMP," as well as making "DECOMP" the default parameter section name.
+ * Changed parameter setting mechanism to make it possible to pass parameters directly to solvers using native names.
+ * Added interface to Gurobi
+ * Added ability to select solver at run-time rather than compile-time.
+
+## Release 0.91.4
+ * Fixed bugs in examples
+ * Updates to dependencies
+ * Samll bug fixes
+
+## Release 0.91.4
+ * Fixed bugs in examples
+ * Updates to dependencies
+ * Samll bug fixes
+
 ## Release 0.91.3
  * Fixes for correctly producing Doxygen documentation
 
