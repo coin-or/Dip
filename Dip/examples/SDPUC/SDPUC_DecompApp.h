@@ -54,7 +54,7 @@ public:
    /** @name Helper functions (public). */   
 
    /** Initialize application. */
-   void initializeApp(UtilParameters & utilParam);
+   void initializeApp();
 
    /* Create models. */
    void createModels();
@@ -82,7 +82,14 @@ public:
       m_classTag  ("SDPUC-APP"),
       m_objective (NULL)
    {
-      initializeApp(utilParam);                    
+      //---
+      //--- get application parameters
+      //---
+      m_appParam.getSettings(utilParam);
+      if(m_appParam.LogLevel >= 1)
+	 m_appParam.dumpSettings();
+
+      initializeApp();                    
    }
    
    virtual ~SDPUC_DecompApp() {

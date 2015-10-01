@@ -155,7 +155,9 @@ void DecompApp::initializeApp()
       //---
       //--- read block file
       //---
-      readBlockFile();
+      if (m_param.BlockFile != ""){
+	 readBlockFile();
+      }
    } else
       // automatic structure detection
    {
@@ -640,8 +642,6 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
    //---
    map<int, int> colIndexToBlockIndex;
    map<int, DecompConstraintSet*>::iterator mit;
-   const double* colLB = m_modelC->getColLB();
-   const double* colUB = m_modelC->getColUB();
 
    for (mit = m_modelR.begin(); mit != m_modelR.end(); mit++) {
       int                   blockIndex = mit->first;
@@ -689,8 +689,10 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
 
       colIndex        = colNameToIndex[colName];
       blockIndex      = colIndexToBlockIndex[colIndex];
-      DecompConstraintSet* model = m_modelR[blockIndex];
       /*
+      const double* colLB = m_modelC->getColLB();
+      const double* colUB = m_modelC->getColUB();
+      DecompConstraintSet* model = m_modelR[blockIndex];
       if (model->m_masterOnly) {
          printf("MasterOnly col=%s value=%g lb=%g ub=%g",
                 colName.c_str(), colValue, colLB[colIndex], colUB[colIndex]);
@@ -1715,8 +1717,35 @@ void DecompApp::singlyBorderStructureDetection()
    }
 }
 
-
-
+// --------------------------------------------------------------------- //
+void DecompApp::setDecompInf(){
+   if (m_param.DecompLPSolver == "Clp"){
+#ifdef DIP_HAS_CLP
+      DecompInf = OsiClpInfinity;
+#else
+      throw UtilException("Clp selected as solver, but it's not available",
+			  "setDecompInf", "DecompApp");
+#endif
+   }else if (m_param.DecompLPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      DecompInf = CPX_INFBOUND;
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "setDecompInf", "DecompApp");
+#endif
+   }else if (m_param.DecompLPSolver == "Gurobi"){
+#ifdef DIP_HAS_GRB
+      DecompInf = GRB_INFINITY;
+#else
+      throw UtilException("Gurobi selected as solver, but it's not available",
+			  "setDecompInf", "DecompApp");
+#endif
+   }else{
+      throw UtilException("Unknown solver selected",
+			  "setDecompInf", "DecompApp");
+   }
+   return;
+}
 
 #if 0
 // --------------------------------------------------------------------- //

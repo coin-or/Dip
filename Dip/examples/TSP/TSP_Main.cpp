@@ -23,6 +23,8 @@
 //===========================================================================//
 #include "UtilTimer.h"
 
+double DecompInf = COIN_DBL_MAX;
+
 //===========================================================================//
 int main(int argc, char ** argv){
    try{      
@@ -60,13 +62,13 @@ int main(int argc, char ** argv){
       //--- create the CPM algorithm object
       //---      
       if(doCut)	 
-         algo = new DecompAlgoC(&tsp, &utilParam);
+         algo = new DecompAlgoC(&tsp, utilParam);
 
       //---
       //--- create the PC algorithm object
       //---
       if(doPriceCut)
-         algo = new DecompAlgoPC(&tsp, &utilParam);
+         algo = new DecompAlgoPC(&tsp, utilParam);
 
       //---
       //--- create the driver AlpsDecomp model

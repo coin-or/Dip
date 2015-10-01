@@ -58,7 +58,7 @@ public:
 
 
    /** Initialize application. */
-   void initializeApp(UtilParameters& utilParam);
+   void initializeApp();
 
    /* Create models. */
    void createModels();
@@ -77,8 +77,18 @@ public:
       m_classTag  ("MCF-APP"),
       objective   (   NULL  ),
       modelRelax  (   NULL  ),
-      modelCore   (   NULL  ) {
-      initializeApp(utilParam);
+      modelCore   (   NULL  )
+   {
+      //---
+      //--- get application parameters
+      //---
+      m_appParam.getSettings(utilParam);
+      
+      if (m_appParam.LogLevel >= 1) {
+	 m_appParam.dumpSettings(m_osLog);
+      }
+      
+      initializeApp();
    }
 
    virtual ~MCF_DecompApp() {

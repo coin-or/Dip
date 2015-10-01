@@ -23,6 +23,8 @@
 //===========================================================================//
 #include "UtilTimer.h"
 
+double DecompInf = COIN_DBL_MAX;
+
 using namespace std;
 
 //===========================================================================//
@@ -64,13 +66,13 @@ int main(int argc, char ** argv){
       //--- create the CPM algorithm object
       //---      
       if(doCut)	 
-         algo = new DecompAlgoC(&mmkp, &utilParam);
+         algo = new DecompAlgoC(&mmkp, utilParam);
 
       //---
       //--- create the PC algorithm object
       //---
       if(doPriceCut)
-         algo = new DecompAlgoPC(&mmkp, &utilParam);
+         algo = new DecompAlgoPC(&mmkp, utilParam);
 
 
       if(doCut && doDirect){

@@ -19,18 +19,11 @@
 #include "DecompAlgo.h"
 
 //===========================================================================//
-void VRP_DecompApp::initializeApp(UtilParameters & utilParam)  {
+void VRP_DecompApp::initializeApp()  {
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
 		      "initializeApp()", m_appParam.LogLevel, 2);
    
-   //---
-   //--- get application parameters
-   //---   
-   m_appParam.getSettings(utilParam);   
-   if(m_appParam.LogLevel >= 1)
-      m_appParam.dumpSettings(m_osLog);
-
    //---
    //--- read VRPLIB instance
    //---

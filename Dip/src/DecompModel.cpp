@@ -232,18 +232,22 @@ void DecompSubModel::solveAsMIP(DecompSolverResult*  result,
    //---
    result->m_solution.clear();
 
-#ifdef __DECOMP_IP_SYMPHONY__
-   solveAsMIPSym(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
-#endif
-#ifdef __DECOMP_IP_CBC__
-   solveAsMIPCbc(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
-#endif
-#ifdef __DECOMP_IP_CPX__
-   solveAsMIPCpx(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
-#endif
-#ifdef __DECOMP_IP_GRB__
-   solveAsMIPGrb(result, param, doExact, doCutoff, isRoot, cutoff, timeLimit);
-#endif
+   if (param.DecompIPSolver == "SYMPHONY"){ 
+      solveAsMIPSym(result, param, doExact, doCutoff, isRoot, cutoff, 
+		    timeLimit);
+   }else if (param.DecompIPSolver == "Cbc"){ 
+      solveAsMIPCbc(result, param, doExact, doCutoff, isRoot, cutoff, 
+		    timeLimit);
+   }else if (param.DecompIPSolver == "CPLEX"){ 
+      solveAsMIPCpx(result, param, doExact, doCutoff, isRoot, cutoff, 
+		    timeLimit);
+   }else if (param.DecompIPSolver == "Gurobi"){ 
+      solveAsMIPGrb(result, param, doExact, doCutoff, isRoot, cutoff, 
+		    timeLimit);
+   }else{
+      throw UtilException("Unknown solver selected.",
+			  "solveAsMIP", "DecompSubModel");
+   }
 }
 
 //===========================================================================//
@@ -255,7 +259,7 @@ void DecompSubModel::solveAsMIPSym(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef __DECOMP_IP_SYMPHONY__
+#ifdef COIN_HAS_SYMPHONY
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    double* solution = new double[numCols];
@@ -368,6 +372,9 @@ void DecompSubModel::solveAsMIPSym(DecompSolverResult*  result,
       }
    }
    UTIL_DELARR(solution);
+#else
+      throw UtilException("SYMPHONY selected as solver, but it's not available",
+			  "solveAsMIPSym", "DecompSubModel");
 #endif
 }
 
@@ -380,7 +387,7 @@ void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef __DECOMP_IP_CBC__
+#ifdef COIN_HAS_CBC
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    //TODO: what exactly does this do? make copy of entire model!?
@@ -587,6 +594,9 @@ void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
       assert(result->m_nSolutions ==
              static_cast<int>(result->m_solution.size()));
    }
+#else
+      throw UtilException("Cbc selected as solver, but it's not available",
+			  "solveAsMIPCbc", "DecompSubModel");
 #endif
 }
 
@@ -599,7 +609,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef __DECOMP_IP_CPX__
+#ifdef COIN_HAS_CPX
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    double* solution = new double[numCols];
@@ -917,6 +927,9 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
       }
    }
    UTIL_DELARR(solution);
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "solveAsMIPCpx", "DecompSubModel");
 #endif
 }
 
@@ -929,7 +942,7 @@ void DecompSubModel::solveAsMIPGrb(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef __DECOMP_IP_GRB__
+#ifdef COIN_HAS_GRB
    int stat;
    const int numCols    = m_osi->getNumCols();
 
@@ -992,6 +1005,9 @@ void DecompSubModel::solveAsMIPGrb(DecompSolverResult*  result,
       throw UtilException("Solution failure",
 			  "solveAsMIPGrb", "DecompSubModel");
    }
+#else
+      throw UtilException("Gurobi selected as solver, but it's not available",
+			  "solveAsMIPGrb", "DecompSubModel");
 #endif
 }
 

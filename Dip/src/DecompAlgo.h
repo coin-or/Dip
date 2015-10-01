@@ -418,6 +418,9 @@ public:
    //TODO: should move out to PC
    //THINK - helper func?, or specific to PC - right? as is genInit
    std::vector<double*> getDualRays(int maxNumRays);
+   std::vector<double*> getDualRaysCpx(int maxNumRays);
+   std::vector<double*> getDualRaysOsi(int maxNumRays);
+   
    virtual int generateVars(DecompVarList&     newVars,
 			    double&            mostNegReducedCost);
 
@@ -488,6 +491,8 @@ public:
    void initSetup();
    void getModelsFromApp();
    void createOsiSubProblem(DecompSubModel& subModel);
+   OsiSolverInterface *getOsiLpSolverInterface();
+   OsiSolverInterface *getOsiIpSolverInterface();
 
    /**
     * Calculate gap: |(ub-lb)|/|lb|
@@ -971,6 +976,7 @@ public:
 	      bool                   doSetup = true) :
       m_classTag   ("D-ALGO"),
       m_param      (),
+      m_utilParam  (&utilParam),
       m_algo       (algo),
       m_status     (STAT_UNKNOWN),
       m_phase      (PHASE_UNKNOWN),
@@ -988,6 +994,7 @@ public:
       m_cutgenSI   (NULL),
       m_cutgenObjCutInd(-1),
       m_auxSI      (NULL),
+      m_modelCore  (utilParam),	 
       m_vars       (),
       m_varpool    (),
       m_cuts       (),
@@ -997,7 +1004,6 @@ public:
       m_xhatIPFeas (),
       m_xhatIPBest (NULL),
       m_isColGenExact(false),
-      m_utilParam    (&utilParam),
       m_numConvexCon (1),
       m_rrLastBlock (-1),
       m_rrIterSinceAll(0),
@@ -1010,8 +1016,7 @@ public:
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
       m_masterOnlyCols(),
-      m_branchingImplementation(DecompBranchInSubproblem),
-      m_modelCore(utilParam)	 
+      m_branchingImplementation(DecompBranchInSubproblem)
    {
       std::string paramSection = DecompAlgoStr[algo];
       //---

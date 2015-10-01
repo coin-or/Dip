@@ -28,6 +28,8 @@
 #define DLLEXPORT extern "C"
 #endif
 
+double DecompInf = COIN_DBL_MAX;
+
 DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
 {
    PyObject* pProb;
@@ -145,7 +147,6 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
       PyObject* pSolution = Py_None;
 
       if (solution != NULL) {
-         int size = solution->getSize();
          const double* values = solution->getValues();
          pSolution = pyTupleList_FromDoubleArray(values, sip.m_colList);
       }

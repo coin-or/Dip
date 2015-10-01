@@ -542,29 +542,31 @@ void DecompAlgo::printCurrentProblemDual(OsiSolverInterface* si,
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
-#ifdef __DECOMP_LP_CPX__
-   OsiCpxSolverInterface* siCpx
-   = dynamic_cast<OsiCpxSolverInterface*>(si);
-   CPXENVptr env = siCpx->getEnvironmentPtr();
-   CPXLPptr  lp  = siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
-   string filename = DecompAlgoStr[m_algo] + "_" + baseName
-                     + ".n" + UtilIntToStr(nodeIndex)
-                     + ".c" + UtilIntToStr(cutPass)
-                     + ".p" + UtilIntToStr(pricePass)
-                     + ".dual.mps";
-   double objShift;
-   int status = CPXdualwrite(env, lp, filename.c_str(), &objShift);
-
-   if (status)
-      throw UtilException("CPXdualwrite failure",
-                          "printCurrentProblemDual", "DecompAlgo");
-
-   printf("objShift in dual = %g\n", objShift);
-   UTIL_DEBUG(m_param.LogDebugLevel, 3,
-              (*m_osLog) << "calling CPXdualwrite filename = "
-              << filename << endl;
-             );
+   if (m_param.DecompIPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      OsiCpxSolverInterface* siCpx
+	 = dynamic_cast<OsiCpxSolverInterface*>(si);
+      CPXENVptr env = siCpx->getEnvironmentPtr();
+      CPXLPptr  lp  = siCpx->getLpPtr(OsiCpxSolverInterface::KEEPCACHED_ALL);
+      string filename = DecompAlgoStr[m_algo] + "_" + baseName
+	 + ".n" + UtilIntToStr(nodeIndex)
+	 + ".c" + UtilIntToStr(cutPass)
+	 + ".p" + UtilIntToStr(pricePass)
+	 + ".dual.mps";
+      double objShift;
+      int status = CPXdualwrite(env, lp, filename.c_str(), &objShift);
+      
+      if (status)
+	 throw UtilException("CPXdualwrite failure",
+			     "printCurrentProblemDual", "DecompAlgo");
+      
+      printf("objShift in dual = %g\n", objShift);
+      UTIL_DEBUG(m_param.LogDebugLevel, 3,
+		 (*m_osLog) << "calling CPXdualwrite filename = "
+		 << filename << endl;
+		 );
 #endif
+   }
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "printCurrentProblemDual()", m_param.LogDebugLevel, 2);
 }
@@ -607,98 +609,101 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface* si,
 
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "printCurrentProblem()", m_param.LogDebugLevel, 2);
-#ifdef __DECOMP_IP_CPX__
-   //---
-   //--- There is no derived OsiCpx::writeLp and the base writeLp does not
-   //---   use names - for some reason (even though they are in Osi memory)
-   //---
-   //--- The characters [] are often used in names but not allowed by
-   //---   CoinLp writer - so replace them here with ().
-   //---
-   int     i            = 0;
-   int     nCols        = si->getNumCols();
-   int     nRows        = si->getNumRows();
-   char** colNamesChar = new char*[nCols];
-   char** rowNamesChar = new char*[nRows + 1];
-
-   for (i = 0; i < nCols; i++) {
-      string colName  = si->getColName(i);
-      replace(colName.begin(), colName.end(), '[', '(');
-      replace(colName.begin(), colName.end(), ']', ')');
-      colNamesChar[i] = new char[colName.size() + 1];
-      copy(colName.begin(), colName.end(), colNamesChar[i]);
-      colNamesChar[i][colName.size()] = '\0';
-   }
-
-   for (i = 0; i < nRows; i++) {
-      string rowName  = si->getRowName(i);
-      replace(rowName.begin(), rowName.end(), '[', '(');
-      replace(rowName.begin(), rowName.end(), ']', ')');
-      rowNamesChar[i] = new char[rowName.size() + 1];
-      copy(rowName.begin(), rowName.end(), rowNamesChar[i]);
-      rowNamesChar[i][rowName.size()] = '\0';
-   }
-
-   string objName = si->getObjName();
-   //printf("objname=%s\n", objName.c_str());
-   replace(objName.begin(), objName.end(), '[', '(');
-   replace(objName.begin(), objName.end(), ']', ')');
-   rowNamesChar[nRows] = new char[objName.size() + 1];
-   copy(objName.begin(), objName.end(), rowNamesChar[nRows]);
-   rowNamesChar[nRows][objName.size()] = '\0';
-   //printf("nRows=%d objname=%s\n", nRows, rowNamesChar[nRows]);
-#endif
    UTIL_DEBUG(m_param.LogDebugLevel, 3,
+	      
+	      if (printMps)
+		 (*m_osLog) << "calling writeMps fileName = "
+			    << fileName << endl;
+	      if (printLp)
+		 (*m_osLog) << "calling writeLp  fileName = "
+			    << fileName << endl;
+	      );
+   
 
-              if (printMps)
-              (*m_osLog) << "calling writeMps fileName = "
-              << fileName << endl;
-              if (printLp)
-                 (*m_osLog) << "calling writeLp  fileName = "
-                 << fileName << endl;
-                );
-
-   if (printMps) {
-#ifdef __DECOMP_IP_CPX__
-      string fileNameMps = fileName + ".mps";
-      si->writeMpsNative(fileNameMps.c_str(),
-                         const_cast<const char**>(rowNamesChar),
-                         const_cast<const char**>(colNamesChar), 1);
-#else
-      si->writeMps(fileName.c_str());
+   if (m_param.DecompIPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      //---
+      //--- There is no derived OsiCpx::writeLp and the base writeLp does not
+      //---   use names - for some reason (even though they are in Osi memory)
+      //---
+      //--- The characters [] are often used in names but not allowed by
+      //---   CoinLp writer - so replace them here with ().
+      //---
+      int     i            = 0;
+      int     nCols        = si->getNumCols();
+      int     nRows        = si->getNumRows();
+      char** colNamesChar = new char*[nCols];
+      char** rowNamesChar = new char*[nRows + 1];
+      
+      for (i = 0; i < nCols; i++) {
+	 string colName  = si->getColName(i);
+	 replace(colName.begin(), colName.end(), '[', '(');
+	 replace(colName.begin(), colName.end(), ']', ')');
+	 colNamesChar[i] = new char[colName.size() + 1];
+	 copy(colName.begin(), colName.end(), colNamesChar[i]);
+	 colNamesChar[i][colName.size()] = '\0';
+      }
+      
+      for (i = 0; i < nRows; i++) {
+	 string rowName  = si->getRowName(i);
+	 replace(rowName.begin(), rowName.end(), '[', '(');
+	 replace(rowName.begin(), rowName.end(), ']', ')');
+	 rowNamesChar[i] = new char[rowName.size() + 1];
+	 copy(rowName.begin(), rowName.end(), rowNamesChar[i]);
+	 rowNamesChar[i][rowName.size()] = '\0';
+      }
+      
+      string objName = si->getObjName();
+      //printf("objname=%s\n", objName.c_str());
+      replace(objName.begin(), objName.end(), '[', '(');
+      replace(objName.begin(), objName.end(), ']', ')');
+      rowNamesChar[nRows] = new char[objName.size() + 1];
+      copy(objName.begin(), objName.end(), rowNamesChar[nRows]);
+      rowNamesChar[nRows][objName.size()] = '\0';
+      //printf("nRows=%d objname=%s\n", nRows, rowNamesChar[nRows]);
+      if (printMps) {
+	 string fileNameMps = fileName + ".mps";
+	 si->writeMpsNative(fileNameMps.c_str(),
+			    const_cast<const char**>(rowNamesChar),
+			    const_cast<const char**>(colNamesChar), 1);
+      }
+      if (printLp) {
+	 double epsilon      = 1e-30;
+	 int    numberAcross = 5;
+	 int    decimals     = 10;
+	 string fileNameLp   = fileName + ".lp";
+	 si->writeLpNative(fileNameLp.c_str(),
+			   rowNamesChar, colNamesChar,
+			   epsilon, numberAcross, decimals);
+      }
+      for (int i = 0; i < nCols; i++) {
+	 UTIL_DELARR(colNamesChar[i]);
+      }
+      
+      for (i = 0; i < (nRows + 1); i++) {
+	 UTIL_DELARR(rowNamesChar[i]);
+      }
+      
+      UTIL_DELARR(colNamesChar);
+      UTIL_DELARR(rowNamesChar);
 #endif
+   }else{
+      if (printMps) {
+	 si->writeMps(fileName.c_str());
+      }
+
+      if (printLp) {
+	 double epsilon      = 1e-30;
+	 int    numberAcross = 5;
+	 int    decimals     = 10;
+	 string fileNameLp   = fileName + ".lp";
+	 //This works because the Osi object in this case is OsiClp
+	 // and Clp takes care of transferring the names.
+	 si->writeLp(fileName.c_str(), "lp",
+		     epsilon, numberAcross, decimals);
+      }
    }
 
-   if (printLp) {
-      double epsilon      = 1e-30;
-      int    numberAcross = 5;
-      int    decimals     = 10;
-      string fileNameLp   = fileName + ".lp";
-#ifdef __DECOMP_IP_CPX__
-      si->writeLpNative(fileNameLp.c_str(),
-                        rowNamesChar, colNamesChar,
-                        epsilon, numberAcross, decimals);
-#else
-      //This works because the Osi object in this case is OsiClp
-      // and Clp takes care of transferring the names.
-      si->writeLp(fileName.c_str(), "lp",
-                  epsilon, numberAcross, decimals);
-#endif
-   }
-
-#ifdef __DECOMP_IP_CPX__
-
-   for (i = 0; i < nCols; i++) {
-      UTIL_DELARR(colNamesChar[i]);
-   }
-
-   for (i = 0; i < (nRows + 1); i++) {
-      UTIL_DELARR(rowNamesChar[i]);
-   }
-
-   UTIL_DELARR(colNamesChar);
-   UTIL_DELARR(rowNamesChar);
-#endif
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "printCurrentProblem()", m_param.LogDebugLevel, 2);
 }
@@ -714,11 +719,10 @@ void DecompAlgo::printCurrentProblem(const OsiSolverInterface * si,
       //const char ** rowNames = NULL;
       //const char ** colNames = NULL;
       //TODO: col/row names have to explicitly pass in
-#ifdef __DECOMP_IP_CPX__
+   if (m_param.DecompIPSolver == "CPLEX"){
       si->writeMpsNative(filename.c_str(), NULL, NULL, 1);
-#else
+   }else{
       si->writeMps(filename.c_str());
-#endif
    }
    if(printLp)
       si->writeLp(filename.c_str(), "lp", 1e-30, 5, 10);
@@ -1134,157 +1138,167 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
       printCurrentProblem(m_masterSI, fileName);
    }
 
-#ifdef __DECOMP_IP_CBC__
-   CbcModel cbc(*m_masterSI);
-   cbc.setLogLevel(logIpLevel);
-   cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
-   cbc.branchAndBound();
-   const int statusSet[2] = {0, 1};
-   int       solStatus    = cbc.status();
-   int       solStatus2   = cbc.secondaryStatus();
-
-   if (!UtilIsInSet(solStatus, statusSet, 2)) {
-      cerr << "Error: CBC IP solver status = "
-           << solStatus << endl;
-      throw UtilException("CBC solver status", "solveDirect", "solveDirect");
-   }
-
-   //---
-   //--- get number of nodes
-   //---
-   nNodes = cbc.getNodeCount();
-   //---
-   //--- get objective and solution
-   //---
-   objLB = cbc.getBestPossibleObjValue();
-
-   if (cbc.isProvenOptimal() || cbc.isSecondsLimitReached()) {
-      objUB = cbc.getObjValue();
-
-      if (result && cbc.getSolutionCount()) {
-         const double* solDbl = cbc.getColSolution();
-         vector<double> solVec(solDbl, solDbl + numCols);
-         result->m_solution.push_back(solVec);
-         result->m_nSolutions++;
-         assert(result->m_nSolutions ==
-                static_cast<int>(result->m_solution.size()));
-         //copy(solution, solution+numCols, result->m_solution);
+   if (m_param.DecompIPSolver == "Cbc"){
+#ifdef DIP_HAS_CBC
+      CbcModel cbc(*m_masterSI);
+      cbc.setLogLevel(logIpLevel);
+      cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
+      cbc.branchAndBound();
+      const int statusSet[2] = {0, 1};
+      int       solStatus    = cbc.status();
+      int       solStatus2   = cbc.secondaryStatus();
+      
+      if (!UtilIsInSet(solStatus, statusSet, 2)) {
+	 cerr << "Error: CBC IP solver status = "
+	      << solStatus << endl;
+	 throw UtilException("CBC solver status", "solveDirect", "solveDirect");
       }
-   }
-
-   //---
-   //--- copy sol status into result
-   //---
-   if (result) {
-      result->m_solStatus  = solStatus;
-      result->m_solStatus2 = solStatus2;
-   }
-
-#endif
-#ifdef __DECOMP_IP_CPX__
-   OsiIpSolverInterface* masterSICpx =
-      dynamic_cast<OsiIpSolverInterface*>(m_masterSI);
-   CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
-   CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
-   int       status = 0;
-   masterSICpx->switchToMIP();//need?
-
-   if (startSol) {
-      int            nCols    = masterSICpx->getNumCols();
-      int            beg[1]   = {0};
-      int*           varInd   = new int[nCols];
-      const double* solution = startSol->getValues();
-      assert(nCols == startSol->getSize());
-      UtilIotaN(varInd, nCols, 0);
-      status = CPXaddmipstarts(cpxEnv, cpxLp,
-                               1, nCols, beg, varInd, solution, NULL, NULL);
-
-      if (status)
-         throw UtilException("CPXaddmipstarts failure",
-                             "solveDirect", "DecompAlgoC");
-
-      UTIL_DELARR(varInd);
-   }
-
-   //---
-   //--- set the time limit
-   //---
-   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
-   //---
-   //--- set the thread limit, otherwise CPLEX will use all the resources
-   //---
-   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, m_param.NumThreadsIPSolver);
-
-   if (status)
-      throw UtilException("CPXsetdblparam failure",
-                          "solveDirect", "DecompAlgoC");
-
-   //---
-   //--- solve the MILP
-   //---
-   UtilTimer timer1;
-   timer1.start();
-   m_masterSI->branchAndBound();
-   timer1.stop();
-   cout << "just after solving" << endl;
-   cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
-        << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
-   //---
-   //--- get solver status
-   //---
-   //---
-   int solStatus = CPXgetstat(cpxEnv, cpxLp);
-
-   if (result) {
-      result->m_solStatus  = solStatus;
-      result->m_solStatus2 = 0;
-   }
-
-   //---
-   //--- get number of nodes
-   //---
-   nNodes  = CPXgetnodecnt(cpxEnv, cpxLp);
-   //---
-   //--- get objective and solution
-   //---
-   status = CPXgetbestobjval(cpxEnv, cpxLp, &objLB);
-
-   if (status)
-      throw UtilException("CPXgetbestobjval failure",
-                          "solveDirect", "DecompAlgoC");
-
-   //---
-   //--- get objective and solution
-   //---
-   if (solStatus == CPXMIP_OPTIMAL     ||
-         solStatus == CPXMIP_OPTIMAL_TOL ||
-         solStatus == CPXMIP_TIME_LIM_FEAS) {
-      status = CPXgetmipobjval(cpxEnv, cpxLp, &objUB);
-
-      if (status)
-         throw UtilException("CPXgetmipobjval failure",
-                             "solveDirect", "DecompAlgoC");
-
+      
+      //---
+      //--- get number of nodes
+      //---
+      nNodes = cbc.getNodeCount();
+      //---
+      //--- get objective and solution
+      //---
+      objLB = cbc.getBestPossibleObjValue();
+      
+      if (cbc.isProvenOptimal() || cbc.isSecondsLimitReached()) {
+	 objUB = cbc.getObjValue();
+	 
+	 if (result && cbc.getSolutionCount()) {
+	    const double* solDbl = cbc.getColSolution();
+	    vector<double> solVec(solDbl, solDbl + numCols);
+	    result->m_solution.push_back(solVec);
+	    result->m_nSolutions++;
+	    assert(result->m_nSolutions ==
+		   static_cast<int>(result->m_solution.size()));
+	    //copy(solution, solution+numCols, result->m_solution);
+	 }
+      }
+      
+      //---
+      //--- copy sol status into result
+      //---
       if (result) {
-         const double* solDbl = m_masterSI->getColSolution();
-         vector<double> solVec(solDbl, solDbl + numCols);
-         result->m_solution.push_back(solVec);
-         result->m_nSolutions++;
-         assert(result->m_nSolutions ==
-                static_cast<int>(result->m_solution.size()));
-         //copy(solution, solution+numCols, result->m_solution);
+	 result->m_solStatus  = solStatus;
+	 result->m_solStatus2 = solStatus2;
       }
-   }
-
-   //---
-   //--- copy sol status into result
-   //---
-   if (result) {
-      result->m_solStatus  = solStatus;
-      result->m_solStatus2 = 0;
-   }
-
+#else
+      throw UtilException("Cbc selected as solver, but it's not available",
+			  "solveDirect", "DecompDebug");
 #endif
+   }else if (m_param.DecompIPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      OsiCpxSolverInterface* masterSICpx =
+	 dynamic_cast<OsiCpxSolverInterface*>(m_masterSI);
+      CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
+      CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
+      int       status = 0;
+      masterSICpx->switchToMIP();//need?
+      
+      if (startSol) {
+	 int            nCols    = masterSICpx->getNumCols();
+	 int            beg[1]   = {0};
+	 int*           varInd   = new int[nCols];
+	 const double* solution = startSol->getValues();
+	 assert(nCols == startSol->getSize());
+	 UtilIotaN(varInd, nCols, 0);
+	 status = CPXaddmipstarts(cpxEnv, cpxLp,
+				  1, nCols, beg, varInd, solution, NULL, NULL);
+	 
+	 if (status)
+	    throw UtilException("CPXaddmipstarts failure",
+				"solveDirect", "DecompAlgoC");
+	 
+	 UTIL_DELARR(varInd);
+      }
+      
+      //---
+      //--- set the time limit
+      //---
+      status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
+      //---
+      //--- set the thread limit, otherwise CPLEX will use all the resources
+      //---
+      status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS, m_param.NumThreadsIPSolver);
+      
+      if (status)
+	 throw UtilException("CPXsetdblparam failure",
+			     "solveDirect", "DecompAlgoC");
+      
+      //---
+      //--- solve the MILP
+      //---
+      UtilTimer timer1;
+      timer1.start();
+      m_masterSI->branchAndBound();
+      timer1.stop();
+      cout << "just after solving" << endl;
+      cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
+	   << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
+      //---
+      //--- get solver status
+      //---
+      //---
+      int solStatus = CPXgetstat(cpxEnv, cpxLp);
+      
+      if (result) {
+	 result->m_solStatus  = solStatus;
+	 result->m_solStatus2 = 0;
+      }
+      
+      //---
+      //--- get number of nodes
+      //---
+      nNodes  = CPXgetnodecnt(cpxEnv, cpxLp);
+      //---
+      //--- get objective and solution
+      //---
+      status = CPXgetbestobjval(cpxEnv, cpxLp, &objLB);
+      
+      if (status)
+	 throw UtilException("CPXgetbestobjval failure",
+			     "solveDirect", "DecompAlgoC");
+      
+      //---
+      //--- get objective and solution
+      //---
+      if (solStatus == CPXMIP_OPTIMAL     ||
+	  solStatus == CPXMIP_OPTIMAL_TOL ||
+	  solStatus == CPXMIP_TIME_LIM_FEAS) {
+	 status = CPXgetmipobjval(cpxEnv, cpxLp, &objUB);
+	 
+	 if (status)
+	    throw UtilException("CPXgetmipobjval failure",
+				"solveDirect", "DecompAlgoC");
+	 
+	 if (result) {
+	    const double* solDbl = m_masterSI->getColSolution();
+	    vector<double> solVec(solDbl, solDbl + numCols);
+	    result->m_solution.push_back(solVec);
+	    result->m_nSolutions++;
+	    assert(result->m_nSolutions ==
+		   static_cast<int>(result->m_solution.size()));
+	    //copy(solution, solution+numCols, result->m_solution);
+	 }
+      }
+      
+      //---
+      //--- copy sol status into result
+      //---
+      if (result) {
+	 result->m_solStatus  = solStatus;
+	 result->m_solStatus2 = 0;
+      }
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "solveDirect", "DecompDebug");
+#endif
+   }else{
+      throw UtilException("solveDirect not implemented for selected solver",
+			  "solveDirect", "DecompDebug");
+   }
 
    //---
    //--- copy bounds into result

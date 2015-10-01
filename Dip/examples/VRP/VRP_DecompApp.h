@@ -91,7 +91,7 @@ public:
 public:
    /** @name Helper functions (public). */   
 
-   void initializeApp(UtilParameters & utilParam);
+   void initializeApp();
 
    /* Create models. */
    void createModels();
@@ -120,7 +120,14 @@ public:
 	m_objective(NULL),
 	m_modelESPPRC(NULL)
    {
-      initializeApp(utilParam);         
+      //---
+      //--- get application parameters
+      //---   
+      m_appParam.getSettings(utilParam);   
+      if(m_appParam.LogLevel >= 1)
+	 m_appParam.dumpSettings(m_osLog);
+
+      initializeApp();         
    }
    
    virtual ~VRP_DecompApp() {

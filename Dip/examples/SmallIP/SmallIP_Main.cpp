@@ -25,6 +25,8 @@
 #include "DecompAlgoPC.h"
 #include "DecompAlgoRC.h"
 
+double DecompInf = COIN_DBL_MAX;
+
 //===========================================================================//
 int main(int argc, char ** argv){
    try{
@@ -52,19 +54,19 @@ int main(int argc, char ** argv){
       //--- create the CPM algorithm object
       //---      
       if(doCut)
-	 algo = new DecompAlgoC(&sip, &utilParam);  
+	 algo = new DecompAlgoC(&sip, utilParam);  
 
       //---
       //--- create the PC algorithm object
       //---      
       if(doPriceCut)
-	 algo = new DecompAlgoPC(&sip, &utilParam);
+	 algo = new DecompAlgoPC(&sip, utilParam);
 
       //---
       //--- create the PC algorithm object
       //---      
       if(doRelaxCut)
-	 algo = new DecompAlgoRC(&sip, &utilParam);
+	 algo = new DecompAlgoRC(&sip, utilParam);
       
       //---
       //--- create the driver AlpsDecomp model

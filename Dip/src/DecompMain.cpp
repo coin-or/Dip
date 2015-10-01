@@ -39,6 +39,8 @@ void DecompAuto(DecompApp milp,
 
 DecompSolverResult* solveDirect(const DecompApp& decompApp);
 
+double DecompInf = DBL_MAX;
+
 //===========================================================================//
 
 int main(int argc, char** argv)
@@ -67,6 +69,8 @@ int main(int argc, char** argv)
       //--- construct the instance
       //---
       DecompApp milp(utilParam);
+      //Ugly hack, make DecompInf a class variable eventually
+      milp.setDecompInf();
 
       // get the current working Directory.
       char the_path[256];
@@ -565,6 +569,7 @@ void DecompAuto(DecompApp milp,
       delete algo;
    }
 }
+
 DecompSolverResult* solveDirect(const DecompApp& decompApp)
 {
    //---
@@ -573,7 +578,39 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    //--- this function is created such that the DIP can serves
    //--- as an interface to call standalone branch-and-cut solver
    //---
-   OsiSolverInterface* m_problemSI = new OsiIpSolverInterface();
+
+   OsiSolverInterface *m_problemSI;
+
+   if (decompApp.m_param.DecompIPSolver == "SYMPONY"){
+#ifdef DIP_HAS_CLP
+      m_problemSI = new OsiSymSolverInterface();
+#else
+      throw UtilException("SYMPHONY selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (decompApp.m_param.DecompIPSolver == "Cbc"){
+#ifdef DIP_HAS_CLP
+      m_problemSI = new OsiCbcSolverInterface();
+#else
+      throw UtilException("Cbc selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (decompApp.m_param.DecompIPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      m_problemSI = new OsiCpxSolverInterface();
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (decompApp.m_param.DecompIPSolver == "Gurobi"){
+#ifdef DIP_HAS_GRB
+      m_problemSI = new OsiGrbSolverInterface();
+#else
+      throw UtilException("Gurobi selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }
+
    string fileName;
 
    if (decompApp.m_param.DataDir != "") {
@@ -605,141 +642,151 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    UtilTimer timer;
    timer.start();
    DecompSolverResult* result = new DecompSolverResult();
-#ifdef __DECOMP_IP_CBC__
-   CbcModel cbc(*m_problemSI);
-   int logIpLevel = decompApp.m_param.LogIpLevel;
-   cbc.setLogLevel(logIpLevel);
-   cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
-   cbc.branchAndBound();
-   const int statusSet[2] = {0, 1};
-   int       solStatus    = cbc.status();
-   int       solStatus2   = cbc.secondaryStatus();
-
-   if (!UtilIsInSet(solStatus, statusSet, 2)) {
-      cerr << "Error: CBC IP solver status = "
-           << solStatus << endl;
-      throw UtilException("CBC solver status", "solveDirect", "solveDirect");
-   }
-
-   //---
-   //--- get number of nodes
-   //---
-   nNodes = cbc.getNodeCount();
-   //---
-   //--- get objective and solution
-   //---
-   objLB = cbc.getBestPossibleObjValue();
-
-   if (cbc.isProvenOptimal() || cbc.isSecondsLimitReached()) {
-      objUB = cbc.getObjValue();
-
-      if (result && cbc.getSolutionCount()) {
-         const double* solDbl = cbc.getColSolution();
-         vector<double> solVec(solDbl, solDbl + numCols);
-         result->m_solution.push_back(solVec);
-         result->m_nSolutions++;
-         assert(result->m_nSolutions ==
-                static_cast<int>(result->m_solution.size()));
-         //copy(solution, solution+numCols, result->m_solution);
+   if (decompApp.m_param.DecompIPSolver == "Cbc"){
+#ifdef DIP_HAS_CBC
+      CbcModel cbc(*m_problemSI);
+      int logIpLevel = decompApp.m_param.LogIpLevel;
+      cbc.setLogLevel(logIpLevel);
+      cbc.setDblParam(CbcModel::CbcMaximumSeconds, timeLimit);
+      cbc.branchAndBound();
+      const int statusSet[2] = {0, 1};
+      int       solStatus    = cbc.status();
+      int       solStatus2   = cbc.secondaryStatus();
+      
+      if (!UtilIsInSet(solStatus, statusSet, 2)) {
+	 cerr << "Error: CBC IP solver status = "
+	      << solStatus << endl;
+	 throw UtilException("CBC solver status", "solveDirect", "solveDirect");
       }
-   }
-
-   //---
-   //--- copy sol status into result
-   //---
-   if (result) {
-      result->m_solStatus  = solStatus;
-      result->m_solStatus2 = solStatus2;
-   }
-
-#endif
-#ifdef __DECOMP_IP_CPX__
-   OsiIpSolverInterface* masterSICpx
-   = dynamic_cast<OsiCpxSolverInterface*>(m_problemSI);
-   CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
-   CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
-   int       status = 0;
-   masterSICpx->switchToMIP();//need?
-   //---
-   //--- set the time limit
-   //---
-   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
-   //---
-   //--- set the thread limit, otherwise CPLEX will use all the resources
-   //---
-   status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS,
-                           decompApp.m_param.NumThreadsIPSolver);
-
-   if (status)
-      throw UtilException("CPXsetdblparam failure",
-                          "solveDirect", "DecompAlgoC");
-
-   //---
-   //--- solve the MILP
-   //---
-   UtilTimer timer1;
-   timer1.start();
-   masterSICpx->branchAndBound();
-   timer1.stop();
-   cout << "just after solving" << endl;
-   cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
-        << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
-   //---
-   //--- get solver status
-   //---
-   //---
-   int solStatus = CPXgetstat(cpxEnv, cpxLp);
-
-   if (result) {
-      result->m_solStatus  = solStatus;
-      result->m_solStatus2 = 0;
-   }
-
-   //---
-   //--- get number of nodes
-   //---
-   nNodes  = CPXgetnodecnt(cpxEnv, cpxLp);
-   //---
-   //--- get objective and solution
-   //---
-   status = CPXgetbestobjval(cpxEnv, cpxLp, &objLB);
-
-   if (status)
-      throw UtilException("CPXgetbestobjval failure",
-                          "solveDirect", "DecompAlgoC");
-
-   //---
-   //--- get objective and solution
-   //---
-   if (solStatus == CPXMIP_OPTIMAL     ||
-         solStatus == CPXMIP_OPTIMAL_TOL ||
-         solStatus == CPXMIP_TIME_LIM_FEAS) {
-      status = CPXgetmipobjval(cpxEnv, cpxLp, &objUB);
-
-      if (status)
-         throw UtilException("CPXgetmipobjval failure",
-                             "solveDirect", "DecompAlgoC");
-
+      
+      //---
+      //--- get number of nodes
+      //---
+      nNodes = cbc.getNodeCount();
+      //---
+      //--- get objective and solution
+      //---
+      objLB = cbc.getBestPossibleObjValue();
+      
+      if (cbc.isProvenOptimal() || cbc.isSecondsLimitReached()) {
+	 objUB = cbc.getObjValue();
+	 
+	 if (result && cbc.getSolutionCount()) {
+	    const double* solDbl = cbc.getColSolution();
+	    vector<double> solVec(solDbl, solDbl + numCols);
+	    result->m_solution.push_back(solVec);
+	    result->m_nSolutions++;
+	    assert(result->m_nSolutions ==
+		   static_cast<int>(result->m_solution.size()));
+	    //copy(solution, solution+numCols, result->m_solution);
+	 }
+      }
+      
+      //---
+      //--- copy sol status into result
+      //---
       if (result) {
-         const double* solDbl = masterSICpx->getColSolution();
-         vector<double> solVec(solDbl, solDbl + numCols);
-         result->m_solution.push_back(solVec);
-         result->m_nSolutions++;
-         assert(result->m_nSolutions ==
-                static_cast<int>(result->m_solution.size()));
-         //copy(solution, solution+numCols, result->m_solution);
+	 result->m_solStatus  = solStatus;
+	 result->m_solStatus2 = solStatus2;
       }
-   }
-
-   //---
-   //--- copy sol status into result
-   //---
-   if (result) {
-      result->m_solStatus  = solStatus;
-      result->m_solStatus2 = 0;
-   }
-
+#else
+      throw UtilException("Cbc selected as solver, but it's not available",
+			  "solveDirect", "DecompMain");
 #endif
+   }else if (decompApp.m_param.DecompIPSolver == "CPLEX"){
+#ifdef DIP_HAS_CPX
+      OsiCpxSolverInterface* masterSICpx
+	 = dynamic_cast<OsiCpxSolverInterface*>(m_problemSI);
+      CPXLPptr  cpxLp  = masterSICpx->getLpPtr();
+      CPXENVptr cpxEnv = masterSICpx->getEnvironmentPtr();
+      int       status = 0;
+      masterSICpx->switchToMIP();//need?
+      //---
+      //--- set the time limit
+      //---
+      status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, timeLimit);
+      //---
+      //--- set the thread limit, otherwise CPLEX will use all the resources
+      //---
+      status = CPXsetintparam(cpxEnv, CPX_PARAM_THREADS,
+			      decompApp.m_param.NumThreadsIPSolver);
+      
+      if (status)
+	 throw UtilException("CPXsetdblparam failure",
+			     "solveDirect", "DecompAlgoC");
+      
+      //---
+      //--- solve the MILP
+      //---
+      UtilTimer timer1;
+      timer1.start();
+      masterSICpx->branchAndBound();
+      timer1.stop();
+      cout << "just after solving" << endl;
+      cout << " Real=" << setw(10) << UtilDblToStr(timer1.getRealTime(), 5)
+	   << " Cpu= " << setw(10) << UtilDblToStr(timer1.getCpuTime() , 5);
+      //---
+      //--- get solver status
+      //---
+      //---
+      int solStatus = CPXgetstat(cpxEnv, cpxLp);
+      
+      if (result) {
+	 result->m_solStatus  = solStatus;
+	 result->m_solStatus2 = 0;
+      }
+      
+      //---
+      //--- get number of nodes
+      //---
+      nNodes  = CPXgetnodecnt(cpxEnv, cpxLp);
+      //---
+      //--- get objective and solution
+      //---
+      status = CPXgetbestobjval(cpxEnv, cpxLp, &objLB);
+      
+      if (status)
+	 throw UtilException("CPXgetbestobjval failure",
+			     "solveDirect", "DecompAlgoC");
+      
+      //---
+      //--- get objective and solution
+      //---
+      if (solStatus == CPXMIP_OPTIMAL     ||
+	  solStatus == CPXMIP_OPTIMAL_TOL ||
+	  solStatus == CPXMIP_TIME_LIM_FEAS) {
+	 status = CPXgetmipobjval(cpxEnv, cpxLp, &objUB);
+	 
+	 if (status)
+	    throw UtilException("CPXgetmipobjval failure",
+				"solveDirect", "DecompAlgoC");
+	 
+	 if (result) {
+	    const double* solDbl = masterSICpx->getColSolution();
+	    vector<double> solVec(solDbl, solDbl + numCols);
+	    result->m_solution.push_back(solVec);
+	    result->m_nSolutions++;
+	    assert(result->m_nSolutions ==
+		   static_cast<int>(result->m_solution.size()));
+	    //copy(solution, solution+numCols, result->m_solution);
+	 }
+      }
+      
+      //---
+      //--- copy sol status into result
+      //---
+      if (result) {
+	 result->m_solStatus  = solStatus;
+	 result->m_solStatus2 = 0;
+      }
+#else
+      throw UtilException("CPLEX selected as solver, but it's not available",
+			  "solveDirect", "DecompMain");
+#endif
+   }else{
+      throw UtilException("solveDirect not implemented for selected solver",
+			  "solveDirect", "DecompDebug");
+   }
 
    //---
    //--- copy bounds into result

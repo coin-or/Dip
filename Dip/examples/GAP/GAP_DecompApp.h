@@ -71,7 +71,7 @@ public:
    /** @name Helper functions (public). */
 
    /** Guts of constructor. */
-   void initializeApp(UtilParameters& utilParam);
+   void initializeApp();
 
    /** TODO comment */
    inline const int getOffsetI(const int i) const {
@@ -121,10 +121,17 @@ public:
 
    /** Default constructor. Takes an instance of UtilParameters */
    GAP_DecompApp(UtilParameters& utilParam) :
-      DecompApp   (),
+      DecompApp   (utilParam),
       m_classTag  ("GAP-APP"),
-      m_objective (NULL) {
-      initializeApp(utilParam);
+      m_objective (NULL)
+   {
+      m_appParam.getSettings(utilParam);
+      
+      if (m_appParam.LogLevel >= 1) {
+	 m_appParam.dumpSettings();
+      }
+
+      initializeApp();
    }
 
    virtual ~GAP_DecompApp() {

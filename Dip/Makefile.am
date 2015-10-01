@@ -43,6 +43,26 @@ EXTRA_DIST =
 test: all
 	cd test; $(MAKE) test
 
+if COIN_HAS_CBC
+test_cbc: all
+	cd test; $(MAKE) test_cbc
+endif
+
+if COIN_HAS_SYMPHONY
+test_symphony: all
+	cd test; $(MAKE) test_symphony
+endif
+
+if COIN_HAS_CPX
+test_cpx: all
+	cd test; $(MAKE) test_cpx
+endif
+
+if COIN_HAS_GRB
+test_grb: all
+	cd test; $(MAKE) test_grb
+endif
+
 unitTest: test
 
 # Doxygen documentation

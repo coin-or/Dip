@@ -20,7 +20,7 @@
 AC_PREREQ(2.59)
 
 # name of project, version number, contact info
-AC_INIT([Dip],[0.92],[dip@lists.coin-or.org])
+AC_INIT([Dip],[trunk],[dip@lists.coin-or.org])
 
 # copyright for configure script
 AC_COPYRIGHT([
@@ -204,110 +204,63 @@ AC_SUBST([PYTHON_CFLAGS])
 #                      Check for the LP solver                              #
 #############################################################################
 
-AC_MSG_CHECKING([for Dip default lp solver])
-AC_ARG_WITH([dip-lp-solver],
-[AC_HELP_STRING([--with-dip-lp-solver@<:@=lpsolver@:>@],
-                [specify the LP solver in small
-                letters(default lpsolver=clp)])],
-		[dip_lp_solver=$withval],[dip_lp_solver=clp])
+AC_MSG_CHECKING([that we have an LP solver])
 
-found_package=true
-case $dip_lp_solver in 
-   clp)
-     AC_MSG_RESULT(Clp)
-     if test $coin_has_clp != yes; then
-         found_package=false
-     fi
-   ;;
-   cplex)
-     AC_MSG_RESULT(Cplex)
-     if test $coin_has_cpx != yes; then 
-         found_package=false
-     fi
-   ;; 
-   gurobi)
-     AC_MSG_RESULT(Gurobi)
-     if test $coin_has_grb != yes; then 
-         found_package=false
-     fi
-   ;; 
-  *)
-    AC_MSG_ERROR(Unknown LP solver!)
-  ;;
-esac
-
-if test $found_package = false; then 
-  AC_MSG_ERROR(Couldn't find the $dip_lp_solver package!)
+found_lp_solver=false
+if test $coin_has_clp = yes; then
+   found_lp_solver=true
+elif test $coin_has_cpx = yes; then
+   found_lp_solver=true
+elif test $coin_has_grb = yes; then
+   found_lp_solver=true
 fi
 
-AM_CONDITIONAL(CLP_LP_SOLVER,[test $dip_lp_solver = clp &&
-test $coin_has_clp != unavailable &&
-test $coin_has_clp != skipping])
-AM_CONDITIONAL(CPLEX_LP_SOLVER,[test $dip_lp_solver = cplex &&
-test $coin_has_cpx != unavailable &&
-test $coin_has_cpx != skipping])
-AM_CONDITIONAL(GRB_LP_SOLVER,[test $dip_lp_solver = gurobi &&
-test $coin_has_grb != unavailable &&
-test $coin_has_grb != skipping])
+if test $found_lp_solver = false; then 
+  AC_MSG_ERROR(Couldn't find an LP solver!)
+else
+  AC_MSG_RESULT(yes)
+fi
 
 #############################################################################
 #                      Check for the IP solver                              #
 #############################################################################
 
-AC_MSG_CHECKING([for Dip default ip solver])
-AC_ARG_WITH([dip-ip-solver],
-[AC_HELP_STRING([--with-dip-ip-solver@<:@=ipsolver@:>@],
-                [specify the IP solver in small
-                letters(default ipsolver=cbc)])],
-		[dip_ip_solver=$withval],[dip_ip_solver=cbc])
+AC_MSG_CHECKING([that we have an IP solver])
 
-found_package=true
-case $dip_ip_solver in 
-   cbc)
-     AC_MSG_RESULT(Cbc) 
-     if test $coin_has_cbc != yes; then
-         found_package=false
-     fi
-   ;;
-   cplex)
-     AC_MSG_RESULT(Cplex)
-     if test $coin_has_cpx != yes; then
-         found_package=false
-     fi
-   ;; 
-   gurobi)
-     AC_MSG_RESULT(Gurobi)
-     if test $coin_has_grb != yes; then
-         found_package=false
-     fi
-   ;; 
-   symphony)
-     AC_MSG_RESULT(SYMPHONY)
-     if test $coin_has_symphony != yes; then
-     	found_package=false
-     fi
-   ;;
-  *)
-    AC_MSG_ERROR(Unknown IP solver!)
-  ;;
-esac
-
-if test $found_package = false; then 
-  AC_MSG_ERROR(Couldn't find the $dip_ip_solver package!)
+found_ip_solver=false
+if test $coin_has_clp = yes; then
+   found_ip_solver=true
+elif test $coin_has_cpx = yes; then
+   found_ip_solver=true
+elif test $coin_has_grb = yes; then
+   found_ip_solver=true
 fi
 
-AM_CONDITIONAL(CBC_IP_SOLVER,[test $dip_ip_solver = cbc &&
-test $coin_has_cbc != unavailable &&
-test $coin_has_cbc != skipping])
-AM_CONDITIONAL(CPLEX_IP_SOLVER,[test $dip_ip_solver = cplex &&
-test $coin_has_cpx != unavailable &&
-test $coin_has_cpx != skipping])
-AM_CONDITIONAL(GRB_IP_SOLVER,[test $dip_ip_solver = gurobi &&
-test $coin_has_grb != unavailable &&
-test $coin_has_grb != skipping])
-AM_CONDITIONAL(SYMPHONY_IP_SOLVER,[test $dip_ip_solver = symphony &&
-test $coin_has_symphony != unavailable &&
-test $coin_has_symphony != skipping])
+if test $found_ip_solver = false; then 
+  AC_MSG_ERROR(Couldn't find an IP solver!)
+else
+  AC_MSG_RESULT(yes)
+fi
+
+#############################################################################
+#                  Export symbols for available solvers                     #
+#############################################################################
+
+if test $coin_has_clp = yes ; then
+  AC_DEFINE(DIP_HAS_CLP, [1], [Define to 1 if we have CLP])
+fi
+if test $coin_has_symphony = yes ; then
+  AC_DEFINE(DIP_HAS_SYMPHONY, [1], [Define to 1 if we have SYMPHONY])
+fi
+if test $coin_has_cbc = yes ; then
+  AC_DEFINE(DIP_HAS_CBC, [1], [Define to 1 if we have CBC])
+fi
+if test $coin_has_cpx = yes ; then
+  AC_DEFINE(DIP_HAS_CPX, [1], [Define to 1 if we have CPLEX])
+fi
+if test $coin_has_grb = yes ; then
+  AC_DEFINE(DIP_HAS_GRB, [1], [Define to 1 if we have Gurobi])
+fi
 
 ##############################################################################
 #                   VPATH links for unit test                                #
