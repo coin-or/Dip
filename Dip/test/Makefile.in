@@ -133,8 +133,14 @@ COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
 COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
+COIN_HAS_DOXYGEN_FALSE = @COIN_HAS_DOXYGEN_FALSE@
+COIN_HAS_DOXYGEN_TRUE = @COIN_HAS_DOXYGEN_TRUE@
+COIN_HAS_GRB_FALSE = @COIN_HAS_GRB_FALSE@
+COIN_HAS_GRB_TRUE = @COIN_HAS_GRB_TRUE@
 COIN_HAS_HMETIS_FALSE = @COIN_HAS_HMETIS_FALSE@
 COIN_HAS_HMETIS_TRUE = @COIN_HAS_HMETIS_TRUE@
+COIN_HAS_LATEX_FALSE = @COIN_HAS_LATEX_FALSE@
+COIN_HAS_LATEX_TRUE = @COIN_HAS_LATEX_TRUE@
 COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
 COIN_HAS_PKGCONFIG_TRUE = @COIN_HAS_PKGCONFIG_TRUE@
 COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
@@ -166,6 +172,8 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEPENDENCY_LINKING_FALSE = @DEPENDENCY_LINKING_FALSE@
+DEPENDENCY_LINKING_TRUE = @DEPENDENCY_LINKING_TRUE@
 DIPINCDIR = @DIPINCDIR@
 DIPLIB_CFLAGS = @DIPLIB_CFLAGS@
 DIPLIB_CFLAGS_INSTALLED = @DIPLIB_CFLAGS_INSTALLED@
@@ -175,6 +183,8 @@ DIPLIB_LIBS_INSTALLED = @DIPLIB_LIBS_INSTALLED@
 DIPLIB_PCLIBS = @DIPLIB_PCLIBS@
 DIPLIB_PCREQUIRES = @DIPLIB_PCREQUIRES@
 DIPSRCDIR = @DIPSRCDIR@
+DIP_OPENMP_FLAGS = @DIP_OPENMP_FLAGS@
+DIP_OPENMP_LIBS = @DIP_OPENMP_LIBS@
 DIP_SVN_REV = @DIP_SVN_REV@
 DipDEFS = @DipDEFS@
 ECHO = @ECHO@
@@ -185,6 +195,17 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GRB_CFLAGS = @GRB_CFLAGS@
+GRB_CFLAGS_INSTALLED = @GRB_CFLAGS_INSTALLED@
+GRB_DATA = @GRB_DATA@
+GRB_DATA_INSTALLED = @GRB_DATA_INSTALLED@
+GRB_DEPENDENCIES = @GRB_DEPENDENCIES@
+GRB_IP_SOLVER_FALSE = @GRB_IP_SOLVER_FALSE@
+GRB_IP_SOLVER_TRUE = @GRB_IP_SOLVER_TRUE@
+GRB_LIBS = @GRB_LIBS@
+GRB_LIBS_INSTALLED = @GRB_LIBS_INSTALLED@
+GRB_LP_SOLVER_FALSE = @GRB_LP_SOLVER_FALSE@
+GRB_LP_SOLVER_TRUE = @GRB_LP_SOLVER_TRUE@
 HAVE_EXTERNALS_FALSE = @HAVE_EXTERNALS_FALSE@
 HAVE_EXTERNALS_TRUE = @HAVE_EXTERNALS_TRUE@
 HAVE_PYTHON_FALSE = @HAVE_PYTHON_FALSE@
@@ -281,6 +302,13 @@ build_alias = @build_alias@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
+coin_doxy_excludes = @coin_doxy_excludes@
+coin_doxy_logname = @coin_doxy_logname@
+coin_doxy_tagfiles = @coin_doxy_tagfiles@
+coin_doxy_tagname = @coin_doxy_tagname@
+coin_doxy_usedot = @coin_doxy_usedot@
+coin_have_doxygen = @coin_have_doxygen@
+coin_have_latex = @coin_have_latex@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
@@ -476,13 +504,13 @@ uninstall-am: uninstall-info-am
 
 test: ../src/dip$(EXEEXT)
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair  --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --MILP:BestKnownLB 508.29976   --MILP::BestKnownUB 508.29976
+	../src/dip$(EXEEXT) --BlockFileFormat Pair  --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --BestKnownLB 508.29976   --BestKnownUB 508.29976
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat List --MILP:Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --MILP:BestKnownLB 59704.02009   --MILP::BestKnownUB 59704.02009
+	../src/dip$(EXEEXT) --BlockFileFormat List --Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --BestKnownLB 59704.02009   --BestKnownUB 59704.02009
 
-	../src/dip$(EXEEXT) --MILP:BlockFileFormat Pair --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --MILP:BestKnownLB 11   --MILP::BestKnownUB 11
+	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --BestKnownLB 11   --BestKnownUB 11
 
-	../src/dip$(EXEEXT) --MILP:Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --MILP:BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --MILP:BestKnownLB 88   --MILP::BestKnownUB 88
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --BestKnownLB -88   --BestKnownUB -88
 
 .PHONY: test
 
