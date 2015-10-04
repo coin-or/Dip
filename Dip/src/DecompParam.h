@@ -720,7 +720,7 @@ public:
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
       BranchingStrategy        = 0;
-      WarmStart                = true;
+      WarmStart                = false;
       BranchPriorityMasterOnly = false; 
       WarmStartNodeLimit       = 100;        
       WarmStartNodeRatio       = 0.5; 
