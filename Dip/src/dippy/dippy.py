@@ -747,14 +747,9 @@ class DipProblem(pulp.LpProblem, DipAPI):
             if gimpy_installed:
                 nodeInd = outputDict['nodeIndex']
                 nodeQuality = outputDict['nodeQuality']
-                print outputDict['pDownUB']
                 numNodes = len(self.Tree.get_node_list())
-                print numNodes, outputDict.keys()
-                dict_list = outputDict.keys()
-                print len(dict_list)
-                for n in dict_list:
+                for n in outputDict:
                     if n == 'pDownUB':
-                        print 'here'
                         if self.layout == 'bak':
                             self.Tree.AddOrUpdateNode(-numNodes, 
                                                       nodeInd, 'L', 
@@ -781,7 +776,6 @@ class DipProblem(pulp.LpProblem, DipAPI):
                         numNodes += 1
 
                     elif n == 'pUpLB':
-                        print 'here'
                         if self.layout == 'bak':
                             self.Tree.AddOrUpdateNode(-numNodes, 
                                                       nodeInd, 'R', 
