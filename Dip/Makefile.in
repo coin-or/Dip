@@ -76,7 +76,6 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(top_srcdir)/examples/ATM/Makefile.in \
 	$(top_srcdir)/examples/ATM/atm.parm.in \
 	$(top_srcdir)/examples/ATM/data_extract.sh.in \
-	$(top_srcdir)/examples/BENMIP/Makefile.in \
 	$(top_srcdir)/examples/ExternalSolvers/Graph/get.boost.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/Makefile.in \
 	$(top_srcdir)/examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger.in \
@@ -148,8 +147,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h \
 	$(top_builddir)/src/config_dip.h
-CONFIG_CLEAN_FILES = examples/Makefile.Examples \
-	examples/BENMIP/Makefile examples/TSP/Makefile \
+CONFIG_CLEAN_FILES = examples/Makefile.Examples examples/TSP/Makefile \
 	examples/TSP/tsp.parm examples/TSP/data_extract.sh \
 	examples/TSP/get_boost.sh examples/TSP/get_concorde.sh \
 	examples/SmallIP/Makefile examples/SmallIP/smallip.parm \
@@ -554,8 +552,6 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 examples/Makefile.Examples: $(top_builddir)/config.status $(top_srcdir)/examples/Makefile.Examples.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
-examples/BENMIP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/BENMIP/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/TSP/tsp.parm: $(top_builddir)/config.status $(top_srcdir)/examples/TSP/tsp.parm.in
@@ -839,7 +835,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doxydoc $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/BENMIP $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doxydoc $(distdir)/examples $(distdir)/examples/AP3 $(distdir)/examples/ATM $(distdir)/examples/ExternalSolvers/Graph $(distdir)/examples/ExternalSolvers/Knapsack/Pisinger $(distdir)/examples/ExternalSolvers/TSP $(distdir)/examples/ExternalSolvers/VRP $(distdir)/examples/GAP $(distdir)/examples/MAD $(distdir)/examples/MCF $(distdir)/examples/MILP $(distdir)/examples/MILPBlock $(distdir)/examples/MMKP $(distdir)/examples/SDPUC $(distdir)/examples/SmallIP $(distdir)/examples/TSP $(distdir)/examples/VRP
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
