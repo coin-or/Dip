@@ -325,6 +325,7 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/dippy/Makefile
                  examples/Makefile.Examples
+		 examples/BENMIP/Makefile
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm
                  examples/TSP/data_extract.sh
