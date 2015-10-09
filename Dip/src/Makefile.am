@@ -104,7 +104,7 @@ libDecomp_la_SOURCES +=        \
 
 # List all additionally required libraries
 if DEPENDENCY_LINKING
-libDecomp_la_LIBADD = $(DIPLIB_LIBS)
+libDecomp_la_LIBADD = $(DIPLIB_LIBS) $(DIP_OPENMP_LIBS)
 endif
 
 # This is for libtool

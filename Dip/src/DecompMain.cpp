@@ -39,7 +39,7 @@ void DecompAuto(DecompApp milp,
 
 DecompSolverResult* solveDirect(const DecompApp& decompApp);
 
-double DecompInf = DBL_MAX;
+extern double DecompInf;
 
 //===========================================================================//
 

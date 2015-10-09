@@ -41,6 +41,8 @@
 
 using namespace std;
 
+double DecompInf = COIN_DBL_MAX;
+
 //===========================================================================//
 
 struct SolveRelaxedThreadArgs {

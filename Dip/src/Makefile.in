@@ -78,6 +78,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 @DEPENDENCY_LINKING_TRUE@libDecomp_la_DEPENDENCIES =  \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1) \
 @DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_1)
 am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	DecompAlgoPC.lo DecompAlgoRC.lo DecompAlgoCGL.lo DecompCut.lo \
@@ -435,7 +436,7 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	UtilMacrosAlps.h
 
 # List all additionally required libraries
-@DEPENDENCY_LINKING_TRUE@libDecomp_la_LIBADD = $(DIPLIB_LIBS)
+@DEPENDENCY_LINKING_TRUE@libDecomp_la_LIBADD = $(DIPLIB_LIBS) $(DIP_OPENMP_LIBS)
 
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
