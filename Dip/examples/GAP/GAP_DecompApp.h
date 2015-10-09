@@ -4,7 +4,9 @@
 // Decomp is distributed under the Common Public License as part of the      //
 // COIN-OR repository (http://www.coin-or.org).                              //
 //                                                                           //
-// Author: Matthew Galati, Lehigh University                                 //
+// Authors: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)      //
+//          Ted Ralphs, Lehigh University (ted@lehigh.edu)                   //
+//          Jiadong Wang, Lehigh University (jiw408@lehigh.edu)              //
 //                                                                           //
 // Copyright (C) 2002-2015 Lehigh University, Matthew Galati, and Ted Ralphs //
 // All Rights Reserved.                                                      //

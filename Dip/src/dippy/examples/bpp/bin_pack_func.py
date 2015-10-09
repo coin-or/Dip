@@ -36,7 +36,7 @@ class BinPackProb:
     
 def formulate(bpp):
     prob = dippy.DipProblem("Bin Packing",
-                            display_mode = 'xdot',
+                            display_mode = 'off',
 #                           layout = 'bak',
                             display_interval = None,
                             )
@@ -84,7 +84,7 @@ def formulate(bpp):
     return prob
 
 def my_branch(prob, sol):
-   
+
     bounds = None
     
     if Symmetry_branch:
@@ -144,6 +144,7 @@ def solve(prob, algo = 'PriceCut'):
 #                'generateInitVars': '1',
 #                 'LogDebugLevel': 5,
 #                'LogDumpModel': 5,
+    dippyOpts['Gurobi'] = {'MipGap':'.05'}
 
     status, message, primals, duals = dippy.Solve(prob, dippyOpts)
   

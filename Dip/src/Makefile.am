@@ -4,10 +4,12 @@
 # DIP is distributed under the Eclipse Public License as part of the         #
 # COIN-OR repository (http://www.coin-or.org).                               #
 #                                                                            #
-# Author: Matthew Galati,  SAS Institute Inc.                                #
+# Authors: Matthew Galati, SAS Institute Inc.                                #
+#          Ted Ralphs, Lehigh University                                     #
+#          Jiadong Wang, Lehigh University                                   #
 #                                                                            #
-# Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
-#                    Ted Ralphs, Lehigh University                           #
+# Copyright (C) 2002-2015, Lehigh University, Matthew Galati, Ted Ralphs     #
+# All Rights Reserved.                                                       #
 #============================================================================#
 
 ## $Id: $
@@ -104,7 +106,7 @@ libDecomp_la_SOURCES +=        \
 
 # List all additionally required libraries
 if DEPENDENCY_LINKING
-libDecomp_la_LIBADD = $(DIPLIB_LIBS)
+libDecomp_la_LIBADD = $(DIPLIB_LIBS) $(DIP_OPENMP_LIBS)
 endif
 
 # This is for libtool

@@ -5,10 +5,9 @@
 // DIP is distributed under the Eclipse Public License as part of the        //
 // COIN-OR repository (http://www.coin-or.org).                              //
 //                                                                           //
-// Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       //
-//                                                                           //
-// Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
-//                    Ted Ralphs, Lehigh University                          //
+// Authors: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)      //
+//          Ted Ralphs, Lehigh University (ted@lehigh.edu)                   //
+//          Jiadong Wang, Lehigh University (jiw408@lehigh.edu)              //
 //                                                                           //
 // Copyright (C) 2002-2015, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
