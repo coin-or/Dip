@@ -45,7 +45,7 @@ prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
-debug_print = True
+debug_print = False
 
 debug_print_lp = False
 
@@ -112,7 +112,7 @@ def knapsack01(obj, weights, capacity):
     if n == 0:
         return 0, []
 
-    if (debug_subproblem):
+    if debug_subproblem:
         relaxation = LpProblem('relaxation', LpMaximize)
         relax_vars = [str(i) for i in range(n)]
         var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
@@ -329,7 +329,8 @@ def init_first_fit(prob):
         dv = (loc[1], var_values)
         bvs.append((i, dv))
         index += 1
-    print bvs
+    if debug_print:
+        print bvs
     return bvs
 
 def init_one_each(prob):
@@ -344,8 +345,8 @@ def init_one_each(prob):
 
         dv = (waste, var_values)
         bvs.append((loc, dv))
-        if debug_print:
-            print bvs
+    if debug_print:
+        print bvs
     return bvs
 
 if debug_print_lp:
