@@ -94,7 +94,8 @@ bool AlpsDecompModel::fathomAllNodes()
    } else if (feasBound < ALPS_OBJ_MAX_LESS) {
       gapVal      = ALPS_MAX(0, feasBound - relBound);
       currAbsGap_ = ALPS_MAX(0, gapVal);
-      currRelGap_ = 100.0 * UtilCalculateGap(relBound, feasBound);
+      currRelGap_ = 100.0 * UtilCalculateGap(relBound, feasBound,
+					     m_decompAlgo->getInfinity());
    }
 
    //printf("+++ Process %d: currAbsGap_ %g, currRelGap_%g\n",

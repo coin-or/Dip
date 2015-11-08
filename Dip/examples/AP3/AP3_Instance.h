@@ -133,7 +133,7 @@ class AP3_Instance {
       m_ncolsFull(0),
       m_nrowsFull(0),
       m_assigncost(0),
-      m_optBound(DecompInf)
+      m_optBound(COIN_DBL_MAX)
       {}
    
    /** Constructor. Construct an instance from data file */
@@ -142,7 +142,7 @@ class AP3_Instance {
       m_ncolsFull(0),
       m_nrowsFull(0),
       m_assigncost(0),
-      m_optBound(DecompInf)
+      m_optBound(COIN_DBL_MAX)
      {
        readInstance(fileName);
      }

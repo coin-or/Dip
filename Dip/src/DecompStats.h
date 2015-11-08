@@ -75,16 +75,16 @@ public:
    }
 
 public:
-   DecompObjBound() :
+   DecompObjBound(double infinity) :
       phase      (0),
       cutPass    (0),
       pricePass  (0),
       timeStamp  (0.0),
-      thisBound  (-DecompInf),
-      thisBoundUB( DecompInf),
-      bestBound  (-DecompInf),
-      thisBoundIP( DecompInf),
-      bestBoundIP( DecompInf) {
+      thisBound  (-infinity),
+      thisBoundUB( infinity),
+      bestBound  (-infinity),
+      thisBoundIP( infinity),
+      bestBoundIP( infinity) {
    }
 
 };
@@ -163,11 +163,16 @@ public:
     */
    int    priceCallsRound;
 
+   /**
+    * Value of infinity
+    */
+   double m_infinity;
+
 public:
    void init() {
       objHistoryBound.clear();
-      objBest.first   = -DecompInf;
-      objBest.second  =  DecompInf;
+      objBest.first   = -m_infinity;
+      objBest.second  =  m_infinity;
       nodeIndex       =  0;
       cutsThisRound   =  0;
       varsThisRound   =  0;
@@ -190,7 +195,7 @@ public:
       varsThisRound   = 0;
    }
    inline void resetBestLB() {
-      objBest.first = -DecompInf;
+      objBest.first = -m_infinity;
    }
    inline DecompObjBound* getLastBound() {
       int nHistorySize = static_cast<int>(objHistoryBound.size());
@@ -202,7 +207,7 @@ public:
       }
    }
    inline double getLastBoundThis() {
-      double           thisBound = -DecompInf;
+      double           thisBound = -m_infinity;
       DecompObjBound* lastBound = getLastBound();
 
       if (lastBound) {
@@ -215,7 +220,8 @@ public:
 public:
    DecompNodeStats() :
       objHistoryBound(),
-      objBest        () {
+      objBest        (),
+      m_infinity     (COIN_DBL_MAX) {
       init();
    }
 };

@@ -81,14 +81,14 @@ void TSP_SubtourCut::create_vector(){
 }
 
 /*-------------------------------------------------------------------------*/
-void TSP_SubtourCut::setBounds(){
+void TSP_SubtourCut::setBounds(double infinity){
    switch(m_type){
    case ACROSS:
       setLowerBound(2.0);
-      setUpperBound(DecompInf);
+      setUpperBound(infinity);
       break;
    case SIDE:
-      setLowerBound(-DecompInf);
+      setLowerBound(-infinity);
       setUpperBound(static_cast<int>(m_S.size()) - 1.0);
       break;
    default:
@@ -132,7 +132,7 @@ void TSP_SubtourCut::expandCutToRow(CoinPackedVector * row){
 }
 
 /*-------------------------------------------------------------------------*/
-void TSP_SubtourCut::print(ostream * os) const{
+void TSP_SubtourCut::print(double infinity, ostream * os) const{
    double lb, ub;
    switch(m_type){
    case ACROSS:
@@ -167,13 +167,13 @@ void TSP_SubtourCut::print(ostream * os) const{
    }
    lb = getLowerBound();
    ub = getUpperBound();
-   if(lb > -DecompInf){
+   if(lb > -infinity){
       (*os) << "\tm_lb\t" << lb;
    }
    else{
       (*os) << "\tm_lb\t-INF";
    }
-   if(ub < DecompInf){
+   if(ub < infinity){
       (*os) << "\tm_ub\t" << ub;
    }
    else{

@@ -209,7 +209,7 @@ void TSP_DecompApp::createModelTrivialSEC(DecompConstraintSet * modelCS){
 	 row.insert(UtilIndexU(u,v), 1.0);
       }
       modelCS->rowLB.push_back(2.0);
-      modelCS->rowUB.push_back(DecompInf);
+      modelCS->rowUB.push_back(m_infinity);
       modelCS->M->appendRow(row);
    }
    UtilFillN(modelCS->colLB,       n_cols,  0.0);
@@ -371,7 +371,7 @@ void TSP_DecompApp::solveOneTree(const double               * cost,
 
    }
    
-   const double bigM     = DecompInf;   
+   const double bigM     = m_infinity;   
    int          exchange = 0;
    vector< pair<int,double> >::iterator vpi = edge_cost.begin();
    

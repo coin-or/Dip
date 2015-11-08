@@ -61,22 +61,22 @@ public:
    /**
     * Default constructors.
     */
-   DecompSolverResult():
+   DecompSolverResult(double infinity):
       m_solStatus (-1),
       m_solStatus2(-1),
-      m_objLB     (-DecompInf),
-      m_objUB     ( DecompInf),
+      m_objLB     (-infinity),
+      m_objUB     ( infinity),
       m_isOptimal (false),
       m_isUnbounded (false),
       m_isCutoff  (false),
       m_nSolutions(0) {
    }
 
-   DecompSolverResult(const DecompSolution* solution):
+ DecompSolverResult(const DecompSolution* solution, double infinity):
       m_solStatus (-1),
       m_solStatus2(-1),
-      m_objLB     (-DecompInf),
-      m_objUB     ( DecompInf),
+      m_objLB     (-infinity),
+      m_objUB     ( infinity),
       m_isOptimal (false),
       m_isUnbounded (false),
       m_isCutoff  (false),

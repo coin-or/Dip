@@ -351,7 +351,7 @@ void MMKP_DecompApp::createModelPartMDKP(DecompConstraintSet * model,
             colIndex++;
          }
       }
-      model->appendRow(rowK, -DecompInf, capacity[*vi]);
+      model->appendRow(rowK, -m_infinity, capacity[*vi]);
    }
       
    //---   
@@ -458,7 +458,7 @@ void MMKP_DecompApp::createModelPartMCKP(DecompConstraintSet * model,
             colIndex++;
          }
       }
-      model->appendRow(rowK, -DecompInf, capacity[*vi]);
+      model->appendRow(rowK, -m_infinity, capacity[*vi]);
    }
 
    //---

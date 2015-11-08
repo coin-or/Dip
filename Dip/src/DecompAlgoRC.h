@@ -130,8 +130,8 @@ public:
       m_classTag("D-ALGORC"),
       m_u        (),
       m_rc       (NULL),
-      m_UB       (DecompInf),
-      m_LB       (-DecompInf),
+      m_UB       (m_infinity),
+      m_LB       (-m_infinity),
       m_cntSameLB(0),
       m_iter     (0),
       m_step     (2.0), //(0, 2] param?

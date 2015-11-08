@@ -87,17 +87,18 @@ string UtilCreateStringHash(const int      len,
 // --------------------------------------------------------------------- //
 string UtilCreateStringHash(const int      len,
                             const int*     ind,
-                            const double* els,
+                            const double*  els,
                             const char     sense,
                             const double   rhs,
-                            const int      precision)
+			    double         infinity,
+			    const int      precision)
 {
    stringstream ss;
    ss << setprecision(precision);
 
-   if (rhs >= DecompInf) {
+   if (rhs >= infinity) {
       ss << "INF";
-   } else if (rhs <= -DecompInf) {
+   } else if (rhs <= -infinity) {
       ss << "-INF";
    } else {
       ss << rhs;

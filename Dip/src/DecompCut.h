@@ -81,18 +81,18 @@ public:
    //faster - but we should not force them
 
    //now it is essentially a DecompCutOsi
-   virtual void     setStringHash(CoinPackedVector* row) {
+   virtual void     setStringHash(CoinPackedVector* row, double infinity) {
       //the user can override this if they can do it faster... also
       //should link up with isSame
       char sense;
       double rhs, range;
       UtilBoundToSense(getLowerBound(),
-                       getUpperBound(), DecompInf,
+                       getUpperBound(), infinity,
                        sense, rhs, range);
       m_strHash = UtilCreateStringHash(row->getNumElements(),
                                        row->getIndices(),
                                        row->getElements(),
-                                       sense, rhs);
+                                       sense, rhs, infinity);
       //need backup for user
       //throw CoinError("Method was invoked but not overridden.",
       //		    "setStringHash", "DecompCut");1

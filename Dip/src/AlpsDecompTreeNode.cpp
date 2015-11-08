@@ -132,8 +132,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
    double currentUB       = getKnowledgeBroker()->getIncumbentValue();
    double parentObjValue  = getQuality();
    double primalTolerance = 1.0e-6;
-   double globalLB        = -DecompInf;
-   double globalUB        =  DecompInf;
+   double globalLB        = -decompAlgo->getInfinity();
+   double globalUB        =  decompAlgo->getInfinity();
    double thisQuality;
    AlpsTreeNode*         bestNode  = NULL;
    const double*         lbs       = desc->lowerBounds_;
@@ -224,8 +224,8 @@ int AlpsDecompTreeNode::process(bool isRoot,
          double* ubsInf = new double[n_cols];
 
          for (c = 0; c < n_cols; c++) {
-            lbsInf[c] = -DecompInf;
-            ubsInf[c] =  DecompInf;
+            lbsInf[c] = -decompAlgo->getInfinity();
+            ubsInf[c] =  decompAlgo->getInfinity();
             //printf("root c:%d lb=%g ub=%g\n",
             //   c, lbs[c], ubs[c]);
          }
@@ -243,7 +243,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
    //---
    currentUB = getKnowledgeBroker()->getIncumbentValue();
    decompAlgo->setObjBoundIP(currentUB);//??
-   gap      = DecompInf;
+   gap      = decompAlgo->getInfinity();
    globalUB = getKnowledgeBroker()->getIncumbentValue();
 
    if (!isRoot) {
@@ -253,7 +253,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //--- if the overall gap is tight enough, fathom whatever is left
       //---
       //TODO: cutoffIncrement (currentUB-cutoffIncrement)
-      gap = UtilCalculateGap(globalLB, globalUB);
+      gap = UtilCalculateGap(globalLB, globalUB, decompAlgo->getInfinity());
 
       if (gap <= relTolerance) {
          doFathom = true;
@@ -303,7 +303,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       }
 
       //watch tolerance here... if quality is close enough, fathom it
-      gap = UtilCalculateGap(thisQuality, currentUB);
+      gap = UtilCalculateGap(thisQuality, currentUB, decompAlgo->getInfinity());
 
       //if(gap <= relTolerance){
       if (quality_ >= currentUB) {

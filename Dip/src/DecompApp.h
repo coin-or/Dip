@@ -1,4 +1,3 @@
-
 //===========================================================================//
 // This file is part of the DIP Solver Framework.                            //
 //                                                                           //
@@ -140,6 +139,10 @@ public:
 
    int m_threadIndex;
 
+   /** The value of infinity **/
+   
+   double m_infinity;
+
 public:
    /**
     * @name Helper functions.
@@ -191,8 +194,6 @@ public:
       m_objective = obj;
    }
 
-   void setDecompInf();
-
    /**
     * Set the model core constraint matrix.
     *
@@ -206,7 +207,7 @@ public:
       assert(model);
 
       if (!model->hasPrepRun()) {
-         model->prepareModel(true);
+	 model->prepareModel(m_infinity, true);
       }
 
       m_modelCore.setModel(model);
@@ -237,46 +238,17 @@ public:
     * NOTE: The user application MUST call this method IF they are
     * not deriving the function DecompApp::solveRelaxed.
     */
-   inline void setModelRelax(DecompConstraintSet* model,
-                             const std::string    modelName = "",
-                             const int            blockId   = 0) {
-      if (model && !model->hasPrepRun()) {
-         model->prepareModel();
-      }
-
-      //---
-      //--- make sure this block has not been set yet
-      //---
-      std::map<int, DecompModel>::iterator mit = m_modelRelax.find(blockId);
-
-      if (mit != m_modelRelax.end()) {
-         std::cerr << "Block " << blockId << " relaxation has already been set. "
-                   << "Only one relaxation definition can be used at one time."
-                   << std::endl;
-         throw UtilException("Multiple relaxation definitions",
-                             "setModelRelax", "DecompApp");
-      }
-
-      DecompModel appModel(model, modelName, blockId, *m_utilParam);
-      m_modelRelax.insert(std::make_pair(blockId, appModel));
-   }
+   void setModelRelax(DecompConstraintSet* model,
+		      const std::string    modelName = "",
+		      const int            blockId   = 0);
 
    /**
     * Set the model relaxed (nested) constraint matrix
     *  (for a particular block).
     */
-   inline void setModelRelaxNest(DecompConstraintSet* model,
-                                 const std::string    modelName,
-                                 const int            blockId = 0) {
-      assert(model);
-
-      if (!model->hasPrepRun()) {
-         model->prepareModel();
-      }
-
-      DecompModel appModel(model, modelName, blockId, *m_utilParam);
-      m_modelRelaxNest[blockId].push_back(appModel);
-   }
+   void setModelRelaxNest(DecompConstraintSet* model,
+			  const std::string    modelName,
+			  const int            blockId = 0);
 
    /**
     * Get a pointer to the base algorithm class
@@ -391,7 +363,7 @@ public:
    virtual void printOriginalSolution(const int              n_cols,
                                       const std::vector<std::string>& colNames,
                                       const double*          solution,
-                                      std::ostream*               os = &std::cout) const;
+                                      std::ostream*          os = &std::cout) const;
 
    /**
     * @}
@@ -456,6 +428,10 @@ public:
 
    const CoinPackedMatrix* getMatrix() { return m_matrix; }
 
+   /** Set the value of infinity **/
+   
+   void setInfinity();
+
 public:
    /**
     * Constructor for base DecompApp class. This accepts a generic parameters
@@ -486,6 +462,8 @@ public:
       }
 
       startupLog();
+
+      setInfinity();
    };
 
    /**

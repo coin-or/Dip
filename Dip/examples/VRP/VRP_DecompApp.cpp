@@ -324,7 +324,7 @@ int VRP_DecompApp::generateCuts(const double              * x,
    //---
    //---  create DecompCuts from CVRPsep cuts
    //--- 
-   m_cvrpSep.createVrpCuts(newCuts);
+   m_cvrpSep.createVrpCuts(newCuts, m_infinity);
 
    UtilPrintFuncEnd(m_osLog, m_classTag,
 		    "generateCuts()", m_appParam.LogLevel, 2);      
@@ -360,7 +360,7 @@ DecompSolverStatus VRP_DecompApp::solveRelaxed(const int          whichBlock,
       //---
       //--- solve the TSP
       //---	 
-      status = m_concorde.solveTSP(vrpRouteInd, vrpRouteEls); 
+      status = m_concorde.solveTSP(vrpRouteInd, vrpRouteEls, m_infinity); 
       assert(!status);
 
       double varRedCost  = 0.0;

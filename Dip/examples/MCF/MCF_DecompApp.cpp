@@ -176,7 +176,7 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet* model)
    //--- create the rows and set the col/row bounds
    //---
    UtilFillN(model->colLB, numCols,  0.0);
-   UtilFillN(model->colUB, numCols,  DecompInf);
+   UtilFillN(model->colUB, numCols,  m_infinity);
 
    for (a = 0; a < numArcs; a++) {
       CoinPackedVector row;
@@ -191,13 +191,13 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet* model)
       }
 
       //TODO: any issue with range constraints?
-      model->appendRow(row, -DecompInf, arcUB);
+      model->appendRow(row, -m_infinity, arcUB);
       string rowNameUB = "capUB(" +
                          UtilIntToStr(a)            + "_" +
                          UtilIntToStr(arcs[a].tail) + "," +
                          UtilIntToStr(arcs[a].head) + ")";
       model->rowNames.push_back(rowNameUB);
-      model->appendRow(row, arcLB,  DecompInf);
+      model->appendRow(row, arcLB,  m_infinity);
       string rowNameLB = "capLB(" +
                          UtilIntToStr(a)            + "_" +
                          UtilIntToStr(arcs[a].tail) + "," +

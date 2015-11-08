@@ -40,8 +40,6 @@
 
 using namespace std;
 
-double DecompInf = COIN_DBL_MAX;
-
 //===========================================================================//
 
 struct SolveRelaxedThreadArgs {
@@ -302,6 +300,7 @@ void DecompAlgo::initSetup()
    //---
 
    m_masterSI = getOsiLpSolverInterface();
+   m_infinity = m_masterSI->getInfinity();
 
    CoinAssertHint(m_masterSI, "Error: Out of Memory");
    m_masterSI->messageHandler()->setLogLevel(m_param.LogLpLevel);
@@ -360,7 +359,7 @@ void DecompAlgo::initSetup()
          }
 
          m_cutgenObjCutInd = m_cutgenSI->getNumRows();
-         m_cutgenSI->addRow(objCut, -DecompInf, DecompInf);
+         m_cutgenSI->addRow(objCut, -m_infinity, m_infinity);
       }
    }
 
@@ -954,7 +953,7 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
 
       colNames.push_back(colName);
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
-                 (*li)->print(m_osLog, m_app);
+                 (*li)->print(m_infinity, m_osLog, m_app);
                 );
       //---
       //--- get dense column = A''s, append convexity constraint on end
@@ -994,7 +993,7 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
       //---
       masterM->appendCol(*sparseCol);
       colLB[colIndex]    = 0.0;
-      colUB[colIndex]    = DecompInf;
+      colUB[colIndex]    = m_infinity;
       objCoeff[colIndex] = 0.0;       //PHASE I
       //---
       //--- set master column type
@@ -1045,7 +1044,7 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    //---
    if (isZeroFeas) {
       for (r = 0; r < m_numConvexCon; r++) {
-         masterRowLB.push_back(-DecompInf);
+         masterRowLB.push_back(-m_infinity);
          masterRowUB.push_back(1.0);
       }
    } else {
@@ -1252,7 +1251,7 @@ void DecompAlgo::masterMatrixAddArtCol(vector<CoinBigIndex>& colBeg,
 
    colBeg.push_back(static_cast<CoinBigIndex>(colBeg.size()));
    colLB    = 0.0;
-   colUB    = DecompInf;
+   colUB    = m_infinity;
    objCoeff = 1.0;
    m_masterColType.push_back(colType);
    m_masterArtCols.push_back(colIndex);
@@ -1463,7 +1462,7 @@ void DecompAlgo::coreMatrixAppendColBounds()
       if (i < nIntVars) {
          //x <= u
          j = modelCore->integerVars[i];
-         modelCore->rowLB.push_back(-DecompInf);
+         modelCore->rowLB.push_back(-m_infinity);
          modelCore->rowUB.push_back(colUBCore[j]);
          sense = 'L';
          rhs   = colUBCore[j];
@@ -1476,7 +1475,7 @@ void DecompAlgo::coreMatrixAppendColBounds()
          //x >= l
          j = modelCore->integerVars[i - nIntVars];
          modelCore->rowLB.push_back(colLBCore[j]);
-         modelCore->rowUB.push_back(DecompInf);
+         modelCore->rowUB.push_back(m_infinity);
          sense = 'G';
          rhs   = colLBCore[j];
 
@@ -1493,7 +1492,8 @@ void DecompAlgo::coreMatrixAppendColBounds()
       string rowHash = UtilCreateStringHash(1,
                                             rowInd + i,
                                             rowEls + i,
-                                            sense, rhs);
+                                            sense, rhs, 
+					    m_infinity);
       modelCore->rowHash.push_back(rowHash);
    }
 
@@ -1597,7 +1597,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
    //--- print the global gap
    //---
    UTIL_MSG(m_param.LogLevel, 2,
-            double gap = UtilCalculateGap(globalLB, globalUB);
+            double gap = UtilCalculateGap(globalLB, globalUB, m_infinity);
             (*m_osLog)
             << "Process Node " << nodeIndex
             << " (algo = "     << DecompAlgoStr[m_algo]
@@ -1653,7 +1653,7 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
    //  short
    //m_nodeStats.objBest.first  = globalLB;
    //if(m_param.DualStab)
-   m_nodeStats.objBest.first  = -DecompInf;
+   m_nodeStats.objBest.first  = -m_infinity;
    //else
    //m_nodeStats.objBest.first  = globalLB;
    m_nodeStats.objBest.second = globalUB;
@@ -2418,7 +2418,7 @@ void DecompAlgo::setMasterBounds(const double* lbs,
                if (m_param.LogDebugLevel >= 4) {
                   (*m_osLog) << "Set masterColIndex=" << masterColIndex
                              << " UB to 0" << endl;
-                  (*li)->print(m_osLog, modelCore->getColNames());
+                  (*li)->print(m_infinity, m_osLog, modelCore->getColNames());
                }
             }
          } else {
@@ -2426,12 +2426,12 @@ void DecompAlgo::setMasterBounds(const double* lbs,
             //--- if needs to be unfixed (from previous node)
             //---
             if (colUB[masterColIndex] <= 0) {
-               m_masterSI->setColBounds(masterColIndex, 0.0, DecompInf);
+               m_masterSI->setColBounds(masterColIndex, 0.0, m_infinity);
 
                if (m_param.LogDebugLevel >= 4) {
                   (*m_osLog) << "Set masterColIndex=" << masterColIndex
                              << " UB to INF" << endl;
-                  (*li)->print(m_osLog, modelCore->getColNames());
+                  (*li)->print(m_infinity, m_osLog, modelCore->getColNames());
                }
             }
          }
@@ -2593,7 +2593,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
    switch (phase) {
    case PHASE_PRICE1:
    case PHASE_PRICE2:
-      m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
+      m_masterSI->setDblParam(OsiDualObjectiveLimit, m_infinity);
 
       if (m_param.SolveMasterUpdateAlgo == DecompDualSimplex) {
          m_masterSI->setHintParam(OsiDoDualInResolve, true, OsiHintDo);
@@ -2755,7 +2755,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       //--- but, we will need a dual ray, so we should resolve with
       //--- presolve off
       //---
-      m_masterSI->setDblParam(OsiDualObjectiveLimit, DecompInf);
+      m_masterSI->setDblParam(OsiDualObjectiveLimit, m_infinity);
       m_masterSI->setHintParam(OsiDoPresolveInResolve, false, OsiHintDo);
       m_masterSI->resolve();
       m_masterSI->setHintParam(OsiDoPresolveInResolve, true,  OsiHintDo);
@@ -3451,7 +3451,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
       assert(objCoeff);
       aveC = UtilAve(objCoeff, nCoreCols);
       attempts = 0;
-      DecompSolverResult subprobResult;//nCoreCols);
+      DecompSolverResult subprobResult(m_infinity);//nCoreCols);
 
       while ((nInitVars < limit) && (attempts < limit2)) {
          //---
@@ -3548,7 +3548,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
       printf("======= BEGIN Gen Init Vars - call CPM process root node\n");
       DecompAlgoC cpm(m_app, *m_utilParam);
       cpm.m_param.CutDC = 2;
-      cpm.processNode(0, -DecompInf, DecompInf);
+      cpm.processNode(0, -m_infinity, m_infinity);
       //---
       //--- copy the vars generated in passes of DC into initVars
       //---   to warm-start DW master formulation
@@ -3980,7 +3980,7 @@ void DecompAlgo::masterPhaseIItoI()
          m_masterSI->setObjCoeff(i, 0.0);
       } else {
          m_masterSI->setObjCoeff(i, 1.0);
-         m_masterSI->setColBounds(i, 0.0, DecompInf);
+         m_masterSI->setColBounds(i, 0.0, m_infinity);
       }
    }
 
@@ -4752,9 +4752,9 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
       m_rrIterSinceAll = 0;
    }
 
-   //vector<double>       mostNegRCvec(m_numConvexCon, DecompInf);
+   //vector<double>       mostNegRCvec(m_numConvexCon, m_infinity);
    vector<double>       mostNegRCvec(m_numConvexCon, 0);
-   DecompSolverResult   solveResult;
+   DecompSolverResult   solveResult(m_infinity);
 
    //---
    //--- solve min{ (c - u.A'')x - alpha |  x in F'}
@@ -4813,7 +4813,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
 
 	 DecompSubModel&    subModel        = getModelRelax(subprobIndex);
 	 double             alpha           = u[nBaseCoreRows + subprobIndex];
-	 DecompSolverResult solveResult;
+	 DecompSolverResult solveResult(m_infinity);
 
 #ifdef _OPENMP
 	 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
@@ -5240,7 +5240,7 @@ int DecompAlgo::generateVars(DecompVarList&     newVars,
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 4,
 
    for (it = newVars.begin(); it != newVars.end(); it++) {
-   (*it)->print(m_osLog, m_app);
+      (*it)->print(m_infinity, m_osLog, m_app);
    }
              );
    //---
@@ -5565,13 +5565,14 @@ void DecompAlgo::addVarsToPool(DecompVarList& newVars)
       if (m_varpool.isDuplicate(m_vars, waitingCol)) {
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
                     (*m_osLog) << "Duplicate variable, already in vars!!\n";
-                    (*li)->print(m_osLog,
+                    (*li)->print(m_infinity,
+				 m_osLog,
                                  modelCore->getColNames(),
                                  NULL);
                    );
          UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
                     (*m_osLog) << "\nVAR POOL:\n";
-                    m_varpool.print(m_osLog);
+                    m_varpool.print(m_infinity, m_osLog);
                     (*m_osLog) << "\nVARS:\n";
                     printVars(m_osLog);
                    );
@@ -5703,7 +5704,7 @@ void DecompAlgo::addVarsFromPool()
            );
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 10,
               (*m_osLog) << "\nVAR POOL BEFORE:\n";
-              m_varpool.print(m_osLog);
+              m_varpool.print(m_infinity, m_osLog);
               (*m_osLog) << "\nVARS BEFORE:\n";
               printVars(m_osLog);
              );
@@ -5826,7 +5827,7 @@ void DecompAlgo::addVarsFromPool()
    m_varpool.erase(m_varpool.begin(), viLast);
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 10,
               (*m_osLog) << "\nVAR POOL AFTER:\n";
-              m_varpool.print(m_osLog);
+              m_varpool.print(m_infinity, m_osLog);
               (*m_osLog) << "\nVARS AFTER:\n";
               printVars(m_osLog);
              );
@@ -5875,7 +5876,7 @@ void DecompAlgo::addCutsToPool(const double*    x,
       //---
       //--- set the hash string (for quick duplicate checks)
       //---
-      (*li)->setStringHash(row);
+      (*li)->setStringHash(row, m_infinity);
 #if 0
       bool isOptViolated = false;
 
@@ -6075,7 +6076,7 @@ int DecompAlgo::addCutsFromPool()
       for (index = 0; index < n_newrows; index++) {
          modelCore->rowLB.push_back(rlb[index]);
          modelCore->rowUB.push_back(rub[index]);
-         UtilBoundToSense(rlb[index], rub[index], DecompInf,
+         UtilBoundToSense(rlb[index], rub[index], m_infinity,
                           sense, rhs, range);
          modelCore->rowRhs.push_back(rhs);
          modelCore->rowSense.push_back(sense);
@@ -6544,7 +6545,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
 					   varOrigCost, varType);
             var->setBlockId(whichBlock);
             UTIL_DEBUG(m_app->m_param.LogDebugLevel, 5,
-                       var->print(););
+                       var->print(m_infinity););
             vars.push_back(var);
          }
       }
@@ -6577,7 +6578,7 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
             UTIL_DEBUG(m_param.LogDebugLevel, 4,
                        (*m_osLog) << "Check that var satisifes relax matrix "
                        << whichBlock << endl;
-                       (*it)->print();
+                       (*it)->print(m_infinity);
                       );
             (*it)->fillDenseArr(n_origCols, xTemp);
             //TODO: get rid of this function, use isPointFeasible
@@ -6686,12 +6687,13 @@ void DecompAlgo::recomposeSolution(const double* solution,
          UTIL_DEBUG(m_param.LogDebugLevel, 4,
                     (*m_osLog) << "LAMBDA[" << colIndex << "]: " << lamSol;
 
-                    if (nColNames)
-                    (*li)->print(m_osLog, colNames);
-         else {
-            (*li)->print(m_osLog);
-            }
-                   );
+                    if (nColNames){
+		       (*li)->print(m_infinity, m_osLog, colNames);
+		    }
+		    else {
+		       (*li)->print(m_infinity, m_osLog);
+		    }
+		    );
          CoinPackedVector& v = (*li)->m_s;
          const int*     inds  = v.getIndices();
          const double* els   = v.getElements();
@@ -6784,7 +6786,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = objBound.thisBound;
       //double masterLB  = m_nodeStats.objBest.first;
-      double masterGap = UtilCalculateGap(masterLB, masterUB);
+      double masterGap = UtilCalculateGap(masterLB, masterUB, m_infinity);
 
       //printf("Check tailoff, masterLB=%g masterUB=%g masterGap=%g\n",
       //     masterLB, masterUB, masterGap);
@@ -6797,7 +6799,7 @@ bool DecompAlgo::isTailoffLB(const int    changeLen,
    = m_nodeStats.objHistoryBound.rbegin();
    int    len       = 0;
    double prevBound = (*it).bestBound;
-   double diff      =  DecompInf;
+   double diff      =  m_infinity;
    double sumDiff   = 0.0;
    double aveDiff   = 0.0;
    double perDiff   = 0.0;

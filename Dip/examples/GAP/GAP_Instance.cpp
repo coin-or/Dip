@@ -95,7 +95,7 @@ void GAP_Instance::readBestKnown(string& fileName,
          if (isProvenOptimal) {
             m_bestKnownLB = bestUpperBound;
          } else {
-            m_bestKnownLB = -DecompInf;
+            m_bestKnownLB = -COIN_DBL_MAX;
          }
 
          m_bestKnownUB     = bestUpperBound;

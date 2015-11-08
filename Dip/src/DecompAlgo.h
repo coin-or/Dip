@@ -91,6 +91,11 @@ protected:
    DecompStatus m_status;
 
    /**
+    * The value of "infinity"
+    */
+   double m_infinity;
+
+   /**
     * The current algorithm phase.
     */
    DecompPhase m_phase;
@@ -301,8 +306,8 @@ public:
     * The main DECOMP process loop for a node.
     */
    virtual DecompStatus processNode(const AlpsDecompTreeNode* node,
-                                    const double globalLB = -DecompInf,
-                                    const double globalUB =  DecompInf);
+                                    const double globalLB,
+                                    const double globalUB);
 
    /**
     * Provide the current node the algorithm is solving.
@@ -397,14 +402,16 @@ public:
       }
    }
 
-
+   /**
+    * Return the value of infinity
+    */
+   double getInfinity() {
+      return m_infinity;
+   }
 
    //................................
    //TODO............................
    //................................
-
-
-
 
    virtual bool isDone() {
       if ((m_nodeStats.cutsThisCall + m_nodeStats.varsThisCall) > 0) {
@@ -498,8 +505,8 @@ public:
     */
    /*double calculateGap(double boundLB,
    	       double boundUB) const {
-      double gap = DecompInf;
-      if(boundLB > -DecompInf && boundUB < DecompInf){
+      double gap = m_infinity;
+      if(boundLB > -m_infinity && boundUB < m_infinity){
     if(boundLB != 0.0)
        gap = fabs(boundUB-boundLB)/fabs(boundLB);
     else
@@ -779,7 +786,7 @@ public:
 
    inline double getMasterObjValue() const {
       if (!m_masterSI) {
-         return -DecompInf;
+         return -m_infinity;
       }
 
       //NOTE: be careful that this is always using the PhaseII obj
@@ -803,14 +810,14 @@ public:
     * Get the current global (integrality) gap.
     */
    inline const double getGlobalGap() const {
-      return UtilCalculateGap(m_globalLB, m_globalUB);
+      return UtilCalculateGap(m_globalLB, m_globalUB, m_infinity);
    }
 
    /**
     * Get the current node (integrality) gap.
     */
    inline const double getNodeIPGap() const {
-      return UtilCalculateGap(getObjBestBoundLB(), getObjBestBoundUB());
+      return UtilCalculateGap(getObjBestBoundLB(), getObjBestBoundUB(), m_infinity);
    }
 
    /**
@@ -823,9 +830,9 @@ public:
       if (nHistorySize > 0) {
          const DecompObjBound& objBound
          = m_nodeStats.objHistoryBound[nHistorySize - 1];
-         return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB);
+         return UtilCalculateGap(getObjBestBoundLB(), objBound.thisBoundUB, m_infinity);
       } else {
-         return DecompInf;
+         return m_infinity;
       }
    }
 
@@ -873,7 +880,7 @@ public:
          }
       }
 
-      DecompObjBound objBound;
+      DecompObjBound objBound(m_infinity);
       objBound.phase         = m_phase == PHASE_PRICE1 ? 1 : 2;
       objBound.cutPass       = m_nodeStats.cutCallsTotal;
       objBound.pricePass     = m_nodeStats.priceCallsTotal;
@@ -908,7 +915,7 @@ public:
       //---
       //--- copy the last continuous history, adjust the time
       //---
-      DecompObjBound   objBoundIP;
+      DecompObjBound   objBoundIP(m_infinity);
       DecompObjBound* objBoundLP = m_nodeStats.getLastBound();
 
       if (objBoundLP) {
@@ -978,6 +985,7 @@ public:
       m_utilParam  (&utilParam),
       m_algo       (algo),
       m_status     (STAT_UNKNOWN),
+      m_infinity   (COIN_DBL_MAX),
       m_phase      (PHASE_UNKNOWN),
       m_phaseLast  (PHASE_UNKNOWN),
       m_phaseForce (PHASE_UNKNOWN),
@@ -999,7 +1007,7 @@ public:
       m_cuts       (),
       m_cutpool    (),
       m_xhat       (0),
-      m_cutoffUB   (DecompInf),
+      m_cutoffUB   (m_infinity),
       m_xhatIPFeas (),
       m_xhatIPBest (NULL),
       m_isColGenExact(false),
@@ -1009,9 +1017,9 @@ public:
 
       m_colLBNode(NULL),
       m_colUBNode(NULL),
-      m_relGap(DecompInf),
+      m_relGap(m_infinity),
       m_stopCriteria(DecompStopNo),
-      m_masterObjLast(DecompInf),
+      m_masterObjLast(m_infinity),
       m_firstPhase2Call(false),
       m_isStrongBranch(false),
       m_masterOnlyCols(),

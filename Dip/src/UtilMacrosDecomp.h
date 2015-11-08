@@ -159,11 +159,12 @@ inline void UtilPrintFuncEnd(ostream*       os,
  * Calculate gap: |(ub-lb)|/|lb|
  */
 inline double UtilCalculateGap(const double boundLB,
-                               const double boundUB)
+                               const double boundUB,
+			       double infinity)
 {
-   double gap = DecompInf;
+   double gap = infinity;
 
-   if (boundLB > -DecompInf && boundUB < DecompInf) {
+   if (boundLB > -infinity && boundUB < infinity) {
       if (boundLB != 0.0) {
          gap = fabs(boundUB - boundLB) / fabs(boundLB);
       } else {

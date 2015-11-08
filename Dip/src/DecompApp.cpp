@@ -13,6 +13,7 @@
 //===========================================================================//
 
 #include "DecompApp.h"
+#include "DecompAlgo.h"
 #include "DecompVar.h"
 #include "DecompConfig.h"
 #include <vector>
@@ -740,7 +741,7 @@ void DecompApp::readInitSolutionFile(DecompVarList& initVars)
                                      -1.0,
                                      origCost);
       var->setBlockId(indexPair.second);
-      var->print(m_osLog, colNames);
+      var->print(m_decompAlgo->getInfinity(), m_osLog, colNames);
       initVars.push_back(var);
       printf("Adding initial variable with origCost = %g\n", origCost);
    }
@@ -1716,25 +1717,64 @@ void DecompApp::singlyBorderStructureDetection()
    }
 }
 
+//===========================================================================//
+void DecompApp::setModelRelax(DecompConstraintSet* model,
+			      const std::string    modelName,
+			      const int            blockId) {
+   if (model && !model->hasPrepRun()) {
+      model->prepareModel(m_infinity);
+   }
+   
+   //---
+   //--- make sure this block has not been set yet
+   //---
+   std::map<int, DecompModel>::iterator mit = m_modelRelax.find(blockId);
+   
+   if (mit != m_modelRelax.end()) {
+      std::cerr << "Block " << blockId << " relaxation has already been set. "
+		<< "Only one relaxation definition can be used at one time."
+		<< std::endl;
+      throw UtilException("Multiple relaxation definitions",
+			  "setModelRelax", "DecompApp");
+   }
+   
+   DecompModel appModel(model, modelName, blockId, *m_utilParam);
+   m_modelRelax.insert(std::make_pair(blockId, appModel));
+}
+
+//===========================================================================//
+void DecompApp::setModelRelaxNest(DecompConstraintSet* model,
+				  const std::string    modelName,
+				  const int            blockId) {
+   assert(model);
+   
+   if (!model->hasPrepRun()) {
+      model->prepareModel(m_infinity);
+   }
+   
+   DecompModel appModel(model, modelName, blockId, *m_utilParam);
+   m_modelRelaxNest[blockId].push_back(appModel);
+}
+
 // --------------------------------------------------------------------- //
-void DecompApp::setDecompInf(){
+void DecompApp::setInfinity(){
    if (m_param.DecompLPSolver == "Clp"){
 #ifdef DIP_HAS_CLP
-      DecompInf = OsiClpInfinity;
+      m_infinity = OsiClpInfinity;
 #else
       throw UtilException("Clp selected as solver, but it's not available",
 			  "setDecompInf", "DecompApp");
 #endif
    }else if (m_param.DecompLPSolver == "CPLEX"){
 #ifdef DIP_HAS_CPX
-      DecompInf = CPX_INFBOUND;
+      m_infinity = CPX_INFBOUND;
 #else
       throw UtilException("CPLEX selected as solver, but it's not available",
 			  "setDecompInf", "DecompApp");
 #endif
    }else if (m_param.DecompLPSolver == "Gurobi"){
 #ifdef DIP_HAS_GRB
-      DecompInf = GRB_INFINITY;
+      m_infinity = GRB_INFINITY;
 #else
       throw UtilException("Gurobi selected as solver, but it's not available",
 			  "setDecompInf", "DecompApp");

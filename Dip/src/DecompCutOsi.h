@@ -43,60 +43,62 @@ private:
 public:
    //is this an expensive operation?
    //temp fix
-   char sense() const {
+   char sense(double infinity) const {
       double lb_ = m_osiCut.lb();
       double ub_ = m_osiCut.ub();
 
       if      ( lb_ == ub_ ) {
          return 'E';
-      } else if ( lb_ == -DecompInf && ub_ == DecompInf ) {
+      } else if ( lb_ == -infinity && ub_ == infinity ) {
          return 'N';
-      } else if ( lb_ == -DecompInf ) {
+      } else if ( lb_ == -infinity ) {
          return 'L';
-      } else if ( ub_ == DecompInf ) {
+      } else if ( ub_ == infinity ) {
          return 'G';
       } else {
          return 'R';
       }
    }
 
-   double rhs() const {
+   double rhs(double infinity) const {
       double lb_ = m_osiCut.lb();
       double ub_ = m_osiCut.ub();
 
       if      ( lb_ == ub_ ) {
          return ub_;
-      } else if ( lb_ == -DecompInf && ub_ == DecompInf ) {
+      } else if ( lb_ == -infinity && ub_ == infinity ) {
          return 0.0;
-      } else if ( lb_ == -DecompInf ) {
+      } else if ( lb_ == -infinity ) {
          return ub_;
-      } else if ( ub_ == DecompInf ) {
+      } else if ( ub_ == infinity ) {
          return lb_;
       } else {
          return ub_;
       }
    }
 
-   void setStringHash() {
+   void setStringHash(double infinity) {
       //we cannot trust osi row cuts sense, since cpx and clp have different infinities...
       m_strHash = UtilCreateStringHash(m_osiCut.row().getNumElements(),
                                        m_osiCut.row().getIndices(),
                                        m_osiCut.row().getElements(),
                                        //m_osiCut.sense(),
-                                       sense(),
+                                       sense(infinity),
                                        //m_osiCut.rhs()
-                                       rhs()
+                                       rhs(infinity),
+				       infinity
                                       );
       //ranges?
    }
-   void setStringHash(CoinPackedVector* row) {
+   void setStringHash(CoinPackedVector* row, double infinity) {
       m_strHash = UtilCreateStringHash(row->getNumElements(),
                                        row->getIndices(),
                                        row->getElements(),
                                        //m_osiCut.sense(),
-                                       sense(),
+                                       sense(infinity),
                                        //m_osiCut.rhs()
-                                       rhs()
+                                       rhs(infinity),
+				       infinity
                                       );
       //ranges?
    }

@@ -237,11 +237,11 @@ void DecompVarPool::reExpand(const DecompConstraintSet& modelCore,
 }
 
 // --------------------------------------------------------------------- //
-void DecompVarPool::print(ostream* os) const
+void DecompVarPool::print(double infinity, ostream* os) const
 {
    vector<DecompWaitingCol>::const_iterator vi;
 
    for (vi = begin(); vi != end(); vi++) {
-      (*vi).getVarPtr()->print(os);
+      (*vi).getVarPtr()->print(infinity, os);
    }
 }

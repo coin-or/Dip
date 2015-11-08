@@ -67,13 +67,13 @@ void DippyDecompApp::createModels()
       name = PyString_AsString(pRowName);
 
       if (pRowLb == Py_None) {
-         lb = -DecompInf;
+         lb = -m_decompAlgo->getInfinity();
       } else {
          lb = PyFloat_AsDouble(pRowLb);
       }
 
       if (pRowUb == Py_None) {
-         ub = DecompInf;
+         ub = m_decompAlgo->getInfinity();
       } else {
          ub = PyFloat_AsDouble(pRowUb);
       }
@@ -120,13 +120,13 @@ void DippyDecompApp::createModels()
       name = PyString_AsString(pColName);
 
       if (pColLb == Py_None) {
-         lb = -DecompInf;
+         lb = -m_decompAlgo->getInfinity();
       } else {
          lb = PyFloat_AsDouble(pColLb);
       }
 
       if (pColUb == Py_None) {
-         ub = DecompInf;
+         ub = m_decompAlgo->getInfinity();
       } else {
          ub = PyFloat_AsDouble(pColUb);
       }
@@ -236,13 +236,13 @@ void DippyDecompApp::createModels()
          name = PyString_AsString(pRowName);
 
          if (pRowLb == Py_None) {
-            lb = -DecompInf;
+            lb = -m_decompAlgo->getInfinity();
          } else {
             lb = PyFloat_AsDouble(pRowLb);
          }
 
          if (pRowUb == Py_None) {
-            ub = DecompInf;
+            ub = m_decompAlgo->getInfinity();
          } else {
             ub = PyFloat_AsDouble(pRowUb);
          }
@@ -465,8 +465,8 @@ int DippyDecompApp::generateCuts(const double* x, DecompCutList& cutList)
          throw UtilException("Error calling method row.getUb()", "generateCuts", "DippyDecompApp");
       }
 
-      lb = (pLb == Py_None) ? -DecompInf : PyFloat_AsDouble(pLb);
-      ub = (pUb == Py_None) ?  DecompInf : PyFloat_AsDouble(pUb);
+      lb = (pLb == Py_None) ? -m_decompAlgo->getInfinity() : PyFloat_AsDouble(pLb);
+      ub = (pUb == Py_None) ?  m_decompAlgo->getInfinity() : PyFloat_AsDouble(pUb);
       int*     varInds = NULL;
       double* varVals = NULL;
       int numPairs = pyColDict_AsPackedArrays(pRow, m_colIndices, &varInds, &varVals);

@@ -115,7 +115,7 @@ public:
       m_param.TotalPriceItersLimit = 1000;
       m_param.RoundPriceItersLimit = 1000;
       m_param.SolveMasterAsMip      = 0;
-      processNode(NULL);
+      processNode(NULL, m_infinity, m_infinity);
    }
 
 

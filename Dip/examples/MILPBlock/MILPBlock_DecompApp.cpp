@@ -378,7 +378,7 @@ void MILPBlock_DecompApp::readInitSolutionFile(DecompVarList & initVars){
                                       origCost);
       var->setBlockId(indexPair.second);
 
-      var->print(m_osLog, colNames);
+      var->print(m_infinity, m_osLog, colNames);
 
       initVars.push_back(var);
       printf("Adding initial variable with origCost = %g\n", origCost);

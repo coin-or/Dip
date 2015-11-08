@@ -253,7 +253,7 @@ MAD_DecompApp::APPcreateModel(double                        *& objCoeff,
    //--- set the row upper and lower bounds
    //--- set the col upper and lower bounds
    //---
-   UtilFillN(modelCoreCl->rowLB,    m_beta,  -DecompInf);
+   UtilFillN(modelCoreCl->rowLB,    m_beta,  -m_infinity);
    UtilFillN(modelCoreCl->rowUB,    m_beta,  static_cast<double>(m_kappa));
    UtilFillN(modelCoreCl->colLB,    n_cols,  0.0);
    UtilFillN(modelCoreCl->colUB,    n_cols,  1.0);
@@ -406,7 +406,7 @@ MAD_DecompApp::APPcreateModel(double                        *& objCoeff,
    //--- set the row upper and lower bounds
    //--- set the col upper and lower bounds
    //---
-   UtilFillN(modelRelaxCl->rowLB, modelRelaxCl->M->getNumRows(),  -DecompInf);
+   UtilFillN(modelRelaxCl->rowLB, modelRelaxCl->M->getNumRows(),  -m_infinity);
    UtilFillN(modelRelaxCl->rowUB, modelRelaxCl->M->getNumRows(),  1.0);
    UtilFillN(modelRelaxCl->colLB, n_cols,                         0.0);
    UtilFillN(modelRelaxCl->colUB, n_cols,                         1.0);
@@ -525,9 +525,9 @@ MAD_DecompApp::APPcreateModel(double                        *& objCoeff,
    //--- set the col upper and lower bounds
    //---
    double kappa = static_cast<double>(m_kappa);
-   UtilFillN(modelCoreCl->rowLB,    m_nOrigRows,  -DecompInf);
+   UtilFillN(modelCoreCl->rowLB,    m_nOrigRows,  -m_infinity);
    UtilFillN(modelCoreCl->rowUB,    m_nOrigRows,  1.0);
-   UtilFillN(modelCoreCl->rowLB,    m_beta,       -DecompInf);
+   UtilFillN(modelCoreCl->rowLB,    m_beta,       -m_infinity);
    UtilFillN(modelCoreCl->rowUB,    m_beta,       kappa);
    UtilFillN(modelCoreCl->colLB,    n_cols,       0.0);
    UtilFillN(modelCoreCl->colUB,    n_cols,       1.0);
@@ -679,7 +679,7 @@ MAD_DecompApp::APPcreateModel(double                        *& objCoeff,
    //--- set the row upper and lower bounds
    //--- set the col upper and lower bounds
    //---
-   UtilFillN(modelRelaxCl->rowLB, modelRelaxCl->M->getNumRows(),  -DecompInf);
+   UtilFillN(modelRelaxCl->rowLB, modelRelaxCl->M->getNumRows(),  -m_infinity);
    UtilFillN(modelRelaxCl->rowUB, modelRelaxCl->M->getNumRows(),  1.0);
    UtilFillN(modelRelaxCl->colLB, n_cols,                         0.0);
    UtilFillN(modelRelaxCl->colUB, n_cols,                         1.0);

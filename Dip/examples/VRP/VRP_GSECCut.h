@@ -63,7 +63,7 @@ private:
 public:
    //these (pure virutal) methods are inherited from DecompCut
    virtual void expandCutToRow(CoinPackedVector * row);
-   virtual void setBounds();  
+   virtual void setBounds(double infinity);  
   
    //these (virutal) methods are inherited from DecompCut
    virtual void print(ostream * os = &cout) const;
@@ -81,6 +81,7 @@ public:
    VRP_GSECCut(const dynamic_bitset<> & inS, 
 	       const int              * vertex_wt,
 	       const int                capacity,
+	       const double             infinity,
 	       const int                demandS = 0) :
       m_classTag("VRP-GSEC"),
       m_inS     (inS),
@@ -92,7 +93,7 @@ public:
       setStorage();
       setCutType();
       setDemand(vertex_wt);
-      setBounds();
+      setBounds(infinity);
    }
 
    virtual ~VRP_GSECCut() {}

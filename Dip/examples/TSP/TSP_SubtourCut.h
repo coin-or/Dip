@@ -42,10 +42,10 @@ private:
 public:
    //these (pure virutal) methods are inherited from DecompCut
    virtual void expandCutToRow(CoinPackedVector * row);
-   virtual void setBounds();
+   virtual void setBounds(double infinity);
 
    //these (virutal) methods are inherited from DecompCut
-   virtual void print(ostream * os = &cout) const;
+   virtual void print(double infinity, ostream * os = &cout) const;
    virtual bool isSame(const DecompCut * cut) const;
 
 public:
@@ -55,36 +55,39 @@ public:
    void create_vector();
 
 public:
-   TSP_SubtourCut(const vector<bool> & inS, 
-		  const cutType        type = ACROSS){
+   TSP_SubtourCut(const vector<bool> & inS,
+		  double infinity,
+		  const cutType type = ACROSS){
       m_inS     = inS;
       m_storage = BITSET;
       m_nverts  = static_cast<int>(m_inS.size());
       m_type    = type;
-      setBounds();
+      setBounds(infinity);
       init();
    };
   
    TSP_SubtourCut(const vector<bool> & inS, 
 		  const vector<int>  & S,
-		  const cutType        type){
+		  double infinity,
+		  const cutType type){
       m_inS     = inS;
       m_S       = S;
       m_storage = BOTH;
       m_nverts  = static_cast<int>(m_inS.size());
       m_type    = type;
-      setBounds();
+      setBounds(infinity);
       init();
    };
 
    TSP_SubtourCut(const vector<bool> & inS, 
-		  const vector<int>  & S){
+		  const vector<int>  & S,
+		  double infinity){
       m_inS     = inS;
       m_S       = S;
       m_storage = BOTH;
       m_nverts  = static_cast<int>(m_inS.size());
       setCutType();
-      setBounds();
+      setBounds(infinity);
       init();
    };
 
