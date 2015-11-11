@@ -348,9 +348,13 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
 
    int nVars = PyObject_Length(pVarList);
 
-   if (nVars == 0) {
-      throw UtilException("Empty variable list", "solveRelaxed", "DippyDecompApp");
-   }
+   // In the new design, we need to allow the possibility that the user will solve
+   // the problem exactly, but not find any solutions with reduced costs zero
+   // The below is is commented out and left in the source for posterity
+   // tkr 11/11/15
+   //if (nVars == 0) {
+   //   throw UtilException("Empty variable list", "solveRelaxed", "DippyDecompApp");
+   //}
 
    // solveRelaxed returns 3-tuples (cost, reduced cost, dictionary of (variable, value) pairs)
    // We can use these to construct a C++ DecompVar objects
