@@ -105,8 +105,7 @@ def relaxed_solver(prob, table, redCosts, target):
         var_values.append((happy[table], table_happiness))
         dvs.append(dict(var_values))
         if debug_print:
-            pass
-            #print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
+            print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
     return DipSolStatOptimal, dvs
 
 seating_model.relaxed_solver = relaxed_solver
