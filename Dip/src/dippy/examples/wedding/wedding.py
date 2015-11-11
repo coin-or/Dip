@@ -15,6 +15,7 @@ try:
 except ImportError:
     import coinor.dippy as dippy
 
+debug_print = False
 max_tables = 5
 max_table_size = 4
 guests = 'A B C D E F G I J K L M N O P Q R'.split()
@@ -99,11 +100,12 @@ def relaxed_solver(prob, table, redCosts, target):
         var_values = [(x[(g, table)], 1) 
                       for g in possible_table]
         var_values.append((happy[table], table_happiness))
-        dvs.append(var_values)
-        print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
-        return dvs
+        dvs.append(dict(var_values))
+        if debug_print:
+            print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
+    return dvs
 
-#seating_model.relaxed_solver = relaxed_solver
+seating_model.relaxed_solver = relaxed_solver
 
 #seating_model.writeLP('wedding_main.lp')
 #for table in tables:
