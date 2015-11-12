@@ -81,7 +81,7 @@ void VRP_DecompApp::createModelESPPCC(DecompConstraintSet * model){
          rowCap.insert(colIndex++, 1.0);
       }
    }
-   model->appendRow(rowCap, -DecompInf, capacity);
+   model->appendRow(rowCap, -m_infinity, capacity);
 
    //---
    //--- sum{j in N} x[0,j]    = 1   

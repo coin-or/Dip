@@ -196,7 +196,7 @@ public:
    }
 
 
-   void createVrpCuts(DecompCutList & newCuts){
+   void createVrpCuts(DecompCutList & newCuts, double infinity){
       int i, j;
       const UtilGraphLib & graphLib = m_vrp->m_graphLib;
       const int            nVerts   = graphLib.n_vertices;
@@ -217,7 +217,8 @@ public:
 		  else
 		     inS.set(CP->IntList[j]);
 	       }
-	       VRP_GSECCut * cut = new VRP_GSECCut(inS, demand, capacity);
+	       VRP_GSECCut * cut = new VRP_GSECCut(inS, demand, capacity,
+						   infinity);
 	       //cut->print();
 	       //double lb = cut->getLowerBound();
 	       double ub = cut->getUpperBound();

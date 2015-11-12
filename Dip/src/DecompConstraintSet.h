@@ -59,6 +59,7 @@ public:
    int           m_numColsOrig;
    std::map<int, int> m_origToSparse;
    std::map<int, int> m_sparseToOrig;
+   double        m_infinity;
 
 public:
    inline void setSparse(const int numColsOrig) {
@@ -131,11 +132,11 @@ public:
 
 
 public:
-   void prepareModel(bool modelIsCore = false);
-   void createRowHash();
-   void checkSenseAndBound();
-   void sensesToBounds();
-   void boundsToSenses();
+   void prepareModel(double infinity, bool modelIsCore = false);
+   void createRowHash(double infinity);
+   void checkSenseAndBound(double infinity);
+   void sensesToBounds(double infinity);
+   void boundsToSenses(double infinity);
    void fixNonActiveColumns();
    CoinPackedMatrix* sparseToOrigMatrix();
 
@@ -199,7 +200,8 @@ public:
       nBaseRows        (0),
       prepHasRun       (false),
       m_isSparse       (false),
-      m_numColsOrig    (0) {
+      m_numColsOrig    (0),
+      m_infinity       (){
    };
 
    ~DecompConstraintSet() {

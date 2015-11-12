@@ -225,6 +225,9 @@ void UtilParameters::Add(string& sSection,
                          string& sValue)
 {
    string    keyname ("");
+   if (sSection == ""){
+      sSection = "DECOMP";
+   }
    keyname  = UtilStrToLower(UtilStrTrim(sSection));
    keyname += "@";
    keyname += UtilStrToLower(UtilStrTrim(sName));

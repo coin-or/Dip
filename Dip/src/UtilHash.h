@@ -35,6 +35,7 @@ std::string UtilCreateStringHash(const int      len,
                                  const double* els,
                                  const char     sense,
                                  const double   rhs,
+				 const double   infinity,
                                  const int      precision = 6);
 
 #endif

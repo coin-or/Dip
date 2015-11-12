@@ -116,7 +116,7 @@ void DecompAlgoRC::phaseDone()
       // ---
       M->appendCol(*sparseCol);
       colLB[col_index] = 0.0; //THINK: (*li)->getLowerBound();
-      colUB[col_index] = DecompInf; //THINK: (*li)->getUpperBound(); //FIX!!
+      colUB[col_index] = m_infinity; //THINK: (*li)->getUpperBound(); //FIX!!
       obj[col_index]   = (*li)->getOriginalCost(); //c.s
       col_index++;
       UTIL_DELPTR(sparseCol); //THINK
@@ -143,7 +143,7 @@ void DecompAlgoRC::phaseDone()
    vector<double> masterRowUB(modelCore->rowUB);
 
    if (isZeroFeas) {
-      masterRowLB.push_back(-DecompInf);
+      masterRowLB.push_back(-m_infinity);
       masterRowUB.push_back(1.0);
    } else {
       masterRowLB.push_back(1.0);
@@ -314,7 +314,7 @@ int DecompAlgoRC::generateVars(DecompVarList&     newVars,
    DecompConstraintSet*           modelCore   = m_modelCore.getModel();
    //really only returning one var here...
    //for RC, doesn't have to be negative??
-   mostNegReducedCost = DecompInf;//bad name here
+   mostNegReducedCost = m_infinity;//bad name here
    //TODO: whenever a cut is added, if doing RC, you need to add an
    //element to u.... do we need to override gen cuts just for that?
    //gen cuts (x) is wrong here anyway... need gen cuts (s)
@@ -417,7 +417,7 @@ DecompStatus DecompAlgoRC::solutionUpdate(const DecompPhase phase,
    CoinAssert(shatVar);
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
               (*m_osLog) << "\nshat: ";
-              shatVar->print(m_osLog);
+              shatVar->print(m_infinity, m_osLog);
              );
    //make this part of class, else realloc every iter...
    //use vector, let it grow?

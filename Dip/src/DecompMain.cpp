@@ -41,8 +41,6 @@ void DecompAuto(DecompApp milp,
 
 DecompSolverResult* solveDirect(const DecompApp& decompApp);
 
-extern double DecompInf;
-
 //===========================================================================//
 
 int main(int argc, char** argv)
@@ -71,8 +69,6 @@ int main(int argc, char** argv)
       //--- construct the instance
       //---
       DecompApp milp(utilParam);
-      //Ugly hack, make DecompInf a class variable eventually
-      milp.setDecompInf();
 
       // get the current working Directory.
       char the_path[256];
@@ -463,7 +459,8 @@ void DecompAuto(DecompApp milp,
            << UtilDblToStr(alpsModel.getGlobalUB(), 5) << endl
            << "OptiGap       = " << setw(10)
            << UtilDblToStr(UtilCalculateGap(alpsModel.getGlobalLB(),
-                                            alpsModel.getGlobalUB()), 5)
+                                            alpsModel.getGlobalUB(),
+					    milp.getDecompAlgo()->getInfinity()), 5)
            << endl
            << "Nodes         = "
            << alpsModel.getNumNodesProcessed() << endl
@@ -638,12 +635,12 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
    m_problemSI->readMps(fileName.c_str());
    int numCols    = decompApp.m_mpsIO.getNumCols();
    int nNodes;
-   double objLB   = -DecompInf;
-   double objUB   = DecompInf;
+   double objLB   = -m_problemSI->getInfinity();
+   double objUB   = m_problemSI->getInfinity();
    double timeLimit = decompApp.m_param.TimeLimit;
    UtilTimer timer;
    timer.start();
-   DecompSolverResult* result = new DecompSolverResult();
+   DecompSolverResult* result = new DecompSolverResult(m_problemSI->getInfinity());
    if (decompApp.m_param.DecompIPSolver == "Cbc"){
 #ifdef DIP_HAS_CBC
       CbcModel cbc(*m_problemSI);

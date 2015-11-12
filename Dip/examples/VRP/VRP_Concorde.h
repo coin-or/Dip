@@ -362,7 +362,8 @@ class VRP_Concorde {
    }
 
    int solveTSP(vector<int>    & vrpRouteInd,
-		vector<double> & vrpRouteEls){
+		vector<double> & vrpRouteEls,
+		double infinity){
 
 
       //---
@@ -423,8 +424,8 @@ class VRP_Concorde {
       int    nRoutes    = m_vrp->m_numRoutes;      
       int    nOrigVerts = graphLib.n_vertices;
       int    nCustomers = nOrigVerts - 1;
-      double upbound    = DecompInf;
-      double optval     = DecompInf;      
+      double upbound    = infinity;
+      double optval     = infinity;      
 
       //---
       //--- try tiny first, switch if needed... if fails

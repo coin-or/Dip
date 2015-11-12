@@ -47,15 +47,12 @@
 //===========================================================================//
 //---
 //--- include some standard COIN headers (depending on LP solver)
-//---   depending on LP solver, set:
-//---      OsiLp, OsiIp, and DecompInf
+//---   depending on LP solver
 //---
 #include "CoinError.hpp"
 #include "CoinFinite.hpp"
 #include "CoinPackedVector.hpp"
 #include "CoinPackedMatrix.hpp"
-
-extern double DecompInf;
 
 #ifdef DIP_HAS_CLP
 #include "OsiClpSolverInterface.hpp"

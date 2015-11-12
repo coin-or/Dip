@@ -268,10 +268,10 @@ int DecompAlgoPC::compressColumns()
       = m_nodeStats.objHistoryBound[nHistorySize - 1];
       double masterUB  = objBound.thisBoundUB;
       double masterLB  = m_nodeStats.objBest.first;
-      double masterGap = DecompInf;
+      double masterGap = m_infinity;
 
-      if (masterUB > -DecompInf &&
-            masterUB <  DecompInf) {
+      if (masterUB > -m_infinity &&
+            masterUB <  m_infinity) {
          if (masterUB != 0.0) {
             masterGap = fabs(masterUB - masterLB) / masterUB;
          } else {
@@ -603,7 +603,7 @@ void DecompAlgoPC::solveMasterAsMIP()
    //--- set the master (generated) columns (lambda) to integer
    //--- set the master-onlys (that are integral) to integer
    //---
-   int          colIndex;
+   int         colIndex;
    const char* intMarkerCore  = modelCore->getIntegerMark();
 
    for (colIndex = 0; colIndex < nMasterCols; colIndex++) {
@@ -623,7 +623,7 @@ void DecompAlgoPC::solveMasterAsMIP()
                           m_nodeStats.cutCallsTotal,
                           m_nodeStats.priceCallsTotal);
 
-   DecompSolverResult    result;
+   DecompSolverResult    result(m_infinity);
 
    if (m_param.DecompIPSolver == "SYMPHONY"){
       solveMasterAsMIPSym(&result);
@@ -1162,7 +1162,7 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
    //---
    //--- set time back
    //---
-   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, DecompInf);
+   status = CPXsetdblparam(cpxEnv, CPX_PARAM_TILIM, m_infinity);
 
    if (status)
       throw UtilException("CPXsetdblparam failure",
@@ -1237,7 +1237,7 @@ void DecompAlgoPC::addCutsToPool(const double*    x,
       //---
       //--- set the hash string (for quick duplicate checks)
       //---
-      (*li)->setStringHash(row);
+      (*li)->setStringHash(row, m_infinity);
       //bool isOptViolated = false;
       //for(i = 0; i < m_optPoint.size(); i++){
       //isOptViolated = (*li)->calcViolation(row, &m_optPoint[i][0]);
@@ -1518,7 +1518,7 @@ int DecompAlgoPC::addCutsFromPool()
       m_masterRowType.push_back(DecompRow_Cut);
       //TODO: make this a function
       UtilBoundToSense(rlb[index], rub[index],
-                       DecompInf, sense, rhs, range);
+                       m_infinity, sense, rhs, range);
       modelCore->rowLB.push_back(rlb[index]);
       modelCore->rowUB.push_back(rub[index]);
       modelCore->rowSense.push_back(sense);

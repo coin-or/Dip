@@ -48,7 +48,7 @@ public:
       m_colsAreValid = colsAreValid;
    }
 
-   void print(std::ostream* os = &std::cout) const;  //THINK: virtual??
+   void print(double infinity, std::ostream* os = &std::cout) const;  //THINK: virtual??
    void reExpand(const DecompConstraintSet& modelCore,
                  const double                tolZero);
    bool isDuplicate(const DecompWaitingCol& wcol);

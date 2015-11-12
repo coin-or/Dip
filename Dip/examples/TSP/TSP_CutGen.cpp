@@ -37,10 +37,10 @@ int TSP_DecompApp::generateCutsSubtour(DecompCutList & newCuts){
       vector<bool> & inS = subtourCuts[c].inS;
 
       if(S.size() >= 2){
-	 TSP_SubtourCut * sec_cut = new TSP_SubtourCut(inS, S);
+	 TSP_SubtourCut * sec_cut = new TSP_SubtourCut(inS, S, m_infinity);
 	 
 	 UTIL_DEBUG(m_param.LogDebugLevel, 3,
-		    sec_cut->print();
+		    sec_cut->print(m_infinity);
 		    );
 	 newCuts.push_back(sec_cut);	 
       }

@@ -100,7 +100,7 @@ void VRP_GSECCut::print(ostream * os) const{
 }
 
 /*-------------------------------------------------------------------------*/
-void VRP_GSECCut::setBounds(){
+void VRP_GSECCut::setBounds(double infinity){
 
    //(i)   ACROSS:     2 * ceil( sum{i in S} d_i / C )
    //(ii)  SIDE:       |S| - ceil( sum{i in S} d_i / C )
@@ -112,14 +112,14 @@ void VRP_GSECCut::setBounds(){
    switch(m_type){
    case ACROSS:
       setLowerBound(2.0 * bin);
-      setUpperBound(DecompInf);
+      setUpperBound(infinity);
       break;
    case SIDE:
-      setLowerBound(-DecompInf);
+      setLowerBound(-infinity);
       setUpperBound(getSize() - bin);
       break;
    case SIDE_COMPL:
-      setLowerBound(-DecompInf);
+      setLowerBound(-infinity);
       setUpperBound(((m_nverts - 1) - getSize()) - bin);
       break;
    default:
@@ -129,12 +129,12 @@ void VRP_GSECCut::setBounds(){
 
    /*
    cout << "in setBounds LB: ";
-   if(getLowerBound() > -(DecompInf/2))
+   if(getLowerBound() > -(infinity/2))
       cout << getLowerBound();
    else
       cout << "-inf";
    cout << "in setBounds UB: ";
-   if(getUpperBound() < (DecompInf/2))
+   if(getUpperBound() < (infinity/2))
       cout << getUpperBound();
    else
       cout << "inf";

@@ -736,7 +736,7 @@ void DecompAlgo::printVars(ostream* os)
 
    for (it = m_vars.begin(); it != m_vars.end(); it++) {
       (*os) << "VAR " << var_index++ << " : ";
-      (*it)->print(os, m_app);
+      (*it)->print(m_infinity, os, m_app);
       (*os) << endl;
    }
 
@@ -877,7 +877,7 @@ void DecompAlgo::checkReducedCost(const double *u, const double *u_adjusted)
 		    << " b-index: " << b
 		    << " rcLP: "   << rcLPi
 		    << endl;
-	 (*it)->print(m_osLog, modelCore->colNames,
+	 (*it)->print(m_infinity, m_osLog, modelCore->colNames,
 		      const_cast<double*>(redCostX));
 	 (*m_osLog) << "******** ERROR ********" << endl;
 	 assert(0);
@@ -897,7 +897,7 @@ void DecompAlgo::checkReducedCost(const double *u, const double *u_adjusted)
 		       << " objLP: "   << objC[(*it)->getColMasterIndex()]
 		       << " objCalc: " << objCalc
 		       << endl;
-	    (*it)->print(m_osLog, modelCore->colNames,
+	    (*it)->print(m_infinity, m_osLog, modelCore->colNames,
 			 const_cast<double*>(origObjective));
 	    (*m_osLog) << "******** ERROR ********" << endl;
 	    assert(0);
@@ -932,7 +932,7 @@ void DecompAlgo::checkReducedCost(const double *u, const double *u_adjusted)
 	 //--- this, plus alpha shows the calculation of the red-cost in
 	 //---   x-space, next, look at the same calculation in lambda-space
 	 //---
-	 (*it)->print(m_osLog, modelCore->colNames,
+	 (*it)->print(m_infinity, m_osLog, modelCore->colNames,
 		      const_cast<double*>(redCostX));
 	 (*m_osLog) << "******** ERROR ********" << endl;
 	 //---
@@ -941,7 +941,7 @@ void DecompAlgo::checkReducedCost(const double *u, const double *u_adjusted)
 	 //---
 	 double* uA2    = new double[nCoreCols];
 	 modelCore->M->transposeTimes(u_adjusted, uA2);
-	 (*it)->print(m_osLog, modelCore->colNames,
+	 (*it)->print(m_infinity, m_osLog, modelCore->colNames,
 		      const_cast<double*>(uA2));
 	 UTIL_DELARR(uA2);
 	 //---
@@ -1014,8 +1014,8 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
                       "solveDirect()", m_param.LogDebugLevel, 2);
    DecompVarList dummy;
    int           i, nNodes;
-   double        objLB      = -DecompInf;
-   double        objUB      =  DecompInf;
+   double        objLB      = -m_infinity;
+   double        objUB      =  m_infinity;
    int           logIpLevel = m_param.LogIpLevel;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    int                   numInts   = modelCore->getNumInts();
@@ -1029,7 +1029,7 @@ DecompSolverResult* DecompAlgoC::solveDirect(const DecompSolution* startSol)
    //---
    //--- create a results object
    //---
-   DecompSolverResult* result = new DecompSolverResult();
+   DecompSolverResult* result = new DecompSolverResult(m_infinity);
    //---
    //--- create the master problem
    //---

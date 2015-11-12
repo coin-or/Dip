@@ -104,7 +104,7 @@ void SmallIP_DecompApp::createModels(){
    //--- set the row upper and lower bounds of part 1
    //---
    double   rowLB1[numRows1] = {13.0, 1.0, -3.0, -27.0, -5.0, -4.0};
-   std::fill_n(back_inserter(m_modelPart1.rowUB), numRows1, DecompInf);
+   std::fill_n(back_inserter(m_modelPart1.rowUB), numRows1, m_infinity);
    std::copy  (rowLB1, rowLB1 + numRows1, back_inserter(m_modelPart1.rowLB));
 
    //---
@@ -123,7 +123,7 @@ void SmallIP_DecompApp::createModels(){
    //--- set the row upper and lower bounds of part 2
    //---
    double   rowLB2[numRows2] = {-8.0, 0.3, 4.5, 9.5, -3.0};
-   std::fill_n(back_inserter(m_modelPart2.rowUB), numRows2, DecompInf);
+   std::fill_n(back_inserter(m_modelPart2.rowUB), numRows2, m_infinity);
    std::copy  (rowLB2, rowLB2 + numRows2, back_inserter(m_modelPart2.rowLB));
 
    //---
@@ -231,7 +231,7 @@ int SmallIP_DecompApp::generateCuts(const double              * x,
 	 OsiRowCut rc;
 	 rc.setRow(cut);      
 	 rc.setLb(rhs[r]);
-	 rc.setUb(DecompInf);
+	 rc.setUb(m_infinity);
       
 	 DecompCutOsi * decompCut = new DecompCutOsi(rc);
 	 //the user should not have to do this hash - decompalgo should be doing this

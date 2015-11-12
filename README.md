@@ -42,6 +42,7 @@ https://projects.coin-or.org/Dip/newticket
  * Changed parameter setting mechanism to make it possible to pass parameters directly to solvers using native names.
  * Added interface to Gurobi
  * Added ability to select solver at run-time rather than compile-time.
+ * In DipPy, the user can now return a status in the subproblem solve to indicate whether the subproblem was solved exactly. Previously, DipPy solved the subproblem to optimality internally whenever no solution was returned, which is unnecessary if the user's subproblem solver is exact. It also means that the user was previously required to provide a full description of the subproblem.
 
 ## Release 0.91.4
  * Fixed bugs in examples

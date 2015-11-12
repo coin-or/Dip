@@ -17,6 +17,8 @@ except ImportError:
     import coinor.dippy as dippy
     from coinor.dippy import DipSolStatOptimal
 
+debug_print = False
+
 max_tables = 5
 max_table_size = 4
 guests = 'A B C D E F G I J K L M N O P Q R'.split()
@@ -101,9 +103,10 @@ def relaxed_solver(prob, table, redCosts, target):
         var_values = [(x[(g, table)], 1) 
                       for g in possible_table]
         var_values.append((happy[table], table_happiness))
-        dvs.append(var_values)
-        print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
-        return DipSolStatOptimal, dvs
+        dvs.append(dict(var_values))
+        if debug_print:
+            print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
+    return DipSolStatOptimal, dvs
 
 seating_model.relaxed_solver = relaxed_solver
 
@@ -114,7 +117,7 @@ seating_model.relaxed_solver = relaxed_solver
 dippy.Solve(seating_model, {
         'doPriceCut' : '1',
         'CutCGL' : '1',
-        'generateInitVars' : '1',
+        #'generateInitVars' : '1',
     })
 
 if seating_model.display_mode != 'off':

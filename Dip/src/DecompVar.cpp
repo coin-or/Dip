@@ -70,8 +70,9 @@ void DecompVar::fillDenseArr(int      len,
 
 // --------------------------------------------------------------------- //
 void
-DecompVar::print(ostream*    os,
-                 DecompApp* app) const
+DecompVar::print(double      infinity,
+		 ostream*    os,
+                 DecompApp*  app) const
 {
    double lb = getLowerBound();
    double ub = getUpperBound();
@@ -81,13 +82,13 @@ DecompVar::print(ostream*    os,
          << " block: "    << m_blockId
          << " colIndex: " << m_colMasterIndex;
 
-   if (lb > -DecompInf) {
+   if (lb > -infinity) {
       (*os) << " lb:  "    << getLowerBound();
    } else {
       (*os) << " lb: -INF";
    }
 
-   if (ub < DecompInf) {
+   if (ub < infinity) {
       (*os) << " ub:  "    << getUpperBound();
    } else {
       (*os) << " ub:  INF";
@@ -99,8 +100,9 @@ DecompVar::print(ostream*    os,
 
 // --------------------------------------------------------------------- //
 void
-DecompVar::print(ostream*               os,
-                 const vector<string>& colNames,
+DecompVar::print(double                 infinity,
+		 ostream*               os,
+                 const vector<string>&  colNames,
                  const double*          value) const
 {
    double lb = getLowerBound();
@@ -111,13 +113,13 @@ DecompVar::print(ostream*               os,
          << " block: "    << m_blockId
          << " colIndex: " << m_colMasterIndex;
 
-   if (lb > -DecompInf) {
+   if (lb > -infinity) {
       (*os) << " lb:  "    << getLowerBound();
    } else {
       (*os) << " lb: -INF";
    }
 
-   if (ub < DecompInf) {
+   if (ub < infinity) {
       (*os) << " ub:  "    << getUpperBound();
    } else {
       (*os) << " ub:  INF";

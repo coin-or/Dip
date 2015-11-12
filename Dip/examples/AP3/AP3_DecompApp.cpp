@@ -478,7 +478,7 @@ DecompStatus AP3_DecompApp::APPsolveRelaxed(const int             whichModel,
    int    dimension = m_ap3data.m_dimension;
    for(ind2 = 0; ind2 < dimension; ind2++){
       for(ind3 = 0; ind3 < dimension; ind3++){
-         min_cost  = DecompInf;
+         min_cost  = m_infinity;
          min_index = 0;
          for(ind1 = 0; ind1 < dimension; ind1++){      
             index = (this->*indexFunc)(ind1,ind2,ind3);
@@ -489,7 +489,7 @@ DecompStatus AP3_DecompApp::APPsolveRelaxed(const int             whichModel,
          }
          m_assigncostMin [ind2][ind3] = min_cost;
          m_assignindexMin[ind2][ind3] = min_index;
-         CoinAssert(min_cost < (DecompInf/2.0));
+         CoinAssert(min_cost < (m_infinity/2.0));
       }
    }
    

@@ -43,13 +43,18 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
       // if chooseBranchSet returns None, do default branching for this algo
       ret_val = algo->DecompAlgo::chooseBranchSet(downBranchLB, downBranchUB, upBranchLB, upBranchUB);
       
-      // No branching set was returned. This shouldn't happen
-      assert(ret_val == true);
+      // Original comment: No branching set was returned. This shouldn't happen
+      // tkr 11/11/15: Actually, it can happen if the solution is integral, but not feasible.
+      // This happens sometimes when column generation is halted because of tailoff and
+      // the solution to the relaxation is feasible. I'm leaving the commented code here for
+      // posterity
+      //assert(ret_val == true);
 
-      if (!ret_val){
-	 throw UtilException("No branch set found in prob.chooseBranchSet()", 
-			     "chooseBranchSet", "DippyDecompAlgo");
-      }
+      //if (!ret_val){
+      // throw UtilException("No branch set found in prob.chooseBranchSet()", 
+      //		     "chooseBranchSet", "DippyDecompAlgo");
+      //}
+
       if (downBranchUB.size() > 0) {
          PyObject* downBranchVar, * upBranchVar;
          pDownLB = PyDict_New(); // Down branch LBs is an empty dictionary

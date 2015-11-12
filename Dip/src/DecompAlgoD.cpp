@@ -50,7 +50,7 @@ void DecompAlgoD::phaseUpdate(DecompPhase&   phase,
       vector< double >::reverse_iterator it = m_phaseIObj.rbegin();
       int    len       = 0;
       double prevBound = (*it);
-      double diff      = DecompInf;
+      double diff      = m_infinity;
       double sumDiff   = 0.0;
       double aveDiff   = 0.0;
       double perDiff   = 0.0;
@@ -150,7 +150,7 @@ void DecompAlgoD::phaseDone()
    //---
    //--- pick the alpha that maximizes the violation
    //---
-   double alpha = -DecompInf;
+   double alpha = -m_infinity;
 
    for (b = 0; b < m_numConvexCon; b++) {
       if (dualSol[m_numOrigCols + b] > alpha) {
@@ -177,10 +177,10 @@ void DecompAlgoD::phaseDone()
       }
 
       rowCut.setRow(cut);
-      rowCut.setLb(-DecompInf);
+      rowCut.setLb(-m_infinity);
       rowCut.setUb(-alpha);
       DecompCutOsi* decompCut = new DecompCutOsi(rowCut);
-      decompCut->setStringHash();//constructor should do!
+      decompCut->setStringHash(m_infinity);//constructor should do!
       //decompCut->print(m_osLog);
       (*m_newCuts).push_back(decompCut);
    }
@@ -479,7 +479,7 @@ void DecompAlgoD::createMasterProblem(DecompVarList& initVars)
       //---
       M->appendCol(artColPlus);
       colLB[col_index] = 0.0;
-      colUB[col_index] = DecompInf;
+      colUB[col_index] = m_infinity;
       obj[col_index]   = 1.0;
       colNamePlus      = "sP(c_" + UtilIntToStr(col_index)
          + "_" + UtilIntToStr(c) + ")";
@@ -487,7 +487,7 @@ void DecompAlgoD::createMasterProblem(DecompVarList& initVars)
 
       M->appendCol(artColMinus);
       colLB[col_index] = 0.0;
-      colUB[col_index] = DecompInf;
+      colUB[col_index] = m_infinity;
       obj[col_index]   = 1.0;
       colNameMinus = "sM(c_" + UtilIntToStr(col_index)
          + "_" + UtilIntToStr(c) + ")";
@@ -526,7 +526,7 @@ void DecompAlgoD::createMasterProblem(DecompVarList& initVars)
                        + ",b_" + UtilIntToStr(blockIndex) + ")";
       colNames.push_back(colName);
       UTIL_DEBUG(m_param.LogDebugLevel, 5,
-                 (*li)->print(m_osLog, m_app);
+                 (*li)->print(m_infinity, m_osLog, m_app);
                 );
       //---
       //--- the column is just the vector s
@@ -555,7 +555,7 @@ void DecompAlgoD::createMasterProblem(DecompVarList& initVars)
       //---
       masterM->appendCol(*sparseCol);
       colLB[colIndex]    = 0.0;
-      colUB[colIndex]    = DecompInf;
+      colUB[colIndex]    = m_infinity;
       objCoeff[colIndex] = 0.0; //for D, we are in PHASEI the whole time
       //---
       //--- set master column type

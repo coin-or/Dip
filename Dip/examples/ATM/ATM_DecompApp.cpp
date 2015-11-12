@@ -171,10 +171,10 @@ void ATM_DecompApp::createModelColumns(DecompConstraintSet * model,
       index++;
    }
    
-   UtilFillN(&model->colUB[0] + getColOffset_fp(), nPairs, DecompInf);
+   UtilFillN(&model->colUB[0] + getColOffset_fp(), nPairs, m_infinity);
    
    //Another case of needing extreme rays??
-   //UtilFillN(&model->colUB[0] + getColOffset_x3(), nAtms,  DecompInf);
+   //UtilFillN(&model->colUB[0] + getColOffset_x3(), nAtms,  m_infinity);
    UtilFillN(&model->colUB[0] + getColOffset_x3(), nAtms,  1000.0);
 
    //---
@@ -319,7 +319,7 @@ int ATM_DecompApp::createConZtoX(DecompConstraintSet * model,
 	 string rowName = "ztox1" + strAT;	 
 	 row.insert(colIndex_z (atmIndex,t),  1.0);
 	 row.insert(colIndex_x1(atmIndex,t), -1.0);
-	 model->appendRow(row, -DecompInf, 0.0, rowName);
+	 model->appendRow(row, -m_infinity, 0.0, rowName);
 	 nRows++;
       }
       CoinPackedVector row2;
@@ -343,16 +343,16 @@ int ATM_DecompApp::createConZtoX(DecompConstraintSet * model,
 	 
 	 row1.insert(colIndex_z (atmIndex,t),  1.0);
 	 row1.insert(colIndex_x1(atmIndex,t), -1.0);
-	 model->appendRow(row1, -DecompInf, 0.0, rowName1);
+	 model->appendRow(row1, -m_infinity, 0.0, rowName1);
 	 
 	 row2.insert(colIndex_z (atmIndex,t),  1.0);
 	 row2.insert(colIndex_x2(atmIndex)  , -1.0);
-	 model->appendRow(row2, -DecompInf, 0.0, rowName2);
+	 model->appendRow(row2, -m_infinity, 0.0, rowName2);
 	 
 	 row3.insert(colIndex_z (atmIndex,t),  1.0);
 	 row3.insert(colIndex_x1(atmIndex,t), -1.0);
 	 row3.insert(colIndex_x2(atmIndex)  , -1.0);
-	 model->appendRow(row3, -1.0, DecompInf, rowName3);
+	 model->appendRow(row3, -1.0, m_infinity, rowName3);
 	 
 	 nRows+=3;         
       }
@@ -378,7 +378,7 @@ int ATM_DecompApp::createConPickOne(DecompConstraintSet * model,
    else{
       for(t = 0; t < m_appParam.NumSteps; t++)
 	 row.insert(colIndex_x1(atmIndex,t), 1.0);
-      model->appendRow(row, -DecompInf, 1.0, rowName);
+      model->appendRow(row, -m_infinity, 1.0, rowName);
    }
    return 1;
 }
@@ -408,7 +408,7 @@ int ATM_DecompApp::createConCount(DecompConstraintSet * model,
       row.insert(colIndex_v(pairIndex), 1.0);
       pairIndex++;
    }
-   model->appendRow(row, -DecompInf, K_a[atmIndex], rowName);
+   model->appendRow(row, -m_infinity, K_a[atmIndex], rowName);
    return 1;
 }
 
@@ -459,7 +459,7 @@ DecompConstraintSet * ATM_DecompApp::createModelCore1(bool includeCount){
    for(d = 0; d < nDates; d++){
       string rowName = "budget(d_" 
 	 + m_instance.getDateName(d) + ")";
-      model->appendRow(rowsD[d], -DecompInf, B_d[d], rowName);
+      model->appendRow(rowsD[d], -m_infinity, B_d[d], rowName);
    }
    UTIL_DELARR(rowsD);
 
@@ -712,7 +712,7 @@ ATM_DecompApp::createModelRelax1(const int a,
       rowLink.insert(colIndex_fm(pairIndex), 1.0);
       rowLink.insert(colIndex_v (pairIndex), -w_ad[*vi]);
       model->M->appendRow(rowLink);
-      model->rowLB.push_back(-DecompInf);
+      model->rowLB.push_back(-m_infinity);
       model->rowUB.push_back(0.0);
       model->rowNames.push_back(rowNameLink);	 
       nRows++;	 
@@ -864,14 +864,14 @@ DecompConstraintSet * ATM_DecompApp::createModelRelax2(const int d){
          + m_instance.getDateName(d) + ")";	 
       rowLink.insert(colIndex_fm(pairIndex), 1.0);
       rowLink.insert(colIndex_v (pairIndex), -w_ad[*vi]);
-      model->appendRow(rowLink, -DecompInf, 0.0, rowNameLink);
+      model->appendRow(rowLink, -m_infinity, 0.0, rowNameLink);
       nRows++;	 
    
       pairIndex++;
    }
    
    string rowNameBudget = "budget(d_" + m_instance.getDateName(d) + ")";
-   model->appendRow(rowBudget, -DecompInf, B_d[d], rowNameBudget);
+   model->appendRow(rowBudget, -m_infinity, B_d[d], rowNameBudget);
    nRows++;
 
   for(a = 0; a < nAtms; a++)
@@ -1024,7 +1024,7 @@ DecompConstraintSet * ATM_DecompApp::createModelRelaxCount(){
          + m_instance.getDateName(d) + ")";	 
       rowLink.insert(colIndex_fm(pairIndex), 1.0);
       rowLink.insert(colIndex_v (pairIndex), -w_ad[*vi]);
-      model->appendRow(rowLink, -DecompInf, 0.0, rowNameLink);
+      model->appendRow(rowLink, -m_infinity, 0.0, rowNameLink);
       nRows++;	 
 
       pairIndex++;
@@ -1032,7 +1032,7 @@ DecompConstraintSet * ATM_DecompApp::createModelRelaxCount(){
 
    for(d = 0; d < nDates; d++){   
       string rowNameBudget = "budget(d_" + m_instance.getDateName(d) + ")";
-      model->appendRow(rowBudget[d], -DecompInf, B_d[d], rowNameBudget);
+      model->appendRow(rowBudget[d], -m_infinity, B_d[d], rowNameBudget);
       nRows++;
    }
 

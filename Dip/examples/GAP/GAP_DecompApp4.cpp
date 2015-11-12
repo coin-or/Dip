@@ -260,7 +260,7 @@ int GAP_DecompApp::createModelPartKP(DecompConstraintSet* model,
          row.insert(mit->second, weight[colIndex]);
       }
 
-      model->appendRow(row, -DecompInf, capacity[i], rowName);
+      model->appendRow(row, -m_infinity, capacity[i], rowName);
    }
 
    UtilPrintFuncEnd(m_osLog, m_classTag,

@@ -60,7 +60,7 @@ public:
       return 0.0;         //TODO
    }
    inline double getUpperBound()     const {
-      return DecompInf;   //TODO
+      return COIN_DBL_MAX;   //TODO
    }
    inline std::string getStrHash()        const {
       return m_strHash;
@@ -141,9 +141,11 @@ public:
                      double* arr);
 
 public:
-   virtual void  print(std::ostream*    os  = &std::cout,
+   virtual void  print(double infinity,
+		       std::ostream*    os  = &std::cout,
                        DecompApp* app = 0) const;
-   virtual void  print(std::ostream*               os,
+   virtual void  print(double infinity,
+		       std::ostream*               os,
                        const std::vector<std::string>& colNames,
                        const double*          value    = NULL) const;
 

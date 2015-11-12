@@ -20,7 +20,7 @@
 using namespace std;
 
 //===========================================================================//
-void DecompConstraintSet::prepareModel(bool modelIsCore)
+void DecompConstraintSet::prepareModel(double infinity, bool modelIsCore)
 {
    //---
    //--- For each model:
@@ -46,10 +46,10 @@ void DecompConstraintSet::prepareModel(bool modelIsCore)
    int numCols     = getNumCols();
    int numColsOrig = getNumColsOrig();
    UtilPrintMemUsage(&cout, 2, 2);
-   checkSenseAndBound();
+   checkSenseAndBound(infinity);
 
    if (modelIsCore) {
-      createRowHash();
+      createRowHash(infinity);
    }
 
    nBaseRows = getNumRows();
@@ -146,7 +146,7 @@ void DecompConstraintSet::prepareModel(bool modelIsCore)
 }
 
 //===========================================================================//
-void DecompConstraintSet::createRowHash()
+void DecompConstraintSet::createRowHash(double infinity)
 {
    int    r;
    string strHash;
@@ -160,21 +160,22 @@ void DecompConstraintSet::createRowHash()
                                      rmat_ind + rmat_beg[r],
                                      rmat_els + rmat_beg[r],
                                      rowSense[r],
-                                     rowRhs[r]);
+                                     rowRhs[r],
+				     infinity);
       rowHash.push_back(strHash);
    }
 }
 
 //===========================================================================//
-void DecompConstraintSet::checkSenseAndBound()
+void DecompConstraintSet::checkSenseAndBound(double infinity)
 {
    assert(rowLB.size() + rowRhs.size() > 0);
    assert(rowUB.size() + rowRhs.size() > 0);
 
    if (rowLB.size() > 0 && rowRhs.size() == 0) {
-      boundsToSenses();
+      boundsToSenses(infinity);
    } else if (rowLB.size() == 0 && rowRhs.size() > 0) {
-      sensesToBounds();
+      sensesToBounds(infinity);
    }
 
    assert(rowLB.size() == rowUB.size());
@@ -183,7 +184,7 @@ void DecompConstraintSet::checkSenseAndBound()
 }
 
 //===========================================================================//
-void DecompConstraintSet::sensesToBounds()
+void DecompConstraintSet::sensesToBounds(double infinity)
 {
    double rlb, rub;
    int    n_rows = static_cast<int>(rowSense.size());
@@ -192,14 +193,14 @@ void DecompConstraintSet::sensesToBounds()
 
    for (int r = 0; r < n_rows; r++) {
       UtilSenseToBound(rowSense[r], rowRhs[r], 0.0,//TODO
-                       DecompInf, rlb, rub);
+                       infinity, rlb, rub);
       rowLB.push_back(rlb);
       rowUB.push_back(rub);
    }
 }
 
 //===========================================================================//
-void DecompConstraintSet::boundsToSenses()
+void DecompConstraintSet::boundsToSenses(double infinity)
 {
    char   sense;
    double rhs, range;//not used
@@ -208,7 +209,7 @@ void DecompConstraintSet::boundsToSenses()
    rowSense.reserve(n_rows);
 
    for (int r = 0; r < n_rows; r++) {
-      UtilBoundToSense(rowLB[r], rowUB[r], DecompInf,
+      UtilBoundToSense(rowLB[r], rowUB[r], infinity,
                        sense, rhs, range);
       rowRhs.push_back(rhs);
       rowSense.push_back(sense);

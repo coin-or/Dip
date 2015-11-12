@@ -221,8 +221,8 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
    //---
    //--- create the rows and set the col/row bounds
    //---
-   UtilFillN(model->colLB, numCols,  -DecompInf);
-   UtilFillN(model->colUB, numCols,  DecompInf);
+   UtilFillN(model->colLB, numCols,  -m_infinity);
+   UtilFillN(model->colUB, numCols,  m_infinity);
    
    for(a = 0; a < numArcs; a++){
       colIndex = a;
@@ -277,16 +277,16 @@ void SDPUC_DecompApp::createModelCore(DecompConstraintSet * model){
          std::string rowNameFix = "fix_y1_" + UtilIntToStr(a) + "_" + UtilIntToStr(t);
  
 	 //TODO: any issue with range constraint
-	 model->appendRow(row1, 0.0, DecompInf, rowName1_1);  //add MP1_constraints (arc investments)
+	 model->appendRow(row1, 0.0, m_infinity, rowName1_1);  //add MP1_constraints (arc investments)
          
-         model->appendRow(row1, -DecompInf, 1.0, rowName1_2);  //add MP1_constraints (arc investments)
+         model->appendRow(row1, -m_infinity, 1.0, rowName1_2);  //add MP1_constraints (arc investments)
 	 if(arcs[a].tail == 0) {   //ONLY for supply arcs (!!)
-	    model->appendRow(row2, 0.0, DecompInf, rowName2_1);  //add MP2_constraints (arc commitment) 
-	    model->appendRow(row2, -DecompInf, 1.0, rowName2_2);  //add MP2_constraints (arc commitment) 
+	    model->appendRow(row2, 0.0, m_infinity, rowName2_1);  //add MP2_constraints (arc commitment) 
+	    model->appendRow(row2, -m_infinity, 1.0, rowName2_2);  //add MP2_constraints (arc commitment) 
 	 }
-	 model->appendRow(rowFix_y1, 1.0, DecompInf, rowNameFix);  //add fix y1 vars
-	 //model->appendRow(y2upper1, 0.0, DecompInf, std::string("y2-upperbound-1"));  //add upperbounds on y2
-	 //model->appendRow(y2upper2, -1.0, DecompInf, std::string("y2-upperbound-2"));  //..to strengthen formulation
+	 model->appendRow(rowFix_y1, 1.0, m_infinity, rowNameFix);  //add fix y1 vars
+	 //model->appendRow(y2upper1, 0.0, m_infinity, std::string("y2-upperbound-1"));  //add upperbounds on y2
+	 //model->appendRow(y2upper2, -1.0, m_infinity, std::string("y2-upperbound-2"));  //..to strengthen formulation
       }
    }
 
@@ -505,7 +505,7 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
       double d = nodes[i].demand * ts[nodes[i].tsdemand].values[tpId];
       std::string rowName = "balance_" + UtilIntToStr(i) + "_" + UtilIntToStr(tpId);
       if(i == source) {
-         model->appendRow(row, -DecompInf, 0.0, rowName);
+         model->appendRow(row, -m_infinity, 0.0, rowName);
       }
       else {
          model->appendRow(row, d, d, rowName);
@@ -533,8 +533,8 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
       //set flow lower and upperbound
       std::string rowNameLB = "lb_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
       std::string rowNameUB = "ub_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
-      model->appendRow(rowLB, 0.0, DecompInf, rowNameLB);
-      model->appendRow(rowUB, -DecompInf, 0.0, rowNameUB);
+      model->appendRow(rowLB, 0.0, m_infinity, rowNameLB);
+      model->appendRow(rowUB, -m_infinity, 0.0, rowNameUB);
 
       //set kirchoffs voltage constraints for ac-arcs
       if(arcs[a].acline == 1) {
@@ -559,8 +559,8 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
 	 }
          std::string rowNameK1 = "k1_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
          std::string rowNameK2 = "k2_" + UtilIntToStr(a) + "_" + UtilIntToStr(tpId);
-	 model->appendRow(rowK1, -DecompInf, bigM, rowNameK1);
-	 model->appendRow(rowK2, -bigM, DecompInf, rowNameK2);
+	 model->appendRow(rowK1, -m_infinity, bigM, rowNameK1);
+	 model->appendRow(rowK2, -bigM, m_infinity, rowNameK2);
       }
 
    }
@@ -610,8 +610,8 @@ void SDPUC_DecompApp::createModelRelax(DecompConstraintSet * model,
    //set theta-columns active
    for(i = 0; i < numNodes; i++){
       colIndex = col_thetaStartIndex + tpId * numNodes + i;
-      model->colLB[colIndex] = -DecompInf;
-      model->colUB[colIndex] =  DecompInf;
+      model->colLB[colIndex] = -m_infinity;
+      model->colUB[colIndex] =  m_infinity;
       model->activeColumns.push_back(colIndex);
    }  
 

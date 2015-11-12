@@ -847,7 +847,6 @@ class DipProblem(pulp.LpProblem, DipAPI):
             if len(dvs) > 0:
                 dvs_with_costs = []
                 for var in dvs:
-                    print var
                     if isinstance(var, dict):
                         cost = sum(self.objective[i]*var[i] for i in var
                                    if i in self.objective)

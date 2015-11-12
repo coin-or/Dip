@@ -67,13 +67,13 @@ void DippyDecompApp::createModels()
       name = PyString_AsString(pRowName);
 
       if (pRowLb == Py_None) {
-         lb = -DecompInf;
+         lb = -m_infinity;
       } else {
          lb = PyFloat_AsDouble(pRowLb);
       }
 
       if (pRowUb == Py_None) {
-         ub = DecompInf;
+         ub = m_infinity;
       } else {
          ub = PyFloat_AsDouble(pRowUb);
       }
@@ -120,13 +120,13 @@ void DippyDecompApp::createModels()
       name = PyString_AsString(pColName);
 
       if (pColLb == Py_None) {
-         lb = -DecompInf;
+         lb = -m_infinity;
       } else {
          lb = PyFloat_AsDouble(pColLb);
       }
 
       if (pColUb == Py_None) {
-         ub = DecompInf;
+         ub = m_infinity;
       } else {
          ub = PyFloat_AsDouble(pColUb);
       }
@@ -236,13 +236,13 @@ void DippyDecompApp::createModels()
          name = PyString_AsString(pRowName);
 
          if (pRowLb == Py_None) {
-            lb = -DecompInf;
+            lb = -m_infinity;
          } else {
             lb = PyFloat_AsDouble(pRowLb);
          }
 
          if (pRowUb == Py_None) {
-            ub = DecompInf;
+            ub = m_infinity;
          } else {
             ub = PyFloat_AsDouble(pRowUb);
          }
@@ -348,9 +348,13 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
 
    int nVars = PyObject_Length(pVarList);
 
-   if (nVars == 0) {
-      throw UtilException("Empty variable list", "solveRelaxed", "DippyDecompApp");
-   }
+   // In the new design, we need to allow the possibility that the user will solve
+   // the problem exactly, but not find any solutions with reduced costs zero
+   // The below is is commented out and left in the source for posterity
+   // tkr 11/11/15
+   //if (nVars == 0) {
+   //   throw UtilException("Empty variable list", "solveRelaxed", "DippyDecompApp");
+   //}
 
    // solveRelaxed returns 3-tuples (cost, reduced cost, dictionary of (variable, value) pairs)
    // We can use these to construct a C++ DecompVar objects
@@ -465,8 +469,8 @@ int DippyDecompApp::generateCuts(const double* x, DecompCutList& cutList)
          throw UtilException("Error calling method row.getUb()", "generateCuts", "DippyDecompApp");
       }
 
-      lb = (pLb == Py_None) ? -DecompInf : PyFloat_AsDouble(pLb);
-      ub = (pUb == Py_None) ?  DecompInf : PyFloat_AsDouble(pUb);
+      lb = (pLb == Py_None) ? -m_infinity : PyFloat_AsDouble(pLb);
+      ub = (pUb == Py_None) ?  m_infinity : PyFloat_AsDouble(pUb);
       int*     varInds = NULL;
       double* varVals = NULL;
       int numPairs = pyColDict_AsPackedArrays(pRow, m_colIndices, &varInds, &varVals);
