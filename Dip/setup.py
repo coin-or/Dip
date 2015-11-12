@@ -7,7 +7,7 @@ import subprocess, os, sys
 from os.path import join, dirname
 
 PROJECT = 'coinor.dippy'
-VERSION = '1.92.1'
+VERSION = '1.92.2'
 URL = 'https://projects.coin-or.org/Dip/wiki/DipPy'
 AUTHOR_EMAIL = u''
 DESC = 'DIP Python Interface'
@@ -107,7 +107,9 @@ if operatingSystem is 'mac':
 modules=[Extension('_dippy', 
                    sources, 
                    libraries=libraries,
-                   include_dirs=[join(coin_install_dir, 'include', 'coin')],
+                   include_dirs=[join(coin_install_dir, 'include', 'coin'),
+                                 '/usr/local/gurobi/linux64/include',
+                                 '/usr/local/cplex/include/ilcplex'],
                    library_dirs=lib_dirs,
                    define_macros=macros)]
 

@@ -32,6 +32,13 @@ https://projects.coin-or.org/Dip/newticket
 
 # CHANGELOG
 
+## Release 0.92.2
+ * Get rid of pesky global variable DecompInf
+ * Fix bugs in wedding planner example
+ * Fix bugs in DipPy to allow returning no solutions, even when an exact 
+   subprobem solver is used and to allow no branching candidates when 
+   branching. 
+
 ## Release 0.92.1
  * Fixed problem with dependency linking
 
@@ -39,10 +46,17 @@ https://projects.coin-or.org/Dip/newticket
  * Substantially re-designed internals
  * Renamed classes, functions, and parameters more intuitively
  * Eliminated unnecessary "MILP" parameter section and joined it to "DECOMP," as well as making "DECOMP" the default parameter section name.
- * Changed parameter setting mechanism to make it possible to pass parameters directly to solvers using native names.
+ 
+ * Changed parameter setting mechanism to make it possible to pass parameters
+   directly to solvers using native names.
  * Added interface to Gurobi
  * Added ability to select solver at run-time rather than compile-time.
- * In DipPy, the user can now return a status in the subproblem solve to indicate whether the subproblem was solved exactly. Previously, DipPy solved the subproblem to optimality internally whenever no solution was returned, which is unnecessary if the user's subproblem solver is exact. It also means that the user was previously required to provide a full description of the subproblem.
+ * In DipPy, the user can now return a status in the subproblem solve to
+   indicate whether the subproblem was solved exactly. Previously, DipPy
+   solved the subproblem to optimality internally whenever no solution was
+   returned, which is unnecessary if the user's subproblem solver is exact. It
+   also means that the user was previously required to provide a full
+   description of the subproblem.
 
 ## Release 0.91.4
  * Fixed bugs in examples
