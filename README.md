@@ -32,6 +32,13 @@ https://projects.coin-or.org/Dip/newticket
 
 # CHANGELOG
 
+## Release 0.91.6
+ * Fixed bugs in Wedding Planner example.
+ * Fixed bug in DipPy having to do with branching.
+
+## Release 0.91.5
+ * Fixed bug with SYMPHONY when not all solutions are accepted.
+
 ## Release 0.91.4
  * Updates to dependencies
  * All examples fixed
