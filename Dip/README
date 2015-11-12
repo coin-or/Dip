@@ -36,6 +36,13 @@ https://projects.coin-or.org/Dip/newticket
 CHANGELOG
 =========
 
+## Release 0.92.2
+ * Get rid of pesky global variable DecompInf
+ * Fix bugs in wedding planner example
+ * Fix bugs in DipPy to allow returning no solutions, even when an exact 
+   subprobem solver is used and to allow no branching candidates when 
+   branching. 
+
 ## Release 0.92.1
  * Fixed problem with dependency linking
 
