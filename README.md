@@ -39,14 +39,21 @@ https://projects.coin-or.org/Dip/newticket
    subprobem solver is used and to allow no branching candidates when 
    branching. 
 
+## Release 0.91.6
+ * Fixed bugs in Wedding Planner example.
+ * Fixed bug in DipPy having to do with branching.
+
 ## Release 0.92.1
  * Fixed problem with dependency linking
+
+## Release 0.91.5
+ * Fixed bug with SYMPHONY when not all solutions are accepted.
 
 ## Release 0.92.0
  * Substantially re-designed internals
  * Renamed classes, functions, and parameters more intuitively
- * Eliminated unnecessary "MILP" parameter section and joined it to "DECOMP," as well as making "DECOMP" the default parameter section name.
- 
+ * Eliminated unnecessary "MILP" parameter section and joined it to "DECOMP,"
+   as well as making "DECOMP" the default parameter section name. 
  * Changed parameter setting mechanism to make it possible to pass parameters
    directly to solvers using native names.
  * Added interface to Gurobi
