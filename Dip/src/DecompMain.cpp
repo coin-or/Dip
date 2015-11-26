@@ -27,7 +27,6 @@
 #include "omp.h"
 #endif
 
-
 using namespace std;
 
 void blockNumberFinder(DecompParam utilParam,
