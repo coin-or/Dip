@@ -2937,7 +2937,6 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                   initVars);             //var list to populate
             }
          }
-
          //---
          //--- THINK: check for duplicate variables - done in solveRelaxed
          //---   don't assume the user does the duplicate check - should be
@@ -3149,15 +3148,18 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    const double* colLower = m_masterSI->getColLower();
    const double* colUpper = m_masterSI->getColUpper();
    const double* sol = m_masterSI->getColSolution();
-
+   // more accurate is to calculate the reduced cost by ourselves
+   //, to make sure the dual value and the reduced cost correspond
    for (int c = 0; c < m_numCols; c++) {
-      if (sol[c] == colLower[c]) {
-         zDW_UBDual += rc[c] * colLower[c];
-      } else if (sol[c] == colUpper[c]) {
-         zDW_UBDual += rc[c] * colUpper[c];
-      }
+     if (rc[c] > 0)
+       {
+	 zDW_UBDual +=colLower[c]*rc[c];
+       }
+     else if (rc[c] <0)
+       {
+	 zDW_UBDual +=colUpper[c]*rc[c];
+       }
    }
-
    /*
    //rStat might not be needed now, but will be needed
    // when we support ranged rows.
@@ -3181,9 +3183,19 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
    for (r = 0; r < nRows; r++) {
       zDW_UBDual += dualSol[r] * rowRhs[r];
    }
+   // need to consider the master only variable's contribution to the lower bound
+   double masterOnlyContri(0.0); 
+   DecompConstraintSet* modelCore = m_modelCore.getModel();
+   std::vector<int>::iterator intIt;
 
-   zDW_LB = zDW_UBDual + mostNegRC;
-   //zDW_LB = zDW_UBPrimal + mostNegRC;
+   for (intIt = modelCore->masterOnlyCols.begin(); intIt!= modelCore->masterOnlyCols.end();
+	++intIt)
+     {
+       masterOnlyContri += sol[m_masterOnlyColsMap[*intIt]]*mostNegRC; 
+
+     }
+   //zDW_LB = zDW_UBDual + mostNegRC + masterOnlyContri;
+   zDW_LB = zDW_UBPrimal + mostNegRC + masterOnlyContri;
    setObjBound(zDW_LB, zDW_UBPrimal);
    double actDiff = fabs(zDW_UBDual - zDW_UBPrimal);
    double unifDiff = actDiff / (1.0 + fabs(zDW_UBPrimal));
@@ -6048,6 +6060,7 @@ void DecompAlgo::addVarsFromPool()
             (*m_osLog) << " master cols = "   << m_masterSI->getNumCols()
             << endl;
            );
+	
    UTIL_DEBUG(m_app->m_param.LogDebugLevel, 10,
               (*m_osLog) << "\nVAR POOL BEFORE:\n";
               m_varpool.print(m_osLog);
