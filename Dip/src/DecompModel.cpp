@@ -254,6 +254,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       sym_environment* env = osi_Sym->getSymphonyEnvironment();
       sym_set_int_param(env, "do_reduced_cost_fixing", 0);
 
+      sym_set_dbl_param(env, "warm_start_node_ratio", param.WarmStartNodeRatio);
+      sym_set_int_param(env, "warm_start_node_limit", param.WarmStartNodeLimit);
+      sym_set_dbl_param(env, "warm_start_node_level_ratio", 
+                        param.WarmStartNodeLevelRatio); 
+      sym_set_int_param(env, "warm_start_node_level", param.WarmStartNodeLevel);
+
       if (logIpLevel == 0 ) {
          sym_set_int_param(env, "verbosity", -10);
       } else {
@@ -264,7 +270,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
 
       osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
       //whether to trim the warm start tree before re-solving.
-      osi_Sym->setSymParam(OsiSymTrimWarmTree, true);
+      osi_Sym->setSymParam(OsiSymTrimWarmTree, false);
 
       if (!m_ws_tag) {
          m_ws = osi_Sym->getWarmStart();
@@ -275,8 +281,19 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       }
 
       if (m_ws_tag) {
-         osi_Sym->resolve();
-         //	 std::cout << "warm start resolve " << std::endl;
+           OsiSolverInterface* m_subModelClone = m_osi->clone();
+            osi_Sym
+            = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
+            //osi_Sym->setSymParam(OsiSymKeepWarmStart, true);
+            assert(osi_Sym);
+            sym_environment* env = osi_Sym->getSymphonyEnvironment();
+            sym_set_int_param(env, "do_reduced_cost_fixing", 0);
+      //      osi_Sym->branchAndBound();
+            osi_Sym->resolve();     
+              assert(env); 
+
+//         osi_Sym->resolve();
+         	 std::cout << "warm start resolve " << std::endl;
       } else {
          osi_Sym->initialSolve();
          //	 std::cout << "NON warm start resolve " << std::endl;
@@ -306,7 +323,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       */
    } else {
     //  osi_Sym = dynamic_cast<OsiSymSolverInterface*>(m_osi);
-      
+      /*  
       OsiSolverInterface* m_subModelClone = m_osi->clone();
       osi_Sym
         = dynamic_cast<OsiSymSolverInterface*>(m_subModelClone);
@@ -323,7 +340,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       sym_set_int_param(env, "max_active_nodes", param.NumThreadsIPSolver);
 
       assert(env);
-      osi_Sym->branchAndBound();
+      */  
+      osi_Sym->initialSolve();
    }
 
    sym_environment* env = osi_Sym->getSymphonyEnvironment();
@@ -408,7 +426,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_isOptimal = false ;
          }
    }
-   std::cout << "bye" << std::endl; 
    /*
    if (!param.WarmStart) {
       UTIL_DELPTR(osi_Sym);
@@ -783,8 +800,6 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_solStatus == CPX_STAT_UNBOUNDED ||
          result->m_solStatus == CPXMIP_UNBOUNDED ||
          result->m_solStatus == CPX_STAT_INForUNBD ) {
-      std::cout << "There might be extreme rays in the subproblems "
-                << std::endl;
       /*
       std::cout << "The solution statu is "
       << result->m_solStatus << std::endl;
