@@ -659,7 +659,7 @@ public:
       SubProbTimeLimitInexact = DecompBigNum;
       NumConcurrentThreadsSubProb       = 4;
       NumThreadsIPSolver             = 1;
-      SubProbNumSolLimit      = 1;
+      SubProbNumSolLimit      = 10001;
       SubProbSolverStartAlgo = DecompDualSimplex;
       RoundRobinInterval   = 0;
       RoundRobinStrategy   = RoundRobinRotate;
@@ -712,11 +712,11 @@ public:
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
       BlockNumInput            = 0;
-      BlockFileOutput          = false;
+      BlockFileOutput          = true;
       RedCostEpsilon           = 0.0001;
       PhaseIObjTol             = 0.0005;
       CheckSpecialStructure    = false;
-      BlockFileOutputFormat    = 0;
+      BlockFileOutputFormat    = GCG_BLOCKFILE;
       SolutionOutputToFile     = true;
       SolutionOutputFileName   = "";
       BranchingStrategy        = 0;
