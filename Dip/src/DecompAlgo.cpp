@@ -2895,6 +2895,11 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          tempTimeLimit = m_param.LimitTime;
          UtilTimer timer;
 #ifdef _OPENMP
+		 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+			 (*m_osLog)
+			 << "===== START Threaded solve of subproblems. =====\n";);
+#endif
+#ifdef _OPENMP
 		 // Avoid the case when the allocated threads is greater than the
 		 // number of blocks
 		 int numThreads;
@@ -2933,6 +2938,11 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
             }
          }
 
+#ifdef _OPENMP
+		 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
+			 (*m_osLog)
+			 << "===== END   Threaded solve of subproblems. =====\n";);
+#endif
          map<int, vector<DecompAlgoModel> >::iterator mivt;
          vector<DecompAlgoModel>           ::iterator vit;
 
@@ -2959,7 +2969,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          nInitVars = static_cast<int>(initVars.size());
          attempts++;
       }
-
+	
       UTIL_DEBUG(m_param.LogDebugLevel, 4,
                  (*m_osLog) << "\nm_varsThisCall = "
                  << initVars.size() << "\n";
