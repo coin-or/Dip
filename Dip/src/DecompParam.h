@@ -107,7 +107,7 @@ public:
    int    CutCglOddHole;
    int    CutCglGomory;
 
-   int    SubProbUseCutoff;
+   bool    SubProbUseCutoff;
 
    double SubProbGapLimitExact;
    double SubProbGapLimitInexact;
@@ -652,7 +652,7 @@ public:
       CutCglClique         = 1;
       CutCglOddHole        = 1;
       CutCglGomory         = 1;
-      SubProbUseCutoff     = 0;
+      SubProbUseCutoff     = false;
       SubProbGapLimitExact   = 0.0001; // 0.01% gap
       SubProbGapLimitInexact = 0.1;    //10.00% gap
       SubProbTimeLimitExact   = DecompBigNum;
