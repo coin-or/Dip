@@ -2894,7 +2894,21 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          tempTimeLimit = m_param.LimitTime;
          UtilTimer timer;
+#ifdef _OPENMP
+		 // Avoid the case when the allocated threads is greater than the
+		 // number of blocks
+		 int numThreads;
 
+		 if (m_numConvexCon < m_param.NumConcurrentThreadsSubProb) {
+			 numThreads = min(m_param.NumConcurrentThreadsSubProb, m_numConvexCon);
+		 }
+		 else {
+			 numThreads = m_param.NumConcurrentThreadsSubProb;
+		 }
+
+		 omp_set_num_threads(numThreads);
+#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
+#endif
          for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
             DecompAlgoModel& algoModel = (*mit).second;
             timer.start();
@@ -3229,14 +3243,13 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
               << endl;
              );
    zDW_UB = zDW_UBPrimal;
-
    if ((getNodeIndex() == 0) &&
          (zDW_LB > (m_app->getBestKnownUB() + DecompEpsilon))) {
       (*m_osLog) << "ERROR: in root node, bestKnownUB = "
                  << UtilDblToStr(m_app->getBestKnownUB())
                  << " thisBoundLB = "
                  << UtilDblToStr(zDW_LB) << endl;
-      assert(0);
+	  assert(0);
    }
 
    //---
