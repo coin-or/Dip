@@ -551,7 +551,7 @@ int DecompAlgoPC::compressColumns()
       //---
       //--- if any vars were deleted, do a solution update to refresh
       //---
-      status = solutionUpdate(m_phase, 99999, 99999);
+      status = solutionUpdate(m_phase, true, 99999, 99999);
    }
 
    m_stats.thisCompressCols.push_back(m_stats.timerOther1.getRealTime());

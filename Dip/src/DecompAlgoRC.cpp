@@ -169,7 +169,7 @@ void DecompAlgoRC::phaseDone()
    UTIL_DELARR(obj);
    UTIL_DELARR(zeroSol);
 #endif
-   m_status = DecompAlgo::solutionUpdate(PHASE_UNKNOWN, 99999, 99999);
+   m_status = DecompAlgo::solutionUpdate(PHASE_UNKNOWN, true, 99999, 99999);
 
    //---
    //--- check if IP feasible (are we done?)
