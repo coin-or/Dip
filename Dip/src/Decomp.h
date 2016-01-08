@@ -143,6 +143,16 @@ const std::string DecompPhaseStr[6] = {
    "PHASE_UNKNOWN"
 };
 
+//---
+//--- This Subprob solving phase is used to dynamically adapt the optimality 
+//--- tolerance 
+//---
+enum DecompSubSolvePhase{
+	SUBSOLVE_PHASE_INEXACT, 
+	SUBSOLVE_PHASE_EXACT
+};
+
+
 //===========================================================================//
 //---
 //--- DECOMP enums (for status)
