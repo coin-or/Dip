@@ -341,9 +341,21 @@ public:
    // Setting this parameter will start the warm start routine using all the
    // nodes above the level warm_start_node_level% of the warm start tree depth.
    // The rest of the tree will be trimmed
-
    double WarmStartNodeLevelRatio; 
   
+
+   // The iteration limit for inexact subproblem solving 
+   int IterLimitInexactSubSolving; 
+
+   // The starting optimality gap for inexact subproblem solving
+   double InitialOptimalityGapInexactSubSolving; 
+
+   // The optimality gap incremental step for inexact subproblem solving 
+   // Here we assume that we provide a optimality gap , e.g. 0.5
+   // if the optimality gap increase step size is 0.1, then the next time
+   // the optimality gap is 0.6. The value continues to increase until it reaches
+   // 1 or the iteration limit for inexact subproblem solving is reached. 
+   double OptimalGapStepSizeInexactSubSolving; 
       
    /**
     * @}
@@ -463,8 +475,11 @@ public:
       PARAM_getSetting("WarmStartNodeRatio", WarmStartNodeRatio); 
       PARAM_getSetting("WarmStartNodeLevel", WarmStartNodeLevel); 
       PARAM_getSetting("WarmStartNodeLevelRatio", WarmStartNodeLevelRatio); 
-
-      //---
+	  PARAM_getSetting("IterLimitInexactSubSolving", IterLimitInexactSubSolving);
+	  PARAM_getSetting("InitialOptimalityGapInexactSubSolving", InitialOptimalityGapInexactSubSolving);
+	  PARAM_getSetting("OptimalGapStepSizeInexactSubSolving", OptimalGapStepSizeInexactSubSolving);
+	 	  
+	  //---
       //--- store the original setting for DualStabAlpha
       //---
       DualStabAlphaOrig = DualStabAlpha;
@@ -612,7 +627,10 @@ public:
       UtilPrintParameter(os, sec, "WarmStartNodeLimit", WarmStartNodeLimit);
       UtilPrintParameter(os, sec, "WarmStartNodeRatio", WarmStartNodeRatio);
       UtilPrintParameter(os, sec, "WarmStartNodeLevel", WarmStartNodeLevel);
-      UtilPrintParameter(os, sec, "WarmStartNodeLevelRatio", WarmStartNodeLevelRatio);
+	  UtilPrintParameter(os, sec, "WarmStartNodeLevelRatio", WarmStartNodeLevelRatio);
+	  UtilPrintParameter(os, sec, "IterLimitInexactSubSolving", IterLimitInexactSubSolving);
+	  UtilPrintParameter(os, sec, "InitialOptimalityGapInexactSubSolving", InitialOptimalityGapInexactSubSolving);
+	  UtilPrintParameter(os, sec, "OptimalGapStepSizeInexactSubSolving", OptimalGapStepSizeInexactSubSolving);
       (*os) << "========================================================\n";
    }
 
@@ -726,6 +744,9 @@ public:
       WarmStartNodeRatio       = 0.5; 
       WarmStartNodeLevel       = 3; 
       WarmStartNodeLevelRatio  = 0.5;  
+	  IterLimitInexactSubSolving = 5;
+	  InitialOptimalityGapInexactSubSolving = 0.1;
+	  OptimalGapStepSizeInexactSubSolving = 0.1;
      }
 
    void dumpSettings(std::ostream* os = &std::cout) {
