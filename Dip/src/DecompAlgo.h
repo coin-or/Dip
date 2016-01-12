@@ -271,8 +271,9 @@ protected:
 
    DecompBranchingImplementation m_branchingImplementation;
 
-
-
+   // variable tracking the subproblem solving phase 
+   // not for initial columns generation (always inexact)
+   DecompSubSolvePhase subProbSolvePhase; 
 public:
    /**
     * @}
@@ -1059,6 +1060,7 @@ public:
       branchStrategy_(NULL),
       rampUpBranchStrategy_(NULL),
       tempTimeLimit(0),
+	  subProbSolvePhase(SUBSOLVE_PHASE_INEXACT),
       m_branchingImplementation(DecompBranchInSubproblem) {
       m_app->m_decompAlgo = this;
    }

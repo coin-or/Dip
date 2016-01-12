@@ -1924,6 +1924,16 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
          m_nodeStats.priceCallsRound++;
          m_nodeStats.priceCallsTotal++;
 
+		 if (m_nodeStats.priceCallsRound >= m_param.IterLimitInexactSubSolving)
+		 {
+			 subProbSolvePhase = SUBSOLVE_PHASE_EXACT; 
+		 }
+		 else
+		 {
+			 double subProbDynamicGap = std::max((m_param.InitialOptimalityGapInexactSubSolving - (m_nodeStats.priceCallsRound - 1)*
+				 m_param.OptimalGapStepSizeInexactSubSolving), 0.0); 
+			 m_param.SubProbGapLimitInexact = std::min(subProbDynamicGap, m_param.SubProbGapLimitInexact); 
+		 }
          //---
          //--- after adding some rows, the columns in the var pool
          //--- might no longer be valid, so we need to re-expand everything
@@ -3569,6 +3579,7 @@ void DecompAlgo::phaseUpdate(DecompPhase&   phase,
          m_nodeStats.resetCutRound();
          m_nodeStats.resetPriceRound();
          m_nodeStats.resetBestLB();
+		 subProbSolvePhase = SUBSOLVE_PHASE_INEXACT; 
 
          if (m_algo == DECOMP) {
             nextPhase  = PHASE_DONE;
@@ -6709,6 +6720,12 @@ DecompStatus DecompAlgo::solveRelaxed(const double*         redCostX,
    bool doCutoff = m_param.SubProbUseCutoff ? true : false;
    bool doExact  = isNested ? false : true;
    doExact       = m_function == DecompFuncGenerateInitVars ? false : doExact;
+
+   if (subProbSolvePhase == SUBSOLVE_PHASE_INEXACT)
+   {
+	   doExact = false; 
+
+   }
    //---
    //--- run user method, but disregard so we can compare
    //--- against built-in oracle
