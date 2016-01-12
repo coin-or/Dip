@@ -475,15 +475,12 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    string cbcSLogSet   = "2";
 
    if (doExact) {
-      cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitExact, param.LimitTime),
-                                -1, COIN_DBL_MAX);
-      cbcGapSet  = UtilDblToStr(min(param.SubProbGapLimitExact, param.LimitTime)
-                                , -1, COIN_DBL_MAX);
+      cbcTimeSet = UtilDblToStr(param.SubProbTimeLimitExact, -1, COIN_DBL_MAX);
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitExact, -1, COIN_DBL_MAX);
    } else {
       cbcTimeSet = UtilDblToStr(min(param.SubProbTimeLimitInexact, param.LimitTime),
                                 -1, COIN_DBL_MAX);
-      cbcGapSet  = UtilDblToStr(min(param.SubProbGapLimitInexact, param.LimitTime),
-                                -1, COIN_DBL_MAX);
+      cbcGapSet  = UtilDblToStr(param.SubProbGapLimitInexact, -1, COIN_DBL_MAX);
    }
 
    bool   doTime       = false;
