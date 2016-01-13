@@ -2830,6 +2830,8 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
    int          c, attempts;
    double       aveC;
    DecompConstraintSet* modelCore = m_modelCore.getModel();
+   // the LimitInitVars could be related to the number of constraints in the model
+   // sometimes the default value is too small
    const int      limit      = m_param.LimitInitVars;
    // Need to get the different strategies for generating initial Vars
    const int      limit2     = 2 * limit;

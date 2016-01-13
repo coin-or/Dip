@@ -644,7 +644,7 @@ public:
       LogIpLevel           = 0;
       LogDumpModel         = 0;
       LogObjHistory        = 0;
-      LimitInitVars        = 5;
+      LimitInitVars        = 15;
       DebugLevel           = 0;
       TolZero              = DecompEpsilon;
       LimitTotalCutIters   = COIN_INT_MAX;
