@@ -8,14 +8,12 @@ do
     elif [ $svn_repo = 'BuildTools' ]; then
 	if [ `echo $i | cut -d '/' -f 6` != 'stable' ]; then
 	    proj=ThirdParty-`echo $i | cut -d '/' -f 7`
-	    git clone https://github.com/coin-or-tools/$proj
-	    if [ `echo $i | cut -d '/' -f 8` != 'trunk' ]; then
-		cd $proj
+	    if [ `echo $i | cut -d '/' -f 8` = 'trunk' ]; then
+		branch=master
+	    else
 		branch=`echo $i | cut -d '/' -f 8-9`
-		git fetch
-		git checkout $branch
-		cd ..
 	    fi
+	    git clone --branch=$branch https://github.com/coin-or-tools/$proj
 	fi
     else
 	if [ $svn_repo = "CHiPPS" ]; then
@@ -35,15 +33,18 @@ do
 		branch=`echo $i | cut -d '/' -f 6-7`
 	    fi	
 	fi
-	echo "Checking out" $proj "..."
-	mkdir $proj
-	cd $proj
-	git init
-	git remote add origin https://github.com/coin-or/$git_repo
-	git config core.sparsecheckout true
-	echo $proj/ >> .git/info/sparse-checkout
-	git fetch
-	git checkout $branch
-	cd ..
+	if [ "$#" = 1 ] && [ $1 = "--sparse" ]; then
+	    mkdir $proj
+	    cd $proj
+	    git init
+	    git remote add origin https://github.com/coin-or/$git_repo
+	    git config core.sparsecheckout true
+	    echo $proj/ >> .git/info/sparse-checkout
+	    git fetch
+	    git checkout $branch
+	    cd ..
+	else
+	    git clone --branch=$branch https://github.com/coin-or/$proj
+	fi
     fi
 done
