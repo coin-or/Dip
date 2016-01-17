@@ -666,6 +666,8 @@ doxydoc/Dip/doxygen.conf -text
 doxydoc/Osi/doxygen.conf -text
 doxydoc/all/doxygen.conf -text
 doxydoc/doxygen.conf.in -text
+/get.dependencies.git.sh -text
+/get.dependencies.svn.sh -text
 /install-sh -text
 /ltmain.sh -text
 /missing -text
