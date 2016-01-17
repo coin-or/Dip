@@ -16,6 +16,6 @@ matrix:
 
 before_install: ./get.dependencies.svn.sh
 
-install: ./configure && make install
+install: ./configure && make install > /dev/null
 
 script: make test
