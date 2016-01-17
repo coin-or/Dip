@@ -14,7 +14,7 @@ matrix:
       osx_image: beta-xcode6.2
     - os: linux
 
-before_install: get.depencies.svn.sh
+before_install: ./get.depencies.svn.sh
 
 install: ./configure && make install
 
