@@ -5084,7 +5084,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
             useCutoff = m_param.SubProbUseCutoff;
          }
 
-         m_isColGenExact = false; //so it goes to IP solver - ugh
          SolveRelaxedThreadArgs* arg = new SolveRelaxedThreadArgs[m_numConvexCon];
 
          for (int i = 0 ; i < m_numConvexCon; i ++) {
@@ -5164,8 +5163,6 @@ int DecompAlgo::generateVarsFea(DecompVarList&     newVars,
                          potentialVarsT[subprobIndex] 
                          );
          }
-
-         m_isColGenExact = true;
 
          //clean-up memory
          for (int subprobIndex = 0; subprobIndex < m_numConvexCon; subprobIndex++) {
