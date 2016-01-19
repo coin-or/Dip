@@ -19,8 +19,8 @@ matrix:
 
 before_install:
     - git clone https://gist.github.com/tkralphs/13d4529b4d4e8889f3a6 scripts
-    - scripts/get.dependencies.svn.sh fetch
+    - sh scripts/get.dependencies.sh fetch
 
-install: scripts/get.dependencies build
+install: sh scripts/get.dependencies.sh build
 
 script: make test
