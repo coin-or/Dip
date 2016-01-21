@@ -766,6 +766,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    //--- get solver status
    //---
+   
    result->m_solStatus  = CPXgetstat(cpxEnv, cpxLp);
    result->m_solStatus2 = 0;
    //printf("cplex status  = %d\n", result->m_solStatus);
@@ -908,10 +909,20 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //printf("solStatus = %d\n", result->m_solStatus);
 
    if (result->m_solStatus == CPXMIP_OPTIMAL ||
-         result->m_solStatus == CPX_STAT_OPTIMAL ||
-         result->m_solStatus == CPXMIP_OPTIMAL_TOL) {
-      result->m_isOptimal  = true;
-   } else if (result->m_solStatus == CPXMIP_UNBOUNDED ||
+         result->m_solStatus == CPX_STAT_OPTIMAL ) {
+	  result->m_isOptimal  = true;
+   } 
+   // If solver stops at the predefined optimality gap,
+   // we cannot claim the result is optimal so that 
+   // later m_isColGenExact is false and the lower bound
+   // calculation is different from the case when m_isColGenExact
+   // is true
+   else if (result->m_solStatus == CPXMIP_OPTIMAL_TOL)
+   {
+	   result->m_isOptimal = false; 
+	   result->m_isUnbounded = false; 
+   }  
+   else if (result->m_solStatus == CPXMIP_UNBOUNDED ||
               result->m_solStatus == CPX_STAT_UNBOUNDED) {
       //      std::cout << "We are generating extreme rays " << std::endl;
       result->m_isUnbounded = true;
