@@ -652,6 +652,7 @@ Dip/test/Makefile.in -text
 /Makefile.in -text
 /README -text
 /README.md -text
+/appveyor.yml -text
 conf/perms.txt -text
 /config.guess -text
 /config.sub -text
@@ -667,8 +668,6 @@ doxydoc/Dip/doxygen.conf -text
 doxydoc/Osi/doxygen.conf -text
 doxydoc/all/doxygen.conf -text
 doxydoc/doxygen.conf.in -text
-/get.dependencies.git.sh -text
-/get.dependencies.svn.sh -text
 /install-sh -text
 /ltmain.sh -text
 /missing -text
