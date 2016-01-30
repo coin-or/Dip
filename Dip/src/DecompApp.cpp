@@ -1404,7 +1404,6 @@ void DecompApp::createModels()
          }
 
          modelCore->masterOnlyCols.push_back(i);
-         std::cout << "the master only index is " << i << std::endl;
       }
 
       if (integerVars && integerVars[i]) {
