@@ -2663,7 +2663,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
 		 // changed Osi locally to accommodate this change 
 		 if (!m_param.CutCGL)
 		 {
-			 m_masterSI->setHintParam(OsiDoBarrierCross, false, OsiHintDo); 
+	//		 m_masterSI->setHintParam(OsiDoBarrierCross, false, OsiHintDo); 
 		 }
       } else {
          throw UtilException("Master Method Unspecified", "solutionUpdate", "DecompAlgo");
