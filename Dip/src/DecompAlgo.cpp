@@ -2656,7 +2656,7 @@ DecompStatus DecompAlgo::solutionUpdate(const DecompPhase phase,
       } else if (m_param.SolveMasterUpdateAlgo == DecompPrimSimplex) {
          m_masterSI->setHintParam(OsiDoDualInResolve, false, OsiHintDo);
       } else if (m_param.SolveMasterUpdateAlgo == DecompBarrier) {
-         m_masterSI->setHintParam(OsiDoBarrierInResolve, true, OsiHintDo);
+        // m_masterSI->setHintParam(OsiDoBarrierInResolve, true, OsiHintDo);
 		 // disable cross over to reduce the computational time
 		 // enable cross over only when we need to add cuts at the last iteration
 		 // of subproblem solving
