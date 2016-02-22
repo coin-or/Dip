@@ -23,7 +23,7 @@ matrix:
     		notification_email: jiadwang@gmail.com
     		build_command_prepend: "./configure; make clean"
     		build_command:   "make -j 4"
-    		branch_pattern: coverity_scan
+    		branch_pattern: jiadong
         apt:
           packages:
           - gfortran
