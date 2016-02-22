@@ -462,7 +462,7 @@ public:
                      const double   feasConTol = 1.0e-5); //0.01%
 
    //fugly
-   DecompStatus solveRelaxed(const double*         redCostX,
+   void solveRelaxed(const double*         redCostX,
                              const double*         origCost,
                              const double          alpha,
                              const int             n_origCols,
