@@ -16,6 +16,14 @@ matrix:
       compiler: clang
     - os: linux
       addons:
+ 	 coverity_scan:
+    		project:
+      		name: "jiadongwang/Dip"
+      		description: "Decomposition In Integer Programming"
+    		notification_email: jiadwang@gmail.com
+    		build_command_prepend: "./configure; make clean"
+    		build_command:   "make -j 4"
+    		branch_pattern: coverity_scan
         apt:
           packages:
           - gfortran
