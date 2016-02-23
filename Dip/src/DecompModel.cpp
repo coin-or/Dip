@@ -630,8 +630,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       */
       //memcpy(result->m_solution,
       //  cbc.getColSolution(), numCols * sizeof(double));
-      assert(result->m_nSolutions ==
-             static_cast<int>(result->m_solution.size()));
+    //  assert(result->m_nSolutions ==
+    //         static_cast<int>(result->m_solution.size()));
    }
 
 #endif
