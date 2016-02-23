@@ -606,7 +606,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          //---
          //--- else it must have stopped on gap
          //---
-         result->m_nSolutions = 1;
+         result->m_nSolutions = cbc.numberSavedSolutions();;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;
       }
@@ -616,8 +616,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- get copy of solution(s)
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
-   int nSols = std::min<int>(result->m_nSolutions,
-			     param.SubProbNumSolLimit);
+   int nSols = result->m_nSolutions;
+			     
    for(int i = 0; i < nSols; i++){
       //result->m_objUB = cbc.getObjValue();
       const double* solDbl = cbc.savedSolution(i);
