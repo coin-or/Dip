@@ -589,7 +589,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       solDbl = m_relax->getPrimalRays(1);
       const double* solDbl2 = solDbl.front();
       vector<double> solVec(solDbl2, solDbl2 + numCols);
-      result->m_solution.push_back(solVec);
+   //   result->m_solution.push_back(solVec);
       result->m_nSolutions++;
       result->m_isUnbounded = true;
    }
@@ -633,6 +633,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //   assert(result->m_nSolutions ==
    //          static_cast<int>(result->m_solution.size()));
    }
+
+    
     assert(result->m_nSolutions == static_cast<int>(result->m_solution.size())); 
 #endif
 #ifdef __DECOMP_IP_CPX__
