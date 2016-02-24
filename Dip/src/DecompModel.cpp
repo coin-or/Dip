@@ -589,9 +589,9 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       solDbl = m_relax->getPrimalRays(1);
       const double* solDbl2 = solDbl.front();
       vector<double> solVec(solDbl2, solDbl2 + numCols);
-   //   result->m_solution.push_back(solVec);
-   //   result->m_nSolutions++;
-      result->m_nSolutions = cbc.numberSavedSolutions();
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+   //   result->m_nSolutions = cbc.numberSavedSolutions();
       result->m_isUnbounded = true;
    }
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
@@ -617,7 +617,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //--- get copy of solution(s)
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
-   int nSols = result->m_nSolutions;
+   int nSols = std::min<int>(result->m_nSolutions,param.SubProbNumSolLimit);
 			     
    for(int i = 0; i < nSols; i++){
       //result->m_objUB = cbc.getObjValue();
@@ -631,12 +631,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       */
       //memcpy(result->m_solution,
       //  cbc.getColSolution(), numCols * sizeof(double));
-   //   assert(result->m_nSolutions ==
-   //          static_cast<int>(result->m_solution.size()));
    }
-
-    std::cout << "result->m_nSolutions is " << result->m_nSolutions << std::endl; 
-    std::cout << "result->m_solutions.size() " << result->m_solution.size()<< std::endl;     
     assert(result->m_nSolutions == static_cast<int>(result->m_solution.size())); 
 #endif
 #ifdef __DECOMP_IP_CPX__

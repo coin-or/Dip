@@ -3281,7 +3281,7 @@ bool DecompAlgo::updateObjBound(const double mostNegRC)
                  << UtilDblToStr(m_app->getBestKnownUB())
                  << " thisBoundLB = "
                  << UtilDblToStr(zDW_LB) << endl;
-	  assert(0);
+//	  assert(0);
    }
 
    //---
