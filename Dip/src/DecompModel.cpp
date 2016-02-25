@@ -632,6 +632,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       //memcpy(result->m_solution,
       //  cbc.getColSolution(), numCols * sizeof(double));
    }
+    std::cout << "nSols is " << nSols << std::endl; 
+    std::cout << "result->m_solution.size()" << std::endl; 
     assert(nSols == static_cast<int>(result->m_solution.size())); 
 #endif
 #ifdef __DECOMP_IP_CPX__
