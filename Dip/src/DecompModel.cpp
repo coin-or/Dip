@@ -591,6 +591,8 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
   //    vector<double> solVec(solDbl2, solDbl2 + numCols);
     //  result->m_solution.push_back(solVec);
       result->m_nSolutions = cbc.numberSavedSolutions();
+      std::cout << "problem is unboundd " << std::endl; 
+      std::cout << "result->m_nSolutions is " << result->m_nSolutions << std::endl; 
       result->m_isUnbounded = true;
    }
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
@@ -609,9 +611,11 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_nSolutions = cbc.numberSavedSolutions();;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;
+        
       }
    }
-
+      std::cout << "result->m_isOptimal " << result->m_isOptimal << std::endl; 
+      std::cout << "result->m_nSolutions "<< result->m_nSolutions << std::endl; 
    //---
    //--- get copy of solution(s)
    //---
