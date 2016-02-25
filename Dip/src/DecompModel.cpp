@@ -580,19 +580,17 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    result->m_nSolutions = 0;
    result->m_isOptimal  = false;
    result->m_isCutoff   = false;
-
+   result->m_isUnbounded = false; 
    if (cbc.isContinuousUnbounded()) {
       OsiClpSolverInterface* m_relax = dynamic_cast<OsiClpSolverInterface*>(m_osi);
       m_relax->initialSolve();
       std::vector<double*> solDbl;
       //ToDo: To add parameter of number of rays in the getPrimalRays()
       solDbl = m_relax->getPrimalRays(1);
-  //    const double* solDbl2 = solDbl.front();
-  //    vector<double> solVec(solDbl2, solDbl2 + numCols);
-    //  result->m_solution.push_back(solVec);
-      result->m_nSolutions = cbc.numberSavedSolutions();
-      std::cout << "problem is unboundd " << std::endl; 
-      std::cout << "result->m_nSolutions is " << result->m_nSolutions << std::endl; 
+      const double* solDbl2 = solDbl.front();
+      vector<double> solVec(solDbl2, solDbl2 + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions ++;
       result->m_isUnbounded = true;
    }
    //printf("cbc.isProvenOptimal() = %d\n", cbc.isProvenOptimal());
@@ -611,18 +609,15 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
          result->m_nSolutions = cbc.numberSavedSolutions();;
          result->m_isCutoff   = doCutoff;
          result->m_isOptimal  = false;
-        
       }
    }
-      std::cout << "result->m_isOptimal " << result->m_isOptimal << std::endl; 
-      std::cout << "result->m_nSolutions "<< result->m_nSolutions << std::endl; 
    //---
    //--- get copy of solution(s)
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
    int nSols = std::min<int>(result->m_nSolutions,param.SubProbNumSolLimit);
    result->m_solution.clear(); 
-			     
+  			     
    for(int i = 0; i < nSols; i++){
       //result->m_objUB = cbc.getObjValue();
       const double* solDbl = cbc.savedSolution(i);
@@ -636,9 +631,10 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
       //memcpy(result->m_solution,
       //  cbc.getColSolution(), numCols * sizeof(double));
    }
-    std::cout << "nSols is " << nSols << std::endl; 
-    std::cout << "result->m_solution.size() is " << result->m_solution.size() << std::endl;
-    assert(nSols == static_cast<int>(result->m_solution.size())); 
+    if (result->m_isUnbounded == false)
+    {
+       assert(result->m_solution.size() == nSols); 
+    }
 #endif
 #ifdef __DECOMP_IP_CPX__
    //---
