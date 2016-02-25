@@ -617,6 +617,7 @@ void DecompAlgoModel::solveOsiAsIp(DecompSolverResult* result,
    //---
    result->m_objLB = cbc.getBestPossibleObjValue();
    int nSols = std::min<int>(result->m_nSolutions,param.SubProbNumSolLimit);
+   result->m_solution.clear(); 
 			     
    for(int i = 0; i < nSols; i++){
       //result->m_objUB = cbc.getObjValue();
