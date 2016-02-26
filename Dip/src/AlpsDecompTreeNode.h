@@ -51,7 +51,6 @@ public:
 
    AlpsDecompTreeNode(AlpsDecompModel* m ) {
       AlpsDecompTreeNode();
-      desc_ = new AlpsDecompNodeDesc(m);
    }
 
 
