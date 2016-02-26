@@ -19,7 +19,7 @@ matrix:
         apt:
           packages:
           - gfortran
-	  - valgrind
+          - valgrind
   allow_failures:
     - os: osx
 
