@@ -28,4 +28,6 @@ before_script:
   - git clone --branch=stable/0.8 https://github.com/coin-or-tools/BuildTools
   - bash BuildTools/get.dependencies.sh fetch > /dev/null
 
-script: bash BuildTools/get.dependencies.sh build --quiet --enable-debug --test 
+script:
+  - bash BuildTools/get.dependencies.sh build --quiet --enable-debug
+  - valgrind build/bin/dip --BlockFileFormat List --Instance  build/share/coin/Data/Sample/atm_5_10_1.mps --BlockFile build/share/coin/Data/Sample/atm_5_10_1.block --BestKnownLB 59704.02009 --BestKnownUB 59704.02009
