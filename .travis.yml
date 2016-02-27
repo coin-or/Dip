@@ -31,4 +31,4 @@ before_script:
 
 script:
   - bash BuildTools/get.dependencies.sh build --quiet --enable-debug
-  - valgrind --leak-check=full /home/travis/build/coin-or/Dip/build/Dip/src/dip --BlockFileFormat List --Instance  /home/travis/build/coin-or/Dip/share/coin/Data/Sample/atm_5_10_1.mps --BlockFile /home/travis/build/coin-or/Dip/share/coin/Data/Sample/atm_5_10_1.block --BestKnownLB 59704.02009 --BestKnownUB 59704.02009
+  - valgrind -v --leak-check=full /home/travis/build/coin-or/Dip/build/Dip/src/dip --BlockFileFormat List --Instance  /home/travis/build/coin-or/Dip/share/coin/Data/Sample/atm_5_10_1.mps --BlockFile /home/travis/build/coin-or/Dip/share/coin/Data/Sample/atm_5_10_1.block --BestKnownLB 59704.02009 --BestKnownUB 59704.02009
