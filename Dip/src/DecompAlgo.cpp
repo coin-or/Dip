@@ -2931,8 +2931,8 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
 			 numThreads = m_param.NumConcurrentThreadsSubProb;
 		 }
 
-		 omp_set_num_threads(numThreads);
-#pragma omp parallel for
+//		 omp_set_num_threads(numThreads);
+//#pragma omp parallel for
 // schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
 
