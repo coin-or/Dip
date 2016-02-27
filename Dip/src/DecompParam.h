@@ -725,7 +725,7 @@ public:
       NumBlocksCand            = 4;
       ConcurrentCutOffTime     = 100;
       CurrentWorkingDir        = "";
-      SubProbParallel          = true;
+      SubProbParallel          = false;
       SubProbParallelType      = SubProbScheduleDynamic;
       SubProbParallelChunksize = 1;
       ConcurrentThreadsNum     = 4;
