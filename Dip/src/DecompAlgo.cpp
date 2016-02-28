@@ -2914,7 +2914,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          tempTimeLimit = m_param.LimitTime;
          UtilTimer timer;
-         timer.start();
+        // timer.start();
 #ifdef _OPENMP
 		 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 			 (*m_osLog)
@@ -2930,8 +2930,8 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
 		 else {
 			 numThreads = m_param.NumConcurrentThreadsSubProb;
 		 }
-		 omp_set_num_threads(numThreads);
-#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
+	//	 omp_set_num_threads(numThreads);
+// #pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
 	 for(int i =0; i < m_modelRelax.size(); i++){
             DecompAlgoModel& algoModel = m_modelRelax[i]; 
@@ -2954,13 +2954,16 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                //     subprobResult.m_objLB, sumInitLB);
             }
          }
- 	 timer.stop();
-         tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);  
+ 	// timer.stop();
+        // tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);  
 #ifdef _OPENMP
 		 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 			 (*m_osLog)
 			 << "===== END   Threaded solve of subproblems. =====\n";);
 #endif
+
+         //timer.stop();
+        // tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0); 
          map<int, vector<DecompAlgoModel> >::iterator mivt;
          vector<DecompAlgoModel>           ::iterator vit;
 
@@ -6737,7 +6740,6 @@ void DecompAlgo::solveRelaxed(const double*         redCostX,
    //---
    DecompSolverStatus solverStatus = DecompSolStatNoSolution;
 
-   //#ifndef RELAXED_THREADED
    if (m_param.SolveRelaxAsIp == 2) {
       list<DecompVar*> varsDebug;
 
