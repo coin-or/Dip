@@ -36,6 +36,19 @@ Bug reports should be reported on the DIP development web site at
 
 https://projects.coin-or.org/Dip/newticket
 
+or here on Github.
+
+# SCREEN SHOTS
+
+###Using DipPy in [Solver Studio](http://solverstudio.org)
+![Solver Studio Pic 1](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic1.png)
+###Choosing algorithm in [Solver Studio](http://solverstudio.org)
+![Solver Studio Pic 3](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic3.png)
+###Displaying search tree using [GrUMPy](https://github.com/coin-or/GrUMPy)
+![GrUMPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/GrUMPyPic.png)
+###Editing DipPy Model with Eclipse and PyDev
+![DipPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/DipPyPic2.png)
+
 # CHANGELOG
 
 ## Release 0.92.2
