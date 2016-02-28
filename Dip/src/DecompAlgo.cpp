@@ -2914,6 +2914,7 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
          double sumInitLB = 0.0; //like LR with 0 dual (only first pass)
          tempTimeLimit = m_param.LimitTime;
          UtilTimer timer;
+         timer.start();
 #ifdef _OPENMP
 		 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 			 (*m_osLog)
@@ -2923,23 +2924,18 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
 		 // Avoid the case when the allocated threads is greater than the
 		 // number of blocks
 		 int numThreads;
-
 		 if (m_numConvexCon < m_param.NumConcurrentThreadsSubProb) {
 			 numThreads = min(m_param.NumConcurrentThreadsSubProb, m_numConvexCon);
 		 }
 		 else {
 			 numThreads = m_param.NumConcurrentThreadsSubProb;
 		 }
-
-//		 omp_set_num_threads(numThreads);
-//#pragma omp parallel for
-// schedule(dynamic, m_param.SubProbParallelChunksize)
+		 omp_set_num_threads(numThreads);
+#pragma omp parallel for schedule(dynamic, m_param.SubProbParallelChunksize)
 #endif
-
-//           for (mit = m_modelRelax.begin(); mit != m_modelRelax.end(); mit++) {
 	 for(int i =0; i < m_modelRelax.size(); i++){
             DecompAlgoModel& algoModel = m_modelRelax[i]; 
-            timer.start();
+            
             solveRelaxed(costeps,               //reduced cost (fake here)
                          objCoeff,              //original cost vector
                          9e15,                  //alpha        (fake here)
@@ -2948,8 +2944,6 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                          algoModel,
                          &subprobResult,        //results
                          initVars);             //var list to populate
-            timer.stop();
-            tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);
 
             if (attempts == 0) {
                //TODO: have to treat masterOnly differently
@@ -2960,7 +2954,8 @@ int DecompAlgo::generateInitVars(DecompVarList& initVars)
                //     subprobResult.m_objLB, sumInitLB);
             }
          }
-
+ 	 timer.stop();
+         tempTimeLimit = max(tempTimeLimit - timer.getRealTime(), 0.0);  
 #ifdef _OPENMP
 		 UTIL_DEBUG(m_app->m_param.LogDebugLevel, 3,
 			 (*m_osLog)
