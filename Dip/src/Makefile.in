@@ -98,8 +98,8 @@ am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	DecompConstraintSet.lo UtilGraphLib.lo UtilHash.lo \
 	UtilMacros.lo UtilMacrosDecomp.lo UtilParameters.lo \
 	UtilKnapsack.lo AlpsDecompModel.lo AlpsDecompTreeNode.lo \
-	UtilMacrosAlps.lo DecompBranchStrategyMaxInf.lo \
-	DecompBranchStrategy.lo
+	UtilMacrosAlps.lo DecompBranchStrategy.lo \
+	DecompBranchStrategyMaxInf.lo
 libDecomp_la_OBJECTS = $(am_libDecomp_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -249,6 +249,8 @@ DBG_CFLAGS = @DBG_CFLAGS@
 DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEPENDENCY_LINKING_FALSE = @DEPENDENCY_LINKING_FALSE@
+DEPENDENCY_LINKING_TRUE = @DEPENDENCY_LINKING_TRUE@
 DIPINCDIR = @DIPINCDIR@
 DIPLIB_CFLAGS = @DIPLIB_CFLAGS@
 DIPLIB_CFLAGS_INSTALLED = @DIPLIB_CFLAGS_INSTALLED@
@@ -414,6 +416,8 @@ lib_LTLIBRARIES = libDecomp.la
 # other 
 
 # Util
+
+# branching
 libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	DecompAlgoC.h DecompAlgoD.cpp DecompAlgoD.h DecompAlgoPC.cpp \
 	DecompAlgoPC.h DecompAlgoRC.cpp DecompAlgoRC.h \
@@ -432,9 +436,9 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	AlpsDecompModel.cpp AlpsDecompModel.h AlpsDecompSolution.h \
 	AlpsDecompTreeNode.cpp AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
-	UtilMacrosAlps.h DecompBranchStrategyMaxInf.h \
-	DecompBranchStrategyMaxInf.cpp \
-	DecompBranchStrategy.h DecompBranchStrategy.cpp
+	UtilMacrosAlps.h DecompBranchObject.h DecompBranchStrategy.h \
+	DecompBranchStrategy.cpp DecompBranchStrategyMaxInf.h \
+	DecompBranchStrategyMaxInf.cpp
 
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
@@ -473,6 +477,8 @@ includecoindir = $(includedir)/coin
 # other 
 
 # Util
+
+# Braching
 includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
 	DecompAlgoPC.h DecompAlgoRC.h DecompAlgoCGL.h DecompCut.h \
 	DecompCutOsi.h DecompCutPool.h DecompApp.h Decomp.h \
@@ -482,7 +488,9 @@ includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
 	DecompWaitingRow.h UtilGraphLib.h UtilHash.h UtilMacros.h \
 	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \
 	AlpsDecompModel.h AlpsDecompSolution.h AlpsDecompTreeNode.h \
-	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h
+	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h \
+	DecompBranchObject.h DecompBranchStrategy.h \
+	DecompBranchStrategyMaxInf.h
 all: config.h config_dip.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -621,6 +629,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompAlgoRC.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompApp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompBranch.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompBranchStrategy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompBranchStrategyMaxInf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompConstraintSet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompCut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DecompCutPool.Plo@am__quote@

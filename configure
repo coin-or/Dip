@@ -1132,6 +1132,9 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --disable-dependency-linking
+                          disable linking library dependencies into shared
+                          libraries
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1846,38 +1849,6 @@ echo "$as_me: error: --enable-msvc option makes sense only under Cygwin or MinGW
   fi
 
 
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
-
-# Check whether --enable-static-standardlibs or --disable-static-standardlibs was given.
-if test "${enable_static_standardlibs+set}" = set; then
-  enableval="$enable_static_standardlibs"
-  case "$enableval" in
-     no | yes | auto ) ;;
-     *)
-       { { echo "$as_me:$LINENO: error: invalid argument for --enable-static-standardlibs: $enableval" >&5
-echo "$as_me: error: invalid argument for --enable-static-standardlibs: $enableval" >&2;}
-   { (exit 1); exit 1; }; } ;;
-   esac
-   use_static_standardlibs=$enableval
-else
-  use_static_standardlibs=no
-fi;
-
-
-
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -1981,6 +1952,7 @@ fi
 	       comps="xlc gcc pgcc icc cc"
 	     fi
 	     ;;
+  *-*-darwin*) comps="clang gcc cc" ;;
   *-linux-gnu*) comps="gcc cc pgcc icc xlc" ;;
   *-linux-*) comps="xlc gcc cc pgcc icc" ;;
   *)         comps="xlc_r xlc cc gcc pgcc icc" ;;
@@ -2965,7 +2937,6 @@ rm -f conftest.err conftest.$ac_objext \
   else
     CFLAGS="$OPT_CFLAGS"
   fi
-
 else
   CFLAGS="$CFLAGS $ADD_CFLAGS $CDEFS"
   if test x${DBG_CFLAGS+set} != xset; then
@@ -3099,98 +3070,9 @@ fi
 case "$CC" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
+    LD=link
     ;;
 esac
-
-# check whether to add flags for static linking against standard libraries to LDFLAGS
-if test x$use_static_standardlibs != xno ; then
-  case $build in
-    *-mingw*)
-      static_standardlib_flag=-static
-      ;;
-    *)
-      static_standardlib_flag=-static-libgcc
-      ;;
-  esac
-  case " $LDFLAGS " in
-    *" $static_standardlib_flag "* ) ;;
-    *)
-    echo "$as_me:$LINENO: checking whether linking with $static_standardlib_flag works" >&5
-echo $ECHO_N "checking whether linking with $static_standardlib_flag works... $ECHO_C" >&6
-    coin_save_LDFLAGS="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $static_standardlib_flag"
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-int
-main ()
-{
-int i=0;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-       LDFLAGS="$coin_save_LDFLAGS"
-       if test $use_static_standardlibs = yes ; then
-         { { echo "$as_me:$LINENO: error: failed to link with $static_standardlib_flag" >&5
-echo "$as_me: error: failed to link with $static_standardlib_flag" >&2;}
-   { (exit 1); exit 1; }; }
-       fi
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-    ;;
-  esac
-fi
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3203,7 +3085,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # Get the name of the C++ compiler and appropriate compiler options
 
  #Let's try if that overcomes configuration problem with VC++ 6.0
-
 
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -3230,7 +3111,7 @@ case $build in
       fi ;;
   *-*-solaris*)
   	     comps="CC xlC_r aCC g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
-  *-darwin*) comps="g++ c++ CC" ;;
+  *-darwin*) comps="clang++ g++ c++ CC" ;;
   *-linux-gnu*)
              comps="g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC xlC_r aCC CC" ;;
           *) comps="xlC_r aCC CC g++ c++ pgCC icpc gpp cxx cc++ cl FCC KCC RCC" ;;
@@ -3667,7 +3548,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 coin_cxx_is_cl=false
 # It seems that we need to cleanup something here for the Windows
 case "$CXX" in
-  clang* ) ;;
+  clang* | */clang*) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
     sed -e 's/^void exit (int);//' confdefs.h >> confdefs.hh
     mv confdefs.hh confdefs.h
@@ -4067,102 +3948,13 @@ echo "$as_me: Will use MPI C++ compiler $MPICXX" >&6;}
   CXX="$MPICXX"
 fi
 
-# correct the LD variable in a mingw build with MS or intel compiler
+# correct the LD variable in a build with MS or Intel-windows compiler
 case "$CXX" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
+    LD=link
     ;;
 esac
-
-# check whether to add flag for static linking against standard libraries to LDFLAGS
-if test x$use_static_standardlibs != xno ; then
-  case $build in
-    *-mingw*)
-      static_standardlib_flag=-static
-      ;;
-    *)
-      static_standardlib_flag=-static-libstdc++
-      ;;
-  esac
-  case " $LDFLAGS " in
-    *" $static_standardlib_flag "* ) ;;
-    *)
-    echo "$as_me:$LINENO: checking whether linking with $static_standardlib_flag works" >&5
-echo $ECHO_N "checking whether linking with $static_standardlib_flag works... $ECHO_C" >&6
-    coin_save_LDFLAGS="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $static_standardlib_flag"
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-int
-main ()
-{
-int i=0;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_cxx_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-       LDFLAGS="$coin_save_LDFLAGS"
-       if test $use_static_standardlibs = yes ; then
-         { { echo "$as_me:$LINENO: error: failed to link with $static_standardlib_flag" >&5
-echo "$as_me: error: failed to link with $static_standardlib_flag" >&2;}
-   { (exit 1); exit 1; }; }
-       fi
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-    ;;
-  esac
-fi
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -4176,7 +3968,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 case $build in
   *-cygwin* | *-mingw*)
      if test "$enable_msvc" = yes ; then
-       coin_f77_comps="ifort fl32 compile_f2c gfortran g95 g77"
+       coin_f77_comps="ifort fl32 compile_f2c"
      else
        coin_f77_comps="gfortran ifort g95 g77 fl32 compile_f2c"
      fi ;;
@@ -4186,8 +3978,6 @@ case $build in
      coin_f77_comps="gfortran ifort g95 fort77 f77 g77 pgf90 pgf77 ifc frt af77 xlf_r" ;;
   *) coin_f77_comps="xlf_r fort77 gfortran ifort g95 f77 g77 pgf90 pgf77 ifc frt af77" ;;
  esac
-
-
 
 
 
@@ -4402,7 +4192,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4405:" \
+echo "$as_me:4195:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -4738,7 +4528,6 @@ rm -f conftest.err conftest.$ac_objext \
   else
     FFLAGS="$OPT_FFLAGS"
   fi
-
 else
   FFLAGS="$FFLAGS $ADD_FFLAGS"
   if test x${DBG_FFLAGS+set} != xset; then
@@ -4845,90 +4634,15 @@ echo "$as_me: Will use MPI Fortran compiler $MPIF77" >&6;}
 fi
 
 # correct the LD variable if we use the intel fortran compiler in windows
-case "$F77" in
-  ifort* | */ifort* | IFORT* | */IFORT*)
-
- case $build in
-  *-mingw*)
-    if test "${LD+set}" = set; then :; else
-      LD=link
-    fi
-    ;;
- esac
- if test $enable_msvc = yes ; then
-   if test "x${LD+set}" = xset; then :; else
-     LD=link
-   fi
- fi
-
-    ;;
+case $build in
+  *-cygwin* | *-mingw*)
+    case "$F77" in
+      ifort* | */ifort* | IFORT* | */IFORT*)
+        LD=link
+      ;;
+    esac
+  ;;
 esac
-
-# check whether to add flag for static linking against standard libraries to LDFLAGS
-if test x$use_static_standardlibs != xno ; then
-  case $build in
-    *-mingw*)
-      static_standardlib_flag=-static
-      ;;
-    *)
-      static_standardlib_flag=-static-libgfortran
-      ;;
-  esac
-  case " $LDFLAGS " in
-    *" $static_standardlib_flag "* ) ;;
-    *)
-    echo "$as_me:$LINENO: checking whether linking with $static_standardlib_flag works" >&5
-echo $ECHO_N "checking whether linking with $static_standardlib_flag works... $ECHO_C" >&6
-    coin_save_LDFLAGS="$LDFLAGS"
-    LDFLAGS="$LDFLAGS $static_standardlib_flag"
-    cat >conftest.$ac_ext <<_ACEOF
-      program main
-      integer i
-      end
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_f77_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-       LDFLAGS="$coin_save_LDFLAGS"
-       if test $use_static_standardlibs = yes ; then
-         { { echo "$as_me:$LINENO: error: failed to link with $static_standardlib_flag" >&5
-echo "$as_me: error: failed to link with $static_standardlib_flag" >&2;}
-   { (exit 1); exit 1; }; }
-       fi
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-    ;;
-  esac
-fi
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -4956,23 +4670,30 @@ echo "$as_me: error: Shared libraries are disabled by user, but this is not feas
   fi
   enable_shared=yes;
 else
-  # On Cygwin and AIX, building DLLs doesn't work
   case $build in
     *-cygwin* | *-mingw*)
       coin_disable_shared=yes
       if test x"$enable_shared" = xyes; then
-        case "$CXX" in
+        case "$CC" in
           clang* )
-            { echo "$as_me:$LINENO: WARNING: DLL building not supported. I'm disabling your choice." >&5
-echo "$as_me: WARNING: DLL building not supported. I'm disabling your choice." >&2;}
+            { echo "$as_me:$LINENO: WARNING: Building of DLLs not supported in this configuration." >&5
+echo "$as_me: WARNING: Building of DLLs not supported in this configuration." >&2;}
             ;;
           cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
-            { echo "$as_me:$LINENO: DLL building not supported, but will build with -MD(d) instead of -MT(d)." >&5
-echo "$as_me: DLL building not supported, but will build with -MD(d) instead of -MT(d)." >&6;}
+            { echo "$as_me:$LINENO: Building of DLLs not supported in this configuration." >&5
+echo "$as_me: Building of DLLs not supported in this configuration." >&6;}
+            ;;
+          *gcc*)
+            if test x"$enable_dependency_linking" = xyes; then
+              coin_disable_shared=no
+            else
+              { echo "$as_me:$LINENO: WARNING: Dependency linking seems to be disabled, so shared libraries (DLLs) will not be built" >&5
+echo "$as_me: WARNING: Dependency linking seems to be disabled, so shared libraries (DLLs) will not be built" >&2;}
+            fi
             ;;
           *)
-            { echo "$as_me:$LINENO: WARNING: DLL building not supported. I'm disabling your choice." >&5
-echo "$as_me: WARNING: DLL building not supported. I'm disabling your choice." >&2;}
+            { echo "$as_me:$LINENO: WARNING: Building of DLLs not supported in this configuration." >&5
+echo "$as_me: WARNING: Building of DLLs not supported in this configuration." >&2;}
             ;;
         esac
       fi
@@ -4981,8 +4702,8 @@ echo "$as_me: WARNING: DLL building not supported. I'm disabling your choice." >
       coin_disable_shared=yes
       platform=AIX
       if test x"$enable_shared" = xyes; then
-        { echo "$as_me:$LINENO: WARNING: Shared objects are not supported. I'm disabling your choice." >&5
-echo "$as_me: WARNING: Shared objects are not supported. I'm disabling your choice." >&2;}
+        { echo "$as_me:$LINENO: WARNING: Shared objects are not supported." >&5
+echo "$as_me: WARNING: Shared objects are not supported." >&2;}
       fi
     ;;
   esac
@@ -6699,7 +6420,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6702 "configure"' > conftest.$ac_ext
+  echo '#line 6423 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8663,11 +8384,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8666: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8387: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8670: \$? = $ac_status" >&5
+   echo "$as_me:8391: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8931,11 +8652,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8934: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8655: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8938: \$? = $ac_status" >&5
+   echo "$as_me:8659: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9035,11 +8756,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9038: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8759: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9042: \$? = $ac_status" >&5
+   echo "$as_me:8763: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11380,7 +11101,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11383 "configure"
+#line 11104 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11480,7 +11201,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11483 "configure"
+#line 11204 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13824,11 +13545,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13827: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13548: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13831: \$? = $ac_status" >&5
+   echo "$as_me:13552: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13928,11 +13649,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13931: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13652: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13935: \$? = $ac_status" >&5
+   echo "$as_me:13656: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15498,11 +15219,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15501: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15222: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15505: \$? = $ac_status" >&5
+   echo "$as_me:15226: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15602,11 +15323,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15605: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15326: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15609: \$? = $ac_status" >&5
+   echo "$as_me:15330: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17809,11 +17530,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17812: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17533: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17816: \$? = $ac_status" >&5
+   echo "$as_me:17537: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18077,11 +17798,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18080: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17801: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18084: \$? = $ac_status" >&5
+   echo "$as_me:17805: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18181,11 +17902,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18184: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17905: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:18188: \$? = $ac_status" >&5
+   echo "$as_me:17909: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -20873,7 +20594,6 @@ echo "$as_me: Build is \"$build\"." >&6;}
   case $build in
     *-mingw*)
       CYGPATH_W=echo
-      mydos2unix=
       ;;
   esac
 
@@ -21071,13 +20791,37 @@ if test "${enable_dependency_linking+set}" = set; then
   enableval="$enable_dependency_linking"
   dependency_linking="$enableval"
 else
-  dependency_linking=no
+  dependency_linking=auto
 fi;
 
-# ToDo
-# For now, don't use the -no-undefined flag, since the Makefiles are
-# not yet set up that way.  But we need to fix this, when we want
-# to comile DLLs under Windows.
+if test "$dependency_linking" = auto; then
+  # On Cygwin and AIX, building DLLs doesn't work
+  dependency_linking=no
+  if test x"$coin_disable_shared" = xno; then
+    case $build in
+      *-cygwin* | *-mingw*)
+        case "$CC" in
+          clang* )
+            dependency_linking=yes
+            ;;
+          cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
+            dependency_linking=no
+            ;;
+          *gcc*)
+            dependency_linking=yes
+            ;;
+          *)
+            dependency_linking=yes
+            ;;
+        esac
+        ;;
+      *)
+        dependency_linking=yes
+        ;;
+    esac
+  fi
+fi
+
 if test "$dependency_linking" = yes ;
 then
   LT_LDFLAGS="-no-undefined"
@@ -21347,7 +21091,7 @@ fi
 
 
 
-  if test $coin_has_lapack != skipping; then
+  if test $coin_has_lapack != no; then
     #--with-lapack can overwrite --with-lapack-lib, and can be set to BUILD to enforce building lapack
 
 # Check whether --with-lapack or --without-lapack was given.

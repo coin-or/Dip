@@ -105,7 +105,6 @@ libDecomp_la_SOURCES +=        \
 # branching
 libDecomp_la_SOURCES += 	\
 	DecompBranchObject.h	\
-	DecompBranchObject.cpp 	\
 	DecompBranchStrategy.h	\
 	DecompBranchStrategy.cpp \
 	DecompBranchStrategyMaxInf.h \
