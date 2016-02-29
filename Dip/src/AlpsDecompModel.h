@@ -89,6 +89,12 @@ private:
    int    m_nodesProcessed;
    int    m_alpsStatus;
 
+   DecompBranchStrategy* m_branchStrategy; 
+
+   int    m_numBranchResolve;
+
+
+ 
    /**
     * @}
     */
@@ -107,7 +113,10 @@ public:
       AlpsModel    (),
       m_classTag   ("ALPSM"),
       m_param      (),
-      m_decompAlgo (NULL) {
+      m_decompAlgo (NULL),
+      m_branchStrategy(NULL), 
+      m_numBranchResolve(0) {
+
    }
 
    AlpsDecompModel(UtilParameters& utilParam,
@@ -115,7 +124,9 @@ public:
       AlpsModel   (),
       m_classTag  ("ALPSM"),
       m_param     (utilParam),
-      m_decompAlgo(decompAlgo) {
+      m_decompAlgo(decompAlgo),
+      m_branchStrategy(NULL),
+      m_numBranchResolve(0) {
       if (decompAlgo == NULL)
          throw UtilException("No DecompAlgo algorithm has been set.",
                              "AlpsDecompModel", "AlpsDecompModel");
@@ -123,6 +134,8 @@ public:
       setAlpsSettings();
    }
 
+   inline int getNumBranchResolve() const {return m_numBranchResolve;} 
+   inline void setNumBranchResolve(int num) {m_numBranchResolve = num;} 
    /**
     * Destructor.
     */
@@ -193,7 +206,9 @@ public:
       return m_param;
    }
 
-
+   inline DecompBranchStrategy* getBranchStrategy() const{
+      return m_branchStrategy; 	
+   } 	 
    /**
     * Get number of rows in core decomp model.
     */
