@@ -242,11 +242,11 @@ void DecompApp::connectedComponentsDetection()
 
       if (setPartitionOrCover == true ) {
          if (rowSense[i] == 'G') {
-            masterRowTypeMap.insert(std::make_pair < int,
+            masterRowTypeMap.insert(std::pair < int,
                                     DecompMasterRowType > (i, SET_COVERING));
             masterRowTypeCount.at(SET_COVERING) += 1;
          } else if (rowSense[i] == 'E') {
-            masterRowTypeMap.insert(std::make_pair < int,
+            masterRowTypeMap.insert(std::pair < int,
                                     DecompMasterRowType > (i,
                                           SET_PARTITIONING));
             masterRowTypeCount.at(SET_PARTITIONING) += 1;
