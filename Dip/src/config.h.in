@@ -24,16 +24,13 @@
 /* Define to 1 if the Cpx package is available */
 #undef COIN_HAS_CPX
 
-/* Define to 1 if the Grb package is available */
-#undef COIN_HAS_GRB
-
 /* Define to 1 if the HMetis package is available */
 #undef COIN_HAS_HMETIS
 
 /* Define to 1 if the Sample package is available */
 #undef COIN_HAS_SAMPLE
 
-/* Define to 1 if the SYMPHONY package is available */
+/* Define to 1 if the Symphony package is available */
 #undef COIN_HAS_SYMPHONY
 
 /* SVN revision number of project */
