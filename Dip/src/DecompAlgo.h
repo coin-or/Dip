@@ -143,11 +143,12 @@ protected:
     *   PC : holds model core in reformulated space
     */
    OsiSolverInterface* m_masterSI;
-
+   
 #ifdef __DECOMP_IP_SYMPHONY__
    OsiSymSolverInterface* osi_Sym;
    CoinWarmStart* ws;
 #endif
+
    /**
     * Solver interface(s) for entire problem (Q'').
     *   CPM: not used (use m_masterSI)
@@ -271,9 +272,14 @@ protected:
 
    DecompBranchingImplementation m_branchingImplementation;
 
+
+   std:: vector<int>   m_branchedMasterOnly; 
+
+
    // variable tracking the subproblem solving phase 
    // not for initial columns generation (always inexact)
    DecompSubSolvePhase subProbSolvePhase; 
+
 public:
    /**
     * @}
@@ -1003,6 +1009,41 @@ public:
    inline void setLastPhase(DecompPhase phase) {
       m_phaseLast = phase;
    }
+
+
+   int branchOnMasterOnly(){
+   //   const double* primSol = m_masterSI->getColSolution();	
+      DecompConstraintSet* modelCore = m_modelCore.getModel();
+      std::vector<int>::iterator intIt; 
+      double temp(0.0); 
+      for(intIt = modelCore->masterOnlyCols.begin(); intIt != modelCore->masterOnlyCols.end();
+           ++intIt){
+        if (std::find(modelCore->integerVars.begin(), modelCore->integerVars.end(),
+                *intIt)!= modelCore->integerVars.end()){
+            std::cout << "The master only index is " << *intIt << std::endl; 
+  //          temp = primSol[m_masterOnlyColsMap[*intIt]]; 
+
+            if (  
+                std::find(m_branchedMasterOnly.begin(), m_branchedMasterOnly.end(),
+                             *intIt)!= m_branchedMasterOnly.end())
+              {	
+    //           temp = primSol[m_masterOnlyColsMap[*intIt]];             
+    //        if (temp <= fabs(temp)+0.0001 && temp >= fabs(temp) -0.0001){
+		continue; 
+	     }
+	    else{
+            m_branchedMasterOnly.push_back(*intIt);
+            return *intIt;
+	    }
+	}
+	else{
+	     return -1; 
+       	}
+	}
+      return -1; 
+    }	
+    
+
    //-----------------------------------------------------------------------//
    /**
     * @name Constructors and destructor.
@@ -1060,8 +1101,10 @@ public:
       branchStrategy_(NULL),
       rampUpBranchStrategy_(NULL),
       tempTimeLimit(0),
-	  subProbSolvePhase(SUBSOLVE_PHASE_INEXACT),
+      m_branchedMasterOnly(), 
+      subProbSolvePhase(SUBSOLVE_PHASE_INEXACT),
       m_branchingImplementation(DecompBranchInSubproblem) {
+
       m_app->m_decompAlgo = this;
    }
 
