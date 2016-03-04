@@ -45,6 +45,9 @@ AlpsDecompTreeNode::createNewTreeNode(AlpsNodeDesc*& desc) const
    AlpsDecompModel*     model
    = dynamic_cast<AlpsDecompModel*>(desc->getModel());
    AlpsDecompParam&     param = model->getParam();
+
+   DecompBranchStrategy *strategy = model->getBranchStrategy(); 
+
    UtilPrintFuncBegin(&cout, m_classTag,
                       "createNewTreeNode()", param.msgLevel, 3);
    AlpsDecompTreeNode* node = new AlpsDecompTreeNode(desc);
@@ -145,7 +148,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
    DecompConstraintSet* modelCore = decompAlgo->getModelCore().getModel();
    const int             n_cols    = modelCore->getNumCols();
    //TODO: cutoffIncrement (currentUB-cutoffIncrement)
-
+   bool foundSolution; 
    /** \todo get primalTolerance from parameter */
    if ((parentObjValue - primalTolerance) > currentUB) {
       doFathom = true;
@@ -365,12 +368,21 @@ TERM_PROCESS:
    //--- so, we fake it by acting like a branching candidate was found
    //---
    decompAlgo->postProcessNode(decompStatus);
-
+   int numPassesLeft = 0 ; 
+   
    if (param.nodeLimit == 0) {
       setStatus(AlpsNodeStatusPregnant);
    } else if (doFathom) { // || param.nodeLimit == 0){
       setStatus(AlpsNodeStatusFathomed);
    } else {
+
+      numPassesLeft = model->getNumBranchResolve(); 
+/*
+      status = selectBranchObject(model, 
+				  foundSolution, 
+	 			  numPassesLeft); 
+      --numPassesLeft; 
+*/     	      
       status = chooseBranchingObject(model);
       decompAlgo->postProcessBranch(decompStatus);
    }
@@ -644,10 +656,14 @@ int AlpsDecompTreeNode::selectBranchObject(AlpsDecompModel* model,
       strategy = model->getDecompAlgo()->getBranchStrategy();
    }
 
+   // create braching object candidates
+       
    branchStatus = strategy->createCandBranchObjects(numPassesLeft,
                   model->getDecompAlgo()->getCutoffUB());
+   
    DecompBranchObject* branchObject_;
 
+   // select the best branching objects  
    if (branchStatus >= 0) {
       branchObject_ = strategy->getBestBranchObject();
 
@@ -897,4 +913,3 @@ AlpsDecompTreeNode::decode(AlpsEncoded& encoded) const
              <<  treeNode->getSentMark() << std::endl;
    return treeNode;
 }
-
