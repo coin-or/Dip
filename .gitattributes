@@ -432,7 +432,6 @@ Dip/src/DecompApp.cpp -text
 Dip/src/DecompApp.h -text
 Dip/src/DecompBranch.cpp -text
 Dip/src/DecompBranchObject.h -text
-Dip/src/DecompBranchStrategy.cpp -text
 Dip/src/DecompBranchStrategy.h -text
 Dip/src/DecompBranchStrategyMaxInf.cpp -text
 Dip/src/DecompBranchStrategyMaxInf.h -text
