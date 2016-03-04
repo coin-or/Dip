@@ -102,6 +102,12 @@ libDecomp_la_SOURCES +=        \
 	UtilMacrosAlps.cpp     \
 	UtilMacrosAlps.h       
 
+<<<<<<< .mine
+# List all additionally required libraries
+if DEPENDENCY_LINKING
+libDecomp_la_LIBADD = $(DIPLIB_LIBS)
+endif
+=======
 # branching
 libDecomp_la_SOURCES += 	\
 	DecompBranchObject.h	\
@@ -109,6 +115,7 @@ libDecomp_la_SOURCES += 	\
 	DecompBranchStrategy.cpp \
 	DecompBranchStrategyMaxInf.h \
 	DecompBranchStrategyMaxInf.cpp
+>>>>>>> .r1545
 
 # This is for libtool
 libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
@@ -160,6 +167,10 @@ if CPLEX_LP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_LP_CPX__
 endif
 
+if GRB_LP_SOLVER
+  AM_CPPFLAGS += -D__DECOMP_LP_GRB__
+endif
+
 ########################################################################
 #                     Includes for IP Solver                           #
 ########################################################################
@@ -172,6 +183,10 @@ endif
 
 if CPLEX_IP_SOLVER
   AM_CPPFLAGS += -D__DECOMP_IP_CPX__
+endif
+
+if GRB_IP_SOLVER
+  AM_CPPFLAGS += -D__DECOMP_IP_GRB__
 endif
 
 if SYMPHONY_IP_SOLVER
@@ -234,13 +249,6 @@ includecoin_HEADERS +=             \
 	AlpsDecompNodeDesc.h   \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
-
-# Braching
-
-includecoin_HEADERS +=   	\	
-	DecompBranchObject.h	\
-	DecompBranchStrategy.h	\		
-	DecompBranchStrategyMaxInf.h 
 
 ########################################################################
 #                     Installing manifest (MSVC++)                     #
