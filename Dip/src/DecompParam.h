@@ -687,9 +687,9 @@ public:
       SolveMasterAsIpLimitTime = 30;
       SolveMasterAsIpLimitGap  = 0.05; //5% gap
       SolveRelaxAsIp           = 0;
-      SolveMasterUpdateAlgo    = DecompDualSimplex;
+      //SolveMasterUpdateAlgo    = DecompDualSimplex;
       // SolveMasterUpdateAlgo    = DecompPrimSimplex;
-      //      SolveMasterUpdateAlgo    = DecompBarrier;
+      SolveMasterUpdateAlgo    = DecompDualSimplex;
       InitVarsWithCutDC        = 0;
       InitVarsWithIP           = 0;
       InitVarsWithIPLimitTime  = 10;
@@ -744,7 +744,7 @@ public:
       WarmStartNodeRatio       = 0.5; 
       WarmStartNodeLevel       = 3; 
       WarmStartNodeLevelRatio  = 0.5;  
-	  IterLimitInexactSubSolving = 5;
+      IterLimitInexactSubSolving = 0;
 	  InitialOptimalityGapInexactSubSolving = 0.9;
 	  OptimalGapStepSizeInexactSubSolving = 0.1;
      }
