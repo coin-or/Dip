@@ -37,11 +37,31 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
    const double* objCoeff = getOrigObjective();
    DecompConstraintSet* modelCore = m_modelCore.getModel();
    maxDist         = DecompEpsilon;//TODO: parameter
+	
+	
    branchedOnIndex = -1;
    branchedOnValue =  0;
    CoinAssert(modelCore->integerVars.size() > 0);
    // const std::vector<std::string> & colNames = modelCore->getColNames();
-
+      
+   if(m_param.BranchPriorityMasterOnly == true 
+      && !modelCore->masterOnlyCols.empty()){
+          j = branchOnMasterOnly();
+          std::cout << "The branch index is " << j << std::endl;
+	if (j != -1){
+            x = m_xhat[j];	
+            obj +=m_xhat[j]*objCoeff[j];
+            branchedOnIndex = j; 
+            branchedOnValue = x; 
+	    m_branchingImplementation = DecompBranchInMaster;      
+     }
+        else
+          {
+	   m_param.BranchPriorityMasterOnly = false; 
+	}
+      }
+ 
+   else {
    for (intIt =  modelCore->integerVars.begin();
          intIt != modelCore->integerVars.end(); intIt++) {
       j   = *intIt;
@@ -54,8 +74,12 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
          branchedOnIndex = j;
          branchedOnValue = x;
       }
+    }
+     if (std::find(m_branchedMasterOnly.begin(), m_branchedMasterOnly.end(), branchedOnIndex)
+         != m_branchedMasterOnly.end()){
+	  branchedOnIndex = -1; 
+	}
    }
-
    std::map<int, int >:: iterator mit;
 
    if (branchedOnIndex != -1) {
@@ -70,6 +94,7 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
          // it indicates the branched variable is a master-only variable
          // we need to set the branching method to branch in the master
          m_branchingImplementation = DecompBranchInMaster;
+         std::cout << "branch in master " << branchedOnIndex << std::endl;
       }
       
       //std::cout << "The branching variable is " << branchedOnIndex
