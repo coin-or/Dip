@@ -1,5 +1,7 @@
 # DIP README
 
+[![Build Status](https://travis-ci.org/coin-or/Dip.svg?branch=master)](https://travis-ci.org/coin-or/Dip)
+
 Welcome to the README for the Decomposition in Integer Programming (DIP)
 Framework. DIP is distributed under the Eclipse Public License and is freely
 redistributable. All source code and documentation is Copyright Matthew

@@ -108,7 +108,7 @@ def relaxed_solver(prob, table, redCosts, target):
             print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
     return DipSolStatOptimal, dvs
 
-seating_model.relaxed_solver = relaxed_solver
+#seating_model.relaxed_solver = relaxed_solver
 
 #seating_model.writeLP('wedding_main.lp')
 #for table in tables:
