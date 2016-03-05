@@ -12,11 +12,8 @@
 // Copyright (C) 2002-2013, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
-
-
 #ifndef DECOMP_APP_INCLUDED
 #define DECOMP_APP_INCLUDED
-
 //===========================================================================//
 #include "UtilParameters.h"
 #include "DecompParam.h"
@@ -26,20 +23,15 @@
 #include "CoinMpsIO.hpp"
 #include "CoinLpIO.hpp"
 
-
 #include "Alps.h"
 #include "AlpsKnowledge.h"
-
 
 extern "C" {
 #if defined (COIN_HAS_METIS)
 #include "hmetis.h"
 #endif
 }
-
 class DecompAlgo;
-//===========================================================================//
-
 //===========================================================================//
 /*!
  * \class DecompApp
