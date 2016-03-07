@@ -51,6 +51,12 @@ or here on Github.
 
 # CHANGELOG
 
+## Release 0.92.3
+ * Update dependencies
+ * Minor bug fix
+ * Add support for Appveyor and Travis
+ * Install examples with DipPy
+
 ## Release 0.92.2
  * Get rid of pesky global variable DecompInf
  * Fix bugs in wedding planner example
