@@ -377,7 +377,7 @@ elif algo == 'Price':
 else:
     dippyOpts['doCut'] = '1'
 
-#dippyOpts['TolZero'] = '%s' % tol
+dippyOpts['TolZero'] = '%s' % tol
   
 dippy.Solve(prob, dippyOpts)
 
