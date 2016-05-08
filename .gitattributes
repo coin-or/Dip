@@ -52,7 +52,7 @@ Dip/config.guess -text
 Dip/config.sub -text
 Dip/configure -text
 Dip/configure.ac -text
-Dip/data/AP3/ReadMe.txt -text
+Dip/data/AP3/README.md -text
 Dip/data/AP3/Saltzman.tgz -text
 Dip/data/ATM/ReadMe.txt -text
 Dip/data/ATM/ampl.tgz -text
@@ -98,7 +98,7 @@ Dip/data/MAD/steiner/madlib.steiner.list -text
 Dip/data/MAD/steiner/madlib.steiner.opt -text
 Dip/data/MAD/unzip.sh -text
 Dip/data/MCF/get.data -text
-Dip/data/MEWCP/ReadMe.txt -text
+Dip/data/MEWCP/README.md -text
 Dip/data/MILP/block/get.data -text
 Dip/data/MILP/block/results/parameters.txt -text
 Dip/data/MILP/block/results/retail_cpx11.300.txt -text

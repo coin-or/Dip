@@ -1,1 +1,1 @@
-wget --no-check-certificate http://coral.ie.lehigh.edu/~magh/decomp/data_gap.tgz
+wget https://github.com/tkralphs/DecompLib/blob/master/gap/gap.tgz
