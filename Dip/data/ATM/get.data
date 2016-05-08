@@ -1,1 +1,2 @@
-wget http://coral.ie.lehigh.edu/~magh/decomp/atm_rand.tgz
+wget https://github.com/tkralphs/DecompLib/blob/master/atm/atm.tgz
+
