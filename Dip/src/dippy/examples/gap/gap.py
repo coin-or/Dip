@@ -94,6 +94,11 @@ def solve_subproblem(prob, machine, redCosts, target):
         print "z, solution =", z, solution
         print "rc", -z
 
+    if z < -tol: # Zero solution is optimal
+        if debug_print:
+            print "Zero solution is optimal"
+        return DipSolStatOptimal, [{}]
+
     var_values = dict([(var[i], 1) for i in solution])
 
     if debug_print:
@@ -158,7 +163,7 @@ def knapsack01(obj, weights, capacity):
         
     return c[n-1][capacity], solution
 
-prob.relaxed_solver = solve_subproblem
+#prob.relaxed_solver = solve_subproblem
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,

@@ -90,6 +90,11 @@ def solve_subproblem(prob, key, redCosts, target):
         print "redCosts[use_vars[loc]] =", redCosts[use_vars[loc]]
         print "Fixed cost, rc", FIXED_COST[loc], redCosts[use_vars[loc]] - z
 
+    if redCosts[use_vars[loc]] > z + tol: # ... or an empty location is "useful"
+        if debug_print:
+            print "Zero solution is optimal"
+        return DipSolStatOptimal, [{}]
+
     var_values = dict([(avars[i], 1) for i in solution])
     var_values[use_vars[loc]] = 1
 
@@ -356,7 +361,7 @@ if debug_print_lp:
 
 #prob.writeFull('facility.lp', 'facility.dec')
 
-prob.relaxed_solver = solve_subproblem
+#prob.relaxed_solver = solve_subproblem
 #prob.init_vars = init_one_each
 #prob.init_vars = init_first_fit
 #prob.generate_cuts = generate_weight_cuts
