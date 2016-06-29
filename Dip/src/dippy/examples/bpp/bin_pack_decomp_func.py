@@ -95,6 +95,11 @@ def solve_subproblem(prob, index, redCosts, target):
         waste = CAPACITY - sum(weights[i] for i in solution)
         rc += redCosts[waste_vars[loc]] * waste
 
+    if redCosts[use_vars[loc]] > z + tol: # ... or an empty location is "useful"
+        if debug_print:
+            print "Zero solution is optimal"
+        return DipSolStatOptimal, [{}]
+
     # Return the solution if the reduced cost is low enough
     var_values = [(assign_vars[(loc, i)], 1) for i in solution]
     var_values.append((use_vars[loc], 1))
