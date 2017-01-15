@@ -83,8 +83,6 @@ PyObject* pyTupleList_FromNode(DecompAlgo* algo, DecompStatus decompStatus)
                     PyInt_FromLong(node->getDepth()));
    addTupleToPyList(pOutput, PyString_FromString("nodeQuality"),
                     PyFloat_FromDouble(quality));
-   addTupleToPyList(pOutput, PyString_FromString("nodeDiving"),
-                    PyInt_FromLong((int)(node->getDiving())));
    addTupleToPyList(pOutput, PyString_FromString("globalLB"),
                     PyFloat_FromDouble(lb));
    addTupleToPyList(pOutput, PyString_FromString("globalUB"),
