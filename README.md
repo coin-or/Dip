@@ -12,6 +12,8 @@ redistributed freely.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/omb0lhiutlh6qnco/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
 
+[![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
+
 # DOCUMENTATION
 
 For a quick start guide, please see the INSTALL file in this distribution.
