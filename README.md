@@ -14,6 +14,8 @@ redistributed freely.
 
 [![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
 
+[ ![Download](https://api.bintray.com/packages/coin-or/download/Dip/images/download.svg?version=0.92) ](https://bintray.com/coin-or/download/Dip/0.92/link)
+
 # DOCUMENTATION
 
 For a quick start guide, please see the INSTALL file in this distribution.
