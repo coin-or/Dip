@@ -333,6 +333,9 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
 					             pRedCostList,
 					             pConvexDual);
 
+   Py_DECREF(pRedCostList);
+   Py_DECREF(pConvexDual);
+
    if ( (pStatandVarList == NULL) || (pStatandVarList == Py_None) ){
       throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
    }
@@ -380,10 +383,15 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
          varVals.push_back(value);
       }
 
+      Py_DECREF(pKeys);
+      Py_DECREF(pTuple);
+
       DecompVar* var =  new DecompVar(varInds, varVals, rc, cost);
       var->setBlockId(whichBlock);
       varList.push_back(var);
    }
+
+   Py_DECREF(pStatandVarList);
 
    return status;
 }

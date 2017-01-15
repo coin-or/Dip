@@ -69,7 +69,9 @@ for i, j in ASSIGNMENTS:
 def solve_subproblem(prob, key, redCosts, target):
     if debug_print:
         print "solve_subproblem..."
+        print "reduced costs:"
         print redCosts
+        print "target value:", target
    
     loc = key
 
@@ -383,7 +385,7 @@ else:
     dippyOpts['doCut'] = '1'
 
 dippyOpts['TolZero'] = '%s' % tol
-  
+
 dippy.Solve(prob, dippyOpts)
 
 if prob.display_mode != 'off':
