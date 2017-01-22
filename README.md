@@ -16,6 +16,8 @@ redistributed freely.
 
 [ ![Download](https://api.bintray.com/packages/coin-or/download/Dip/images/download.svg?version=0.92) ](https://bintray.com/coin-or/download/Dip/0.92/link)
 
+Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/Dip) 
+
 ## Cite
 
 [![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
