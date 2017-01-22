@@ -6,17 +6,21 @@ redistributable. All source code and documentation is Copyright Matthew
 Galati, Ted Ralphs, Lehigh University, and others. This README may be 
 redistributed freely.
 
-# Current Testing Status
+## Current Testing Status
 
 [![Build Status](https://travis-ci.org/coin-or/Dip.svg?branch=master)](https://travis-ci.org/coin-or/Dip)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/omb0lhiutlh6qnco/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
 
-[![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
+## Download
 
 [ ![Download](https://api.bintray.com/packages/coin-or/download/Dip/images/download.svg?version=0.92) ](https://bintray.com/coin-or/download/Dip/0.92/link)
 
-# DOCUMENTATION
+## Cite
+
+[![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
+
+## DOCUMENTATION
 
 For a quick start guide, please see the INSTALL file in this distribution.
 Automatically generated documentation of the source code can be found here:
@@ -27,14 +31,14 @@ Further information can be found here:
 
 http://projects.coin-or.org/Dip
 
-# SUPPORT
+## SUPPORT
 
-## List Serve
+### List Serve
 
 DIP users should use the Dip mailing list. To subscribe, go to 
 http://list.coin-or.org/mailman/listinfo/dip
 
-## Bug Reports
+### Bug Reports
 
 Bug reports should be reported on the DIP development web site at
 
@@ -42,7 +46,7 @@ https://projects.coin-or.org/Dip/newticket
 
 or here on Github.
 
-# SCREEN SHOTS
+## SCREEN SHOTS
 
 ###Using DipPy in [Solver Studio](http://solverstudio.org)
 ![Solver Studio Pic 1](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic1.png)
@@ -53,32 +57,32 @@ or here on Github.
 ###Editing DipPy Model with Eclipse and PyDev
 ![DipPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/DipPyPic2.png)
 
-# CHANGELOG
+## CHANGELOG
 
-## Release 0.92.3
+### Release 0.92.3
  * Update dependencies
  * Minor bug fix
  * Add support for Appveyor and Travis
  * Install examples with DipPy
 
-## Release 0.92.2
+### Release 0.92.2
  * Get rid of pesky global variable DecompInf
  * Fix bugs in wedding planner example
  * Fix bugs in DipPy to allow returning no solutions, even when an exact 
    subprobem solver is used and to allow no branching candidates when 
    branching. 
 
-## Release 0.91.6
+### Release 0.91.6
  * Fixed bugs in Wedding Planner example.
  * Fixed bug in DipPy having to do with branching.
 
-## Release 0.92.1
+### Release 0.92.1
  * Fixed problem with dependency linking
 
-## Release 0.91.5
+### Release 0.91.5
  * Fixed bug with SYMPHONY when not all solutions are accepted.
 
-## Release 0.92.0
+### Release 0.92.0
  * Substantially re-designed internals
  * Renamed classes, functions, and parameters more intuitively
  * Eliminated unnecessary "MILP" parameter section and joined it to "DECOMP,"
@@ -94,31 +98,31 @@ or here on Github.
    also means that the user was previously required to provide a full
    description of the subproblem.
 
-## Release 0.91.4
+### Release 0.91.4
  * Fixed bugs in examples
  * Updates to dependencies
  * Samll bug fixes
 
-## Release 0.91.4
+### Release 0.91.4
  * Fixed bugs in examples
  * Updates to dependencies
  * Samll bug fixes
 
-## Release 0.91.3
+### Release 0.91.3
  * Fixes for correctly producing Doxygen documentation
 
-## Release 0.91.2
+### Release 0.91.2
  * Fixed issue with master only variable when solving master as an integer 
    program.
  * Added ability to generate multiple columns per iteration with SYMPHONY and 
    Cbc. 
 
-## Release 0.91.1
+### Release 0.91.1
  * Updating dependencies.
  * Fix for dependency linking
  * Fix to installation with {{{DESTDIR}}}
 
-## Release 0.91.0
+### Release 0.91.0
  * Multiple parallel modes added
    * Solution of individual subproblems can be parallelized
    * Multiple subproblems can be solved simultaneously
@@ -129,25 +133,25 @@ or here on Github.
  * Unbounded feasible regions now supported.
  * Explicit treatment of master-only variables.
 
-## Release 0.9.12:
+### Release 0.9.12:
 
  * Fixed long-standing issues with stand-alone apps
 
  * Small some bug fixes 
 
-## Release 0.9.11:
+### Release 0.9.11:
 
  * Added some new DipPy examples
 
  * Small bug fixes 
 
-## Release 0.9.10:
+### Release 0.9.10:
 
  * Fixes to stand-alone app examples
 
  * Fixes to Visual studio files for examples to support property pages 
 
-New Stable Version 0.91:
+##New Stable Version 0.91:
 
  * Changes to the DipPy callback interface to make it more user friendly
 
@@ -155,51 +159,51 @@ New Stable Version 0.91:
 
  * Planning for other changes to the internal algorithm 
 
-## Release 0.9.9:
+### Release 0.9.9:
 
  * Fixes to DipPy build and examples
 
  * Fixes to allow CGL cuts to be generated from within DipPy branch and price. 
 
-## Release 0.9.8:
+### Release 0.9.8:
 
  * Fixes to DipPy examples
 
  * Support for dependency linking 
 
-## Release 0.9.7:
+### Release 0.9.7:
 
  * Fixes to DipPy examples
 
  * Support for dependency linking 
 
-## Release 0.9.6:
+### Release 0.9.6:
 
  * Fixes to allow proper installation of DipPy on Mac OS X 
 
-## Release 0.9.5:
+### Release 0.9.5:
 
  * Small fixes to DipPy
 
-## Release 0.9.4:
+### Release 0.9.4:
 
  * Fixes to parallel subproblem solution mode with OpenMP
 
-## Release 0.9.3:
+### Release 0.9.3:
 
  * More updates to build system
 
-## Release 0.9.2:
+### Release 0.9.2:
 
  * Updates to build system
 
-## Release 0.9.1:
+### Release 0.9.1:
 
  * Fixes to Python installation
 
  * Fix to DipPy
 
-## Release 0.9.0:
+### Release 0.9.0:
 
  * DIP now includes DipPy, a Python-based modeling language.
 
@@ -214,19 +218,19 @@ New Stable Version 0.91:
 
  * Numerous bug fixes and improvements. 
 
-## Release 0.82.2:
+### Release 0.82.2:
 
  * Fixes to build system
 
  * Updates to dependencies
 
-## Release 0.82.1:
+### Release 0.82.1:
 
  * Fixes to build system
 
  * Updates to dependencies
 
-## Release 0.82.0:
+### Release 0.82.0:
 
  * Support for MSVC++ version 10 added.
 
