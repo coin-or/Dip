@@ -188,7 +188,8 @@ void pyColDict_AsPairedVector(PyObject* pColDict, vector<pair<int, double> >& ve
       index = indices[pCol];
 
       if ( (index < 0) || (index >= indices.size()) ) {
-         PyObject* pColName = PyObject_CallMethod(pCol, "__str__", NULL);
+	 char str[] = "__str__";
+	 PyObject* pColName = PyObject_CallMethod(pCol, str, NULL);
 
          if (pColName == NULL) {
             throw UtilException("Error calling method col.__str__()", "pyColDict_AsPairedVector", "DippyPythonUtils");
@@ -226,7 +227,8 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
       index = indices[pCol];
 
       if ( (index < 0) || (index >= indices.size()) ) {
-         PyObject* pColName = PyObject_CallMethod(pCol, "getName", NULL);
+	char getName[] = "getName";
+         PyObject* pColName = PyObject_CallMethod(pCol, getName, NULL);
 
          if (pColName == NULL) {
             throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
@@ -259,7 +261,8 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
       index = indices[pCol];
 
       if ( (index < 0) || (index >= indices.size()) ) {
-         PyObject* pColName = PyObject_CallMethod(pCol, "getName", NULL);
+	char getName[] = "getName";
+         PyObject* pColName = PyObject_CallMethod(pCol, getName, NULL);
 
          if (pColName == NULL) {
             throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
@@ -268,8 +271,8 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
          string name = PyString_AsString(pColName);
          throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays", "DippyPythonUtils");
       }
-
-      PyObject* pColType = PyObject_CallMethod(pCol, "getVarType", NULL);      
+      char getVarType[] = "getVarType";
+      PyObject* pColType = PyObject_CallMethod(pCol, getVarType, NULL);      
      
       (*inds)[i] = index;
       (*vals)[i] = value;
