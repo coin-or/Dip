@@ -18,16 +18,16 @@
 /***************************************************************************/
 
 /* Version number of project */
-#define DIP_VERSION "0.92.4"
+#define DIP_VERSION "trunk"
 
 /* Major Version number of project */
-#define DIP_VERSION_MAJOR 0
+#define DIP_VERSION_MAJOR   9999
 
 /* Minor Version number of project */
-#define DIP_VERSION_MINOR 92
+#define DIP_VERSION_MINOR   9999
 
 /* Release Version number of project */
-#define DIP_VERSION_RELEASE 4
+#define DIP_VERSION_RELEASE 9999
 
 /* Define to 1 if the Clp package is available */
 #define DIP_HAS_CLP 1
