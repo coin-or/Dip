@@ -8,7 +8,7 @@
 //          Ted Ralphs, Lehigh University (ted@lehigh.edu)                   //
 //          Jiadong Wang, Lehigh University (jiw408@lehigh.edu)              //
 //                                                                           //
-// Copyright (C) 2002-2015, Lehigh University, Matthew Galati, Ted Ralphs    //
+// Copyright (C) 2002-2019, Lehigh University, Matthew Galati, Ted Ralphs    //
 // All Rights Reserved.                                                      //
 //===========================================================================//
 /*--------------------------------------------------------------------------

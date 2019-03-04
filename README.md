@@ -31,7 +31,7 @@ http://www.coin-or.org/Doxygen/Dip/
 
 Further information can be found here:
 
-http://projects.coin-or.org/Dip
+http://github.com/coin-or/Dip
 
 ## SUPPORT
 
@@ -42,11 +42,9 @@ http://list.coin-or.org/mailman/listinfo/dip
 
 ### Bug Reports
 
-Bug reports should be reported on the DIP development web site at
+Bug reports should be reported on github at
 
-https://projects.coin-or.org/Dip/newticket
-
-or here on Github.
+https://github.com/Dip/issues/new
 
 ## SCREEN SHOTS
 
@@ -61,6 +59,10 @@ or here on Github.
 
 ## CHANGELOG
 
+### Release 0.92.4
+ * Update dependencies
+ * Minor bug fixes for DipPy
+ 
 ### Release 0.92.3
  * Update dependencies
  * Minor bug fix

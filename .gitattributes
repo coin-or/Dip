@@ -651,6 +651,7 @@ Dip/src/old/UtilPortable.h.OLD -text
 Dip/test/Makefile.am -text
 Dip/test/Makefile.in -text
 /INSTALL -text
+/INSTALL.md -text
 /LICENSE -text
 /Makefile.am -text
 /Makefile.in -text
