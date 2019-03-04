@@ -28,8 +28,11 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
    const double* xhat = algo->getXhat();
    PyObject* pSolutionList = pyTupleList_FromDoubleArray(xhat, app->m_colList);
    // try to call chooseBranchSet on the DipProblem python object
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "chooseBranchSet", "O", 
-					   pSolutionList);
+   char arg1[] = "chooseBranchSet";
+   char arg2[] = "O";
+   PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2,  pSolutionList);
+   // PyObject* pResult = PyObject_CallMethod(m_pProb, "chooseBranchSet", "O", 
+   // 					   pSolutionList);
 
    if (pResult == NULL) {
       //something's gone wrong with the function call, a Python exception has 
@@ -123,7 +126,10 @@ void DippyAlgoMixin::postProcessBranch(DecompAlgo* algo,
 
    addTupleToPyList(pOutput, PyString_FromString("nodeIndex"), PyInt_FromLong(algo->getNodeIndex()));
    addTupleToPyList(pOutput, PyString_FromString("nodeQuality"), PyFloat_FromDouble(quality));
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "postProcessBranch", "O", pOutput);
+   char arg1[] = "postProcessBranch";
+   char arg2[] = "O";
+   PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2, pOutput);
+   // PyObject* pResult = PyObject_CallMethod(m_pProb, "postProcessBranch", "O", pOutput);
 }
 
 void DippyAlgoMixin::postProcessNode(DecompAlgo* algo, DecompStatus decompStatus)
@@ -133,6 +139,9 @@ void DippyAlgoMixin::postProcessNode(DecompAlgo* algo, DecompStatus decompStatus
    }
 
    PyObject* pOutput = pyTupleList_FromNode(algo, decompStatus);
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "postProcessNode", "O", pOutput);
+   char arg1[] = "postProcessNode";
+   char arg2[] = "O";
+   PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2, pOutput);
+   // PyObject* pResult = PyObject_CallMethod(m_pProb, "postProcessNode", "O", pOutput);
 }
 

@@ -422,6 +422,10 @@ Dip/examples/scripts/random/forestry/run240.sh -text
 Dip/examples/scripts/random/forestry/run40.sh -text
 Dip/examples/scripts/report_decomp.py -text
 Dip/ez_setup.py -text
+Dip/images/DipPyPic2.png -text
+Dip/images/GrUMPyPic.png -text
+Dip/images/SolverStudioPic1.png -text
+Dip/images/SolverStudioPic3.png -text
 Dip/install-sh -text
 Dip/ltmain.sh -text
 Dip/missing -text

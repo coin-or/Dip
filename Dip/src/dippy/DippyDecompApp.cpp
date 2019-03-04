@@ -21,8 +21,8 @@ void DippyDecompApp::createModels()
    // create the core model
    DecompConstraintSet* modelCore = new DecompConstraintSet();
    // gets the master problem model
-   PyObject* pMasterAsTuple = PyObject_CallMethod(m_pProb, "getMasterAsTuple", 
-						  NULL);
+   char masterTuple[] = "getMasterAsTuple";
+   PyObject* pMasterAsTuple = PyObject_CallMethod(m_pProb, masterTuple, NULL);
 
    if (pMasterAsTuple == NULL) {
       throw UtilException("Error calling method prob.getMasterAsTuple()", 
@@ -43,21 +43,22 @@ void DippyDecompApp::createModels()
 
    for (int i = 0; i < numRows; i++) {
       pRow = PyList_GetItem(pRowList, i);
-      pRowName = PyObject_CallMethod(pRow, "getName", NULL);
+      char getName[] = "getName";
+      pRowName = PyObject_CallMethod(pRow, getName, NULL);
 
       if (pRowName == NULL) {
          throw UtilException("Error calling method row.getName()", 
 			     "createModels", "DippyDecompApp");
       }
-
-      pRowLb   = PyObject_CallMethod(pRow, "getLb", NULL);
+      char getLb[] = "getLb";
+      pRowLb   = PyObject_CallMethod(pRow, getLb, NULL);
 
       if (pRowLb == NULL) {
          throw UtilException("Error calling method row.getLb()", 
 			     "createModels", "DippyDecompApp");
       }
-
-      pRowUb   = PyObject_CallMethod(pRow, "getUb", NULL);
+      char getUb[] = "getUb";
+      pRowUb   = PyObject_CallMethod(pRow, getUb, NULL);
 
       if (pRowUb == NULL) {
          throw UtilException("Error calling method row.getUb()", 
@@ -89,28 +90,29 @@ void DippyDecompApp::createModels()
 
    for (int j = 0; j < m_numCols; j++) {
       pCol = PyList_GetItem(pColList, j);
-      pColName = PyObject_CallMethod(pCol, "getName", NULL);
+      char getName[] = "getName";
+      pColName = PyObject_CallMethod(pCol, getName, NULL);
 
       if (pColName == NULL) {
          throw UtilException("Error calling method col.getName()", 
 			     "createModels", "DippyDecompApp");
       }
-
-      pColLb   = PyObject_CallMethod(pCol, "getLb", NULL);
+      char getLb[] = "getLb";
+      pColLb   = PyObject_CallMethod(pCol, getLb, NULL);
 
       if (pColLb == NULL) {
          throw UtilException("Error calling method col.getLb()", 
 			     "createModels", "DippyDecompApp");
       }
-
-      pColUb   = PyObject_CallMethod(pCol, "getUb", NULL);
+      char getUb[] = "getUb";
+      pColUb   = PyObject_CallMethod(pCol, getUb, NULL);
 
       if (pColUb == NULL) {
          throw UtilException("Error calling method col.getUb()", 
 			     "createModels", "DippyDecompApp");
       }
-
-      pIsInt   = PyObject_CallMethod(pCol, "isInteger", NULL);
+      char isInteger[] = "isInteger";
+      pIsInt   = PyObject_CallMethod(pCol, isInteger, NULL);
 
       if (pIsInt == NULL) {
          throw UtilException("Error calling method col.isInteger()", 
@@ -162,11 +164,11 @@ void DippyDecompApp::createModels()
    modelCore->M->setDimensions(modelCore->rowLB.size(), 
 			       modelCore->colLB.size());
    // subproblems
-   PyObject* pRelaxedDict = PyObject_CallMethod(m_pProb, "getRelaxsAsDict", 
-						NULL);
+   char getRelaxAsDict[] = "getRelaxAsDict";
+   PyObject* pRelaxedDict = PyObject_CallMethod(m_pProb, getRelaxAsDict, NULL);
 
    if (pRelaxedDict == NULL) {
-      throw UtilException("Error calling method prob.getRelaxsAsDict()", 
+      throw UtilException("Error calling method prob.getRelaxAsDict()", 
 			  "createModels", "DippyDecompApp");
    }
 
@@ -196,8 +198,10 @@ void DippyDecompApp::createModels()
       pRelax = PyDict_GetItem(pRelaxedDict, pKey);
       m_relaxIndices[pKey] = p; // Don't need to increase reference count here 
       //as m_relaxedKey references pKey
-      PyObject* pRelaxAsTuple = PyObject_CallMethod(m_pProb, "getRelaxAsTuple",
-						    "O", pRelax);
+      char getRelaxAsTuple[] = "getRelaxAsTuple";
+      char O[] = "O";
+      PyObject* pRelaxAsTuple = PyObject_CallMethod(m_pProb,getRelaxAsTuple,
+                                                    O, pRelax);
 
       if (pRelaxAsTuple == NULL) {
          throw UtilException("Error calling method prob.getRelaxAsTuple()", 
@@ -212,21 +216,22 @@ void DippyDecompApp::createModels()
 
       for (int i = 0; i < numRows; i++) {
          pRow = PyList_GetItem(pRowList, i);
-         pRowName = PyObject_CallMethod(pRow, "getName", NULL);
+	 char getName[] = "getName";
+         pRowName = PyObject_CallMethod(pRow, getName, NULL);
 
          if (pRowName == NULL) {
             throw UtilException("Error calling method row.getName()", 
 				"createModels", "DippyDecompApp");
          }
-
-         pRowLb   = PyObject_CallMethod(pRow, "getLb", NULL);
+	 char getLb[] = "getLb";
+         pRowLb   = PyObject_CallMethod(pRow, getLb, NULL);
 
          if (pRowLb == NULL) {
             throw UtilException("Error calling method row.getLb()", 
 				"createModels", "DippyDecompApp");
          }
-
-         pRowUb   = PyObject_CallMethod(pRow, "getUb", NULL);
+	 char getUb[] = "getUb";
+         pRowUb   = PyObject_CallMethod(pRow, getUb, NULL);
 
          if (pRowUb == NULL) {
             throw UtilException("Error calling method row.getUb()", 
@@ -328,7 +333,9 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
    PyObject* pConvexDual = PyFloat_FromDouble(convexDual);
    // call solveRelaxed on DipProblem
 
-   PyObject* pStatandVarList = PyObject_CallMethod(m_pProb, "solveRelaxed", "OOd", 
+   char solveRelaxed[] = "SolveRelaxed";
+   char OOd[] = "OOd";
+   PyObject* pStatandVarList = PyObject_CallMethod(m_pProb, solveRelaxed, OOd, 
 					             pRelaxKey,
 					             pRedCostList,
 					             pConvexDual);
@@ -410,8 +417,9 @@ bool DippyDecompApp::APPisUserFeasible(const double* x, const int n_cols, const 
    if (!m_pyIsUserFeasible) {
       return true;
    }
-
-   PyObject* pResult = PyObject_CallMethod(m_pProb, "isUserFeasible", "Od", pSolutionList, pTolZero);
+   char isUserFeasible[] = "isUserFeasible";
+   char Od[] = "Od";
+   PyObject* pResult = PyObject_CallMethod(m_pProb, isUserFeasible, Od, pSolutionList, pTolZero);
 
    if (pResult == NULL) {
       throw UtilException("Error calling method prob.isUserFeasible()", "APPisUserFeasible", "DippyDecompApp");
@@ -441,7 +449,9 @@ int DippyDecompApp::generateCuts(const double* x, DecompCutList& cutList)
    // PyObject *pSolutionList = pyTupleList_FromDoubleArray(x, m_colList);
    // MO (28/2/2012) - Don't need this anymore as solution is contained within node
    PyObject* pPackagedNode = pyTupleList_FromNode(getDecompAlgo(), STAT_FEASIBLE);
-   PyObject* pCutList = PyObject_CallMethod(m_pProb, "generateCuts", "O", pPackagedNode);
+   char generateCuts[] = "generateCuts";
+   char O[] = "O";
+   PyObject* pCutList = PyObject_CallMethod(m_pProb, generateCuts, O, pPackagedNode);
 
    if (pCutList == NULL) {
       throw UtilException("Error calling method prob.generateCuts()", "generateCuts", "DippyDecompApp");
@@ -465,13 +475,14 @@ int DippyDecompApp::generateCuts(const double* x, DecompCutList& cutList)
 
    for (int i = 0; i < len; i++) {
       pRow = PySequence_GetItem(pCutList, i);
-      pLb = PyObject_CallMethod(pRow, "getLb", NULL);
+      char getLb[] = "getLb";
+      pLb = PyObject_CallMethod(pRow, getLb, NULL);
 
       if (pLb == NULL) {
          throw UtilException("Error calling method row.getLb()", "generateCuts", "DippyDecompApp");
       }
-
-      pUb = PyObject_CallMethod(pRow, "getUb", NULL);
+      char getUb[] = "getUb";
+      pUb = PyObject_CallMethod(pRow, getUb, NULL);
 
       if (pUb == NULL) {
          throw UtilException("Error calling method row.getUb()", "generateCuts", "DippyDecompApp");
@@ -504,7 +515,9 @@ int DippyDecompApp::APPheuristics(const double* xhat, const double* origCost, ve
 
    PyObject* pSolution = pyTupleList_FromDoubleArray(xhat, m_colList);
    PyObject* pObjective = pyTupleList_FromDoubleArray(origCost, m_colList);
-   PyObject* pSolList = PyObject_CallMethod(m_pProb, "solveHeuristics", "OO", pSolution, pObjective);
+   char solveHeuristics[] = "solveHeuristics";
+   char OO[] = "OO";
+   PyObject* pSolList = PyObject_CallMethod(m_pProb, solveHeuristics, OO, pSolution, pObjective);
 
    if (pSolList == NULL) {
       throw UtilException("Error calling method prob.solveHeuristics()", "APPheuristics", "DippyDecompApp");
@@ -554,7 +567,8 @@ int DippyDecompApp::generateInitVars(DecompVarList& initVars)
       return 0;
    }
 
-   PyObject* pVarList = PyObject_CallMethod(m_pProb, "generateInitVars", NULL);
+   char generateInitVars[] = "generateInitVars";
+   PyObject* pVarList = PyObject_CallMethod(m_pProb, generateInitVars, NULL);
 
    if (pVarList == NULL) {
       throw UtilException("Error calling method prob.generateInitVars()", "generateInitVars", "DippyDecompApp");

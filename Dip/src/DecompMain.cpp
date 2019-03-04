@@ -580,15 +580,15 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
 
    OsiSolverInterface *m_problemSI;
 
-   if (decompApp.m_param.DecompIPSolver == "SYMPONY"){
-#ifdef DIP_HAS_CLP
+   if (decompApp.m_param.DecompIPSolver == "SYMPHONY"){
+#ifdef DIP_HAS_SYMPHONY
       m_problemSI = new OsiSymSolverInterface();
 #else
       throw UtilException("SYMPHONY selected as solver, but it's not available",
 			  "getOsiIpSolverInterface", "DecompAlgo");
 #endif
    }else if (decompApp.m_param.DecompIPSolver == "Cbc"){
-#ifdef DIP_HAS_CLP
+#ifdef DIP_HAS_CBC
       m_problemSI = new OsiCbcSolverInterface();
 #else
       throw UtilException("Cbc selected as solver, but it's not available",
