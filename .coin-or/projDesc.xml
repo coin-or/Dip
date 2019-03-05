@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type = "text/xsl" href = "http://www.coin-or.org/projects/autoGen.xsl"?>
+<projectData xmlns="coin-or.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="coin-or.org  http://www.coin-or.org/projects/autoGen.xsd">
+
+	<projectBasics>
+
+		<projectName>DIP</projectName>
+		<projectRepo>Dip</projectRepo>
+
+		<projectDescription>
+		  DIP (Decomposition in Integer Programming) is a framework for
+		  implementing a wide variety of decomposition-based algorithms
+		  for solving integer programs.
+		</projectDescription>
+		<projectShortDescription>
+		  A framework for implementing a variety of decomposition-based
+		  branch-and-bound algorithms for solving mixed-integer linear
+		  programs.
+		</projectShortDescription>
+
+		<projectManager>Ted Ralphs, ted at lehigh dot edu </projectManager>
+
+		<projectHomePage>https://projects.coin-or.org/Dip</projectHomePage>
+
+		<projectLicense>Eclipse Public License 1.0</projectLicense>
+		<projectLicenseURL>http://www.opensource.org/licenses/eclipse-1.0.php</projectLicenseURL>
+
+		<coinLinkedProjects>  
+		     <coinProject>
+		           <repoName>BuildTools</repoName>
+		     </coinProject>
+		     <coinProject>
+		           <repoName>CoinUtils</repoName>
+		     </coinProject>
+		     <coinProject>
+		           <repoName>CHiPPS</repoName>
+		     </coinProject>
+		     <coinProject>
+		           <repoName>Cgl</repoName>
+		     </coinProject>
+                     <coinProject>
+		           <repoName>Osi</repoName>
+		     </coinProject>
+                     <coinProject>
+		           <repoName>Clp</repoName>
+		     </coinProject>
+                     <coinProject>
+		           <repoName>Cbc</repoName>
+		     </coinProject>
+		</coinLinkedProjects>
+	
+		<otherLinkedPackages>
+		
+		<otherPackage>
+			<packageName> BLAS </packageName>
+			<packageURL> http://www.netlib.org/blas </packageURL>
+			<requiredOrOptional> Optional </requiredOrOptional>
+		</otherPackage>
+		<otherPackage>
+			<packageName> LAPACK </packageName>
+			<packageURL> http://www.netlib.org/lapack </packageURL>
+			<requiredOrOptional> Optional </requiredOrOptional>
+		</otherPackage> 
+			
+		</otherLinkedPackages>
+
+		<projectLanguage>C++</projectLanguage>
+
+		<developmentStatus>
+
+			<activityStatus>Active</activityStatus>
+
+			<maturityLevel>5</maturityLevel>
+
+			<!-- <stableVersionNumber></stableVersionNumber> -->
+
+			<!-- <releaseNumber></releaseNumber> -->
+
+		</developmentStatus>
+
+		<testedPlatforms>
+
+                     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+			   <compiler>MSVC++/cl</compiler>
+                     </platform>
+                     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+                           <compiler>CYGWIN/cl</compiler>
+                     </platform>
+		     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+			   <compiler>CYGWIN/gcc</compiler>
+                     </platform>
+                     <platform>
+                           <operatingSystem>Microsoft Windows</operatingSystem>
+			   <compiler>MSys/gcc</compiler>
+		     </platform>
+                     <platform>
+                           <operatingSystem>Linux</operatingSystem>
+			   <compiler>gcc</compiler>
+		     </platform>
+		     <platform>
+                          <operatingSystem>OSX</operatingSystem>
+			  <compiler>gcc</compiler>
+                     </platform>
+		     <platform>
+		          <operatingSystem>Solarix X86</operatingSystem>
+			  <compiler>gcc</compiler>
+		     </platform>
+		     <platform>
+		          <operatingSystem>Solarix X86</operatingSystem>
+			  <compiler>sunpro</compiler>
+                      </platform>
+
+		</testedPlatforms>
+
+		<projectCategories>
+
+		      <category>
+		           Optimization deterministic linear discrete
+		      </category>
+		</projectCategories>
+
+	</projectBasics>
+
+	<leftMenuLinks>  
+	        <documentation>http://projects.coin-or.org/Dip</documentation>
+		<sourceCodeDownload>http://www.coin-or.org/download/source/Dip</sourceCodeDownload>
+		<binaryDownload></binaryDownload>
+		<mailingList>http://list.coin-or.org/mailman/listinfo/dip</mailingList>
+	</leftMenuLinks>
+
+    </projectData>
