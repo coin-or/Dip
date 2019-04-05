@@ -75,29 +75,29 @@ PyObject* pyTupleList_FromNode(DecompAlgo* algo, DecompStatus decompStatus)
    }
 
    // Add into the list the output needed
-   addTupleToPyList(pOutput, PyString_FromString("nodeIndex"),
-                    PyInt_FromLong(node->getIndex()));
-   addTupleToPyList(pOutput, PyString_FromString("parentIndex"),
-                    PyInt_FromLong(node->getParentIndex()));
-   addTupleToPyList(pOutput, PyString_FromString("nodeDepth"),
-                    PyInt_FromLong(node->getDepth()));
-   addTupleToPyList(pOutput, PyString_FromString("nodeQuality"),
+   addTupleToPyList(pOutput, PyUnicode_FromString("nodeIndex"),
+                    PyLong_FromLong(node->getIndex()));
+   addTupleToPyList(pOutput, PyUnicode_FromString("parentIndex"),
+                    PyLong_FromLong(node->getParentIndex()));
+   addTupleToPyList(pOutput, PyUnicode_FromString("nodeDepth"),
+                    PyLong_FromLong(node->getDepth()));
+   addTupleToPyList(pOutput, PyUnicode_FromString("nodeQuality"),
                     PyFloat_FromDouble(quality));
-   addTupleToPyList(pOutput, PyString_FromString("globalLB"),
+   addTupleToPyList(pOutput, PyUnicode_FromString("globalLB"),
                     PyFloat_FromDouble(lb));
-   addTupleToPyList(pOutput, PyString_FromString("globalUB"),
+   addTupleToPyList(pOutput, PyUnicode_FromString("globalUB"),
                     PyFloat_FromDouble(ub));
-   addTupleToPyList(pOutput, PyString_FromString("nodeStatus"),
-                    PyString_FromString(status.c_str()));
-   addTupleToPyList(pOutput, PyString_FromString("branchedDir"),
-                    PyInt_FromLong(dynamic_cast<AlpsDecompNodeDesc*>
+   addTupleToPyList(pOutput, PyUnicode_FromString("nodeStatus"),
+                    PyUnicode_FromString(status.c_str()));
+   addTupleToPyList(pOutput, PyUnicode_FromString("branchedDir"),
+                    PyLong_FromLong(dynamic_cast<AlpsDecompNodeDesc*>
                                    (algo->getCurrentNode()->getDesc())->getBranchedDir()));
    // Copy the current solution into a Python list
    const double* xhat = algo->getXhat();
    DippyDecompApp* app = (DippyDecompApp*)algo->getDecompApp();
    PyObject* pSolutionList = pyTupleList_FromDoubleArray(xhat,
                              app->m_colList);
-   addTupleToPyList(pOutput, PyString_FromString("xhat"), pSolutionList);
+   addTupleToPyList(pOutput, PyUnicode_FromString("xhat"), pSolutionList);
    /** MO. 29/2/2012 - This section was originally an attempt to add "simple" cuts. i.e.,
        that the sum of non-basic variables >= 1 (or at least a variant for lb and ub), so I
    	passed the variable bounds at the node and lists of basic, lower bound and upper bound
@@ -126,7 +126,7 @@ PyObject* pyTupleList_FromNode(DecompAlgo* algo, DecompStatus decompStatus)
    		PyTuple_SetItem(pBoundPair, 1, PyFloat_FromDouble(ub[j]));
    	addTupleToPyList(pBoundList, PyList_GetItem(app->m_colList, j), pBoundPair);
    }
-   addTupleToPyList(pOutput, PyString_FromString("bounds"), pBoundList);
+   addTupleToPyList(pOutput, PyUnicode_FromString("bounds"), pBoundList);
 
    // Copy the original variables into "status" lists
    PyObject * pBasisList = PyList_New(0),
@@ -160,9 +160,9 @@ PyObject* pyTupleList_FromNode(DecompAlgo* algo, DecompStatus decompStatus)
    	delete [] cstat;
    }
 
-   addTupleToPyList(pOutput, PyString_FromString("basic"), pBasisList);
-   addTupleToPyList(pOutput, PyString_FromString("atLB"), pLBList);
-   addTupleToPyList(pOutput, PyString_FromString("atUB"), pUBList);
+   addTupleToPyList(pOutput, PyUnicode_FromString("basic"), pBasisList);
+   addTupleToPyList(pOutput, PyUnicode_FromString("atLB"), pLBList);
+   addTupleToPyList(pOutput, PyUnicode_FromString("atUB"), pUBList);
    */
    return pOutput;
 }
@@ -195,7 +195,7 @@ void pyColDict_AsPairedVector(PyObject* pColDict, vector<pair<int, double> >& ve
             throw UtilException("Error calling method col.__str__()", "pyColDict_AsPairedVector", "DippyPythonUtils");
          }
 
-         string name = PyString_AsString(pColName);
+         string name = PyBytes_AsString(pColName);
          throw UtilException("Bad index for " + name, "pyTupleList_AsPairedVector", "DippyPythonUtils");
       }
 
@@ -234,7 +234,7 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
             throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
          }
 
-         string name = PyString_AsString(pColName);
+         string name = PyBytes_AsString(pColName);
          throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays", "DippyPythonUtils");
       }
 
@@ -268,7 +268,7 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
             throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
          }
 
-         string name = PyString_AsString(pColName);
+         string name = PyBytes_AsString(pColName);
          throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays", "DippyPythonUtils");
       }
       char getVarType[] = "getVarType";

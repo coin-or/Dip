@@ -65,7 +65,7 @@ void DippyDecompApp::createModels()
 			     "createModels", "DippyDecompApp");
       }
 
-      name = PyString_AsString(pRowName);
+      name = PyBytes_AsString(pRowName);
 
       if (pRowLb == Py_None) {
          lb = -m_infinity;
@@ -119,7 +119,7 @@ void DippyDecompApp::createModels()
 			     "createModels", "DippyDecompApp");
       }
 
-      name = PyString_AsString(pColName);
+      name = PyBytes_AsString(pColName);
 
       if (pColLb == Py_None) {
          lb = -m_infinity;
@@ -238,7 +238,7 @@ void DippyDecompApp::createModels()
 				"createModels", "DippyDecompApp");
          }
 
-         name = PyString_AsString(pRowName);
+         name = PyBytes_AsString(pRowName);
 
          if (pRowLb == Py_None) {
             lb = -m_infinity;
@@ -350,7 +350,7 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
    // [status, varList] = relaxed_solver(...)
    PyObject * pStatus = PyTuple_GetItem(pStatandVarList, 0);
 
-   int cStatus = PyInt_AsLong(pStatus);
+   int cStatus = PyLong_AsLong(pStatus);
 
    DecompSolverStatus status = (DecompSolverStatus)cStatus;
 

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMinimize, LpAffineExpression
 
 try:
@@ -18,7 +23,7 @@ MINE_SUPPLY = {
     "M5": 36.9,
     "M6": 1100,
 }
-MINES = MINE_SUPPLY.keys()
+MINES = list(MINE_SUPPLY.keys())
 MINES.sort()
 
 LOCATIONS = ["L1", "L2", "L3", "L4", "L5", "L6"]
@@ -32,7 +37,7 @@ SIZE_COSTS = {
     375: 16.5,
     450: 19.6,
 }
-SIZES = SIZE_COSTS.keys()
+SIZES = list(SIZE_COSTS.keys())
 SIZES.sort()
 
 CUSTOMER_DEMAND = {
@@ -43,7 +48,7 @@ CUSTOMER_DEMAND = {
     "C5": 720.75,
     "C6": 5.5,
 }
-CUSTOMERS = CUSTOMER_DEMAND.keys()
+CUSTOMERS = list(CUSTOMER_DEMAND.keys())
 CUSTOMERS.sort()
 
 MINE_TRANS_DATA = """
@@ -87,7 +92,7 @@ CUST_TRANS = read_table(CUST_TRANS_DATA, int, \
 
 ARC_COSTS = dict(MINE_TRANS)
 ARC_COSTS.update(CUST_TRANS)
-ARCS = ARC_COSTS.keys()
+ARCS = list(ARC_COSTS.keys())
 
 def cross(i1, i2):
     r = []
@@ -131,7 +136,7 @@ for loc in LOCATIONS:
 # flows are in terms of tonnes of coke
 for m in MINES:
     prob += lpSum(flowVars[(m, j)] for j in LOCATIONS) <= \
-            MINE_SUPPLY[m]/CC
+            old_div(MINE_SUPPLY[m],CC)
 
 for loc in LOCATIONS:
     prob += lpSum(flowVars[(m, loc)] for m in MINES) - \
@@ -174,9 +179,9 @@ dippy.Solve(prob, {
 })
 
 def print_table(rows, cols, fn):
-    print "\t", "\t".join(cols)
+    print("\t", "\t".join(cols))
     for r in rows:
-        print r,"\t", "\t".join(str(fn(r,c)) for c in cols)
+        print(r,"\t", "\t".join(str(fn(r,c)) for c in cols))
 
 def print_var_table(rows, cols, var, fn=lambda x: x):
     print_table(rows, cols, lambda x, y:
@@ -184,12 +189,12 @@ def print_var_table(rows, cols, var, fn=lambda x: x):
 
 for (l, s) in LOC_SIZES:
     if buildVars[(l,s)].varValue > 0:
-        print "Build %s %s (%s)" % \
-              (l, s, buildVars[(l,s)].varValue)
-print
+        print("Build %s %s (%s)" % \
+              (l, s, buildVars[(l,s)].varValue))
+print()
 
 print_var_table(MINES, LOCATIONS, flowVars, \
                 fn=lambda x: CC*x)
-print
+print()
 print_var_table(LOCATIONS, CUSTOMERS, flowVars)
 

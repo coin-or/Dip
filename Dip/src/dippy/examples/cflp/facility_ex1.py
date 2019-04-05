@@ -10,7 +10,7 @@ REQUIREMENT = {
 }
 
 # Set of all products
-PRODUCTS = REQUIREMENT.keys()
+PRODUCTS = list(REQUIREMENT.keys())
 PRODUCTS.sort()
 
 # Costs of the facilities
@@ -23,7 +23,7 @@ FIXED_COST = {
 }
 
 # Set of facilities
-LOCATIONS = FIXED_COST.keys()
+LOCATIONS = list(FIXED_COST.keys())
 LOCATIONS.sort()
 
 # The capacity of the facilities

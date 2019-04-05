@@ -1,3 +1,5 @@
+from builtins import range
+from builtins import object
 import sys
 
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
@@ -17,14 +19,14 @@ except ImportError:
 
 from math import floor, ceil
 
-class MDBinPackProb:
+class MDBinPackProb(object):
     def __init__(self, ITEMS, LIMITS, volume, capacity):
         self.ITEMS = ITEMS
         self.LIMITS = LIMITS
         self.volume = volume
         self.capacity = capacity
 
-        self.BINS = range(len(ITEMS)) # Create 1 bin for each item, indices 
+        self.BINS = list(range(len(ITEMS))) # Create 1 bin for each item, indices 
                                       # start at 0
     
 def formulate(bpp):

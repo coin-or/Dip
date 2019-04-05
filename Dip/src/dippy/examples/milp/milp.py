@@ -3,6 +3,10 @@ Created on Dec 29, 2013
 
 @author: ted
 '''
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
 
 #!/usr/bin/env python
 
@@ -36,7 +40,7 @@ def GenerateRandomBlock(VARIABLES, CONSTRAINTS, density = 0.2,
 display_mode = 'xdot'
 layout = 'dot'
 
-tol = pow(pow(2, -24), 2.0 / 3.0)
+tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
 prob = dippy.DipProblem("MILP", display_mode = display_mode,
                         layout = layout, display_interval = 0)

@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-from mdbin_pack_func import MDBinPackProb, formulate, solve
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from past.utils import old_div
+from .mdbin_pack_func import MDBinPackProb, formulate, solve
 
 if __name__ == '__main__':
     # Python starts here
@@ -23,14 +27,14 @@ if __name__ == '__main__':
   
     prob = formulate(bpp)
   
-    prob.tol = pow(pow(2, -24), 2.0 / 3.0)
+    prob.tol = pow(pow(2, -24), old_div(2.0, 3.0))
     xopt = solve(prob)
   
     if xopt is not None:
         for var in prob.variables():
-            print var.name, "=", xopt[var]
+            print(var.name, "=", xopt[var])
     else:
-        print "Dippy could not find and optimal solution"    
+        print("Dippy could not find and optimal solution")    
   
     if prob.display_mode != 'off':
         numNodes = len(prob.Tree.get_node_list())

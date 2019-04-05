@@ -1,8 +1,12 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
 import unittest
 from pulp import *
 import coinor.dippy as dippy
 
-from dippy_tests import DippyTestCase
+from .dippy_tests import DippyTestCase
 
 
 class TestFacilityProblem(DippyTestCase):
@@ -12,7 +16,7 @@ class TestFacilityProblem(DippyTestCase):
         sets up the coke problem as a unittest
         """
         self.prob, self.branch, self.cuts = create_facility_problem()
-        self.tol = pow(pow(2, -24), 2.0 / 3.0)
+        self.tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
     def test_pulp_solve(self):
         """
@@ -70,7 +74,7 @@ def create_facility_problem():
 
     from math import floor, ceil
 
-    tol = pow(pow(2, -24), 2.0 / 3.0)
+    tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
     # The requirements for the products
 
@@ -87,7 +91,7 @@ def create_facility_problem():
         10 : 17,
     }
     # Set of all products
-    PRODUCTS = REQUIREMENT.keys()
+    PRODUCTS = list(REQUIREMENT.keys())
     PRODUCTS.sort()
 
     # Set of all locations

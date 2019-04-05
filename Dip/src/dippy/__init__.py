@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sys
 
 try:
@@ -5,5 +6,5 @@ try:
 except ImportError:
     pass
 
-from dippy import *
+from .dippy import *
 

@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+from builtins import range
 import unittest
 from pulp import *
 import coinor.dippy as dippy
 
-from dippy_tests import DippyTestCase
+from .dippy_tests import DippyTestCase
 
 
 class TestCuttingStockProblem(DippyTestCase):
@@ -45,7 +47,7 @@ def create_cutting_stock_problem(doRelaxed=False):
     "5cm": 5
     }
 
-    ITEMS = length.keys()
+    ITEMS = list(length.keys())
 
     demand = {
     "9cm": 1,
@@ -58,7 +60,7 @@ def create_cutting_stock_problem(doRelaxed=False):
     total_length = {}
     for p in range(total_patterns):
         total_length[p] = 20
-    PATTERNS = total_length.keys()
+    PATTERNS = list(total_length.keys())
 
     CUTS = [(p, i) for p in PATTERNS
                    for i in ITEMS]

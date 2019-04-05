@@ -1,3 +1,7 @@
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from past.utils import old_div
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
 try:
@@ -11,7 +15,7 @@ except ImportError:
 
 from math import floor, ceil
 
-tol = pow(pow(2, -24), 2.0 / 3.0)
+tol = pow(pow(2, -24), old_div(2.0, 3.0))
 debug_print = False
 
 REQUIREMENT = data.REQUIREMENT
@@ -19,7 +23,7 @@ PRODUCTS = data.PRODUCTS
 LOCATIONS = data.LOCATIONS
 CAPACITY = data.CAPACITY
 
-print REQUIREMENT
+print(REQUIREMENT)
 
 prob = dippy.DipProblem("Bin Packing")
 
@@ -97,7 +101,7 @@ def solve_subproblem(prob, index, redCosts, target):
 
     if redCosts[use_vars[loc]] > z + tol: # ... or an empty location is "useful"
         if debug_print:
-            print "Zero solution is optimal"
+            print("Zero solution is optimal")
         return DipSolStatOptimal, [{}]
 
     # Return the solution if the reduced cost is low enough
@@ -214,7 +218,7 @@ dippy.Solve(prob, {
 # print solution
 for i in LOCATIONS:
     if use_vars[i].varValue > tol:
-        print "Location ", i, \
+        print("Location ", i, \
               " produces ", \
               [j for j in PRODUCTS
-               if assign_vars[(i, j)].varValue > tol]
+               if assign_vars[(i, j)].varValue > tol])

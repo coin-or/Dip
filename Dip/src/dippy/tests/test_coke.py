@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 import unittest
 from pulp import *
 import coinor.dippy as dippy
 
-from dippy_tests import DippyTestCase
+from .dippy_tests import DippyTestCase
 
 
 class TestCokeProblem(DippyTestCase):
@@ -51,7 +52,7 @@ def create_coke_problem():
         "M5": 36.9,
         "M6": 1100,
     }
-    MINES = MINE_SUPPLY.keys()
+    MINES = list(MINE_SUPPLY.keys())
     MINES.sort()
 
     LOCATIONS = ["L1", "L2", "L3", "L4", "L5", "L6"]
@@ -65,7 +66,7 @@ def create_coke_problem():
         375: 16.5,
         450: 19.6,
     }
-    SIZES = SIZE_COSTS.keys()
+    SIZES = list(SIZE_COSTS.keys())
     SIZES.sort()
 
     CUSTOMER_DEMAND = {
@@ -76,7 +77,7 @@ def create_coke_problem():
         "C5": 720.75,
         "C6": 5.5,
     }
-    CUSTOMERS = CUSTOMER_DEMAND.keys()
+    CUSTOMERS = list(CUSTOMER_DEMAND.keys())
     CUSTOMERS.sort()
 
     MINE_TRANSPORT_DATA = """
@@ -118,7 +119,7 @@ def create_coke_problem():
     #add both parts of the network together
     ARC_COSTS = MINE_TRANSPORT.copy()
     ARC_COSTS.update(CUST_TRANSPORT)
-    ARCS = ARC_COSTS.keys()
+    ARCS = list(ARC_COSTS.keys())
 
     LOCATIONS_SIZES = [(l, s) for l in LOCATIONS
                         for s in SIZES]

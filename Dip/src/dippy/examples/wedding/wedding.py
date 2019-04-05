@@ -3,6 +3,8 @@ A formulation in original variables of a wedding seating problem
 
 Authors: Stuart Mitchell 2010
 """
+from __future__ import print_function
+from builtins import range
 import pulp
 
 try:
@@ -31,7 +33,7 @@ def happiness(guest_a, guest_b):
     return abs(ord(guest_a) - ord(guest_b))
 
 #create the set of possible tables
-tables = range(max_tables)
+tables = list(range(max_tables))
 
 possible_seatings = [(g, t) for g in guests
                             for t in tables]
@@ -105,7 +107,7 @@ def relaxed_solver(prob, table, redCosts, target):
         var_values.append((happy[table], table_happiness))
         dvs.append(dict(var_values))
         if debug_print:
-            print 'Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc
+            print('Table: ', table, 'Happiness: ', table_happiness, 'RC: ', rc)
     return DipSolStatOptimal, dvs
 
 #seating_model.relaxed_solver = relaxed_solver
@@ -128,9 +130,9 @@ if seating_model.display_mode != 'off':
     seating_model.Tree.display()
 
 for table in tables:
-    print table,
+    print(table, end=' ')
     for guest in guests:
         if x[(guest,table)].value() >= 0.99:
-            print guest,
-    print happy[table].value()
+            print(guest, end=' ')
+    print(happy[table].value())
 

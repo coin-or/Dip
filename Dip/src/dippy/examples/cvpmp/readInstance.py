@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from builtins import range
 #!/usr/bin/env python
 
 
@@ -8,7 +10,7 @@ __email__   = 'dago@yalma.fime.uanl.mx'
 
 
 import string
-import Global
+from . import Global
 
 
 def read(path):

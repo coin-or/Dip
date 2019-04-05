@@ -4,6 +4,11 @@
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
 
+from __future__ import division
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import sys
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
@@ -22,7 +27,7 @@ except ImportError:
 
 debug_print = False
 
-tol = pow(pow(2, -24), 2.0 / 3.0)
+tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
 # parse data file
 input = open(sys.argv[1])
@@ -30,8 +35,8 @@ input = open(sys.argv[1])
 line = input.readline().split()
 NUM_MACHINES = int(line[0])
 NUM_TASKS = int(line[1])
-MACHINES = range(NUM_MACHINES)
-TASKS = range(NUM_TASKS)
+MACHINES = list(range(NUM_MACHINES))
+TASKS = list(range(NUM_TASKS))
 MACHINES_TASKS = [(m, t) for m in MACHINES for t in TASKS]
 
 COSTS = []
@@ -76,8 +81,8 @@ for t in TASKS:
 
 def solve_subproblem(prob, machine, redCosts, target):
     if debug_print:
-        print "solve_subproblem..."
-        print redCosts
+        print("solve_subproblem...")
+        print(redCosts)
    
     # get tasks which have negative reduced costs
     task_idx = [t for t in TASKS if redCosts[assignVars[machine][t]] < 0]
@@ -89,24 +94,24 @@ def solve_subproblem(prob, machine, redCosts, target):
 
     # Get the reduced cost of the knapsack solution and waste
     if debug_print:
-        print [(v, redCosts[v]) for v in var]
-        print obj
-        print "z, solution =", z, solution
-        print "rc", -z
+        print([(v, redCosts[v]) for v in var])
+        print(obj)
+        print("z, solution =", z, solution)
+        print("rc", -z)
 
     if z < -tol: # Zero solution is optimal
         if debug_print:
-            print "Zero solution is optimal"
+            print("Zero solution is optimal")
         return DipSolStatOptimal, [{}]
 
     var_values = dict([(var[i], 1) for i in solution])
 
     if debug_print:
         rcCheck = 0.0
-        for v in var_values.keys():
+        for v in list(var_values.keys()):
             rcCheck += redCosts[v] * var_values[v]
-        print "Checking rc calc", -z, rcCheck 
-        print var_values
+        print("Checking rc calc", -z, rcCheck) 
+        print(var_values)
         
     return DipSolStatOptimal, [var_values]
 
@@ -131,7 +136,7 @@ def knapsack01(obj, weights, capacity):
 
         solution =  [i for i in range(n) if var_dict[str(i)].varValue > tol ]
 
-        print relax_obj, solution
+        print(relax_obj, solution)
 
 
     c = [[0]*(capacity+1) for i in range(n)]
@@ -172,12 +177,12 @@ dippy.Solve(prob, {
 })
 
 for m in MACHINES:
-    print 
-    print "Machine %d assigned tasks" %m,
+    print() 
+    print("Machine %d assigned tasks" %m, end=' ')
     for t in TASKS:
         v = assignVars[m][t].varValue
         if v:
-            print "%d" %t,
+            print("%d" %t, end=' ')
             
 if prob.display_mode != 'off':
     if (prob.Tree.attr['display'] == 'pygame') or (prob.Tree.attr['display'] == 'xdot'):

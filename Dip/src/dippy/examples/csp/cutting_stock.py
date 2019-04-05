@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 #!/usr/bin/env python
 
 from pulp import *
@@ -15,7 +17,7 @@ length = {
 "5cm": 5
 }
 
-ITEMS = length.keys()
+ITEMS = list(length.keys())
 
 demand = {
 "9cm": 3,
@@ -28,7 +30,7 @@ total_patterns = sum(demand[i] for i in ITEMS)
 total_length = {}
 for p in range(total_patterns):
     total_length[p] = 20
-PATTERNS = total_length.keys()
+PATTERNS = list(total_length.keys())
 
 def cross(i1, i2):
     r = []
@@ -125,15 +127,15 @@ dippy.Solve(prob, {
         # use default IP to solve subproblems
 })
 
-for i, var in useVars.items():
+for i, var in list(useVars.items()):
     if var.varValue:
-        print "Use", i, var.varValue
+        print("Use", i, var.varValue)
 
 for pat in PATTERNS:
     for i in ITEMS:
         if cutVars[(pat, i)].varValue:
-            print "Pat", pat, "item", i, \
-                  cutVars[(pat, i)].varValue
+            print("Pat", pat, "item", i, \
+                  cutVars[(pat, i)].varValue)
 
 ##for (pat, w), var in cutVars.items():
 ##    if var.varValue:

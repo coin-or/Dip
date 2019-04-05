@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 from pulp import *
 import sys
 
@@ -14,7 +16,7 @@ from math import sqrt
 CITY_LOCS = [(0, 2), (0, 4), (1, 2), (1, 4), \
              (4, 1), (4, 4), (4, 5),  (5, 0), \
              (5, 2), (5, 5)]
-CITIES = range(len(CITY_LOCS))
+CITIES = list(range(len(CITY_LOCS)))
 
 ARCS = [] # list of arcs (no duplicates)
 ARC_COSTS = {} # distance
@@ -113,6 +115,6 @@ def get_subtour(sol, node):
 dippy.Solve(prob, {'doCut': '1'})
 
 # print solution
-for arc, var in arc_vars.items():
+for arc, var in list(arc_vars.items()):
     if var.varValue:
-        print arc, var.varValue
+        print(arc, var.varValue)

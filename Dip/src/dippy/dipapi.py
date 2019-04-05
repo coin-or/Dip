@@ -16,6 +16,7 @@ def Solve(prob, params=None):
     print "Error returned from _dippy"
     raise
 """
+from builtins import object
 
 class DipAPIError(Exception):
   """

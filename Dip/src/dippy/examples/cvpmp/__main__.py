@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+from __future__ import absolute_import
 __title__   = 'Main module of B&P-cut for the CVPMP and CVPCP'
 __version__ = '1.0 Nov 2013'
 __author__  = 'Dago Quevedo'
@@ -8,16 +9,16 @@ __email__   = 'dago@yalma.fime.uanl.mx'
 
 
 import  sys
-import  draw
-import  Global
+from . import  draw
+from . import  Global
 
 try:
     import path
 except ImportError:
     pass
         
-import  CVPMP
-from    readInstance import *
+from . import  CVPMP
+from    .readInstance import *
 
 def main():
     #read instance

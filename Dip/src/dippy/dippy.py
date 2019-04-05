@@ -1,3 +1,8 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import pulp
 
 import sys
@@ -7,7 +12,7 @@ try:
 except ImportError:
     pass
 
-from dipapi import DipAPI
+from .dipapi import DipAPI
 
 from _dippy import *
 
@@ -112,13 +117,13 @@ def Solve(prob, params=None):
     if prob.is_solution_feasible == None:
         params['pyIsSolutionFeasible'] = '0'
 
-    for key, value in params.items():
+    for key, value in list(params.items()):
         valid_types = (basestring, int, float)
         if not isinstance(key, basestring):
             raise DipError("Bad key in parameter dictionary, expecting string")
         if isinstance(value, dict):
             section = key
-            for name, param_val in value.items():
+            for name, param_val in list(value.items()):
                 if not isinstance(param_val, valid_types):
                     raise DipError("Bad value '%s' in parameter dictionary, expecting string or number" % param_val)
                 processed[(section, name)] = str(param_val)
@@ -159,8 +164,8 @@ def Solve(prob, params=None):
                 prob.last_svg += 1
             
     except Exception as ex:
-        print "Error returned from _dippy"
-        print ex
+        print("Error returned from _dippy")
+        print(ex)
         raise
 
     if solList is None:
@@ -325,14 +330,14 @@ class DipProblem(pulp.LpProblem, DipAPI):
         
         if self.display_mode != 'off':
             if not gimpy_installed:
-                print "GiMPy not installed. Display mode set to 'off'"
+                print("GiMPy not installed. Display mode set to 'off'")
                 self.display_mode = 'off'
             else:
                 if grumpy_installed:
                     self.Tree = BBTree()
                 else:
                     if self.layout == 'bak':
-                        print "GrUMPy not installed. Display mode set to 'off'"
+                        print("GrUMPy not installed. Display mode set to 'off'")
                         self.display_mode = 'off'
                     else:
                         self.Tree = BinaryTree()
@@ -359,13 +364,13 @@ class DipProblem(pulp.LpProblem, DipAPI):
         if dipcopy.objective != None:
             dipcopy.objective = self.objective.copy()
         dipcopy.constraints = {}
-        for k,v in self.constraints.iteritems():
+        for k,v in self.constraints.items():
             dipcopy.constraints[k] = v.copy()
         dipcopy.sos1 = self.sos1.copy()
         dipcopy.sos2 = self.sos2.copy()
 
         dipcopy._subproblem = self._subproblem[:]
-        for k in self.relaxation.keys():
+        for k in list(self.relaxation.keys()):
             dipcopy.relaxation[k] = self.relaxation[k].copy()
 
         return dipcopy
@@ -384,10 +389,10 @@ class DipProblem(pulp.LpProblem, DipAPI):
         variables = {}
         if self.objective:
             variables.update(self.objective)
-        for c in self.constraints.itervalues():
+        for c in self.constraints.values():
             variables.update(c)
         for p in sorted(self.relaxation.keys()):
-            for c in self.relaxation[p].constraints.itervalues():
+            for c in self.relaxation[p].constraints.values():
                 variables.update(c)
         variables = list(variables)
         variables = sorted(variables, key=lambda variable: variable.name)
@@ -414,10 +419,10 @@ class DipProblem(pulp.LpProblem, DipAPI):
         if problem is None:
             problem = self
 
-        for n, c in problem.constraints.iteritems():
+        for n, c in problem.constraints.items():
             if c.name == None:
                 c.name = n
-        constraints = problem.constraints.values()
+        constraints = list(problem.constraints.values())
 
         return constraints
 
@@ -434,7 +439,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
             variables = self.variables()
         else:
             variables = {}
-            for c in problem.constraints.itervalues():
+            for c in problem.constraints.values():
                 variables.update(c)
             variables = list(variables)
             variables = sorted(variables, key=lambda variable: variable.name)
@@ -483,7 +488,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
         repeated_names = {}
         for v in vs:
             repeated_names[v.name] = repeated_names.get(v.name, 0) + 1
-        repeated_names = [(key, value) for key, value in repeated_names.items()
+        repeated_names = [(key, value) for key, value in list(repeated_names.items())
                             if value >= 2]
         if repeated_names:
             raise PulpError('Repeated variable names in Lp format\n' 
@@ -533,7 +538,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
         f = file(filename, "w")
         f.write("\\* "+relaxation.name+" *\\\n")
         f.write("Subject To\n")
-        ks = relaxation.constraints.keys()
+        ks = list(relaxation.constraints.keys())
         ks.sort()
         for k in ks:
             f.write(relaxation.constraints[k].asCplexLpConstraint(k))
@@ -604,10 +609,10 @@ class DipProblem(pulp.LpProblem, DipAPI):
           
     def decipherNode(self, output):
         outputDict = dict(output)
-        if "xhat" in outputDict.keys():
+        if "xhat" in list(outputDict.keys()):
             xhat = outputDict["xhat"]
             outputDict["xhat"] = dict(xhat)
-        if "bounds" in outputDict.keys():
+        if "bounds" in list(outputDict.keys()):
             bounds = outputDict["bounds"]
             outputDict["bounds"] = dict(bounds)
             
@@ -838,7 +843,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
             setRedCostVars = set(redCostDict.keys())
             diff = setVars.symmetric_difference(setRedCostVars)
             if len(diff) > 0:
-                print diff
+                print(diff)
                 raise DipError("Reduced cost and variable list don't match in",
                                "solveRelaxed")
     
@@ -930,7 +935,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 if len(cuts) > 0:
                     return cuts
                 else:
-                    print "Empty cut list in generateCuts, returning None"
+                    print("Empty cut list in generateCuts, returning None")
 
         except Exception as ex:
             errorStr = "Error in generateCuts\n%s" % ex
@@ -971,7 +976,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 if len(sols) > 0:
                     return sols
                 else:
-                    print "Empty solution list in solveHeuristics, returning None"
+                    print("Empty solution list in solveHeuristics, returning None")
 
         except Exception as ex:
             errorStr = "Error in solveHeuristics\n%s" % ex
@@ -996,7 +1001,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
                 if len(bvs) > 0:
                     return bvs
                 else:
-                    print "Empty variable list in generateInitVars, returning None"
+                    print("Empty variable list in generateInitVars, returning None")
 
         except Exception as ex:
             errorStr = "Error in generateInitVars\n%s" % ex
@@ -1023,7 +1028,7 @@ class RelaxationCollection(object):
         self.dict[name] = value
 
     def keys(self):
-        return self.dict.keys()
+        return list(self.dict.keys())
 
     def values(self):
-        return self.dict.values()
+        return list(self.dict.values())

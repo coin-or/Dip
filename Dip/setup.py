@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from ez_setup import use_setuptools
-use_setuptools()
+#from ez_setup import use_setuptools
+#use_setuptools()
 from setuptools import setup, Extension
 import subprocess, os, sys
 from os.path import join, dirname
@@ -95,7 +95,7 @@ files = ['DippyDecompAlgo.cpp',
          'DippyPythonUtils.cpp',
          ]
 
-sources = [join('src/dippy', f) for f in files]
+sources = [join('src', 'dippy', f) for f in files]
 
 lib_dirs = get_lib_dirs(coin_install_dir)
 lib_dirs.append(join(coin_install_dir, 'lib'))
@@ -104,7 +104,7 @@ if operatingSystem is 'windows':
 if operatingSystem is 'mac':
     os.environ['LDFLAGS'] = get_frameworks(coin_install_dir)
 
-modules=[Extension('_dippy', 
+modules=[Extension('coinor.dippy._dippy', 
                    sources, 
                    libraries=libraries,
                    include_dirs=[join(coin_install_dir, 'include', 'coin'),

@@ -1,4 +1,8 @@
-from coke_func import CokeProb, read_table, formulate, solve, \
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from past.utils import old_div
+from .coke_func import CokeProb, read_table, formulate, solve, \
                       print_table, print_var_table
 
 if __name__ == '__main__':
@@ -71,19 +75,19 @@ if __name__ == '__main__':
     prob = formulate(cp)
 
     # Set a zero tolerance (Mike Saunders' "magic number")  
-    prob.tol = pow(pow(2, -24), 2.0 / 3.0)
+    prob.tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
     xopt = solve(prob)
 
     for l in cp.LOCATIONS:
         for s in cp.SIZES:
             if xopt[prob.buildVars[(l,s)]] > 0:
-                print "Build %s %s (%s)" % \
-                      (l, s, xopt[prob.buildVars[(l,s)]])
-    print
+                print("Build %s %s (%s)" % \
+                      (l, s, xopt[prob.buildVars[(l,s)]]))
+    print()
 
     print_var_table(cp.MINES, LOCATIONS, prob.flowVars)
-    print
+    print()
     print_var_table(cp.LOCATIONS, cp.CUSTOMERS, prob.flowVars)
 
     if prob.display_mode != 'off':

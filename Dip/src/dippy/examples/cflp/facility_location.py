@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import sys
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
@@ -18,22 +24,22 @@ except ImportError:
 
 from math import floor, ceil
 
-tol = pow(pow(2, -24), 2.0 / 3.0)
+tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
-from facility_ex2 import REQUIREMENT, PRODUCTS
-from facility_ex2 import LOCATIONS, CAPACITY
+from .facility_ex2 import REQUIREMENT, PRODUCTS
+from .facility_ex2 import LOCATIONS, CAPACITY
 try:
-    from facility_ex2 import FIXED_COST
+    from .facility_ex2 import FIXED_COST
 except ImportError:
     FIXED_COST = [1 for i in LOCATIONS]
 
 try:
-    from facility_ex2 import ASSIGNMENTS
+    from .facility_ex2 import ASSIGNMENTS
 except ImportError:
     ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
 
 try:
-    from facility_ex2 import ASSIGNMENT_COSTS
+    from .facility_ex2 import ASSIGNMENT_COSTS
 except ImportError:
     ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
@@ -68,10 +74,10 @@ for i, j in ASSIGNMENTS:
 
 def solve_subproblem(prob, key, redCosts, target):
     if debug_print:
-        print "solve_subproblem..."
-        print "reduced costs:"
-        print redCosts
-        print "target value:", target
+        print("solve_subproblem...")
+        print("reduced costs:")
+        print(redCosts)
+        print("target value:", target)
    
     loc = key
 
@@ -86,15 +92,15 @@ def solve_subproblem(prob, key, redCosts, target):
    
     # Get the reduced cost of the knapsack solution
     if debug_print:
-        print [(v, redCosts[v]) for v in avars]
-        print obj
-        print "z, solution =", z, solution
-        print "redCosts[use_vars[loc]] =", redCosts[use_vars[loc]]
-        print "Fixed cost, rc", FIXED_COST[loc], redCosts[use_vars[loc]] - z
+        print([(v, redCosts[v]) for v in avars])
+        print(obj)
+        print("z, solution =", z, solution)
+        print("redCosts[use_vars[loc]] =", redCosts[use_vars[loc]])
+        print("Fixed cost, rc", FIXED_COST[loc], redCosts[use_vars[loc]] - z)
 
     if redCosts[use_vars[loc]] > z + tol: # ... or an empty location is "useful"
         if debug_print:
-            print "Zero solution is optimal"
+            print("Zero solution is optimal")
         return DipSolStatOptimal, [{}]
 
     var_values = dict([(avars[i], 1) for i in solution])
@@ -102,10 +108,10 @@ def solve_subproblem(prob, key, redCosts, target):
 
     if debug_print:
         rcCheck = 0.0
-        for v in var_values.keys():
+        for v in list(var_values.keys()):
             rcCheck += redCosts[v] * var_values[v]
-        print "Checking rc calc", redCosts[use_vars[loc]] - z, rcCheck 
-        print var_values
+        print("Checking rc calc", redCosts[use_vars[loc]] - z, rcCheck) 
+        print(var_values)
 
     return DipSolStatOptimal, [var_values]
 
@@ -131,7 +137,7 @@ def knapsack01(obj, weights, capacity):
 
         solution =  [i for i in range(n) if var_dict[str(i)].varValue > tol ]
 
-        print relax_obj, solution
+        print(relax_obj, solution)
 
 
     c = [[0]*(capacity+1) for i in range(n)]
@@ -330,20 +336,20 @@ def init_first_fit(prob):
     for loc in locations:
         i = LOCATIONS[index]
         if debug_print:
-            print [(assign_vars[(i, j)], 1) for j in loc[0]]
+            print([(assign_vars[(i, j)], 1) for j in loc[0]])
         var_values = dict([(assign_vars[(i, j)], 1) for j in loc[0]])
         var_values[use_vars[i]] = 1
         dv = (loc[1], var_values)
         bvs.append((i, dv))
         index += 1
     if debug_print:
-        print bvs
+        print(bvs)
     return bvs
 
 def init_one_each(prob):
     bvs = []
     if debug_print:
-        print "LOCATIONS =", LOCATIONS
+        print("LOCATIONS =", LOCATIONS)
     for index, loc in enumerate(LOCATIONS):
         lc = [PRODUCTS[index]]
         waste = CAPACITY - REQUIREMENT[PRODUCTS[index]]
@@ -353,7 +359,7 @@ def init_one_each(prob):
         dv = (waste, var_values)
         bvs.append((loc, dv))
     if debug_print:
-        print bvs
+        print(bvs)
     return bvs
 
 if debug_print_lp:
@@ -396,11 +402,11 @@ if prob.display_mode != 'off':
     prob.Tree.display()
 
 # print solution
-print "Optimal solution found!" 
-print "************************************"
+print("Optimal solution found!") 
+print("************************************")
 for i in LOCATIONS:
     if use_vars[i].varValue > 0:
-        print "Location ", i, " is assigned: ",
-        print [j for j in PRODUCTS if assign_vars[(i, j)].varValue > 0]
-print "************************************"
-print
+        print("Location ", i, " is assigned: ", end=' ')
+        print([j for j in PRODUCTS if assign_vars[(i, j)].varValue > 0])
+print("************************************")
+print()

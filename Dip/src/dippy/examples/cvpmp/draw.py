@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 
 
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from past.utils import old_div
 __title__   = 'Display graphic solution for the CVPMP and CVPCP'
 __version__ = '1.0 Nov 2013'
 __author__  = 'Dago Quevedo'
@@ -8,7 +14,7 @@ __email__   = 'dago@yalma.fime.uanl.mx'
 
 
 import  string
-from    Tkinter import  * 
+from    tkinter import  * 
 
 def draw(path, mytype, id):
     f = open(path,"r")
@@ -40,11 +46,11 @@ def draw(path, mytype, id):
     
 
     for i in range(len(V)):
-        V[i][3] = (((V[i][3] - x_min) / (x_max - x_min)) * scale) + delta
-        V[i][4] = (((V[i][4] - y_min) / (y_max - y_min)) * scale) + delta
+        V[i][3] = ((old_div((V[i][3] - x_min), (x_max - x_min))) * scale) + delta
+        V[i][4] = ((old_div((V[i][4] - y_min), (y_max - y_min))) * scale) + delta
         if i  <  len(P):
-            P[i][3] = (((P[i][3] - x_min) / (x_max - x_min)) * scale) + delta
-            P[i][4] = (((P[i][4] - y_min) / (y_max - y_min)) * scale) + delta
+            P[i][3] = ((old_div((P[i][3] - x_min), (x_max - x_min))) * scale) + delta
+            P[i][4] = ((old_div((P[i][4] - y_min), (y_max - y_min))) * scale) + delta
 
     _d_ = 0
     

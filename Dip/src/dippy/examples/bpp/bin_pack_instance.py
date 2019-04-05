@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 # bin_pack_instance.py
-from bin_pack_func import BinPackProb, formulate, solve
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from past.utils import old_div
+from .bin_pack_func import BinPackProb, formulate, solve
 
 import sys
 
@@ -14,7 +18,7 @@ if __name__ == '__main__':
     prob = formulate(bpp)
 
     # Set a zero tolerance (Mike Saunders' "magic number")	
-    prob.tol = pow(pow(2, -24), 2.0 / 3.0)
+    prob.tol = pow(pow(2, -24), old_div(2.0, 3.0))
     if len(sys.argv) > 1:
         xopt = solve(prob, sys.argv[1])
     else:
@@ -22,9 +26,9 @@ if __name__ == '__main__':
   
     if xopt is not None:
         for var in prob.variables():
-            print var.name, "=", xopt[var]
+            print(var.name, "=", xopt[var])
     else:
-        print "Dippy could not find and optimal solution"    
+        print("Dippy could not find and optimal solution")    
   
     if prob.display_mode != 'off':
         numNodes = len(prob.Tree.get_node_list())

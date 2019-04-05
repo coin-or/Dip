@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+from builtins import range
 import unittest
 from pulp import *
 import coinor.dippy as dippy
 
-from dippy_tests import DippyTestCase
+from .dippy_tests import DippyTestCase
 
 
 class TestTSPProblem(DippyTestCase):
@@ -51,7 +53,7 @@ def create_tsp_problem(doRelaxed=False):
     CITY_LOCS = [(0, 2), (0, 4), (1, 2), (1, 4), \
                  (4, 1), (4, 4), (4, 5),  (5, 0), \
                  (5, 2), (5, 5)]
-    CITIES = range(len(CITY_LOCS))
+    CITIES = list(range(len(CITY_LOCS)))
 
     ARCS = [] # list of arcs (no duplicates)
     ARC_COSTS = {} # distance

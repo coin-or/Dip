@@ -1,3 +1,7 @@
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 CGL_cuts = True
 Advanced_branch = True
 
@@ -23,17 +27,17 @@ except ImportError:
     except ImportError:
         import coinor.dippy as dippy
 
-class CokeProb:
+class CokeProb(object):
     def __init__(self, supply, demand, LOCATIONS, build_costs,
                  conversion_factor, transport_costs):
-        self.MINES     = supply.keys()
+        self.MINES     = list(supply.keys())
         self.MINES.sort()
-        self.CUSTOMERS = demand.keys()
+        self.CUSTOMERS = list(demand.keys())
         self.CUSTOMERS.sort()
         self.LOCATIONS = LOCATIONS
-        self.SIZES     = build_costs.keys()
+        self.SIZES     = list(build_costs.keys())
         self.SIZES.sort()
-        self.ARCS      = transport_costs.keys()
+        self.ARCS      = list(transport_costs.keys())
         self.conversion_factor = conversion_factor
         self.supply            = supply
         self.demand            = demand
@@ -159,9 +163,9 @@ def read_table(data, coerce, transpose=False):
     return result
 
 def print_table(rows, cols, fn):
-    print "\t", "\t".join(cols)
+    print("\t", "\t".join(cols))
     for r in rows:
-        print r,"\t", "\t".join(str(fn(r,c)) for c in cols)
+        print(r,"\t", "\t".join(str(fn(r,c)) for c in cols))
 
 def print_var_table(rows, cols, var, fn=lambda x: x):
     print_table(rows, cols, lambda x, y:

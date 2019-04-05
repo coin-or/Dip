@@ -1,3 +1,5 @@
+from builtins import range
+from builtins import object
 CGL_cuts = False
 
 Bin_antisymmetry = False
@@ -26,11 +28,11 @@ except ImportError:
 
 from math import floor, ceil
 
-class BinPackProb:
+class BinPackProb(object):
     def __init__(self, ITEMS, volume, capacity):
         self.ITEMS = ITEMS
         self.volume = volume
-        self.BINS = range(len(ITEMS)) # Create 1 bin for each
+        self.BINS = list(range(len(ITEMS))) # Create 1 bin for each
                                       # item, indices start at 0
         self.capacity = capacity
     
@@ -278,7 +280,7 @@ def first_fit(prob):
 #  print "first fit..."
   
     bpp = prob.bpp
-    sorted_volume = sorted(bpp.volume.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sorted_volume = sorted(iter(bpp.volume.items()), key=operator.itemgetter(1), reverse=True)
     sorted_ITEMS = [i for (i, v) in sorted_volume]
   
 #   print sorted_ITEMS
@@ -300,7 +302,7 @@ def frac_fit(prob, xhat):
     assign = dict(((i, j), xhat[assign_vars[i, j]]) for i in bpp.ITEMS for j in bpp.BINS)
 #   print assign
   
-    sorted_assign = sorted(assign.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sorted_assign = sorted(iter(assign.items()), key=operator.itemgetter(1), reverse=True)
     order = [(i, j) for ((i, j), x) in sorted_assign]
    
 #   print order

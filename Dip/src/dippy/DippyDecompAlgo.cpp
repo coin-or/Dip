@@ -64,11 +64,11 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
          pDownUB = PyDict_New();
          downBranchVar = PyList_GetItem(app->m_colList, downBranchUB[0].first);
          PyDict_SetItem(pDownUB, downBranchVar, 
-			PyInt_FromLong(static_cast<int>(round(downBranchUB[0].second))));
+			PyLong_FromLong(static_cast<int>(round(downBranchUB[0].second))));
          pUpLB = PyDict_New();
          upBranchVar = PyList_GetItem(app->m_colList, upBranchLB[0].first);
          PyDict_SetItem(pUpLB, upBranchVar, 
-			PyInt_FromLong(static_cast<int>(round(upBranchLB[0].second))));
+			PyLong_FromLong(static_cast<int>(round(upBranchLB[0].second))));
          pUpUB = PyDict_New(); // Up branch UBs is an empty dictionary
          assert(downBranchVar == upBranchVar);
       }else{
@@ -109,23 +109,23 @@ void DippyAlgoMixin::postProcessBranch(DecompAlgo* algo,
    double quality = node->getQuality();
 
    if (pDownLB != NULL) {
-      addTupleToPyList(pOutput, PyString_FromString("pDownLB"), pDownLB);
+      addTupleToPyList(pOutput, PyUnicode_FromString("pDownLB"), pDownLB);
    }
 
    if (pDownUB != NULL) {
-      addTupleToPyList(pOutput, PyString_FromString("pDownUB"), pDownUB);
+      addTupleToPyList(pOutput, PyUnicode_FromString("pDownUB"), pDownUB);
    }
 
    if (pUpLB != NULL) {
-      addTupleToPyList(pOutput, PyString_FromString("pUpLB"), pUpLB);
+      addTupleToPyList(pOutput, PyUnicode_FromString("pUpLB"), pUpLB);
    }
 
    if (pUpUB != NULL) {
-      addTupleToPyList(pOutput, PyString_FromString("pUpUB"), pUpUB);
+      addTupleToPyList(pOutput, PyUnicode_FromString("pUpUB"), pUpUB);
    }
 
-   addTupleToPyList(pOutput, PyString_FromString("nodeIndex"), PyInt_FromLong(algo->getNodeIndex()));
-   addTupleToPyList(pOutput, PyString_FromString("nodeQuality"), PyFloat_FromDouble(quality));
+   addTupleToPyList(pOutput, PyUnicode_FromString("nodeIndex"), PyLong_FromLong(algo->getNodeIndex()));
+   addTupleToPyList(pOutput, PyUnicode_FromString("nodeQuality"), PyFloat_FromDouble(quality));
    char arg1[] = "postProcessBranch";
    char arg2[] = "O";
    PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2, pOutput);

@@ -62,11 +62,11 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
          PyObject* pSection = PyTuple_GetItem(pKey, 0);
 
          if (pSection != Py_None) {
-            section = PyString_AsString(PyTuple_GetItem(pKey, 0));
+            section = PyBytes_AsString(PyTuple_GetItem(pKey, 0));
          }
 
-         const char* name = PyString_AsString(PyTuple_GetItem(pKey, 1));
-         const char* value = PyString_AsString(pValue);
+         const char* name = PyBytes_AsString(PyTuple_GetItem(pKey, 1));
+         const char* value = PyBytes_AsString(pValue);
          utilParam.Add(section, name, value);
       }
 
@@ -107,26 +107,26 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
 
       switch (status) {
       case AlpsExitStatusOptimal:
-         pStatus = PyInt_FromLong(1);
+         pStatus = PyLong_FromLong(1);
          break;
 
       case AlpsExitStatusTimeLimit:
-         pStatus = PyInt_FromLong(0);
-         pMessage = PyString_FromString("Reached time limit");
+         pStatus = PyLong_FromLong(0);
+         pMessage = PyUnicode_FromString("Reached time limit");
          break;
 
       case AlpsExitStatusNodeLimit:
-         pStatus = PyInt_FromLong(0);
-         pMessage = PyString_FromString("Reached node limit");
+         pStatus = PyLong_FromLong(0);
+         pMessage = PyUnicode_FromString("Reached node limit");
          break;
 
       case AlpsExitStatusSolLimit:
-         pStatus = PyInt_FromLong(0);
-         pMessage = PyString_FromString("Reached sol limit");
+         pStatus = PyLong_FromLong(0);
+         pMessage = PyUnicode_FromString("Reached sol limit");
          break;
 
       case AlpsExitStatusInfeasible:
-         pStatus = PyInt_FromLong(-1);
+         pStatus = PyLong_FromLong(-1);
          break;
 
       case AlpsExitStatusNoMemory:
@@ -136,7 +136,7 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
          throw UtilException("Solve failed", "Solve", "DippySolve");
 
       case AlpsExitStatusUnbounded:
-         pStatus = PyInt_FromLong(-2);
+         pStatus = PyLong_FromLong(-2);
          break;
 
       case AlpsExitStatusFeasible:

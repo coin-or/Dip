@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 __title__     = 'B&P-cut for the Capacitated Vertex p-Median Problem (CVPMP)'
 __version__   = '1.0 Nov 2013'
 __author__    = 'Dago Quevedo'
@@ -31,7 +34,7 @@ V  = None
 x  = None
 y  = None
 
-tol          = pow(pow(2, -24), 2.0 / 3.0)
+tol          = pow(pow(2, -24), old_div(2.0, 3.0))
 display_mode = 'off'
 
 def init(_n,_p,_d,_s,_w,_V):
