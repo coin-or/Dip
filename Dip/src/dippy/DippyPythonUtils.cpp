@@ -29,6 +29,8 @@ PyObject* pyTupleList_FromDoubleArray(const double* values, PyObject* pList)
       insertTupleToPyList(pTupleList, i, pObj, PyFloat_FromDouble(values[i]));
    }
 
+   assert(!PyErr_Occurred());
+
    return pTupleList;
 }
 
@@ -164,6 +166,9 @@ PyObject* pyTupleList_FromNode(DecompAlgo* algo, DecompStatus decompStatus)
    addTupleToPyList(pOutput, PyUnicode_FromString("atLB"), pLBList);
    addTupleToPyList(pOutput, PyUnicode_FromString("atUB"), pUBList);
    */
+
+   assert(!PyErr_Occurred());
+
    return pOutput;
 }
 
@@ -192,15 +197,20 @@ void pyColDict_AsPairedVector(PyObject* pColDict, vector<pair<int, double> >& ve
 	 PyObject* pColName = PyObject_CallMethod(pCol, str, NULL);
 
          if (pColName == NULL) {
-            throw UtilException("Error calling method col.__str__()", "pyColDict_AsPairedVector", "DippyPythonUtils");
+            throw UtilException("Error calling method col.__str__()", "pyColDict_AsPairedVector",
+                                "DippyPythonUtils");
          }
 
-         string name = PyBytes_AsString(pColName);
-         throw UtilException("Bad index for " + name, "pyTupleList_AsPairedVector", "DippyPythonUtils");
+         string name = PyBytes_AsString(PyUnicode_AsEncodedString(pColName, "UTF-8", "strict"));
+
+         throw UtilException("Bad index for " + name, "pyTupleList_AsPairedVector",
+                             "DippyPythonUtils");
       }
 
       vec.push_back(pair<int, double>(index, value));
    }
+
+   assert(!PyErr_Occurred());
 }
 
 /**
@@ -231,16 +241,20 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
          PyObject* pColName = PyObject_CallMethod(pCol, getName, NULL);
 
          if (pColName == NULL) {
-            throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
+            throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays",
+                                "DippyPythonUtils");
          }
 
-         string name = PyBytes_AsString(pColName);
+         string name = PyBytes_AsString(PyUnicode_AsEncodedString(pColName, "UTF-8", "strict"));
+
          throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays", "DippyPythonUtils");
       }
 
       (*inds)[i] = index;
       (*vals)[i] = value;
    }
+
+   assert(!PyErr_Occurred());
 
    return len;
 }
@@ -265,18 +279,27 @@ int pyColDict_AsPackedArrays(PyObject* pColDict, map<PyObject*, int> indices, in
          PyObject* pColName = PyObject_CallMethod(pCol, getName, NULL);
 
          if (pColName == NULL) {
-            throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays", "DippyPythonUtils");
+            throw UtilException("Error calling method col.getName()", "pyColDict_AsPackedArrays",
+                                "DippyPythonUtils");
          }
 
-         string name = PyBytes_AsString(pColName);
-         throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays", "DippyPythonUtils");
+         string name = PyBytes_AsString(PyUnicode_AsEncodedString(pColName, "UTF-8", "strict"));
+
+         throw UtilException("Bad index for " + name, "pyColDict_AsPackedArrays",
+                             "DippyPythonUtils");
       }
       char getVarType[] = "getVarType";
       PyObject* pColType = PyObject_CallMethod(pCol, getVarType, NULL);      
+      if (pColType == NULL){
+         throw UtilException("getVarType call failed.", "pyColDict_AsPackedArrays",
+                             "DippyPythonUtils");
+      }
      
       (*inds)[i] = index;
       (*vals)[i] = value;
    }
+
+   assert(!PyErr_Occurred());
 
    return len;
 }
@@ -332,6 +355,8 @@ CoinPackedMatrix* pyConstraints_AsPackedMatrix(PyObject* pRowList,
       start += num;
    }
 
+   assert(!PyErr_Occurred());
+
    return new CoinPackedMatrix(false, rowInds, colInds, values, numNZs);
 }
 
@@ -344,6 +369,7 @@ void addTupleToPyList(PyObject* pList, PyObject* key, PyObject* value)
    PyTuple_SetItem(pTuple, 0, key);
    PyTuple_SetItem(pTuple, 1, value);
    PyList_Append(pList, pTuple);
+   assert(!PyErr_Occurred());
 }
 
 /**
@@ -355,5 +381,6 @@ void insertTupleToPyList(PyObject* pList, unsigned position, PyObject* key, PyOb
    PyTuple_SetItem(pTuple, 0, key);
    PyTuple_SetItem(pTuple, 1, value);
    PyList_SetItem(pList, position, pTuple);
+   assert(!PyErr_Occurred());
 }
 

@@ -14,7 +14,7 @@ except ImportError:
 
 from .dipapi import DipAPI
 
-from _dippy import *
+from ._dippy import *
 
 gimpy_installed = True
 try:

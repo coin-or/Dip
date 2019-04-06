@@ -37,13 +37,12 @@ def GenerateRandomBlock(VARIABLES, CONSTRAINTS, density = 0.2,
                                   for i in CONSTRAINTS)
     return OBJ, MAT, RHS
 
-display_mode = 'xdot'
-layout = 'dot'
+#display_mode = 'xdot'
+#layout = 'dot'
 
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
-prob = dippy.DipProblem("MILP", display_mode = display_mode,
-                        layout = layout, display_interval = 0)
+prob = dippy.DipProblem("MILP")
 
 numBlocks = 1
 numBlockVars = [40]
@@ -81,18 +80,18 @@ for k in range(numBlocks):
         prob.relaxation[k] += (lpSum([MAT[(k, i), j]*var[k, i] for i in range(numBlockVars[k])])
                                <=RHS[j], j)
 
-dippy.Solve(prob, {
+dippy.Solve(prob,{
     'TolZero': '%s' % tol,
     'doCut': '1',
     'CutCGL': '1',
     'SolveMasterAsIp': '0',
     'generateInitVars': '1',
-#    'LogDebugLevel': '3',
-#    'LogLevel': '4',
-#    'LogDumpModel': 5,
-#    'ALPS' :
-#    {'msgLevel' : 3}
-})
+    'LogDebugLevel': '3',
+    'LogLevel': '4',
+    'LogDumpModel': 5,
+    'ALPS' :
+    {'msgLevel' : 3}}
+)
 
 if prob.display_mode != 'off':
     numNodes = len(prob.Tree.get_node_list())

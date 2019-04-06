@@ -31,8 +31,6 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
    char arg1[] = "chooseBranchSet";
    char arg2[] = "O";
    PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2,  pSolutionList);
-   // PyObject* pResult = PyObject_CallMethod(m_pProb, "chooseBranchSet", "O", 
-   // 					   pSolutionList);
 
    if (pResult == NULL) {
       //something's gone wrong with the function call, a Python exception has 
@@ -94,6 +92,7 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
       pyColDict_AsPairedVector(pUpUB, upBranchUB, app->m_colIndices);
       return true;
    }
+   assert(!PyErr_Occurred());
 }
 
 void DippyAlgoMixin::postProcessBranch(DecompAlgo* algo, 
@@ -129,7 +128,11 @@ void DippyAlgoMixin::postProcessBranch(DecompAlgo* algo,
    char arg1[] = "postProcessBranch";
    char arg2[] = "O";
    PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2, pOutput);
-   // PyObject* pResult = PyObject_CallMethod(m_pProb, "postProcessBranch", "O", pOutput);
+   if (pResult == NULL){
+      throw UtilException("postProcessNode call failed.", "postProcessNode", "DippyAlgoMixin");
+   }
+
+   assert(!PyErr_Occurred());
 }
 
 void DippyAlgoMixin::postProcessNode(DecompAlgo* algo, DecompStatus decompStatus)
@@ -142,6 +145,10 @@ void DippyAlgoMixin::postProcessNode(DecompAlgo* algo, DecompStatus decompStatus
    char arg1[] = "postProcessNode";
    char arg2[] = "O";
    PyObject* pResult = PyObject_CallMethod(m_pProb, arg1, arg2, pOutput);
-   // PyObject* pResult = PyObject_CallMethod(m_pProb, "postProcessNode", "O", pOutput);
+   if (pResult == NULL){
+      throw UtilException("postProcessNode call failed.", "postProcessNode", "DippyAlgoMixin");
+   }
+
+   assert(!PyErr_Occurred());
 }
 

@@ -26,27 +26,27 @@ from math import floor, ceil
 
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
-from .facility_ex2 import REQUIREMENT, PRODUCTS
-from .facility_ex2 import LOCATIONS, CAPACITY
+from facility_ex2 import REQUIREMENT, PRODUCTS
+from facility_ex2 import LOCATIONS, CAPACITY
 try:
-    from .facility_ex2 import FIXED_COST
+    from facility_ex2 import FIXED_COST
 except ImportError:
     FIXED_COST = [1 for i in LOCATIONS]
 
 try:
-    from .facility_ex2 import ASSIGNMENTS
+    from facility_ex2 import ASSIGNMENTS
 except ImportError:
     ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
 
 try:
-    from .facility_ex2 import ASSIGNMENT_COSTS
+    from facility_ex2 import ASSIGNMENT_COSTS
 except ImportError:
     ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
 
-display_mode = 'xdot'
+#display_mode = 'xdot'
+#layout = 'dot'
 
-prob = dippy.DipProblem("Facility Location", display_mode = display_mode,
-                        layout = 'dot', display_interval = 0)
+prob = dippy.DipProblem("Facility Location")
 
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)

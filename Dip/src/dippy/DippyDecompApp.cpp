@@ -65,7 +65,7 @@ void DippyDecompApp::createModels()
 			     "createModels", "DippyDecompApp");
       }
 
-      name = PyBytes_AsString(pRowName);
+      name = PyBytes_AsString(PyUnicode_AsEncodedString(pRowName, "UTF-8", "strict"));
 
       if (pRowLb == Py_None) {
          lb = -m_infinity;
@@ -119,7 +119,7 @@ void DippyDecompApp::createModels()
 			     "createModels", "DippyDecompApp");
       }
 
-      name = PyBytes_AsString(pColName);
+      name = PyBytes_AsString(PyUnicode_AsEncodedString(pColName, "UTF-8", "strict"));
 
       if (pColLb == Py_None) {
          lb = -m_infinity;
@@ -164,11 +164,11 @@ void DippyDecompApp::createModels()
    modelCore->M->setDimensions(modelCore->rowLB.size(), 
 			       modelCore->colLB.size());
    // subproblems
-   char getRelaxAsDict[] = "getRelaxAsDict";
-   PyObject* pRelaxedDict = PyObject_CallMethod(m_pProb, getRelaxAsDict, NULL);
+   char getRelaxsAsDict[] = "getRelaxsAsDict";
+   PyObject* pRelaxedDict = PyObject_CallMethod(m_pProb, getRelaxsAsDict, NULL);
 
    if (pRelaxedDict == NULL) {
-      throw UtilException("Error calling method prob.getRelaxAsDict()", 
+      throw UtilException("Error calling method prob.getRelaxsAsDict()", 
 			  "createModels", "DippyDecompApp");
    }
 
@@ -238,7 +238,7 @@ void DippyDecompApp::createModels()
 				"createModels", "DippyDecompApp");
          }
 
-         name = PyBytes_AsString(pRowName);
+         name = PyBytes_AsString(PyUnicode_AsEncodedString(pRowName, "UTF-8", "strict"));
 
          if (pRowLb == Py_None) {
             lb = -m_infinity;
@@ -308,6 +308,8 @@ void DippyDecompApp::createModels()
    // set the core problem
    setModelCore(modelCore, "CORE");
    UTIL_DELARR(masterOnly);
+   
+   assert(!PyErr_Occurred());
 }
 
 /**
@@ -344,7 +346,8 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
    Py_DECREF(pConvexDual);
 
    if ( (pStatandVarList == NULL) || (pStatandVarList == Py_None) ){
-      throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed", "DippyDecompApp");
+      throw UtilException("Error calling method prob.solveRelaxed()", "solveRelaxed",
+                          "DippyDecompApp");
    }
 
    // [status, varList] = relaxed_solver(...)
@@ -400,6 +403,8 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
 
    Py_DECREF(pStatandVarList);
 
+   assert(!PyErr_Occurred());
+
    return status;
 }
 
@@ -422,14 +427,18 @@ bool DippyDecompApp::APPisUserFeasible(const double* x, const int n_cols, const 
    PyObject* pResult = PyObject_CallMethod(m_pProb, isUserFeasible, Od, pSolutionList, pTolZero);
 
    if (pResult == NULL) {
-      throw UtilException("Error calling method prob.isUserFeasible()", "APPisUserFeasible", "DippyDecompApp");
+      throw UtilException("Error calling method prob.isUserFeasible()", "APPisUserFeasible",
+                          "DippyDecompApp");
    }
 
-   // This should not happen as having isUserFeasible present but not returning a boolean is not good
+   // This should not happen as having isUserFeasible present but not returning a boolean is
+   // not good
    if (pResult == Py_None) {
       // method exists, but not implemented, return true
       return true;
    }
+
+   assert(!PyErr_Occurred());
 
    return (bool)PyObject_IsTrue(pResult);
 }
@@ -454,7 +463,8 @@ int DippyDecompApp::generateCuts(const double* x, DecompCutList& cutList)
    PyObject* pCutList = PyObject_CallMethod(m_pProb, generateCuts, O, pPackagedNode);
 
    if (pCutList == NULL) {
-      throw UtilException("Error calling method prob.generateCuts()", "generateCuts", "DippyDecompApp");
+      throw UtilException("Error calling method prob.generateCuts()", "generateCuts",
+                          "DippyDecompApp");
    }
 
    // This should never happen, pyGenerateCuts should be set to false in dippy.py
@@ -499,6 +509,8 @@ int DippyDecompApp::generateCuts(const double* x, DecompCutList& cutList)
       cutList.push_back(cut);
    }
 
+   assert(!PyErr_Occurred());
+
    return len;
 }
 
@@ -520,7 +532,8 @@ int DippyDecompApp::APPheuristics(const double* xhat, const double* origCost, ve
    PyObject* pSolList = PyObject_CallMethod(m_pProb, solveHeuristics, OO, pSolution, pObjective);
 
    if (pSolList == NULL) {
-      throw UtilException("Error calling method prob.solveHeuristics()", "APPheuristics", "DippyDecompApp");
+      throw UtilException("Error calling method prob.solveHeuristics()", "APPheuristics",
+                          "DippyDecompApp");
    }
 
    // This should never happen, pyHeuristics should be set to false in dippy.py
@@ -553,6 +566,8 @@ int DippyDecompApp::APPheuristics(const double* xhat, const double* origCost, ve
       delete [] varVals;
    }
 
+   assert(!PyErr_Occurred());
+
    return len;
 }
 
@@ -571,7 +586,8 @@ int DippyDecompApp::generateInitVars(DecompVarList& initVars)
    PyObject* pVarList = PyObject_CallMethod(m_pProb, generateInitVars, NULL);
 
    if (pVarList == NULL) {
-      throw UtilException("Error calling method prob.generateInitVars()", "generateInitVars", "DippyDecompApp");
+      throw UtilException("Error calling method prob.generateInitVars()", "generateInitVars",
+                          "DippyDecompApp");
    }
 
    if (pVarList == Py_None)
@@ -602,6 +618,8 @@ int DippyDecompApp::generateInitVars(DecompVarList& initVars)
       var->setBlockId(whichBlock);
       initVars.push_back(var);
    }
+
+   assert(!PyErr_Occurred());
 
    return nVars;
 }

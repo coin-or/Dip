@@ -62,11 +62,15 @@ DLLEXPORT PyObject* Solve(PyObject* self, PyObject* args)
          PyObject* pSection = PyTuple_GetItem(pKey, 0);
 
          if (pSection != Py_None) {
-            section = PyBytes_AsString(PyTuple_GetItem(pKey, 0));
+            section = PyBytes_AsString(PyUnicode_AsEncodedString(PyTuple_GetItem(pKey, 0),
+                                                                 "UTF-8", "strict"));
          }
 
-         const char* name = PyBytes_AsString(PyTuple_GetItem(pKey, 1));
-         const char* value = PyBytes_AsString(pValue);
+         const char* name =
+            PyBytes_AsString(PyUnicode_AsEncodedString(PyTuple_GetItem(pKey, 1),
+                                                       "UTF-8", "strict"));
+         const char* value =
+            PyBytes_AsString(PyUnicode_AsEncodedString(pValue, "UTF-8", "strict"));
          utilParam.Add(section, name, value);
       }
 
