@@ -454,8 +454,8 @@ class DipProblem(pulp.LpProblem, DipAPI):
         return self.relaxation.dict
 
     def writeFull(self, instancefile, blockfile, mip = True):
-        f = file(instancefile, "w")
-        b = file(blockfile, "w")
+        f = open(instancefile, "w")
+        b = open(blockfile, "w")
         f.write("\\* "+self.name+" *\\\n")
         if self.sense == 1:
             f.write("Minimize\n")
@@ -535,7 +535,7 @@ class DipProblem(pulp.LpProblem, DipAPI):
             - The file is created.
         """
         relaxation = self.relaxation[block]
-        f = file(filename, "w")
+        f = open(filename, "w")
         f.write("\\* "+relaxation.name+" *\\\n")
         f.write("Subject To\n")
         ks = list(relaxation.constraints.keys())
