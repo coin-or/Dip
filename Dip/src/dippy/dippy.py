@@ -304,7 +304,7 @@ def createBranchLabel(lbs, ubs):
 import string
 def asCplexName(name):
     #to remove illegal characters from the names
-    trans = string.maketrans("-+[] ->/","________")
+    trans = str.maketrans("-+[] ->/","________")
     
     return str(name).translate(trans)
 
