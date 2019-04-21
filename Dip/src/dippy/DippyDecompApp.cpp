@@ -335,7 +335,7 @@ DecompSolverStatus DippyDecompApp::solveRelaxed(const int whichBlock,
    PyObject* pConvexDual = PyFloat_FromDouble(convexDual);
    // call solveRelaxed on DipProblem
 
-   char solveRelaxed[] = "SolveRelaxed";
+   char solveRelaxed[] = "solveRelaxed";
    char OOd[] = "OOd";
    PyObject* pStatandVarList = PyObject_CallMethod(m_pProb, solveRelaxed, OOd, 
 					             pRelaxKey,
