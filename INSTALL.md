@@ -1,6 +1,8 @@
-## BUILDING AND INSTALLING (SERIAL VERSION)
+# DIP (See below for DipPy)
 
-These instructions are for building and installing ALPS from source. For
+## BUILDING AND INSTALLING SERIAL VERSION
+
+These instructions are for building and installing DIP from source. For
 instructions on how to obtain pre-built binaries, please see the README file.
 
 IMPORTANT: The build instructions have changed significantly. In most case,
@@ -13,54 +15,41 @@ Most Linux distributions come with all the required tools installed. To obtain
 the source code, the first step is to get the installer that will then
 fetch the source for ALPS and all its dependencies. *You do not need to
 clone this repository first, just do the following!* Open a terminal and execute
-
 ```
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 ```
-
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the `COIN-OR-OptimizationSuite`
-subdirectory. To execute the script, do
-
+(including dependencies), execute the script in the `coinbrew`
+subdirectory. To execute the script, you can now do
 ```
-cd COIN-OR-OptimizationSuite
-chmod u+x coin.install.sh
-./coin.install.sh
+cd coinbrew
+./coinbrew
 ```
-
-(Note: The `chmod` command is only needed if the execute permission is not
-automatically set by git on cloning). Once you run the script,
-you will be prompted interactively to select a project to fetch and build. The
+for the interactive version. Once you run the script in interactive mode,
+you will be prompted to select a project to fetch and build. The
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
-
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip
+./coinbrew fetch build Dip --no-prompt
 ```
-
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
-
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip --enable-debug
+./coinbrew fetch build Dip --no-prompt --enable-debug
 ```
-
 To get help with additional options available in running the script, do
-
 ```
-./coin/install.sh --help
+./coinbrew --help
 ```
-
 The above procedures will build all required dependencies and Dip itself.
-Afterwards, the binaries will be installed in the directory `Mibs/build/bin`
-and the libraries in the directory `Dip/build/lib`. If you wish to
-install in a different directory, such as `/usr/local`, then run the command
-
+Afterwards, the binaries will be installed in the directory `build/bin`
+and the libraries in the directory `build/lib`. If you wish to
+install in a different directory, such as `/usr/local`, then run the commands
 ```
-./coin.install.sh install --no-prompt --main-proj=Dip --prefix=/path/to/install/dir
+./coinbrew fetch build Dip --no-prompt --prefix=/path/to/install/dir
+./coinbrew install Dip --no-prompt
 ```
-
 After installation, you will also need to add `/path/to/install/dir/bin` to your
 `PATH` variable in your `.bashrc` and also add `/path/to/install/dir/lib`
 to your `LD_LIBRARY_PATH` if you want to link to COIN libraries. 
@@ -89,51 +78,33 @@ or manually add `msys64\usr\bin`, `msys64\mingw32\bin`, and
 
 Once you have bash installed and in your `PATH`, open a Windows terminal and
 type 
-
 ```
 bash
 pacman -S make wget tar patch dos2unix diffutils git svn
 ```
-
-To obtain the source code, the first step is to get the installer that will then
-fetch the source for Dip and all its dependencies. *You do not need to
-clone Dip first, just do the following!* Open a terminal and execute
-
-```
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
-```
-
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the `COIN-OR-OptimizationSuite`
-subdirectory. To execute the script, do
-
+(including dependencies), execute the script in the `coinbrew`
+subdirectory. To execute the script, you can now do
 ```
-cd COIN-OR-OptimizationSuite
-chmod u+x coi.install.sh
-./coin.install.sh
+cd coinbrew
+./coinbrew
 ```
-
-(Note: The `chmod` command is only needed if the execute permission is not
-automatically set by git on cloning). Once you run the script,
-you will be prompted interactively to select a project to fetch and build. the
+for the interactive version. Once you run the script in interactive mode,
+you will be prompted to select a project to fetch and build. The
 rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
-
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip
+./coinbrew fetch build Dip --no-prompt
 ```
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
-
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip --enable-debug
+./coinbrew fetch build Dip --no-prompt --enable-debug
 ```
-
 To get help with additional options available in running the script, do
-
 ```
-./coin/install.sh --help
+./coinbrew --help
 ```
 
 To use the resulting binaries and/or libraries, you will need to add the
@@ -154,7 +125,7 @@ free). Then follow all the steps above, but replace the `build` command
 with
 
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip --enable-msvc
+./coinbrew fetch build Dip --no-prompt --enable-msvc
 ```
 
 ### Building with the MSVC++ IDE
@@ -187,64 +158,71 @@ brew install gcc wget svn git
 To obtain the source code, the first step is to get the installer that will
 then fetch the source for Dip and all its dependencies. *You do not need to
 clone Dip first, just do the following!* Open a terminal and execute
-
 ```
-git clone https://www.github.com/coin-or/COIN-OR-OptimizationSuite
+git clone https://www.github.com/coin-or/coinbrew
 ```
-
 Next, to check out source code for and build all the necessary projects
-(including dependencies), execute the script in the `COIN-OR-OptimizationSuite`
-subdirectory. To execute the script, do
+(including dependencies), execute the script in the `coinbrew`
+subdirectory. To execute the script in interactive mode, do
 
 ```
-cd COIN-OR-OptimizationSuite
-chmod u+x coi.install.sh
-./coin.install.sh
+cd coinbrew
+./coinbrew
 ```
-
-(Note: The `chmod` command is only needed if the execute permission is not
-automatically set by git on cloning). Once you run the script,
-you will be prompted interactively to select a project to fetch and build. the
-rest should happen automagically. Alternatively, the following command-line
-incantation will execute the procedure non-interactively.
-
+Once you run the script,you will be prompted interactively to select a project to 
+fetch and build. the rest should happen automagically. Alternatively, the following 
+command-line incantation will execute the procedure non-interactively.
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip
+./coinbrew fetch build Dip --no-prompt
 ```
-
 With this setup, `clang` will be used for compiling C++ by default and
 `gfortran` will be used for Fortran. Since `clang` uses the GNU standard
 library, `gfortran` is compatible.
 
 If you want to use the `gcc` compiler provided by Homebrew, then replace the
 `build` command above with
-
 ```
-./coin.install.sh build --no-prompt --main-proj=Dip CC=gcc-5 CXX=g++-5
+./coinbrew build Dip --no-prompt CC=gcc-x CXX=g++-x
 ```
-
+where `x` is the version of `gcc` you have installed.
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
 with debugging symbols, do
-
 ```
-./coin.install.sh fetch build --no-prompt --main-proj=Dip --enable-debug
+./coinbrew fetch build Dip --no-prompt --enable-debug
 ```
-
 To get help with additional options available in running the script, do
-
 ```
-./coin/install.sh --help
+./coinbrew --help
 ```
-
 If you wish to install in a different directory, such as `/usr/local`, then run
-the command
-
+the commands
 ```
-./coin.install.sh install --no-prompt --main-proj=Dip --prefix=/path/to/install/dir
+./coinbrew fetch build Dip --no-prompt --prefix=/path/to/install/dir
+./coinbrew install Dip --no-prompt
 ```
-
 After installation, you will also need to add `/path/to/install/dir/bin` to your
 `PATH` variable in your `.bashrc` and also add `/path/to/install/dir/lib`
 to your `DYLD_LIBRARY_PATH` if you want to link to COIN libraries. 
 
+# DipPy
+
+## Installing on Windows
+
+To install DipPy in Windows, just do
+```
+pip install coinor.dippy
+```
+to get the self-contained binary wheel.
+
+## Installing on Linux and OS X 
+
+Build DIP as specified above and set the environment variable COIN_INSTALL_DIR to the install directory.
+```
+export COIN_INSTALL_DIR=/path/to/coinbrew/build/
+```
+Then 
+```
+pip install .
+```
+in the directory containing the `setup.py` file
