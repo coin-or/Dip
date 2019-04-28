@@ -10,7 +10,7 @@ redistributed freely.
 
 [![Build Status](https://travis-ci.org/coin-or/Dip.svg?branch=master)](https://travis-ci.org/coin-or/Dip)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/omb0lhiutlh6qnco/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/eke5pr1qo9ywvs2h/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
 
 ## Download
 
@@ -37,8 +37,8 @@ http://github.com/coin-or/Dip
 
 ### List Serve
 
-DIP users should use the Dip mailing list. To subscribe, go to 
-http://list.coin-or.org/mailman/listinfo/dip
+DIP users should either use the Dip mailing list or open an issue to ask questions to subscribe to the mailing list, 
+go to http://list.coin-or.org/mailman/listinfo/dip
 
 ### Bug Reports
 
