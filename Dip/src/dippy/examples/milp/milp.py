@@ -44,9 +44,9 @@ tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
 prob = dippy.DipProblem("MILP")
 
-numBlocks = 1
-numBlockVars = [40]
-numBlockCons = [10]
+numBlocks = 10
+numBlockVars = [10]
+numBlockCons = [5]
 numLinkingCons = 10
 numVars = sum(numBlockVars)
 numCons = sum(numBlockCons) + numLinkingCons

@@ -378,7 +378,7 @@ if debug_print_lp:
 #prob.node_heuristic = True
 
 dippyOpts = {}
-algo = 'PriceCut'
+algo = 'doCut'
 if len(sys.argv) > 1:
     algo = sys.argv[1]
 if algo == 'PriceCut':
