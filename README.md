@@ -12,11 +12,15 @@ redistributed freely.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/eke5pr1qo9ywvs2h/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
 
-## Download
+## Download and Install
 
 [ ![Download](https://api.bintray.com/packages/coin-or/download/Dip/images/download.svg?version=0.92) ](https://bintray.com/coin-or/download/Dip/0.92/link)
 
-Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/Dip) 
+Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/Dip).
+
+For DipPy, see [Pypi](https://pypi.org/project/coinor.dippy/).
+
+For installation, see the [INSTALL](https://github.com/coin-or/Dip/blob/master/INSTALL.md) file.
 
 ## Cite
 
