@@ -10,7 +10,7 @@ redistributed freely.
 
 [![Build Status](https://travis-ci.org/coin-or/Dip.svg?branch=master)](https://travis-ci.org/coin-or/Dip)
 
-[![Build status](https://ci.appveyor.com/api/projects/status/eke5pr1qo9ywvs2h/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/eke5pr1qo9ywvs2h/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip-qk8he/branch/master)
 
 ## Download and Install
 
