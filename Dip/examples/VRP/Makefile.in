@@ -86,7 +86,7 @@ $(CONCORDE_DIR)/$(CONCORDE_LIB).a:
 	(cd ${CONCORDE_DIR} && \
 	./configure \
 	--with-qsopt=$(BUILDDIR)/examples/ExternalSolvers/TSP && \
-	&& make)
+	make)
 
 $(CVRPSEP_DIR)/$(CVRPSEP_LIB).a:
 	(cd $(CVRPSEP_DIR) && make)
