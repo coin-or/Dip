@@ -89,7 +89,7 @@ am_libDecomp_la_OBJECTS = DecompAlgo.lo DecompAlgoC.lo DecompAlgoD.lo \
 	DecompConstraintSet.lo UtilGraphLib.lo UtilHash.lo \
 	UtilMacros.lo UtilMacrosDecomp.lo UtilParameters.lo \
 	UtilKnapsack.lo AlpsDecompModel.lo AlpsDecompTreeNode.lo \
-	UtilMacrosAlps.lo
+	UtilMacrosAlps.lo Decomp_C_Interface.lo
 libDecomp_la_OBJECTS = $(am_libDecomp_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -435,7 +435,7 @@ libDecomp_la_SOURCES = DecompAlgo.cpp DecompAlgo.h DecompAlgoC.cpp \
 	AlpsDecompModel.cpp AlpsDecompModel.h AlpsDecompSolution.h \
 	AlpsDecompTreeNode.cpp AlpsDecompTreeNode.h \
 	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.cpp \
-	UtilMacrosAlps.h
+	UtilMacrosAlps.h Decomp_C_Interface.h Decomp_C_Interface.cpp
 
 # List all additionally required libraries
 @DEPENDENCY_LINKING_TRUE@libDecomp_la_LIBADD = $(DIPLIB_LIBS) $(DIP_OPENMP_LIBS)
@@ -484,7 +484,8 @@ includecoin_HEADERS = DecompAlgo.h DecompAlgoC.h DecompAlgoD.h \
 	DecompWaitingRow.h UtilGraphLib.h UtilHash.h UtilMacros.h \
 	UtilMacrosDecomp.h UtilParameters.h UtilKnapsack.h UtilTimer.h \
 	AlpsDecompModel.h AlpsDecompSolution.h AlpsDecompTreeNode.h \
-	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h
+	AlpsDecompNodeDesc.h AlpsDecompParam.h UtilMacrosAlps.h \
+	Decomp_C_Interface.h
 all: config.h config_dip.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -639,6 +640,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilMacrosAlps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilMacrosDecomp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilParameters.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Decomp_C_Interface.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
