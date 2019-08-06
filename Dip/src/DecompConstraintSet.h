@@ -185,6 +185,24 @@ public:
       }
    }
 
+   inline void pushCol(const double loBound,
+                       const double upBound,
+                       std::string colName,
+                       const bool isInteger = false,
+                       const int origIndex = -1)
+   {
+      pushCol(loBound, upBound, isInteger, origIndex);
+      colNames.push_back(colName);
+   }
+
+   inline void init(const int nCols,
+                    const int nRows)
+   {
+      M = new CoinPackedMatrix(false, 0.0, 0.0);
+      M->setDimensions(0, nCols);
+      reserve(nCols, nRows);
+   }
+
    inline void reserve(const int nCols,
                        const int nRows) {
       M->reserve(nRows, nCols);
