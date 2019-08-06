@@ -124,7 +124,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
    int            status       = AlpsReturnStatusOk;
    bool           doFathom     = false;
    DecompStatus   decompStatus = STAT_FEASIBLE;
-   double         relTolerance = 0.0001; //0.01% means optimal (make param)
+   double         relTolerance = decompAlgo->getParam().MasterGapLimit;
    double         gap;
    //---
    //--- check if this can be fathomed based on parent by objective cutoff
@@ -305,8 +305,7 @@ int AlpsDecompTreeNode::process(bool isRoot,
       //watch tolerance here... if quality is close enough, fathom it
       gap = UtilCalculateGap(thisQuality, currentUB, decompAlgo->getInfinity());
 
-      //if(gap <= relTolerance){
-      if (quality_ >= currentUB) {
+      if(gap <= relTolerance){
          doFathom = true;
          UTIL_DEBUG(param.msgLevel, 3,
                     cout << "Fathom since thisQuality= "
