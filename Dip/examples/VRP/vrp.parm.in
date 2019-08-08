@@ -28,7 +28,7 @@ LimitInitVars           = 2
 
 [VRP]
 LogLevel  = 0
-DataDir   = ../../../../Dip/data/VRP/vrplib
+DataDir   = @srcdir@/../../Dip/data/VRP/vrplib
 Instance  = E-n13-k4
 NumRoutes = 4
 
