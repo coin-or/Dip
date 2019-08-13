@@ -33,6 +33,20 @@ extern "C" {
 //===========================================================================//
 class DecompAlgo;
 
+typedef std::function<DecompSolverStatus(
+    const DecompApp *app,
+    const int whichBlock,
+    const double *redCostX,
+    const double target,
+    DecompVarList &varList)>
+    DecompCallbackSolveRelaxed;
+
+typedef std::function<int(
+    const DecompApp *app,
+    const double *x,
+    DecompCutList &newCuts)>
+    DecompCallbackGenerateCuts;
+
 //===========================================================================//
 /*!
  * \class DecompApp
@@ -64,6 +78,9 @@ protected:
     */
    double m_bestKnownLB;
    double m_bestKnownUB;
+
+   DecompCallbackSolveRelaxed m_callbackSolveRelaxed;
+   DecompCallbackGenerateCuts m_callbackGenerateCuts;
 
 public:
 
@@ -333,18 +350,30 @@ public:
 
    virtual int generateInitVars(DecompVarList& initVars);
 
-   virtual int generateCuts(const double*   x,
-                            DecompCutList& newCuts);
+   int generateCuts(const double *x,
+                            DecompCutList &newCuts)
+   {
+      if (m_callbackGenerateCuts != NULL)
+      {
+         return m_callbackGenerateCuts(this, x, newCuts);
+      }
+      return 0;
+   }
 
    virtual void solveRelaxedWhich(std::vector<int>& blocksToSolve,
                                   std::map< int,
 				  std::vector<double> >& userDualsByBlock) {
    };
 
-   virtual DecompSolverStatus solveRelaxed(const int          whichBlock,
+   DecompSolverStatus solveRelaxed(const int          whichBlock,
                                            const double*      redCostX,
 					   const double       target,
                                            DecompVarList&     varList) {
+      if (m_callbackSolveRelaxed != NULL)
+      {
+         return m_callbackSolveRelaxed(this, whichBlock, redCostX, target, varList);
+      }
+
       return DecompSolStatNoSolution;
    }
    virtual DecompSolverStatus solveRelaxedNest(const int          whichBlock,
@@ -354,7 +383,23 @@ public:
       return DecompSolStatNoSolution;
    }
 
+   //-----------------------------------------------------------------------//
+   /**
+    * @name Callback methods
+    * @{
+    */
+   //-----------------------------------------------------------------------//
+   inline void setCallbackSolveRelaxed(DecompCallbackSolveRelaxed callback)
+   {
+      m_callbackSolveRelaxed = callback;
+   }
 
+   inline void setCallbackGenerateCuts(DecompCallbackGenerateCuts callback)
+   {
+      m_callbackGenerateCuts = callback;
+   }
+
+public:
    virtual void printOriginalColumn(const int   index,
                                     std::ostream*    os = &std::cout) const;
 
@@ -444,6 +489,8 @@ public:
       m_osLog      (&std::cout  ),
       m_bestKnownLB(-1e75  ),
       m_bestKnownUB( 1e75  ),
+      m_callbackSolveRelaxed( NULL ),
+      m_callbackGenerateCuts( NULL ),
       NumBlocks    (  0    ),
       m_utilParam  (&utilParam),
       m_objective  ( NULL  ),
