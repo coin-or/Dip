@@ -94,6 +94,7 @@ void MCF_DecompApp::createModels()
    int   numCommodities = m_instance.m_numCommodities;
    int   numArcs        = m_instance.m_numArcs;
    int   numCols        = numCommodities * numArcs;
+   MCF_Instance::commodity* commodities = m_instance.m_commodities;
    MCF_Instance::arc* arcs = m_instance.m_arcs;
    //---
    //--- Construct the objective function and set it
@@ -109,7 +110,7 @@ void MCF_DecompApp::createModels()
 
    for (k = 0; k < numCommodities; k++)
       for (a = 0; a < numArcs; a++) {
-         objective[colIndex++] = arcs[a].weight;
+         objective[colIndex++] = arcs[a].weight * commodities[k].demand;
       }
 
    //---
@@ -158,6 +159,7 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet* model)
    int   numArcs        = m_instance.m_numArcs;
    int   numCols        = numCommodities * numArcs;
    int   numRows        = 2              * numArcs;
+   MCF_Instance::commodity* commodities = m_instance.m_commodities;
    MCF_Instance::arc* arcs = m_instance.m_arcs;
    UtilPrintFuncBegin(m_osLog, m_classTag,
                       "createModelCore()", m_appParam.LogLevel, 2);
@@ -185,9 +187,9 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet* model)
 
       for (k = 0; k < numCommodities; k++) {
          colIndex = k * numArcs + a;
-         model->colLB[colIndex] = arcLB;
-         model->colUB[colIndex] = arcUB;
-         row.insert(colIndex, 1.0);
+         model->colLB[colIndex] = 0;
+         model->colUB[colIndex] = 1;
+         row.insert(colIndex, 1.0 * commodities[k].demand);
       }
 
       //TODO: any issue with range constraints?
@@ -203,6 +205,25 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet* model)
                          UtilIntToStr(arcs[a].tail) + "," +
                          UtilIntToStr(arcs[a].head) + ")";
       model->rowNames.push_back(rowNameLB);
+   }
+
+   for (k = 0; k < numCommodities; k++) {
+      int source = commodities[k].source;
+      
+      CoinPackedVector row;
+
+      for (a = 0; a < numArcs; a++) {
+         int tail = arcs[a].tail;
+         colIndex = k * numArcs + a;
+
+         if (tail == source)
+            row.insert(colIndex, 1.0);
+      }
+      model->appendRow(row, 1.0, 1.0);
+      string rowNameUB = "d(" +
+                         UtilIntToStr(a)            + "_" +
+                         UtilIntToStr(arcs[a].tail) + ")";
+      model->rowNames.push_back(rowNameUB);
    }
 
    //---
@@ -221,7 +242,7 @@ void MCF_DecompApp::createModelCore(DecompConstraintSet* model)
    //---
    //--- set the indices of the integer variables of model
    //---
-   UtilIotaN(model->integerVars, numCols, 0);
+   //UtilIotaN(model->integerVars, numCols, 0);
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModelCore()", m_appParam.LogLevel, 2);
 }
@@ -290,12 +311,12 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet* model,
 
       if (i == source)
          model->appendRow(row,
-                          -commodities[commId].demand,
-                          -commodities[commId].demand);
+                          -1,
+                          -1);
       else if (i == sink)
          model->appendRow(row,
-                          commodities[commId].demand,
-                          commodities[commId].demand);
+                          1,
+                          1);
       else {
          model->appendRow(row, 0.0, 0.0);
       }
@@ -319,8 +340,8 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet* model,
    for (a = 0; a < numArcs; a++) {
       double           arcLB = arcs[a].lb;
       double           arcUB = arcs[a].ub;
-      model->colLB[colIndex] = arcLB;
-      model->colUB[colIndex] = arcUB;
+      model->colLB[colIndex] = 0;
+      model->colUB[colIndex] = 1;
       model->activeColumns.push_back(colIndex);
       colIndex++;
    }
@@ -328,7 +349,7 @@ void MCF_DecompApp::createModelRelax(DecompConstraintSet* model,
    //---
    //--- set the indices of the integer variables of model
    //---
-   UtilIotaN(model->integerVars, numCols, 0);
+   //UtilIotaN(model->integerVars, numCols, 0);
    UtilPrintFuncEnd(m_osLog, m_classTag,
                     "createModelRelax()", m_appParam.LogLevel, 2);
 }
@@ -396,12 +417,12 @@ void MCF_DecompApp::createModelRelaxSparse(DecompConstraintSet* model,
 
       if (i == source)
          model->appendRow(row,
-                          -commodities[commId].demand,
-                          -commodities[commId].demand);
+                          -1,
+                          -1);
       else if (i == sink)
          model->appendRow(row,
-                          commodities[commId].demand,
-                          commodities[commId].demand);
+                          1,
+                          1);
       else {
          model->appendRow(row, 0.0, 0.0);
       }
@@ -413,9 +434,9 @@ void MCF_DecompApp::createModelRelaxSparse(DecompConstraintSet* model,
    origColIndex = commId * numArcs;
 
    for (a = 0; a < numArcs; a++) {
-      double           arcLB = arcs[a].lb;
-      double           arcUB = arcs[a].ub;
-      model->pushCol(arcLB, arcUB, true, origColIndex);
+      double           arcLB = 0;
+      double           arcUB = 1;
+      model->pushCol(arcLB, arcUB, false, origColIndex);
       origColIndex++;
    }
 
