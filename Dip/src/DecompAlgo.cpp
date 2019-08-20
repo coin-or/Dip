@@ -1851,9 +1851,14 @@ DecompStatus DecompAlgo::processNode(const AlpsDecompTreeNode* node,
       //--- TOOD: seems confusing to store bounds from different objectives
       //---       in the same structure - maybe should use m_nodeStats1/2
       //---
+      //--- TKR (8/20/19): removed tolerance used on comparison below to be 
+      //---                consistent with seemingly duplicative check in
+      //---                AlpsDecompTreeNode::process(). TODO: determine
+      //---                whether we need a tolerance here and whether the
+      //---                the duplicate checks can/should be eliminated.
       if (m_phase != PHASE_PRICE1 &&
             (m_nodeStats.objBest.first >=
-             (m_nodeStats.objBest.second - DecompEpsilon))) {
+             (m_nodeStats.objBest.second))) {
          UTIL_MSG(m_param.LogLevel, 2,
                   (*m_osLog)
                   << "Node " << nodeIndex << " process stopping on bound."

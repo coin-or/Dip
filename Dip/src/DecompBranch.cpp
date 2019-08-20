@@ -38,7 +38,6 @@ chooseBranchSet(std::vector< std::pair<int, double> >& downBranchLB,
    maxDist         = DecompEpsilon;//TODO: parameter
    branchedOnIndex = -1;
    branchedOnValue =  0;
-   CoinAssert(modelCore->integerVars.size() > 0);
    // const std::vector<std::string> & colNames = modelCore->getColNames();
 
    for (intIt =  modelCore->integerVars.begin();
