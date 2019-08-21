@@ -13,27 +13,37 @@ from math import sqrt
 # 2d Euclidean TSP with extremely simple cut generation
 
 # x,y coords of cities
-CITY_LOCS = [(0, 2), (0, 4), (1, 2), (1, 4), \
-             (4, 1), (4, 4), (4, 5),  (5, 0), \
-             (5, 2), (5, 5)]
+CITY_LOCS = [
+    (0, 2),
+    (0, 4),
+    (1, 2),
+    (1, 4),
+    (4, 1),
+    (4, 4),
+    (4, 5),
+    (5, 0),
+    (5, 2),
+    (5, 5),
+]
 CITIES = list(range(len(CITY_LOCS)))
 
-ARCS = [] # list of arcs (no duplicates)
-ARC_COSTS = {} # distance
+ARCS = []  # list of arcs (no duplicates)
+ARC_COSTS = {}  # distance
 
 # for each city, list of arcs into/out of
 CITY_ARCS = [[] for i in CITIES]
 
 # use 2d euclidean distance
 def dist(x1, y1, x2, y2):
-    return sqrt((x1-x2)**2 + (y1-y2)**2)
+    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
 
 # construct list of arcs
 for i in CITIES:
     i_x, i_y = CITY_LOCS[i]
-    for j in CITIES[i+1:]:
+    for j in CITIES[i + 1 :]:
         j_x, j_y = CITY_LOCS[j]
-        ARC_COSTS[(i,j)] = dist(i_x, i_y, j_x, j_y)
+        ARC_COSTS[(i, j)] = dist(i_x, i_y, j_x, j_y)
         ARCS.append((i, j))
         CITY_ARCS[i].append((i, j))
         CITY_ARCS[j].append((i, j))
@@ -47,8 +57,7 @@ prob += lpSum(ARC_COSTS[x] * arc_vars[x] for x in ARCS)
 
 # degree constraints
 for city in CITIES:
-    prob += lpSum(arc_vars[x] for x in CITY_ARCS[city]) \
-            == 2
+    prob += lpSum(arc_vars[x] for x in CITY_ARCS[city]) == 2
 
 # generate subtour elimination constraints
 
@@ -61,6 +70,7 @@ for i in CITIES:
             symmetric[(i, j)] = (i, j)
             symmetric[(j, i)] = (i, j)
 
+
 def generate_cuts(prob, sol):
     cons = []
     not_connected = set(CITIES)
@@ -68,22 +78,25 @@ def generate_cuts(prob, sol):
     while not_connected:
         start = not_connected.pop()
         nodes, arcs = get_subtour(sol, start)
-        if len(nodes) == len(arcs) and \
-           len(nodes) < len(CITIES):
-            cons.append( lpSum(arc_vars[a] for a in arcs) \
-                         <= len(arcs) - 1 )
+        if len(nodes) == len(arcs) and len(nodes) < len(CITIES):
+            cons.append(lpSum(arc_vars[a] for a in arcs) <= len(arcs) - 1)
         nodes.remove(start)
         not_connected -= nodes
 
     return cons
+
+
 prob.generate_cuts = generate_cuts
+
 
 def is_solution_feasible(prob, sol, tol):
     nodes, arcs = get_subtour(sol, 0)
 
-    return len(nodes) == len(arcs) and \
-           len(nodes) == len(CITIES)
+    return len(nodes) == len(arcs) and len(nodes) == len(CITIES)
+
+
 prob.is_solution_feasible = is_solution_feasible
+
 
 def get_subtour(sol, node):
     # returns: list of nodes and arcs
@@ -99,20 +112,20 @@ def get_subtour(sol, node):
     while to_process:
         c = to_process.pop()
         not_processed.remove(c)
-        new_arcs = [ symmetric[(c, i)] \
-                     for i in not_processed \
-                     if sol[ \
-                         arc_vars[symmetric[(c, i)]]]
-                     > one]                     
-        new_nodes = [ i for i in not_processed \
-                      if symmetric[(i, c)] in new_arcs ]
+        new_arcs = [
+            symmetric[(c, i)]
+            for i in not_processed
+            if sol[arc_vars[symmetric[(c, i)]]] > one
+        ]
+        new_nodes = [i for i in not_processed if symmetric[(i, c)] in new_arcs]
         arcs |= set(new_arcs)
         nodes |= set(new_nodes)
         to_process |= set(new_nodes)
 
     return nodes, arcs
 
-dippy.Solve(prob, {'doCut': '1'})
+
+dippy.Solve(prob, {"doCut": "1"})
 
 # print solution
 for arc, var in list(arc_vars.items()):

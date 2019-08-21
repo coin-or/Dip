@@ -8,12 +8,9 @@ from .dippy_tests import DippyTestCase
 
 
 class TestTSPProblem(DippyTestCase):
-
     def setUp(self):
-        self.prob, self.generate_cuts, self.is_solution_feasible = \
-                    create_tsp_problem()
+        self.prob, self.generate_cuts, self.is_solution_feasible = create_tsp_problem()
         self.tol = 1e-6
-
 
     def test_pulp_solve(self):
         """
@@ -25,7 +22,7 @@ class TestTSPProblem(DippyTestCase):
         self.variable_feasibility_test(self.prob)
         self.constraint_feasibility_test(self.prob)
         # would like this in here but not sure how to do it
-        #~ self.assertFalse(self.is_solution_feasible())
+        # ~ self.assertFalse(self.is_solution_feasible())
 
     def test_dippy_solve(self):
         """
@@ -40,6 +37,7 @@ class TestTSPProblem(DippyTestCase):
         # would like this in here but not sure how to do it
         self.assertTrue(self.is_solution_feasible(self.prob, sol, self.tol))
 
+
 def create_tsp_problem(doRelaxed=False):
     """
     creates and returns the tsp problem
@@ -50,27 +48,36 @@ def create_tsp_problem(doRelaxed=False):
     # 2d Euclidean TSP with extremely simple cut generation
 
     # x,y coords of cities
-    CITY_LOCS = [(0, 2), (0, 4), (1, 2), (1, 4), \
-                 (4, 1), (4, 4), (4, 5),  (5, 0), \
-                 (5, 2), (5, 5)]
+    CITY_LOCS = [
+        (0, 2),
+        (0, 4),
+        (1, 2),
+        (1, 4),
+        (4, 1),
+        (4, 4),
+        (4, 5),
+        (5, 0),
+        (5, 2),
+        (5, 5),
+    ]
     CITIES = list(range(len(CITY_LOCS)))
 
-    ARCS = [] # list of arcs (no duplicates)
-    ARC_COSTS = {} # distance
+    ARCS = []  # list of arcs (no duplicates)
+    ARC_COSTS = {}  # distance
 
     # for each city, list of arcs into/out of
     CITY_ARCS = [[] for i in CITIES]
 
     # use 2d euclidean distance
     def dist(x1, y1, x2, y2):
-        return sqrt((x1-x2)**2 + (y1-y2)**2)
+        return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
     # construct list of arcs
     for i in CITIES:
         i_x, i_y = CITY_LOCS[i]
-        for j in CITIES[i+1:]:
+        for j in CITIES[i + 1 :]:
             j_x, j_y = CITY_LOCS[j]
-            ARC_COSTS[(i,j)] = dist(i_x, i_y, j_x, j_y)
+            ARC_COSTS[(i, j)] = dist(i_x, i_y, j_x, j_y)
             ARCS.append((i, j))
             CITY_ARCS[i].append((i, j))
             CITY_ARCS[j].append((i, j))
@@ -102,30 +109,27 @@ def create_tsp_problem(doRelaxed=False):
         not_connected = set(CITIES)
 
         while not_connected:
-     #       print "not_connected", [n for n in not_connected]
+            #       print "not_connected", [n for n in not_connected]
             start = not_connected.pop()
             nodes, arcs = get_subtour(sol, start)
-            if len(nodes) == len(arcs) and \
-               len(nodes) < len(CITIES):
-                cons.append( sum(arc_vars[a] for a in arcs) \
-                             <= len(arcs) - 1 )
-     #       print "nodes", [n for n in nodes]
-     #       print "arcs", [a for a in arcs]
+            if len(nodes) == len(arcs) and len(nodes) < len(CITIES):
+                cons.append(sum(arc_vars[a] for a in arcs) <= len(arcs) - 1)
+            #       print "nodes", [n for n in nodes]
+            #       print "arcs", [a for a in arcs]
             nodes.remove(start)
             not_connected -= nodes
 
-    ##    print "# cons = ", len(cons)
-    ##    print "cons = ", [ con for con in cons ]
+        ##    print "# cons = ", len(cons)
+        ##    print "cons = ", [ con for con in cons ]
         return cons
 
     def is_solution_feasible(prob, sol, tol):
         nodes, arcs = get_subtour(sol, 0)
-    #    print "Checking: # nodes = ", len(nodes), \
-    #          ", # cities = ", len(CITIES)
-    #    print "nodes", [n for n in nodes]
+        #    print "Checking: # nodes = ", len(nodes), \
+        #          ", # cities = ", len(CITIES)
+        #    print "nodes", [n for n in nodes]
 
-        return len(nodes) == len(arcs) and \
-               len(nodes) == len(CITIES)
+        return len(nodes) == len(arcs) and len(nodes) == len(CITIES)
 
     def get_subtour(sol, node):
         # returns: list of nodes and arcs
@@ -141,26 +145,25 @@ def create_tsp_problem(doRelaxed=False):
         while to_process:
             c = to_process.pop()
             not_processed.remove(c)
-            new_arcs = [ symmetric[(c, i)] \
-                         for i in not_processed \
-                         if sol[ \
-                             arc_vars[symmetric[(c, i)]]]
-                         > one]
-            new_nodes = [ i for i in not_processed \
-                          if symmetric[(i, c)] in new_arcs ]
-     #       print "new_nodes", [n for n in new_nodes]
-     #       print "new_arcs", [a for a in new_arcs]
+            new_arcs = [
+                symmetric[(c, i)]
+                for i in not_processed
+                if sol[arc_vars[symmetric[(c, i)]]] > one
+            ]
+            new_nodes = [i for i in not_processed if symmetric[(i, c)] in new_arcs]
+            #       print "new_nodes", [n for n in new_nodes]
+            #       print "new_arcs", [a for a in new_arcs]
             arcs |= set(new_arcs)
             nodes |= set(new_nodes)
             to_process |= set(new_nodes)
-     #       print "not_processed", [n for n in not_processed]
-     #       print "nodes", [n for n in nodes]
-     #       print "arcs", [a for a in arcs]
+        #       print "not_processed", [n for n in not_processed]
+        #       print "nodes", [n for n in nodes]
+        #       print "arcs", [a for a in arcs]
 
         return nodes, arcs
 
     return prob, generate_cuts, is_solution_feasible
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

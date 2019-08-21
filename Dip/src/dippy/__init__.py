@@ -7,4 +7,3 @@ except ImportError:
     pass
 
 from .dippy import *
-

@@ -15,14 +15,13 @@
 #include "MAD_DecompApp.h"
 
 // --------------------------------------------------------------------- //
-void MAD_DecompApp::printRowMarks(const int * rowInd,
-                                  const int   rowLen) const{
+void MAD_DecompApp::printRowMarks(const int *rowInd, const int rowLen) const {
 
-   int        i;
-   const char mark = '*';
-   string     str(m_instance.getNumCols(),' ');
-   for(i = 0; i < rowLen; i++){
-      str[rowInd[i]] = mark;
-   }
-   (*m_osLog) << str << endl;
+  int i;
+  const char mark = '*';
+  string str(m_instance.getNumCols(), ' ');
+  for (i = 0; i < rowLen; i++) {
+    str[rowInd[i]] = mark;
+  }
+  (*m_osLog) << str << endl;
 }

@@ -6,9 +6,9 @@ import unittest
 from pulp import *
 import coinor.dippy as dippy
 
-class DippyTestCase(unittest.TestCase):
 
-    def variable_feasibility_test(self, prob, tol = 1e-5):
+class DippyTestCase(unittest.TestCase):
+    def variable_feasibility_test(self, prob, tol=1e-5):
         """
         tests that the problem is feasible for its class of variables
         """
@@ -20,7 +20,7 @@ class DippyTestCase(unittest.TestCase):
             if var.cat == LpInteger:
                 self.assertAlmostEqual(int(var.value() + tol), var.value())
 
-    def constraint_feasibility_test(self, prob, tol = 1e-5):
+    def constraint_feasibility_test(self, prob, tol=1e-5):
         """
         tests that the problem is feasible for its class of variables
         """
@@ -28,9 +28,11 @@ class DippyTestCase(unittest.TestCase):
         for constraint_name, constraint in list(prob.constraints.items()):
             self.assertTrue(constraint.valid(tol))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     from .test_coke import *
     from .test_facility import *
     from .test_cutting_stock import *
     from .test_tsp import *
+
     unittest.main()

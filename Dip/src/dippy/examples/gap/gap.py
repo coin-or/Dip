@@ -17,7 +17,7 @@ try:
     import path
 except ImportError:
     pass
-        
+
 try:
     import src.dippy as dippy
     from src.dippy import DipSolStatOptimal
@@ -62,28 +62,27 @@ for m in MACHINES:
         v.append(LpVariable("M%dT%d" % (m, t), cat=LpBinary))
     assignVars.append(v)
 
-prob = dippy.DipProblem("GAP",
-                        display_mode = 'off', 
-                        layout = 'dot',
-                        display_interval = None,
-                        )
+prob = dippy.DipProblem("GAP", display_mode="off", layout="dot", display_interval=None)
 
 # objective
 prob += lpSum(assignVars[m][t] * COSTS[m][t] for m, t in MACHINES_TASKS), "min"
 
 # machine capacity (knapsacks, relaxation)
 for m in MACHINES:
-    prob.relaxation[m] += lpSum(assignVars[m][t] * RESOURCE_USE[m][t] for t in TASKS) <= CAPACITIES[m]
+    prob.relaxation[m] += (
+        lpSum(assignVars[m][t] * RESOURCE_USE[m][t] for t in TASKS) <= CAPACITIES[m]
+    )
 
 # assignment
 for t in TASKS:
     prob += lpSum(assignVars[m][t] for m in MACHINES) == 1
 
+
 def solve_subproblem(prob, machine, redCosts, target):
     if debug_print:
         print("solve_subproblem...")
         print(redCosts)
-   
+
     # get tasks which have negative reduced costs
     task_idx = [t for t in TASKS if redCosts[assignVars[machine][t]] < 0]
     var = [assignVars[machine][t] for t in task_idx]
@@ -99,7 +98,7 @@ def solve_subproblem(prob, machine, redCosts, target):
         print("z, solution =", z, solution)
         print("rc", -z)
 
-    if z < -tol: # Zero solution is optimal
+    if z < -tol:  # Zero solution is optimal
         if debug_print:
             print("Zero solution is optimal")
         return DipSolStatOptimal, [{}]
@@ -110,53 +109,53 @@ def solve_subproblem(prob, machine, redCosts, target):
         rcCheck = 0.0
         for v in list(var_values.keys()):
             rcCheck += redCosts[v] * var_values[v]
-        print("Checking rc calc", -z, rcCheck) 
+        print("Checking rc calc", -z, rcCheck)
         print(var_values)
-        
+
     return DipSolStatOptimal, [var_values]
+
 
 def knapsack01(obj, weights, capacity):
     """ 0/1 knapsack solver, maximizes profit. weights and capacity integer """
-        
+
     debug_subproblem = False
-    
+
     assert len(obj) == len(weights)
     n = len(obj)
     if n == 0:
         return 0, []
 
-    if (debug_subproblem):
-        relaxation = LpProblem('relaxation', LpMaximize)
+    if debug_subproblem:
+        relaxation = LpProblem("relaxation", LpMaximize)
         relax_vars = [str(i) for i in range(n)]
-        var_dict   = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
+        var_dict = LpVariable.dicts("", relax_vars, 0, 1, LpBinary)
         relaxation += lpSum(var_dict[str(i)] * weights[i] for i in range(n)) <= capacity
         relaxation += lpSum(var_dict[str(i)] * obj[i] for i in range(n))
         relaxation.solve()
         relax_obj = value(relaxation.objective)
 
-        solution =  [i for i in range(n) if var_dict[str(i)].varValue > tol ]
+        solution = [i for i in range(n) if var_dict[str(i)].varValue > tol]
 
         print(relax_obj, solution)
 
-
-    c = [[0]*(capacity+1) for i in range(n)]
-    added = [[False]*(capacity+1) for i in range(n)]
+    c = [[0] * (capacity + 1) for i in range(n)]
+    added = [[False] * (capacity + 1) for i in range(n)]
     # c [items, remaining capacity]
     # important: this code assumes strictly positive objective values
     for i in range(n):
-        for j in range(capacity+1):
-            if (weights[i] > j):
-                c[i][j] = c[i-1][j]
+        for j in range(capacity + 1):
+            if weights[i] > j:
+                c[i][j] = c[i - 1][j]
             else:
-                c_add = obj[i] + c[i-1][j-weights[i]]
-                if c_add > c[i-1][j]:
+                c_add = obj[i] + c[i - 1][j - weights[i]]
+                if c_add > c[i - 1][j]:
                     c[i][j] = c_add
                     added[i][j] = True
                 else:
-                    c[i][j] = c[i-1][j]
+                    c[i][j] = c[i - 1][j]
 
     # backtrack to find solution
-    i = n-1
+    i = n - 1
     j = capacity
 
     solution = []
@@ -165,26 +164,29 @@ def knapsack01(obj, weights, capacity):
             solution.append(i)
             j -= weights[i]
         i -= 1
-        
-    return c[n-1][capacity], solution
 
-#prob.relaxed_solver = solve_subproblem
+    return c[n - 1][capacity], solution
 
-dippy.Solve(prob, {
-    'TolZero': '%s' % tol,
-    'doPriceCut': '1',
-#    'logLevel': '3', 
-})
+
+# prob.relaxed_solver = solve_subproblem
+
+dippy.Solve(
+    prob,
+    {
+        "TolZero": "%s" % tol,
+        "doPriceCut": "1",
+        #    'logLevel': '3',
+    },
+)
 
 for m in MACHINES:
-    print() 
-    print("Machine %d assigned tasks" %m, end=' ')
+    print()
+    print("Machine %d assigned tasks" % m, end=" ")
     for t in TASKS:
         v = assignVars[m][t].varValue
         if v:
-            print("%d" %t, end=' ')
-            
-if prob.display_mode != 'off':
-    if (prob.Tree.attr['display'] == 'pygame') or (prob.Tree.attr['display'] == 'xdot'):
-        prob.Tree.display()
+            print("%d" % t, end=" ")
 
+if prob.display_mode != "off":
+    if (prob.Tree.attr["display"] == "pygame") or (prob.Tree.attr["display"] == "xdot"):
+        prob.Tree.display()

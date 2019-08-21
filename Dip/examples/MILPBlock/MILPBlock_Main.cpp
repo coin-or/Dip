@@ -26,156 +26,145 @@
 #include "UtilTimer.h"
 
 //===========================================================================//
-int main(int argc, char ** argv){
-   try{
-      
-      //---
-      //--- create the utility class for parsing parameters
-      //---
-      UtilParameters utilParam(argc, argv);  
+int main(int argc, char **argv) {
+  try {
 
-      bool doCut        = utilParam.GetSetting("doCut",        true);
-      bool doPriceCut   = utilParam.GetSetting("doPriceCut",   false);
-      bool doDirect     = utilParam.GetSetting("doDirect",     false);
-      
-      UtilTimer timer;
-      double    timeSetupReal = 0.0;
-      double    timeSetupCpu  = 0.0;
-      double    timeSolveReal = 0.0;
-      double    timeSolveCpu  = 0.0;      
+    //---
+    //--- create the utility class for parsing parameters
+    //---
+    UtilParameters utilParam(argc, argv);
+
+    bool doCut = utilParam.GetSetting("doCut", true);
+    bool doPriceCut = utilParam.GetSetting("doPriceCut", false);
+    bool doDirect = utilParam.GetSetting("doDirect", false);
+
+    UtilTimer timer;
+    double timeSetupReal = 0.0;
+    double timeSetupCpu = 0.0;
+    double timeSolveReal = 0.0;
+    double timeSolveCpu = 0.0;
+
+    //---
+    //--- start overall timer
+    //---
+    timer.start();
+
+    //---
+    //--- create the user application (a DecompApp)
+    //---
+    MILPBlock_DecompApp milp(utilParam);
+
+    //---
+    //--- create the algorithm (a DecompAlgo)
+    //---
+    DecompAlgo *algo = NULL;
+    if ((doCut + doPriceCut) != 1)
+      throw UtilException("doCut or doPriceCut must be set", "main", "main");
+    // assert(doCut + doPriceCut == 1);
+
+    //---
+    //--- create the CPM algorithm object
+    //---
+    if (doCut)
+      algo = new DecompAlgoC(&milp, utilParam);
+
+    //---
+    //--- create the PC algorithm object
+    //---
+    if (doPriceCut)
+      algo = new DecompAlgoPC(&milp, utilParam);
+
+    if (doCut && doDirect) {
+      timer.stop();
+      timeSetupCpu = timer.getCpuTime();
+      timeSetupReal = timer.getRealTime();
 
       //---
-      //--- start overall timer
+      //--- solve
       //---
       timer.start();
-      
+      algo->solveDirect();
+      timer.stop();
+      timeSolveCpu = timer.getCpuTime();
+      timeSolveReal = timer.getRealTime();
+    } else {
       //---
-      //--- create the user application (a DecompApp)
+      //--- create the driver AlpsDecomp model
       //---
-      MILPBlock_DecompApp milp(utilParam); 
+      AlpsDecompModel alpsModel(utilParam, algo);
+
+      timer.stop();
+      timeSetupCpu = timer.getCpuTime();
+      timeSetupReal = timer.getRealTime();
 
       //---
-      //--- create the algorithm (a DecompAlgo)
+      //--- solve
       //---
-      DecompAlgo * algo = NULL;
-      if((doCut + doPriceCut) != 1)
-         throw UtilException("doCut or doPriceCut must be set", 
-                             "main", "main");
-      //assert(doCut + doPriceCut == 1);
+      timer.start();
+      alpsModel.solve();
+      timer.stop();
+      timeSolveCpu = timer.getCpuTime();
+      timeSolveReal = timer.getRealTime();
 
       //---
-      //--- create the CPM algorithm object
-      //---      
-      if(doCut)	 
-         algo = new DecompAlgoC(&milp, utilParam);
-      
+      //--- sanity check
       //---
-      //--- create the PC algorithm object
+      cout << setiosflags(ios::fixed | ios::showpoint);
+      cout << "Status= " << alpsModel.getSolStatus() << " BestLB=  " << setw(10)
+           << UtilDblToStr(alpsModel.getGlobalLB(), 5)
+           << " BestUB= " << setw(10)
+           << UtilDblToStr(alpsModel.getGlobalUB(), 5) << " Nodes= " << setw(6)
+           << alpsModel.getNumNodesProcessed() << " SetupCPU= " << timeSetupCpu
+           << " SolveCPU= " << timeSolveCpu
+           << " TotalCPU= " << timeSetupCpu + timeSolveCpu
+           << " SetupReal= " << timeSetupReal << " SolveReal= " << timeSolveReal
+           << " TotalReal= " << timeSetupReal + timeSolveReal << endl;
+
       //---
-      if(doPriceCut)
-         algo = new DecompAlgoPC(&milp, utilParam);
-      
-      if(doCut && doDirect){
-	 timer.stop();
-	 timeSetupCpu  = timer.getCpuTime();
-	 timeSetupReal = timer.getRealTime();
-	 
-	 //---
-	 //--- solve
-	 //---
-	 timer.start();      
-	 algo->solveDirect();
-	 timer.stop();
-	 timeSolveCpu  = timer.getCpuTime();
-	 timeSolveReal = timer.getRealTime();
+      //--- sanity check
+      //---   if user defines bestLB==bestUB (i.e., known optimal)
+      //---   and solved claims we have optimal, check that they match
+      //---
+      double epsilon = 0.01; // 1%
+      double userLB = milp.getBestKnownLB();
+      double userUB = milp.getBestKnownUB();
+      double userDiff = fabs(userUB - userLB);
+      if (alpsModel.getSolStatus() == AlpsExitStatusOptimal &&
+          userDiff < epsilon) {
+        double diff = fabs(alpsModel.getGlobalUB() - userUB);
+        double diffPer = userUB == 0 ? diff : diff / userUB;
+        if (diffPer > epsilon) {
+          cerr << setiosflags(ios::fixed | ios::showpoint);
+          cerr << "ERROR. BestKnownLB/UB= " << UtilDblToStr(userUB, 5)
+               << " but DIP claims GlobalUB= "
+               << UtilDblToStr(alpsModel.getGlobalUB(), 5) << endl;
+          throw UtilException("Invalid claim of optimal.", "main", "MILPBlock");
+        }
       }
-      else{
-	 //---
-	 //--- create the driver AlpsDecomp model
-	 //---
-	 AlpsDecompModel alpsModel(utilParam, algo);
-	 
-	 timer.stop();
-	 timeSetupCpu  = timer.getCpuTime();
-	 timeSetupReal = timer.getRealTime();
-	 
-	 //---
-	 //--- solve
-	 //---
-	 timer.start();      
-	 alpsModel.solve();
-	 timer.stop();
-	 timeSolveCpu  = timer.getCpuTime();
-	 timeSolveReal = timer.getRealTime();
 
-	 //---
-	 //--- sanity check
-	 //---
-	 cout << setiosflags(ios::fixed|ios::showpoint);
-	 cout << "Status= "   << alpsModel.getSolStatus()  
-	      << " BestLB=  " << setw(10) 
-	      << UtilDblToStr(alpsModel.getGlobalLB(),5)
-	      << " BestUB= " << setw(10)
-	      << UtilDblToStr(alpsModel.getGlobalUB(),5)        
-	      << " Nodes= " << setw(6) 
-	      << alpsModel.getNumNodesProcessed()
-	      << " SetupCPU= "  << timeSetupCpu
-	      << " SolveCPU= "  << timeSolveCpu 
-	      << " TotalCPU= "  << timeSetupCpu + timeSolveCpu
-	      << " SetupReal= " << timeSetupReal
-	      << " SolveReal= " << timeSolveReal
-	      << " TotalReal= " << timeSetupReal + timeSolveReal
-	      << endl;      
-
-         //---
-         //--- sanity check
-         //---   if user defines bestLB==bestUB (i.e., known optimal)
-         //---   and solved claims we have optimal, check that they match
-         //---
-         double epsilon  = 0.01; //1%
-         double userLB   = milp.getBestKnownLB();
-         double userUB   = milp.getBestKnownUB();
-         double userDiff = fabs(userUB - userLB);
-         if(alpsModel.getSolStatus() == AlpsExitStatusOptimal &&
-            userDiff                  < epsilon){
-            double diff   = fabs(alpsModel.getGlobalUB() - userUB);
-	    double diffPer= userUB == 0 ? diff : diff / userUB;
-            if(diffPer > epsilon){
-	       cerr << setiosflags(ios::fixed|ios::showpoint);
-               cerr << "ERROR. BestKnownLB/UB= " 
-                    << UtilDblToStr(userUB,5) 
-		    << " but DIP claims GlobalUB= " 
-                    << UtilDblToStr(alpsModel.getGlobalUB(),5) 
-		    << endl;
-               throw UtilException("Invalid claim of optimal.",
-                                   "main", "MILPBlock");
-            }
-         }
-	 
-         //---
-         //--- get optimal solution
-         //---     
-         if(alpsModel.getSolStatus() == AlpsExitStatusOptimal){
-	    string   solutionFile = milp.getInstanceName() + ".sol";
-	    ofstream osSolution(solutionFile.c_str());
-            const DecompSolution * solution = alpsModel.getBestSolution();
-	    const vector<string> & colNames = alpsModel.getColNames();
-            cout << "Optimal Solution" << endl;
-            solution->print(colNames, 8, osSolution);
-	    osSolution.close();
-         }
-
-	 //---
-	 //--- free local memory
-	 //---
-	 delete algo;      
+      //---
+      //--- get optimal solution
+      //---
+      if (alpsModel.getSolStatus() == AlpsExitStatusOptimal) {
+        string solutionFile = milp.getInstanceName() + ".sol";
+        ofstream osSolution(solutionFile.c_str());
+        const DecompSolution *solution = alpsModel.getBestSolution();
+        const vector<string> &colNames = alpsModel.getColNames();
+        cout << "Optimal Solution" << endl;
+        solution->print(colNames, 8, osSolution);
+        osSolution.close();
       }
-   }
-   catch(CoinError & ex){
-      cerr << "COIN Exception [ " << ex.message() << " ]"
-           << " at " << ex.fileName()  << ":L" << ex.lineNumber()
-           << " in " << ex.className() << "::" << ex.methodName() << endl;
-      return 1;
-   }
-   return 0;
-} 
+
+      //---
+      //--- free local memory
+      //---
+      delete algo;
+    }
+  } catch (CoinError &ex) {
+    cerr << "COIN Exception [ " << ex.message() << " ]"
+         << " at " << ex.fileName() << ":L" << ex.lineNumber() << " in "
+         << ex.className() << "::" << ex.methodName() << endl;
+    return 1;
+  }
+  return 0;
+}

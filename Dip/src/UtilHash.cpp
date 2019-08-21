@@ -13,17 +13,17 @@
 //===========================================================================//
 
 // --------------------------------------------------------------------- //
+#include <iomanip>
 #include <sstream>
 #include <string>
-#include <iomanip>
 using namespace std;
 
-#include "UtilMacros.h"
 #include "Decomp.h"
+#include "UtilMacros.h"
 
-//http://burtleburtle.net/bob/hash/evahash.html or just map?
-//if this is not really doing hashing, then move this function into
-//util macros
+// http://burtleburtle.net/bob/hash/evahash.html or just map?
+// if this is not really doing hashing, then move this function into
+// util macros
 
 //---
 //--- NOTE:
@@ -32,81 +32,66 @@ using namespace std;
 //---
 
 // --------------------------------------------------------------------- //
-string UtilCreateStringHash(const int      len,
-                            const double* els,
-                            const int      precision)
-{
-   stringstream ss;
-   ss << setprecision(precision);
+string UtilCreateStringHash(const int len, const double *els,
+                            const int precision) {
+  stringstream ss;
+  ss << setprecision(precision);
 
-   for (int i = 0; i < len; i++) {
-      if (!UtilIsZero(els[i])) {
-         ss << i << "_" << els[i] << "_";
-      }
-   }
+  for (int i = 0; i < len; i++) {
+    if (!UtilIsZero(els[i])) {
+      ss << i << "_" << els[i] << "_";
+    }
+  }
 
-   return ss.str();
+  return ss.str();
 }
 
 // --------------------------------------------------------------------- //
-string UtilCreateStringHash(const int      len,
-                            const int*     ind,
-                            const double* els,
-                            const int      precision)
-{
-   stringstream ss;
-   ss << setprecision(precision);
+string UtilCreateStringHash(const int len, const int *ind, const double *els,
+                            const int precision) {
+  stringstream ss;
+  ss << setprecision(precision);
 
-   for (int i = 0; i < len; i++) {
-      if (!UtilIsZero(els[i])) {
-         ss << ind[i] << "_" << els[i] << "_";
-      }
-   }
+  for (int i = 0; i < len; i++) {
+    if (!UtilIsZero(els[i])) {
+      ss << ind[i] << "_" << els[i] << "_";
+    }
+  }
 
-   return ss.str();
+  return ss.str();
 }
 
 // --------------------------------------------------------------------- //
-string UtilCreateStringHash(const int      len,
-                            const int*     ind,
-                            const double   els,
-                            const int      precision)
-{
-   stringstream ss;
-   ss << setprecision(precision);
+string UtilCreateStringHash(const int len, const int *ind, const double els,
+                            const int precision) {
+  stringstream ss;
+  ss << setprecision(precision);
 
-   for (int i = 0; i < len; i++) {
-      if (!UtilIsZero(els)) {
-         ss << ind[i] << "_" << els << "_";
-      }
-   }
+  for (int i = 0; i < len; i++) {
+    if (!UtilIsZero(els)) {
+      ss << ind[i] << "_" << els << "_";
+    }
+  }
 
-   return ss.str();
+  return ss.str();
 }
 
 // --------------------------------------------------------------------- //
-string UtilCreateStringHash(const int      len,
-                            const int*     ind,
-                            const double*  els,
-                            const char     sense,
-                            const double   rhs,
-			    double         infinity,
-			    const int      precision)
-{
-   stringstream ss;
-   ss << setprecision(precision);
+string UtilCreateStringHash(const int len, const int *ind, const double *els,
+                            const char sense, const double rhs, double infinity,
+                            const int precision) {
+  stringstream ss;
+  ss << setprecision(precision);
 
-   if (rhs >= infinity) {
-      ss << "INF";
-   } else if (rhs <= -infinity) {
-      ss << "-INF";
-   } else {
-      ss << rhs;
-   }
+  if (rhs >= infinity) {
+    ss << "INF";
+  } else if (rhs <= -infinity) {
+    ss << "-INF";
+  } else {
+    ss << rhs;
+  }
 
-   ss << "_" << sense << "_";
-   ss << UtilCreateStringHash(len, ind, els, precision);
-   return ss.str();
+  ss << "_" << sense << "_";
+  ss << UtilCreateStringHash(len, ind, els, precision);
+  return ss.str();
 }
-
-

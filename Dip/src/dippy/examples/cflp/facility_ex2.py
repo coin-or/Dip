@@ -1,26 +1,14 @@
 from random import randint, seed
 
 # The requirements for the products
-REQUIREMENT = {
-    1 : 7,
-    2 : 5,
-    3 : 3,
-    4 : 2,
-    5 : 2
-}
+REQUIREMENT = {1: 7, 2: 5, 3: 3, 4: 2, 5: 2}
 
 # Set of all products
 PRODUCTS = list(REQUIREMENT.keys())
 PRODUCTS.sort()
 
 # Costs of the facilities
-FIXED_COST = {
-    1 : 1,
-    2 : 1,
-    3 : 1, 
-    4 : 1, 
-    5 : 1
-}
+FIXED_COST = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
 
 # Set of facilities
 LOCATIONS = list(FIXED_COST.keys())

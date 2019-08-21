@@ -18,43 +18,39 @@
 #include "TSP_SubtourCut.h"
 
 /*--------------------------------------------------------------------------*/
-int TSP_DecompApp::generateCutsSubtour(DecompCutList & newCuts){
+int TSP_DecompApp::generateCutsSubtour(DecompCutList &newCuts) {
 
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-		      "generateCutsSubtour()", m_param.LogDebugLevel, 2);
-   
-   //TODO: use access methods
-   TSP_Concorde     & tspConcorde      = m_tsp.m_concorde;
+  UtilPrintFuncBegin(m_osLog, m_classTag, "generateCutsSubtour()",
+                     m_param.LogDebugLevel, 2);
 
-   vector<ConcordeSubtourCut> subtourCuts;
+  // TODO: use access methods
+  TSP_Concorde &tspConcorde = m_tsp.m_concorde;
 
-   int c;
-   int n_subtour  = tspConcorde.generateCutsSubtour(subtourCuts);
-   int n_prevcuts = static_cast<int>(newCuts.size());
-   
-   for(c = 0; c < n_subtour; c++){
-      vector<int>  & S   = subtourCuts[c].S;
-      vector<bool> & inS = subtourCuts[c].inS;
+  vector<ConcordeSubtourCut> subtourCuts;
 
-      if(S.size() >= 2){
-	 TSP_SubtourCut * sec_cut = new TSP_SubtourCut(inS, S, m_infinity);
-	 
-	 UTIL_DEBUG(m_param.LogDebugLevel, 3,
-		    sec_cut->print(m_infinity);
-		    );
-	 newCuts.push_back(sec_cut);	 
-      }
-      else{
-	 cout << "ERROR size of S < 2 (not adding)" << endl;
-      }
-   }
+  int c;
+  int n_subtour = tspConcorde.generateCutsSubtour(subtourCuts);
+  int n_prevcuts = static_cast<int>(newCuts.size());
 
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-		    "generateCutsSubtour()", m_param.LogDebugLevel, 2);
+  for (c = 0; c < n_subtour; c++) {
+    vector<int> &S = subtourCuts[c].S;
+    vector<bool> &inS = subtourCuts[c].inS;
 
-   return static_cast<int>(newCuts.size()) - n_prevcuts;
+    if (S.size() >= 2) {
+      TSP_SubtourCut *sec_cut = new TSP_SubtourCut(inS, S, m_infinity);
+
+      UTIL_DEBUG(m_param.LogDebugLevel, 3, sec_cut->print(m_infinity););
+      newCuts.push_back(sec_cut);
+    } else {
+      cout << "ERROR size of S < 2 (not adding)" << endl;
+    }
+  }
+
+  UtilPrintFuncEnd(m_osLog, m_classTag, "generateCutsSubtour()",
+                   m_param.LogDebugLevel, 2);
+
+  return static_cast<int>(newCuts.size()) - n_prevcuts;
 }
-
 
 #if 0
 //TODO

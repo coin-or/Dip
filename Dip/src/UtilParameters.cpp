@@ -13,8 +13,8 @@
 //===========================================================================//
 
 //===========================================================================//
-#include "UtilMacros.h"
 #include "UtilParameters.h"
+#include "UtilMacros.h"
 
 #include <cassert>
 #include <iostream>
@@ -23,390 +23,367 @@ using namespace std;
 #define MAXLINE 1024
 //===========================================================================//
 
-//TODO: need a template for usage, need application to register this, defaults
-//TODO: this is an ugly combination of old C code and C++, C++-ify it
+// TODO: need a template for usage, need application to register this, defaults
+// TODO: this is an ugly combination of old C code and C++, C++-ify it
 
 // ------------------------------------------------------------------------- //
-void UtilParameters::ScanCmdLineArgs(int&   argc,
-                                     char* argv[])
-{
-   int i, j;
+void UtilParameters::ScanCmdLineArgs(int &argc, char *argv[]) {
+  int i, j;
 
-   //---
-   //--- if there are no arguments, return
-   //---
-   if (argc == 0 || argv == NULL) {
-      return;
-   }
+  //---
+  //--- if there are no arguments, return
+  //---
+  if (argc == 0 || argv == NULL) {
+    return;
+  }
 
-   j = 1;
-   string paramFileName;
+  j = 1;
+  string paramFileName;
 
-   for (i = 1; i < argc; i++) {
+  for (i = 1; i < argc; i++) {
+    //---
+    //--- if "--param" is specified
+    //---
+    if (strcmp(argv[i], "--param") == 0) {
       //---
-      //--- if "--param" is specified
+      //---   if a filename follows the flag
+      //---           grab the filename
       //---
-      if (strcmp(argv[i], "--param") == 0) {
-         //---
-         //---   if a filename follows the flag
-         //---           grab the filename
-         //---
-         if (((i + 1) < argc)
-               && (argv[i + 1][0] != '-' || argv[i + 1][1] != '-')) {
-            paramFileName = argv[++i];
-         }
-
-         continue;
+      if (((i + 1) < argc) &&
+          (argv[i + 1][0] != '-' || argv[i + 1][1] != '-')) {
+        paramFileName = argv[++i];
       }
 
-      argv[j++] = argv[i];
-   }
+      continue;
+    }
 
-   argc = j;
-   //---
-   //--- load the parameter file
-   //---
-   LoadParamFile(paramFileName);
-   //---
-   //--- enter the command line flags into the parameter map
-   //---   format is --SECTION:PARAMETER value
-   //---
-   char cmdBuf[MAXLINE];
+    argv[j++] = argv[i];
+  }
 
-   for (i = 1; i < argc; i++) {
-      if (argv[i][0] == '-' && argv[i][1] == '-') {
-         string name (argv[i] + 2);
-         string value("");
-         strcpy(cmdBuf, argv[i] + 2);
-         char* ptr1    = strtok(cmdBuf, ":");
-         char* ptr2    = strtok(NULL, ":");
-         char* section = NULL;
-         char* parm    = NULL;
+  argc = j;
+  //---
+  //--- load the parameter file
+  //---
+  LoadParamFile(paramFileName);
+  //---
+  //--- enter the command line flags into the parameter map
+  //---   format is --SECTION:PARAMETER value
+  //---
+  char cmdBuf[MAXLINE];
 
-         if (ptr2 == NULL) {
-            //---
-            //--- section is NULL
-            //---
-            parm = ptr1;
-         } else {
-            //---
-            //--- section is not NULL
-            //---
-            section = ptr1;
-            parm    = ptr2;
-         }
+  for (i = 1; i < argc; i++) {
+    if (argv[i][0] == '-' && argv[i][1] == '-') {
+      string name(argv[i] + 2);
+      string value("");
+      strcpy(cmdBuf, argv[i] + 2);
+      char *ptr1 = strtok(cmdBuf, ":");
+      char *ptr2 = strtok(NULL, ":");
+      char *section = NULL;
+      char *parm = NULL;
 
-         if (((i + 1) < argc) && (argv[i + 1][0] != '-' || argv[i + 1][1] != '-')) {
-            value = argv[++i];
-         }
-
-         Add(section, parm, value.c_str());
-         continue;
-      }
-   }
-
-   //STOP - what is the point of this?
-   //
-   //      -----   remove all the flags from the command line
-   //
-   j = 1;
-
-   for (i = 1; i < argc; i++) {
-      if (argv[i][0] == '-' && argv[i][1] == '-') {
-         string name (argv[i] + 2);
-         string value("");
-
-         if (((i + 1) < argc)
-               && (argv[i + 1][0] != '-' || argv[i + 1][1] != '-')) {
-            value = argv[++i];
-         }
-
-         continue;
+      if (ptr2 == NULL) {
+        //---
+        //--- section is NULL
+        //---
+        parm = ptr1;
+      } else {
+        //---
+        //--- section is not NULL
+        //---
+        section = ptr1;
+        parm = ptr2;
       }
 
-      argv[j++] = argv[i];
-   }
-
-   argc = j;
-}
-
-// ------------------------------------------------------------------------- //
-void UtilParameters::LoadParamFile(string& paramFileName)
-{
-   char     buf[MAXLINE];
-   char*    ptr = NULL;
-   string   curSection("");
-   string   bufStr    ("");
-   string   name      ("");
-   string   value     ("");
-   //---
-   //--- open the stream pointer
-   //---
-   ifstream is(paramFileName.c_str());
-
-   if (!is) {
-      return;
-   }
-
-   //---
-   //---   foreach line in the file
-   //---     skip comments (#) and blank lines
-   //---
-   int lineNum = 0;
-
-   while (!is.eof()) {
-      is.getline(buf, sizeof(buf) - 1);
-      lineNum++;
-      ptr = strchr(buf, '#');
-
-      if (ptr != NULL) {
-         *ptr = '\0';
+      if (((i + 1) < argc) &&
+          (argv[i + 1][0] != '-' || argv[i + 1][1] != '-')) {
+        value = argv[++i];
       }
 
-      //TODO: move all to use string? do we need buf?
-      bufStr = buf;
-      bufStr = UtilStrTrim(bufStr);
-      strcpy(buf, bufStr.c_str());
+      Add(section, parm, value.c_str());
+      continue;
+    }
+  }
 
-      if (strlen(buf) < 3) {
-         continue;
+  // STOP - what is the point of this?
+  //
+  //      -----   remove all the flags from the command line
+  //
+  j = 1;
+
+  for (i = 1; i < argc; i++) {
+    if (argv[i][0] == '-' && argv[i][1] == '-') {
+      string name(argv[i] + 2);
+      string value("");
+
+      if (((i + 1) < argc) &&
+          (argv[i + 1][0] != '-' || argv[i + 1][1] != '-')) {
+        value = argv[++i];
       }
 
-      //---
-      //--- if line is '[section]'
-      //---   create a new section
-      //---
-      if (buf[0] == '[') {
-         ptr = strchr(buf + 1, ']');
+      continue;
+    }
 
-         if (ptr == NULL) {
-            cerr << "UtilParameters: syntax error on line "
-                 << lineNum << " '" << buf << "'" << endl;
-         }
+    argv[j++] = argv[i];
+  }
 
-         *ptr = '\0';
-         curSection = buf + 1;
-         continue;
+  argc = j;
+}
+
+// ------------------------------------------------------------------------- //
+void UtilParameters::LoadParamFile(string &paramFileName) {
+  char buf[MAXLINE];
+  char *ptr = NULL;
+  string curSection("");
+  string bufStr("");
+  string name("");
+  string value("");
+  //---
+  //--- open the stream pointer
+  //---
+  ifstream is(paramFileName.c_str());
+
+  if (!is) {
+    return;
+  }
+
+  //---
+  //---   foreach line in the file
+  //---     skip comments (#) and blank lines
+  //---
+  int lineNum = 0;
+
+  while (!is.eof()) {
+    is.getline(buf, sizeof(buf) - 1);
+    lineNum++;
+    ptr = strchr(buf, '#');
+
+    if (ptr != NULL) {
+      *ptr = '\0';
+    }
+
+    // TODO: move all to use string? do we need buf?
+    bufStr = buf;
+    bufStr = UtilStrTrim(bufStr);
+    strcpy(buf, bufStr.c_str());
+
+    if (strlen(buf) < 3) {
+      continue;
+    }
+
+    //---
+    //--- if line is '[section]'
+    //---   create a new section
+    //---
+    if (buf[0] == '[') {
+      ptr = strchr(buf + 1, ']');
+
+      if (ptr == NULL) {
+        cerr << "UtilParameters: syntax error on line " << lineNum << " '"
+             << buf << "'" << endl;
       }
 
-      //---
-      //--- if line is 'name = value'
-      //---   create a new name/value pair in the current section
-      //---
-      ptr = strchr(buf, '=');
+      *ptr = '\0';
+      curSection = buf + 1;
+      continue;
+    }
 
-      if (ptr != NULL) {
-         *ptr++ = '\0';
-      }
+    //---
+    //--- if line is 'name = value'
+    //---   create a new name/value pair in the current section
+    //---
+    ptr = strchr(buf, '=');
 
-      name  = buf;
-      value = "1";
-      name  = UtilStrTrim(name);
-      name  = UtilStrToLower(name);
+    if (ptr != NULL) {
+      *ptr++ = '\0';
+    }
 
-      if (ptr != NULL) {
-         //TODO: look into old code -> value=Expand(ptr)
-         value = ptr;
-         value = UtilStrTrim(value);
-      }
+    name = buf;
+    value = "1";
+    name = UtilStrTrim(name);
+    name = UtilStrToLower(name);
 
-      Add(curSection, name, value);
-   }
+    if (ptr != NULL) {
+      // TODO: look into old code -> value=Expand(ptr)
+      value = ptr;
+      value = UtilStrTrim(value);
+    }
 
-   //---
-   //--- close file stream
-   //---
-   is.close();
+    Add(curSection, name, value);
+  }
+
+  //---
+  //--- close file stream
+  //---
+  is.close();
 }
 
 // ------------------------------------------------------------------------- //
-void UtilParameters::Add(string& sSection,
-                         string& sName,
-                         string& sValue)
-{
-   string    keyname ("");
-   if (sSection == ""){
-      sSection = "DECOMP";
-   }
-   keyname  = UtilStrToLower(UtilStrTrim(sSection));
-   keyname += "@";
-   keyname += UtilStrToLower(UtilStrTrim(sName));
-   //TODO: why doesn't insert override??
-   // m_paramMap.insert(make_pair(keyname, UtilStrTrim(sValue)));
-   m_paramMap[keyname] = UtilStrTrim(sValue);
+void UtilParameters::Add(string &sSection, string &sName, string &sValue) {
+  string keyname("");
+  if (sSection == "") {
+    sSection = "DECOMP";
+  }
+  keyname = UtilStrToLower(UtilStrTrim(sSection));
+  keyname += "@";
+  keyname += UtilStrToLower(UtilStrTrim(sName));
+  // TODO: why doesn't insert override??
+  // m_paramMap.insert(make_pair(keyname, UtilStrTrim(sValue)));
+  m_paramMap[keyname] = UtilStrTrim(sValue);
 }
 
 // ------------------------------------------------------------------------- //
-void UtilParameters::Add(const char* section,
-                         const char* name,
-                         const char* value)
-{
-   string    keyname ("");
-   string    sSection("DECOMP");
-   string    sName   (name);
-   string    sValue  (value);
+void UtilParameters::Add(const char *section, const char *name,
+                         const char *value) {
+  string keyname("");
+  string sSection("DECOMP");
+  string sName(name);
+  string sValue(value);
 
-   if (section) {
-      sSection = section;
-   }      
+  if (section) {
+    sSection = section;
+  }
 
-   keyname  = UtilStrToLower(UtilStrTrim(sSection));
+  keyname = UtilStrToLower(UtilStrTrim(sSection));
 
-   keyname += "@";
-   keyname += UtilStrToLower(UtilStrTrim(sName));
-   //TODO: why doesn't insert override??
-   // m_paramMap.insert(make_pair(keyname, utilParam));
-   m_paramMap[keyname] = UtilStrTrim(sValue);
+  keyname += "@";
+  keyname += UtilStrToLower(UtilStrTrim(sName));
+  // TODO: why doesn't insert override??
+  // m_paramMap.insert(make_pair(keyname, utilParam));
+  m_paramMap[keyname] = UtilStrTrim(sValue);
 }
 
 // ------------------------------------------------------------------------- //
-std::string* UtilParameters::Find(const char* section,
-				  const char* name)
-{
-   string    keyname ("");
-   string    sSection("DECOMP");
-   string    sName   (name);
+std::string *UtilParameters::Find(const char *section, const char *name) {
+  string keyname("");
+  string sSection("DECOMP");
+  string sName(name);
 
-   if (section) {
-      sSection = section;
-   }
-   keyname  = UtilStrToLower(UtilStrTrim(sSection));
+  if (section) {
+    sSection = section;
+  }
+  keyname = UtilStrToLower(UtilStrTrim(sSection));
 
-   keyname += "@";
-   keyname += UtilStrToLower(UtilStrTrim(sName));
-   map<std::string, std::string>::iterator it;
-   it = m_paramMap.find(keyname);
+  keyname += "@";
+  keyname += UtilStrToLower(UtilStrTrim(sName));
+  map<std::string, std::string>::iterator it;
+  it = m_paramMap.find(keyname);
 
-   if (it == m_paramMap.end()) {
-      Add(section, name, "(undefined)");
-      return NULL;
-   } else if (it->second == "(undefined)"){
-      return NULL;
-   }else{
-      return &(it->second);
-   }
+  if (it == m_paramMap.end()) {
+    Add(section, name, "(undefined)");
+    return NULL;
+  } else if (it->second == "(undefined)") {
+    return NULL;
+  } else {
+    return &(it->second);
+  }
 }
 
 // ------------------------------------------------------------------------- //
-string UtilParameters::GetSetting(const char* name,
-                                  const std::string  defaultValue,
-                                  const char* section)
-{
-   //---
-   //--- build the qualified name using the section
-   //--- if the parameter is not found, return the default
-   //--- else convert the string to the appropriate type
-   //---
-   string* pVal = Find(section, name);
+string UtilParameters::GetSetting(const char *name,
+                                  const std::string defaultValue,
+                                  const char *section) {
+  //---
+  //--- build the qualified name using the section
+  //--- if the parameter is not found, return the default
+  //--- else convert the string to the appropriate type
+  //---
+  string *pVal = Find(section, name);
 
-   if (pVal == NULL) {
-      return defaultValue;
-   }
+  if (pVal == NULL) {
+    return defaultValue;
+  }
 
-   return *pVal;
-}
-
-
-
-
-// ------------------------------------------------------------------------- //
-string UtilParameters::GetSetting(const char* name,
-                                  const char* defaultValue,
-                                  const char* section)
-{
-   //---
-   //--- build the qualified name using the section
-   //--- if the parameter is not found, return the default
-   //--- else convert the string to the appropriate type
-   //---
-   string* pVal = Find(section, name);
-
-   if (pVal == NULL) {
-      return string(defaultValue);
-   }
-
-   return *pVal;
+  return *pVal;
 }
 
 // ------------------------------------------------------------------------- //
-int UtilParameters::GetSetting(const char* name,
-                               const int    defaultValue,
-                               const char* section)
-{
-   //---
-   //--- build the qualified name using the section
-   //--- if the parameter is not found, return the default
-   //--- else convert the string to the appropriate type
-   //---
-   string* pVal = Find(section, name);
+string UtilParameters::GetSetting(const char *name, const char *defaultValue,
+                                  const char *section) {
+  //---
+  //--- build the qualified name using the section
+  //--- if the parameter is not found, return the default
+  //--- else convert the string to the appropriate type
+  //---
+  string *pVal = Find(section, name);
 
-   if (pVal == NULL) {
-      return defaultValue;
-   }
+  if (pVal == NULL) {
+    return string(defaultValue);
+  }
 
-   int value = atoi(pVal->c_str());
-   return value;
+  return *pVal;
 }
 
 // ------------------------------------------------------------------------- //
-bool UtilParameters::GetSetting(const char* name,
-                                const bool   defaultValue,
-                                const char* section)
-{
-   //---
-   //--- build the qualified name using the section
-   //--- if the parameter is not found, return the default
-   //--- else convert the string to the appropriate type
-   //---
-   string* pVal = Find(section, name);
+int UtilParameters::GetSetting(const char *name, const int defaultValue,
+                               const char *section) {
+  //---
+  //--- build the qualified name using the section
+  //--- if the parameter is not found, return the default
+  //--- else convert the string to the appropriate type
+  //---
+  string *pVal = Find(section, name);
 
-   if (pVal == NULL) {
-      return defaultValue;
-   }
+  if (pVal == NULL) {
+    return defaultValue;
+  }
 
-   bool value = atoi(pVal->c_str()) != 0;
-   return value;
+  int value = atoi(pVal->c_str());
+  return value;
 }
 
 // ------------------------------------------------------------------------- //
-long UtilParameters::GetSetting(const char* name,
-                                const long   defaultValue,
-                                const char* section)
-{
-   //---
-   //--- build the qualified name using the section
-   //--- if the parameter is not found, return the default
-   //--- else convert the string to the appropriate type
-   //---
-   string* pVal = Find(section, name);
+bool UtilParameters::GetSetting(const char *name, const bool defaultValue,
+                                const char *section) {
+  //---
+  //--- build the qualified name using the section
+  //--- if the parameter is not found, return the default
+  //--- else convert the string to the appropriate type
+  //---
+  string *pVal = Find(section, name);
 
-   if (pVal == NULL) {
-      return defaultValue;
-   }
+  if (pVal == NULL) {
+    return defaultValue;
+  }
 
-   long value = atol(pVal->c_str());
-   return value;
+  bool value = atoi(pVal->c_str()) != 0;
+  return value;
 }
 
 // ------------------------------------------------------------------------- //
-double UtilParameters::GetSetting(const char* name,
-                                  const double defaultValue,
-                                  const char* section)
-{
-   //---
-   //--- build the qualified name using the section
-   //--- if the parameter is not found, return the default
-   //--- else convert the string to the appropriate type
-   //---
-   string* pVal = Find(section, name);
+long UtilParameters::GetSetting(const char *name, const long defaultValue,
+                                const char *section) {
+  //---
+  //--- build the qualified name using the section
+  //--- if the parameter is not found, return the default
+  //--- else convert the string to the appropriate type
+  //---
+  string *pVal = Find(section, name);
 
-   if (pVal == NULL) {
-      return defaultValue;
-   }
+  if (pVal == NULL) {
+    return defaultValue;
+  }
 
-   char*    pEnd  = NULL;
-   double   value = strtod(pVal->c_str(), &pEnd);
-   return value;
+  long value = atol(pVal->c_str());
+  return value;
+}
+
+// ------------------------------------------------------------------------- //
+double UtilParameters::GetSetting(const char *name, const double defaultValue,
+                                  const char *section) {
+  //---
+  //--- build the qualified name using the section
+  //--- if the parameter is not found, return the default
+  //--- else convert the string to the appropriate type
+  //---
+  string *pVal = Find(section, name);
+
+  if (pVal == NULL) {
+    return defaultValue;
+  }
+
+  char *pEnd = NULL;
+  double value = strtod(pVal->c_str(), &pEnd);
+  return value;
 }
 
 #if 0

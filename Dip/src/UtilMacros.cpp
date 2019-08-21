@@ -21,10 +21,9 @@
 // Graph Macros
 // =========================================================================
 // ------------------------------------------------------------------------- //
-std::pair<int, int> UtilBothEndsU(const int index)
-{
-   int i = (int)(floor(sqrt(1 + 8.0 * index) / 2 + .500000001));
-   return std::make_pair( i, index - (i * (i - 1) / 2) );
+std::pair<int, int> UtilBothEndsU(const int index) {
+  int i = (int)(floor(sqrt(1 + 8.0 * index) / 2 + .500000001));
+  return std::make_pair(i, index - (i * (i - 1) / 2));
 }
 
 // =========================================================================
@@ -32,154 +31,146 @@ std::pair<int, int> UtilBothEndsU(const int index)
 // =========================================================================
 
 // ------------------------------------------------------------------------- //
-int UtilScaleDblToIntArr(const int      arrLen,
-                         const double* arrDbl,
-                         int*           arrInt,
-                         const double   oneDbl,
-                         int*           oneInt,
-                         const double   epstol)
-{
-   //---
-   //--- A very simple function to scale an array of doubles to integers.
-   //---    Note: epstol denotes the preferred accuracy,
-   //---    so, we will scale by 1.0/epstol, unless something smaller works.
-   //--- It constructs the scaled array and returns the scale factor.
-   //---
-   //--- It can also scale oneDbl to oneInt wrt to the array (e.g..,
-   //--- the rhs of row). If oneInt == NULL, then this part is skipped.
-   //---
-   int      i, scaleFactor = 1, n_aFrac = 0, factorTooBig = 0;
-   double* arrFrac = NULL;
-   double   fractionalPart;
-   double   oneOverEps = 1.0 / epstol;
-   arrFrac = new double[arrLen + 1];
-   assert(arrFrac);
+int UtilScaleDblToIntArr(const int arrLen, const double *arrDbl, int *arrInt,
+                         const double oneDbl, int *oneInt,
+                         const double epstol) {
+  //---
+  //--- A very simple function to scale an array of doubles to integers.
+  //---    Note: epstol denotes the preferred accuracy,
+  //---    so, we will scale by 1.0/epstol, unless something smaller works.
+  //--- It constructs the scaled array and returns the scale factor.
+  //---
+  //--- It can also scale oneDbl to oneInt wrt to the array (e.g..,
+  //--- the rhs of row). If oneInt == NULL, then this part is skipped.
+  //---
+  int i, scaleFactor = 1, n_aFrac = 0, factorTooBig = 0;
+  double *arrFrac = NULL;
+  double fractionalPart;
+  double oneOverEps = 1.0 / epstol;
+  arrFrac = new double[arrLen + 1];
+  assert(arrFrac);
 
-   for (i = 0; i < arrLen; i++) {
-      fractionalPart = UtilFracPart(arrDbl[i]);
+  for (i = 0; i < arrLen; i++) {
+    fractionalPart = UtilFracPart(arrDbl[i]);
 
-      if (!UtilIsZero(fractionalPart)) {
-         fractionalPart     *= oneOverEps;
-         arrFrac[n_aFrac++]  = static_cast<int>(round(fractionalPart))
-                               * (double)epstol;
-      }
-   }
+    if (!UtilIsZero(fractionalPart)) {
+      fractionalPart *= oneOverEps;
+      arrFrac[n_aFrac++] =
+          static_cast<int>(round(fractionalPart)) * (double)epstol;
+    }
+  }
 
-   if (oneInt) {
-      fractionalPart = UtilFracPart(oneDbl);
+  if (oneInt) {
+    fractionalPart = UtilFracPart(oneDbl);
 
-      if (!UtilIsZero(fractionalPart)) {
-         fractionalPart     *= oneOverEps;
-         arrFrac[n_aFrac++]  = static_cast<int>(round(fractionalPart))
-                               * (double)epstol;
-      }
-   }
+    if (!UtilIsZero(fractionalPart)) {
+      fractionalPart *= oneOverEps;
+      arrFrac[n_aFrac++] =
+          static_cast<int>(round(fractionalPart)) * (double)epstol;
+    }
+  }
 
-   for (i = 0; i < n_aFrac; i++) {
-      assert(arrFrac[i] < (INT_MAX / scaleFactor));
-      arrFrac[i] *= scaleFactor;
+  for (i = 0; i < n_aFrac; i++) {
+    assert(arrFrac[i] < (INT_MAX / scaleFactor));
+    arrFrac[i] *= scaleFactor;
 
-      while (!UtilIsZero(UtilFracPart(arrFrac[i]))) {
-         scaleFactor *= 10;
+    while (!UtilIsZero(UtilFracPart(arrFrac[i]))) {
+      scaleFactor *= 10;
 
-         if (scaleFactor >= oneOverEps) {
-            factorTooBig = 1;
-            break;
-         }
-
-         assert(arrFrac[i] < (INT_MAX / 10));
-         arrFrac[i]    *= 10;
-         assert(arrFrac[i] >= 0);
+      if (scaleFactor >= oneOverEps) {
+        factorTooBig = 1;
+        break;
       }
 
-      if (factorTooBig) {
-         break;
-      }
-   }
+      assert(arrFrac[i] < (INT_MAX / 10));
+      arrFrac[i] *= 10;
+      assert(arrFrac[i] >= 0);
+    }
 
-   for (i = 0; i < arrLen; i++) {
-      arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
-   }
+    if (factorTooBig) {
+      break;
+    }
+  }
 
-   if (oneInt) {
-      *oneInt = static_cast<int>(round(oneDbl * scaleFactor));
-   }
+  for (i = 0; i < arrLen; i++) {
+    arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
+  }
 
-   UTIL_DELARR(arrFrac);
-   return scaleFactor;
+  if (oneInt) {
+    *oneInt = static_cast<int>(round(oneDbl * scaleFactor));
+  }
+
+  UTIL_DELARR(arrFrac);
+  return scaleFactor;
 }
 
-
 /*==========================================================================*/
-int UtilScaleDblToIntArr(const int      arrLen,
-                         const double* arrDbl,
-                         int*           arrInt,
-                         const double   epstol)
-{
-   //---
-   //--- A very simple function to scale an array of doubles to integers.
-   //---    Note: epstol denotes the preferred accuracy,
-   //---    so, we will scale by 1.0/epstol, unless something smaller works.
-   //--- It constructs the scaled array and returns the scale factor.
-   //---
-   //--- It can also scale oneDbl to oneInt wrt to the array (e.g..,
-   //--- the rhs of row). If oneInt == NULL, then this part is skipped.
-   //---
-   int      i, scaleFactor = 1, n_aFrac = 0, factorTooBig = 0;
-   double* arrFrac = NULL;
-   double   fractionalPart;
-   double   oneOverEps = 1.0 / epstol;
-   //TODO: pass in arrFrac?
-   arrFrac = new double[arrLen];
-   assert(arrFrac);
+int UtilScaleDblToIntArr(const int arrLen, const double *arrDbl, int *arrInt,
+                         const double epstol) {
+  //---
+  //--- A very simple function to scale an array of doubles to integers.
+  //---    Note: epstol denotes the preferred accuracy,
+  //---    so, we will scale by 1.0/epstol, unless something smaller works.
+  //--- It constructs the scaled array and returns the scale factor.
+  //---
+  //--- It can also scale oneDbl to oneInt wrt to the array (e.g..,
+  //--- the rhs of row). If oneInt == NULL, then this part is skipped.
+  //---
+  int i, scaleFactor = 1, n_aFrac = 0, factorTooBig = 0;
+  double *arrFrac = NULL;
+  double fractionalPart;
+  double oneOverEps = 1.0 / epstol;
+  // TODO: pass in arrFrac?
+  arrFrac = new double[arrLen];
+  assert(arrFrac);
 
-   for (i = 0; i < arrLen; i++) {
-      fractionalPart = UtilFracPart(arrDbl[i]);
+  for (i = 0; i < arrLen; i++) {
+    fractionalPart = UtilFracPart(arrDbl[i]);
 
-      //printf("arrDbl[%d]=%10.5f fracPart=%6.5f\n",
-      //     i, arrDbl[i], fractionalPart);
-      if (!UtilIsZero(fractionalPart)) {
-         fractionalPart     *= oneOverEps;
-         //printf("fracPart is not zero oneOverEps= %10.5f fracPart= %10.5f\n",
-         //oneOverEps, fractionalPart);
-         arrFrac[n_aFrac++]  = static_cast<int>(round(fractionalPart))
-                               * (double)epstol;
-         //printf("arrFrac[%d] = %10.5f\n", (n_aFrac-1), arrFrac[n_aFrac-1]);
-      }
-   }
+    // printf("arrDbl[%d]=%10.5f fracPart=%6.5f\n",
+    //     i, arrDbl[i], fractionalPart);
+    if (!UtilIsZero(fractionalPart)) {
+      fractionalPart *= oneOverEps;
+      // printf("fracPart is not zero oneOverEps= %10.5f fracPart= %10.5f\n",
+      // oneOverEps, fractionalPart);
+      arrFrac[n_aFrac++] =
+          static_cast<int>(round(fractionalPart)) * (double)epstol;
+      // printf("arrFrac[%d] = %10.5f\n", (n_aFrac-1), arrFrac[n_aFrac-1]);
+    }
+  }
 
-   for (i = 0; i < n_aFrac; i++) {
-      assert(arrFrac[i] < (INT_MAX / scaleFactor));
-      arrFrac[i] *= scaleFactor;
+  for (i = 0; i < n_aFrac; i++) {
+    assert(arrFrac[i] < (INT_MAX / scaleFactor));
+    arrFrac[i] *= scaleFactor;
 
-      while (!UtilIsZero(UtilFracPart(arrFrac[i]))) {
-         scaleFactor *= 10;
+    while (!UtilIsZero(UtilFracPart(arrFrac[i]))) {
+      scaleFactor *= 10;
 
-         if (scaleFactor >= oneOverEps) {
-            factorTooBig = 1;
-            break;
-         }
-
-         assert(arrFrac[i] < (INT_MAX / 10));
-         arrFrac[i]    *= 10;
-         assert(arrFrac[i] >= 0);
+      if (scaleFactor >= oneOverEps) {
+        factorTooBig = 1;
+        break;
       }
 
-      if (factorTooBig) {
-         break;
-      }
-   }
+      assert(arrFrac[i] < (INT_MAX / 10));
+      arrFrac[i] *= 10;
+      assert(arrFrac[i] >= 0);
+    }
 
-   //---
-   //--- must be careful not to trunc here
-   //---   so, we want to round
-   //---
-   for (i = 0; i < arrLen; i++) {
-      arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
-   }
+    if (factorTooBig) {
+      break;
+    }
+  }
 
-   UTIL_DELARR(arrFrac);
-   return scaleFactor;
+  //---
+  //--- must be careful not to trunc here
+  //---   so, we want to round
+  //---
+  for (i = 0; i < arrLen; i++) {
+    arrInt[i] = static_cast<int>(round(arrDbl[i] * scaleFactor));
+  }
+
+  UTIL_DELARR(arrFrac);
+  return scaleFactor;
 }
 
 #if 0
@@ -188,8 +179,8 @@ int UtilScaleDblToIntArr(const int      arrLen,
 //--- taken from Concorde's integerize_vector in LOCALCUT/first.c
 //---
 /*==========================================================================*/
-#define INTEGERIZE_MUL (16*9*5*7*11*13*17)
-#define CC_SWAP(a,b,t) (((t)=(a)),((a)=(b)),((b)=(t)))
+#define INTEGERIZE_MUL (16 * 9 * 5 * 7 * 11 * 13 * 17)
+#define CC_SWAP(a, b, t) (((t) = (a)), ((a) = (b)), ((b) = (t)))
 
 /*==========================================================================*/
 static int CCutil_our_gcd (int a, int b)

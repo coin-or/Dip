@@ -12,10 +12,9 @@
 // All Rights Reserved.                                                      //
 //===========================================================================//
 
-
-#include "DecompVar.h"
 #include "DecompCutPool.h"
 #include "DecompConstraintSet.h"
+#include "DecompVar.h"
 
 using namespace std;
 
@@ -32,7 +31,6 @@ bool DecompWaitingRow::calcViolation(const double* x)
    return violation > 0.0000001;//param?
 };
 #endif
-
 
 #if 0
 // --------------------------------------------------------------------- //
@@ -59,123 +57,119 @@ bool DecompCutPool::isDuplicate(const DecompWaitingRow& wcol)
 #endif
 
 /*-------------------------------------------------------------------------*/
-bool DecompCutPool::calcViolations(const double*             x,
-                                   DecompCutPool::iterator   first,
-                                   DecompCutPool::iterator   last)
-{
-   bool found_violated_cut = false;
+bool DecompCutPool::calcViolations(const double *x,
+                                   DecompCutPool::iterator first,
+                                   DecompCutPool::iterator last) {
+  bool found_violated_cut = false;
 
-   for (DecompCutPool::iterator vi = first; vi != last; vi++) {
-      // ---
-      // --- calculate and set the violations for the cuts
-      // --- which are pointed to in this pool, if any have vio > 0,
-      // --- return true
-      // ---
-      found_violated_cut
-      = (*vi).getCutPtr()->calcViolation((*vi).getRowPtr(), x) ?
-        true : found_violated_cut;
-   }
+  for (DecompCutPool::iterator vi = first; vi != last; vi++) {
+    // ---
+    // --- calculate and set the violations for the cuts
+    // --- which are pointed to in this pool, if any have vio > 0,
+    // --- return true
+    // ---
+    found_violated_cut = (*vi).getCutPtr()->calcViolation((*vi).getRowPtr(), x)
+                             ? true
+                             : found_violated_cut;
+  }
 
-   return found_violated_cut;
+  return found_violated_cut;
 }
 
 /*-------------------------------------------------------------------------*/
-void DecompCutPool::reExpand(const DecompVarList& vars,
-                             const int             n_coreCols,
-                             const int             n_artCols)
-{
-   //---
-   //--- For each waiting row in the cut pool, we need to reset
-   //--- the row in the current master LP (in terms of reformulation)
-   //--- to take into account any new columns.
-   //---
-   DecompCutPool::iterator vi;
+void DecompCutPool::reExpand(const DecompVarList &vars, const int n_coreCols,
+                             const int n_artCols) {
+  //---
+  //--- For each waiting row in the cut pool, we need to reset
+  //--- the row in the current master LP (in terms of reformulation)
+  //--- to take into account any new columns.
+  //---
+  DecompCutPool::iterator vi;
 
-   for (vi = begin(); vi != end(); vi++) {
-      //only need to do this reformulation in PC...
-      //make this re-expansion a function? - also called in addCutsToPool
-      CoinPackedVector* rowReform = createRowReform(n_coreCols,
-                                    //n_artCols,
-                                    (*vi).getRowPtr(),
-                                    vars);
+  for (vi = begin(); vi != end(); vi++) {
+    // only need to do this reformulation in PC...
+    // make this re-expansion a function? - also called in addCutsToPool
+    CoinPackedVector *rowReform = createRowReform(n_coreCols,
+                                                  // n_artCols,
+                                                  (*vi).getRowPtr(), vars);
 
-      if (!rowReform) {
-         assert(0);
-         vi = erase(vi);//THINK...
-      } else {
-         (*vi).deleteRowReform();
-         (*vi).setRowReform(rowReform);
-      }
+    if (!rowReform) {
+      assert(0);
+      vi = erase(vi); // THINK...
+    } else {
+      (*vi).deleteRowReform();
+      (*vi).setRowReform(rowReform);
+    }
 
-      //THINK: once we reexpand, do we need to reset violation?
-      //no, this is done next.... this section just "re-expands"
-   }
+    // THINK: once we reexpand, do we need to reset violation?
+    // no, this is done next.... this section just "re-expands"
+  }
 
-   setRowsAreValid(true);
+  setRowsAreValid(true);
 }
 
 /*------------------------------------------------------------------------*/
-CoinPackedVector*
-DecompCutPool::createRowReform(const int                n_coreCols,
-                               //const int                n_artCols,
-                               const CoinPackedVector* row,          //x-space
-                               const DecompVarList&     vars)
-{
-   //---
-   //--- Create a dense row from the original sparse row (in terms of x).
-   //---
-   double* rowDense  = row->denseVector(n_coreCols);
-   //---
-   //--- In order to expand to the reformulated row (in terms of lambda),
-   //--- we need to substitute x = sum{s in F'} s lambda[s]
-   //---
-   //--- Example - Given a cut:
-   //---   a[1]x[1] + a[2]x[2] >= b
-   //---   a[1]x[1]             = a[1] (s1[1] lam[1] + s2[1] lam[2])
-   //---              a[2]x[2]  = a[2] (s1[2] lam[1] + s2[2] lam[2])
-   //--- So,   lam[1]'s coeff   = a[1] s1[1] + a[2] s1[2]
-   //---       lam[2]'s coeff   = a[1] s2[1] + a[2] s2[2]
-   //---
-   double             coeff;
-   int                colIndex;
-   CoinPackedVector* rowReform = new CoinPackedVector();
-   //---
-   //--- for each variable (non-artificial), dot product the dense row (in terms of x)
-   //---    with the incidence vector of the variable (var->m_s) to get the coefficient
-   //---    in lambda space
-   //---
-   DecompVarList::const_iterator vli;
-   vector<string> noNames;
+CoinPackedVector *
+DecompCutPool::createRowReform(const int n_coreCols,
+                               // const int                n_artCols,
+                               const CoinPackedVector *row, // x-space
+                               const DecompVarList &vars) {
+  //---
+  //--- Create a dense row from the original sparse row (in terms of x).
+  //---
+  double *rowDense = row->denseVector(n_coreCols);
+  //---
+  //--- In order to expand to the reformulated row (in terms of lambda),
+  //--- we need to substitute x = sum{s in F'} s lambda[s]
+  //---
+  //--- Example - Given a cut:
+  //---   a[1]x[1] + a[2]x[2] >= b
+  //---   a[1]x[1]             = a[1] (s1[1] lam[1] + s2[1] lam[2])
+  //---              a[2]x[2]  = a[2] (s1[2] lam[1] + s2[2] lam[2])
+  //--- So,   lam[1]'s coeff   = a[1] s1[1] + a[2] s1[2]
+  //---       lam[2]'s coeff   = a[1] s2[1] + a[2] s2[2]
+  //---
+  double coeff;
+  int colIndex;
+  CoinPackedVector *rowReform = new CoinPackedVector();
+  //---
+  //--- for each variable (non-artificial), dot product the dense row (in terms
+  // of x)
+  //---    with the incidence vector of the variable (var->m_s) to get the
+  // coefficient
+  //---    in lambda space
+  //---
+  DecompVarList::const_iterator vli;
+  vector<string> noNames;
 
-   for (vli = vars.begin(); vli != vars.end(); vli++) {
-      //printf("REFORM ROW for CUT on var master index = %d\n",
-      //    (*vli)->getColMasterIndex());
-      //UtilPrintPackedVector((*vli)->m_s, &cout,
-      //		   noNames,
-      //		   rowDense);
-      coeff = (*vli)->m_s.dotProduct(rowDense);
+  for (vli = vars.begin(); vli != vars.end(); vli++) {
+    // printf("REFORM ROW for CUT on var master index = %d\n",
+    //    (*vli)->getColMasterIndex());
+    // UtilPrintPackedVector((*vli)->m_s, &cout,
+    //		   noNames,
+    //		   rowDense);
+    coeff = (*vli)->m_s.dotProduct(rowDense);
 
-      //printf("COEFF using dotProduct = %12.10f\n", coeff);
-      if (fabs(coeff) > DecompZero) {
-         colIndex = (*vli)->getColMasterIndex();
-         rowReform->insert(colIndex, coeff);
-      }
-   }
+    // printf("COEFF using dotProduct = %12.10f\n", coeff);
+    if (fabs(coeff) > DecompZero) {
+      colIndex = (*vli)->getColMasterIndex();
+      rowReform->insert(colIndex, coeff);
+    }
+  }
 
-   //assert(rowReform->getNumElements() > 0);
-   //---
-   //--- delete the temporary memory
-   //---
-   UTIL_DELARR(rowDense);
-   return rowReform;
+  // assert(rowReform->getNumElements() > 0);
+  //---
+  //--- delete the temporary memory
+  //---
+  UTIL_DELARR(rowDense);
+  return rowReform;
 }
 
 // --------------------------------------------------------------------- //
-void DecompCutPool::print(ostream* os) const
-{
-   vector<DecompWaitingRow>::const_iterator vi;
+void DecompCutPool::print(ostream *os) const {
+  vector<DecompWaitingRow>::const_iterator vi;
 
-   for (vi = begin(); vi != end(); vi++) {
-      (*vi).getCutPtr()->print(os);
-   }
+  for (vi = begin(); vi != end(); vi++) {
+    (*vi).getCutPtr()->print(os);
+  }
 }
