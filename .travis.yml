@@ -4,38 +4,47 @@ env:
   - secure: G7+GGtBDpP73nuIa7dcWD3sRI+v6jkDubFaOY65wO/S1KxqdbQBHdI10K3oXq3QalOpI6/Kilm+JVA7Xm8B1tbQ34bVSuhPQIEaO45Bz4546xpzjqShX+zXVj5In/BghrSbt75mwYoRFAmsKRCg7VtFXgtTaWgXHyE81Yhcb+SA81tzC45D+9BT8ei8NU++ez7RDo9IA9RXQTRDhgVH6YSvpgDThXGI2RbQ5v5ktMuVDnjIyJTayb/oc6xsR9LRtLMkyOfU0nLq9X9eQkD+Tqb5nkdQRwYKutv/ChSoQiB4fAfp9fI0KEH9RirHXbigFBZWnIo8UdhApRN5KzRMsXzR/BX6fMEH9iT+qK7DOhvBS658XhlTyQwOOHJp3EYu5K+6yXDpLOmuh3Nd+FHFw0IXb3bryVhP9S16mxVvm04i8ZWKXgQ4R5rlNkgcXZU7u/ZvpRAAVT5iPeg0EOAisnqaaPwYZG9GtmAgAhCha7w+N3grUAOIWX3mV37DrvoMDTrE1GUsJ+Z56Ztq1bAFEJXMGRs7hU5miyAgIUt2ejcQNAi2AnK9AK8eOJSVaZDopQpCLf44Dpp5zPOR1Hn6ceYwVP7bPnevleD0vMChFSTpUZZ6tYKcIXeAt6auafKKgOSNotURtC/75hY+0YL8U3tZnHNb2kdWwio3bR3QGxRk=
 matrix:
   include:
-  - os: linux
-    addons:
-      apt:
-        packages:
-        - gfortran
-  - os: osx
-    osx_image: xcode10
-    env: OSX=10.13
-    compiler: clang
-  - os: osx
-    osx_image: xcode9.2
-    env: OSX=10.12
-    compiler: clang
-  - os: osx
-    osx_image: xcode8
-    env: OSX=10.11
-    compiler: clang
-  allow_failures:
-  - os: osx
+    - os: linux
+      addons:
+        apt:
+          packages:
+            - gfortran
+            - liblapack-dev
+    - os: linux
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - gfortran
+            - liblapack-dev
+    - os: osx
+      osx_image: xcode11
+      env: OSX=10.14 CC=gcc CXX=g++ 
+      compiler: clang
+    - os: osx
+      osx_image: xcode11
+      env: OSX=10.14 
+      compiler: clang
+    - os: osx
+      osx_image: xcode10
+      env: OSX=10.13 
+      compiler: clang
+    - os: osx
+      osx_image: xcode9.2
+      env: OSX=10.12 
+      compiler: clang
+
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  export PLATFORM=osx$OSX-x86_64-clang`clang -dumpversion`; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; brew link --overwrite gcc; gfortran --version; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PLATFORM=linux-x86_64-gcc`gcc -dumpversion`; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; clang --version; gfortran --version; fi
+  - if [[ "$TRAVIS_OS_NAME $CC" == "osx gcc" ]]; then export CC=gcc-9 ; export CXX=g++-9 ; $CC --version; $CXX --version; fi
   - cd ..
   - wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
   - export PROJECT_URL=https://github.com/$TRAVIS_REPO_SLUG
   - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
-  - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update > /dev/null
+  - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update  > /dev/null 
 
 script:
-  - bash ./coinbrew build $PROJECT --no-prompt --verbosity=2 --test 
-
+  - bash ./coinbrew build $PROJECT --no-prompt --verbosity=2 --test
 after_script:
   - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=master; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
   - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
