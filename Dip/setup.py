@@ -8,9 +8,8 @@ from os.path import join, dirname
 
 PROJECT = 'coinor.dippy'
 VERSION = '1.95.0'
-URL = 'https://projects.coin-or.org/Dip/wiki/DipPy'
-AUTHOR_EMAIL = u''
-DESC = 'DIP Python Interface'
+URL = 'https://github.com/coin-or/Dip'
+DESC = u'DIP Python Interface'
 
 coin_install_dir = os.environ['COIN_INSTALL_DIR']
 
@@ -117,10 +116,13 @@ setup(name=PROJECT,
       version=VERSION,
       description=DESC,
       long_description=read_file('README.rst'),
-      author=read_file('AUTHORS'),
-      author_email=AUTHOR_EMAIL,
+      long_description_content_type='text/x-rst',
+      author='''Michael O'Sullivan, Qi-Shan Lim, Stuart Mitchell''',
+      author_email='michael.osullivan@auckland.ac.nz',
+      maintainer='Ted Ralphs',
+      maintainer_email='ted@lehigh.edu',
       url=URL,
-      license=read_file('LICENSE'),
+      license='Eclipse Public License',
       namespace_packages=['coinor'],
       packages=['coinor.dippy','coinor.dippy.examples','coinor'],
       package_dir = {'coinor': 'src'},
