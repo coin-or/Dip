@@ -798,7 +798,6 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    int nRowsCore = modelCore->getNumRows();
    int nIntVars  = modelCore->getNumInts();
    int nInitVars = static_cast<int>(initVars.size());
-   assert(initVars.size() > 0);//TODO: this should be OK
    double* dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
    //---
