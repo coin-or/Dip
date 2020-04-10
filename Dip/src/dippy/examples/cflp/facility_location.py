@@ -46,7 +46,9 @@ except ImportError:
 #display_mode = 'xdot'
 #layout = 'dot'
 
-prob = dippy.DipProblem("Facility Location")
+prob = dippy.DipProblem("Facility Location", display_mode = 'matplotlib', display_interval = 10000)
+
+#prob.display_mode = 'matplotlib'
 
 assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
 use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
@@ -378,7 +380,7 @@ if debug_print_lp:
 #prob.node_heuristic = True
 
 dippyOpts = {}
-algo = 'doCut'
+algo = 'Cut'
 if len(sys.argv) > 1:
     algo = sys.argv[1]
 if algo == 'PriceCut':
@@ -387,9 +389,12 @@ if algo == 'PriceCut':
 elif algo == 'Price':
     dippyOpts['doPriceCut'] = '1'
     dippyOpts['CutCGL'] = '0'
+elif algo == 'Direct':
+    dippyOpts['doDirect'] = '1'
+    dippyOpts['doCut'] = '1'
 else:
     dippyOpts['doCut'] = '1'
-
+    
 dippyOpts['TolZero'] = '%s' % tol
 
 dippy.Solve(prob, dippyOpts)

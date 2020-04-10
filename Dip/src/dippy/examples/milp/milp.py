@@ -82,7 +82,7 @@ for k in range(numBlocks):
 
 dippy.Solve(prob,{
     'TolZero': '%s' % tol,
-    'doCut': '1',
+    'doDirect': '1',
     'CutCGL': '1',
     'SolveMasterAsIp': '0',
     'generateInitVars': '1',
