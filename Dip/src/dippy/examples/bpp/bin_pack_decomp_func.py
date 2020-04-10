@@ -11,7 +11,7 @@ try:
 except ImportError:
     import coinor.dippy as dippy
     from coinor.dippy import DipSolStatOptimal
-    import coinor.dippy.examples.cflp.facility_ex1 as data
+    import facility_ex1 as data
 
 from math import floor, ceil
 

@@ -2,12 +2,12 @@
 
 #from ez_setup import use_setuptools
 #use_setuptools()
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 import subprocess, os, sys
 from os.path import join, dirname
 
 PROJECT = 'coinor.dippy'
-VERSION = '1.95.0'
+VERSION = '1.95.1'
 URL = 'https://github.com/coin-or/Dip'
 DESC = u'DIP Python Interface'
 
@@ -115,7 +115,7 @@ modules=[Extension('coinor.dippy._dippy',
 setup(name=PROJECT,
       version=VERSION,
       description=DESC,
-      long_description=read_file('README.rst'),
+      long_description=read_file('README.md'),
       long_description_content_type='text/x-rst',
       author='''Michael O'Sullivan, Qi-Shan Lim, Stuart Mitchell''',
       author_email='michael.osullivan@auckland.ac.nz',
@@ -124,7 +124,8 @@ setup(name=PROJECT,
       url=URL,
       license='Eclipse Public License',
       namespace_packages=['coinor'],
-      packages=['coinor.dippy','coinor.dippy.examples','coinor'],
+      #There must be a better way
+      packages=[pkg.replace('src','coinor') for pkg in find_packages()],
       package_dir = {'coinor': 'src'},
       install_requires=['pulp>=1.5.4','coinor.gimpy>=2.0.0'],
       ext_modules=modules
