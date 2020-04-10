@@ -63,6 +63,9 @@ https://github.com/Dip/issues/new
 
 ## CHANGELOG
 
+### Release 0.95.0
+ * Python 3 support added
+
 ### Release 0.92.4
  * Update dependencies
  * Minor bug fixes for DipPy

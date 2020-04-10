@@ -59,7 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = README $(am__configure_deps) \
+DIST_COMMON = README.md $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
 	$(top_srcdir)/doxydoc/doxygen.conf.in AUTHORS INSTALL \
@@ -271,7 +271,7 @@ SUBDIRS_DOXY = $(SUBDIRS) all
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES = coin_subdirs.txt $(am__append_2) \
 	$(VPATH_DISTCLEANFILES)
-DocFiles = README AUTHORS LICENSE 
+DocFiles = README.md AUTHORS LICENSE 
 DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
 COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
 COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE

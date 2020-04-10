@@ -24,7 +24,7 @@ subdirectory. To execute the script, do
 
 ```
 cd coinbrew
-chmod u+x coin.install.sh
+chmod u+x coinbrew
 ./coinbrew
 ```
 
@@ -35,8 +35,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.92
-./coinbrew build --no-prompt Dip --prefix=/path/to/install/dir --verbosity=1
+./coinbrew fetch --no-prompt Dip:stable/0.95
+./coinbrew build --no-prompt Dip --prefix=/path/to/install/dir
 ./coinbrew install Dip
 ```
 
