@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-#from ez_setup import use_setuptools
-#use_setuptools()
 from setuptools import setup, Extension, find_packages
 import subprocess, os, sys
 from os.path import join, dirname
@@ -10,8 +8,6 @@ PROJECT = 'coinor.dippy'
 VERSION = '1.95.1'
 URL = 'https://github.com/coin-or/Dip'
 DESC = u'DIP Python Interface'
-
-coin_install_dir = os.environ['COIN_INSTALL_DIR']
 
 def read_file(file_name):
 
@@ -22,49 +18,67 @@ def read_file(file_name):
 
     return open(file_path).read()
 
-def get_libs(dir):
+try:
+    CoinDir = os.environ['COIN_INSTALL_DIR']
+except:
+    from os.path import abspath, dirname
+
+    try:
+        location = dirname(
+            check_output(['which', 'clp']).strip()).decode('utf-8')
+        CoinDir = abspath(join(location, ".."))
+    except:
+        pass
+            
+def get_libs():
     '''
     Return a list of distinct library names used by ``dependencies``.
     '''
-    with open(join(dir, 'share', 'coin',
-                   'doc', 'Dip', 'dip_addlibs.txt')) as f:
-        link_line = f.read()
-        if operatingSystem == 'windows':
-            libs = [flag[:-4] for flag in link_line.split() if
-                    flag.endswith('.lib')]
-        else:
-            libs = [flag[2:] for flag in link_line.split() if
-                    flag.startswith('-l')]
-    return libs
+    libs = []
 
-def get_lib_dirs(dir):
-    '''
-    Return a list of library directories.
-    '''
-    with open(join(dir, 'share', 'coin',
-                   'doc', 'Dip', 'dip_addlibs.txt')) as f:
-        link_line = f.read()
-        libs = [flag[2:] for flag in link_line.split() if
-                flag.startswith('-L')]
-    return libs
+    try:
+        from subprocess import check_output
+        
+        flags = (check_output(['pkg-config', '--libs', 'dip'])
+                 .strip().decode('utf-8'))
+        libs = [flag[2:] for flag in flags.split()
+                if flag.startswith('-l')]
+        libDirs = [flag[2:] for flag in flags.split()
+                   if flag.startswith('-L')]
+        flags = (check_output(['pkg-config', '--cflags', 'dip'])
+                 .strip().decode('utf-8'))
+        incDirs = [flag[2:] for flag in flags.split() if
+                   flag.startswith('-I')]
 
-def get_frameworks(dir):
-    '''
-    On OS X, return a list of linked frameworks.
-    '''
-    with open(join(dir, 'share', 'coin',
-                   'doc', 'Dip', 'dip_addlibs.txt')) as f:
-        link_line = f.read()
-        add_framework = False
-        frameworks = ''
-        for flag in link_line.split():
-            if add_framework:
-                frameworks += '-framework ' + flag + ' '
-                add_framework = False
-            if flag == '-framework':
-                add_framework = True
+    except:
+        if CoinDir != None:
+            
+            if operatingSystem == 'windows':
+                if os.path.exists(join(CoinDir, 'lib', 'Cbc.lib')):
+                    libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
+                            'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
+                else:
+                    libs = ['libDecomp', 'libOsiSym', 'libSym', 'libOsiCbc', 'libCbcSolver',
+                            'libCbc', 'libCgl', 'libOsiClp', 'libClpSolver',  'libClp', 'libOsi',
+                            'libAlps', 'libCoinUtils']
+            else:
+                libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
+                        'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
                 
-    return frameworks
+            libDirs = [join(CoinDir, 'lib')]
+            incDirs = [join(CoinDir, 'include', 'coin')] 
+                
+        else:
+            raise Exception('''
+            Could not find location of COIN installation.
+            Please ensure that either 
+            * COIN_INSTALL_DIR is set to the location of the installation,
+            * PKG_CONFIG_PATH points to the location of the .pc files, or
+            * The cbc executable is in your executable path and is installed
+            at the same location as the libraries. 
+            ''')
+
+    return libs, libDirs, incDirs
 
 operatingSystem = sys.platform
 if 'linux' in operatingSystem:
@@ -74,16 +88,9 @@ elif 'darwin' in operatingSystem:
 elif 'win' in operatingSystem:
     operatingSystem = 'windows'
 
-try:
-    coin_install_dir = os.environ['COIN_INSTALL_DIR']
-except KeyError:
-    raise Exception('Please set the environment variable COIN_INSTALL_DIR' +
-                    'to the location of the COIN installation')
+libs, libDirs, incDirs = get_libs()
 
-if len(coin_install_dir.split(';')) > 1:
-    raise Exception('Error: More than one directory listed in COIN_INSTALL_DIR')
-
-libraries = get_libs(coin_install_dir)
+print (libs, libDirs, incDirs)
 
 macros = [('__DECOMP_LP_CLP__', None)]
 
@@ -96,20 +103,11 @@ files = ['DippyDecompAlgo.cpp',
 
 sources = [join('src', 'dippy', f) for f in files]
 
-lib_dirs = get_lib_dirs(coin_install_dir)
-lib_dirs.append(join(coin_install_dir, 'lib'))
-if operatingSystem is 'windows':
-    lib_dirs.append(join(coin_install_dir, 'lib', 'intel'))
-if operatingSystem is 'mac':
-    os.environ['LDFLAGS'] = get_frameworks(coin_install_dir)
-
 modules=[Extension('coinor.dippy._dippy', 
                    sources, 
-                   libraries=libraries,
-                   include_dirs=[join(coin_install_dir, 'include', 'coin'),
-                                 '/usr/local/gurobi/linux64/include',
-                                 '/usr/local/cplex/include/ilcplex'],
-                   library_dirs=lib_dirs,
+                   libraries=libs,
+                   include_dirs=incDirs,
+                   library_dirs=libDirs,
                    define_macros=macros)]
 
 setup(name=PROJECT,
