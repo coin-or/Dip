@@ -8,16 +8,9 @@ from builtins import range
 import pulp
 
 try:
-    import path
+    from src.dippy import DipProblem, DipSolStatOptimal, Solve
 except ImportError:
-    pass
-        
-try:
-    import src.dippy as dippy
-    from src.dippy import DipSolStatOptimal
-except ImportError:
-    import coinor.dippy as dippy
-    from coinor.dippy import DipSolStatOptimal
+    from coinor.dippy import DipProblem, DipSolStatOptimal, Solve
 
 debug_print = False
 
@@ -44,8 +37,8 @@ x = pulp.LpVariable.dicts('possible_seatings', possible_seatings,
                             upBound = 1,
                             cat = pulp.LpInteger)
 
-seating_model = dippy.DipProblem("Wedding Seating Model (DIP)", pulp.LpMinimize,
-                                 display_mode = 'off', display_interval = 10000)
+seating_model = DipProblem("Wedding Seating Model (DIP)", pulp.LpMinimize,
+                           display_mode = 'off', display_interval = 10000)
 
 #specify the maximum number of guests per table
 for table in tables:
@@ -116,7 +109,7 @@ def relaxed_solver(prob, table, redCosts, target):
 #for table in tables:
 #    seating_model.writeRelaxed(table, 'wedding_relax%s.lp' % table);
     
-dippy.Solve(seating_model, {
+Solve(seating_model, {
         'doPriceCut' : '1',
         'CutCGL' : '1',
         #'generateInitVars' : '1',
