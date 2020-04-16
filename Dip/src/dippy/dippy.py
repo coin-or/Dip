@@ -543,7 +543,8 @@ class DipProblem(pulp.LpProblem, DipAPI):
         for k in ks:
             f.write(relaxation.constraints[k].asCplexLpConstraint(k))
         vs = relaxation.variables()
-        vs.sort()
+        # check for repeated names
+        relaxation.checkDuplicateVars()
         # Bounds on non-"positive" variables
         # Note: XPRESS and CPLEX do not interpret integer variables without 
         # explicit bounds

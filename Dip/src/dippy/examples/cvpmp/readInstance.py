@@ -15,7 +15,7 @@ from . import Global
 
 def read(path):
     file = open(path,'r')
-    line = string.split(file.readline())
+    line = file.readline().split()
 
     type = int(line[0])
     cxy  = None
@@ -25,7 +25,7 @@ def read(path):
         id   = int(line[1])
         n    = int(line[2])
         p    = int(line[3])
-        line = string.split(file.readline())
+        line = file.readline().split()
         q    = int(line[0])
         
         cxy  = {}
@@ -35,7 +35,7 @@ def read(path):
         V    = [i for i in range(1, n + 1)]
         
         for i in V:
-            line    = string.split(file.readline())
+            line    = file.readline().split()
             cxy[i]  = [int(line[1]), int(line[2])]
             s[i]    = q
             w[i]    = int(line[3])
@@ -59,18 +59,18 @@ def read(path):
         V  = [i for i in range(1,n+1)]
         
         i = 1
-        for s_ in string.split(file.readline()):
+        for s_ in file.readline().split():
             s[i] = int(float(s_))
             i += 1
         
         i = 1
-        for w_ in string.split(file.readline()):
+        for w_ in file.readline().split():
             w[i] = int(float(w_))
             i += 1
         
         for i in V:
             j = 1
-            for d_ in string.split(file.readline()):
+            for d_ in file.readline().split():
                 d[i,j] = int(float(d_))
                 j += 1
     
@@ -89,7 +89,7 @@ def read(path):
         V   = [i for i in range(1,n+1)]
         
         for i in V:
-            line    = string.split(file.readline())
+            line    = file.readline().split()
             cxy[i]  = [int(line[0]), int(line[1])]
             s[i]    = int(line[2])
             w[i]    = int(line[3])
@@ -116,17 +116,17 @@ def read(path):
 
         for i in V:
             j = 1
-            for d_ in string.split(file.readline()):
+            for d_ in file.readline().split():
                 d[i,j] = int(float(d_))
                 j += 1
 
         i = 1
-        for w_ in string.split(file.readline()):
+        for w_ in file.readline().split():
             w[i] = int(float(w_))
             i += 1
         
         i = 1
-        for s_ in string.split(file.readline()):
+        for s_ in file.readline().split():
             s[i] = int(float(s_))
             i += 1
     

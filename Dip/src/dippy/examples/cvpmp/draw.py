@@ -22,7 +22,7 @@ def draw(path, mytype, id):
     P = []
     
     for line in f:
-        Z = string.split(line)
+        Z = line.split()
         V.append([int(Z[0]),int(Z[1]),int(Z[2]),float(Z[3]),float(Z[4])])
         if int(Z[0]) ==  1:
             P.append([int(Z[0]),int(Z[1]),int(Z[2]),float(Z[3]),float(Z[4])])

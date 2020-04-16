@@ -26,3 +26,7 @@ Dip/dist
 Dip/coinor.dippy.egg-info
 Dip/python3-defaults*
 *~
+acinclude*
+aclocal*
+autom4te*
+*.pyc

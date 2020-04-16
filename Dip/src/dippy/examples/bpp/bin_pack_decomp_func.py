@@ -11,7 +11,7 @@ try:
 except ImportError:
     import coinor.dippy as dippy
     from coinor.dippy import DipSolStatOptimal
-    import facility_ex1 as data
+    import coinor.dippy.examples.cflp.facility_ex1 as data
 
 from math import floor, ceil
 
@@ -204,10 +204,6 @@ def one_each(prob):
 
 #prob.init_vars = first_fit
 ##prob.init_vars = one_each
-
-prob.writeLP('facility_main.lp')
-for n, i in enumerate(LOCATIONS):
-    prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
 
 dippy.Solve(prob, {
     'TolZero': '%s' % tol,
