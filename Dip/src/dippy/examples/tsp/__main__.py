@@ -13,7 +13,7 @@ from .tsp_func import *
 if len(sys.argv) > 1:
     prob = formulate(sys.argv[1])
 else:
-    prob = formulate('coinor.dippy.examples.cflp.facility_ex2')
+    prob = formulate('coinor.dippy.examples.tsp.tsp_data')
 
 prob.generate_cuts = generate_cuts
 prob.is_solution_feasible = is_solution_feasible

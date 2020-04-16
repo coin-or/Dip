@@ -24,7 +24,7 @@ from .gap_func import *
 if len(sys.argv) > 1:
     module_name = sys.argv[1]
 else:
-    module_name = 'gap0515-2'
+    module_name = 'coinor.dippy.examples.gap.gap0515-2'
 
 prob = formulate(module_name)
 
