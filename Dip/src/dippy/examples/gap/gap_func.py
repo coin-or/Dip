@@ -10,6 +10,7 @@ from builtins import str
 from builtins import range
 from past.utils import old_div
 import sys
+import importlib as ilib
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 
@@ -19,68 +20,70 @@ except ImportError:
     pass
         
 try:
-    import src.dippy as dippy
-    from src.dippy import DipSolStatOptimal
+    from src.dippy import DipProblem, DipSolStatOptimal
 except ImportError:
-    import coinor.dippy as dippy
-    from coinor.dippy import DipSolStatOptimal
+    from coinor.dippy import DipProblem, DipSolStatOptimal
 
 debug_print = False
 
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
-# parse data file
-if len(sys.argv) > 1:
-    input = open(sys.argv[1])
-else:
-    input = open('gap0515-2.dat')
+def formulate(module_name):
 
-line = input.readline().split()
-NUM_MACHINES = int(line[0])
-NUM_TASKS = int(line[1])
-MACHINES = list(range(NUM_MACHINES))
-TASKS = list(range(NUM_TASKS))
-MACHINES_TASKS = [(m, t) for m in MACHINES for t in TASKS]
+    m = ilib.import_module(module_name)
 
-COSTS = []
-for m in MACHINES:
-    line = input.readline().split()
-    assert len(line) == NUM_TASKS
-    COSTS.append([int(f) for f in line])
+    lines = m.gap_data.splitlines()
+    line = lines[1].split() #first line is blank
+    NUM_MACHINES = int(line[0])
+    NUM_TASKS = int(line[1])
+    MACHINES = list(range(NUM_MACHINES))
+    TASKS = list(range(NUM_TASKS))
+    MACHINES_TASKS = [(m, t) for m in MACHINES for t in TASKS]
 
-RESOURCE_USE = []
-for m in MACHINES:
-    line = input.readline().split()
-    assert len(line) == NUM_TASKS
-    RESOURCE_USE.append([int(f) for f in line])
+    COSTS = []
+    line_num = 2
+    for m in MACHINES:
+        line = lines[line_num].split()
+        assert len(line) == NUM_TASKS
+        COSTS.append([int(f) for f in line])
+        line_num += 1
 
-line = input.readline().split()
-assert len(line) == NUM_MACHINES
-CAPACITIES = [int(f) for f in line]
+    RESOURCE_USE = []
+    for m in MACHINES:
+        line = lines[line_num].split()
+        assert len(line) == NUM_TASKS
+        RESOURCE_USE.append([int(f) for f in line])
+        line_num += 1
 
-assignVars = []
-for m in MACHINES:
-    v = []
+    line = lines[line_num].split()
+    assert len(line) == NUM_MACHINES
+    CAPACITIES = [int(f) for f in line]
+
+    assignVars = []
+    for m in MACHINES:
+        v = []
+        for t in TASKS:
+            v.append(LpVariable("M%dT%d" % (m, t), cat=LpBinary))
+        assignVars.append(v)
+
+    prob = DipProblem("GAP")
+
+    # objective
+    prob += lpSum(assignVars[m][t] * COSTS[m][t] for m, t in MACHINES_TASKS), "min"
+
+    # machine capacity (knapsacks, relaxation)
+    for m in MACHINES:
+        prob.relaxation[m] += lpSum(assignVars[m][t] * RESOURCE_USE[m][t] for t in TASKS) <= CAPACITIES[m]
+
+        # assignment
     for t in TASKS:
-        v.append(LpVariable("M%dT%d" % (m, t), cat=LpBinary))
-    assignVars.append(v)
+        prob += lpSum(assignVars[m][t] for m in MACHINES) == 1
 
-prob = dippy.DipProblem("GAP",
-                        display_mode = 'off', 
-                        layout = 'dot',
-                        display_interval = None,
-                        )
+    prob.assignVars = assignVars
+    prob.MACHINES = MACHINES
+    prob.TASKS = TASKS
 
-# objective
-prob += lpSum(assignVars[m][t] * COSTS[m][t] for m, t in MACHINES_TASKS), "min"
-
-# machine capacity (knapsacks, relaxation)
-for m in MACHINES:
-    prob.relaxation[m] += lpSum(assignVars[m][t] * RESOURCE_USE[m][t] for t in TASKS) <= CAPACITIES[m]
-
-# assignment
-for t in TASKS:
-    prob += lpSum(assignVars[m][t] for m in MACHINES) == 1
+    return prob
 
 def solve_subproblem(prob, machine, redCosts, target):
     if debug_print:
@@ -170,25 +173,4 @@ def knapsack01(obj, weights, capacity):
         i -= 1
         
     return c[n-1][capacity], solution
-
-#prob.relaxed_solver = solve_subproblem
-
-dippy.Solve(prob, {
-    'TolZero': '%s' % tol,
-    'doPriceCut': '1',
-#    'logLevel': '3', 
-})
-
-for m in MACHINES:
-    print() 
-    print("Machine %d assigned tasks" %m, end=' ')
-    for t in TASKS:
-        v = assignVars[m][t].varValue
-        if v:
-            print("%d" %t, end=' ')
-print()
-            
-if prob.display_mode != 'off':
-    if (prob.Tree.attr['display'] == 'pygame') or (prob.Tree.attr['display'] == 'xdot'):
-        prob.Tree.display()
 

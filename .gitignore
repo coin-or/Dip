@@ -29,3 +29,4 @@ Dip/python3-defaults*
 acinclude*
 aclocal*
 autom4te*
+*.pyc
