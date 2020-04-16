@@ -9,7 +9,7 @@ import importlib as ilib
 if len(sys.argv) > 1:
     module_name = sys.argv[1]
 else:
-    module_name = coke_data
+    module_name = 'coinor.dippy.examples.coke.coke_data'
 
 m = ilib.import_module(module_name)
     
@@ -24,7 +24,7 @@ transport_costs.update(cust_trans)
 cp = CokeProb(supply = m.mine_supply, demand = m.customer_demand,
               LOCATIONS = m.LOCATIONS, build_costs = m.build_costs,
               conversion_factor = m.convert,
-              transport_costs = m.transport_costs)
+              transport_costs = transport_costs)
 
 prob = formulate(cp)
 
@@ -40,7 +40,7 @@ for l in cp.LOCATIONS:
                   (l, s, xopt[prob.buildVars[(l,s)]]))
 print()
 
-print_var_table(cp.MINES, LOCATIONS, prob.flowVars)
+print_var_table(cp.MINES, cp.LOCATIONS, prob.flowVars)
 print()
 print_var_table(cp.LOCATIONS, cp.CUSTOMERS, prob.flowVars)
 

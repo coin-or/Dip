@@ -10,22 +10,10 @@ import sys
 # Import classes and functions from PuLP
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
-# Import any customised paths
 try:
-    import path
+    from src.dippy import DipProblem, Solve
 except ImportError:
-    pass
-
-# Import dippy (local copy first,
-# then a development copy - if python setup.py develop used,
-# then the coinor.dippy package
-try:
-    import dippy
-except ImportError:
-    try:
-        import src.dippy as dippy
-    except ImportError:
-        import coinor.dippy as dippy
+    from coinor.dippy import DipProblem, Solve
 
 class CokeProb(object):
     def __init__(self, supply, demand, LOCATIONS, build_costs,
@@ -46,11 +34,7 @@ class CokeProb(object):
 
 def formulate(cp):
 
-    prob = dippy.DipProblem("Coke",
-                            display_mode = 'xdot',
-#                           layout = 'bak',
-                            display_interval = None,
-                            )
+    prob = DipProblem("Coke", display_mode = 'xdot', display_interval = None)
 
     # create variables
     LOC_SIZES = [(l, s) for l in cp.LOCATIONS
@@ -143,7 +127,7 @@ def solve(prob):
     if not CGL_cuts:
       dippyOpts['CutCGL'] = '0'
       
-    status, message, primals, duals = dippy.Solve(prob, dippyOpts)
+    status, message, primals, duals = Solve(prob, dippyOpts)
     
     if status == LpStatusOptimal:
         return dict((var, var.value()) for var in prob.variables())

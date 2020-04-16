@@ -1,15 +1,12 @@
 from __future__ import print_function
 from builtins import range
-#!/usr/bin/env python
-
 from pulp import *
+import importlib as ilib
 
 try:
-    import src.dippy as dippy
-    from src.dippy import DipSolStatOptimal
+    from src.dippy import DipProblem, DipSolStatOptimal
 except ImportError:
-    import coinor.dippy as dippy
-    from coinor.dippy import DipSolStatOptimal
+    from coinor.dippy import DipProblem, DipSolStatOptimal
 
 def cross(i1, i2):
     r = []
@@ -18,36 +15,42 @@ def cross(i1, i2):
             r.append((a, b))
     return r
 
-CUTS = cross(PATTERNS, ITEMS)
+def formulate(module_name):
 
-prob = dippy.DipProblem("Python", LpMinimize)
+    prob = DipProblem("Python", LpMinimize)
 
-# create variables
+    m = ilib.import_module(module_name)
+    
+    # create variables
+    useVars = LpVariable.dicts("Use", m.PATTERNS, 0, 1, LpBinary)
+    prob.useVars = useVars
 
-useVars = LpVariable.dicts("Use", PATTERNS, 0, 1, LpBinary)
-prob.useVars = useVars
+    cutVars = LpVariable.dicts("Cut", m.CUTS, 0, 10, LpInteger)
+    prob.cutVars = cutVars
 
-cutVars = LpVariable.dicts("Cut", CUTS, 0, 10, LpInteger)
-prob.cutVars = cutVars
+    # objective
+    prob += lpSum(useVars[p] for p in m.PATTERNS), "min"
 
-# objective
-prob += lpSum(useVars[p] for p in PATTERNS), "min"
+    # Meet demand
+    for i in m.ITEMS:
+        prob += lpSum(cutVars[(p, i)] for p in m.PATTERNS) \
+                >= m.demand[i]
 
-# Meet demand
-for i in ITEMS:
-    prob += lpSum(cutVars[(p, i)] for p in PATTERNS) \
-            >= demand[i]
+    # Ordering patterns
+    for i, p in enumerate(m.PATTERNS):
+        if p != m.PATTERNS[-1]:
+            prob += useVars[p] >= useVars[m.PATTERNS[i+1]]
 
-# Ordering patterns
-for i, p in enumerate(PATTERNS):
-    if p != PATTERNS[-1]:
-        prob += useVars[p] >= useVars[PATTERNS[i+1]]
+    for p in m.PATTERNS:
+        prob.relaxation[p] += \
+                lpSum(m.length[i] * cutVars[(p, i)] for i in m.ITEMS) \
+                <= m.total_length[p] * useVars[p]
 
-for p in PATTERNS:
-    prob.relaxation[p] += \
-    lpSum(length[i] * cutVars[(p, i)] for i in ITEMS) \
-    <= total_length[p] * useVars[p]
-
+    prob.ITEMS = m.ITEMS
+    prob.PATTERNS = m.PATTERNS
+    
+    return prob
+        
 def solve_subproblem(prob, keySub, redCosts, target):
     # get items with negative reduced cost
     item_idx = [i for i in ITEMS \
@@ -69,8 +72,6 @@ def solve_subproblem(prob, keySub, redCosts, target):
     var_values.append((useVars[keySub], 1))
 
     return DipSolStatOptimal, [var_values]
-
-prob.relaxed_solver = solve_subproblem
 
 def kp(obj, weights, capacity):
     assert len(obj) == len(weights)
@@ -98,26 +99,4 @@ def kp(obj, weights, capacity):
                 solbest = solyes
 
     return zbest, solbest
-
-dippy.Solve(prob, {
-    'generateCuts': '1', 
-    'doPriceCut':'1', 
-    'SolveRelaxAsIp': '1', \
-        # use default IP to solve subproblems
-})
-
-for i, var in list(useVars.items()):
-    if var.varValue:
-        print("Use", i, var.varValue)
-
-for pat in PATTERNS:
-    for i in ITEMS:
-        if cutVars[(pat, i)].varValue:
-            print("Pat", pat, "item", i, \
-                  cutVars[(pat, i)].varValue)
-
-##for (pat, w), var in cutVars.items():
-##    if var.varValue:
-##        print "Pat", pat, "item", w, var.varValue
-
 
