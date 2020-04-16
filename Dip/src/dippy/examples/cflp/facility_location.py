@@ -6,74 +6,62 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import range
 from past.utils import old_div
-import sys
+import importlib as ilib
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
 try:
-    import path
+    from src.dippy import DipProblem, DipSolStatOptimal
 except ImportError:
-    pass
-                
-try:
-    import src.dippy as dippy
-    from src.dippy import DipSolStatOptimal
-except ImportError:
-    import coinor.dippy as dippy
-    from coinor.dippy import DipSolStatOptimal
-
-from math import floor, ceil
+    from coinor.dippy import DipProblem, DipSolStatOptimal
 
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
-
-from facility_ex2 import REQUIREMENT, PRODUCTS
-from facility_ex2 import LOCATIONS, CAPACITY
-try:
-    from facility_ex2 import FIXED_COST
-except ImportError:
-    FIXED_COST = [1 for i in LOCATIONS]
-
-try:
-    from facility_ex2 import ASSIGNMENTS
-except ImportError:
-    ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
-
-try:
-    from facility_ex2 import ASSIGNMENT_COSTS
-except ImportError:
-    ASSIGNMENT_COSTS = dict((i, 0) for i in ASSIGNMENTS)
-
-#display_mode = 'xdot'
-#layout = 'dot'
-
-prob = dippy.DipProblem("Facility Location", display_mode = 'matplotlib', display_interval = 10000)
-
-#prob.display_mode = 'matplotlib'
-
-assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
-use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
 debug_print = False
 
 debug_print_lp = False
 
-prob += (lpSum(use_vars[i] * FIXED_COST[i] for i in LOCATIONS) +
-         lpSum(assign_vars[j] * ASSIGNMENT_COSTS[j] for j in ASSIGNMENTS), 
-         "min")
+#display_mode = 'xdot'
+#layout = 'dot'
+def formulate(module_name):
 
-# assignment constraints
-for j in PRODUCTS:
-    prob += lpSum(assign_vars[(i, j)] for i in LOCATIONS) == 1
+    m = ilib.import_module(module_name)
+    if not hasattr(m, 'FIXED_COST'):
+        m.FIXED_COST = {i:1 for i in m.LOCATIONS}
+    if not hasattr(m, 'ASSIGNMENTS'):
+        m.ASSIGNMENTS = [(i, j) for i in m.LOCATIONS for j in m.PRODUCTS]
+    if not hasattr(m, 'ASSIGNMENT_COSTS'):
+        m.ASSIGNMENT_COSTS = {i:0 for i in m.ASSIGNMENTS}
 
-# Aggregate capacity constraints
-for i in LOCATIONS:
-    prob.relaxation[i] += lpSum(assign_vars[(i, j)] * REQUIREMENT[j]
-                                for j in PRODUCTS) <= CAPACITY * use_vars[i]
+    prob = DipProblem("Facility Location")
 
-# Disaggregate capacity constraints
-for i, j in ASSIGNMENTS:
-    prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
+    assign_vars = LpVariable.dicts("x", m.ASSIGNMENTS, 0, 1, LpBinary)
+    use_vars    = LpVariable.dicts("y", m.LOCATIONS, 0, 1, LpBinary)
 
+    prob += (lpSum(use_vars[i] * m.FIXED_COST[i] for i in m.LOCATIONS) +
+             lpSum(assign_vars[j] * m.ASSIGNMENT_COSTS[j] for j in m.ASSIGNMENTS), 
+             "min")
+
+    # assignment constraints
+    for j in m.PRODUCTS:
+        prob += lpSum(assign_vars[(i, j)] for i in m.LOCATIONS) == 1
+
+    # Aggregate capacity constraints
+    for i in m.LOCATIONS:
+        prob.relaxation[i] += lpSum(assign_vars[(i, j)] * m.REQUIREMENT[j]
+                                    for j in m.PRODUCTS) <= m.CAPACITY * use_vars[i]
+
+    # Disaggregate capacity constraints
+    for i, j in m.ASSIGNMENTS:
+        prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
+
+    prob.LOCATIONS = m.LOCATIONS
+    prob.PRODUCTS = m.PRODUCTS
+    prob.assign_vars = assign_vars
+    prob.use_vars = use_vars
+
+    return prob
+        
 def solve_subproblem(prob, key, redCosts, target):
     if debug_print:
         print("solve_subproblem...")
@@ -364,54 +352,3 @@ def init_one_each(prob):
         print(bvs)
     return bvs
 
-if debug_print_lp:
-    prob.writeLP('facility_main.lp')
-    for n, i in enumerate(LOCATIONS):
-        prob.writeRelaxed(n, 'facility_relax%s.lp' % i);
-
-#prob.writeFull('facility.lp', 'facility.dec')
-
-#prob.relaxed_solver = solve_subproblem
-#prob.init_vars = init_one_each
-#prob.init_vars = init_first_fit
-#prob.generate_cuts = generate_weight_cuts
-#prob.heuristics = heuristics
-#prob.root_heuristic = True
-#prob.node_heuristic = True
-
-dippyOpts = {}
-algo = 'Cut'
-if len(sys.argv) > 1:
-    algo = sys.argv[1]
-if algo == 'PriceCut':
-    dippyOpts['doPriceCut'] = '1'
-    dippyOpts['CutCGL'] = '1'
-elif algo == 'Price':
-    dippyOpts['doPriceCut'] = '1'
-    dippyOpts['CutCGL'] = '0'
-elif algo == 'Direct':
-    dippyOpts['doDirect'] = '1'
-    dippyOpts['doCut'] = '1'
-else:
-    dippyOpts['doCut'] = '1'
-    
-dippyOpts['TolZero'] = '%s' % tol
-
-dippy.Solve(prob, dippyOpts)
-
-if prob.display_mode != 'off':
-    numNodes = len(prob.Tree.get_node_list())
-    if prob.Tree.attr['display'] == 'svg':
-        prob.Tree.write_as_svg(filename = "facility_node%d" % (numNodes + 1), 
-                               prevfile = "facility_node%d" % numNodes)
-    prob.Tree.display()
-
-# print solution
-print("Optimal solution found!") 
-print("************************************")
-for i in LOCATIONS:
-    if use_vars[i].varValue > 0:
-        print("Location ", i, " is assigned: ", end=' ')
-        print([j for j in PRODUCTS if assign_vars[(i, j)].varValue > 0])
-print("************************************")
-print()

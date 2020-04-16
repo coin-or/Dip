@@ -45,7 +45,7 @@ x = pulp.LpVariable.dicts('possible_seatings', possible_seatings,
                             cat = pulp.LpInteger)
 
 seating_model = dippy.DipProblem("Wedding Seating Model (DIP)", pulp.LpMinimize,
-                                 display_mode = 'xdot', display_interval = 0)
+                                 display_mode = 'off', display_interval = 10000)
 
 #specify the maximum number of guests per table
 for table in tables:

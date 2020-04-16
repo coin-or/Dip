@@ -30,7 +30,10 @@ debug_print = False
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
 # parse data file
-input = open(sys.argv[1])
+if len(sys.argv) > 1:
+    input = open(sys.argv[1])
+else:
+    input = open('gap0515-2.dat')
 
 line = input.readline().split()
 NUM_MACHINES = int(line[0])
@@ -183,6 +186,7 @@ for m in MACHINES:
         v = assignVars[m][t].varValue
         if v:
             print("%d" %t, end=' ')
+print()
             
 if prob.display_mode != 'off':
     if (prob.Tree.attr['display'] == 'pygame') or (prob.Tree.attr['display'] == 'xdot'):
