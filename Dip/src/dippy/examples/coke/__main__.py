@@ -5,9 +5,19 @@ from past.utils import old_div
 from .coke_func import *
 import sys
 import importlib as ilib
+from os.path import dirname
+from inspect import getfile
+import coinor.dippy.examples.coke
 
 if len(sys.argv) > 1:
-    module_name = sys.argv[1]
+    if sys.argv[1] == '-h' or sys.argv[1] == '--help' or len(sys.argv) > 2:
+        print('Usage: coke <module_name>')
+        print('       module_name : Python module containing instance data')
+        print('                     For example file, check directory')
+        print('                    ', dirname(getfile(coinor.dippy.examples.coke)))
+        exit()
+    else:
+        module_name = sys.argv[1]
 else:
     module_name = 'coinor.dippy.examples.coke.coke_data'
 

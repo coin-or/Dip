@@ -22,9 +22,9 @@ except ImportError:
 # then a development copy - if python setup.py develop used,
 # then the coinor.dippy package
 try:
-    import src.dippy as dippy
+    from src.dippy import DipProblem, Solve
 except ImportError:
-    import coinor.dippy as dippy
+    from coinor.dippy import DipProblem, Solve
 
 from math import floor, ceil
 
@@ -37,11 +37,8 @@ class BinPackProb(object):
         self.capacity = capacity
     
 def formulate(bpp):
-    prob = dippy.DipProblem("Bin Packing",
-                            display_mode = 'off',
-#                           layout = 'bak',
-                            display_interval = None,
-                            )
+
+    prob = DipProblem("Bin Packing")
 
     assign_vars = LpVariable.dicts("x",
                                    [(i, j) for i in bpp.BINS
@@ -148,7 +145,7 @@ def solve(prob, algo = 'PriceCut'):
 #                'LogDumpModel': 5,
     dippyOpts['Gurobi'] = {'MipGap':'.05'}
 
-    status, message, primals, duals = dippy.Solve(prob, dippyOpts)
+    status, message, primals, duals = Solve(prob, dippyOpts)
   
     if status == LpStatusOptimal:
         return dict((var, var.value()) for var in prob.variables())

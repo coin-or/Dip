@@ -7,6 +7,9 @@ from builtins import str
 from builtins import range
 from past.utils import old_div
 import sys
+from os.path import dirname
+from inspect import getfile
+import coinor.dippy.examples.cflp
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
@@ -19,11 +22,15 @@ from .facility_location import *
     
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
-#display_mode = 'xdot'
-#layout = 'dot'
-
 if len(sys.argv) > 1:
-    prob = formulate(sys.argv[1])
+    if sys.argv[1] == '-h' or sys.argv[1] == '--help' or len(sys.argv) > 2:
+        print('Usage: cflp <module_name>')
+        print('       module_name : Python module containing instance data')
+        print('                     For example file, check directory')
+        print('                    ', dirname(getfile(coinor.dippy.examples.cflp)))
+        exit()
+    else:
+        prob = formulate(sys.argv[1])
 else:
     prob = formulate('coinor.dippy.examples.cflp.facility_ex2')
 

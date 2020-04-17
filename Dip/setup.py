@@ -3,6 +3,7 @@
 from setuptools import setup, Extension, find_packages
 import subprocess, os, sys
 from os.path import join, dirname
+from os import listdir
 
 PROJECT = 'coinor.dippy'
 VERSION = '1.95.1'
@@ -90,8 +91,6 @@ elif 'win' in operatingSystem:
 
 libs, libDirs, incDirs = get_libs()
 
-print (libs, libDirs, incDirs)
-
 macros = [('__DECOMP_LP_CLP__', None)]
 
 files = ['DippyDecompAlgo.cpp',
@@ -110,6 +109,9 @@ modules=[Extension('coinor.dippy._dippy',
                    library_dirs=libDirs,
                    define_macros=macros)]
 
+cvpmp_instance_files = [join('Instances', f) for f in
+                        listdir('src/dippy/examples/cvpmp/Instances')]
+
 setup(name=PROJECT,
       version=VERSION,
       description=DESC,
@@ -125,6 +127,7 @@ setup(name=PROJECT,
       #There must be a better way
       packages=[pkg.replace('src','coinor') for pkg in find_packages()],
       package_dir = {'coinor': 'src'},
+      package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
       install_requires=['pulp>=1.5.4','coinor.gimpy>=2.0.0'],
       ext_modules=modules
      )
