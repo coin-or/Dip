@@ -5,8 +5,25 @@ import importlib as ilib
 
 try:
     from src.dippy import DipProblem, DipSolStatOptimal
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import DipProblem, DipSolStatOptimal
+    from coinor.dippy.examples.gen_func import *
+
+def parseArgs():
+    parser = argparse.ArgumentParser(
+        description='Solve a cutting stock problem.')
+    parser.add_argument('--module', '-m', metavar = 'module name', 
+                        help='name of the Python module from which to import data',
+                        default = 'coinor.dippy.examples.csp.cutting_stock_data')
+    parser.add_argument('--useCustomSolver', action='store_true', 
+                        help='enable custom subproblem solver')
+
+    addDippyArgs(parser)
+    
+    args = parser.parse_args()
+
+    return(args)
 
 def cross(i1, i2):
     r = []

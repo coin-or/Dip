@@ -2,18 +2,15 @@ from __future__ import print_function
 from builtins import str
 from builtins import range
 from builtins import object
-CGL_cuts = True
-Advanced_branch = True
-
-import sys
-
-# Import classes and functions from PuLP
+import argparse
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
 try:
     from src.dippy import DipProblem, Solve
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import DipProblem, Solve
+    from coinor.dippy.examples.gen_func import *
 
 class CokeProb(object):
     def __init__(self, supply, demand, LOCATIONS, build_costs,
@@ -31,6 +28,22 @@ class CokeProb(object):
         self.demand            = demand
         self.build_costs       = build_costs
         self.transport_costs   = transport_costs
+
+def parseArgs():
+    
+    parser = argparse.ArgumentParser(
+        description='Solve a steel manufacturing problem.')
+    parser.add_argument('--module', '-m', metavar = 'module name', 
+                        help='name of the Python module from which to import data',
+                        default = 'coinor.dippy.examples.coke.coke_data')
+    parser.add_argument('--advancedBranch', action='store_true', 
+                        help='enable advanced branching')
+
+    addDippyArgs(parser)
+
+    args = parser.parse_args()
+
+    return args
 
 def formulate(cp):
 
@@ -118,15 +131,16 @@ def do_branch(prob, sol):
 
             return down_lbs, down_ubs, up_lbs, up_ubs
         
-def solve(prob):
+def solve(prob, args):
 
-    if Advanced_branch:
-      prob.branch_method = do_branch
-  
-    dippyOpts = {}
-    if not CGL_cuts:
-      dippyOpts['CutCGL'] = '0'
-      
+    if args.advancedBranch:
+        prob.branch_method = do_branch
+
+    if args.algo != 'Cut':
+        print("This application only works with the cutting plane method")
+        
+    dippyOpts = addDippyOpts(args)
+
     status, message, primals, duals = Solve(prob, dippyOpts)
     
     if status == LpStatusOptimal:

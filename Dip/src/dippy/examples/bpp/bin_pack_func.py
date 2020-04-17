@@ -1,32 +1,47 @@
 from builtins import range
 from builtins import object
-CGL_cuts = False
-
-Bin_antisymmetry = False
-Item_antisymmetry = False
-
-Symmetry_branch = False
-Most_use_branch = False
-Most_assign_branch = False
-
-# Import classes and functions from PuLP
+import argparse
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
-# Import any customised paths
-try:
-    import path
-except ImportError:
-    pass
-
-# Import dippy (local copy first,
-# then a development copy - if python setup.py develop used,
-# then the coinor.dippy package
 try:
     from src.dippy import DipProblem, Solve
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import DipProblem, Solve
+    from coinor.dippy.examples.gen_func import *
 
 from math import floor, ceil
+
+def parseArgs():
+    parser = argparse.ArgumentParser(
+        description='Solve a bin packing problem.')
+    parser.add_argument('--module', '-m', metavar = 'module name', 
+                        help='name of the Python module from which to import data')
+    parser.add_argument('--antisymmetryCutsBins', '-j', action='store_true',
+                        help='enable antisymmetry cuts for bins')
+    parser.add_argument('--antisymmetryCutsItems', '-i', action='store_true',
+                        help='enable antisymmetry cuts for items')
+    parser.add_argument('--rootHeuristic', '-r', action='store_true', 
+                        help='enable root heuristic')
+    parser.add_argument('--nodeHeuristic', '-n', action='store_true', 
+                        help='enable node heuristic')
+    parser.add_argument('--branchingRule', '-b', choices=['symmetry', 'mostUse', 'mostAssign'], 
+                        help='which branching rule to use', default = 'Default')
+    parser.add_argument('--numItems', '-I', type=int, default = 5, metavar = 'N',
+                        help = 'number of items for instance specified on command line')
+    parser.add_argument('--volumes', '-V', nargs='*', default = [2, 5, 3, 7, 2],
+                        help = 'list of volumes for instance specified on command line')
+    parser.add_argument('--capacity', '-C', type=int, default = 8, metavar = 'C',
+                        help = 'capacity of bins for instance specified on command line')
+
+    addDippyArgs(parser)
+    
+    args = parser.parse_args()
+
+    if len(args.volumes) != args.numItems:
+        raise ('Number of item volumes specified is not equal to number of items!')
+    
+    return(args)
 
 class BinPackProb(object):
     def __init__(self, ITEMS, volume, capacity):
@@ -36,7 +51,7 @@ class BinPackProb(object):
                                       # item, indices start at 0
         self.capacity = capacity
     
-def formulate(bpp):
+def formulate(bpp, args):
 
     prob = DipProblem("Bin Packing")
 
@@ -61,11 +76,11 @@ def formulate(bpp):
         for j in bpp.ITEMS:
             prob.relaxation[i] += assign_vars[i, j] <= use_vars[i]
 
-    if Bin_antisymmetry:
+    if args.antisymmetryCutsBins:
         for m in range(0, len(bpp.BINS) - 1):
             prob += use_vars[bpp.BINS[m]] >= use_vars[bpp.BINS[m + 1]]
 
-    if Item_antisymmetry:
+    if args.antisymmetryCutsItems:
         for m in range(0, len(bpp.BINS)):
             for n in range(0, len(bpp.ITEMS)):
                 if m > n:
@@ -86,21 +101,17 @@ def my_branch(prob, sol):
 
     bounds = None
     
-    if Symmetry_branch:
+    if prob.branchingRule == 'symmetry':
         bounds = symmetry(prob, sol)
-  
-    if Most_use_branch:
-        if bounds is None:
-            bounds = most_frac_use(prob, sol)
-    
-    if Most_assign_branch:
-        if bounds is None:
-            bounds = most_frac_assign(prob, sol)
+    elif prob.branchingRule == 'mostUse':
+        bounds = most_frac_use(prob, sol)
+    elif prob.branchingRule == 'mostAssign':
+        bounds = most_frac_assign(prob, sol)
     
     return bounds
 
 def my_heuristics(prob, xhat, cost):
-#  print "Heuristics..."
+    #  print "Heuristics..."
     sol = None
   
     if prob.is_root_node:
@@ -114,36 +125,20 @@ def my_heuristics(prob, xhat, cost):
     if sol is not None:
         return [sol]
 
-def solve(prob, algo = 'PriceCut'):
+def solve(prob, args):
 
-    if Symmetry_branch or Most_use_branch or Most_assign_branch:
+    if args.branchingRule != 'Default':
         prob.branch_method = my_branch
-#    prob.heuristics = my_heuristics
-#    prob.is_root_node = True
-#    prob.root_heuristic = True
-#    prob.node_heuristic = True
+        prob.branching_rule = args.branchingRule
+    if args.rootHeuristic:
+        prob.heuristics = my_heuristics
+        prob.is_root_node = True
+        prob.root_heuristic = True
+    if args.nodeHeuristic:
+        prob.heuristics = my_heuristics
+        prob.node_heuristic = True
   
-    dippyOpts = {}
-
-    if CGL_cuts:
-        dippyOpts['CutCGL'] = '1'
-    else:
-        dippyOpts['CutCGL'] = '0'
-
-    if algo == 'PriceCut':
-        dippyOpts['doPriceCut'] = '1'
-        dippyOpts['CutCGL'] = '1'
-    elif algo == 'Price':
-        dippyOpts['doPriceCut'] = '1'
-        dippyOpts['CutCGL'] = '0'
-    else:
-        dippyOpts['doCut'] = '1'
-
-#                'SolveMasterAsIp': '0'
-#                'generateInitVars': '1',
-#                 'LogDebugLevel': 5,
-#                'LogDumpModel': 5,
-    dippyOpts['Gurobi'] = {'MipGap':'.05'}
+    dippyOpts = addDippyOpts(args)
 
     status, message, primals, duals = Solve(prob, dippyOpts)
   
@@ -175,7 +170,7 @@ def most_frac_use(prob, sol):
     up_lbs = {}
     up_ubs = {}
     if bin is not None:
-#        print bin, sol[use_vars[bin]]
+        #        print bin, sol[use_vars[bin]]
         down_ubs[use_vars[bin]] = 0.0
         up_lbs[use_vars[bin]] = 1.0
     
@@ -204,7 +199,7 @@ def most_frac_assign(prob, sol):
     up_lbs = {}
     up_ubs = {}
     if assign is not None:
-#    print assign, sol[assign_vars[assign]]
+        #    print assign, sol[assign_vars[assign]]
         down_ubs[assign_vars[assign]] = 0.0
         up_lbs[assign_vars[assign]] = 1.0
     
@@ -217,12 +212,12 @@ def symmetry(prob, sol):
     tol      = prob.tol
   
     alpha = sum(sol[use_vars[j]] for j in bpp.BINS)
-#      print "# bins =", alpha
+    #      print "# bins =", alpha
     up    = int(ceil(alpha))  # Round up to next nearest integer 
     down  = int(floor(alpha)) # Round down
     frac  = min(up - alpha, alpha - down)
     if frac > tol: # Is fractional?
-#    print "Symmetry branch"
+        #    print "Symmetry branch"
     
         down_lbs = {}
         down_ubs = {}
@@ -230,10 +225,10 @@ def symmetry(prob, sol):
         up_ubs = {}
         for n in range(up - 1, len(bpp.BINS)):
             down_ubs[use_vars[bpp.BINS[n]]] = 0.0
-#           print down_ubs
+        #           print down_ubs
         for n in range(up): # Same as range(0, up)
             up_lbs[use_vars[bpp.BINS[n]]] = 1.0
-#           print up_lbs
+        #           print up_lbs
 
         return down_lbs, down_ubs, up_lbs, up_ubs
   
@@ -267,44 +262,47 @@ def fit(prob, order):
             sol[use_vars[j]] = 0.0
             sol[waste_vars[j]] = 0.0
       
-#   print sol
+    #   print sol
   
     return sol
 
 import operator
 
 def first_fit(prob):
-#  print "first fit..."
+    #  print "first fit..."
   
     bpp = prob.bpp
-    sorted_volume = sorted(iter(bpp.volume.items()), key=operator.itemgetter(1), reverse=True)
+    sorted_volume = sorted(iter(bpp.volume.items()),
+                           key=operator.itemgetter(1), reverse=True)
     sorted_ITEMS = [i for (i, v) in sorted_volume]
   
-#   print sorted_ITEMS
+    #   print sorted_ITEMS
 
     order = [(i, j) for i in sorted_ITEMS for j in bpp.BINS]
   
-#   print order
+    #   print order
   
     sol = fit(prob, order)
-#   print sol
+    #   print sol
     return sol
 
 def frac_fit(prob, xhat):
-#    print "frac fit..."
+    #    print "frac fit..."
   
     bpp = prob.bpp
     assign_vars = prob.assign_vars
   
-    assign = dict(((i, j), xhat[assign_vars[i, j]]) for i in bpp.ITEMS for j in bpp.BINS)
-#   print assign
+    assign = dict(((i, j), xhat[assign_vars[i, j]])
+                  for i in bpp.ITEMS for j in bpp.BINS)
+    #   print assign
   
-    sorted_assign = sorted(iter(assign.items()), key=operator.itemgetter(1), reverse=True)
+    sorted_assign = sorted(iter(assign.items()), key=operator.itemgetter(1),
+                           reverse=True)
     order = [(i, j) for ((i, j), x) in sorted_assign]
    
-#   print order
+    #   print order
   
     sol = fit(prob, order)
-#   print sol
+    #   print sol
     return sol
          

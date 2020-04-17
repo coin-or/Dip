@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Generalized Assignment Problem
 # argument should be a problem file, see Dip/examples/GAP_Instance.cpp for format
 # for an e.g. see gap0512-2.dat included in this directory
@@ -9,24 +7,34 @@ from __future__ import print_function
 from builtins import str
 from builtins import range
 from past.utils import old_div
-import sys
 import importlib as ilib
-
+import argparse
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 
 try:
-    import path
-except ImportError:
-    pass
-        
-try:
     from src.dippy import DipProblem, DipSolStatOptimal
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import DipProblem, DipSolStatOptimal
+    from coinor.dippy.examples.gen_func import *
 
 debug_print = False
 
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
+
+def parseArgs():
+    
+    parser = argparse.ArgumentParser(
+        description='Solve a generalized assignment problem.')
+    parser.add_argument('--module', '-m', metavar = 'module name', 
+                        help='name of the Python module from which to import data',
+                        default = 'coinor.dippy.examples.gap.gap0515-2')
+
+    addDippyArgs(parser)
+
+    args = parser.parse_args()
+
+    return args
 
 def formulate(module_name):
 

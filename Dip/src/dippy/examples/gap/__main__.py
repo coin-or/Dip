@@ -10,39 +10,28 @@ from builtins import str
 from builtins import range
 from past.utils import old_div
 import sys
-from os.path import dirname
-from inspect import getfile
-import coinor.dippy.examples.gap
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 
 try:
     from src.dippy import Solve
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import Solve
+    from coinor.dippy.examples.gen_func import *
 
 from .gap_func import *
-    
-if len(sys.argv) > 1:
-    if sys.argv[1] == '-h' or sys.argv[1] == '--help' or len(sys.argv) > 2:
-        print('Usage: coke <module_name>')
-        print('       module_name : Python module containing instance data')
-        print('                     For example file, check directory')
-        print('                    ', dirname(getfile(coinor.dippy.examples.gap)))
-        exit()
-    else:
-        module_name = sys.argv[1]
-else:
-    module_name = 'coinor.dippy.examples.coke.gap0515-2'
+
+args = parseArgs()
 
 # parse data file
-prob = formulate(module_name)
+prob = formulate(args.module)
 
-Solve(prob, {
-    'TolZero': '%s' % tol,
-    'doPriceCut': '1',
-#    'logLevel': '3', 
-})
+dippyOpts = addDippyOpts(args)
+
+dippyOpts['TolZero'] = '%s' % tol
+
+Solve(prob, dippyOpts)
 
 for m in prob.MACHINES:
     print() 

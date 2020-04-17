@@ -1,7 +1,7 @@
 from random import randint, seed
 
 # The requirements for the products
-REQUIREMENT = {
+DEMAND = {
     1 : 7,
     2 : 5,
     3 : 3,
@@ -10,7 +10,7 @@ REQUIREMENT = {
 }
 
 # Set of all products
-PRODUCTS = list(REQUIREMENT.keys())
+PRODUCTS = list(DEMAND.keys())
 PRODUCTS.sort()
 
 # Costs of the facilities

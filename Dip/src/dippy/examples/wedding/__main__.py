@@ -6,11 +6,14 @@ Authors: Stuart Mitchell 2010
 from __future__ import print_function
 from builtins import range
 import pulp
+import argparse
 
 try:
     from src.dippy import DipProblem, DipSolStatOptimal, Solve
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import DipProblem, DipSolStatOptimal, Solve
+    from coinor.dippy.examples.gen_func import *
 
 debug_print = False
 
@@ -24,6 +27,10 @@ def happiness(guest_a, guest_b):
     guests together in the same table
     """
     return abs(ord(guest_a) - ord(guest_b))
+
+parser = argparse.ArgumentParser(description='Solve a wedding planner problem.')
+addDippyArgs(parser)
+args = parser.parse_args()
 
 #create the set of possible tables
 tables = list(range(max_tables))
@@ -108,12 +115,10 @@ def relaxed_solver(prob, table, redCosts, target):
 #seating_model.writeLP('wedding_main.lp')
 #for table in tables:
 #    seating_model.writeRelaxed(table, 'wedding_relax%s.lp' % table);
-    
-Solve(seating_model, {
-        'doPriceCut' : '1',
-        'CutCGL' : '1',
-        #'generateInitVars' : '1',
-    })
+
+dippyOpts = addDippyOpts(args)
+
+Solve(seating_model, dippyOpts)
 
 if seating_model.display_mode != 'off':
     numNodes = len(seating_model.Tree.get_node_list())
