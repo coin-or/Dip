@@ -22,7 +22,7 @@ For DipPy, see [Pypi](https://pypi.org/project/coinor.dippy/).
 
 For full installation instructions, see the [INSTALL](https://github.com/coin-or/Dip/blob/master/INSTALL.md) file.
 
-# Quickstart with DIP/DipPy
+### Quickstart with DIP/DipPy
 
 If you are on Linux or OS X, DIP can be installed from source using 
 [coinbrew](https://github.com/coin-or/coinbrew). In Windows, there are pre-built
