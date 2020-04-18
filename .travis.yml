@@ -21,6 +21,7 @@ matrix:
             - libcholmod1.7.1
             - libsuitesparse-dev
             - chrpath
+            - libmetis-dev
       install:
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
@@ -32,6 +33,7 @@ matrix:
           packages:
             - gfortran
             - liblapack-dev
+            - libmetis-dev
     - os: linux
       dist: bionic
       addons:
@@ -39,6 +41,7 @@ matrix:
           packages:
             - gfortran
             - liblapack-dev
+            - libmetis-dev
     - os: osx
       osx_image: xcode11
       env: OSX=10.14 CC=gcc CXX=g++ 
@@ -67,7 +70,7 @@ before_script:
   - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update 
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable --skip="ThirdParty/Lapack ThirdParty/Blas"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable --skip="ThirdParty/Lapack ThirdParty/Blas ThirdParty/Metis"; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable; fi
 
 after_script:
