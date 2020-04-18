@@ -6,7 +6,7 @@ matrix:
   include:
     - os: linux
       dist: precise
-      env: BUILD_STATIC=false DEBUG=false
+      env: 
       addons:
         apt:
           sources:
@@ -67,14 +67,42 @@ before_script:
   - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update 
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ $BUILD_STATIC == "false" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable $DBGC; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests none --enable-relocatable; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable --skip="ThirdParty/Lapack ThirdParty/Blas"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable; fi
 
 after_script:
   - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=master; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
-  - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
+  - export TGZ_FILE=$PROJECT-$VERSION-$TRAVIS_DIST-$PLATFORM.tgz
   - echo $TGZ_FILE
   - cp $PROJECT/README.md $PROJECT/LICENSE $PROJECT/$PROJECT/AUTHORS dist
   - cd dist
+  - cd dist
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_DIST" == "precise" ]];
+    then
+      # adding required libraries
+      cp /usr/lib/lapack/liblapack.so.3gf lib/
+      cp /usr/lib/x86_64-linux-gnu/libgfortran.so.5 lib/
+      cp /usr/lib/x86_64-linux-gnu/libgfortran.so.3 lib/
+      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 lib/
+      cp /usr/lib/libblas/libblas.so.3gf lib/
+      cp /lib/x86_64-linux-gnu/libreadline.so.6 lib/
+      cp /lib/x86_64-linux-gnu/libbz2.so.1.0 lib/
+      cp /lib/x86_64-linux-gnu/libtinfo.so.5 lib/
+      cp /usr/lib/x86_64-linux-gnu/libquadmath.so.0 lib/
+      cp /usr/lib/libcholmod.so.1.7.1 lib/
+      cp /usr/lib/libamd.so.2.2.0 lib/
+      cp /usr/lib/libcolamd.so.2.7.1 lib/
+    
+      for libfile in lib/*.so*;
+      do
+        chrpath -r ./ $libfile
+      done
+
+      chrpath -r \$\ORIGIN/../lib/ bin/cbc
+      chrpath -r \$\ORIGIN/../lib/ bin/clp
+      chrpath -r \$\ORIGIN/../lib/ bin/symphony
+      chrpath -r \$\ORIGIN/../lib/ bin/dip
+    fi
   - tar -czvf $TGZ_FILE lib/* bin/* include/* share/* README.md LICENSE AUTHORS
   - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/download/$PROJECT/$VERSION/$TGZ_FILE
