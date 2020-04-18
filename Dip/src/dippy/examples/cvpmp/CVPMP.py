@@ -8,20 +8,17 @@ __version__   = '1.0 Nov 2013'
 __author__    = 'Dago Quevedo'
 __email__     = 'dago@yalma.fime.uanl.mx'
 
-import  sys
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
-from    math import *
+from math import *
+from inspect import getfile
+from os.path import join, dirname
+import coinor.dippy.examples.cvpmp
 try:
-    import path
+    from src.dippy import DipProblem, Solve, DipSolStatOptimal
+    from src.dippy.examples.gen_func import *
 except ImportError:
-    pass
-        
-try:
-    import src.dippy as dippy
-    from src.dippy import DipSolStatOptimal
-except ImportError:
-    import coinor.dippy as dippy
-    from coinor.dippy import DipSolStatOptimal
+    from coinor.dippy import DipProblem, Solve, DipSolStatOptimal
+    from coinor.dippy.examples.gen_func import *
 
 #Globar vars
 
@@ -37,7 +34,24 @@ y  = None
 tol          = pow(pow(2, -24), old_div(2.0, 3.0))
 display_mode = 'off'
 
-def init(_n,_p,_d,_s,_w,_V):
+def parseArgs():
+    
+    parser = argparse.ArgumentParser(
+        description='Solve a p-median problem.')
+    parser.add_argument('--instance', metavar = 'file', 
+                        help='path to the file from which to import data',
+                        default = join(dirname(getfile(coinor.dippy.examples.cvpmp)),
+                                       'Instances','pmedcap1.dat'))
+    parser.add_argument('--useCustomSolver', action='store_true', 
+                        help='enable custom subproblem solver')
+
+    addDippyArgs(parser)
+
+    args = parser.parse_args()
+
+    return args
+
+def Init(_n,_p,_d,_s,_w,_V):
     
     global n, p, d, s, w, V
     n   = _n
@@ -103,12 +117,12 @@ def KP01(obj, weights, capacity):
 
 
 
-def Solver():
+def Solver(args):
     
     global  x,y
 
-    prob = dippy.DipProblem("CVPMP", display_mode = display_mode,
-                            layout = 'dot', display_interval = 0)
+    prob = DipProblem("CVPMP", display_mode = display_mode,
+                      layout = 'dot', display_interval = 0)
     
     X = [(i, j) for i in V for j in V]
     x = LpVariable.dicts("x", X, 0, 1, LpBinary)
@@ -127,15 +141,12 @@ def Solver():
 
     prob += lpSum(y[i] for i in V) == p
 
-    prob.relaxed_solver = solve_subproblem
+    if args.useCustomSolver:
+        prob.relaxed_solver = solve_subproblem
 
-    dippy.Solve(prob, {
-        'TolZero'           : '%s' % tol,
-        'doCut'        : '1',
-        'generateInitVars'  : '1',
-        'CutCGL'            : '1',
-    })
-
+    dippyOpts = addDippyOpts(args)
+    
+    Solve(prob, dippyOpts)
 
     #Make solution
     solution = []

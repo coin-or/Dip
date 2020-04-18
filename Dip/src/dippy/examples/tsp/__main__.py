@@ -1,24 +1,26 @@
 from __future__ import print_function
 from builtins import range
 from pulp import *
-import sys
 
 try:
     from src.dippy import Solve
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import Solve
+    from coinor.dippy.examples.gen_func import *
 
 from .tsp_func import *
     
-if len(sys.argv) > 1:
-    prob = formulate(sys.argv[1])
-else:
-    prob = formulate('coinor.dippy.examples.cflp.facility_ex2')
+args = parseArgs()
+    
+prob = formulate(args.module)
 
 prob.generate_cuts = generate_cuts
 prob.is_solution_feasible = is_solution_feasible
 
-Solve(prob, {'doCut': '1'})
+dippyOpts = addDippyOpts(args)
+
+Solve(prob, dippyOpts)
 
 # print solution
 for arc, var in list(prob.arc_vars.items()):

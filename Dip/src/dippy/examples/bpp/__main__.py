@@ -1,26 +1,27 @@
-#!/usr/bin/env python
-
-# bin_pack_instance.py
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 from past.utils import old_div
-from .bin_pack_func import BinPackProb, formulate, solve
+from .bin_pack_func import *
+import importlib as ilib
 
-import sys
+args = parseArgs()
 
-bpp = BinPackProb(ITEMS  = [1, 2, 3, 4, 5],
-                  volume = {1: 2, 2: 5, 3: 3, 4: 7, 5: 2},
-                  capacity = 8)
-  
-prob = formulate(bpp)
-
-# Set a zero tolerance (Mike Saunders' "magic number")	
-prob.tol = pow(pow(2, -24), old_div(2.0, 3.0))
-if len(sys.argv) > 1:
-    xopt = solve(prob, sys.argv[1])
+if args.module != None:
+    m = ilib.import_module(args.module)
+    bpp = BinPackProb(ITEMS = m.ITEMS, volume = m.volume, capacity = m.capacity)
 else:
-    xopt = solve(prob)
+    bpp = BinPackProb(ITEMS  = range(args.numItems),
+                      volume = dict(zip(range(args.numItems),[int(i) for i in args.volumes])),
+                      capacity = args.capacity)
+
+print(bpp.ITEMS)
+print(bpp.volume)
+print(bpp.capacity)
+  
+prob = formulate(bpp, args)
+
+xopt = solve(prob, args)
   
 if xopt is not None:
     for var in prob.variables():
@@ -33,3 +34,5 @@ if prob.display_mode != 'off':
     if ((prob.Tree.attr['display'] == 'pygame') or 
         (prob.Tree.attr['display'] == 'xdot')):
         prob.Tree.display()
+
+

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
@@ -7,13 +5,16 @@ from builtins import str
 from builtins import range
 from past.utils import old_div
 import importlib as ilib
+import argparse
 
 from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize, LpAffineExpression
 
 try:
     from src.dippy import DipProblem, DipSolStatOptimal
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import DipProblem, DipSolStatOptimal
+    from coinor.dippy.examples.gen_func import *
 
 tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
@@ -21,42 +22,103 @@ debug_print = False
 
 debug_print_lp = False
 
-#display_mode = 'xdot'
-#layout = 'dot'
-def formulate(module_name):
+def parseArgs():
+    
+    parser = argparse.ArgumentParser(
+        description='Solve a facility location problem.')
+    parser.add_argument('--module', '-m', metavar = 'module name', 
+                        help='name of the Python module from which to import data')
+    parser.add_argument('--useCustomSolver', action='store_true', 
+                        help='enable custom subproblem solver')
+    parser.add_argument('--customInitRule', choices=['initOneEach', 'initFirstFit'],
+                        default = 'Default', 
+                        help='enable custom method of initializing columns')
+    parser.add_argument('--useCustomCuts', action='store_true', 
+                        help='enable custom cut generation')
+    parser.add_argument('--rootHeuristic', '-r', action='store_true', 
+                        help='enable root heuristic')
+    parser.add_argument('--nodeHeuristic', '-n', action='store_true', 
+                        help='enable node heuristic')
+    parser.add_argument('--numLocations', '-L', type=int, default = 5, metavar = 'L',
+                        help = 'number of locations for instance specified on command line')
+    parser.add_argument('--numProducts', '-P', type=int, default = 5, metavar = 'P',
+                        help = 'number of products for instance specified on command line')
+    parser.add_argument('--demands', '-D', nargs='*', default = [7, 5, 3, 2, 2],
+                        help = 'list of demands for instances specified on command line')
+    parser.add_argument('--fixedCosts', '-F', nargs='*', default = None,
+                        help = 'list of fixed costs for instance specified on command line')
+    parser.add_argument('--capacity', '-C', type=int, default = 8, metavar = 'C',
+                        help = 'capacity of facilities for instance specified on command line')
+    
+    addDippyArgs(parser)
 
-    m = ilib.import_module(module_name)
-    if not hasattr(m, 'FIXED_COST'):
-        m.FIXED_COST = {i:1 for i in m.LOCATIONS}
-    if not hasattr(m, 'ASSIGNMENTS'):
-        m.ASSIGNMENTS = [(i, j) for i in m.LOCATIONS for j in m.PRODUCTS]
-    if not hasattr(m, 'ASSIGNMENT_COSTS'):
-        m.ASSIGNMENT_COSTS = {i:0 for i in m.ASSIGNMENTS}
+    args = parser.parse_args()
+
+    if len(args.demands) != args.numProducts:
+        raise ('Number of demands specified is not equal to number of products!')
+    
+    if args.fixedCosts != None and len(args.fixedCosts) != args.numLocations:
+        raise ('Number of fixed costs specified is not equal to number of locations!')
+    
+    return(args)
+
+def formulate(args):
+
+    FIXED_COST = None
+    ASSIGNMENTS = None
+    ASSIGNMENT_COSTS = None
+
+    if args.module:
+        m = ilib.import_module(args.module)
+        LOCATIONS = m.LOCATIONS
+        PRODUCTS = m.PRODUCTS
+        DEMAND = m.DEMAND
+        CAPACITY = m.CAPACITY
+        if hasattr(m, 'FIXED_COST'):
+            FIXED_COST = m.FIXED_COST
+        if hasattr(m, 'ASSIGNMENTS'):
+            ASSIGNMENTS = m.ASSIGNMENTS
+        if hasattr(m, 'ASSIGNMENT_COSTS'):
+            ASSIGNMENT_COSTS = m.ASSIGNMENT_COSTS
+    else:
+        LOCATIONS = range(args.numLocations)
+        PRODUCTS = range(args.numProducts)
+        DEMAND = [int(i) for i in args.demands]
+        CAPACITY = args.capacity
+        if args.fixedCosts != None:
+            FIXED_COST = [int(i) for i in args.fixedCosts]
+        
+    if FIXED_COST == None:
+        FIXED_COST = {i:1 for i in LOCATIONS}
+    if ASSIGNMENTS == None:
+        ASSIGNMENTS = [(i, j) for i in LOCATIONS for j in PRODUCTS]
+    if ASSIGNMENT_COSTS == None:
+        ASSIGNMENT_COSTS = {i:0 for i in ASSIGNMENTS}
 
     prob = DipProblem("Facility Location")
 
-    assign_vars = LpVariable.dicts("x", m.ASSIGNMENTS, 0, 1, LpBinary)
-    use_vars    = LpVariable.dicts("y", m.LOCATIONS, 0, 1, LpBinary)
+    assign_vars = LpVariable.dicts("x", ASSIGNMENTS, 0, 1, LpBinary)
+    use_vars    = LpVariable.dicts("y", LOCATIONS, 0, 1, LpBinary)
 
-    prob += (lpSum(use_vars[i] * m.FIXED_COST[i] for i in m.LOCATIONS) +
-             lpSum(assign_vars[j] * m.ASSIGNMENT_COSTS[j] for j in m.ASSIGNMENTS), 
+    prob += (lpSum(use_vars[i] * FIXED_COST[i] for i in LOCATIONS) +
+             lpSum(assign_vars[j] * ASSIGNMENT_COSTS[j] for j in ASSIGNMENTS), 
              "min")
 
     # assignment constraints
-    for j in m.PRODUCTS:
-        prob += lpSum(assign_vars[(i, j)] for i in m.LOCATIONS) == 1
+    for j in PRODUCTS:
+        prob += lpSum(assign_vars[(i, j)] for i in LOCATIONS) == 1
 
     # Aggregate capacity constraints
-    for i in m.LOCATIONS:
-        prob.relaxation[i] += lpSum(assign_vars[(i, j)] * m.REQUIREMENT[j]
-                                    for j in m.PRODUCTS) <= m.CAPACITY * use_vars[i]
+    for i in LOCATIONS:
+        prob.relaxation[i] += lpSum(assign_vars[(i, j)] * DEMAND[j]
+                                    for j in PRODUCTS) <= CAPACITY * use_vars[i]
 
     # Disaggregate capacity constraints
-    for i, j in m.ASSIGNMENTS:
+    for i, j in ASSIGNMENTS:
         prob.relaxation[i] += assign_vars[(i, j)] <= use_vars[i]
 
-    prob.LOCATIONS = m.LOCATIONS
-    prob.PRODUCTS = m.PRODUCTS
+    prob.LOCATIONS = LOCATIONS
+    prob.PRODUCTS = PRODUCTS
     prob.assign_vars = assign_vars
     prob.use_vars = use_vars
 
@@ -75,7 +137,7 @@ def solve_subproblem(prob, key, redCosts, target):
 
     avars = [assign_vars[(loc, j)] for j in PRODUCTS]
     obj = [max(-redCosts[assign_vars[(loc, j)]], 0) for j in PRODUCTS]
-    weights = [REQUIREMENT[j] for j in PRODUCTS]
+    weights = [DEMAND[j] for j in PRODUCTS]
    
     # Use 0-1 KP to max. total effective value of products at location
     z, solution = knapsack01(obj, weights, CAPACITY)
@@ -176,7 +238,7 @@ def generate_weight_cuts(prob, sol):
             for j in PRODUCTS:
                 if j not in S[i]: # If this product is not in the subset
                     if (sol[assign_vars[(i, j)]] > bestValue) \
-                    and (REQUIREMENT[j] <= mu[i]):
+                    and (DEMAND[j] <= mu[i]):
                         # The assignment variable for this product is closer
                         # to 1 than any other product checked, and "fits" in
                         # this location's remaining space
@@ -185,7 +247,7 @@ def generate_weight_cuts(prob, sol):
         # Make the best assignment found across all products and locactions
         if bestAssign:
             (i,j) = bestAssign
-            mu[i] -= REQUIREMENT[j] # Decrease spare CAPACITY at this location
+            mu[i] -= DEMAND[j] # Decrease spare CAPACITY at this location
             S[i].append(j) # Assign this product to this location's set
         else:
             assigning = False # Didn't find anything to assign - stop
@@ -195,9 +257,9 @@ def generate_weight_cuts(prob, sol):
     for i in LOCATIONS:
         if len(S[i]) > 0: # If an item assigned to this location
             con = LpAffineExpression() # Start a new constraint
-            con += sum(REQUIREMENT[j] * assign_vars[(i, j)] 
+            con += sum(DEMAND[j] * assign_vars[(i, j)] 
                             for j in S[i])
-            con += sum(max(0, REQUIREMENT[j] - mu[i]) *
+            con += sum(max(0, DEMAND[j] - mu[i]) *
                             assign_vars[(i, j)] for j in PRODUCTS 
                             if j not in S[i])
             new_cuts.append(con <= CAPACITY - mu[i])
@@ -208,7 +270,7 @@ def generate_weight_cuts(prob, sol):
 
 def first_fit_heuristic():
     # Sort the items in descending weight order
-    productReqs = [(REQUIREMENT[j],j) for j in PRODUCTS]
+    productReqs = [(DEMAND[j],j) for j in PRODUCTS]
     productReqs.sort(reverse=True)
 
     # Add items to locations, fitting in as much
@@ -280,13 +342,13 @@ def frac_fit(xhat):
                 notUsed[i] = False
                 sol[use_vars[i]] = 1
                 waste[i] = CAPACITY
-            if REQUIREMENT[j] <= waste[i]: # Space left?
+            if DEMAND[j] <= waste[i]: # Space left?
                 sol[assign_vars[(i, j)]] = 1
                 notAllocated[j] = False
-                waste[i] -= REQUIREMENT[j]
+                waste[i] -= DEMAND[j]
     
     # Allocate the remaining products
-    unallocated = [(REQUIREMENT[j],j) for j in PRODUCTS
+    unallocated = [(DEMAND[j],j) for j in PRODUCTS
                                       if notAllocated[j]]
     unallocated.sort(reverse=True)
     unused = [i for i in LOCATIONS if notUsed[i]]
@@ -342,7 +404,7 @@ def init_one_each(prob):
         print("LOCATIONS =", LOCATIONS)
     for index, loc in enumerate(LOCATIONS):
         lc = [PRODUCTS[index]]
-        waste = CAPACITY - REQUIREMENT[PRODUCTS[index]]
+        waste = CAPACITY - DEMAND[PRODUCTS[index]]
         var_values = dict([(assign_vars[(loc, j)], 1) for j in lc])
         var_values[use_vars[loc]] = 1
 

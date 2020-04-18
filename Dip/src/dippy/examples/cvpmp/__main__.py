@@ -1,35 +1,26 @@
-#!/usr/bin/env python
-
-
 from __future__ import absolute_import
 __title__   = 'Main module of B&P-cut for the CVPMP and CVPCP'
 __version__ = '1.0 Nov 2013'
 __author__  = 'Dago Quevedo'
 __email__   = 'dago@yalma.fime.uanl.mx'
 
-
-import  sys
 from . import  draw
 from . import  Global
 
-try:
-    import path
-except ImportError:
-    pass
-        
-from . import  CVPMP
-from    .readInstance import *
+from .CVPMP import *
+from .readInstance import *
 
 def main():
-    #read instance
-    #path=sys.argv[1]
-    id,n,p,d,s,w,cxy,V,mytype,id = read('Instances/pmedcap1.dat')
+
+    args = parseArgs()
     
-    CVPMP.init(n,p,d,s,w,V)
-    z, solution = CVPMP.Solver()
+    id,n,p,d,s,w,cxy,V,mytype,id = read(args.instance)
+    
+    Init(n,p,d,s,w,V)
+    z, solution = Solver(args)
 
     #display solution
-    data = Global.path()+'/out.dat'
+    data = 'out.dat'
     f = open(data,'w')
         
     for s in solution:

@@ -15,24 +15,23 @@ from pulp import LpVariable, LpBinary, lpSum, value, LpProblem, LpMaximize
 
 try:
     from src.dippy import Solve
+    from src.dippy.examples.gen_func import *
 except ImportError:
     from coinor.dippy import Solve
+    from coinor.dippy.examples.gen_func import *
 
 from .gap_func import *
-    
+
+args = parseArgs()
+
 # parse data file
-if len(sys.argv) > 1:
-    module_name = sys.argv[1]
-else:
-    module_name = 'gap0515-2'
+prob = formulate(args.module)
 
-prob = formulate(module_name)
+dippyOpts = addDippyOpts(args)
 
-Solve(prob, {
-    'TolZero': '%s' % tol,
-    'doPriceCut': '1',
-#    'logLevel': '3', 
-})
+dippyOpts['TolZero'] = '%s' % tol
+
+Solve(prob, dippyOpts)
 
 for m in prob.MACHINES:
     print() 
