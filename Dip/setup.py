@@ -6,7 +6,7 @@ from os.path import join, dirname
 from os import listdir
 
 PROJECT = 'coinor.dippy'
-VERSION = '1.95.1'
+VERSION = '1.95.2'
 URL = 'https://github.com/coin-or/Dip'
 DESC = u'DIP Python Interface'
 
