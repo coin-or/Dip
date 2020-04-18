@@ -20,8 +20,36 @@ Binaries for most platforms are available for download from [Bintray](https://bi
 
 For DipPy, see [Pypi](https://pypi.org/project/coinor.dippy/).
 
-For installation, see the [INSTALL](https://github.com/coin-or/Dip/blob/master/INSTALL.md) file.
+For full installation instructions, see the [INSTALL](https://github.com/coin-or/Dip/blob/master/INSTALL.md) file.
 
+# Quickstart with DIP/DipPy
+
+If you are on Linux or OS X, DIP can be installed from source using 
+[coinbrew](https://github.com/coin-or/coinbrew). In Windows, there are pre-built
+binary wheels for DipPy and binaries on [Bintray](https://bintray.com/coin-or/download/Dip).
+After build and install of DIP, if you are installing DipPy,
+make sure to set `PKG_CONFIG_PATH` to point to the directory where the 
+`.pc` files are installed (by default, this is in the `lib/pkgconfig` directory 
+in the installation directory). You may also need to set either `LD_LIBRARY_PATH` (Linux)
+or `DYLD_LIBRARY_PATH` (OS X) to point to the directory where the libraries are 
+installed. Then simply do
+```
+pip install coinor.dippy
+```
+After installation, you can try running the examples to see if trhings are working.
+These should all work out of the box. For a listing of examples and some brief
+instructions, do
+```
+python -m coinor.dippy.examples
+```
+To get help for an example, do, e.g.,
+```
+python -m coinor.dippy.example.cflp --help
+```
+or just run
+```
+python -m coinor.dippy.examples.cflp
+```
 ## Cite
 
 [![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
