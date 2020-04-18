@@ -27,7 +27,7 @@ For full installation instructions, see the [INSTALL](https://github.com/coin-or
 If you are on Linux or OS X, DIP can be installed from source using 
 [coinbrew](https://github.com/coin-or/coinbrew). In Windows, there are pre-built
 binary wheels for DipPy and binaries on [Bintray](https://bintray.com/coin-or/download/Dip).
-After build and install of DIP, if you are installing DipPy,
+for DIP. After build and install of DIP, if you are installing DipPy,
 make sure to set `PKG_CONFIG_PATH` to point to the directory where the 
 `.pc` files are installed (by default, this is in the `lib/pkgconfig` directory 
 in the installation directory). You may also need to set either `LD_LIBRARY_PATH` (Linux)
