@@ -1,11 +1,37 @@
-## BUILDING AND INSTALLING (SERIAL VERSION)
+## BUILDING AND INSTALLING DipPy (see below for DIP)
 
-These instructions are for building and installing ALPS from source. For
+If you are on Linux or OS X, you will first need to install DIP using 
+[coinbrew](https://github.com/coin-or/coinbrew). In Windows, there are pre-built
+binary wheels and no further installation should be needed. After build and install,
+make sure to set `PKG_CONFIG_PATH` to point to the directory where the 
+`.pc` files are installed (by default, this is in the `lib/pkgconfig` directory 
+in the installation directory). You may also need to set either `LD_LIBRARY_PATH` (Linux)
+or `DYLD_LIBRARY_PATH` (OS X) to point to the directory where the libraries are 
+installed. Then simply do
+```
+pip install coinor.dippy
+```
+After installation, you can try running the examples to see if trhings are working.
+These should all work out of the box. For a listing of examples and some brief
+instructions, do
+```
+python -m coinor.dippy.examples
+```
+To get help for an example, do, e.g.,
+```
+python -m coinor.dippy.example.cflp --help
+```
+or just run
+```
+python -m coinor.dippy.examples.cflp
+```
+## BUILDING AND INSTALLING DIP (SERIAL VERSION)
+
+These instructions are for building and installing DIP from source. For
 instructions on how to obtain pre-built binaries, please see the README file.
 
-IMPORTANT: The build instructions have changed significantly. In most case,
-you do not need to clone this repository first! Please follow the instructions
-for your platform below.
+IMPORTANT: In most cases,you do not need to clone this repository first! 
+Please follow the instructions for your platform below.
 
 ### Building on Linux
 
