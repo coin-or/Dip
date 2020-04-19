@@ -16,7 +16,7 @@ redistributed freely.
 
 [ ![Download](https://api.bintray.com/packages/coin-or/download/Dip/images/download.svg?version=0.92) ](https://bintray.com/coin-or/download/Dip/0.92/link)
 
-Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/Dip).
+Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/Dip). However, be aware that on Linux and OSX, you may have difficulties if you are using a distribution with different versions of various libraries than the build machine.  
 
 For DipPy, see [Pypi](https://pypi.org/project/coinor.dippy/).
 
