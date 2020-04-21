@@ -74,7 +74,7 @@ script:
 
 after_script:
   - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=master; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
-  - export TGZ_FILE=$PROJECT-$VERSION-$TRAVIS_DIST-$PLATFORM.tgz
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export TGZ_FILE=$PROJECT-$VERSION-$TRAVIS_DIST-$PLATFORM.tgz; else export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz; fi
   - echo $TGZ_FILE
   - cp $PROJECT/README.md $PROJECT/LICENSE $PROJECT/$PROJECT/AUTHORS dist
   - cd dist
