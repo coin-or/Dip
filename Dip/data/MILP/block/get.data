@@ -1,7 +1,5 @@
-#wget https://coral.ie.lehigh.edu/~magh/decomp/atm.tgz
-#wget https://coral.ie.lehigh.edu/~magh/decomp/retail.tgz
-#wget https://coral.ie.lehigh.edu/~magh/decomp/drugport.tgz
-wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/atm.tgz
-wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/retail.tgz
-wget --no-check-certificate https://coral.ie.lehigh.edu/~magh/decomp/drugport.tgz
+wget https://github.com/tkralphs/DecompLib/blob/master/atm/atm.tgz
+wget https://github.com/tkralphs/DecompLib/blob/master/retail/retail.tgz
+#This one is too big for Github
+wget https://coral.ise.lehigh.edu/magh/decomp/drugport.tgz
 
