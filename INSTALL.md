@@ -61,9 +61,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.95
+./coinbrew fetch --no-prompt Dip@0.95
 ./coinbrew build --no-prompt Dip --prefix=/path/to/install/dir
-./coinbrew install Dip
 ```
 
 Options that would have been passed to the `configure` script under the old
@@ -143,9 +142,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.92
+./coinbrew fetch --no-prompt Dip@0.95
 ./coinbrew build --no-prompt Dip --prefix=C:\path\to\install\dir --verbosity=1
-./coinbrew install Dip
 ```
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
@@ -234,9 +232,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.92
+./coinbrew fetch --no-prompt Dip@0.92
 ./coinbrew build --no-prompt Dip --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install Dip
 ```
 
 With this setup, `clang` will be used for compiling C++ by default and
