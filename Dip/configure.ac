@@ -81,15 +81,23 @@ AC_EXEEXT
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils osi alps], [DipLib])
-if test $coin_has_coindepend != yes ; then
-  AC_MSG_ERROR([Required package CoinUtils, Osi, or Alps not available.])
+AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [DipLib])
+if test $coin_has_coinutils != yes ; then
+  AC_MSG_ERROR([Required package CoinUtils not available.])
+fi
+AC_COIN_CHECK_PACKAGE(Osi, [osi], [DipLib])
+if test $coin_has_osi != yes ; then
+  AC_MSG_ERROR([Required package Osi not available.])
+fi
+AC_COIN_CHECK_PACKAGE(Alps, [alps], [DipLib])
+if test $coin_has_alps != yes ; then
+  AC_MSG_ERROR([Required package Alps not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp clp],  [DipLib])
 AC_COIN_CHECK_PACKAGE(Sample,   [coindatasample])
 AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [DipLib])
-AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc cbc],  [DipLib])
 
 #############################################################################
 #                            Third party solvers                            #
