@@ -6,6 +6,9 @@
 /* Define to the debug verbosity level (0 is no output) */
 #undef COIN_DIP_VERBOSITY
 
+/* Define to 1 if the Alps package is available */
+#undef COIN_HAS_ALPS
+
 /* Define to 1 if the ASL package is available */
 #undef COIN_HAS_ASL
 
@@ -18,8 +21,8 @@
 /* Define to 1 if the Clp package is available */
 #undef COIN_HAS_CLP
 
-/* Define to 1 if the CoinDepend package is available */
-#undef COIN_HAS_COINDEPEND
+/* Define to 1 if the CoinUtils package is available */
+#undef COIN_HAS_COINUTILS
 
 /* Define to 1 if the Cpx package is available */
 #undef COIN_HAS_CPX
@@ -29,6 +32,9 @@
 
 /* Define to 1 if the HMetis package is available */
 #undef COIN_HAS_HMETIS
+
+/* Define to 1 if the Osi package is available */
+#undef COIN_HAS_OSI
 
 /* Define to 1 if the Sample package is available */
 #undef COIN_HAS_SAMPLE
