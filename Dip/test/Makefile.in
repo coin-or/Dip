@@ -562,6 +562,11 @@ test_grb:
 
 	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB -88   --BestKnownUB -88
 
+test_py:
+	if [ ! -d "venv" ]; then python -m venv venv; fi
+	source venv/bin/activate && pip install -r $(srcdir)/requirements.txt
+	source venv/bin/activate && DIP_EXE=../src/dip$(EXEEXT) DATA_DIR=`$(CYGPATH_W) $(SAMPLE_DATA)` python $(srcdir)/benchmark.py
+
 .PHONY: test
 
 ########################################################################
