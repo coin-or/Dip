@@ -243,6 +243,9 @@ void DecompSubModel::solveAsMIP(DecompSolverResult*  result,
    }else if (param.DecompIPSolver == "Gurobi"){ 
       solveAsMIPGrb(result, param, doExact, doCutoff, isRoot, cutoff, 
 		    timeLimit);
+   }else if (param.DecompIPSolver == "Xpress"){
+      solveAsMIPXpr(result, param, doExact, doCutoff, isRoot, cutoff, 
+		    timeLimit);
    }else{
       throw UtilException("Unknown solver selected.",
 			  "solveAsMIP", "DecompSubModel");
@@ -1007,6 +1010,110 @@ void DecompSubModel::solveAsMIPGrb(DecompSolverResult*  result,
 #else
       throw UtilException("Gurobi selected as solver, but it's not available",
 			  "solveAsMIPGrb", "DecompSubModel");
+#endif
+}
+
+//===========================================================================//
+void DecompSubModel::solveAsMIPXpr(DecompSolverResult*  result,
+				   DecompParam&         param,
+				   bool                 doExact,
+				   bool                 doCutoff,
+				   bool                 isRoot,
+				   double               cutoff,
+				   double               timeLimit)
+{
+#ifdef COIN_HAS_XPR
+   const int numCols    = m_osi->getNumCols();
+   const int logIpLevel = param.LogIpLevel;
+
+   OsiXprSolverInterface* osiXpr
+      = dynamic_cast<OsiXprSolverInterface*>(m_osi);
+
+   XPRSprob model = osiXpr->getLpPtr();
+
+   //---
+   //--- set parameters
+   //---
+   int status = 0;
+
+   if (logIpLevel) {
+      status = XPRSsetintcontrol(model,  XPRS_OUTPUTLOG, XPRS_OUTPUTLOG_FULL_OUTPUT);
+
+      if (status)
+         throw UtilException("XPRSsetintcontrol failure",
+                             "solveAsMIPXpr", "DecompSubModel");
+   } else {
+      status = XPRSsetintcontrol(model,  XPRS_OUTPUTLOG, XPRS_OUTPUTLOG_NO_OUTPUT);
+
+      if (status)
+         throw UtilException("XPRSsetintcontrol failure",
+                             "solveAsMIPXpr", "DecompSubModel");
+   }
+
+   if (doExact)
+      status = XPRSsetdblcontrol(model, XPRS_MIPRELSTOP,
+                              param.SubProbGapLimitExact);
+   else
+      status = XPRSsetdblcontrol(model, XPRS_MIPRELSTOP,
+                              param.SubProbGapLimitInexact);
+
+   if (status)
+      throw UtilException("XPRSsetdblcontrol failure",
+                          "solveAsMIPXpr", "DecompSubModel");
+
+   if (doExact) {
+      if (param.SubProbTimeLimitExact < COIN_DBL_MAX) {
+         status = XPRSsetintcontrol(model, XPRS_MAXTIME, int(param.SubProbTimeLimitExact));
+      }
+   } else {
+      if (param.SubProbTimeLimitInexact < COIN_DBL_MAX) {
+         status = XPRSsetintcontrol(model, XPRS_MAXTIME, int(param.SubProbTimeLimitInexact));
+      }
+   }
+
+   if (status)
+      throw UtilException("XPRSsetintcontrol failure",
+                          "solveAsMIPXpr", "DecompSubModel");
+
+   if (doCutoff) {
+      status = XPRSsetdblcontrol(model, XPRS_MIPABSCUTOFF, cutoff);
+   } else {
+      status = XPRSsetdblcontrol(model, XPRS_MIPABSCUTOFF, 1.0e+75);
+   }
+
+   if (status)
+      throw UtilException("XPRSsetdblcontrol failure",
+                          "solveAsMIPXpr", "DecompSubModel");
+
+   m_osi->branchAndBound();
+
+   result->m_isUnbounded = false;
+   result->m_isOptimal   = false;
+   result->m_isCutoff    = false;
+   result->m_nSolutions  = 0;
+
+   if (m_osi->isProvenOptimal()){
+      const double *solution = m_osi->getColSolution();
+      vector<double> solVec(solution, solution + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isOptimal   = true;
+   }else if (m_osi->isProvenDualInfeasible()){
+      m_osi->initialSolve();
+      const double *ray = m_osi->getDualRays(1, true)[0];
+      vector<double> solVec(ray, ray + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isUnbounded = true;
+   }else if (m_osi->isProvenPrimalInfeasible()){
+      result->m_isOptimal = true;
+   }else{
+      throw UtilException("Solution failure",
+			  "solveAsMIPXpr", "DecompSubModel");
+   }
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
+			  "solveAsMIPXpr", "DecompSubModel");
 #endif
 }
 

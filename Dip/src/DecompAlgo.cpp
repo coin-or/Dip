@@ -2796,7 +2796,8 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
    if (m_param.DecompLPSolver == "CPLEX"){ 
       return(getDualRaysCpx(maxNumRays));
    }else if (m_param.DecompLPSolver == "Clp" ||
-	     m_param.DecompLPSolver == "Gurobi"){ 
+	     m_param.DecompLPSolver == "Gurobi" ||
+        m_param.DecompLPSolver == "Xpress"){ 
       return(getDualRaysOsi(maxNumRays));
    }else{
       throw UtilException("Unknown solver selected.",
@@ -6897,6 +6898,13 @@ OsiSolverInterface *DecompAlgo::getOsiLpSolverInterface()
       throw UtilException("Gurobi selected as solver, but it's not available",
 			  "getOsiLpSolverInterface", "DecompAlgo");
 #endif
+   }else if (m_param.DecompLPSolver == "Xpress"){
+#ifdef COIN_HAS_XPR
+      return(new OsiXprSolverInterface());
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
+			  "getOsiLpSolverInterface", "DecompAlgo");
+#endif
    }else{
       throw UtilException("Unknown solver selected",
 			  "getOsiLpSolverInterface", "DecompAlgo");
@@ -6934,6 +6942,13 @@ OsiSolverInterface *DecompAlgo::getOsiIpSolverInterface()
       return(new OsiGrbSolverInterface());
 #else
       throw UtilException("Gurobi selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompIPSolver == "Xpress"){
+#ifdef COIN_HAS_XPR
+      return(new OsiXprSolverInterface());
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
 			  "getOsiIpSolverInterface", "DecompAlgo");
 #endif
    }else{

@@ -633,6 +633,9 @@ void DecompAlgoPC::solveMasterAsMIP()
       solveMasterAsMIPCpx(&result);
    }else if (m_param.DecompIPSolver == "Gurobi"){
       solveMasterAsMIPGrb(&result);
+   }else if (m_param.DecompIPSolver == "Xpress"){
+      // TODO all solver should use their OsiSolverInterface
+      solveMasterAsMIPOsi(&result);
    }else{
       throw UtilException("Unknown solver selected",
 			  "solveMasterAsMIP", "DecompAlgoPC");
@@ -1208,6 +1211,28 @@ void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
    throw UtilException("Gurobi selected as solver, but it's not available",
 		       "solveMasterAsMIPGrb", "DecompAlgoPC");
 #endif
+}
+
+//===========================================================================//
+void DecompAlgoPC::solveMasterAsMIPOsi(DecompSolverResult* result)
+{
+   const int numCols = m_masterSI->getNumCols();
+
+   m_masterSI->branchAndBound();
+
+   result->m_isUnbounded = false;
+   result->m_isOptimal   = false;
+   result->m_isCutoff    = false;
+   result->m_nSolutions  = 0;
+   if (m_masterSI->isProvenOptimal()){
+      const double *solution = m_masterSI->getColSolution();
+      vector<double> solVec(solution, solution + numCols);
+      result->m_solution.push_back(solVec);
+      result->m_nSolutions++;
+      result->m_isOptimal   = true;
+   }else{
+      result->m_isOptimal = true;
+   }
 }
 
 //===========================================================================//
