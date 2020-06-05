@@ -42,6 +42,9 @@
 /* Define to 1 if the SYMPHONY package is available */
 #undef COIN_HAS_SYMPHONY
 
+/* Define to 1 if the Xpr package is available */
+#undef COIN_HAS_XPR
+
 /* Define to 1 if we have CBC */
 #undef DIP_HAS_CBC
 

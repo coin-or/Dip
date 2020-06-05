@@ -154,6 +154,8 @@ COIN_HAS_SAMPLE_FALSE = @COIN_HAS_SAMPLE_FALSE@
 COIN_HAS_SAMPLE_TRUE = @COIN_HAS_SAMPLE_TRUE@
 COIN_HAS_SYMPHONY_FALSE = @COIN_HAS_SYMPHONY_FALSE@
 COIN_HAS_SYMPHONY_TRUE = @COIN_HAS_SYMPHONY_TRUE@
+COIN_HAS_XPR_FALSE = @COIN_HAS_XPR_FALSE@
+COIN_HAS_XPR_TRUE = @COIN_HAS_XPR_TRUE@
 COIN_PKG_CONFIG_PATH = @COIN_PKG_CONFIG_PATH@
 COIN_PKG_CONFIG_PATH_UNINSTALLED = @COIN_PKG_CONFIG_PATH_UNINSTALLED@
 CPP = @CPP@
@@ -278,6 +280,13 @@ SYMPHONY_LIBS = @SYMPHONY_LIBS@
 SYMPHONY_LIBS_INSTALLED = @SYMPHONY_LIBS_INSTALLED@
 VERSION = @VERSION@
 VPATH_DISTCLEANFILES = @VPATH_DISTCLEANFILES@
+XPR_CFLAGS = @XPR_CFLAGS@
+XPR_CFLAGS_INSTALLED = @XPR_CFLAGS_INSTALLED@
+XPR_DATA = @XPR_DATA@
+XPR_DATA_INSTALLED = @XPR_DATA_INSTALLED@
+XPR_DEPENDENCIES = @XPR_DEPENDENCIES@
+XPR_LIBS = @XPR_LIBS@
+XPR_LIBS_INSTALLED = @XPR_LIBS_INSTALLED@
 abs_bin_dir = @abs_bin_dir@
 abs_include_dir = @abs_include_dir@
 abs_lib_dir = @abs_lib_dir@
@@ -513,6 +522,7 @@ test: ../src/dip$(EXEEXT)
 @COIN_HAS_SYMPHONY_TRUE@test: test_symphony
 @COIN_HAS_CPX_TRUE@test: test_cpx
 @COIN_HAS_GRB_TRUE@test: test_grb
+@COIN_HAS_XPR_TRUE@test: test_xpr
 
 test_cbc:
 
@@ -561,6 +571,18 @@ test_grb:
 	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB -88   --BestKnownUB -88
 
 	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --DecompIPSolver Gurobi --DecompLPSolver Gurobi --BestKnownLB -88   --BestKnownUB -88
+
+test_xpr:
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair  --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/retail3.block --DecompIPSolver Xpress --DecompLPSolver Xpress --BestKnownLB 508.29976   --BestKnownUB 508.29976
+
+	../src/dip$(EXEEXT) --BlockFileFormat List --Instance  `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/atm_5_10_1.block --DecompIPSolver Xpress --DecompLPSolver Xpress --BestKnownLB 59704.02009   --BestKnownUB 59704.02009
+
+	../src/dip$(EXEEXT) --BlockFileFormat Pair --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.mps --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/wedding_16.block --DecompIPSolver Xpress --DecompLPSolver Xpress --BestKnownLB 11   --BestKnownUB 11
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --BlockFile `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.dec --DecompIPSolver Xpress --DecompLPSolver Xpress --BestKnownLB -88   --BestKnownUB -88
+
+	../src/dip$(EXEEXT) --Instance `$(CYGPATH_W) $(SAMPLE_DATA)`/block_milp.lp --doCut 1 --doPriceCut 0 --DecompIPSolver Xpress --DecompLPSolver Xpress --BestKnownLB -88   --BestKnownUB -88
 
 .PHONY: test
 
