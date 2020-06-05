@@ -608,6 +608,13 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
       throw UtilException("Gurobi selected as solver, but it's not available",
 			  "getOsiIpSolverInterface", "DecompAlgo");
 #endif
+   }else if (decompApp.m_param.DecompIPSolver == "Xpress"){
+#ifdef COIN_HAS_XPR
+      m_problemSI = new OsiXprSolverInterface();
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
    }
 
    string fileName;
