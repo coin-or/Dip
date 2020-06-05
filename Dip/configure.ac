@@ -108,6 +108,7 @@ AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc cbc],  [DipLib])
 AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 AC_COIN_CHECK_PACKAGE(SYMPHONY, [osi-sym], [DipLib])
 AC_COIN_CHECK_PACKAGE(Grb, [osi-gurobi], [DipLib])
+AC_COIN_CHECK_PACKAGE(Xpr, [osi-xpress], [DipLib])
 
 #############################################################################
 #                       Other third party software                          #
@@ -221,6 +222,8 @@ elif test $coin_has_cpx = yes; then
    found_lp_solver=true
 elif test $coin_has_grb = yes; then
    found_lp_solver=true
+elif test $coin_has_xpr = yes; then
+   found_lp_solver=true
 fi
 
 if test $found_lp_solver = false; then 
@@ -241,6 +244,8 @@ if test $coin_has_clp = yes; then
 elif test $coin_has_cpx = yes; then
    found_ip_solver=true
 elif test $coin_has_grb = yes; then
+   found_ip_solver=true
+elif test $coin_has_xpr = yes; then
    found_ip_solver=true
 fi
 
