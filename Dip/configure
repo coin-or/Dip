@@ -27616,6 +27616,13 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
+if test $coin_has_xpr = yes ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define DIP_HAS_XPR 1
+_ACEOF
+
+fi
 
 ##############################################################################
 #                   VPATH links for unit test                                #

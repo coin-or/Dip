@@ -41,6 +41,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@COIN_HAS_CBC_TRUE@am__append_1 = test_cbc
+@COIN_HAS_SYMPHONY_TRUE@am__append_2 = test_symphony
+@COIN_HAS_CPX_TRUE@am__append_3 = test_cpx
+@COIN_HAS_GRB_TRUE@am__append_4 = test_grb
+@COIN_HAS_XPR_TRUE@am__append_5 = test_xpr
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -355,6 +360,8 @@ sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
+TARGETS = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 all: all-am
 
 .SUFFIXES:
@@ -516,13 +523,7 @@ uninstall-am: uninstall-info-am
 	uninstall-info-am
 
 
-test: ../src/dip$(EXEEXT)
-
-@COIN_HAS_CBC_TRUE@test: test_cbc
-@COIN_HAS_SYMPHONY_TRUE@test: test_symphony
-@COIN_HAS_CPX_TRUE@test: test_cpx
-@COIN_HAS_GRB_TRUE@test: test_grb
-@COIN_HAS_XPR_TRUE@test: test_xpr
+test: ../src/dip$(EXEEXT) $(TARGETS)
 
 test_cbc:
 

@@ -60,6 +60,9 @@
 /* Define to 1 if we have SYMPHONY */
 #undef DIP_HAS_SYMPHONY
 
+/* Define to 1 if we have Xpress */
+#undef DIP_HAS_XPR
+
 /* SVN revision number of project */
 #undef DIP_SVN_REV
 
