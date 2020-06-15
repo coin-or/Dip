@@ -70,7 +70,7 @@ extern "C" {
 #include "OsiGrbSolverInterface.hpp"
 #endif
 
-#ifdef COIN_HAS_XPR
+#ifdef DIP_HAS_XPR
 #include "xprs.h"
 #include "OsiXprSolverInterface.hpp"
 #endif

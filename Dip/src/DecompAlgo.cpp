@@ -6899,7 +6899,7 @@ OsiSolverInterface *DecompAlgo::getOsiLpSolverInterface()
 			  "getOsiLpSolverInterface", "DecompAlgo");
 #endif
    }else if (m_param.DecompLPSolver == "Xpress"){
-#ifdef COIN_HAS_XPR
+#ifdef DIP_HAS_XPR
       return(new OsiXprSolverInterface());
 #else
       throw UtilException("Xpress selected as solver, but it's not available",
@@ -6945,7 +6945,7 @@ OsiSolverInterface *DecompAlgo::getOsiIpSolverInterface()
 			  "getOsiIpSolverInterface", "DecompAlgo");
 #endif
    }else if (m_param.DecompIPSolver == "Xpress"){
-#ifdef COIN_HAS_XPR
+#ifdef DIP_HAS_XPR
       return(new OsiXprSolverInterface());
 #else
       throw UtilException("Xpress selected as solver, but it's not available",
