@@ -1022,7 +1022,7 @@ void DecompSubModel::solveAsMIPXpr(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef COIN_HAS_XPR
+#ifdef DIP_HAS_XPR
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
 

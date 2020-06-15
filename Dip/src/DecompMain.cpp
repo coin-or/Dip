@@ -609,7 +609,7 @@ DecompSolverResult* solveDirect(const DecompApp& decompApp)
 			  "getOsiIpSolverInterface", "DecompAlgo");
 #endif
    }else if (decompApp.m_param.DecompIPSolver == "Xpress"){
-#ifdef COIN_HAS_XPR
+#ifdef DIP_HAS_XPR
       m_problemSI = new OsiXprSolverInterface();
 #else
       throw UtilException("Xpress selected as solver, but it's not available",
