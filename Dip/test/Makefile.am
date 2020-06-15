@@ -8,23 +8,25 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-test: ../src/dip$(EXEEXT)
+TARGETS=
 
 if COIN_HAS_CBC
-test: test_cbc
+TARGETS+=test_cbc
 endif
 if COIN_HAS_SYMPHONY
-test: test_symphony
+TARGETS+=test_symphony
 endif
 if COIN_HAS_CPX
-test: test_cpx
+TARGETS+=test_cpx
 endif
 if COIN_HAS_GRB
-test: test_grb
+TARGETS+=test_grb
 endif
 if COIN_HAS_XPR
-test: test_xpr
+TARGETS+=test_xpr
 endif
+
+test: ../src/dip$(EXEEXT) $(TARGETS)
 
 test_cbc:
 

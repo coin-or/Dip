@@ -274,6 +274,9 @@ fi
 if test $coin_has_grb = yes ; then
   AC_DEFINE(DIP_HAS_GRB, [1], [Define to 1 if we have Gurobi])
 fi
+if test $coin_has_xpr = yes ; then
+  AC_DEFINE(DIP_HAS_XPR, [1], [Define to 1 if we have Xpress])
+fi
 
 ##############################################################################
 #                   VPATH links for unit test                                #
