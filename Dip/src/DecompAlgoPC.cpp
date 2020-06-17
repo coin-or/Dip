@@ -631,10 +631,8 @@ void DecompAlgoPC::solveMasterAsMIP()
       solveMasterAsMIPCbc(&result);
    }else if (m_param.DecompIPSolver == "CPLEX"){
       solveMasterAsMIPCpx(&result);
-   }else if (m_param.DecompIPSolver == "Gurobi"){
-      solveMasterAsMIPGrb(&result);
-   }else if (m_param.DecompIPSolver == "Xpress"){
-      // TODO all solver should use their OsiSolverInterface
+   }else if (m_param.DecompIPSolver == "Gurobi" ||
+             m_param.DecompIPSolver == "Xpress"){
       solveMasterAsMIPOsi(&result);
    }else{
       throw UtilException("Unknown solver selected",
@@ -1173,43 +1171,6 @@ void DecompAlgoPC::solveMasterAsMIPCpx(DecompSolverResult* result)
 #else
    throw UtilException("CPLEX selected as solver, but it's not available",
 		       "solveMasterAsMIPCpx", "DecompAlgoPC");
-#endif
-}
-
-//===========================================================================//
-void DecompAlgoPC::solveMasterAsMIPGrb(DecompSolverResult* result)
-{
-#ifdef DIP_HAS_GRB
-   int stat;
-   const int numCols    = m_masterSI->getNumCols();
-
-   OsiGrbSolverInterface* osiGrb
-      = dynamic_cast<OsiGrbSolverInterface*>(m_masterSI);
-
-   GRBenv* env = osiGrb->getEnvironmentPtr();
-
-   GRBmodel* model = osiGrb->getLpPtr();
-
-   osiGrb->branchAndBound();
-
-   GRBgetintattr(model, GRB_INT_ATTR_STATUS, &stat);
-
-   result->m_isUnbounded = false;
-   result->m_isOptimal   = false;
-   result->m_isCutoff    = false;
-   result->m_nSolutions  = 0;
-   if (stat == GRB_OPTIMAL){
-      const double *solution = osiGrb->getColSolution();
-      vector<double> solVec(solution, solution + numCols);
-      result->m_solution.push_back(solVec);
-      result->m_nSolutions++;
-      result->m_isOptimal   = true;
-   }else{
-      result->m_isOptimal = true;
-   }
-#else
-   throw UtilException("Gurobi selected as solver, but it's not available",
-		       "solveMasterAsMIPGrb", "DecompAlgoPC");
 #endif
 }
 
