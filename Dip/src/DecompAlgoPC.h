@@ -166,7 +166,7 @@ private:
    void solveMasterAsMIPSym(DecompSolverResult* result);
    void solveMasterAsMIPCbc(DecompSolverResult* result);
    void solveMasterAsMIPCpx(DecompSolverResult* result);
-   void solveMasterAsMIPGrb(DecompSolverResult* result);
+   void solveMasterAsMIPOsi(DecompSolverResult* result);
    int  adjustColumnsEffCnt();
    int  compressColumns    ();
 

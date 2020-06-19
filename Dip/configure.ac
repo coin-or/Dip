@@ -81,15 +81,23 @@ AC_EXEEXT
 #                              COIN components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [coinutils osi alps], [DipLib])
-if test $coin_has_coindepend != yes ; then
-  AC_MSG_ERROR([Required package CoinUtils, Osi, or Alps not available.])
+AC_COIN_CHECK_PACKAGE(CoinUtils, [coinutils], [DipLib])
+if test $coin_has_coinutils != yes ; then
+  AC_MSG_ERROR([Required package CoinUtils not available.])
+fi
+AC_COIN_CHECK_PACKAGE(Osi, [osi], [DipLib])
+if test $coin_has_osi != yes ; then
+  AC_MSG_ERROR([Required package Osi not available.])
+fi
+AC_COIN_CHECK_PACKAGE(Alps, [alps], [DipLib])
+if test $coin_has_alps != yes ; then
+  AC_MSG_ERROR([Required package Alps not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Clp,  [osi-clp clp],  [DipLib])
 AC_COIN_CHECK_PACKAGE(Sample,   [coindatasample])
 AC_COIN_CHECK_PACKAGE(Cgl,  [cgl],      [DipLib])
-AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
+AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc cbc],  [DipLib])
 
 #############################################################################
 #                            Third party solvers                            #
@@ -100,6 +108,7 @@ AC_COIN_CHECK_PACKAGE(Cbc,  [osi-cbc],  [DipLib])
 AC_COIN_CHECK_PACKAGE(Cpx,  [osi-cplex],  [DipLib])
 AC_COIN_CHECK_PACKAGE(SYMPHONY, [osi-sym], [DipLib])
 AC_COIN_CHECK_PACKAGE(Grb, [osi-gurobi], [DipLib])
+AC_COIN_CHECK_PACKAGE(Xpr, [osi-xpress], [DipLib])
 
 #############################################################################
 #                       Other third party software                          #
@@ -213,6 +222,8 @@ elif test $coin_has_cpx = yes; then
    found_lp_solver=true
 elif test $coin_has_grb = yes; then
    found_lp_solver=true
+elif test $coin_has_xpr = yes; then
+   found_lp_solver=true
 fi
 
 if test $found_lp_solver = false; then 
@@ -233,6 +244,8 @@ if test $coin_has_clp = yes; then
 elif test $coin_has_cpx = yes; then
    found_ip_solver=true
 elif test $coin_has_grb = yes; then
+   found_ip_solver=true
+elif test $coin_has_xpr = yes; then
    found_ip_solver=true
 fi
 
@@ -260,6 +273,9 @@ if test $coin_has_cpx = yes ; then
 fi
 if test $coin_has_grb = yes ; then
   AC_DEFINE(DIP_HAS_GRB, [1], [Define to 1 if we have Gurobi])
+fi
+if test $coin_has_xpr = yes ; then
+  AC_DEFINE(DIP_HAS_XPR, [1], [Define to 1 if we have Xpress])
 fi
 
 ##############################################################################

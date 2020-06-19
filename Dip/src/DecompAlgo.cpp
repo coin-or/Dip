@@ -798,7 +798,6 @@ void DecompAlgo::createMasterProblem(DecompVarList& initVars)
    int nRowsCore = modelCore->getNumRows();
    int nIntVars  = modelCore->getNumInts();
    int nInitVars = static_cast<int>(initVars.size());
-   assert(initVars.size() > 0);//TODO: this should be OK
    double* dblArrNCoreCols = new double[nColsCore];
    assert(dblArrNCoreCols);
    //---
@@ -2796,7 +2795,8 @@ vector<double*> DecompAlgo::getDualRays(int maxNumRays)
    if (m_param.DecompLPSolver == "CPLEX"){ 
       return(getDualRaysCpx(maxNumRays));
    }else if (m_param.DecompLPSolver == "Clp" ||
-	     m_param.DecompLPSolver == "Gurobi"){ 
+	     m_param.DecompLPSolver == "Gurobi" ||
+        m_param.DecompLPSolver == "Xpress"){ 
       return(getDualRaysOsi(maxNumRays));
    }else{
       throw UtilException("Unknown solver selected.",
@@ -6897,6 +6897,13 @@ OsiSolverInterface *DecompAlgo::getOsiLpSolverInterface()
       throw UtilException("Gurobi selected as solver, but it's not available",
 			  "getOsiLpSolverInterface", "DecompAlgo");
 #endif
+   }else if (m_param.DecompLPSolver == "Xpress"){
+#ifdef DIP_HAS_XPR
+      return(new OsiXprSolverInterface());
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
+			  "getOsiLpSolverInterface", "DecompAlgo");
+#endif
    }else{
       throw UtilException("Unknown solver selected",
 			  "getOsiLpSolverInterface", "DecompAlgo");
@@ -6934,6 +6941,13 @@ OsiSolverInterface *DecompAlgo::getOsiIpSolverInterface()
       return(new OsiGrbSolverInterface());
 #else
       throw UtilException("Gurobi selected as solver, but it's not available",
+			  "getOsiIpSolverInterface", "DecompAlgo");
+#endif
+   }else if (m_param.DecompIPSolver == "Xpress"){
+#ifdef DIP_HAS_XPR
+      return(new OsiXprSolverInterface());
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
 			  "getOsiIpSolverInterface", "DecompAlgo");
 #endif
    }else{

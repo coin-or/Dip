@@ -1,5 +1,6 @@
 from builtins import range
 from builtins import object
+from past.utils import old_div
 import argparse
 from pulp import LpVariable, lpSum, LpBinary, LpStatusOptimal
 
@@ -94,6 +95,7 @@ def formulate(bpp, args):
     prob.assign_vars = assign_vars
     prob.use_vars    = use_vars
     prob.waste_vars  = waste_vars
+    prob.tol = pow(pow(2, -24), old_div(2.0, 3.0))
 
     return prob
 
@@ -127,6 +129,8 @@ def my_heuristics(prob, xhat, cost):
 
 def solve(prob, args):
 
+    prob.root_heuristic = False
+    prob.node_heuristic = False
     if args.branchingRule != 'Default':
         prob.branch_method = my_branch
         prob.branching_rule = args.branchingRule
@@ -136,6 +140,7 @@ def solve(prob, args):
         prob.root_heuristic = True
     if args.nodeHeuristic:
         prob.heuristics = my_heuristics
+        prob.is_root_node = True
         prob.node_heuristic = True
   
     dippyOpts = addDippyOpts(args)

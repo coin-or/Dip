@@ -5,11 +5,34 @@ env:
 matrix:
   include:
     - os: linux
+      dist: precise
+      env: 
+      addons:
+        apt:
+          sources:
+            - sourceline: 'ppa:ubuntu-toolchain-r/test'
+          packages:
+            - gcc-9
+            - g++-9
+            - gfortran-9
+            - libgfortran-9-dev
+            - liblapack-dev
+            - libamd2.2.0
+            - libcholmod1.7.1
+            - libsuitesparse-dev
+            - chrpath
+      install:
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
+        - sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-9 90
+        - sudo update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-9 90
+    - os: linux
       addons:
         apt:
           packages:
             - gfortran
             - liblapack-dev
+            - libmetis-dev
     - os: linux
       dist: bionic
       addons:
@@ -17,6 +40,7 @@ matrix:
           packages:
             - gfortran
             - liblapack-dev
+            - libmetis-dev
     - os: osx
       osx_image: xcode11
       env: OSX=10.14 CC=gcc CXX=g++ 
@@ -29,14 +53,12 @@ matrix:
       osx_image: xcode10
       env: OSX=10.13 
       compiler: clang
-    - os: osx
-      osx_image: xcode9.2
-      env: OSX=10.12 
-      compiler: clang
 
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; clang --version; gfortran --version; fi
-  - if [[ "$TRAVIS_OS_NAME $CC" == "osx gcc" ]]; then export CC=gcc-9 ; export CXX=g++-9 ; $CC --version; $CXX --version; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then if [ x`brew list | fgrep bash` != x'bash' ]; then brew install bash; fi; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then if [ x`brew list | fgrep gcc` != x'gcc' ]; then brew install gcc; fi; fi
+  - if [[ "$TRAVIS_OS_NAME $CC" == "osx gcc" ]]; then export CC=gcc-9 ; export CXX=g++-9 ; $CC --version; $CXX --version; gfortran --version; fi
   - if [[ "$TRAVIS_OS_NAME $CC" == "osx clang" ]]; then  export PLATFORM=osx$OSX-x86_64-clang`clang -dumpversion`; fi
   - if [[ "$TRAVIS_OS_NAME $CC" == "osx gcc-9" ]]; then  export PLATFORM=osx$OSX-x86_64-gcc`gcc-9 -dumpversion`; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then  export PLATFORM=linux-x86_64-gcc`gcc -dumpversion`; fi
@@ -44,15 +66,45 @@ before_script:
   - wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
   - export PROJECT_URL=https://github.com/$TRAVIS_REPO_SLUG
   - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
-  - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update  > /dev/null 
+  - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update 
 
 script:
-  - bash ./coinbrew build $PROJECT --no-prompt --verbosity=2 --test
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable --skip="ThirdParty/Lapack ThirdParty/Blas"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bash ./coinbrew build $PROJECT --no-prompt --verbosity=3 --tests main --enable-relocatable; fi
+
 after_script:
   - if [ $TRAVIS_BRANCH = "master" ]; then export VERSION=master; else export VERSION=`echo $TRAVIS_BRANCH | cut -d "/" -f 2`; fi
-  - export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export TGZ_FILE=$PROJECT-$VERSION-$TRAVIS_DIST-$PLATFORM.tgz; else export TGZ_FILE=$PROJECT-$VERSION-$PLATFORM.tgz; fi
   - echo $TGZ_FILE
   - cp $PROJECT/README.md $PROJECT/LICENSE $PROJECT/$PROJECT/AUTHORS dist
   - cd dist
+  - cd dist
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]] && [[ "$TRAVIS_DIST" == "precise" ]];
+    then
+      # adding required libraries
+      cp /usr/lib/lapack/liblapack.so.3gf lib/
+      cp /usr/lib/x86_64-linux-gnu/libgfortran.so.5 lib/
+      cp /usr/lib/x86_64-linux-gnu/libgfortran.so.3 lib/
+      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 lib/
+      cp /usr/lib/libblas/libblas.so.3gf lib/
+      cp /lib/x86_64-linux-gnu/libreadline.so.6 lib/
+      cp /lib/x86_64-linux-gnu/libbz2.so.1.0 lib/
+      cp /lib/x86_64-linux-gnu/libtinfo.so.5 lib/
+      cp /usr/lib/x86_64-linux-gnu/libquadmath.so.0 lib/
+      cp /usr/lib/libcholmod.so.1.7.1 lib/
+      cp /usr/lib/libamd.so.2.2.0 lib/
+      cp /usr/lib/libcolamd.so.2.7.1 lib/
+    
+      for libfile in lib/*.so*;
+      do
+        chrpath -r ./ $libfile
+      done
+
+      chrpath -r \$\ORIGIN/../lib/ bin/cbc
+      chrpath -r \$\ORIGIN/../lib/ bin/clp
+      chrpath -r \$\ORIGIN/../lib/ bin/symphony
+      chrpath -r \$\ORIGIN/../lib/ bin/dip
+    fi
   - tar -czvf $TGZ_FILE lib/* bin/* include/* share/* README.md LICENSE AUTHORS
   - curl -T $TGZ_FILE -utkralphs:$BINTRAY_API -H "X-Bintray-Publish:1" -H "X-Bintray-Override:1" https://api.bintray.com/content/coin-or/download/$PROJECT/$VERSION/$TGZ_FILE

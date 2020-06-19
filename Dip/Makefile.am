@@ -63,6 +63,11 @@ test_grb: all
 	cd test; $(MAKE) test_grb
 endif
 
+if COIN_HAS_XPR
+test_xpr: all
+	cd test; $(MAKE) test_xpr
+endif
+
 unitTest: test
 
 # Doxygen documentation

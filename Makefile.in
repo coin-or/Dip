@@ -59,7 +59,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = README.md $(am__configure_deps) \
+DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
 	$(top_srcdir)/doxydoc/doxygen.conf.in AUTHORS INSTALL \

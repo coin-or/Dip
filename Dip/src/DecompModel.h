@@ -217,6 +217,14 @@ public:
 		      bool                 isRoot,
 		      double               cutoff,
 		      double               timeLimit);
+
+   void solveAsMIPXpr(DecompSolverResult*  result,
+				DecompParam&         param,
+				bool                 doExact,
+				bool                 doCutoff,
+				bool                 isRoot,
+				double               cutoff,
+				double               timeLimit);
    
 public:
    OsiSolverInterface*   getOsi() const {

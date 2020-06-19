@@ -1,11 +1,37 @@
-## BUILDING AND INSTALLING (SERIAL VERSION)
+## BUILDING AND INSTALLING DipPy (see below for DIP)
 
-These instructions are for building and installing ALPS from source. For
+If you are on Linux or OS X, you will first need to install DIP using 
+[coinbrew](https://github.com/coin-or/coinbrew). In Windows, there are pre-built
+binary wheels and no further installation should be needed. After build and install,
+make sure to set `PKG_CONFIG_PATH` to point to the directory where the 
+`.pc` files are installed (by default, this is in the `lib/pkgconfig` directory 
+in the installation directory). You may also need to set either `LD_LIBRARY_PATH` (Linux)
+or `DYLD_LIBRARY_PATH` (OS X) to point to the directory where the libraries are 
+installed. Then simply do
+```
+pip install coinor.dippy
+```
+After installation, you can try running the examples to see if trhings are working.
+These should all work out of the box. For a listing of examples and some brief
+instructions, do
+```
+python -m coinor.dippy.examples
+```
+To get help for an example, do, e.g.,
+```
+python -m coinor.dippy.example.cflp --help
+```
+or just run
+```
+python -m coinor.dippy.examples.cflp
+```
+## BUILDING AND INSTALLING DIP (SERIAL VERSION)
+
+These instructions are for building and installing DIP from source. For
 instructions on how to obtain pre-built binaries, please see the README file.
 
-IMPORTANT: The build instructions have changed significantly. In most case,
-you do not need to clone this repository first! Please follow the instructions
-for your platform below.
+IMPORTANT: In most cases,you do not need to clone this repository first! 
+Please follow the instructions for your platform below.
 
 ### Building on Linux
 
@@ -35,9 +61,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.95
+./coinbrew fetch --no-prompt Dip@0.95
 ./coinbrew build --no-prompt Dip --prefix=/path/to/install/dir
-./coinbrew install Dip
 ```
 
 Options that would have been passed to the `configure` script under the old
@@ -117,9 +142,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.92
+./coinbrew fetch --no-prompt Dip@0.95
 ./coinbrew build --no-prompt Dip --prefix=C:\path\to\install\dir --verbosity=1
-./coinbrew install Dip
 ```
 Options that would have been passed to the `configure` script under the old
 build system can simply be added to the command-line. For example, to build
@@ -208,9 +232,8 @@ rest should happen automagically. Alternatively, the following command-line
 incantation will execute the procedure non-interactively.
 
 ```
-./coinbrew fetch --no-prompt Dip:stable/0.92
+./coinbrew fetch --no-prompt Dip@0.92
 ./coinbrew build --no-prompt Dip --prefix=/path/to/install/dir --verbosity=1
-./coinbrew install Dip
 ```
 
 With this setup, `clang` will be used for compiling C++ by default and

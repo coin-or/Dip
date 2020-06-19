@@ -1779,6 +1779,13 @@ void DecompApp::setInfinity(){
       throw UtilException("Gurobi selected as solver, but it's not available",
 			  "setDecompInf", "DecompApp");
 #endif
+   }else if (m_param.DecompLPSolver == "Xpress"){
+#ifdef DIP_HAS_XPR
+      m_infinity = XPRS_PLUSINFINITY;
+#else
+      throw UtilException("Xpress selected as solver, but it's not available",
+			  "setDecompInf", "DecompApp");
+#endif
    }else{
       throw UtilException("Unknown solver selected",
 			  "setDecompInf", "DecompApp");
