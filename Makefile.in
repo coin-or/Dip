@@ -272,7 +272,7 @@ SUBDIRS_DOXY = $(SUBDIRS) all
 # Files that are generated and should be cleaned with make distclean
 DISTCLEANFILES = coin_subdirs.txt $(am__append_2) \
 	$(VPATH_DISTCLEANFILES)
-DocFiles = README.md AUTHORS LICENSE 
+DocFiles = README README.md AUTHORS AUTHORS.md LICENSE LICENSE.md 
 DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
 COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
 COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
@@ -849,7 +849,7 @@ uninstall-all-doxygen-docs:
 	  fi ; \
 	done ; 
 
-install-doc: $(DocFiles) 
+install-doc: 
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
 	for file in $(DocFiles); do \
 	  if test -f "$$file"; then dir=; else dir="$(srcdir)/"; fi; \
