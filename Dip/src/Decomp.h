@@ -211,11 +211,11 @@ const std::string DecompPriceCutStrategyStr[3] = {
 
 //===========================================================================//
 enum DecompSolverStatus {
-   DecompSolStatError,
-   DecompSolStatOptimal,
-   DecompSolStatFeasible,
-   DecompSolStatInfeasible,
-   DecompSolStatNoSolution
+   DecompSolStatError = -1,
+   DecompSolStatOptimal = 0,
+   DecompSolStatFeasible = 1,
+   DecompSolStatInfeasible = 2,
+   DecompSolStatNoSolution = 3
 };
 
 //===========================================================================//
@@ -273,9 +273,9 @@ const std::string DecompRowTypeStr[4] = {
 //Corresponding to the class DecompVar
 enum DecompVarType {
    // points generated from bounded subproblem
-   DecompVar_Point,
+   DecompVar_Point = 0,
    // rays generated from unbounded subproblem
-   DecompVar_Ray
+   DecompVar_Ray = 1
 };
 
 
