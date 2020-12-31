@@ -85,20 +85,6 @@ int DecompApp::generateInitVars(DecompVarList& initVars)
    return 0;
 }
 
-// --------------------------------------------------------------------- //
-int DecompApp::generateCuts(const double*   x,
-                            DecompCutList& newCuts)
-{
-   // ---
-   // --- this function does nothing by default
-   // ---
-   UtilPrintFuncBegin(m_osLog, m_classTag,
-                      "generateCuts()", m_param.LogDebugLevel, 2);
-   UtilPrintFuncEnd(m_osLog, m_classTag,
-                    "generateCuts()", m_param.LogDebugLevel, 2);
-   return 0;
-}
-
 /*-------------------------------------------------------------------------*/
 void DecompApp::printOriginalColumn(const int index,
                                     ostream* os) const
