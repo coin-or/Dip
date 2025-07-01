@@ -1,0 +1,31 @@
+[project]
+name = "coinor.dippy"
+version = "1.95.3"
+description="DIP Python Interface"
+readme="README.md"
+authors=[
+  {  name = "Michael O'Sullivan", email = "michael.osullivan@auckland.ac.nz"  }, 
+  {  name = "Qi-Shan Lim"  },
+  {  name = "Stuart Mitchell"  },
+  {  name =  "Ted Ralphs", email = "ted@lehigh.edu"  }
+]
+license='EPL-2.0'
+dependencies = [
+  'pulp>=1.5.4',
+  'coinor.gimpy>=2.0.0'
+]
+[project.urls]
+"Home Page"="https://github.com/coin-or/DIP"
+
+[build-system]
+requires = [
+  'setuptools',
+  'pulp>=1.5.4',
+  'coinor.gimpy>=2.0.0'
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
+
+

@@ -112,23 +112,12 @@ modules=[Extension('coinor.dippy._dippy',
 cvpmp_instance_files = [join('Instances', f) for f in
                         listdir('src/dippy/examples/cvpmp/Instances')]
 
-setup(name=PROJECT,
-      version=VERSION,
-      description=DESC,
-      long_description=read_file('README.md'),
-      long_description_content_type='text/markdown',
-      author='''Michael O'Sullivan, Qi-Shan Lim, Stuart Mitchell''',
-      author_email='michael.osullivan@auckland.ac.nz',
-      maintainer='Ted Ralphs',
-      maintainer_email='ted@lehigh.edu',
-      url=URL,
-      license='Eclipse Public License',
-      namespace_packages=['coinor'],
+setup(namespace_packages=['coinor'],
       #There must be a better way
       packages=[pkg.replace('src','coinor') for pkg in find_packages()],
       package_dir = {'coinor': 'src'},
       package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
-      install_requires=['pulp>=1.5.4','coinor.gimpy>=2.0.0'],
+      install_requires=[
       ext_modules=modules
      )
 
