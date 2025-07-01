@@ -1,4 +1,4 @@
-# Dip 0.95
+# Dip 0.95.1
 
 [![A COIN-OR Project](https://coin-or.github.io/coin-or-badge.png)](https://www.coin-or.org)
 
@@ -48,9 +48,9 @@ Paper: http://dx.doi.org/10.1007/s10107-005-0606-3
 
 ## CURRENT BUILD STATUS
 
-[![Windows Builds](https://github.com/coin-or/Dip/actions/workflows/windows-ci.yml/badge.svg?branch=stable/0.95)](https://github.com/coin-or/Dip/actions/workflows/windows-ci.yml?query=branch%3Astable/0.95)
+[![Windows Builds](https://github.com/coin-or/Dip/actions/workflows/windows-ci.yml/badge.svg?branch=releases/0.95.1)](https://github.com/coin-or/Dip/actions/workflows/windows-ci.yml?query=branch%3Areleases/0.95.1)
 
-[![Linux and MacOS Builds](https://github.com/coin-or/Dip/actions/workflows/linux-ci.yml/badge.svg?branch=stable/0.95)](https://github.com/coin-or/Dip/actions/workflows/linux-ci.yml?query=branch%3Astable/0.95)
+[![Linux and MacOS Builds](https://github.com/coin-or/Dip/actions/workflows/linux-ci.yml/badge.svg?branch=releases/0.95.1)](https://github.com/coin-or/Dip/actions/workflows/linux-ci.yml?query=branch%3Areleases/0.95.1)
 
 ## DOWNLOAD
 
@@ -71,6 +71,39 @@ releases in Github
 [here](https://github.com/coin-or/Dip/releases). Older binaries
 are archived as part of Dip
 [here](https://www.coin-or.org/download/binary/Dip).
+
+ * *Linux* (see https://repology.org/project/coin-or-dip/versions for a complete listing): 
+   * arch:
+     ```
+     $ sudo pacman -S  coin-or-dip
+     ```
+   * Debian/Ubuntu:
+     ```
+     $ sudo apt-get install  coinor-dip coinor-libdip-dev
+     ```
+   * Fedora/Redhat/CentOS:
+     ```
+     $ sudo yum install  coin-or-Dip coin-or-Dip-devel
+     ```
+   * freebsd:
+     ```
+     $ sudo pkg install math/dip
+     ```
+   * linuxbrew:
+     ```
+     $ brew install dip
+     ```
+ * *Windows*: The easiest way to get Dip on Windows is to download an archive as described above.
+ * *Mac OS X*: The easiest way to get Dip on Mac OS X is through [Homebrew](https://brew.sh).
+     ```
+     $ brew tap coin-or-tools/coinor
+     $ brew install coin-or-tools/coinor/dip
+     ```
+
+* *conda* (cross-platform, no Windows for now):
+     ```
+     $ conda install coin-or-dip
+     ```
 
 Due to license incompatibilities, pre-compiled binaries lack some 
 functionality. If binaries are not available for your platform for the latest 
@@ -108,7 +141,7 @@ following on the command line.
 ```
 wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 chmod u+x coinbrew
-./coinbrew fetch Dip@0.95
+./coinbrew fetch Dip@0.95.1
 ./coinbrew build Dip
 ```
 For more detailed instructions on coinbrew, see https://coin-or.github.io/coinbrew.
@@ -174,7 +207,7 @@ If you have `Doxygen` available, you can build a HTML documentation by typing
 `make doxydoc` 
 
 in the build directory. If Dip was built via `coinbrew`, then the build
-directory will be `./build/Dip/0.95` by default. The doxygen documentation main file
+directory will be `./build/Dip/0.95.1` by default. The doxygen documentation main file
 is found at `<build-dir>/doxydoc/html/index.html`.
 
 If you don't have `doxygen` installed locally, you can use also find the
