@@ -29,7 +29,7 @@ try:
 except:
     # If user didn't supply location, then try pkg-config
     try:
-        for p in ['cbc','cgl','osi-clp','clp','osi','coinutils']:
+        for p in ['dip','alps','cbc','cgl','osi-clp','clp','osi','coinutils']:
             flags = (check_output(['pkg-config', '--libs', p])
                      .strip().decode('utf-8'))
             for flag in flags.split():
