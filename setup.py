@@ -86,6 +86,8 @@ elif 'win' in operatingSystem:
 
 libs, libDirs, incDirs = get_libs()
 
+incDirs.extend(join('Dip', 'src', 'dippy'))
+
 macros = [('__DECOMP_LP_CLP__', None)]
 
 files = ['DippyDecompAlgo.cpp',
@@ -105,7 +107,8 @@ modules=[Extension('coinor.dippy._dippy',
                    define_macros=macros)]
 
 cvpmp_instance_files = [join('Instances', f) for f in
-                        listdir('Dip/src/dippy/examples/cvpmp/Instances')]
+                        listdir(join('Dip', 'src', 'dippy', 'examples',
+                                     'cvpmp'))]
 
 setup(namespace_packages=['coinor'],
       #There must be a better way
