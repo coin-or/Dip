@@ -5,11 +5,6 @@ import subprocess, os, sys
 from os.path import join, dirname
 from os import listdir
 
-PROJECT = 'coinor.dippy'
-VERSION = '1.95.2'
-URL = 'https://github.com/coin-or/Dip'
-DESC = u'DIP Python Interface'
-
 def read_file(file_name):
 
     file_path = join(
@@ -100,7 +95,7 @@ files = ['DippyDecompAlgo.cpp',
          'DippyPythonUtils.cpp',
          ]
 
-sources = [join('src', 'dippy', f) for f in files]
+sources = [join('Dip', 'src', 'dippy', f) for f in files]
 
 modules=[Extension('coinor.dippy._dippy', 
                    sources, 
@@ -110,14 +105,13 @@ modules=[Extension('coinor.dippy._dippy',
                    define_macros=macros)]
 
 cvpmp_instance_files = [join('Instances', f) for f in
-                        listdir('src/dippy/examples/cvpmp/Instances')]
+                        listdir('Dip/src/dippy/examples/cvpmp/Instances')]
 
 setup(namespace_packages=['coinor'],
       #There must be a better way
-      packages=[pkg.replace('src','coinor') for pkg in find_packages()],
-      package_dir = {'coinor': 'src'},
+      packages=[pkg.replace('Dip/src','coinor') for pkg in find_packages()],
+      package_dir = {'coinor': 'Dip/src'},
       package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
-      install_requires=[
       ext_modules=modules
      )
 
