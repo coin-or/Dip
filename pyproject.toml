@@ -9,11 +9,13 @@ authors=[
   {  name = "Stuart Mitchell"  },
   {  name =  "Ted Ralphs", email = "ted@lehigh.edu"  }
 ]
-license='EPL-2.0'
 dependencies = [
   'pulp>=1.5.4',
   'coinor.gimpy>=2.0.0'
 ]
+license='EPL-2.0'
+dynamic=[]
+
 [project.urls]
 "Home Page"="https://github.com/coin-or/DIP"
 

@@ -59,6 +59,14 @@ except:
             at the same location as the libraries. 
             ''')
 
+operatingSystem = sys.platform
+if 'linux' in operatingSystem:
+    operatingSystem = 'linux'
+elif 'darwin' in operatingSystem:
+    operatingSystem = 'mac'
+elif 'win' in operatingSystem:
+    operatingSystem = 'windows'
+
 if CoinDir != None:
     # We come here if user supplied the installation directory or pkg-config failed
     if operatingSystem == 'windows':
@@ -76,14 +84,6 @@ if CoinDir != None:
     libDirs = [join(CoinDir, 'lib')]
     incDirs = [join(CoinDir, 'include', 'coin')] 
             
-operatingSystem = sys.platform
-if 'linux' in operatingSystem:
-    operatingSystem = 'linux'
-elif 'darwin' in operatingSystem:
-    operatingSystem = 'mac'
-elif 'win' in operatingSystem:
-    operatingSystem = 'windows'
-
 incDirs.extend(join('Dip', 'src', 'dippy'))
 
 macros = [('__DECOMP_LP_CLP__', None)]
