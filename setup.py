@@ -14,57 +14,42 @@ def read_file(file_name):
 
     return open(file_path).read()
 
+CoinDir = None
+
+libs = []
+libDirs = []
+incDirs = []
+
 try:
-    CoinDir = os.environ['COIN_INSTALL_DIR']
-except:
-    from os.path import abspath, dirname
-
-    try:
-        location = dirname(
-            check_output(['which', 'clp']).strip()).decode('utf-8')
-        CoinDir = abspath(join(location, ".."))
-    except:
+    if len(sys.argv) > 1 and (sys.argv[1] == "sdist" or sys.argv[1] == "egg_info"):
+        # Do not need CoinDir
         pass
-            
-def get_libs():
-    '''
-    Return a list of distinct library names used by ``dependencies``.
-    '''
-    libs = []
-
+    else:
+        CoinDir = os.environ['COIN_INSTALL_DIR']
+except:
+    # If user didn't supply location, then try pkg-config
     try:
-        from subprocess import check_output
-        
-        flags = (check_output(['pkg-config', '--libs', 'dip'])
-                 .strip().decode('utf-8'))
-        libs = [flag[2:] for flag in flags.split()
-                if flag.startswith('-l')]
-        libDirs = [flag[2:] for flag in flags.split()
-                   if flag.startswith('-L')]
-        flags = (check_output(['pkg-config', '--cflags', 'dip'])
-                 .strip().decode('utf-8'))
-        incDirs = [flag[2:] for flag in flags.split() if
-                   flag.startswith('-I')]
-
+        for p in ['cbc','cgl','osi-clp','clp','osi','coinutils']:
+            flags = (check_output(['pkg-config', '--libs', p])
+                     .strip().decode('utf-8'))
+            for flag in flags.split():
+                if flag.startswith('-l') and flag[2:] not in libs:
+                    libs.append(flag[2:]) 
+                if flag.startswith('-L') and flag[2:] not in libDirs:
+                    libDirs.append(flag[2:]) 
+            flags = (check_output(['pkg-config', '--cflags', p])
+                     .strip().decode('utf-8'))
+            for flag in flags.split():
+                if flag.startswith('-I') and flag[2:] not in incDirs:
+                    incDirs.append(flag[2:]) 
     except:
-        if CoinDir != None:
-            
-            if operatingSystem == 'windows':
-                if os.path.exists(join(CoinDir, 'lib', 'Cbc.lib')):
-                    libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
-                            'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
-                else:
-                    libs = ['libDecomp', 'libOsiSym', 'libSym', 'libOsiCbc', 'libCbcSolver',
-                            'libCbc', 'libCgl', 'libOsiClp', 'libClpSolver',  'libClp', 'libOsi',
-                            'libAlps', 'libCoinUtils']
-            else:
-                libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
-                        'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
-                
-            libDirs = [join(CoinDir, 'lib')]
-            incDirs = [join(CoinDir, 'include', 'coin')] 
-                
-        else:
+        # If pkg-config fails, then look for an installed Cbc
+        try:
+            location = dirname(
+                check_output(['which', 'cbc']).strip()).decode('utf-8')
+            CoinDir = abspath(join(location, ".."))
+        except:
+            #Otherwise, raise an exception
             raise Exception('''
             Could not find location of COIN installation.
             Please ensure that either 
@@ -74,8 +59,23 @@ def get_libs():
             at the same location as the libraries. 
             ''')
 
-    return libs, libDirs, incDirs
-
+if CoinDir != None:
+    # We come here if user supplied the installation directory or pkg-config failed
+    if operatingSystem == 'windows':
+        if os.path.exists(join(CoinDir, 'lib', 'Cbc.lib')):
+            libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
+                    'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
+        else:
+            libs = ['libDecomp', 'libOsiSym', 'libSym', 'libOsiCbc', 'libCbcSolver',
+                    'libCbc', 'libCgl', 'libOsiClp', 'libClpSolver',  'libClp', 'libOsi',
+                    'libAlps', 'libCoinUtils']
+    else:
+        libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
+                'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
+                
+    libDirs = [join(CoinDir, 'lib')]
+    incDirs = [join(CoinDir, 'include', 'coin')] 
+            
 operatingSystem = sys.platform
 if 'linux' in operatingSystem:
     operatingSystem = 'linux'
@@ -83,8 +83,6 @@ elif 'darwin' in operatingSystem:
     operatingSystem = 'mac'
 elif 'win' in operatingSystem:
     operatingSystem = 'windows'
-
-libs, libDirs, incDirs = get_libs()
 
 incDirs.extend(join('Dip', 'src', 'dippy'))
 
