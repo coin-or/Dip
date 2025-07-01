@@ -47,7 +47,7 @@ before-all = """
   esac
   ./coinbrew fetch Dip@0.95.1 --no-third-party && eval ./coinbrew build Dip --no-third-party --parallel-jobs 16 --prefix=$(pwd)/local --verbosity 4 $config_args || (cat build/Data/Sample/1.2.12/config.log; echo ignoring errors)
 """
-environment = { PATH="$(pwd)/build/local/bin:$PATH", LD_LIBRARY_PATH="$(pwd)/build/local/lib:$LD_LIBRARY_PATH", PKG_CONFIG_PATH="$(pwd)/local/build/lib/pkgconfig:$PKG_CONFIG_PATH", CIBW_ARCHS="$CIBW_ARCHS" }
+environment = { PATH="$(pwd)/build/local/bin:$PATH", LD_LIBRARY_PATH="$(pwd)/build/local/lib:$LD_LIBRARY_PATH", PKG_CONFIG_PATH="$(pwd)/build/local/lib/pkgconfig:$PKG_CONFIG_PATH", CIBW_ARCHS="$CIBW_ARCHS" }
 skip = ["*-musllinux*", "cp38-*", "cp312-*i686"]
 
 
