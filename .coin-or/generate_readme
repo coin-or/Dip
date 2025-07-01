@@ -1,54 +1,78 @@
-# DIP README
+#!/usr/bin/env bash
 
-Welcome to the README for the Decomposition in Integer Programming (DIP)
-Framework. DIP is distributed under the Eclipse Public License and is freely
-redistributable. All source code and documentation is Copyright Matthew
-Galati, Ted Ralphs, Lehigh University, and others. This README may be 
-redistributed freely.
+# Exit when command fails
+set -e
+#Attempt to use undefined variable outputs error message, and forces an exit
+set -u
+#Causes a pipeline to return the exit status of the last command in the pipe
+#that returned a non-zero return value.
+set -o pipefail
+#set -x
 
-## Current Testing Status
+source $COINBREW_HOME/scripts/generate_readme
 
-[![Build Status](https://travis-ci.org/coin-or/Dip.svg?branch=master)](https://travis-ci.org/coin-or/Dip)
+pushd . > /dev/null
+cd $(dirname $0)
+SCRIPT_DIR=$PWD
+popd > /dev/null
 
-[![Build status](https://ci.appveyor.com/api/projects/status/omb0lhiutlh6qnco/branch/master?svg=true)](https://ci.appveyor.com/project/tkralphs/dip/branch/master)
+create_variables $SCRIPT_DIR/config.yml
 
-## Download
+make_header
 
-[ ![Download](https://api.bintray.com/packages/coin-or/download/Dip/images/download.svg?version=0.92) ](https://bintray.com/coin-or/download/Dip/0.92/link)
+echo "DIP (Decomposition in Integer Programming) is a framework for
+implementing a wide variety of decomposition-based algorithms for solving
+integer programs, including full generic column generation in which the user
+need only indicate whic constraints to relax and the framework takes care of
+all other aspects of the column-generation. The problem can be specified using
+[DiPPy](https://pypi.org/project/coinor.dippy/), an extension of the
+Python-based modeling language [PuLP](https://github.com/coin-or/PuLP) (see
+[examples](Dip/src/dippy/examples)). If desired, custom subroutines for solving
+the subproblem, branching, heuristics, etc. can be implemented in pure Python
+and called automatically from C++ during execution of the algorithm.
 
-Binaries for most platforms are available for download from [Bintray](https://bintray.com/coin-or/download/Dip) 
+Dip makes it easy to implement and compare different variety of
+decomposition-based algorithm while keeping as many details of the algorithmic
+implem,entation constant as possible, allowing for rigorous empirical
+comparisons.
 
-## Cite
+Using [DiPPy](https://pypi.org/project/coinor.dippy/), one can even implement
+a full column-generation algorithm within an Excel spreadsheet using [Solver
+Studio](http://solverstudio.org). See screen shots below."
 
-[![DOI](https://zenodo.org/badge/23778922.svg)](https://zenodo.org/badge/latestdoi/23778922)
+make_build_info
 
-## DOCUMENTATION
+echo "## Quickstart with DIP/DipPy
 
-For a quick start guide, please see the INSTALL file in this distribution.
-Automatically generated documentation of the source code can be found here:
+If you are on Linux or OS X, DIP can be installed from source using
+[coinbrew](https://github.com/coin-or/coinbrew) (see below). In Windows, there
+are pre-built binary wheels for DipPy. After build and install of DIP, if you
+are installing DipPy, make sure to set \`PKG_CONFIG_PATH\` to point to the
+directory where the \`.pc\` files are installed (by default, this is in the
+\`lib/pkgconfig\` directory in the installation directory). You may also need to
+set either \`LD_LIBRARY_PATH\` (Linux) or \`DYLD_LIBRARY_PATH\` (OS X) to point to
+the directory where the libraries are installed. Then simply do
+\`\`\`
+pip install coinor.dippy
+\`\`\`
 
-http://www.coin-or.org/Doxygen/Dip/
+After installation, you can try running the examples to see if trhings are
+working. These should all work out of the box. For a listing of examples and
+some brief instructions, do
+\`\`\`
+python -m coinor.dippy.examples
+\`\`\`
+To get help for an example, do, e.g.,
+\`\`\`
+python -m coinor.dippy.example.cflp --help
+\`\`\`
+or just run
+\`\`\`
+python -m coinor.dippy.examples.cflp
+\`\`\`
 
-Further information can be found here:
-
-http://github.com/coin-or/Dip
-
-## SUPPORT
-
-### List Serve
-
-DIP users should use the Dip mailing list. To subscribe, go to 
-http://list.coin-or.org/mailman/listinfo/dip
-
-### Bug Reports
-
-Bug reports should be reported on github at
-
-https://github.com/Dip/issues/new
-
-## SCREEN SHOTS
-
-### Using DipPy in [Solver Studio](http://solverstudio.org)
+## Scrren Shots
+### Using [DiPPy](https://pypi.org/project/coinor.dippy/) in [Solver Studio](http://solverstudio.org)
 ![Solver Studio Pic 1](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic1.png)
 ### Choosing algorithm in [Solver Studio](http://solverstudio.org)
 ![Solver Studio Pic 3](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic3.png)
@@ -57,7 +81,28 @@ https://github.com/Dip/issues/new
 ### Editing DipPy Model with Eclipse and PyDev
 ![DipPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/DipPyPic2.png)
 
-## CHANGELOG
+"
+
+make_doxygen_info
+
+echo "## Additional Documentation
+
+ * C++ [examples](Dip/examples)
+ * [DiPPy](https://pypi.org/project/coinor.dippy/) (Python) [examples](Dip/src/dippy/examples)
+ * Slides providing a brief introduction are [here](https://coral.ise.lehigh.edu/~ted/files/talks/DecompIFORS14.pdf)
+ * Slides providing a much longer introduction are [here](https://coral.ise.lehigh.edu/~ted/files/talks/DecompCSIRO11.pdf)
+ * For the methodological basis, see
+   * [This](http://dx.doi.org/10.1007/s10107-005-0606-3) paper (pre-print [here](http://coral.ie.lehigh.edu/~ted/files/papers/DECOMP04.pdf)); or
+   * [This](http://coral.ie.lehigh.edu/~ted/files/papers/DECOMP04.pdf) more detailed paper; or
+   * [This](http://coral.ie.lehigh.edu/~ted/files/papers/MatthewGalatiDissertation09.pdf) dissertation (much more detailed)
+ * http://coral.ie.lehigh.edu/~ted/files/papers/MatthewGalatiDissertation09.pdf
+"
+make_links
+
+echo "## CHANGELOG
+
+### Release 0.95.0
+ * Python 3 support added
 
 ### Release 0.92.4
  * Update dependencies
@@ -73,7 +118,7 @@ https://github.com/Dip/issues/new
  * Get rid of pesky global variable DecompInf
  * Fix bugs in wedding planner example
  * Fix bugs in DipPy to allow returning no solutions, even when an exact 
-   subprobem solver is used and to allow no branching candidates when 
+   subproblem solver is used and to allow no branching candidates when 
    branching. 
 
 ### Release 0.91.6
@@ -245,4 +290,4 @@ https://github.com/Dip/issues/new
  * Updated externals to new stable versions of dependent projects.
 
  * Minor bug fixes. 
-
+"
