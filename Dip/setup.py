@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_namespace_packages
 import subprocess, os, sys
 from os.path import join, dirname
 from os import listdir
+from subprocess import check_output
 
 def read_file(file_name):
 
@@ -43,7 +44,7 @@ except:
                 if flag.startswith('-I') and flag[2:] not in incDirs:
                     incDirs.append(flag[2:]) 
     except:
-        # If pkg-config fails, then look for an installed Cbc
+        #If pkg-config fails, then look for an installed Cbc
         try:
             location = dirname(
                 check_output(['which', 'cbc']).strip()).decode('utf-8')
@@ -108,8 +109,7 @@ cvpmp_instance_files = [join('Instances', f) for f in
                         listdir(join('src','coinor', 'dippy', 'examples',
                                      'cvpmp'))]
 
-setup(#There must be a better way
-      packages=['coinor.dippy'],
+setup(packages=find_namespace_packages(where='src/'),
       package_dir = {'': 'src'},
       package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
       ext_modules=modules
