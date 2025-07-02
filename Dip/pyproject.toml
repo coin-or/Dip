@@ -1,6 +1,6 @@
 [project]
 name = "coinor.dippy"
-version = "1.95.3"
+version = "1.95.4"
 description="DIP Python Interface"
 readme="README.md"
 authors=[
