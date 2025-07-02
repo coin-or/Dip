@@ -58,6 +58,7 @@ jobs:
 
       - name: Build sdist
         run: pipx run build --sdist
+        working-directory: Dip
 
       - uses: actions/upload-artifact@v4
         with:
