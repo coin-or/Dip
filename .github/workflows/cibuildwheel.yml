@@ -62,14 +62,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cibuildwheel-sdist
-          path: dist/*.tar.gz
+          path: Dip/dist/*.tar.gz
 
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/cylp
+      url: https://pypi.org/p/coinor.dippy
     permissions:
       id-token: write
 

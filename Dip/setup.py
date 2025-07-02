@@ -109,7 +109,7 @@ cvpmp_instance_files = [join('Instances', f) for f in
                         listdir(join('src','coinor', 'dippy', 'examples',
                                      'cvpmp'))]
 
-setup(packages=find_namespace_packages(where='src/'),
+setup(packages=find_namespace_packages(where='src/', include=['coinor.dippy*']),
       package_dir = {'': 'src'},
       package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
       ext_modules=modules
