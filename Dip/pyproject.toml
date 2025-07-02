@@ -29,6 +29,8 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 # Use --no-third-party to avoid linking in GLPK.
 # The resulting binary would not be distributable.
+# We have to fetch in a subdirectory (build) because
+# otherwise, coinbrew doesn't properly get the release.
 before-all = """
   set -x
   apt-get install --yes wget || yum install -y wget || brew install bash coreutils
