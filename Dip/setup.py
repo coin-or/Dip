@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension
 import subprocess, os, sys
 from os.path import join, dirname
 from os import listdir
@@ -84,7 +84,7 @@ if CoinDir != None:
     libDirs = [join(CoinDir, 'lib')]
     incDirs = [join(CoinDir, 'include', 'coin')] 
             
-incDirs.extend(join('Dip', 'src', 'dippy'))
+incDirs.extend(join('src', 'coinor', 'dippy'))
 
 macros = [('__DECOMP_LP_CLP__', None)]
 
@@ -95,7 +95,7 @@ files = ['DippyDecompAlgo.cpp',
          'DippyPythonUtils.cpp',
          ]
 
-sources = [join('Dip', 'src', 'dippy', f) for f in files]
+sources = [join('src', 'coinor', 'dippy', f) for f in files]
 
 modules=[Extension('coinor.dippy._dippy', 
                    sources, 
@@ -105,13 +105,12 @@ modules=[Extension('coinor.dippy._dippy',
                    define_macros=macros)]
 
 cvpmp_instance_files = [join('Instances', f) for f in
-                        listdir(join('Dip', 'src', 'dippy', 'examples',
+                        listdir(join('src','coinor', 'dippy', 'examples',
                                      'cvpmp'))]
 
-setup(namespace_packages=['coinor'],
-      #There must be a better way
-      packages=[pkg.replace('Dip/src','coinor') for pkg in find_packages()],
-      package_dir = {'coinor': 'Dip/src'},
+setup(#There must be a better way
+      packages=['coinor.dippy'],
+      package_dir = {'': 'src'},
       package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
       ext_modules=modules
      )

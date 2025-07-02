@@ -10,8 +10,9 @@ authors=[
   {  name =  "Ted Ralphs", email = "ted@lehigh.edu"  }
 ]
 dependencies = [
-  'pulp>=1.5.4',
-  'coinor.gimpy>=2.0.0'
+  'pulp>=1.5.4,<=2.9.0',
+  'coinor.gimpy>=2.0.0',
+  'future'
 ]
 license='EPL-2.0'
 dynamic=[]
@@ -21,14 +22,9 @@ dynamic=[]
 
 [build-system]
 requires = [
-  'setuptools',
-  'pulp>=1.5.4',
-  'coinor.gimpy>=2.0.0'
+  'setuptools'
 ]
 build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages]
-find = {}  # Scan the project directory with the default parameters
 
 [tool.cibuildwheel]
 # Use --no-third-party to avoid linking in GLPK.
@@ -45,7 +41,7 @@ before-all = """
       arm64) config_args="--build=arm-apple-darwin";;
       aarch64) config_args="--build=aarch64-unknown-linux-gnu";;
   esac
-  ./coinbrew fetch Dip@0.95.1 --no-third-party && eval ./coinbrew build Dip --no-third-party --parallel-jobs 16 --prefix=$(pwd)/local --verbosity 4 $config_args || (cat build/Data/Sample/1.2.12/config.log; echo ignoring errors)
+  ./coinbrew fetch Dip@0.95.1 --no-third-party && eval ./coinbrew build Dip --no-third-party --parallel-jobs 16 --prefix=$(pwd)/local --tests none --verbosity 4 $config_args || (cat build/Data/Sample/1.2.12/config.log; echo ignoring errors)
 """
 environment = { PATH="$(pwd)/build/local/bin:$PATH", LD_LIBRARY_PATH="$(pwd)/build/local/lib:$LD_LIBRARY_PATH", PKG_CONFIG_PATH="$(pwd)/build/local/lib/pkgconfig:$PKG_CONFIG_PATH", COIN_INSTALL_DIR="$(pwd)/build/local", CIBW_ARCHS="$CIBW_ARCHS" }
 skip = ["*-musllinux*", "cp38-*", "cp312-*i686"]
