@@ -16,7 +16,7 @@
 
 SUBDIRS = .
 if HAVE_PYTHON
-SUBDIRS += dippy
+SUBDIRS += coinor/dippy
 endif
 
 ########################################################################

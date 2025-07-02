@@ -2013,7 +2013,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # compiler, if the C++ is set, but the C compiler isn't (only for CXX=cl)
 if test x"$CXX" != x; then
   case "$CXX" in
-    clang* ) ;;
+    clang* | */clang* ) ;;
     cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
       if test x"$CC" = x; then
         CC="$CXX"
@@ -2834,7 +2834,7 @@ echo "$as_me: error: Failed to find a C compiler!" >&2;}
 fi
 # Autoconf incorrectly concludes that cl recognises -g. It doesn't.
 case "$CC" in
-  clang* ) ;;
+  clang* | */clang* ) ;;
   cl* | */cl* | CL* | */CL* )
     if test "$ac_cv_prog_cc_g" = yes ; then
       ac_cv_prog_cc_g=no
@@ -2852,7 +2852,7 @@ CFLAGS="$save_cflags"
 # add automake conditional so we can recognize cl compiler in makefile
 coin_cc_is_cl=false
 case "$CC" in
-  clang* ) ;;
+  clang* | */clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
     coin_cc_is_cl=true
     ;;
@@ -2898,7 +2898,7 @@ if test x"$CFLAGS" = x; then
     case $build in
       *-cygwin* | *-mingw*)
         case "$CC" in
-          clang* ) ;;
+          clang* | */clang* ) ;;
           cl* | */cl* | CL* | */CL*)
             if test "$coin_disable_shared" = yes || test "$enable_shared" = yes ; then
               coin_opt_cflags='-MD -O2'
@@ -3213,7 +3213,7 @@ fi
 
 # Correct the LD variable if we are using the MS or Intel-windows compiler
 case "$CC" in
-  clang* ) ;;
+  clang* | */clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
     LD=link
     ;;
@@ -3713,7 +3713,7 @@ fi
 
 # Autoconf incorrectly concludes that cl recognises -g. It doesn't.
 case "$CXX" in
-  clang* ) ;;
+  clang* | */clang* ) ;;
   cl* | */cl* | CL* | */CL* )
     if test "$ac_cv_prog_cxx_g" = yes ; then
       ac_cv_prog_cxx_g=no
@@ -3763,7 +3763,7 @@ if test x"$CXXFLAGS" = x; then
     case $build in
       *-cygwin* | *-mingw*)
         case "$CXX" in
-          clang* ) ;;
+          clang* | */clang* ) ;;
           cl* | */cl* | CL* | */CL*)
             # The MT and MTd options are mutually exclusive
             if test "$coin_disable_shared" = yes || test "$enable_shared" = yes ; then
@@ -4086,7 +4086,7 @@ fi
 
 # correct the LD variable in a build with MS or Intel-windows compiler
 case "$CXX" in
-  clang* ) ;;
+  clang* | */clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
     LD=link
     ;;
@@ -4130,7 +4130,7 @@ else
       coin_disable_shared=yes
       if test x"$enable_shared" = xyes; then
         case "$CC" in
-          clang* )
+          clang* | */clang* )
             { echo "$as_me:$LINENO: WARNING: Building of DLLs not supported in this configuration." >&5
 echo "$as_me: WARNING: Building of DLLs not supported in this configuration." >&2;}
             ;;
@@ -20329,7 +20329,7 @@ fi
     # sys_lib_search_path_spec
     *-cygwin* | *-mingw*)
        case "$CXX" in
-    clang* )
+    clang* | */clang* )
       # we assume that libtool patches for CLANG are the same as for GNU compiler - correct???
       { echo "$as_me:$LINENO: Applying patches to libtool for CLANG compiler" >&5
 echo "$as_me: Applying patches to libtool for CLANG compiler" >&6;}
@@ -20528,7 +20528,7 @@ if test "$dependency_linking" = auto; then
     case $build in
       *-cygwin* | *-mingw*)
         case "$CC" in
-          clang* )
+          clang* | */clang* )
             dependency_linking=yes
             ;;
           cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
@@ -27648,7 +27648,7 @@ echo "$as_me:$LINENO: checking which command should be used to link input files"
 echo $ECHO_N "checking which command should be used to link input files... $ECHO_C" >&6
 coin_link_input_cmd="$LN_S"
 case "$CC" in
-  clang* ) ;;
+  clang* | */clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
     coin_link_input_cmd=cp ;;
 esac
@@ -27921,7 +27921,7 @@ esac
 
 # Here list all the files that configure should create (except for the
 # configuration header file)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile src/dippy/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/data_extract.sh examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ATM/data_extract.sh examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh examples/SDPUC/README.txt examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc doxydoc/doxygen.conf"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ac_config_files="$ac_config_files Makefile src/Makefile src/coinor/dippy/Makefile examples/Makefile.Examples examples/TSP/Makefile examples/TSP/tsp.parm examples/TSP/data_extract.sh examples/TSP/get_boost.sh examples/TSP/get_concorde.sh examples/SmallIP/Makefile examples/SmallIP/smallip.parm examples/SmallIP/README.txt examples/SmallIP/test.sh examples/MILP/Makefile examples/MILP/milp.parm examples/MILP/data_extract.sh examples/MILP/README.txt examples/MILPBlock/Makefile examples/MILPBlock/milpblock.parm examples/MILPBlock/milpblock.parm2 examples/MILPBlock/data_extract.sh examples/MILPBlock/README.txt examples/MILPBlock/test.sh examples/AP3/Makefile examples/AP3/ap3.parm examples/GAP/Makefile examples/GAP/gap.parm examples/GAP/data_extract.sh examples/GAP/get_pisinger.sh examples/GAP/README.txt examples/MAD/Makefile examples/MAD/mad.parm examples/MCF/Makefile examples/MCF/mcf.parm examples/MCF/data_extract.sh examples/MCF/README.txt examples/MMKP/Makefile examples/MMKP/mmkp.parm examples/MMKP/data_extract.sh examples/MMKP/get_pisinger.sh examples/MMKP/README.txt examples/VRP/Makefile examples/VRP/vrp.parm examples/VRP/data_extract.sh examples/VRP/get_boost.sh examples/VRP/get_concorde.sh examples/VRP/get_cvrpsep.sh examples/ATM/Makefile examples/ATM/atm.parm examples/ATM/data_extract.sh examples/SDPUC/Makefile examples/SDPUC/sdpuc.parm examples/SDPUC/data_extract.sh examples/SDPUC/README.txt examples/ExternalSolvers/Knapsack/Pisinger/Makefile examples/ExternalSolvers/Knapsack/Pisinger/get.pisinger examples/ExternalSolvers/Knapsack/Pisinger/patch.pisinger examples/ExternalSolvers/Knapsack/Pisinger/mcknap.h examples/ExternalSolvers/VRP/get.cvrpsep examples/ExternalSolvers/Graph/get.boost examples/ExternalSolvers/TSP/get.concorde test/Makefile dip.pc dip-uninstalled.pc doxydoc/doxygen.conf"
 
 
 
@@ -27937,7 +27937,7 @@ if test x$coin_skip_ac_output != xyes; then
   # library extension
 
   case "$CC" in
-    clang* )
+    clang* | */clang* )
          LIBEXT=a ;;
     cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
          LIBEXT=lib ;;
@@ -28790,7 +28790,7 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-  "src/dippy/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dippy/Makefile" ;;
+  "src/coinor/dippy/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/coinor/dippy/Makefile" ;;
   "examples/Makefile.Examples" ) CONFIG_FILES="$CONFIG_FILES examples/Makefile.Examples" ;;
   "examples/TSP/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/Makefile" ;;
   "examples/TSP/tsp.parm" ) CONFIG_FILES="$CONFIG_FILES examples/TSP/tsp.parm" ;;
@@ -30123,8 +30123,8 @@ echo "$as_me: error: cannot create directory $dir" >&2;}
     done
   fi
 
-  { echo "$as_me:$LINENO: In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting" >&5
-echo "$as_me: In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting" >&6;}
+  { echo "$as_me:$LINENO: In case of trouble, first consult the troubleshooting page at https://github.com/coin-or-tools/BuildTools/wiki/user-troubleshooting" >&5
+echo "$as_me: In case of trouble, first consult the troubleshooting page at https://github.com/coin-or-tools/BuildTools/wiki/user-troubleshooting" >&6;}
   if test x$coin_projectdir = xyes; then
     { echo "$as_me:$LINENO: Configuration of $PACKAGE_NAME successful" >&5
 echo "$as_me: Configuration of $PACKAGE_NAME successful" >&6;}

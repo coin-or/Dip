@@ -1,0 +1,101 @@
+name: Build and upload to PyPI
+# taken from https://github.com/pypa/cibuildwheel/blob/main/examples/github-deploy.yml
+
+# Build on every branch push, tag push, and pull request change:
+# on: [push, pull_request]
+# Alternatively, to publish when a (published) GitHub Release is created, use the following:
+on:
+  #push:
+  pull_request:
+  release:
+    types:
+      - published
+
+concurrency:
+  # Cancel previous runs of this workflow for the same branch
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}, arch ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x86_64
+          - os: ubuntu-latest
+            arch: i686
+          - os: ubuntu-24.04-arm
+            arch: aarch64
+          - os: macos-13
+            arch: x86_64
+          - os: macos-latest
+            arch: arm64
+    env:
+      CIBW_ARCHS: ${{ matrix.arch }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.0.0
+        with:
+          package-dir: Dip
+          config-file: "{package}/pyproject.toml"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibuildwheel-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        run: pipx run build --sdist
+        working-directory: Dip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibuildwheel-sdist
+          path: dist/*.tar.gz
+
+  upload_pypi:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/cylp
+    permissions:
+      id-token: write
+
+    # upload to PyPI on every tag starting with 'v'
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    # alternatively, to publish when a GitHub Release is created, use the following rule:
+    #if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "cibuildwheel-*"
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+
+  upload_release_assets:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release'}}
+    steps:
+      - name: Upload artifacts to release
+        uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["./wheelhouse/*.whl"]'

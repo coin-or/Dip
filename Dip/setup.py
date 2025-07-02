@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
-from setuptools import setup, Extension, find_packages
+from setuptools import setup, Extension, find_namespace_packages
 import subprocess, os, sys
 from os.path import join, dirname
 from os import listdir
-
-PROJECT = 'coinor.dippy'
-VERSION = '1.95.2'
-URL = 'https://github.com/coin-or/Dip'
-DESC = u'DIP Python Interface'
+from subprocess import check_output
 
 def read_file(file_name):
 
@@ -19,57 +15,42 @@ def read_file(file_name):
 
     return open(file_path).read()
 
+CoinDir = None
+
+libs = []
+libDirs = []
+incDirs = []
+
 try:
-    CoinDir = os.environ['COIN_INSTALL_DIR']
-except:
-    from os.path import abspath, dirname
-
-    try:
-        location = dirname(
-            check_output(['which', 'clp']).strip()).decode('utf-8')
-        CoinDir = abspath(join(location, ".."))
-    except:
+    if len(sys.argv) > 1 and (sys.argv[1] == "sdist" or sys.argv[1] == "egg_info"):
+        # Do not need CoinDir
         pass
-            
-def get_libs():
-    '''
-    Return a list of distinct library names used by ``dependencies``.
-    '''
-    libs = []
-
+    else:
+        CoinDir = os.environ['COIN_INSTALL_DIR']
+except:
+    # If user didn't supply location, then try pkg-config
     try:
-        from subprocess import check_output
-        
-        flags = (check_output(['pkg-config', '--libs', 'dip'])
-                 .strip().decode('utf-8'))
-        libs = [flag[2:] for flag in flags.split()
-                if flag.startswith('-l')]
-        libDirs = [flag[2:] for flag in flags.split()
-                   if flag.startswith('-L')]
-        flags = (check_output(['pkg-config', '--cflags', 'dip'])
-                 .strip().decode('utf-8'))
-        incDirs = [flag[2:] for flag in flags.split() if
-                   flag.startswith('-I')]
-
+        for p in ['dip','alps','cbc','cgl','osi-clp','clp','osi','coinutils']:
+            flags = (check_output(['pkg-config', '--libs', p])
+                     .strip().decode('utf-8'))
+            for flag in flags.split():
+                if flag.startswith('-l') and flag[2:] not in libs:
+                    libs.append(flag[2:]) 
+                if flag.startswith('-L') and flag[2:] not in libDirs:
+                    libDirs.append(flag[2:]) 
+            flags = (check_output(['pkg-config', '--cflags', p])
+                     .strip().decode('utf-8'))
+            for flag in flags.split():
+                if flag.startswith('-I') and flag[2:] not in incDirs:
+                    incDirs.append(flag[2:]) 
     except:
-        if CoinDir != None:
-            
-            if operatingSystem == 'windows':
-                if os.path.exists(join(CoinDir, 'lib', 'Cbc.lib')):
-                    libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
-                            'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
-                else:
-                    libs = ['libDecomp', 'libOsiSym', 'libSym', 'libOsiCbc', 'libCbcSolver',
-                            'libCbc', 'libCgl', 'libOsiClp', 'libClpSolver',  'libClp', 'libOsi',
-                            'libAlps', 'libCoinUtils']
-            else:
-                libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
-                        'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
-                
-            libDirs = [join(CoinDir, 'lib')]
-            incDirs = [join(CoinDir, 'include', 'coin')] 
-                
-        else:
+        #If pkg-config fails, then look for an installed Cbc
+        try:
+            location = dirname(
+                check_output(['which', 'cbc']).strip()).decode('utf-8')
+            CoinDir = abspath(join(location, ".."))
+        except:
+            #Otherwise, raise an exception
             raise Exception('''
             Could not find location of COIN installation.
             Please ensure that either 
@@ -79,8 +60,6 @@ def get_libs():
             at the same location as the libraries. 
             ''')
 
-    return libs, libDirs, incDirs
-
 operatingSystem = sys.platform
 if 'linux' in operatingSystem:
     operatingSystem = 'linux'
@@ -89,7 +68,24 @@ elif 'darwin' in operatingSystem:
 elif 'win' in operatingSystem:
     operatingSystem = 'windows'
 
-libs, libDirs, incDirs = get_libs()
+if CoinDir != None:
+    # We come here if user supplied the installation directory or pkg-config failed
+    if operatingSystem == 'windows':
+        if os.path.exists(join(CoinDir, 'lib', 'Cbc.lib')):
+            libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
+                    'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
+        else:
+            libs = ['libDecomp', 'libOsiSym', 'libSym', 'libOsiCbc', 'libCbcSolver',
+                    'libCbc', 'libCgl', 'libOsiClp', 'libClpSolver',  'libClp', 'libOsi',
+                    'libAlps', 'libCoinUtils']
+    else:
+        libs = ['Decomp', 'OsiSym', 'Sym', 'OsiCbc', 'CbcSolver', 'Cbc', 'Cgl',
+                'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
+                
+    libDirs = [join(CoinDir, 'lib')]
+    incDirs = [join(CoinDir, 'include', 'coin')] 
+            
+incDirs.extend(join('src', 'coinor', 'dippy'))
 
 macros = [('__DECOMP_LP_CLP__', None)]
 
@@ -100,7 +96,7 @@ files = ['DippyDecompAlgo.cpp',
          'DippyPythonUtils.cpp',
          ]
 
-sources = [join('src', 'dippy', f) for f in files]
+sources = [join('src', 'coinor', 'dippy', f) for f in files]
 
 modules=[Extension('coinor.dippy._dippy', 
                    sources, 
@@ -110,14 +106,12 @@ modules=[Extension('coinor.dippy._dippy',
                    define_macros=macros)]
 
 cvpmp_instance_files = [join('Instances', f) for f in
-                        listdir('src/dippy/examples/cvpmp/Instances')]
+                        listdir(join('src','coinor', 'dippy', 'examples',
+                                     'cvpmp'))]
 
-setup(namespace_packages=['coinor'],
-      #There must be a better way
-      packages=[pkg.replace('src','coinor') for pkg in find_packages()],
-      package_dir = {'coinor': 'src'},
+setup(packages=find_namespace_packages(where='src/'),
+      package_dir = {'': 'src'},
       package_data = {'coinor.dippy.examples.cvpmp': cvpmp_instance_files},
-      install_requires=[
       ext_modules=modules
      )
 

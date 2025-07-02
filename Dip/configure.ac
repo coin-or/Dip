@@ -339,7 +339,7 @@ AC_SUBST(CXXFLAGS)
 # configuration header file)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/dippy/Makefile
+                 src/coinor/dippy/Makefile
                  examples/Makefile.Examples
 		 examples/TSP/Makefile
 		 examples/TSP/tsp.parm
