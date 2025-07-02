@@ -42,7 +42,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.0.0
         with:
-          package_dir: Dip/Dip
+          package-dir: Dip
           config-file: "{package}/pyproject.toml"
 
       - uses: actions/upload-artifact@v4
