@@ -318,7 +318,7 @@ void DecompSubModel::solveAsMIPSym(DecompSolverResult*  result,
 	 std::cout << "TM has NO SOLUTION"
 		   << std::endl;
       } else {
-	 std::cerr << "Error: SYPHONMY IP solver status =  "
+	 std::cerr << "Error: SYMPHONY IP solver status =  "
 		   << status << std::endl;
       }
    }
