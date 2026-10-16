@@ -836,11 +836,11 @@ void DecompAlgoPC::solveMasterAsMIPSym(DecompSolverResult* result)
       }
    }
 
-   if (status == (TM_ERROR__USER || TM_ERROR__COMM_ERROR
-                  || TM_ERROR__NUMERICAL_INSTABILITY
-                  || TM_ERROR__ILLEGAL_RETURN_CODE
-                  || TM_ERROR__NO_BRANCHING_CANDIDATE)) {
-      std::cerr << "Error: SYPHONMY IP solver status =  "
+   if (status == TM_ERROR__USER || status == TM_ERROR__COMM_ERROR
+         || status == TM_ERROR__NUMERICAL_INSTABILITY
+         || status == TM_ERROR__ILLEGAL_RETURN_CODE
+         || status == TM_ERROR__NO_BRANCHING_CANDIDATE) {
+      std::cerr << "Error: SYMPHONY IP solver status =  "
                 << status << std::endl;
    }
 
