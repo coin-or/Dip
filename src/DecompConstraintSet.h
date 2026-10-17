@@ -27,7 +27,7 @@ enum ColMarkerType {
 };
 
 // --------------------------------------------------------------------- //
-class DecompConstraintSet {
+class DIPLIB_EXPORT DecompConstraintSet {
 public:
    CoinPackedMatrix*    M;
    int                  nBaseRowsOrig;

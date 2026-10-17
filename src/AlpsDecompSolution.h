@@ -20,7 +20,7 @@
 #include "AlpsDecompModel.h"
 
 //===========================================================================//
-class AlpsDecompSolution : public AlpsSolution {
+class DIPLIB_EXPORT AlpsDecompSolution : public AlpsSolution {
 protected:
    /** Length of solution (number of columns). */
    int      m_size;

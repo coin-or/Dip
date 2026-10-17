@@ -37,6 +37,20 @@
 #ifdef HAVE_CONFIG_H
 #ifdef DIPLIB_BUILD
 #include "config.h"
+
+/* overwrite DIPLIB_EXPORT from config.h when building Dip
+ * we want it to be __declspec(dllexport) when building a DLL on Windows
+ * we want it to be __attribute__((__visibility__("default"))) when building with GCC,
+ *   so user can compile with -fvisibility=hidden
+ */
+#ifdef DLL_EXPORT
+#undef DIPLIB_EXPORT
+#define DIPLIB_EXPORT __declspec(dllexport)
+#elif defined(__GNUC__) && __GNUC__ >= 4
+#undef DIPLIB_EXPORT
+#define DIPLIB_EXPORT __attribute__((__visibility__("default")))
+#endif
+
 #else
 #include "config_dip.h"
 #endif

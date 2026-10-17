@@ -177,21 +177,21 @@ inline double UtilCalculateGap(const double boundLB,
 
 
 // ------------------------------------------------------------------------- //
-CoinPackedVector* UtilPackedVectorFromDense(const int      len,
-      const double* dense,
-      const double   etol);
-void UtilPackedVectorFromDense(const int          len,
-                               const double*      dense,
-                               const double       etol,
-                               CoinPackedVector& v);
+DIPLIB_EXPORT CoinPackedVector* UtilPackedVectorFromDense(const int      len,
+                    const double* dense,
+                    const double   etol);
+DIPLIB_EXPORT void UtilPackedVectorFromDense(const int          len,
+                                             const double*      dense,
+                                             const double       etol,
+                                             CoinPackedVector& v);
 
-void UtilPrintPackedVector(const CoinPackedVector& v,
-                           std::ostream*                 os  = &std::cout,
-                           DecompApp*               app = 0);
-void UtilPrintPackedVector(const CoinPackedVector& v,
-                           std::ostream*                 os,
-                           const std::vector<std::string>&          colNames,
-                           const double*            value = NULL);
+DIPLIB_EXPORT void UtilPrintPackedVector(const CoinPackedVector& v,
+                                         std::ostream*                 os  = &std::cout,
+                                         DecompApp*               app = 0);
+DIPLIB_EXPORT void UtilPrintPackedVector(const CoinPackedVector& v,
+                                         std::ostream*                 os,
+                                         const std::vector<std::string>&          colNames,
+                                         const double*            value = NULL);
 
 
 

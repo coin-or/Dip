@@ -24,7 +24,7 @@
 //===========================================================================//
 //naming convention - usually would do DecompModelXx, DecompModelYy
 //===========================================================================//
-class DecompModel {
+class DIPLIB_EXPORT DecompModel {
 protected:
    DecompConstraintSet*  m_model;
    std::string           m_modelName;
@@ -88,7 +88,7 @@ public:
 };
 
 //===========================================================================//
-class DecompSubModel : public DecompModel {
+class DIPLIB_EXPORT DecompSubModel : public DecompModel {
 private:
    OsiSolverInterface*   m_osi;
    int                   m_numCols;

@@ -31,7 +31,7 @@
 #include <string>
 
 // ----------------------------------------------------------------------- //
-class UtilGraphLib {
+class DIPLIB_EXPORT UtilGraphLib {
 private:
    UtilGraphLib(const UtilGraphLib&);
    UtilGraphLib& operator=(const UtilGraphLib&);

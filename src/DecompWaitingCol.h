@@ -20,7 +20,7 @@
 #include "UtilMacros.h"
 
 // ---------------------------------------------------------------------- //
-class DecompWaitingCol {
+class DIPLIB_EXPORT DecompWaitingCol {
 
 private:
    DecompVar*         m_var;  //s        the variable

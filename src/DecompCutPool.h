@@ -24,7 +24,7 @@ class DecompConstraintSet;
 
 // --------------------------------------------------------------------- //
 //TODO: switch to distance
-class is_greater_thanD { //member of class instead??
+class DIPLIB_EXPORT is_greater_thanD { //member of class instead??
 public:
    //TODO: design, waitingcol, rc is member of var, not waiting col,
    //but for waitingrow, distance is member of wr, not of cut - why?
@@ -35,6 +35,9 @@ public:
 };
 
 // --------------------------------------------------------------------- //
+// The members are exported individually: exporting the whole class makes
+// MSVC instantiate all members of the std::vector base, some of which
+// need a default constructor of the element type.
 class DecompCutPool : public std::vector<DecompWaitingRow> {
 private:
    DecompCutPool(const DecompCutPool&);
@@ -52,22 +55,22 @@ public:
       m_rowsAreValid = rowsAreValid;
    }
 
-   void print(std::ostream* os = &std::cout) const;  //THINK: virtual??
-   void reExpand(const DecompVarList& vars,
-                 const int             n_coreCols,
-                 const int             n_artCols);
+   DIPLIB_EXPORT void print(std::ostream* os = &std::cout) const;  //THINK: virtual??
+   DIPLIB_EXPORT void reExpand(const DecompVarList& vars,
+                               const int             n_coreCols,
+                               const int             n_artCols);
 
-   CoinPackedVector* createRowReform(const int                n_coreCols,
-                                     //const int                n_artCols,
-                                     const CoinPackedVector* row,
-                                     const DecompVarList&     vars);
+   DIPLIB_EXPORT CoinPackedVector* createRowReform(const int                n_coreCols,
+                                                   //const int                n_artCols,
+                                                   const CoinPackedVector* row,
+                                                   const DecompVarList&     vars);
 
    //THINK
    //bool isDuplicate(const DecompWaitingRow & wcol);
 
-   bool calcViolations(const double*             x,
-                       DecompCutPool::iterator   first,
-                       DecompCutPool::iterator   last);
+   DIPLIB_EXPORT bool calcViolations(const double*             x,
+                                     DecompCutPool::iterator   first,
+                                     DecompCutPool::iterator   last);
    bool calcViolations(const double*             x) {
       return calcViolations(x, begin(), end());
    }

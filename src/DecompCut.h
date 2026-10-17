@@ -31,7 +31,7 @@
 #include "UtilHash.h"
 #include "UtilMacros.h"
 
-class DecompCut {
+class DIPLIB_EXPORT DecompCut {
 private:
    double           m_lb;        //row lower bound
    double           m_ub;        //row upper bound

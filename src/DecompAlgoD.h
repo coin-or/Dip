@@ -33,7 +33,7 @@
 #include "DecompAlgoPC.h"
 
 //===========================================================================//
-class DecompAlgoD : public DecompAlgoPC {
+class DIPLIB_EXPORT DecompAlgoD : public DecompAlgoPC {
 private:
 
    //----------------------------------------------------------------------//

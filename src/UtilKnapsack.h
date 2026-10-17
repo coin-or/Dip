@@ -15,6 +15,8 @@
 #ifndef UTIL_KNAPSACK_INCLUDED
 #define UTIL_KNAPSACK_INCLUDED
 
+#include "DecompConfig.h"
+
 
 /*==========================================================================*/
 /*                           SOR_IntDblArr                                  */
@@ -34,27 +36,27 @@ typedef struct SOR_IntDblArrT {
 typedef SOR_IntDblArr   SOR_IntDblArr;
 typedef SOR_IntDblArr* SOR_IntDblArrPtr;
 
-SOR_IntDblArrPtr SOR_IntDblArrNew (int    size,
-                                   int*   pstatus);
-void SOR_IntDblSwap(SOR_IntDbl* A,
-                    SOR_IntDbl* B);
-void SOR_IntDblArrPrint(const SOR_IntDblArr* A);
-void SOR_IntDblArrFree(SOR_IntDblArrPtr* A);
+DIPLIB_EXPORT SOR_IntDblArrPtr SOR_IntDblArrNew (int    size,
+                                                 int*   pstatus);
+DIPLIB_EXPORT void SOR_IntDblSwap(SOR_IntDbl* A,
+                                  SOR_IntDbl* B);
+DIPLIB_EXPORT void SOR_IntDblArrPrint(const SOR_IntDblArr* A);
+DIPLIB_EXPORT void SOR_IntDblArrFree(SOR_IntDblArrPtr* A);
 
 
-void KnapsackSortRatioOut(const int       n,
-                          const double*   p,
-                          const double*   w,
-                          double*         psort,
-                          double*         wsort,
-                          SOR_IntDbl*     ratio);
-int KnapsackOptimizeHS(const int      n,
-                       const double   c,
-                       double*        p,
-                       double*        w,
-                       int*           x,
-                       double*        z,
-                       int*           pstatus);
+DIPLIB_EXPORT void KnapsackSortRatioOut(const int       n,
+                                        const double*   p,
+                                        const double*   w,
+                                        double*         psort,
+                                        double*         wsort,
+                                        SOR_IntDbl*     ratio);
+DIPLIB_EXPORT int KnapsackOptimizeHS(const int      n,
+                                     const double   c,
+                                     double*        p,
+                                     double*        w,
+                                     int*           x,
+                                     double*        z,
+                                     int*           pstatus);
 
 
 

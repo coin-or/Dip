@@ -24,7 +24,7 @@
 #define PARAM_getSetting(xstr, x) x = param.GetSetting(xstr, x, sec)
 
 //===========================================================================//
-class DecompParam {
+class DIPLIB_EXPORT DecompParam {
 
 
    //----------------------------------------------------------------------//

@@ -52,7 +52,7 @@ class CoinWarmStartBasis;
 //===========================================================================//
 
 //===========================================================================//
-class AlpsDecompNodeDesc : public AlpsNodeDesc {
+class DIPLIB_EXPORT AlpsDecompNodeDesc : public AlpsNodeDesc {
 
 private:
 

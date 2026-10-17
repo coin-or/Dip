@@ -59,7 +59,7 @@ class DecompConstraintSet;
 class DecompSolverResult;
 
 //===========================================================================//
-class DecompAlgo {
+class DIPLIB_EXPORT DecompAlgo {
 
 protected:
 

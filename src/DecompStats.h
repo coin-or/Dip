@@ -22,7 +22,7 @@
 //===========================================================================//
 
 //===========================================================================//
-class DecompObjBound {
+class DIPLIB_EXPORT DecompObjBound {
 public:
    /**
     * The phase when bound was recorded.
@@ -90,7 +90,7 @@ public:
 };
 
 //===========================================================================//
-class DecompNodeStats {
+class DIPLIB_EXPORT DecompNodeStats {
 public:
 
    //---
@@ -228,7 +228,7 @@ public:
 
 
 //===========================================================================//
-class DecompStats {
+class DIPLIB_EXPORT DecompStats {
 
 public:
    UtilTimer timerOverall;

@@ -15,6 +15,8 @@
 #ifndef AlpsDecompTreeNode_h_
 #define AlpsDecompTreeNode_h_
 
+#include "DecompConfig.h"
+
 //===========================================================================//
 #include "Alps.h"
 #include "AlpsTreeNode.h"
@@ -24,7 +26,7 @@ class AlpsNodeDesc;
 class AlpsDecompModel;
 
 //===========================================================================//
-class AlpsDecompTreeNode : public AlpsTreeNode {
+class DIPLIB_EXPORT AlpsDecompTreeNode : public AlpsTreeNode {
 private:
    /** class tag for debugging */
    std::string m_classTag;

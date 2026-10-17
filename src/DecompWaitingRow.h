@@ -22,7 +22,7 @@
 //TODO? use to have DecompRow = CoinPackedVector
 
 // ---------------------------------------------------------------------- //
-class DecompWaitingRow {
+class DIPLIB_EXPORT DecompWaitingRow {
 private:
    DecompCut*         m_cut;        //the cut
    CoinPackedVector* m_row;         //the row (in terms of x)

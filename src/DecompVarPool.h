@@ -22,7 +22,7 @@
 class DecompConstraintSet;
 
 // --------------------------------------------------------------------- //
-class is_less_thanD { //member of class instead??
+class DIPLIB_EXPORT is_less_thanD { //member of class instead??
 public:
    bool operator()( const DecompWaitingCol& x,
                     const DecompWaitingCol& y) {
@@ -31,6 +31,9 @@ public:
 };
 
 // --------------------------------------------------------------------- //
+// The members are exported individually: exporting the whole class makes
+// MSVC instantiate all members of the std::vector base, some of which
+// need a default constructor of the element type.
 class DecompVarPool : public std::vector<DecompWaitingCol> {
 private:
    DecompVarPool(const DecompVarPool&);
@@ -48,19 +51,19 @@ public:
       m_colsAreValid = colsAreValid;
    }
 
-   void print(double infinity, std::ostream* os = &std::cout) const;  //THINK: virtual??
-   void reExpand(const DecompConstraintSet& modelCore,
-                 const double                tolZero);
-   bool isDuplicate(const DecompWaitingCol& wcol);
-   bool isDuplicate(const DecompVarList&     vars,
-                    const DecompWaitingCol& wcol);
-   bool isParallel(const DecompVarList&     vars,
-                   const DecompWaitingCol& wcol,
-                   const double             maxCosine);
-   bool setReducedCosts(const double*             u,
-                        const DecompStatus          stat,
-                        DecompVarPool::iterator   first,
-                        DecompVarPool::iterator   last);
+   DIPLIB_EXPORT void print(double infinity, std::ostream* os = &std::cout) const;  //THINK: virtual??
+   DIPLIB_EXPORT void reExpand(const DecompConstraintSet& modelCore,
+                               const double                tolZero);
+   DIPLIB_EXPORT bool isDuplicate(const DecompWaitingCol& wcol);
+   DIPLIB_EXPORT bool isDuplicate(const DecompVarList&     vars,
+                                  const DecompWaitingCol& wcol);
+   DIPLIB_EXPORT bool isParallel(const DecompVarList&     vars,
+                                 const DecompWaitingCol& wcol,
+                                 const double             maxCosine);
+   DIPLIB_EXPORT bool setReducedCosts(const double*             u,
+                                      const DecompStatus          stat,
+                                      DecompVarPool::iterator   first,
+                                      DecompVarPool::iterator   last);
    bool setReducedCosts(const double*             u,
                         const DecompStatus          stat) {
       return setReducedCosts(u, stat, begin(), end());

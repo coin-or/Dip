@@ -61,7 +61,7 @@ class AlpsTreeNode;
 //===========================================================================//
 
 //===========================================================================//
-class AlpsDecompModel : public AlpsModel {
+class DIPLIB_EXPORT AlpsDecompModel : public AlpsModel {
 
 
 private:

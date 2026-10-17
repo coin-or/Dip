@@ -16,10 +16,12 @@
 #ifndef DecompMemPool_h_
 #define DecompMemPool_h_
 
+#include "DecompConfig.h"
+
 #include "CoinError.hpp"
 
 // --------------------------------------------------------------------- //
-class DecompMemPool {
+class DIPLIB_EXPORT DecompMemPool {
 public:
    double* dblArrNCoreCols;
    double* dblArrNCoreRows;

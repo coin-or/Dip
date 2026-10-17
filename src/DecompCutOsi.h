@@ -30,7 +30,7 @@
 //or just use osi?
 
 
-class DecompCutOsi : public DecompCut {
+class DIPLIB_EXPORT DecompCutOsi : public DecompCut {
 private:
    DecompCutOsi(const DecompVar&);
    DecompCutOsi& operator=(const DecompVar&);
