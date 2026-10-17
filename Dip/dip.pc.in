@@ -1,12 +1,15 @@
-prefix=@prefix@
+@COIN_RELOCATABLE_FALSE@prefix=@prefix@
+@COIN_RELOCATABLE_TRUE@prefix=${pcfiledir}/../..
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-includedir=@includedir@/coin
+includedir=@includedir@/coin-or
 
-Name: DIP
+Name: @PACKAGE_NAME@
 Description: Decomposition for Integer Programs
-URL: https://projects.coin-or.org/Dip
+URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lDecomp @DIPLIB_PCLIBS@ @DIP_OPENMP_LIBS@
-Cflags: -I${includedir} @DIP_OPENMP_FLAGS@
-Requires: @DIPLIB_PCREQUIRES@
+Cflags: -I${includedir}
+@COIN_STATIC_BUILD_FALSE@Libs: -L${libdir} -lDecomp
+@COIN_STATIC_BUILD_FALSE@Requires.private: @DIPLIB_PCFILES@
+@COIN_STATIC_BUILD_TRUE@Libs: -L${libdir} -lDecomp @DIPLIB_LFLAGS_NOPC@
+@COIN_STATIC_BUILD_TRUE@Requires: @DIPLIB_PCFILES@

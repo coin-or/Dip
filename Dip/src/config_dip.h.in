@@ -43,4 +43,7 @@
 /* Whether we have Gurobi */
 #undef DIP_HAS_GRB
 
+/* Whether we have Xpress */
+#undef DIP_HAS_XPR
+
 #endif

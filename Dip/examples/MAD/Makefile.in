@@ -60,12 +60,6 @@ CXXFLAGS = @CXXFLAGS@
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Directory with COIN header files
-COININCDIR = @abs_include_dir@
-
-# Directory with COIN libraries
-COINLIBDIR = @abs_lib_dir@
-
 # Necessary Include dirs (we use the CYGPATH_W variables to allow
 # compilation with Windows compilers)
 INCL =  -I`$(CYGPATH_W) $(COININCDIR)` $(ADDINCFLAGS)

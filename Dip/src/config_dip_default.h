@@ -18,7 +18,7 @@
 /***************************************************************************/
 
 /* Version number of project */
-#define DIP_VERSION "trunk"
+#define DIP_VERSION "devel"
 
 /* Major Version number of project */
 #define DIP_VERSION_MAJOR   9999

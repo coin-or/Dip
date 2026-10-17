@@ -42,13 +42,13 @@
 /***************************************************************************/
 
 /* Define to 1 if the Cgl package is used */
-#define COIN_HAS_CGL 1
+#define DIP_HAS_CGL 1
 
 /* Define to 1 if the CoinUtils package is used */
-#define COIN_HAS_COINUTILS 1
+#define DIP_HAS_COINUTILS 1
 
 /* Define to 1 if the Osi package is available */
-#define COIN_HAS_OSI 1
+#define DIP_HAS_OSI 1
 
 /* Define to the debug sanity check level (0 is no test) */
 //#define COIN_DECOMP_CHECKLEVEL 0

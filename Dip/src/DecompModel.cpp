@@ -261,7 +261,7 @@ void DecompSubModel::solveAsMIPSym(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef COIN_HAS_SYMPHONY
+#ifdef DIP_HAS_SYMPHONY
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    double* solution = new double[numCols];
@@ -389,7 +389,7 @@ void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef COIN_HAS_CBC
+#ifdef DIP_HAS_CBC
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    //TODO: what exactly does this do? make copy of entire model!?
@@ -611,7 +611,7 @@ void DecompSubModel::solveAsMIPCpx(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef COIN_HAS_CPX
+#ifdef DIP_HAS_CPX
    const int numCols    = m_osi->getNumCols();
    const int logIpLevel = param.LogIpLevel;
    double* solution = new double[numCols];
@@ -944,7 +944,7 @@ void DecompSubModel::solveAsMIPGrb(DecompSolverResult*  result,
 				   double               cutoff,
 				   double               timeLimit)
 {
-#ifdef COIN_HAS_GRB
+#ifdef DIP_HAS_GRB
    int stat;
    const int numCols    = m_osi->getNumCols();
 

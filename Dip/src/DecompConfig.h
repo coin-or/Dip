@@ -32,9 +32,10 @@
  */
 
 #ifndef __DIPCONFIG_H__
+#define __DIPCONFIG_H__
 
 #ifdef HAVE_CONFIG_H
-#ifdef DIP_BUILD
+#ifdef DIPLIB_BUILD
 #include "config.h"
 #else
 #include "config_dip.h"
@@ -42,7 +43,7 @@
 
 #else /* HAVE_CONFIG_H */
 
-#ifdef DIP_BUILD
+#ifdef DIPLIB_BUILD
 #include "config_default.h"
 #else
 #include "config_dip_default.h"
