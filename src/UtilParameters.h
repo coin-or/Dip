@@ -15,6 +15,8 @@
 #ifndef UTIL_PARAMETERS_INCLUDED
 #define UTIL_PARAMETERS_INCLUDED
 
+#include "DecompConfig.h"
+
 //===========================================================================//
 #include <map>
 #include <string>
@@ -23,7 +25,7 @@
 #include <vector>
 
 //===========================================================================//
-class UtilParameters {
+class DIPLIB_EXPORT UtilParameters {
 private:
    std::map<std::string, std::string> m_paramMap;
 

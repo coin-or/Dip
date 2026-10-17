@@ -45,7 +45,7 @@ class DecompAlgo;
  */
 
 //===========================================================================//
-class DecompApp {
+class DIPLIB_EXPORT DecompApp {
 
 private:
    /**

@@ -111,7 +111,7 @@ const double DecompZero     = 1.0e-14;
 //---
 
 
-struct DecompMainParam {
+struct DIPLIB_EXPORT DecompMainParam {
    bool doCut;
    bool doPriceCut;
    bool doDirect;

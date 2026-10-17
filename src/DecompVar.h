@@ -26,7 +26,7 @@ class DecompApp;
 class DecompSubModel;
 
 // --------------------------------------------------------------------- //
-class DecompVar {
+class DIPLIB_EXPORT DecompVar {
 public:
    //THINK: or user overriden way to store it (like a tree)
    //and a function which says expandVarToCol - just as in cuts

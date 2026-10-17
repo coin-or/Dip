@@ -21,7 +21,7 @@
 #include "DecompAlgo.h"
 
 //===========================================================================//
-class DecompAlgoRC : public DecompAlgo {
+class DIPLIB_EXPORT DecompAlgoRC : public DecompAlgo {
 
    //----------------------------------------------------------------------//
    /**

@@ -15,6 +15,8 @@
 #ifndef UtilMacrosAlps_h_
 #define UtilMacrosAlps_h_
 
+#include "DecompConfig.h"
+
 //===========================================================================//
 #include "Alps.h"
 
@@ -26,11 +28,11 @@ class CoinWarmStartBasis;
 
 //===========================================================================//
 /** Pack coin warm start into an encoded object. */
-int UtilAlpsEncodeWarmStart(AlpsEncoded*               encoded,
-                            const CoinWarmStartBasis* ws);
+DIPLIB_EXPORT int UtilAlpsEncodeWarmStart(AlpsEncoded*               encoded,
+                                          const CoinWarmStartBasis* ws);
 
 /** Unpack coin warm start from an encoded object. */
-CoinWarmStartBasis* UtilAlpsDecodeWarmStart(AlpsEncoded&       encoded,
-      AlpsReturnStatus* rc);
+DIPLIB_EXPORT CoinWarmStartBasis* UtilAlpsDecodeWarmStart(AlpsEncoded&       encoded,
+                    AlpsReturnStatus* rc);
 
 #endif

@@ -15,6 +15,15 @@
 /* include the COIN-OR-wide system specific configure header */
 #include "configall_system.h"
 
+/* this needs to come before the include of config_dip_default.h */
+#ifndef DIPLIB_EXPORT
+#if defined(_WIN32) && defined(DLL_EXPORT)
+#define DIPLIB_EXPORT __declspec(dllexport)
+#else
+#define DIPLIB_EXPORT
+#endif
+#endif
+
 /* include the public project specific macros */
 #include "config_dip_default.h"
 

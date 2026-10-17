@@ -15,6 +15,8 @@
 #ifndef UTIL_MACROS_INCLUDED
 #define UTIL_MACROS_INCLUDED
 
+#include "DecompConfig.h"
+
 // =========================================================================
 #include <cstdio>
 #include <cassert>
@@ -231,7 +233,7 @@ inline int UtilIndexU(const int i, const int j)
 }
 
 /*-----------------------------------------------------------------------*/
-std::pair<int, int> UtilBothEndsU(const int index);
+DIPLIB_EXPORT std::pair<int, int> UtilBothEndsU(const int index);
 
 /*-----------------------------------------------------------------------*/
 inline void UtilPrintEdge(const int   index,
@@ -531,18 +533,18 @@ inline double UtilFracPart(const double x)
 }
 
 // ------------------------------------------------------------------------- //
-int UtilScaleDblToIntArr(const int      arrLen,
-                         const double* arrDbl,
-                         int*           arrInt,
-                         const double   oneDbl,
-                         int*           oneInt,
-                         const double   epstol = UtilEpsilon);
+DIPLIB_EXPORT int UtilScaleDblToIntArr(const int      arrLen,
+                                       const double* arrDbl,
+                                       int*           arrInt,
+                                       const double   oneDbl,
+                                       int*           oneInt,
+                                       const double   epstol = UtilEpsilon);
 
 // ------------------------------------------------------------------------- //
-int UtilScaleDblToIntArr(const int      arrLen,
-                         const double* arrDbl,
-                         int*           arrInt,
-                         const double   epstol = UtilEpsilon);
+DIPLIB_EXPORT int UtilScaleDblToIntArr(const int      arrLen,
+                                       const double* arrDbl,
+                                       int*           arrInt,
+                                       const double   epstol = UtilEpsilon);
 
 // ------------------------------------------------------------------------- //
 inline bool UtilIsZero(const double x,

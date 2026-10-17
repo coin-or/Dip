@@ -35,3 +35,11 @@
 /* Define to 1 if the Cbc package is available */
 #define DIP_HAS_CBC 1
 
+#ifndef DIPLIB_EXPORT
+#if defined(_WIN32) && defined(DLL_EXPORT)
+#define DIPLIB_EXPORT __declspec(dllimport)
+#else
+#define DIPLIB_EXPORT
+#endif
+#endif
+

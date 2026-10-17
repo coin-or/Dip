@@ -30,7 +30,7 @@
 #include "DecompSolution.h"
 
 //===========================================================================//
-class DecompSolverResult {
+class DIPLIB_EXPORT DecompSolverResult {
 
    //----------------------------------------------------------------------//
    /**

@@ -16,26 +16,28 @@
 #ifndef UTIL_HASH_INCLUDED
 #define UTIL_HASH_INCLUDED
 
+#include "DecompConfig.h"
+
 #include <string>
 
-std::string UtilCreateStringHash(const int      len,
-                                 const double* els,
-                                 const int      precision = 6);
+DIPLIB_EXPORT std::string UtilCreateStringHash(const int      len,
+                                               const double* els,
+                                               const int      precision = 6);
 
-std::string UtilCreateStringHash(const int      len,
-                                 const int*     ind,
-                                 const double* els,
-                                 const int      precision = 6);
-std::string UtilCreateStringHash(const int      len,
-                                 const int*     ind,
-                                 const double   els,
-                                 const int      precision = 6);
-std::string UtilCreateStringHash(const int      len,
-                                 const int*     ind,
-                                 const double* els,
-                                 const char     sense,
-                                 const double   rhs,
-				 const double   infinity,
-                                 const int      precision = 6);
+DIPLIB_EXPORT std::string UtilCreateStringHash(const int      len,
+                                               const int*     ind,
+                                               const double* els,
+                                               const int      precision = 6);
+DIPLIB_EXPORT std::string UtilCreateStringHash(const int      len,
+                                               const int*     ind,
+                                               const double   els,
+                                               const int      precision = 6);
+DIPLIB_EXPORT std::string UtilCreateStringHash(const int      len,
+                                               const int*     ind,
+                                               const double* els,
+                                               const char     sense,
+                                               const double   rhs,
+              				 const double   infinity,
+                                               const int      precision = 6);
 
 #endif

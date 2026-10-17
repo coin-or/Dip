@@ -16,6 +16,9 @@
 #ifndef __CONFIG_DIP_H__
 #define __CONFIG_DIP_H__
 
+/* Library Visibility Attribute */
+#undef DIPLIB_EXPORT
+
 /* Version number of project */
 #undef DIP_VERSION
 

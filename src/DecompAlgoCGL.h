@@ -38,7 +38,7 @@
 #include "CglMixedIntegerRounding2.hpp"
 
 //===========================================================================//
-class DecompAlgoCGL {
+class DIPLIB_EXPORT DecompAlgoCGL {
 
    //----------------------------------------------------------------------//
    /**

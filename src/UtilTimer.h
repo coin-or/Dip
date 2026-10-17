@@ -15,12 +15,14 @@
 #ifndef UTIL_TIMER_INCLUDED
 #define UTIL_TIMER_INCLUDED
 
+#include "DecompConfig.h"
+
 //===========================================================================//
 #include "CoinTime.hpp"
 
 //===========================================================================//
 /* A timer used to record cpu and wallclock time. */
-class UtilTimer {
+class DIPLIB_EXPORT UtilTimer {
 private:
    /** Start, end markers. */
    double startCpu_;

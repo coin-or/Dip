@@ -20,6 +20,7 @@ using namespace std;
 
 #include "UtilMacros.h"
 #include "Decomp.h"
+#include "UtilHash.h"
 
 //http://burtleburtle.net/bob/hash/evahash.html or just map?
 //if this is not really doing hashing, then move this function into

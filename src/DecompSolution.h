@@ -15,8 +15,10 @@
 #ifndef DECOMP_SOLUTION_INCLUDED
 #define DECOMP_SOLUTION_INCLUDED
 
+#include "DecompConfig.h"
+
 //TODO: make this public AlpsDecompSolution?
-class DecompSolution {
+class DIPLIB_EXPORT DecompSolution {
 protected:
    /** Length of solution (number of columns). */
    int      m_size;
