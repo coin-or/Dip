@@ -83,7 +83,7 @@ if CoinDir != None:
                 'OsiClp', 'ClpSolver',  'Clp', 'Osi', 'Alps', 'CoinUtils']
                 
     libDirs = [join(CoinDir, 'lib')]
-    incDirs = [join(CoinDir, 'include', 'coin')] 
+    incDirs = [join(CoinDir, 'include', 'coin-or')] 
             
 incDirs.extend(join('src', 'coinor', 'dippy'))
 

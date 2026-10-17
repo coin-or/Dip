@@ -26,31 +26,31 @@ Dependencies:
     Required: Required
   - Description: COIN-OR Utilities
     URL: https://github.com/coin-or/CoinUtils
-    Version: 2.11
+    Version: master
     Required: Required
   - Description: Open Solver Interface
     URL: https://github.com/coin-or/Osi
-    Version: 0.108
+    Version: master
     Required: Required
   - Description: COIN-OR LP Solver
     URL: https://github.com/coin-or/Clp
-    Version: 1.17
+    Version: master
     Required: Required
   - Description: The Cut Generator Library
     URL: https://github.com/coin-or/Cgl
-    Version: 0.60
+    Version: master
     Required: Required
   - Description: COIN-OR Branch-and-cut
     URL: https://github.com/coin-or/Cbc
-    Version: 2.10
+    Version: master
     Required: Required
-  - Description: Abstract Library for Parallel Search.
+  - Description: Abstract Library for Parallel Search
     URL: https://github.com/coin-or/CHiPPS-ALPS
-    Version: 1.5
+    Version: 1.6
     Required: Required
-  - Description: Abstract Library for Parallel Search.
+  - Description: SYMPHONY MILP Solver
     URL: https://github.com/coin-or/SYMPHONY
-    Version: 5.6
+    Version: master
     Required: Required
   - Description: Basic Linear Algebra Subroutines (BLAS)
     URL: http://www.netlib.org/blas
