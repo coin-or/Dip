@@ -21,7 +21,7 @@ need only indicate whic constraints to relax and the framework takes care of
 all other aspects of the column-generation. The problem can be specified using
 [DiPPy](https://pypi.org/project/coinor.dippy/), an extension of the
 Python-based modeling language [PuLP](https://github.com/coin-or/PuLP) (see
-[examples](Dip/src/dippy/examples)). If desired, custom subroutines for solving
+[examples](src/coinor/dippy/examples)). If desired, custom subroutines for solving
 the subproblem, branching, heuristics, etc. can be implemented in pure Python
 and called automatically from C++ during execution of the algorithm.
 
@@ -158,13 +158,13 @@ python -m coinor.dippy.examples.cflp
 
 ## Screen Shots
 ### Using [DiPPy](https://pypi.org/project/coinor.dippy/) in [Solver Studio](http://solverstudio.org)
-![Solver Studio Pic 1](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic1.png)
+![Solver Studio Pic 1](https://raw.githubusercontent.com/coin-or/Dip/master/images/SolverStudioPic1.png)
 ### Choosing algorithm in [Solver Studio](http://solverstudio.org)
-![Solver Studio Pic 3](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/SolverStudioPic3.png)
+![Solver Studio Pic 3](https://raw.githubusercontent.com/coin-or/Dip/master/images/SolverStudioPic3.png)
 ### Displaying search tree using [GrUMPy](https://github.com/coin-or/GrUMPy)
-![GrUMPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/GrUMPyPic.png)
+![GrUMPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/images/GrUMPyPic.png)
 ### Editing DipPy Model with Eclipse and PyDev
-![DipPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/Dip/images/DipPyPic2.png)
+![DipPy Pic](https://raw.githubusercontent.com/coin-or/Dip/master/images/DipPyPic2.png)
 
 ## Doxygen Documentation
 
@@ -181,8 +181,8 @@ documentation [here](http://coin-or.github.io/Dip/Doxygen).
 
 ## Additional Documentation
 
- * C++ [examples](Dip/examples)
- * [DiPPy](https://pypi.org/project/coinor.dippy/) (Python) [examples](Dip/src/dippy/examples)
+ * C++ [examples](examples)
+ * [DiPPy](https://pypi.org/project/coinor.dippy/) (Python) [examples](src/coinor/dippy/examples)
  * Slides providing a brief introduction are [here](https://coral.ise.lehigh.edu/~ted/files/talks/DecompIFORS14.pdf)
  * Slides providing a much longer introduction are [here](https://coral.ise.lehigh.edu/~ted/files/talks/DecompCSIRO11.pdf)
  * For the methodological basis, see

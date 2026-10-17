@@ -1,0 +1,81 @@
+#===========================================================================#
+# This file is part of the Decomp Solver Framework.                         #
+#                                                                           #
+# Decomp is distributed under the Common Public License as part of the      #
+# COIN-OR repository (http://www.coin-or.org).                              #
+#                                                                           #
+# Authors: Matthew Galati, SAS Institute Inc.                               #
+#          Ted Ralphs, Lehigh University                                    #
+#          Jiadong Wang, Lehigh University                                  #
+#                                                                           #
+# Copyright (C) 2002-2019, Lehigh University, Matthew Galati, and Ted Ralphs#
+# All Rights Reserved.                                                      #
+#===========================================================================#
+
+###########################################################################
+# C++ Compiler command and flags
+###########################################################################
+
+CXX = @CXX@
+
+CXXFLAGS = @CXXFLAGS@
+
+CXXLINKFLAGS = @RPATH_FLAGS@
+
+###########################################################################
+# directories for finding COIN packages (if pkg-config is not available)
+###########################################################################
+
+prefix = @prefix@
+
+exec_prefix = @exec_prefix@
+
+COININCDIR = @includedir@/coin-or
+
+COINLIBDIR = @libdir@
+
+###########################################################################
+# The following is necessary under cygwin, if native compilers are used
+###########################################################################
+
+CYGPATH_W = @CYGPATH_W@
+
+###########################################################################
+# define DECOMP libs
+###########################################################################
+
+# The examples use the dependencies of Dip directly, so link them, too
+@COIN_HAS_PKGCONFIG_TRUE@LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip @DIPLIB_PCFILES@`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS += -L$(COINLIBDIR) -lDecomp @DIPLIB_LFLAGS_NOPC@
+
+CFLAGS += -DCOIN_ASSERT
+
+###########################################################################
+# define CFLAGS
+###########################################################################
+
+@COIN_HAS_PKGCONFIG_TRUE@CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags dip`
+@COIN_HAS_PKGCONFIG_FALSE@CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)` @DIPLIB_CFLAGS_NOPC@
+
+###########################################################################
+# default targets
+###########################################################################
+
+all: $(EXE)
+
+.SUFFIXES: .cpp .c .o .obj
+
+$(EXE): $(OBJS) $(DEPS)
+	bla=;\
+	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS) $(ADDLIBS)
+
+clean:
+	rm -rf $(EXE) $(OBJS)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
+
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

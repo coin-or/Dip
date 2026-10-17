@@ -4,99 +4,73 @@
 # DIP is distributed under the Eclipse Public License as part of the         #
 # COIN-OR repository (http://www.coin-or.org).                               #
 #                                                                            #
-# Authors: Matthew Galati, SAS Institute Inc.                                #
-#          Ted Ralphs, Lehigh University                                     #
-#          Jiadong Wang, Lehigh University                                   #
+# Author: Matthew Galati,  SAS Institute Inc.                                #
+#                                                                            #
+# Conceptual Design: Matthew Galati, SAS Institute Inc.                      #
+#                    Ted Ralphs, Lehigh University                           #
 #                                                                            #
 # Copyright (C) 2002-2019, Lehigh University, Matthew Galati, Ted Ralphs     #
 # All Rights Reserved.                                                       #
 #============================================================================#
 
-AUTOMAKE_OPTIONS = foreign
-EXTRA_DIST = doxydoc/all/doxygen.conf  \
-	doxydoc/Dip/doxygen.conf    \
-	doxydoc/CoinUtils/doxygen.conf \
-	doxydoc/Osi/doxygen.conf       \
-	doxydoc/Clp/doxygen.conf       \
-	doxydoc/Cgl/doxygen.conf       \
-	doxydoc/Cbc/doxygen.conf       \
-	doxydoc/Alps/doxygen.conf 
+include BuildTools/Makemain.inc
 
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
-# subdirs is set by configure as the list of all subdirectories to recurse
-SUBDIRS = $(subdirs)
-SUBDIRS_DOXY = $(SUBDIRS) all
+
+SUBDIRS = src
+
+########################################################################
+#             Additional files to be included in tarball               #
+########################################################################
+
+pkgconfiglib_DATA = dip.pc
 
 ########################################################################
 #                           Extra Targets                              #
 ########################################################################
 
 test: all
-	cd Dip; $(MAKE) test
+	cd test; $(MAKE) test
 
+if COIN_HAS_CBC
 test_cbc: all
-	cd Dip; $(MAKE) test_cbc
+	cd test; $(MAKE) test_cbc
+endif
 
+if COIN_HAS_SYMPHONY
 test_symphony: all
-	cd Dip; $(MAKE) test_symphony
+	cd test; $(MAKE) test_symphony
+endif
 
+if COIN_HAS_CPX
 test_cpx: all
-	cd Dip; $(MAKE) test_cpx
+	cd test; $(MAKE) test_cpx
+endif
 
+if COIN_HAS_GRB
 test_grb: all
-	cd Dip; $(MAKE) test_grb
+	cd test; $(MAKE) test_grb
+endif
 
-tests: all
-	for dir in $(SUBDIRS); do \
-	  if test -r $$dir/test/Makefile; then \
-	    (cd $$dir; $(MAKE) test) \
-	  fi; \
-	done
+if COIN_HAS_XPR
+test_xpr: all
+	cd test; $(MAKE) test_xpr
+endif
 
-unitTests: tests
+unitTest: test
 
-# Generate doxygen doc'n in subdirectories (except @PACKAGE_NAME@) if a doxydoc
-# directory is present, then do the base, if present.
+# Doxygen documentation
 
-doxydoc:
-	for dir in $(subdirs) ; do \
-	  if test $$dir != @PACKAGE_NAME@ && test -r $$dir/doxydoc ; then \
-	    (cd $$dir ; $(MAKE) doxydoc) \
-	  fi ; \
-	done ; \
-	if test -r doxydoc/doxygen.conf ; then \
-	  doxygen doxydoc/doxygen.conf ; \
-	fi
+clean-local: clean-doxygen-docs
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
 
-clean-doxydoc:
-	( cd doxydoc ; rm -rf html *.log *.tag )
+distclean-local:
+	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
-# DocInstallDir is defined in Makemain.inc and is specific to the package.
-# For the short term, adopt the notion that we install only the package
-# doxydoc.
+install-exec-local: install-doc
 
-install-doxydoc: doxydoc
-	if test -r doxydoc/doxygen.conf ; then \
-	  $(mkdir_p) $(DocInstallDir) ; \
-	  cp -R doxydoc $(DocInstallDir) ; \
-	fi
+uninstall-local: uninstall-doc uninstall-doxygen-docs
 
-uninstall-doxydoc:
-	rm -rf $(DocInstallDir)/doxydoc
-
-clean-local: clean-doxydoc
-# install-data-local: install-doxydoc
-uninstall-local: uninstall-doxydoc
-
-.PHONY: test tests unitTests doxydoc
-
-########################################################################
-#                         Maintainer Stuff                             #
-########################################################################
-
-# Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES = coin_subdirs.txt
-
-include BuildTools/Makemain.inc
+.PHONY: test unitTest doxydoc

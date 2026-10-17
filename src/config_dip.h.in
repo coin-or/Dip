@@ -1,0 +1,52 @@
+//===========================================================================//
+// This file is part of the DIP Solver Framework.                            //
+//                                                                           //
+// DIP is distributed under the Eclipse Public License as part of the        //
+// COIN-OR repository (http://www.coin-or.org).                              //
+//                                                                           //
+// Author: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)       //
+//                                                                           //
+// Conceptual Design: Matthew Galati, SAS Institute Inc.                     //
+//                    Ted Ralphs, Lehigh University                          //
+//                                                                           //
+// Copyright (C) 2002-2019, Lehigh University, Matthew Galati, Ted Ralphs    //
+// All Rights Reserved.                                                      //
+//===========================================================================//
+
+#ifndef __CONFIG_DIP_H__
+#define __CONFIG_DIP_H__
+
+/* Library Visibility Attribute */
+#undef DIPLIB_EXPORT
+
+/* Version number of project */
+#undef DIP_VERSION
+
+/* Major Version number of project */
+#undef DIP_VERSION_MAJOR
+
+/* Minor Version number of project */
+#undef DIP_VERSION_MINOR
+
+/* Release Version number of project */
+#undef DIP_VERSION_RELEASE
+
+/* Whether we have CLP */
+#undef DIP_HAS_CLP
+
+/* Whether we have SYMPHONY */
+#undef DIP_HAS_SYMPHONY
+
+/* Whether we have CBC */
+#undef DIP_HAS_CBC
+
+/* Whether we have CPLEX */
+#undef DIP_HAS_CPX
+
+/* Whether we have Gurobi */
+#undef DIP_HAS_GRB
+
+/* Whether we have Xpress */
+#undef DIP_HAS_XPR
+
+#endif

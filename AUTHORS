@@ -1,4 +1,11 @@
-For DIP author information, please see the AUTHORS file in the DIP
-subdirectory. For author information for any other COIN-OR or third-party
-source code that was automatically checked out with DECOMP, please see the
-AUTHORS file in the appropriate subdirectories.
+DIP
+
+Matthew Galati (matthew.galati@sas.com)
+Ted Ralphs (ted@lehigh.edu)
+Jiadong Wang (jiw508@lehigh.edu)
+
+DIPPY
+
+Michael O'Sullivan
+Qi-Shan Lim
+Stuart Mitchell

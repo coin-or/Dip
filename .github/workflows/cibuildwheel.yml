@@ -41,7 +41,6 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.0.0
         with:
-          package-dir: Dip
           config-file: "{package}/pyproject.toml"
 
       - uses: actions/upload-artifact@v4
@@ -57,12 +56,11 @@ jobs:
 
       - name: Build sdist
         run: pipx run build --sdist
-        working-directory: Dip
 
       - uses: actions/upload-artifact@v4
         with:
           name: cibuildwheel-sdist
-          path: Dip/dist/*.tar.gz
+          path: dist/*.tar.gz
 
   upload_pypi:
     needs: [build_wheels, build_sdist]

@@ -1,0 +1,63 @@
+//===========================================================================//
+// This file is part of the DIP Solver Framework.                            //
+//                                                                           //
+// DIP is distributed under the Eclipse Public License as part of the        //
+// COIN-OR repository (http://www.coin-or.org).                              //
+//                                                                           //
+// Authors: Matthew Galati, SAS Institute Inc. (matthew.galati@sas.com)      //
+//          Ted Ralphs, Lehigh University (ted@lehigh.edu)                   //
+//          Jiadong Wang, Lehigh University (jiw408@lehigh.edu)              //
+//                                                                           //
+// Copyright (C) 2002-2019, Lehigh University, Matthew Galati, Ted Ralphs    //
+// All Rights Reserved.                                                      //
+//===========================================================================//
+
+#ifndef UTIL_KNAPSACK_INCLUDED
+#define UTIL_KNAPSACK_INCLUDED
+
+#include "DecompConfig.h"
+
+
+/*==========================================================================*/
+/*                           SOR_IntDblArr                                  */
+/*==========================================================================*/
+
+typedef struct SOR_IntDblT {
+   int    i;
+   double x;
+} SOR_IntDbl;
+
+typedef struct SOR_IntDblArrT {
+   SOR_IntDbl* arr;
+   int          len;
+   int          size;
+} SOR_IntDblArr;
+
+typedef SOR_IntDblArr   SOR_IntDblArr;
+typedef SOR_IntDblArr* SOR_IntDblArrPtr;
+
+DIPLIB_EXPORT SOR_IntDblArrPtr SOR_IntDblArrNew (int    size,
+                                                 int*   pstatus);
+DIPLIB_EXPORT void SOR_IntDblSwap(SOR_IntDbl* A,
+                                  SOR_IntDbl* B);
+DIPLIB_EXPORT void SOR_IntDblArrPrint(const SOR_IntDblArr* A);
+DIPLIB_EXPORT void SOR_IntDblArrFree(SOR_IntDblArrPtr* A);
+
+
+DIPLIB_EXPORT void KnapsackSortRatioOut(const int       n,
+                                        const double*   p,
+                                        const double*   w,
+                                        double*         psort,
+                                        double*         wsort,
+                                        SOR_IntDbl*     ratio);
+DIPLIB_EXPORT int KnapsackOptimizeHS(const int      n,
+                                     const double   c,
+                                     double*        p,
+                                     double*        w,
+                                     int*           x,
+                                     double*        z,
+                                     int*           pstatus);
+
+
+
+#endif

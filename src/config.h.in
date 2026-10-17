@@ -1,0 +1,120 @@
+/* src/config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to 1 if your C++ compiler doesn't accept -c and -o together. */
+#undef CXX_NO_MINUS_C_MINUS_O
+
+/* Library Visibility Attribute */
+#undef DIPLIB_EXPORT
+
+/* Define to 1 if Alps is available. */
+#undef DIP_HAS_ALPS
+
+/* Define to 1 if Cbc is available. */
+#undef DIP_HAS_CBC
+
+/* Define to 1 if Cgl is available. */
+#undef DIP_HAS_CGL
+
+/* Define to 1 if Clp is available. */
+#undef DIP_HAS_CLP
+
+/* Define to 1 if CoinUtils is available. */
+#undef DIP_HAS_COINUTILS
+
+/* Define to 1 if Cpx is available. */
+#undef DIP_HAS_CPX
+
+/* Define to 1 if Grb is available. */
+#undef DIP_HAS_GRB
+
+/* Define to 1 if the HMetis package is available */
+#undef DIP_HAS_HMETIS
+
+/* Define to 1 if Osi is available. */
+#undef DIP_HAS_OSI
+
+/* Define to 1 if OsiCbc is available. */
+#undef DIP_HAS_OSICBC
+
+/* Define to 1 if OsiClp is available. */
+#undef DIP_HAS_OSICLP
+
+/* Define to 1 if OsiSYMPHONY is available. */
+#undef DIP_HAS_OSISYMPHONY
+
+/* Define to 1 if Sample is available. */
+#undef DIP_HAS_SAMPLE
+
+/* Define to 1 if SYMPHONY is available. */
+#undef DIP_HAS_SYMPHONY
+
+/* Define to 1 if Xpr is available. */
+#undef DIP_HAS_XPR
+
+/* Version number of project */
+#undef DIP_VERSION
+
+/* Major version number of project. */
+#undef DIP_VERSION_MAJOR
+
+/* Minor version number of project. */
+#undef DIP_VERSION_MINOR
+
+/* Release version number of project. */
+#undef DIP_VERSION_RELEASE
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
+#undef STDC_HEADERS
