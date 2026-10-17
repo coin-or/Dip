@@ -21,6 +21,9 @@
 #include "DecompConstraintSet.h"
 //===========================================================================//
 #include "CoinWarmStartBasis.hpp"
+#ifdef DIP_HAS_CBC
+#include "CbcSolver.hpp"
+#endif
 
 using namespace std;
 
@@ -867,7 +870,8 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
 #if 0
    cbc.branchAndBound();
 #else
-   CbcMain0(cbc);
+   CbcParameters cbcParams;
+   CbcMain0(cbc, cbcParams);
    //---
    //--- build argument list
    //---
@@ -899,7 +903,7 @@ void DecompAlgoPC::solveMasterAsMIPCbc(DecompSolverResult* result)
    //---
    //--- solve IP using argument list
    //---
-   CbcMain1(argc, argv, cbc);
+   CbcMain1(argc, argv, cbc, cbcParams);
 #endif
    //---
    //--- get solver status

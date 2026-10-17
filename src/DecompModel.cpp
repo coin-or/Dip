@@ -17,6 +17,9 @@
 //===========================================================================//
 #include "DecompModel.h"
 #include "DecompSolverResult.h"
+#ifdef DIP_HAS_CBC
+#include "CbcSolver.hpp"
+#endif
 //===========================================================================//
 using namespace std;
 
@@ -482,7 +485,9 @@ void DecompSubModel::solveAsMIPCbc(DecompSolverResult*  result,
    //---
    //--- solve IP using argument list
    //---
-   CbcMain(argc, argv, cbc);
+   CbcParameters cbcParams;
+   CbcMain0(cbc, cbcParams);
+   CbcMain1(argc, argv, cbc, cbcParams);
    //---
    //--- get solver status
    //---   comments based on Cbc2.3
