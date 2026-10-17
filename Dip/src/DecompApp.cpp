@@ -37,7 +37,7 @@
 #else
 
 extern "C" {
-#if defined (COIN_HAS_HMETIS)
+#if defined (DIP_HAS_HMETIS)
 #include "hmetis.h"
 #endif
 }
@@ -1553,7 +1553,7 @@ void DecompApp::singlyBorderStructureDetection()
            );
 #else
    clock_t begin = clock();
-#if defined(COIN_HAS_HMETIS)
+#if defined(DIP_HAS_HMETIS)
    // maximum load imbalance (%)
    int ubfactor = 5;
    HMETIS_PartRecursive(numVertices, numHyperedges, vwgts, eptr,

@@ -14,11 +14,6 @@
 
 ## $Id: $
 
-SUBDIRS = .
-if HAVE_PYTHON
-SUBDIRS += coinor/dippy
-endif
-
 ########################################################################
 #                               libDecomp                              #
 ########################################################################
@@ -105,12 +100,9 @@ libDecomp_la_SOURCES +=        \
 	UtilMacrosAlps.h       
 
 # List all additionally required libraries
-if DEPENDENCY_LINKING
-libDecomp_la_LIBADD = $(DIPLIB_LIBS) $(DIP_OPENMP_LIBS)
-endif
+libDecomp_la_LIBADD = $(DIPLIB_LFLAGS)
 
-# This is for libtool
-libDecomp_la_LDFLAGS = $(LT_LDFLAGS)
+libDecomp_la_CPPFLAGS = $(DIPLIB_CFLAGS)
 
 ########################################################################
 #                            DIP binary                                #
@@ -124,35 +116,24 @@ bin_PROGRAMS = dip
 dip_SOURCES = DecompMain.cpp
 
 # Additional libraries
-dip_LDADD = libDecomp.la $(DIPLIB_LIBS)
-if COIN_HAS_HMETIS
-dip_LDADD +=  $(HMETISLIB)
-endif
-dip_DEPENDENCIES = libDecomp.la $(DIPLIB_DEPENDENCIES)
+dip_LDADD = libDecomp.la $(DIPLIB_LFLAGS)
+
+dip_CPPFLAGS = $(DIPLIB_CFLAGS)
 
 ########################################################################
 #                            Additional flags                          #
 ########################################################################
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows.
-
-AM_CPPFLAGS = $(DIPLIB_CFLAGS)
-
-if COIN_HAS_HMETIS
-AM_CPPFLAGS += -I`$(CYGPATH_W) $(HMETISINCDIR)`
-endif
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
+# This is for libtool
+AM_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
+# and that therefore should be installed in 'include/coin-or'
 
-includecoindir = $(includedir)/coin
+includecoindir = $(includedir)/coin-or
 
 #DecompAlgo
 includecoin_HEADERS =        \
@@ -202,17 +183,6 @@ includecoin_HEADERS +=             \
 	AlpsDecompNodeDesc.h   \
 	AlpsDecompParam.h      \
 	UtilMacrosAlps.h       
-
-########################################################################
-#                     Installing manifest (MSVC++)                     #
-########################################################################
-
-if COIN_CXX_IS_CL
-install-exec-hook:
-	test -s dip.exe.manifest && \
-	mt -manifest dip.exe.manifest -outputresource:dip.exe;\
-	cp dip.exe $(bindir)/dip.exe
-endif
 
 #######################################################################
 # Create the Config.h file that has all public defines and install it #

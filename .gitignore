@@ -30,3 +30,8 @@ acinclude*
 aclocal*
 autom4te*
 *.pyc
+Makefile
+config.cache
+config.log
+config.status
+libtool

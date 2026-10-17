@@ -6,7 +6,6 @@
 
 # Author:  Ted Ralphs           Lehigh    2009-10-18
 
-AUTOMAKE_OPTIONS = foreign
 
 TARGETS=
 

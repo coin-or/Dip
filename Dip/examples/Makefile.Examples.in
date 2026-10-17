@@ -23,12 +23,16 @@ CXXFLAGS = @CXXFLAGS@
 CXXLINKFLAGS = @RPATH_FLAGS@
 
 ###########################################################################
-# directories for finding COIN packages
+# directories for finding COIN packages (if pkg-config is not available)
 ###########################################################################
 
-COININCDIR = @abs_include_dir@/coin
+prefix = @prefix@
 
-COINLIBDIR = @abs_lib_dir@
+exec_prefix = @exec_prefix@
+
+COININCDIR = @includedir@/coin-or
+
+COINLIBDIR = @libdir@
 
 ###########################################################################
 # The following is necessary under cygwin, if native compilers are used
@@ -40,13 +44,9 @@ CYGPATH_W = @CYGPATH_W@
 # define DECOMP libs
 ###########################################################################
 
-COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
-
-ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip`
-else
-LIBS += -L@abs_lib_dir@ -lDecomp @DIPLIB_LIBS_INSTALLED@
-endif
+# The examples use the dependencies of Dip directly, so link them, too
+@COIN_HAS_PKGCONFIG_TRUE@LIBS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs dip @DIPLIB_PCFILES@`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS += -L$(COINLIBDIR) -lDecomp @DIPLIB_LFLAGS_NOPC@
 
 CFLAGS += -DCOIN_ASSERT
 
@@ -54,13 +54,8 @@ CFLAGS += -DCOIN_ASSERT
 # define CFLAGS
 ###########################################################################
 
-CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)`
-
-ifeq ($(COIN_HAS_PKGCONFIG),TRUE)
-CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags dip`
-else
-CFLAGS += @DIPLIB_CFLAGS_INSTALLED@
-endif
+@COIN_HAS_PKGCONFIG_TRUE@CFLAGS += `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags dip`
+@COIN_HAS_PKGCONFIG_FALSE@CFLAGS += -I`$(CYGPATH_W) $(COININCDIR)` @DIPLIB_CFLAGS_NOPC@
 
 ###########################################################################
 # default targets
