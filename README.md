@@ -68,9 +68,7 @@ Suite](https://github.com/coin-or/COIN-OR-OptimizationSuite) [here](https://hub.
 
 For newer releases, binaries will be made available as assets attached to
 releases in Github
-[here](https://github.com/coin-or/Dip/releases). Older binaries
-are archived as part of Dip
-[here](https://www.coin-or.org/download/binary/Dip).
+[here](https://github.com/coin-or/Dip/releases).
 
  * *Windows*: The easiest way to get Dip on Windows is to download an archive as described above.
 
