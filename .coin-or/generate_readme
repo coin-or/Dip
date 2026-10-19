@@ -18,6 +18,9 @@ popd > /dev/null
 
 create_variables $SCRIPT_DIR/config.yml
 
+# The archive of older Dip binaries at coin-or.org is not accessible
+Binary_Archive=no
+
 make_header
 
 echo "DIP (Decomposition in Integer Programming) is a framework for
