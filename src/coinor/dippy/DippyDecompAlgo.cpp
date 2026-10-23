@@ -62,11 +62,11 @@ bool DippyAlgoMixin::chooseBranchSet(DecompAlgo* algo,
          pDownUB = PyDict_New();
          downBranchVar = PyList_GetItem(app->m_colList, downBranchUB[0].first);
          PyDict_SetItem(pDownUB, downBranchVar, 
-			PyLong_FromLong(static_cast<int>(round(downBranchUB[0].second))));
+			PyLong_FromLong(static_cast<int>(UtilRound(downBranchUB[0].second))));
          pUpLB = PyDict_New();
          upBranchVar = PyList_GetItem(app->m_colList, upBranchLB[0].first);
          PyDict_SetItem(pUpLB, upBranchVar, 
-			PyLong_FromLong(static_cast<int>(round(upBranchLB[0].second))));
+			PyLong_FromLong(static_cast<int>(UtilRound(upBranchLB[0].second))));
          pUpUB = PyDict_New(); // Up branch UBs is an empty dictionary
          assert(downBranchVar == upBranchVar);
       }else{

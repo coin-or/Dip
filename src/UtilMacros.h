@@ -46,9 +46,13 @@ const double UtilSmallerThanTooBig = 1.0e19;
 #define INT_MAX (static_cast<int>((~(static_cast<unsigned int>(0))) >> 1))
 #endif
 
-#ifndef round
-#define round(x) floor(x+0.5)
-#endif
+// Rounds half up, as floor(x + 0.5). Not a macro named round: that breaks
+// std::round and std::chrono::round in any standard header included after
+// this one, such as <chrono> through <mutex>.
+inline double UtilRound(double x)
+{
+   return floor(x + 0.5);
+}
 
 // =========================================================================
 
